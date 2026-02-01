@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Customer;
+use App\Modules\Core\Domain\Models\Customer;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

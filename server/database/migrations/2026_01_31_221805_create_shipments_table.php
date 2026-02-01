@@ -1,8 +1,8 @@
 <?php
 
 use App\Enums\ShipmentStatusEnum;
-use App\Models\Order;
-use App\Models\ShippingMethod;
+use App\Modules\Ecommerce\Domain\Models\Order;
+use App\Modules\Ecommerce\Domain\Models\ShippingMethod;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

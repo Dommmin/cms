@@ -1,0 +1,42 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Providers;
+
+use App\Listeners\SendOrderConfirmationEmail;
+use App\Listeners\UpdateInventoryOnOrder;
+use App\Modules\Ecommerce\Domain\Events\OrderCreated;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+
+final class EventServiceProvider extends ServiceProvider
+{
+    /**
+     * The event to listener mappings for the application.
+     *
+     * @var array<class-string, array<int, class-string>>
+     */
+    protected $listen = [
+        OrderCreated::class => [
+            SendOrderConfirmationEmail::class,
+            UpdateInventoryOnOrder::class,
+        ],
+    ];
+
+    /**
+     * Register any events for your application.
+     */
+    public function boot(): void
+    {
+        //
+    }
+
+    /**
+     * Determine if events and listeners should be automatically discovered.
+     */
+    public function shouldDiscoverEvents(): bool
+    {
+        return false;
+    }
+}
+

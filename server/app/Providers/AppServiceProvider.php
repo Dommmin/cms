@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Shared\Kernel\Events\EventBus;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 final class AppServiceProvider extends ServiceProvider
@@ -16,7 +21,23 @@ final class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Register Event Bus as singleton
+        $this->app->singleton(EventBus::class, function ($app) {
+            return new EventBus($app->make(Dispatcher::class));
+        });
+
+        // Register AI Service (can be switched to Anthropic later)
+        $this->app->singleton(
+            \App\Modules\AI\Domain\Interfaces\AIServiceInterface::class,
+            function ($app) {
+                $apiKey = config('services.openai.key');
+                if ($apiKey) {
+                    return new \App\Modules\AI\Infrastructure\External\OpenAIService($apiKey);
+                }
+                // Return stub if no API key
+                return new \App\Modules\AI\Infrastructure\External\OpenAIService('');
+            }
+        );
     }
 
     /**
@@ -25,6 +46,14 @@ final class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureRateLimiting();
+
+        if (App::environment('local')) {
+            Model::shouldBeStrict();
+        }
+
+        if (App::environment('production', 'staging')) {
+            URL::forceScheme('https');
+        }
     }
 
     /**

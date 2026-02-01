@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Models\AttributeValue;
-use App\Models\Attribute;
-use App\Models\ProductVariant;
+use App\Modules\Ecommerce\Domain\Models\AttributeValue;
+use App\Modules\Ecommerce\Domain\Models\Attribute;
+use App\Modules\Ecommerce\Domain\Models\ProductVariant;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'force.json' => ForceJsonResponse::class,
             'log.api' => LogApiRequests::class,
             'verified' => EnsureEmailVerified::class,
+            'feature' => \App\Http\Middleware\CheckFeature::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

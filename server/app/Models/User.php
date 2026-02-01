@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property int $id
@@ -24,6 +25,7 @@ use Laravel\Sanctum\HasApiTokens;
 final class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens;
+    use HasRoles;
 
     /** @use HasFactory<UserFactory> */
     use HasFactory;
