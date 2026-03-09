@@ -1,0 +1,80 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+
+import { useForgotPassword } from "@/hooks/use-auth";
+
+export default function ForgotPasswordPage() {
+  const { mutate: forgotPassword, isPending, isSuccess, error } = useForgotPassword();
+  const [email, setEmail] = useState("");
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    forgotPassword(email);
+  }
+
+  const errorMessage =
+    // @ts-expect-error axios error shape
+    error?.response?.data?.message ?? (error ? "Request failed. Please try again." : null);
+
+  if (isSuccess) {
+    return (
+      <div className="mx-auto max-w-sm px-4 py-24 text-center sm:px-6">
+        <h1 className="mb-2 text-3xl font-bold">Check your email</h1>
+        <p className="text-muted-foreground">
+          If an account exists for <strong>{email}</strong>, we&apos;ve sent a password reset link.
+        </p>
+        <Link href="/login" className="mt-8 inline-block text-sm underline">
+          Back to sign in
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto max-w-sm px-4 py-24 sm:px-6">
+      <h1 className="mb-2 text-center text-3xl font-bold">Reset Password</h1>
+      <p className="mb-8 text-center text-muted-foreground">
+        Enter your email and we&apos;ll send you a reset link.
+      </p>
+
+      {errorMessage && (
+        <div className="mb-4 rounded-xl border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+          {errorMessage}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="email" className="mb-1 block text-sm font-medium">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={isPending}
+          className="w-full rounded-xl bg-primary py-2.5 font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50"
+        >
+          {isPending ? "Sending…" : "Send Reset Link"}
+        </button>
+      </form>
+
+      <p className="mt-6 text-center text-sm text-muted-foreground">
+        Remembered your password?{" "}
+        <Link href="/login" className="font-medium underline hover:text-foreground">
+          Sign in
+        </Link>
+      </p>
+    </div>
+  );
+}
