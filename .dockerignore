@@ -1,0 +1,8 @@
+.git
+server/node_modules
+server/vendor
+server/.env
+server/tests
+server/storage
+
+client/node_modules

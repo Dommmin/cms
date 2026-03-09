@@ -157,3 +157,5 @@ Homestead.json
 
 
 .idea/
+/client_old/
+/server_old/
