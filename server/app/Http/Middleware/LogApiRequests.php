@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
-final class LogApiRequests
+class LogApiRequests
 {
     /**
      * Log API requests for debugging and monitoring.

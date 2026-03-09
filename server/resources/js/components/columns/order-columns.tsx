@@ -1,0 +1,139 @@
+import { router } from '@inertiajs/react';
+import type { ColumnDef } from '@tanstack/react-table';
+import { EyeIcon } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+
+export type OrderRow = {
+    id: number;
+    order_number: string;
+    status: string;
+    payment_status: string;
+    total: number;
+    customer?: {
+        first_name: string;
+        last_name: string;
+        email: string;
+    };
+    created_at: string;
+};
+
+const statusColors: Record<string, string> = {
+    pending: 'bg-yellow-100 text-yellow-800',
+    confirmed: 'bg-blue-100 text-blue-800',
+    processing: 'bg-purple-100 text-purple-800',
+    shipped: 'bg-indigo-100 text-indigo-800',
+    delivered: 'bg-green-100 text-green-800',
+    cancelled: 'bg-red-100 text-red-800',
+};
+
+const paymentStatusColors: Record<string, string> = {
+    pending: 'bg-yellow-100 text-yellow-800',
+    paid: 'bg-green-100 text-green-800',
+    failed: 'bg-red-100 text-red-800',
+    refunded: 'bg-gray-100 text-gray-800',
+};
+
+export const orderColumns: ColumnDef<OrderRow>[] = [
+    {
+        accessorKey: 'order_number',
+        header: 'Order',
+        cell: ({ row }) => (
+            <span className="font-mono font-medium">
+                {row.original.order_number}
+            </span>
+        ),
+    },
+    {
+        accessorKey: 'customer',
+        header: 'Customer',
+        cell: ({ row }) =>
+            row.original.customer ? (
+                <div>
+                    <div className="font-medium">
+                        {row.original.customer.first_name}{' '}
+                        {row.original.customer.last_name}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                        {row.original.customer.email}
+                    </div>
+                </div>
+            ) : (
+                <span className="text-muted-foreground">Guest</span>
+            ),
+    },
+    {
+        accessorKey: 'status',
+        header: 'Status',
+        cell: ({ row }) => (
+            <Badge
+                className={
+                    statusColors[row.original.status] ||
+                    'bg-gray-100 text-gray-800'
+                }
+            >
+                {row.original.status}
+            </Badge>
+        ),
+    },
+    {
+        accessorKey: 'payment_status',
+        header: 'Payment',
+        cell: ({ row }) => (
+            <Badge
+                variant="outline"
+                className={
+                    paymentStatusColors[row.original.payment_status] ||
+                    'bg-gray-100 text-gray-800'
+                }
+            >
+                {row.original.payment_status}
+            </Badge>
+        ),
+    },
+    {
+        accessorKey: 'total',
+        header: 'Total',
+        cell: ({ row }) => (
+            <span className="font-mono font-medium">
+                {new Intl.NumberFormat('pl-PL', {
+                    style: 'currency',
+                    currency: 'PLN',
+                }).format(row.original.total / 100)}
+            </span>
+        ),
+    },
+    {
+        accessorKey: 'created_at',
+        header: 'Date',
+        cell: ({ row }) => (
+            <span className="text-sm">
+                {new Date(row.original.created_at).toLocaleDateString('pl-PL', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                })}
+            </span>
+        ),
+    },
+    {
+        id: 'actions',
+        header: 'Actions',
+        cell: ({ row }) => (
+            <div className="flex items-center gap-2">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                        router.visit(
+                            `/admin/ecommerce/orders/${row.original.id}`,
+                        )
+                    }
+                >
+                    <EyeIcon className="mr-1 h-3 w-3" />
+                    View
+                </Button>
+            </div>
+        ),
+    },
+];

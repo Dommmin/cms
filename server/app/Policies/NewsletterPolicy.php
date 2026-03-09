@@ -5,32 +5,32 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Models\User;
-use App\Modules\Newsletter\Domain\Models\NewsletterSubscriber;
 
-final class NewsletterPolicy
+class NewsletterPolicy
 {
     public function viewAny(User $user): bool
     {
         return $user->can('newsletter.view');
     }
 
-    public function view(User $user, NewsletterSubscriber $newsletterSubscriber): bool
+    public function view(User $user): bool
     {
         return $user->can('newsletter.view');
     }
 
-    public function create(User $user): bool
+    public function create(): bool
     {
         // Public subscription is allowed, but admin creation requires permission
-        return true; // Public can subscribe, but admin needs permission
+        return true;
+        // Public can subscribe, but admin needs permission
     }
 
-    public function update(User $user, NewsletterSubscriber $newsletterSubscriber): bool
+    public function update(User $user): bool
     {
         return $user->can('newsletter.create');
     }
 
-    public function delete(User $user, NewsletterSubscriber $newsletterSubscriber): bool
+    public function delete(User $user): bool
     {
         return $user->can('newsletter.delete');
     }

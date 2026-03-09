@@ -1,6 +1,8 @@
 <?php
 
-use App\Modules\Ecommerce\Domain\Models\Order;
+declare(strict_types=1);
+
+use App\Models\Order;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -9,7 +11,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('order_status_history', function (Blueprint $table) {
+        Schema::create('order_status_history', function (Blueprint $table): void {
             $table->id();
             $table->foreignIdFor(Order::class)->constrained()->cascadeOnDelete();
             $table->string('previous_status');

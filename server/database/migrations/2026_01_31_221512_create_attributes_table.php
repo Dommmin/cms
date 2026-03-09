@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\AttributeTypeEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,13 +14,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('attributes', function (Blueprint $table) {
+        Schema::create('attributes', function (Blueprint $table): void {
             $table->id();
             $table->string('name');
             $table->string('slug')->unique();
             // select = dropdown, multiselect = checkboxes,
             // text = free text, numeric = liczba, color = color picker
-            $table->enum('type', AttributeTypeEnum::cases())->default(AttributeTypeEnum::TEXT->value);
+            $table->enum('type', array_column(AttributeTypeEnum::cases(), 'value'))->default(AttributeTypeEnum::TEXT->value);
             $table->string('unit')->nullable();                // "cm", "kg", "GB"
             $table->boolean('is_filterable')->default(false);  // Pojawia się w filtrach
             $table->boolean('is_variant_selection')->default(false); // Tworzy warianty

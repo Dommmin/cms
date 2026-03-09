@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Models\Cart;
 use App\Models\User;
-use App\Modules\Ecommerce\Domain\Models\Cart;
 
-final class CartPolicy
+class CartPolicy
 {
     public function viewAny(User $user): bool
     {
@@ -19,6 +19,7 @@ final class CartPolicy
     {
         // Users can only view their own cart
         $customer = $user->customer ?? null;
+
         return $customer && $cart->customer_id === $customer->id;
     }
 
@@ -30,12 +31,14 @@ final class CartPolicy
     public function update(User $user, Cart $cart): bool
     {
         $customer = $user->customer ?? null;
+
         return $customer && $cart->customer_id === $customer->id;
     }
 
     public function delete(User $user, Cart $cart): bool
     {
         $customer = $user->customer ?? null;
+
         return $customer && $cart->customer_id === $customer->id;
     }
 }

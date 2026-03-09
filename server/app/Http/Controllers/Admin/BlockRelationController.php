@@ -1,0 +1,79 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Faq;
+use App\Models\Form;
+use App\Models\Menu;
+use App\Models\Page;
+use App\Models\Product;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+
+class BlockRelationController extends Controller
+{
+    /**
+     * Search entities by relation type.
+     */
+    public function search(Request $request): JsonResponse
+    {
+        $type = $request->string('type')->toString();
+        $query = $request->string('q')->toString();
+
+        $results = match ($type) {
+            'category' => Category::query()
+                ->when($query, fn ($q) => $q->where('name', 'like', "%{$query}%"))
+                ->orderBy('name')
+                ->limit(20)
+                ->get(['id', 'name'])
+                ->map(fn ($item) => ['id' => $item->id, 'name' => $item->getTranslation('name', 'en')]),
+
+            'product' => Product::query()
+                ->when($query, fn ($q) => $q->where('name', 'like', "%{$query}%"))
+                ->orderBy('name')
+                ->limit(20)
+                ->get(['id', 'name'])
+                ->map(fn ($item) => ['id' => $item->id, 'name' => $item->getTranslation('name', 'en')]),
+
+            'brand' => Brand::query()
+                ->when($query, fn ($q) => $q->where('name', 'like', "%{$query}%"))
+                ->orderBy('name')
+                ->limit(20)
+                ->get(['id', 'name']),
+
+            'page' => Page::query()
+                ->when($query, fn ($q) => $q->where('title', 'like', "%{$query}%"))
+                ->orderBy('title')
+                ->limit(20)
+                ->get(['id', 'title'])
+                ->map(fn ($item) => ['id' => $item->id, 'name' => $item->getTranslation('title', 'en')]),
+
+            'menu' => Menu::query()
+                ->when($query, fn ($q) => $q->where('name', 'like', "%{$query}%"))
+                ->orderBy('name')
+                ->limit(20)
+                ->get(['id', 'name']),
+
+            'form' => Form::query()
+                ->when($query, fn ($q) => $q->where('name', 'like', "%{$query}%"))
+                ->orderBy('name')
+                ->limit(20)
+                ->get(['id', 'name']),
+
+            'faq' => Faq::query()
+                ->when($query, fn ($q) => $q->where('question', 'like', "%{$query}%"))
+                ->orderBy('question')
+                ->limit(20)
+                ->get(['id', 'question as name']),
+
+            default => collect(),
+        };
+
+        return response()->json($results);
+    }
+}

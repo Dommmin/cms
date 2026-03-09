@@ -1,0 +1,155 @@
+import { Head, Link, router } from '@inertiajs/react';
+import type { ColumnDef } from '@tanstack/react-table';
+import { Users, PlusIcon, PencilIcon, TrashIcon } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { ConfirmButton } from '@/components/confirm-dialog';
+import DataTable from '@/components/data-table';
+import { PageHeader, PageHeaderActions } from '@/components/page-header';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import Wrapper from '@/components/wrapper';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem } from '@/types';
+
+type Segment = {
+    id: number;
+    name: string;
+    description: string | null;
+    is_active: boolean;
+    campaigns_count: number;
+    created_at: string;
+};
+
+type SegmentsData = {
+    data: Segment[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    prev_page_url: string | null;
+    next_page_url: string | null;
+};
+
+type Props = {
+    segments: SegmentsData;
+    filters: { search?: string; is_active?: string };
+};
+
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Newsletter', href: '/admin/newsletter' },
+    { title: 'Segments', href: '/admin/newsletter/segments' },
+];
+
+export default function SegmentsIndex({ segments, filters }: Props) {
+    const columns: ColumnDef<Segment>[] = [
+        {
+            accessorKey: 'name',
+            header: 'Name',
+            cell: ({ row }) => (
+                <div className="font-medium">{row.original.name}</div>
+            ),
+        },
+        {
+            accessorKey: 'description',
+            header: 'Description',
+            cell: ({ row }) =>
+                row.original.description ? (
+                    <span className="line-clamp-1 text-sm text-muted-foreground">
+                        {row.original.description}
+                    </span>
+                ) : (
+                    <span className="text-muted-foreground">—</span>
+                ),
+        },
+        {
+            accessorKey: 'campaigns_count',
+            header: 'Campaigns',
+            cell: ({ row }) => (
+                <span className="text-sm">{row.original.campaigns_count}</span>
+            ),
+        },
+        {
+            accessorKey: 'is_active',
+            header: 'Status',
+            cell: ({ row }) => (
+                <Badge
+                    variant={row.original.is_active ? 'default' : 'secondary'}
+                >
+                    {row.original.is_active ? 'Active' : 'Inactive'}
+                </Badge>
+            ),
+        },
+        {
+            id: 'actions',
+            header: 'Actions',
+            cell: ({ row }) => (
+                <div className="flex items-center gap-2">
+                    <Link
+                        href={`/admin/newsletter/segments/${row.original.id}/edit`}
+                    >
+                        <Button variant="outline" size="sm">
+                            <PencilIcon className="mr-1 h-3 w-3" />
+                            Edit
+                        </Button>
+                    </Link>
+                    <ConfirmButton
+                        variant="destructive"
+                        size="sm"
+                        title="Delete Segment"
+                        description={`Are you sure you want to delete "${row.original.name}"?`}
+                        onConfirm={() => {
+                            router.delete(
+                                `/admin/newsletter/segments/${row.original.id}`,
+                                {
+                                    onSuccess: () =>
+                                        toast.success('Segment deleted'),
+                                },
+                            );
+                        }}
+                        disabled={row.original.campaigns_count > 0}
+                    >
+                        <TrashIcon className="mr-1 h-3 w-3" />
+                    </ConfirmButton>
+                </div>
+            ),
+        },
+    ];
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Newsletter Segments" />
+            <Wrapper>
+                <PageHeader
+                    title="Segments"
+                    description="Manage subscriber segments"
+                >
+                    <PageHeaderActions>
+                        <Link href="/admin/newsletter/segments/create">
+                            <Button>
+                                <PlusIcon className="mr-2 h-4 w-4" />
+                                Create Segment
+                            </Button>
+                        </Link>
+                    </PageHeaderActions>
+                </PageHeader>
+
+                <DataTable
+                    columns={columns}
+                    data={segments.data}
+                    pagination={{
+                        current_page: segments.current_page,
+                        last_page: segments.last_page,
+                        per_page: segments.per_page,
+                        total: segments.total,
+                        prev_page_url: segments.prev_page_url ?? null,
+                        next_page_url: segments.next_page_url ?? null,
+                    }}
+                    searchable
+                    searchPlaceholder="Search segments..."
+                    searchValue={filters.search ?? ''}
+                    baseUrl="/admin/newsletter/segments"
+                />
+            </Wrapper>
+        </AppLayout>
+    );
+}

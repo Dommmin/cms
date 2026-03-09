@@ -1,0 +1,600 @@
+import { Head, router, useForm } from '@inertiajs/react';
+import { ArrowLeftIcon } from 'lucide-react';
+import InputError from '@/components/input-error';
+import { PageHeader, PageHeaderActions } from '@/components/page-header';
+import StickyFormActions from '@/components/sticky-form-actions';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import Wrapper from '@/components/wrapper';
+import AppLayout from '@/layouts/app-layout';
+import { resolveLocalizedText } from '@/lib/localized-text';
+import { slugify } from '@/lib/slug';
+import type { BreadcrumbItem } from '@/types';
+
+interface Category {
+    id: number;
+    name: string | Record<string, string>;
+}
+
+interface Product {
+    id: number;
+    name: string | Record<string, string>;
+    price: number;
+}
+
+interface FormData {
+    name: string;
+    slug: string;
+    description: string;
+    type: 'percentage' | 'fixed_amount' | 'buy_x_get_y' | 'free_shipping';
+    value: string;
+    min_value: string;
+    max_discount: string;
+    apply_to: 'all' | 'specific_products' | 'specific_categories';
+    is_active: boolean;
+    is_stackable: boolean;
+    priority: string;
+    starts_at: string;
+    ends_at: string;
+    products: Record<string, { discount_value: string; discount_type: string }>;
+    categories: Record<string, { discount_value: string; discount_type: string }>;
+    metadata: Record<string, string>;
+}
+
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Promotions', href: '/admin/ecommerce/promotions' },
+    { title: 'Create', href: '/admin/ecommerce/promotions/create' },
+];
+
+const formId = 'promotion-create-form';
+
+export default function Create({
+    categories,
+    products,
+}: {
+    categories: Category[];
+    products: Product[];
+}) {
+    const { data, setData, post, processing, errors } = useForm<FormData>({
+        name: '',
+        slug: '',
+        description: '',
+        type: 'percentage',
+        value: '',
+        min_value: '',
+        max_discount: '',
+        apply_to: 'all',
+        is_active: true,
+        is_stackable: false,
+        priority: '0',
+        starts_at: '',
+        ends_at: '',
+        products: {},
+        categories: {},
+        metadata: {},
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post('/admin/ecommerce/promotions');
+    };
+
+    const handleNameChange = (value: string) => {
+        setData((prev) => ({
+            ...prev,
+            name: value,
+            slug: prev.slug === slugify(prev.name) ? slugify(value) : prev.slug,
+        }));
+    };
+
+    const toggleProduct = (productId: string, checked: boolean) => {
+        const newProducts = { ...data.products };
+        if (checked) {
+            newProducts[productId] = {
+                discount_value: '',
+                discount_type: data.type === 'buy_x_get_y' ? 'percentage' : data.type,
+            };
+        } else {
+            delete newProducts[productId];
+        }
+        setData('products', newProducts);
+    };
+
+    const toggleCategory = (categoryId: string, checked: boolean) => {
+        const newCategories = { ...data.categories };
+        if (checked) {
+            newCategories[categoryId] = {
+                discount_value: '',
+                discount_type: data.type === 'buy_x_get_y' ? 'percentage' : data.type,
+            };
+        } else {
+            delete newCategories[categoryId];
+        }
+        setData('categories', newCategories);
+    };
+
+    const updateProductDiscount = (
+        productId: string,
+        field: 'discount_value' | 'discount_type',
+        value: string,
+    ) => {
+        setData('products', {
+            ...data.products,
+            [productId]: { ...data.products[productId], [field]: value },
+        });
+    };
+
+    const updateCategoryDiscount = (
+        categoryId: string,
+        field: 'discount_value' | 'discount_type',
+        value: string,
+    ) => {
+        setData('categories', {
+            ...data.categories,
+            [categoryId]: { ...data.categories[categoryId], [field]: value },
+        });
+    };
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Create Promotion" />
+
+            <Wrapper>
+                <PageHeader title="Dodaj Promocję" description="Utwórz nową promocję produktową">
+                    <PageHeaderActions>
+                        <Button
+                            variant="outline"
+                            onClick={() => router.visit('/admin/ecommerce/promotions')}
+                        >
+                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                            Powrót
+                        </Button>
+                    </PageHeaderActions>
+                </PageHeader>
+
+                <form id={formId} onSubmit={handleSubmit}>
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                        {/* Main content */}
+                        <div className="space-y-6 lg:col-span-2">
+                            {/* Basic info */}
+                            <div className="space-y-4 rounded-xl border bg-card p-6">
+                                <h2 className="font-semibold">Podstawowe Informacje</h2>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="name">Nazwa Promocji *</Label>
+                                    <Input
+                                        id="name"
+                                        value={data.name}
+                                        onChange={(e) => handleNameChange(e.target.value)}
+                                        placeholder="np. Black Friday 2024"
+                                        required
+                                    />
+                                    <InputError message={errors.name} />
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="slug">Slug *</Label>
+                                    <Input
+                                        id="slug"
+                                        value={data.slug}
+                                        onChange={(e) => setData('slug', slugify(e.target.value))}
+                                        placeholder="black-friday-2024"
+                                        required
+                                    />
+                                    <InputError message={errors.slug} />
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="description">Opis</Label>
+                                    <Textarea
+                                        id="description"
+                                        value={data.description}
+                                        onChange={(e) => setData('description', e.target.value)}
+                                        placeholder="Szczegółowy opis promocji..."
+                                        rows={3}
+                                    />
+                                    <InputError message={errors.description} />
+                                </div>
+                            </div>
+
+                            {/* Promotion settings */}
+                            <div className="space-y-4 rounded-xl border bg-card p-6">
+                                <h2 className="font-semibold">Ustawienia Promocji</h2>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="type">Typ Promocji</Label>
+                                    <Select
+                                        value={data.type}
+                                        onValueChange={(value: FormData['type']) =>
+                                            setData('type', value)
+                                        }
+                                    >
+                                        <SelectTrigger id="type">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="percentage">Rabat procentowy</SelectItem>
+                                            <SelectItem value="fixed_amount">Kwota stała</SelectItem>
+                                            <SelectItem value="buy_x_get_y">Kup X weź Y</SelectItem>
+                                            <SelectItem value="free_shipping">Darmowa dostawa</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError message={errors.type} />
+                                </div>
+
+                                {data.type !== 'free_shipping' && (
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="value">
+                                            Wartość {data.type === 'percentage' ? '(%)' : '(zł)'}
+                                        </Label>
+                                        <Input
+                                            id="value"
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            value={data.value}
+                                            onChange={(e) => setData('value', e.target.value)}
+                                            placeholder={data.type === 'percentage' ? '20' : '50'}
+                                            required
+                                        />
+                                        <InputError message={errors.value} />
+                                    </div>
+                                )}
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="min_value">Min. wartość zamówienia (zł)</Label>
+                                        <Input
+                                            id="min_value"
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            value={data.min_value}
+                                            onChange={(e) => setData('min_value', e.target.value)}
+                                            placeholder="100"
+                                        />
+                                        <InputError message={errors.min_value} />
+                                    </div>
+
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="max_discount">Maksymalny rabat (zł)</Label>
+                                        <Input
+                                            id="max_discount"
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            value={data.max_discount}
+                                            onChange={(e) => setData('max_discount', e.target.value)}
+                                            placeholder="200"
+                                        />
+                                        <InputError message={errors.max_discount} />
+                                    </div>
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="apply_to">Zastosuj do</Label>
+                                    <Select
+                                        value={data.apply_to}
+                                        onValueChange={(value: FormData['apply_to']) =>
+                                            setData('apply_to', value)
+                                        }
+                                    >
+                                        <SelectTrigger id="apply_to">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">Wszystkich produktów</SelectItem>
+                                            <SelectItem value="specific_products">
+                                                Wybranych produktów
+                                            </SelectItem>
+                                            <SelectItem value="specific_categories">
+                                                Wybranych kategorii
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError message={errors.apply_to} />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="starts_at">Data rozpoczęcia</Label>
+                                        <Input
+                                            id="starts_at"
+                                            type="datetime-local"
+                                            value={data.starts_at}
+                                            onChange={(e) => setData('starts_at', e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="ends_at">Data zakończenia</Label>
+                                        <Input
+                                            id="ends_at"
+                                            type="datetime-local"
+                                            value={data.ends_at}
+                                            onChange={(e) => setData('ends_at', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Products / categories selection */}
+                            {(data.apply_to === 'specific_products' ||
+                                data.apply_to === 'specific_categories') && (
+                                <div className="rounded-xl border bg-card p-6">
+                                    <h2 className="mb-1 font-semibold">
+                                        {data.apply_to === 'specific_products'
+                                            ? 'Wybrane Produkty'
+                                            : 'Wybrane Kategorie'}
+                                    </h2>
+                                    <p className="mb-4 text-sm text-muted-foreground">
+                                        {data.apply_to === 'specific_products'
+                                            ? 'Wybierz produkty objęte promocją'
+                                            : 'Wybierz kategorie objęte promocją'}
+                                    </p>
+
+                                    <div className="space-y-3">
+                                        {data.apply_to === 'specific_products' &&
+                                            products.map((product) => (
+                                                <div
+                                                    key={product.id}
+                                                    className="flex items-center justify-between rounded-lg border p-3"
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <Checkbox
+                                                            checked={
+                                                                !!data.products[product.id.toString()]
+                                                            }
+                                                            onCheckedChange={(checked) =>
+                                                                toggleProduct(
+                                                                    product.id.toString(),
+                                                                    !!checked,
+                                                                )
+                                                            }
+                                                        />
+                                                        <div>
+                                                            <div className="font-medium">{resolveLocalizedText(product.name)}</div>
+                                                            <div className="text-sm text-muted-foreground">
+                                                                {(product.price / 100).toFixed(2)} zł
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {data.products[product.id.toString()] && (
+                                                        <div className="flex items-center gap-2">
+                                                            <Input
+                                                                type="number"
+                                                                step="0.01"
+                                                                min="0"
+                                                                placeholder="Wartość"
+                                                                value={
+                                                                    data.products[product.id.toString()]
+                                                                        .discount_value
+                                                                }
+                                                                onChange={(e) =>
+                                                                    updateProductDiscount(
+                                                                        product.id.toString(),
+                                                                        'discount_value',
+                                                                        e.target.value,
+                                                                    )
+                                                                }
+                                                                className="w-24"
+                                                            />
+                                                            <Select
+                                                                value={
+                                                                    data.products[product.id.toString()]
+                                                                        .discount_type
+                                                                }
+                                                                onValueChange={(value) =>
+                                                                    updateProductDiscount(
+                                                                        product.id.toString(),
+                                                                        'discount_type',
+                                                                        value,
+                                                                    )
+                                                                }
+                                                            >
+                                                                <SelectTrigger className="w-28">
+                                                                    <SelectValue />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="percentage">%</SelectItem>
+                                                                    <SelectItem value="fixed_amount">
+                                                                        zł
+                                                                    </SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+
+                                        {data.apply_to === 'specific_categories' &&
+                                            categories.map((category) => (
+                                                <div
+                                                    key={category.id}
+                                                    className="flex items-center justify-between rounded-lg border p-3"
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <Checkbox
+                                                            checked={
+                                                                !!data.categories[category.id.toString()]
+                                                            }
+                                                            onCheckedChange={(checked) =>
+                                                                toggleCategory(
+                                                                    category.id.toString(),
+                                                                    !!checked,
+                                                                )
+                                                            }
+                                                        />
+                                                        <div className="font-medium">{resolveLocalizedText(category.name)}</div>
+                                                    </div>
+                                                    {data.categories[category.id.toString()] && (
+                                                        <div className="flex items-center gap-2">
+                                                            <Input
+                                                                type="number"
+                                                                step="0.01"
+                                                                min="0"
+                                                                placeholder="Wartość"
+                                                                value={
+                                                                    data.categories[category.id.toString()]
+                                                                        .discount_value
+                                                                }
+                                                                onChange={(e) =>
+                                                                    updateCategoryDiscount(
+                                                                        category.id.toString(),
+                                                                        'discount_value',
+                                                                        e.target.value,
+                                                                    )
+                                                                }
+                                                                className="w-24"
+                                                            />
+                                                            <Select
+                                                                value={
+                                                                    data.categories[category.id.toString()]
+                                                                        .discount_type
+                                                                }
+                                                                onValueChange={(value) =>
+                                                                    updateCategoryDiscount(
+                                                                        category.id.toString(),
+                                                                        'discount_type',
+                                                                        value,
+                                                                    )
+                                                                }
+                                                            >
+                                                                <SelectTrigger className="w-28">
+                                                                    <SelectValue />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="percentage">%</SelectItem>
+                                                                    <SelectItem value="fixed_amount">
+                                                                        zł
+                                                                    </SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Sidebar */}
+                        <div className="space-y-6">
+                            <div className="rounded-xl border bg-card p-6">
+                                <h3 className="mb-4 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                                    Status
+                                </h3>
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2">
+                                        <Checkbox
+                                            id="is_active"
+                                            checked={data.is_active}
+                                            onCheckedChange={(checked) =>
+                                                setData('is_active', !!checked)
+                                            }
+                                        />
+                                        <Label htmlFor="is_active" className="font-normal">
+                                            Aktywna
+                                        </Label>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Checkbox
+                                            id="is_stackable"
+                                            checked={data.is_stackable}
+                                            onCheckedChange={(checked) =>
+                                                setData('is_stackable', !!checked)
+                                            }
+                                        />
+                                        <Label htmlFor="is_stackable" className="font-normal">
+                                            Możliwość łączenia
+                                        </Label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="rounded-xl border bg-card p-6">
+                                <h3 className="mb-4 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                                    Priorytet
+                                </h3>
+                                <Input
+                                    id="priority"
+                                    type="number"
+                                    min="0"
+                                    value={data.priority}
+                                    onChange={(e) => setData('priority', e.target.value)}
+                                    placeholder="0"
+                                />
+                                <p className="mt-1.5 text-xs text-muted-foreground">
+                                    Wyższy priorytet = zastosowany pierwszy
+                                </p>
+                                <InputError message={errors.priority} />
+                            </div>
+
+                            <div className="rounded-xl border bg-card p-6">
+                                <h3 className="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                                    Podgląd
+                                </h3>
+                                <dl className="space-y-2 text-sm">
+                                    <div className="flex justify-between">
+                                        <dt className="text-muted-foreground">Nazwa</dt>
+                                        <dd className="font-medium">{data.name || '—'}</dd>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <dt className="text-muted-foreground">Typ</dt>
+                                        <dd className="font-medium">
+                                            {data.type === 'percentage'
+                                                ? 'Procentowy'
+                                                : data.type === 'fixed_amount'
+                                                  ? 'Kwotowy'
+                                                  : data.type === 'buy_x_get_y'
+                                                    ? 'Kup X weź Y'
+                                                    : 'Darmowa dostawa'}
+                                        </dd>
+                                    </div>
+                                    {data.type !== 'free_shipping' && data.value && (
+                                        <div className="flex justify-between">
+                                            <dt className="text-muted-foreground">Wartość</dt>
+                                            <dd className="font-medium">
+                                                {data.value}
+                                                {data.type === 'percentage' ? '%' : ' zł'}
+                                            </dd>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between">
+                                        <dt className="text-muted-foreground">Status</dt>
+                                        <dd
+                                            className={
+                                                data.is_active
+                                                    ? 'font-medium text-green-600 dark:text-green-400'
+                                                    : 'font-medium text-muted-foreground'
+                                            }
+                                        >
+                                            {data.is_active ? 'Aktywna' : 'Nieaktywna'}
+                                        </dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+
+                    <StickyFormActions
+                        formId={formId}
+                        processing={processing}
+                        submitLabel="Zapisz Promocję"
+                        processingLabel="Zapisywanie..."
+                    />
+                </form>
+            </Wrapper>
+        </AppLayout>
+    );
+}

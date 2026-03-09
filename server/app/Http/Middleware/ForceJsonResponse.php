@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-final class ForceJsonResponse
+class ForceJsonResponse
 {
     /**
      * Ensure all responses are JSON and set proper Accept header.
@@ -21,6 +21,12 @@ final class ForceJsonResponse
         $response = $next($request);
 
         if ($response instanceof JsonResponse) {
+            return $response;
+        }
+
+        // Pass through binary/file responses (PDFs, downloads, etc.)
+        $contentType = $response->headers->get('Content-Type', '');
+        if (str_starts_with($contentType, 'application/pdf') || $response->headers->has('Content-Disposition')) {
             return $response;
         }
 

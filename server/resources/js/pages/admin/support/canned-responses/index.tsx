@@ -1,0 +1,122 @@
+import { Head, router } from '@inertiajs/react';
+import type { ColumnDef } from '@tanstack/react-table';
+import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { ConfirmButton } from '@/components/confirm-dialog';
+import DataTable from '@/components/data-table';
+import { PageHeader, PageHeaderActions } from '@/components/page-header';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import Wrapper from '@/components/wrapper';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem } from '@/types';
+
+type CannedResponse = {
+    id: number;
+    title: string;
+    shortcut: string;
+    body: string;
+    created_at: string;
+};
+
+type CannedResponsesData = {
+    data: CannedResponse[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    prev_page_url: string | null;
+    next_page_url: string | null;
+};
+
+type Props = { canned_responses: CannedResponsesData };
+
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Support', href: '/admin/support' },
+    { title: 'Canned Responses', href: '/admin/support/canned-responses' },
+];
+
+export default function CannedResponsesIndex({ canned_responses }: Props) {
+    const columns: ColumnDef<CannedResponse>[] = [
+        {
+            accessorKey: 'title',
+            header: 'Title',
+            cell: ({ row }) => <span className="font-medium">{row.original.title}</span>,
+        },
+        {
+            accessorKey: 'shortcut',
+            header: 'Shortcut',
+            cell: ({ row }) => (
+                <Badge variant="outline" className="font-mono text-xs">#{row.original.shortcut}</Badge>
+            ),
+        },
+        {
+            accessorKey: 'body',
+            header: 'Preview',
+            cell: ({ row }) => (
+                <span className="line-clamp-1 max-w-xs text-sm text-muted-foreground">
+                    {row.original.body}
+                </span>
+            ),
+        },
+        {
+            id: 'actions',
+            header: 'Actions',
+            cell: ({ row }) => (
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => router.visit(`/admin/support/canned-responses/${row.original.id}/edit`)}
+                    >
+                        <PencilIcon className="mr-1 h-3 w-3" />
+                        Edit
+                    </Button>
+                    <ConfirmButton
+                        variant="destructive"
+                        size="sm"
+                        title="Delete Response"
+                        description="Are you sure you want to delete this canned response?"
+                        onConfirm={() => {
+                            router.delete(`/admin/support/canned-responses/${row.original.id}`, {
+                                onSuccess: () => toast.success('Canned response deleted'),
+                            });
+                        }}
+                    >
+                        <TrashIcon className="h-3 w-3" />
+                    </ConfirmButton>
+                </div>
+            ),
+        },
+    ];
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Canned Responses" />
+            <Wrapper>
+                <PageHeader title="Canned Responses" description="Predefined replies for common questions">
+                    <PageHeaderActions>
+                        <Button onClick={() => router.visit('/admin/support/canned-responses/create')}>
+                            <PlusIcon className="mr-2 h-4 w-4" />
+                            New Response
+                        </Button>
+                    </PageHeaderActions>
+                </PageHeader>
+
+                <DataTable
+                    columns={columns}
+                    data={canned_responses.data}
+                    pagination={{
+                        current_page: canned_responses.current_page,
+                        last_page: canned_responses.last_page,
+                        per_page: canned_responses.per_page,
+                        total: canned_responses.total,
+                        prev_page_url: canned_responses.prev_page_url ?? null,
+                        next_page_url: canned_responses.next_page_url ?? null,
+                    }}
+                    baseUrl="/admin/support/canned-responses"
+                />
+            </Wrapper>
+        </AppLayout>
+    );
+}

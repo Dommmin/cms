@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Database\Seeders;
+
+use App\Models\ProductType;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
+
+class ProductTypeSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $types = [
+            ['name' => 'Apparel', 'has_variants' => true, 'is_shippable' => true],
+            ['name' => 'Home & Living', 'has_variants' => false, 'is_shippable' => true],
+            ['name' => 'Accessories', 'has_variants' => true, 'is_shippable' => true],
+        ];
+
+        foreach ($types as $type) {
+            ProductType::query()->updateOrCreate(
+                ['slug' => Str::slug($type['name'])],
+                [
+                    'name' => $type['name'],
+                    'has_variants' => $type['has_variants'],
+                    'is_shippable' => $type['is_shippable'],
+                    'variant_selection_attributes' => $type['has_variants'] ? ['color', 'size'] : [],
+                ],
+            );
+        }
+    }
+}

@@ -1,0 +1,246 @@
+import { Link, router } from '@inertiajs/react';
+import type { ColumnDef } from '@tanstack/react-table';
+import {
+    useReactTable,
+    getCoreRowModel,
+    flexRender,
+} from '@tanstack/react-table';
+import { useCallback, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+import type { PaginationInfo } from '@/types';
+
+interface DataTableProps<T> {
+    columns: ColumnDef<T>[];
+    data: T[];
+    pagination?: PaginationInfo;
+    sortable?: boolean;
+    searchable?: boolean;
+    searchPlaceholder?: string;
+    searchValue?: string;
+    onSearch?: (value: string) => void;
+    onPerPageChange?: (perPage: number) => void;
+    onSortChange?: (sort: string) => void;
+    baseUrl?: string;
+    className?: string;
+}
+
+export default function DataTable<T>({
+    columns,
+    data,
+    pagination,
+    searchable = false,
+    searchPlaceholder = 'Search...',
+    searchValue = '',
+    onSearch,
+    onPerPageChange,
+    baseUrl,
+    className,
+}: DataTableProps<T>) {
+    const [search, setSearch] = useState(searchValue);
+    const perPageOptions = pagination
+        ? Array.from(
+              new Set([10, 25, 50, 100, pagination.per_page]),
+          ).sort((a, b) => a - b)
+        : [10, 25, 50, 100];
+
+    const handleSearch = useCallback(() => {
+        const currentParams = typeof window !== 'undefined'
+            ? Object.fromEntries(new URLSearchParams(window.location.search).entries())
+            : {};
+
+        if (onSearch) {
+            onSearch(search);
+        } else if (baseUrl) {
+            router.get(
+                baseUrl,
+                { ...currentParams, search: search || undefined, page: 1 },
+                { replace: true, preserveState: true },
+            );
+        }
+    }, [search, onSearch, baseUrl]);
+
+    const table = useReactTable({
+        data,
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+        manualPagination: true,
+        manualSorting: true,
+    });
+
+    return (
+        <div className={cn('space-y-4', className)}>
+            {searchable && (
+                <div className="flex items-center gap-2">
+                    <input
+                        type="text"
+                        placeholder={searchPlaceholder}
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                handleSearch();
+                            }
+                        }}
+                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                    <Button variant="secondary" onClick={handleSearch}>
+                        Search
+                    </Button>
+                </div>
+            )}
+
+            <div className="overflow-x-auto rounded-md border">
+                <table className="w-full min-w-max text-sm">
+                    <thead className="bg-muted/50">
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <tr key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => (
+                                    <th
+                                        key={header.id}
+                                        className="h-10 px-3 text-left align-middle font-medium text-muted-foreground"
+                                    >
+                                        {header.isPlaceholder
+                                            ? null
+                                            : flexRender(
+                                                  header.column.columnDef
+                                                      .header,
+                                                  header.getContext(),
+                                              )}
+                                    </th>
+                                ))}
+                            </tr>
+                        ))}
+                    </thead>
+                    <tbody>
+                        {table.getRowModel().rows.length === 0 ? (
+                            <tr>
+                                <td
+                                    colSpan={columns.length}
+                                    className="h-24 text-center text-muted-foreground"
+                                >
+                                    No results.
+                                </td>
+                            </tr>
+                        ) : (
+                            table.getRowModel().rows.map((row) => (
+                                <tr
+                                    key={row.id}
+                                    className="border-t transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <td
+                                            key={cell.id}
+                                            className="p-3 align-middle"
+                                        >
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext(),
+                                            )}
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {pagination && (
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">
+                            Showing{' '}
+                            {(pagination.current_page - 1) *
+                                pagination.per_page +
+                                1}{' '}
+                            to{' '}
+                            {Math.min(
+                                pagination.current_page * pagination.per_page,
+                                pagination.total,
+                            )}{' '}
+                            of {pagination.total} results
+                        </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <Select
+                            value={pagination.per_page.toString()}
+                            onValueChange={(value) => {
+                                if (onPerPageChange) {
+                                    onPerPageChange(parseInt(value));
+                                } else if (baseUrl) {
+                                    const currentParams = typeof window !== 'undefined'
+                                        ? Object.fromEntries(new URLSearchParams(window.location.search).entries())
+                                        : {};
+                                    router.get(
+                                        baseUrl,
+                                        { ...currentParams, per_page: parseInt(value), page: 1 },
+                                        { replace: true, preserveState: true },
+                                    );
+                                }
+                            }}
+                        >
+                            <SelectTrigger className="h-8 w-[70px]">
+                                <SelectValue
+                                    placeholder={pagination.per_page.toString()}
+                                />
+                            </SelectTrigger>
+                            <SelectContent side="top">
+                                {perPageOptions.map((pageSize) => (
+                                    <SelectItem
+                                        key={pageSize}
+                                        value={pageSize.toString()}
+                                    >
+                                        {pageSize}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+
+                        <div className="flex gap-1">
+                            {pagination.prev_page_url ? (
+                                <Link
+                                    href={pagination.prev_page_url}
+                                    preserveScroll
+                                    prefetch
+                                >
+                                    <Button variant="outline" size="sm">
+                                        Previous
+                                    </Button>
+                                </Link>
+                            ) : (
+                                <Button variant="outline" size="sm" disabled>
+                                    Previous
+                                </Button>
+                            )}
+
+                            {pagination.next_page_url ? (
+                                <Link
+                                    href={pagination.next_page_url}
+                                    preserveScroll
+                                    prefetch
+                                >
+                                    <Button variant="outline" size="sm">
+                                        Next
+                                    </Button>
+                                </Link>
+                            ) : (
+                                <Button variant="outline" size="sm" disabled>
+                                    Next
+                                </Button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}

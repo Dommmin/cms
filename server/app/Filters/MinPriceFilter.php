@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Filters;
+
+use Illuminate\Database\Eloquent\Builder;
+use Spatie\QueryBuilder\Filters\Filter;
+
+/**
+ * @implements Filter<\App\Models\Product>
+ */
+class MinPriceFilter implements Filter
+{
+    public function __invoke(Builder $query, mixed $value, string $property): void
+    {
+        $priceInCents = (int) round((float) $value * 100);
+
+        $query->whereHas('variants', fn (Builder $q) => $q->where('price', '>=', $priceInCents));
+    }
+}

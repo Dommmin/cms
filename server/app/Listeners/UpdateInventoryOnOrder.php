@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
-use App\Modules\Ecommerce\Domain\Events\OrderCreated;
+use App\Events\OrderCreated;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -12,7 +12,7 @@ use Illuminate\Queue\InteractsWithQueue;
  * Update Inventory on Order Listener
  * Decrements stock when order is created
  */
-final class UpdateInventoryOnOrder implements ShouldQueue
+class UpdateInventoryOnOrder implements ShouldQueue
 {
     use InteractsWithQueue;
 
@@ -26,4 +26,3 @@ final class UpdateInventoryOnOrder implements ShouldQueue
         // like logging, notifications, etc.
     }
 }
-

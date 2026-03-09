@@ -1,6 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\OrderStatusEnum;
+use App\Models\Customer;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,13 +15,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('orders', function (Blueprint $table): void {
             $table->id();
             $table->string('reference_number')->unique();      // "ORD-2025-00142"
-            $table->foreignId('customer_id')->nullable()->constrained()->nullOnDelete(); // Guest = null
-            $table->foreignId('billing_address_id')->constrained();
-            $table->foreignId('shipping_address_id')->constrained();
-            $table->enum('status', OrderStatusEnum::cases())->default(OrderStatusEnum::PENDING->value);
+            $table->foreignIdFor(Customer::class)->nullable()->constrained()->nullOnDelete(); // Guest = null
+            $table->foreignId('billing_address_id')->constrained('addresses');
+            $table->foreignId('shipping_address_id')->constrained('addresses');
+            $table->enum('status', array_column(OrderStatusEnum::cases(), 'value'))->default(OrderStatusEnum::PENDING->value);
             // ─── Wszystkie kwoty jako INTEGER (grosze) ───────
             $table->unsignedInteger('subtotal');               // Suma linii (bez VAT, bez shipping)
             $table->unsignedInteger('discount_amount')->default(0);

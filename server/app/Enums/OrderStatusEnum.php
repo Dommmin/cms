@@ -18,14 +18,14 @@ enum OrderStatusEnum: string
     public function getLabel(): string
     {
         return match ($this) {
-            self::PENDING => 'Pending',
-            self::AWAITING => 'Awaiting payment',
-            self::PAID => 'Paid',
-            self::PROCESSING => 'Processing',
-            self::SHIPPED => 'Shipped',
-            self::DELIVERED => 'Delivered',
-            self::CANCELLED => 'Cancelled',
-            self::REFUNDED => 'Refunded',
+            self::PENDING => 'Oczekujące',
+            self::AWAITING => 'Oczekuje na płatność',
+            self::PAID => 'Opłacone',
+            self::PROCESSING => 'W realizacji',
+            self::SHIPPED => 'Wysłane',
+            self::DELIVERED => 'Dostarczone',
+            self::CANCELLED => 'Anulowane',
+            self::REFUNDED => 'Zwrócone',
         };
     }
 

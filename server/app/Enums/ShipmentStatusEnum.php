@@ -39,6 +39,7 @@ enum ShipmentStatusEnum: string
             self::OUT_FOR_DELIVERY => 'indigo',
             self::DELIVERED => 'purple',
             self::FAILED => 'red',
+            self::RETURNED => 'orange',
         };
     }
 }

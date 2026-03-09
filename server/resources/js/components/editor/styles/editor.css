@@ -1,0 +1,574 @@
+@reference "../../../../css/app.css";
+
+/* ─── Editor Layout ───────────────────────────────────────────────────────── */
+
+.editor-shell {
+    @apply relative rounded-lg border bg-card shadow-sm;
+}
+
+.editor-container {
+    @apply relative;
+}
+
+.editor-scroller {
+    @apply min-h-[300px] border-0 outline-none resize-none overflow-auto;
+}
+
+.editor-inner {
+    @apply relative bg-background;
+}
+
+/* ─── Content Editable ────────────────────────────────────────────────────── */
+
+.ContentEditable__root {
+    @apply min-h-[300px] p-4 outline-none text-foreground;
+}
+
+/* ─── Placeholder ─────────────────────────────────────────────────────────── */
+
+.Placeholder__root {
+    @apply absolute top-4 left-4 pointer-events-none text-muted-foreground select-none;
+}
+
+/* ─── Block Types ─────────────────────────────────────────────────────────── */
+
+.editor-paragraph {
+    @apply mb-2 last:mb-0 min-h-[1.5em] relative;
+}
+
+.editor-h1 {
+    @apply text-3xl font-bold mb-3 mt-5 first:mt-0;
+}
+
+.editor-h2 {
+    @apply text-2xl font-semibold mb-2 mt-4 first:mt-0;
+}
+
+.editor-h3 {
+    @apply text-xl font-semibold mb-2 mt-3 first:mt-0;
+}
+
+.editor-h4 {
+    @apply text-lg font-semibold mb-1 mt-3 first:mt-0;
+}
+
+.editor-h5 {
+    @apply text-base font-semibold mb-1 mt-2 first:mt-0;
+}
+
+.editor-h6 {
+    @apply text-sm font-semibold mb-1 mt-2 first:mt-0 text-muted-foreground;
+}
+
+.editor-quote {
+    @apply border-l-4 border-border pl-4 italic text-muted-foreground my-3;
+}
+
+.editor-hr {
+    @apply border-0 border-t border-border h-0 my-4;
+}
+
+/* ─── Text Formatting ─────────────────────────────────────────────────────── */
+
+.editor-text-code {
+    @apply bg-muted text-destructive rounded px-1.5 py-0.5 font-mono text-sm;
+}
+
+.editor-text-subscript {
+    font-size: 0.8em;
+    vertical-align: sub;
+}
+
+.editor-text-superscript {
+    font-size: 0.8em;
+    vertical-align: super;
+}
+
+/* ─── Code Block ──────────────────────────────────────────────────────────── */
+
+.editor-code {
+    @apply block bg-muted rounded-lg pr-4 pt-4 pb-4 pl-14 font-mono text-sm my-3 overflow-x-auto whitespace-pre relative;
+    tab-size: 2;
+}
+
+.editor-code:before {
+    content: attr(data-gutter);
+    @apply absolute left-0 top-0 bottom-0 bg-muted-foreground/10 text-muted-foreground px-2 py-4 text-right min-w-[3rem] select-none font-mono text-xs;
+    white-space: pre-wrap;
+    border-right: 1px solid var(--border);
+}
+
+/* ─── Code Highlight Tokens ───────────────────────────────────────────────── */
+
+.editor-token-comment {
+    @apply text-slate-400 italic;
+}
+
+.editor-token-punctuation {
+    @apply text-slate-500;
+}
+
+.editor-token-property {
+    @apply text-red-500 dark:text-red-400;
+}
+
+.editor-token-selector {
+    @apply text-green-600 dark:text-green-400;
+}
+
+.editor-token-operator {
+    @apply text-amber-600 dark:text-amber-400;
+}
+
+.editor-token-attr {
+    @apply text-sky-600 dark:text-sky-400;
+}
+
+.editor-token-variable {
+    @apply text-amber-600 dark:text-amber-400;
+}
+
+.editor-token-function {
+    @apply text-blue-600 dark:text-blue-400;
+}
+
+/* ─── Lists ───────────────────────────────────────────────────────────────── */
+
+.editor-list-ul {
+    @apply list-disc ml-6 my-2;
+}
+
+.editor-list-ol {
+    @apply list-decimal ml-6 my-2;
+}
+
+.editor-list-item {
+    @apply mb-0.5;
+}
+
+.editor-nested-list-item {
+    list-style: none;
+}
+
+/* ─── Checklist ───────────────────────────────────────────────────────────── */
+
+.editor-checklist {
+    @apply ml-0 list-none my-2;
+}
+
+.editor-list-item-unchecked,
+.editor-list-item-checked {
+    @apply relative pl-7 outline-none mb-0.5;
+}
+
+.editor-list-item-unchecked:before,
+.editor-list-item-checked:before {
+    content: '';
+    @apply absolute left-0 top-0.5 w-4 h-4 rounded border border-border cursor-pointer;
+}
+
+.editor-list-item-checked:before {
+    @apply bg-primary border-primary;
+}
+
+.editor-list-item-checked:after {
+    content: '';
+    @apply absolute top-[5px] left-[3px] w-[10px] h-[6px] rotate-[-45deg] border-b-2 border-l-2 border-primary-foreground;
+}
+
+.editor-list-item-checked > span {
+    @apply line-through text-muted-foreground;
+}
+
+/* ─── Table ───────────────────────────────────────────────────────────────── */
+
+.editor-table-scrollable-wrapper {
+    @apply overflow-x-auto my-4;
+}
+
+.editor-table {
+    @apply w-full border-collapse border border-border;
+}
+
+.editor-table-cell {
+    @apply border border-border px-3 py-2 min-w-[50px] text-left align-top relative outline-none;
+}
+
+.editor-table-cell-header {
+    @apply bg-muted font-semibold;
+}
+
+.editor-table-cell-selected {
+    @apply bg-primary/10;
+}
+
+.editor-table-cell-primary-selected {
+    @apply border-primary;
+    border-width: 2px;
+}
+
+.editor-table-cell-editing {
+    box-shadow: 0 0 0 2px var(--primary);
+}
+
+.editor-table-cell-resizer {
+    @apply absolute right-0 top-0 bottom-0 w-1 cursor-col-resize z-10;
+}
+
+.editor-table-resize-ruler {
+    @apply absolute top-0 bottom-0 w-0.5 bg-primary pointer-events-none;
+}
+
+.editor-table-selected {
+    @apply outline outline-2 outline-primary;
+}
+
+.editor-table-selection {
+    @apply bg-primary/10;
+}
+
+.editor-table-add-rows,
+.editor-table-add-columns {
+    @apply absolute cursor-pointer flex items-center justify-center;
+}
+
+.editor-table-cell-action-button-container {
+    @apply absolute top-1 right-1 z-10;
+}
+
+.editor-table-cell-action-button {
+    @apply w-5 h-5 rounded flex items-center justify-center bg-background border border-border cursor-pointer text-xs hover:bg-muted;
+}
+
+.editor-table-row-striping tr:nth-child(even) .editor-table-cell {
+    @apply bg-muted/30;
+}
+
+.editor-table-cell-sorted-indicator {
+    @apply inline-block ml-1 text-xs text-muted-foreground;
+}
+
+/* ─── Links ───────────────────────────────────────────────────────────────── */
+
+.editor-link {
+    @apply text-primary underline cursor-pointer;
+}
+
+.editor-link:hover {
+    @apply opacity-80;
+}
+
+/* ─── Hashtag ─────────────────────────────────────────────────────────────── */
+
+.editor-hashtag {
+    @apply text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 rounded px-0.5;
+}
+
+/* ─── Mark / Highlight ────────────────────────────────────────────────────── */
+
+.editor-mark {
+    @apply bg-yellow-200 dark:bg-yellow-800/50 rounded-sm;
+}
+
+.editor-mark-overlap {
+    @apply bg-yellow-300 dark:bg-yellow-700/50;
+}
+
+/* ─── Image ───────────────────────────────────────────────────────────────── */
+
+.editor-image {
+    @apply cursor-default inline-block relative select-none;
+}
+
+.editor-image img {
+    @apply max-w-full;
+}
+
+.editor-image img.focused {
+    @apply outline outline-2 outline-primary;
+}
+
+.editor-image img.focused.draggable {
+    @apply cursor-grab;
+}
+
+/* ─── Image Resizer ───────────────────────────────────────────────────────── */
+
+.image-resizer {
+    display: block;
+    width: 8px;
+    height: 8px;
+    position: absolute;
+    background-color: var(--primary);
+    border: 2px solid var(--primary-foreground);
+    border-radius: 2px;
+    z-index: 10;
+}
+
+.image-resizer.image-resizer-n {
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: n-resize;
+}
+
+.image-resizer.image-resizer-ne {
+    top: -4px;
+    right: -4px;
+    cursor: ne-resize;
+}
+
+.image-resizer.image-resizer-e {
+    right: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: e-resize;
+}
+
+.image-resizer.image-resizer-se {
+    bottom: -4px;
+    right: -4px;
+    cursor: se-resize;
+}
+
+.image-resizer.image-resizer-s {
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: s-resize;
+}
+
+.image-resizer.image-resizer-sw {
+    bottom: -4px;
+    left: -4px;
+    cursor: sw-resize;
+}
+
+.image-resizer.image-resizer-w {
+    left: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: w-resize;
+}
+
+.image-resizer.image-resizer-nw {
+    top: -4px;
+    left: -4px;
+    cursor: nw-resize;
+}
+
+/* ─── Layout ──────────────────────────────────────────────────────────────── */
+
+.editor-layout-container {
+    @apply grid gap-4 my-4;
+}
+
+.editor-layout-item {
+    @apply border border-dashed border-border rounded p-2 min-h-[50px];
+}
+
+.editor-layout-item:focus {
+    @apply border-primary;
+}
+
+/* ─── Embed Block ─────────────────────────────────────────────────────────── */
+
+.editor-embed-block {
+    @apply relative my-4 select-none;
+}
+
+.editor-embed-block-focus {
+    @apply outline outline-2 outline-primary;
+}
+
+/* ─── Block Cursor ────────────────────────────────────────────────────────── */
+
+.editor-block-cursor {
+    @apply absolute pointer-events-none;
+}
+
+.editor-block-cursor::after {
+    content: '';
+    @apply absolute top-0 left-0 right-0 bottom-0 border-2 border-primary rounded-sm;
+    animation: CursorBlink 1s ease-in-out infinite;
+}
+
+@keyframes CursorBlink {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+}
+
+/* ─── Indent ──────────────────────────────────────────────────────────────── */
+
+.editor-indent {
+    --lexical-indent-base-value: 40px;
+}
+
+/* ─── Character Limit ─────────────────────────────────────────────────────── */
+
+.editor-character-limit {
+    @apply text-destructive;
+}
+
+/* ─── Floating Link Toolbar ───────────────────────────────────────────────── */
+
+.link-editor {
+    @apply absolute z-50 top-full left-0 mt-1 rounded-lg border bg-popover shadow-md p-2 flex items-center gap-2;
+}
+
+.link-editor input {
+    @apply flex-1 bg-transparent outline-none text-sm text-foreground;
+}
+
+/* ─── Floating Text Format Toolbar ───────────────────────────────────────── */
+
+.floating-text-format-popup {
+    @apply absolute z-50 bg-popover rounded-lg border shadow-md flex items-center gap-0.5 p-1;
+}
+
+/* ─── Draggable Block ─────────────────────────────────────────────────────── */
+
+.draggable-block-menu {
+    @apply absolute flex items-center cursor-grab rounded p-0.5 z-10 will-change-transform hover:bg-muted/50 active:cursor-grabbing;
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+
+.draggable-block-target-line {
+    @apply pointer-events-none h-0.5 bg-primary absolute left-0 z-20 will-change-transform rounded-full;
+    top: 0;
+    opacity: 0;
+}
+
+/* ─── Mentions ────────────────────────────────────────────────────────────── */
+
+.mention {
+    @apply text-primary font-semibold;
+}
+
+/* ─── Emoji ───────────────────────────────────────────────────────────────── */
+
+.emoji {
+    @apply inline-block;
+}
+
+/* ─── Keyword ─────────────────────────────────────────────────────────────── */
+
+.editor-keyword {
+    @apply bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 rounded px-0.5;
+}
+
+/* ─── Page Break ──────────────────────────────────────────────────────────── */
+
+.editor-page-break {
+    @apply my-4 border-t-2 border-dashed border-border;
+}
+
+/* ─── Sticky Note ─────────────────────────────────────────────────────────── */
+
+.sticky-note {
+    @apply absolute w-48 min-h-[80px] rounded-lg shadow-lg p-3 cursor-grab select-none;
+}
+
+/* ─── Component Picker ────────────────────────────────────────────────────── */
+
+.component-picker-menu {
+    @apply absolute z-50 bg-popover rounded-lg border shadow-lg w-64 max-h-64 overflow-y-auto;
+}
+
+.component-picker-item {
+    @apply flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-accent;
+}
+
+.component-picker-item.selected {
+    @apply bg-accent;
+}
+
+/* ─── Collapsible ─────────────────────────────────────────────────────────── */
+
+.collapsible-container {
+    @apply border border-border rounded-lg my-2 overflow-hidden;
+}
+
+.collapsible-title {
+    @apply flex items-center gap-2 p-3 font-medium cursor-pointer select-none hover:bg-muted/50;
+    list-style: none;
+}
+
+.collapsible-title::-webkit-details-marker {
+    display: none;
+}
+
+.collapsible-title::before {
+    content: '';
+    display: block;
+    flex-shrink: 0;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 7px solid currentColor;
+    opacity: 0.5;
+    transition: transform 0.2s ease;
+}
+
+details[open] > .collapsible-title::before {
+    transform: rotate(90deg);
+}
+
+.collapsible-content {
+    @apply p-3 border-t border-border;
+}
+
+/* ─── YouTube / Twitter / Figma Embeds ───────────────────────────────────── */
+
+.editor-youtube-embed {
+    @apply my-4 w-full;
+}
+
+.editor-tweet-embed {
+    @apply my-4;
+}
+
+.editor-figma-embed {
+    @apply my-4 w-full;
+}
+
+/* ─── Autocomplete ────────────────────────────────────────────────────────── */
+
+.editor-autocomplete {
+    @apply text-muted-foreground;
+}
+
+/* ─── Toolbar ─────────────────────────────────────────────────────────────── */
+
+.toolbar-divider {
+    @apply w-px h-5 bg-border mx-0.5 self-center;
+}
+
+/* ─── Code Action Menu ────────────────────────────────────────────────────── */
+
+.code-action-menu-container {
+    @apply absolute top-2 right-2 flex items-center gap-1 z-10;
+}
+
+/* ─── Selection ───────────────────────────────────────────────────────────── */
+
+::selection {
+    background-color: color-mix(in oklch, var(--primary) 25%, transparent);
+}
+
+/* RTL */
+.ltr {
+    direction: ltr;
+}
+
+.rtl {
+    direction: rtl;
+}

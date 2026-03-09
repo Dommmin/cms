@@ -1,8 +1,3 @@
-includes:
-    - vendor/larastan/larastan/extension.neon
-    - vendor/nesbot/carbon/extension.neon
-    - phar://phpstan.phar/conf/bleedingEdge.neon
-
 parameters:
 
     paths:
@@ -16,6 +11,6 @@ parameters:
     excludePaths:
         - config/database.php
 
-    level: max
+    level: 5
 
     tmpDir: /tmp/phpstan

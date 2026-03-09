@@ -2,5 +2,10 @@
 
 declare(strict_types=1);
 
-// Web routes disabled - API only application
-// Scramble documentation available at /docs/api
+use App\Http\Controllers\BlogFeedController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/feed', BlogFeedController::class)->name('blog.feed');
+
+require __DIR__.'/admin.php';
+require __DIR__.'/settings.php';

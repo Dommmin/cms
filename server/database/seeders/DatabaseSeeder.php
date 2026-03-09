@@ -4,28 +4,35 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-final class DatabaseSeeder extends Seeder
+class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
-        // Seed roles and permissions first
         $this->call([
             RolePermissionSeeder::class,
+            UserSeeder::class,
+            ProductTypeSeeder::class,
+            //            CategorySeeder::class,
+            EcommerceDemoSeeder::class,
+            DiscountSeeder::class,
+            PromotionSeeder::class,
+            FormSeeder::class,
+            PagesDemoSeeder::class,
+            SectionTemplateSeeder::class,
+            ThemeSeeder::class,
+            SettingsSeeder::class,
+            ShippingMethodSeeder::class,
+            MenuSeeder::class,
+            BlogSeeder::class,
+            LocaleSeeder::class,
+            TranslationSeeder::class,
+            DashboardWidgetSeeder::class,
         ]);
-
-        // Create test user (optional)
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
     }
 }

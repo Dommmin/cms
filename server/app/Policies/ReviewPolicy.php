@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Models\ProductReview;
 use App\Models\User;
-use App\Modules\Reviews\Domain\Models\ProductReview;
 
-final class ReviewPolicy
+class ReviewPolicy
 {
-    public function viewAny(User $user): bool
+    public function viewAny(): bool
     {
         // Public access for viewing reviews
         return true;
     }
 
-    public function view(User $user, ProductReview $productReview): bool
+    public function view(): bool
     {
         // Public access for viewing reviews
         return true;
@@ -32,6 +32,7 @@ final class ReviewPolicy
         // Users can update their own reviews, admins can update any
         if ($user->hasRole('customer')) {
             $customer = $user->customer ?? null;
+
             return $customer && $productReview->customer_id === $customer->id;
         }
 
@@ -43,13 +44,14 @@ final class ReviewPolicy
         // Users can delete their own reviews, admins can delete any
         if ($user->hasRole('customer')) {
             $customer = $user->customer ?? null;
+
             return $customer && $productReview->customer_id === $customer->id;
         }
 
         return $user->can('reviews.delete');
     }
 
-    public function moderate(User $user, ProductReview $productReview): bool
+    public function moderate(User $user): bool
     {
         return $user->can('reviews.moderate');
     }

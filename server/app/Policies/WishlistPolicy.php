@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Models\User;
-use App\Modules\Ecommerce\Domain\Models\Wishlist;
+use App\Models\Wishlist;
 
-final class WishlistPolicy
+class WishlistPolicy
 {
     public function viewAny(User $user): bool
     {
@@ -33,12 +33,14 @@ final class WishlistPolicy
     public function update(User $user, Wishlist $wishlist): bool
     {
         $customer = $user->customer ?? null;
+
         return $customer && $wishlist->customer_id === $customer->id;
     }
 
     public function delete(User $user, Wishlist $wishlist): bool
     {
         $customer = $user->customer ?? null;
+
         return $customer && $wishlist->customer_id === $customer->id;
     }
 }

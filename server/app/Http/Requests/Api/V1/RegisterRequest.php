@@ -11,8 +11,9 @@ use Illuminate\Foundation\Http\FormRequest;
  * @property string $name
  * @property string $email
  * @property string $password
+ * @property string|null $cart_token
  */
-final class RegisterRequest extends FormRequest
+class RegisterRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -28,6 +29,7 @@ final class RegisterRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'cart_token' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

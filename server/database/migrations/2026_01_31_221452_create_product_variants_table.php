@@ -1,6 +1,8 @@
 <?php
 
-use App\Modules\Ecommerce\Domain\Models\Product;
+declare(strict_types=1);
+
+use App\Models\Product;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,7 +18,7 @@ return new class extends Migration
         // Jeśli product_type.has_variants = false,
         // system tworzy 1 default variant automatycznie.
         // Cena, stock, SKU zawsze żyją tutaj.
-        Schema::create('product_variants', function (Blueprint $table) {
+        Schema::create('product_variants', function (Blueprint $table): void {
             $table->id();
             $table->foreignIdFor(Product::class)->constrained()->cascadeOnDelete();
             $table->string('sku')->unique();

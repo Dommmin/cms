@@ -1,6 +1,8 @@
 <?php
 
-use App\Modules\Core\Domain\Models\Customer;
+declare(strict_types=1);
+
+use App\Models\Customer;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,7 +14,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('carts', function (Blueprint $table) {
+        Schema::create('carts', function (Blueprint $table): void {
             $table->id();
             $table->foreignIdFor(Customer::class)->nullable()->constrained()->nullOnDelete();
             $table->string('session_token')->nullable();       // Guest cart identifier

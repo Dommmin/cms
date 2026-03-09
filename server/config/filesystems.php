@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 return [
 
     /*
@@ -16,16 +14,6 @@ return [
     */
 
     'default' => env('FILESYSTEM_DISK', 'local'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Media Storage
-    |--------------------------------------------------------------------------
-    |
-    | Media storage disk - can be 'public' (local) or 'cloudinary'
-    |
-    */
-    'media' => env('MEDIA_STORAGE', 'public'),
 
     /*
     |--------------------------------------------------------------------------
@@ -53,7 +41,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

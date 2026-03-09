@@ -1,6 +1,8 @@
 <?php
 
-use App\Modules\Ecommerce\Domain\Models\Discount;
+declare(strict_types=1);
+
+use App\Models\Discount;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,7 +14,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('discount_conditions', function (Blueprint $table) {
+        Schema::create('discount_conditions', function (Blueprint $table): void {
             $table->id();
             $table->foreignIdFor(Discount::class)->constrained()->cascadeOnDelete();
             $table->enum('type', ['product', 'category', 'variant']);

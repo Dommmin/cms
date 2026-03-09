@@ -1,0 +1,165 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+use App\Modules\Core\Domain\Models\Currency;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+
+/**
+ * Product Variant Model
+ * Moved to Ecommerce module
+ *
+ * @property int $id
+ * @property int $product_id
+ * @property int|null $tax_rate_id
+ * @property string $sku
+ * @property string $name
+ * @property int $price
+ * @property int $cost_price
+ * @property int|null $compare_at_price
+ * @property float|null $weight
+ * @property int $stock_quantity
+ * @property int $stock_threshold
+ * @property bool $is_active
+ * @property bool $is_default
+ * @property int $position
+ * @property-read Product|null $product
+ * @property-read TaxRate|null $taxRate
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, VariantAttributeValue> $attributeValues
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductImage> $images
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, PriceHistory> $priceHistory
+ */
+class ProductVariant extends Model
+{
+    use HasFactory;
+    use LogsActivity;
+
+    protected $table = 'product_variants';
+
+    protected $fillable = [
+        'product_id', 'tax_rate_id', 'sku', 'name', 'price', 'cost_price',
+        'compare_at_price', 'weight', 'stock_quantity', 'stock_threshold',
+        'is_active', 'is_default', 'position',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'is_default' => 'boolean',
+    ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['sku', 'price', 'stock_quantity', 'is_active'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('product_variant');
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function taxRate(): BelongsTo
+    {
+        return $this->belongsTo(TaxRate::class);
+    }
+
+    /**
+     * Get tax rate - from variant or from product category
+     */
+    public function effectiveTaxRate(): ?TaxRate
+    {
+        $rate = $this->taxRate;
+
+        if (! $rate) {
+            $product = $this->product;
+            if ($product && $product->category) {
+                $rate = $product->category->taxRate;
+            }
+        }
+
+        return $rate instanceof TaxRate ? $rate : TaxRate::default();
+    }
+
+    public function attributeValues(): HasMany
+    {
+        return $this->hasMany(VariantAttributeValue::class, 'variant_id');
+    }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
+    public function priceHistory(): HasMany
+    {
+        return $this->hasMany(PriceHistory::class)->latest('recorded_at');
+    }
+
+    /**
+     * Lowest price in the last 30 days (Omnibus Directive). Returns current price if no history.
+     */
+    public function lowestPriceInLast30Days(): int
+    {
+        $lowest = $this->priceHistory()
+            ->where('recorded_at', '>=', now()->subDays(30))
+            ->min('price');
+
+        return $lowest ?? $this->price;
+    }
+
+    /**
+     * Formatted price
+     */
+    public function formattedPrice(): string
+    {
+        $currency = Currency::base();
+
+        return $currency->format($this->price);
+    }
+
+    /**
+     * Check if in stock
+     */
+    public function isInStock(): bool
+    {
+        return $this->stock_quantity > 0;
+    }
+
+    /**
+     * Check if stock is low
+     */
+    public function isLowStock(): bool
+    {
+        return $this->stock_quantity > 0 && $this->stock_quantity <= $this->stock_threshold;
+    }
+
+    /**
+     * Margin in cents
+     */
+    public function margin(): int
+    {
+        return $this->price - $this->cost_price;
+    }
+
+    /**
+     * Margin in percentage
+     */
+    public function marginPercent(): float
+    {
+        if ($this->price === 0) {
+            return 0;
+        }
+
+        return round(($this->margin() / $this->price) * 100, 2);
+    }
+}

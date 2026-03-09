@@ -7,7 +7,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
-final class EnsureEmailVerified
+class EnsureEmailVerified
 {
     /**
      * Ensure the user's email is verified before allowing access.

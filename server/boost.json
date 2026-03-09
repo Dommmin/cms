@@ -1,18 +1,27 @@
 {
     "agents": [
-        "claude_code",
-        "codex",
         "cursor",
-        "junie"
+        "codex",
+        "claude_code",
+        "junie",
+        "opencode"
     ],
     "guidelines": true,
     "herd_mcp": false,
     "mcp": true,
     "packages": [
-        "filament/filament"
+        "laravel/fortify",
+        "spatie/laravel-medialibrary",
+        "spatie/laravel-permission"
     ],
     "sail": false,
     "skills": [
-        "pest-testing"
+        "wayfinder-development",
+        "pest-testing",
+        "inertia-react-development",
+        "tailwindcss-development",
+        "developing-with-fortify",
+        "medialibrary-development",
+        "laravel-permission-development"
     ]
 }

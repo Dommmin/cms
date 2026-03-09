@@ -9,36 +9,34 @@ return [
     | Cross-Origin Resource Sharing (CORS) Configuration
     |--------------------------------------------------------------------------
     |
-    | Here you may configure your settings for cross-origin resource sharing
-    | or "CORS". This determines what cross-origin operations may execute
-    | in web browsers. You are free to adjust these settings as needed.
+    | allowed_origins: Use '*' for fully public endpoints, or restrict to your
+    | frontend domain(s) via CORS_ALLOWED_ORIGINS env variable.
     |
-    | To learn more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+    | Mobile apps (iOS/Android) are not subject to CORS restrictions, so this
+    | config applies primarily to web frontends.
+    |
+    | Examples:
+    |   CORS_ALLOWED_ORIGINS=https://myapp.com,https://staging.myapp.com
+    |   CORS_ALLOWED_ORIGINS=*   (allow all — fine for fully public APIs)
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*'],
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => array_filter(
+        explode(',', env('CORS_ALLOWED_ORIGINS', '*'))
+    ),
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With', 'X-Cart-Token', 'Idempotency-Key', 'X-Idempotency-Key'],
 
-    'exposed_headers' => [
-        'X-RateLimit-Limit',
-        'X-RateLimit-Remaining',
-        'Retry-After',
-        'X-API-Version',
-        'X-API-Version-Status',
-        'Deprecation',
-        'Sunset',
-    ],
+    'exposed_headers' => [],
 
-    'max_age' => 86400, // 24 hours
+    'max_age' => 3600,
 
-    'supports_credentials' => false,
+    'supports_credentials' => true,
 
 ];

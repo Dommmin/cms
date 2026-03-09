@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\PaymentStatusEnum;
-use App\Modules\Ecommerce\Domain\Models\Order;
+use App\Models\Order;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,12 +15,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payments', function (Blueprint $table) {
+        Schema::create('payments', function (Blueprint $table): void {
             $table->id();
             $table->foreignIdFor(Order::class)->constrained()->cascadeOnDelete();
             $table->enum('provider', ['p24', 'payu', 'stripe']); // Extensible
             $table->string('provider_transaction_id')->nullable();
-            $table->enum('status', PaymentStatusEnum::cases())->default(PaymentStatusEnum::PENDING->value);
+            $table->enum('status', array_column(PaymentStatusEnum::cases(), 'value'))->default(PaymentStatusEnum::PENDING->value);
             // ─── Kwota jako INTEGER (grosze) ─────────────────
             $table->unsignedInteger('amount');
             $table->string('currency_code', 3)->default('PLN');
