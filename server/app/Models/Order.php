@@ -37,7 +37,7 @@ class Order extends Model
     protected $table = 'orders';
 
     protected $fillable = [
-        'reference_number', 'customer_id', 'billing_address_id', 'shipping_address_id',
+        'reference_number', 'customer_id', 'guest_email', 'billing_address_id', 'shipping_address_id',
         'status', 'subtotal', 'discount_amount', 'shipping_cost', 'tax_amount', 'total',
         'currency_code', 'exchange_rate', 'notes',
     ];
