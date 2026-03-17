@@ -35,28 +35,36 @@ class CheckoutService
      * @param  array<string, mixed>  $shippingAddress
      */
     public function checkout(
-        User $user,
+        ?User $user,
         int $shippingMethodId,
         PaymentProviderEnum $paymentProvider,
         array $billingAddress,
         array $shippingAddress,
+        ?string $guestEmail = null,
+        ?string $cartToken = null,
         ?string $pickupPointId = null,
         ?string $notes = null,
         ?string $referralCode = null
     ): Order {
-        if (! $user->customer) {
-            Customer::query()->create([
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'first_name' => $user->name,
-            ]);
+        if ($user !== null) {
+            if (! $user->customer) {
+                Customer::query()->create([
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'first_name' => $user->name,
+                ]);
 
-            $user->load('customer');
+                $user->load('customer');
+            }
+
+            $this->cartService->mergeGuestCartIntoCustomer($user, $cartToken);
+            $cart = $this->cartService->getOrCreateCart($user);
+            $customer = $user->customer;
+        } else {
+            $customer = null;
+            $cart = $this->cartService->getOrCreateCart(null, $cartToken);
         }
 
-        $this->cartService->mergeGuestCartIntoCustomer($user);
-
-        $cart = $this->cartService->getOrCreateCart($user);
         $cart->load('items.variant.product.category');
 
         if ($cart->isEmpty()) {
@@ -85,8 +93,8 @@ class CheckoutService
 
         $total = max(0, $subtotalAfterDiscount + $shippingCost);
 
-        $billing = Address::query()->create($this->mapAddressPayload($billingAddress, $user, AddressTypeEnum::BILLING));
-        $shipping = Address::query()->create($this->mapAddressPayload($shippingAddress, $user, AddressTypeEnum::SHIPPING));
+        $billing = Address::query()->create($this->mapAddressPayload($billingAddress, $customer, AddressTypeEnum::BILLING));
+        $shipping = Address::query()->create($this->mapAddressPayload($shippingAddress, $customer, AddressTypeEnum::SHIPPING));
 
         $initialStatus = $paymentProvider === PaymentProviderEnum::CASH_ON_DELIVERY
             ? OrderStatusEnum::PENDING
@@ -94,7 +102,8 @@ class CheckoutService
 
         $order = Order::query()->create([
             'reference_number' => Order::generateReferenceNumber(),
-            'customer_id' => $user->customer?->id,
+            'customer_id' => $customer?->id,
+            'guest_email' => $customer === null ? $guestEmail : null,
             'billing_address_id' => $billing->id,
             'shipping_address_id' => $shipping->id,
             'status' => $initialStatus->value,
@@ -144,7 +153,7 @@ class CheckoutService
         $cart->items()->delete();
         $cart->update(['discount_code' => null]);
 
-        if ($affiliateCode) {
+        if ($affiliateCode && $user !== null) {
             $commission = $affiliateCode->calculateCommission($order->total);
             Referral::query()->create([
                 'affiliate_code_id' => $affiliateCode->id,
@@ -227,10 +236,10 @@ class CheckoutService
      * @param  array<string, mixed>  $payload
      * @return array<string, mixed>
      */
-    private function mapAddressPayload(array $payload, User $user, AddressTypeEnum $type): array
+    private function mapAddressPayload(array $payload, ?Customer $customer, AddressTypeEnum $type): array
     {
         return [
-            'customer_id' => $user->customer?->id,
+            'customer_id' => $customer?->id,
             'type' => $type->value,
             'first_name' => (string) Arr::get($payload, 'first_name'),
             'last_name' => (string) Arr::get($payload, 'last_name'),

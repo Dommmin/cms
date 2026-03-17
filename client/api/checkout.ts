@@ -9,6 +9,29 @@ export interface ShippingMethod {
   estimated_days_min: number | null;
   estimated_days_max: number | null;
   free_shipping_threshold: number | null;
+  requires_pickup_point: boolean;
+  uses_native_widget: boolean;
+  /** False when env vars required for the pickup picker are missing in server/.env */
+  configured: boolean;
+  /** Names of missing env vars, e.g. ["FURGONETKA_CLIENT_ID"] */
+  missing_config: string[];
+}
+
+export interface PaymentMethodConfig {
+  id: "cash_on_delivery" | "payu" | "p24" | "apple_pay" | "google_pay" | "bank_transfer";
+  configured: boolean;
+  /** Names of missing env vars in server/.env */
+  missing_env: string[];
+}
+
+export interface BankDetails {
+  account_name: string;
+  iban: string;
+  swift: string;
+  bank_name: string;
+  reference: string;
+  amount: number;
+  currency: string;
 }
 
 export interface AddressPayload {
@@ -24,11 +47,23 @@ export interface AddressPayload {
 }
 
 export interface CheckoutPayload {
+  guest_email?: string;
   shipping_method_id: number;
+  pickup_point_id?: string;
   payment_provider: string;
+  payment_method?: string;
+  blik_code?: string;
+  payment_token?: string;
   billing_address: AddressPayload;
   shipping_address: AddressPayload;
   notes?: string;
+}
+
+export interface PaymentResult {
+  id: number | null;
+  action: "redirect" | "wait" | "none";
+  redirect_url: string | null;
+  bank_details?: BankDetails | null;
 }
 
 export interface OrderResponse {
@@ -44,6 +79,16 @@ export interface OrderResponse {
   created_at: string;
 }
 
+export interface CheckoutResponse {
+  order: OrderResponse;
+  payment: PaymentResult;
+}
+
+export async function getPaymentMethods(): Promise<PaymentMethodConfig[]> {
+  const { data } = await api.get<{ data: PaymentMethodConfig[] }>("/checkout/payment-methods");
+  return data.data ?? [];
+}
+
 export async function getShippingMethods(): Promise<ShippingMethod[]> {
   const { data } = await api.get<{ data: ShippingMethod[] }>(
     "/checkout/shipping-methods",
@@ -53,8 +98,8 @@ export async function getShippingMethods(): Promise<ShippingMethod[]> {
 
 export async function submitCheckout(
   payload: CheckoutPayload,
-): Promise<OrderResponse> {
-  const { data } = await api.post<{ data: OrderResponse; order: OrderResponse }>(
+): Promise<CheckoutResponse> {
+  const { data } = await api.post<CheckoutResponse>(
     "/checkout",
     payload,
     {
@@ -63,5 +108,5 @@ export async function submitCheckout(
       },
     },
   );
-  return data.data ?? data.order ?? (data as unknown as OrderResponse);
+  return data;
 }

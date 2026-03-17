@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   CheckoutPayload,
+  PaymentMethodConfig,
+  getPaymentMethods,
   getShippingMethods,
   submitCheckout,
 } from "@/api/checkout";
@@ -14,6 +16,14 @@ export function useShippingMethods() {
     queryKey: ["shipping-methods"],
     queryFn: getShippingMethods,
     staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function usePaymentMethods() {
+  return useQuery<PaymentMethodConfig[]>({
+    queryKey: ["checkout-payment-methods"],
+    queryFn: getPaymentMethods,
+    staleTime: 60 * 60 * 1000, // config changes only on redeploy
   });
 }
 
