@@ -169,10 +169,10 @@ class DashboardWidgetSeeder extends Seeder
                 'color' => 'indigo',
                 'config' => [
                     'actions' => [
-                        ['label' => 'New Product', 'route' => 'admin.ecommerce.products.create', 'icon' => 'plus'],
-                        ['label' => 'New Order', 'route' => 'admin.ecommerce.orders.create', 'icon' => 'shopping-cart'],
-                        ['label' => 'New Customer', 'route' => 'admin.ecommerce.customers.create', 'icon' => 'user-plus'],
-                        ['label' => 'View Reports', 'route' => 'admin.reports', 'icon' => 'bar-chart'],
+                        ['label' => 'New Product', 'url' => '/admin/ecommerce/products/create', 'icon' => 'package'],
+                        ['label' => 'New Blog Post', 'url' => '/admin/blog/posts/create', 'icon' => 'book-open'],
+                        ['label' => 'All Orders', 'url' => '/admin/ecommerce/orders', 'icon' => 'shopping-cart'],
+                        ['label' => 'Customers', 'url' => '/admin/ecommerce/customers', 'icon' => 'users'],
                     ],
                 ],
             ],

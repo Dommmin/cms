@@ -1,10 +1,11 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { AlertTriangle, Eye, EyeOff, LayoutDashboard, RotateCcw, Star } from 'lucide-react';
-import { useState } from 'react';
+import { AlertTriangle, Eye, EyeOff, LayoutDashboard, RotateCcw, Star, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ChartWidget } from '@/components/widgets/chart-widget';
 import { StatCard } from '@/components/widgets/stat-card';
+import { CreateWidgetDialog } from '@/components/widgets/create-widget-dialog';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes/admin';
 import type { BreadcrumbItem } from '@/types';
@@ -14,8 +15,21 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: dashboard().url },
 ];
 
+interface WidgetShell {
+    id: number;
+    title: string;
+    type: string;
+    size: WidgetSize;
+    icon: string | null;
+    color: string | null;
+    is_active: boolean;
+    order: number;
+    config: Record<string, unknown> | null;
+}
+
 interface DashboardProps {
-    widgets: Widget[];
+    widgetShells: WidgetShell[];
+    widgets: Widget[] | undefined; // deferred — undefined until loaded
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -27,22 +41,30 @@ const STATUS_COLORS: Record<string, string> = {
     cancelled: 'bg-red-100 text-red-800',
 };
 
-export default function Dashboard({ widgets: initialWidgets }: DashboardProps) {
-    const [widgets, setWidgets] = useState(initialWidgets);
+export default function Dashboard({ widgetShells, widgets: deferredWidgets }: DashboardProps) {
+    // Use deferred widgets once loaded; mutations update local state optimistically
+    const [widgets, setWidgets] = useState<Widget[]>([]);
+    const loaded = deferredWidgets !== undefined;
+
+    useEffect(() => {
+        if (deferredWidgets) {
+            setWidgets(deferredWidgets);
+        }
+    }, [deferredWidgets]);
     const [resetting, setResetting] = useState(false);
 
     function getSizeClass(size: WidgetSize) {
         switch (size) {
             case 'small':
-                return 'md:col-span-1';
+                return 'col-span-1';
             case 'medium':
-                return 'md:col-span-2';
+                return 'col-span-1 sm:col-span-2';
             case 'large':
-                return 'md:col-span-3';
+                return 'col-span-1 sm:col-span-2 lg:col-span-3';
             case 'full':
-                return 'md:col-span-4';
+                return 'col-span-1 sm:col-span-2 lg:col-span-4';
             default:
-                return 'md:col-span-1';
+                return 'col-span-1';
         }
     }
 
@@ -58,6 +80,18 @@ export default function Dashboard({ widgets: initialWidgets }: DashboardProps) {
                             w.id === widgetId ? { ...w, is_active: !currentActive } : w,
                         ),
                     );
+                },
+            },
+        );
+    }
+
+    function deleteWidget(widgetId: number) {
+        router.delete(
+            `/admin/dashboard/widgets/${widgetId}`,
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setWidgets((prev) => prev.filter((w) => w.id !== widgetId));
                 },
             },
         );
@@ -268,8 +302,11 @@ export default function Dashboard({ widgets: initialWidgets }: DashboardProps) {
         }
     }
 
+    const displayShells = loaded ? widgets : widgetShells;
     const activeWidgets = widgets.filter((w) => w.is_active);
     const hiddenWidgets = widgets.filter((w) => !w.is_active);
+    const activeCount = displayShells.filter((w) => w.is_active).length;
+    const hiddenCount = displayShells.filter((w) => !w.is_active).length;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -280,37 +317,62 @@ export default function Dashboard({ widgets: initialWidgets }: DashboardProps) {
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <LayoutDashboard className="h-4 w-4" />
-                        <span>{activeWidgets.length} active widget{activeWidgets.length !== 1 ? 's' : ''}</span>
-                        {hiddenWidgets.length > 0 && (
-                            <span className="text-xs">· {hiddenWidgets.length} hidden</span>
+                        <span>{activeCount} active widget{activeCount !== 1 ? 's' : ''}</span>
+                        {hiddenCount > 0 && (
+                            <span className="text-xs">· {hiddenCount} hidden</span>
                         )}
                     </div>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={restoreDefaults}
-                        disabled={resetting}
-                        className="gap-2"
-                    >
-                        <RotateCcw className={`h-3.5 w-3.5 ${resetting ? 'animate-spin' : ''}`} />
-                        Restore defaults
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <CreateWidgetDialog onCreated={() => router.reload({ only: ['widgets'] })} />
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={restoreDefaults}
+                            disabled={resetting}
+                            className="gap-2"
+                        >
+                            <RotateCcw className={`h-3.5 w-3.5 ${resetting ? 'animate-spin' : ''}`} />
+                            Restore defaults
+                        </Button>
+                    </div>
                 </div>
 
+                {/* Skeleton while deferred widgets load */}
+                {!loaded && (
+                    <div className="grid auto-rows-min grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        {widgetShells.filter((s) => s.is_active).map((shell) => (
+                            <div
+                                key={shell.id}
+                                className={`${getSizeClass(shell.size)} animate-pulse rounded-xl border border-border bg-muted/40`}
+                                style={{ minHeight: 120 }}
+                            />
+                        ))}
+                    </div>
+                )}
+
                 {/* Active widgets grid */}
-                {activeWidgets.length > 0 && (
-                    <div className="grid auto-rows-min gap-4 md:grid-cols-4">
+                {loaded && activeWidgets.length > 0 && (
+                    <div className="grid auto-rows-min grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         {activeWidgets.map((widget) => (
                             <div key={widget.id} className={`group relative ${getSizeClass(widget.size)}`}>
                                 {renderWidget(widget)}
-                                {/* Hide toggle */}
-                                <button
-                                    onClick={() => toggleWidget(widget.id, true)}
-                                    className="absolute right-2 top-2 hidden rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-accent group-hover:opacity-100 group-hover:flex"
-                                    title="Hide widget"
-                                >
-                                    <EyeOff className="h-3.5 w-3.5" />
-                                </button>
+                                {/* Widget controls */}
+                                <div className="absolute right-2 top-2 hidden items-center gap-0.5 opacity-0 transition-opacity group-hover:flex group-hover:opacity-100">
+                                    <button
+                                        onClick={() => toggleWidget(widget.id, true)}
+                                        className="rounded-md p-1 text-muted-foreground hover:bg-accent"
+                                        title="Hide widget"
+                                    >
+                                        <EyeOff className="h-3.5 w-3.5" />
+                                    </button>
+                                    <button
+                                        onClick={() => deleteWidget(widget.id)}
+                                        className="rounded-md p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                                        title="Delete widget"
+                                    >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -324,22 +386,30 @@ export default function Dashboard({ widgets: initialWidgets }: DashboardProps) {
                         </p>
                         <div className="flex flex-wrap gap-2">
                             {hiddenWidgets.map((widget) => (
-                                <button
-                                    key={widget.id}
-                                    onClick={() => toggleWidget(widget.id, false)}
-                                    className="flex items-center gap-1.5 rounded-lg border border-dashed px-3 py-1.5 text-sm text-muted-foreground hover:border-border hover:text-foreground"
-                                    title="Show widget"
-                                >
-                                    <Eye className="h-3.5 w-3.5" />
-                                    {widget.title}
-                                </button>
+                                <div key={widget.id} className="group flex items-center gap-0.5 rounded-lg border border-dashed pr-1 hover:border-border">
+                                    <button
+                                        onClick={() => toggleWidget(widget.id, false)}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground"
+                                        title="Show widget"
+                                    >
+                                        <Eye className="h-3.5 w-3.5" />
+                                        {widget.title}
+                                    </button>
+                                    <button
+                                        onClick={() => deleteWidget(widget.id)}
+                                        className="rounded-md p-1 text-muted-foreground opacity-0 hover:text-destructive group-hover:opacity-100"
+                                        title="Delete widget"
+                                    >
+                                        <Trash2 className="h-3 w-3" />
+                                    </button>
+                                </div>
                             ))}
                         </div>
                     </div>
                 )}
 
                 {/* Empty state */}
-                {widgets.length === 0 && (
+                {loaded && widgets.length === 0 && (
                     <div className="flex h-[400px] items-center justify-center rounded-xl border border-dashed">
                         <div className="text-center">
                             <LayoutDashboard className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />

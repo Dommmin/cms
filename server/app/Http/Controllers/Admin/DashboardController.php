@@ -20,26 +20,39 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Load all widgets (active + inactive) so the dashboard can render toggle buttons
+        // Load all widgets (active + inactive) so the dashboard can render toggle buttons.
+        // Widget shells (id/type/size/config) are returned immediately; live data is deferred
+        // so the page paints instantly while the aggregations run in the background.
         $widgets = DashboardWidget::ordered()->get();
 
-        $widgetsData = $widgets->map(function ($widget) {
-            return [
-                'id' => $widget->id,
-                'title' => $widget->title,
-                'type' => $widget->type->value,
-                'size' => $widget->size->value,
-                'icon' => $widget->icon,
-                'color' => $widget->color,
-                'is_active' => $widget->is_active,
-                'order' => $widget->order,
-                'config' => $widget->config,
-                'data' => $widget->is_active ? $this->getWidgetData($widget) : null,
-            ];
-        });
+        $shells = $widgets->map(fn ($w) => [
+            'id'        => $w->id,
+            'title'     => $w->title,
+            'type'      => $w->type->value,
+            'size'      => $w->size->value,
+            'icon'      => $w->icon,
+            'color'     => $w->color,
+            'is_active' => $w->is_active,
+            'order'     => $w->order,
+            'config'    => $w->config,
+        ]);
 
         return Inertia::render('admin/dashboard', [
-            'widgets' => $widgetsData,
+            'widgetShells' => $shells,
+            'widgets'      => Inertia::defer(function () use ($widgets) {
+                return $widgets->map(fn ($w) => [
+                    'id'        => $w->id,
+                    'title'     => $w->title,
+                    'type'      => $w->type->value,
+                    'size'      => $w->size->value,
+                    'icon'      => $w->icon,
+                    'color'     => $w->color,
+                    'is_active' => $w->is_active,
+                    'order'     => $w->order,
+                    'config'    => $w->config,
+                    'data'      => $w->is_active ? $this->getWidgetData($w) : null,
+                ]);
+            }),
         ]);
     }
 
@@ -50,6 +63,10 @@ class DashboardController extends Controller
             'chart' => $this->getChartData($widget),
             'table' => $this->getTableData($widget),
             'quick_actions' => collect($widget->config['actions'] ?? [])->map(function ($action) {
+                if (isset($action['url'])) {
+                    return $action;
+                }
+
                 try {
                     $url = route($action['route']);
                 } catch (Exception) {
@@ -95,7 +112,10 @@ class DashboardController extends Controller
             $previousQuery = clone $query;
 
             $previousValue = match ($period) {
-                'last_month' => $previousQuery->whereMonth('created_at', now()->subMonth()->month)->count(),
+                'last_month' => $previousQuery->whereBetween('created_at', [
+                    now()->subMonth()->startOfMonth(),
+                    now()->subMonth()->endOfMonth(),
+                ])->count(),
                 'last_week' => $previousQuery->whereBetween('created_at', [now()->subWeek(), now()])->count(),
                 default => 0,
             };
@@ -125,14 +145,21 @@ class DashboardController extends Controller
             return $this->getLowStockData($config['threshold'] ?? 5);
         }
 
-        // Default: 365-day revenue chart (daily granularity, frontend aggregates to weekly/monthly)
+        // Default: 365-day revenue chart — single query grouped by date
+        $from = now()->subDays(364)->startOfDay();
+
+        $revenueByDate = Order::query()
+            ->selectRaw('DATE(created_at) as date, SUM(total) as value')
+            ->where('created_at', '>=', $from)
+            ->groupByRaw('DATE(created_at)')
+            ->pluck('value', 'date');
+
         $data = [];
         for ($i = 364; $i >= 0; $i--) {
-            $date = now()->subDays($i);
-            $value = Order::whereDate('created_at', $date->toDateString())->sum('total') ?? 0;
+            $date = now()->subDays($i)->toDateString();
             $data[] = [
-                'date' => $date->toDateString(),
-                'value' => (int) $value,
+                'date' => $date,
+                'value' => (int) ($revenueByDate[$date] ?? 0),
             ];
         }
 
@@ -143,11 +170,22 @@ class DashboardController extends Controller
     {
         $statuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
 
-        return collect($statuses)->map(fn ($status) => [
-            'label' => ucfirst($status),
-            'date' => ucfirst($status),
-            'value' => Order::where('status', $status)->count(),
-        ])->filter(fn ($item) => $item['value'] > 0)->values()->toArray();
+        // Single GROUP BY query instead of one COUNT per status
+        $counts = Order::query()
+            ->selectRaw('status, COUNT(*) as count')
+            ->whereIn('status', $statuses)
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
+        return collect($statuses)
+            ->map(fn ($status) => [
+                'label' => ucfirst($status),
+                'date' => ucfirst($status),
+                'value' => (int) ($counts[$status] ?? 0),
+            ])
+            ->filter(fn ($item) => $item['value'] > 0)
+            ->values()
+            ->toArray();
     }
 
     private function getLowStockData(int $threshold): array
