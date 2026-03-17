@@ -185,7 +185,7 @@ it('stores product with decimal prices and selected images', function () {
     ]);
 
     $response = $this->post('/admin/ecommerce/products', [
-        'name' => 'Created Product',
+        'name' => ['en' => 'Created Product'],
         'slug' => 'created-product',
         'product_type_id' => $productType->id,
         'category_id' => $category->id,
@@ -266,7 +266,7 @@ it('updates product booleans and converts decimal price values to cents', functi
     ]);
 
     $response = $this->put("/admin/ecommerce/products/{$product->id}", [
-        'name' => 'Update Product',
+        'name' => ['en' => 'Update Product'],
         'slug' => 'update-product',
         'product_type_id' => $productType->id,
         'category_id' => $category->id,
@@ -359,7 +359,7 @@ it('creates product with auto-generated slug from name when slug is not provided
     ]);
 
     $response = $this->post('/admin/ecommerce/products', [
-        'name' => 'Mój Produkt Testowy',
+        'name' => ['en' => 'Mój Produkt Testowy'],
         'product_type_id' => $productType->id,
         'category_id' => $category->id,
         'variant' => [
@@ -424,7 +424,7 @@ it('stores and updates product brand and flags assignments', function () {
     ]);
 
     $storeResponse = $this->post('/admin/ecommerce/products', [
-        'name' => 'Flagged Product',
+        'name' => ['en' => 'Flagged Product'],
         'slug' => 'flagged-product',
         'product_type_id' => $productType->id,
         'category_id' => $category->id,
@@ -450,7 +450,7 @@ it('stores and updates product brand and flags assignments', function () {
     ]);
 
     $updateResponse = $this->put("/admin/ecommerce/products/{$product->id}", [
-        'name' => 'Flagged Product',
+        'name' => ['en' => 'Flagged Product'],
         'slug' => 'flagged-product',
         'product_type_id' => $productType->id,
         'category_id' => $category->id,
