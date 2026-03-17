@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\ShippingCarrierEnum;
-use App\Modules\Ecommerce\Domain\Interfaces\ShippingCarrierInterface;
+use App\Interfaces\ShippingCarrierInterface;
 use InvalidArgumentException;
 
 class ShippingCarrierManager

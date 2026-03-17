@@ -2,31 +2,37 @@
 
 declare(strict_types=1);
 
+/** @deprecated Use App\Infrastructure\Shipping\Furgonetka\FurgonetkaCarrier('dpd_classic') */
+
 namespace App\Infrastructure\Shipping;
 
+use App\Infrastructure\Shipping\Furgonetka\FurgonetkaCarrier;
+use App\Interfaces\ShippingCarrierInterface;
 use App\Models\Order;
 use App\Models\Shipment;
-use App\Modules\Ecommerce\Domain\Interfaces\ShippingCarrierInterface;
 
+/** @codeCoverageIgnore */
 class DpdCarrier implements ShippingCarrierInterface
 {
-    public function createShipment(Order $order, array $data): Shipment
+    public function __construct(private readonly FurgonetkaCarrier $delegate) {}
+
+    public function createShipment(Order $order, array $data = []): Shipment
     {
-        return $order->shipment()->firstOrFail();
+        return $this->delegate->createShipment($order, $data);
     }
 
     public function generateLabel(Shipment $shipment): string
     {
-        return '';
+        return $this->delegate->generateLabel($shipment);
     }
 
     public function trackShipment(Shipment $shipment): array
     {
-        return [];
+        return $this->delegate->trackShipment($shipment);
     }
 
     public function handleWebhook(array $payload): void
     {
-        // Stub: to be implemented
+        $this->delegate->handleWebhook($payload);
     }
 }

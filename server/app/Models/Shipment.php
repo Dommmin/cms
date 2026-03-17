@@ -16,8 +16,8 @@ class Shipment extends Model
     protected $table = 'shipments';
 
     protected $fillable = [
-        'order_id', 'shipping_method_id', 'carrier', 'tracking_number',
-        'label_url', 'status', 'pickup_point_id', 'carrier_payload',
+        'order_id', 'shipping_method_id', 'carrier', 'provider_shipment_id',
+        'tracking_number', 'label_url', 'status', 'pickup_point_id', 'carrier_payload',
     ];
 
     protected $casts = [
