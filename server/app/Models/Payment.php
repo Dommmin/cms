@@ -18,7 +18,7 @@ class Payment extends Model
     protected $table = 'payments';
 
     protected $fillable = [
-        'order_id', 'provider', 'provider_transaction_id',
+        'order_id', 'provider', 'payment_method', 'provider_transaction_id',
         'status', 'amount', 'currency_code', 'payload',
     ];
 

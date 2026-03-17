@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\PaymentProviderEnum;
-use App\Modules\Ecommerce\Domain\Interfaces\PaymentGatewayInterface;
+use App\Interfaces\PaymentGatewayInterface;
 use InvalidArgumentException;
 
 class PaymentGatewayManager

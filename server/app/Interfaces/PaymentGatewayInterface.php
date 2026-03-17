@@ -19,9 +19,12 @@ interface PaymentGatewayInterface
     public function createPayment(Order $order, array $data): Payment;
 
     /**
-     * Process payment (redirect to gateway)
+     * Process payment — returns action details for the caller.
+     *
+     * @param  array<string, mixed>  $options  customer_ip, payment_method, blik_code, payment_token, return_url, continue_url
+     * @return array{action: 'redirect'|'wait'|'none', redirect_url: string|null, message: string}
      */
-    public function processPayment(Payment $payment): array;
+    public function processPayment(Payment $payment, array $options = []): array;
 
     /**
      * Verify payment status
