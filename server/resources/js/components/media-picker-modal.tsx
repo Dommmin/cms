@@ -11,6 +11,8 @@ import {
     GripVerticalIcon,
     StarIcon,
     TrashIcon,
+    UploadIcon,
+    LoaderCircleIcon,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -85,6 +87,9 @@ export function MediaPickerModal({
     const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+    const [uploading, setUploading] = useState(false);
+    const [isDragOver, setIsDragOver] = useState(false);
+    const uploadInputRef = useRef<HTMLInputElement>(null);
     const searchRef = useRef(search);
     const extensionRef = useRef(extension);
 
@@ -177,6 +182,59 @@ export function MediaPickerModal({
         setDraggedIndex(null);
     };
 
+    const uploadFiles = async (files: FileList | File[]) => {
+        if (!files || files.length === 0) return;
+        setUploading(true);
+
+        const formData = new FormData();
+        Array.from(files).forEach((file) => formData.append('files[]', file));
+
+        try {
+            const response = await axios.post<MediaItem[]>(
+                '/admin/media/upload',
+                formData,
+                { headers: { 'Content-Type': 'multipart/form-data' } },
+            );
+            // Refresh the list to show newly uploaded files
+            await fetchMedia(1);
+            setCurrentPage(1);
+            // Auto-select all newly uploaded items
+            response.data.forEach((item) => onSelect(item));
+        } catch (error) {
+            console.error('Upload failed:', error);
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleUploadInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            uploadFiles(e.target.files);
+            e.target.value = '';
+        }
+    };
+
+    const handleDropzoneDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(true);
+    };
+
+    const handleDropzoneDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(false);
+    };
+
+    const handleDropzoneDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(false);
+        if (e.dataTransfer.files.length > 0) {
+            uploadFiles(e.dataTransfer.files);
+        }
+    };
+
     const extensions = [
         'jpg',
         'jpeg',
@@ -231,9 +289,43 @@ export function MediaPickerModal({
                                     </option>
                                 ))}
                             </select>
+                            <input
+                                ref={uploadInputRef}
+                                type="file"
+                                multiple
+                                accept="image/*,application/pdf,video/*"
+                                className="hidden"
+                                onChange={handleUploadInputChange}
+                            />
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => uploadInputRef.current?.click()}
+                                disabled={uploading}
+                            >
+                                {uploading ? (
+                                    <LoaderCircleIcon className="h-4 w-4 animate-spin" />
+                                ) : (
+                                    <UploadIcon className="h-4 w-4" />
+                                )}
+                                {uploading ? 'Uploading...' : 'Upload'}
+                            </Button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-6">
+                        <div
+                            className="relative flex-1 overflow-y-auto p-6"
+                            onDragOver={handleDropzoneDragOver}
+                            onDragLeave={handleDropzoneDragLeave}
+                            onDrop={handleDropzoneDrop}
+                        >
+                            {isDragOver && (
+                                <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-primary bg-primary/10">
+                                    <UploadIcon className="h-12 w-12 text-primary" />
+                                    <p className="mt-3 text-lg font-semibold text-primary">
+                                        Drop files to upload
+                                    </p>
+                                </div>
+                            )}
                             {loading ? (
                                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                                     {[...Array(12)].map((_, i) => (

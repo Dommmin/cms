@@ -1,4 +1,4 @@
-import { router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilIcon, TrashIcon, Folder } from 'lucide-react';
 import { ConfirmButton } from '@/components/confirm-dialog';
@@ -89,17 +89,11 @@ export const categoryColumns: ColumnDef<CategoryRow>[] = [
         header: 'Actions',
         cell: ({ row }) => (
             <div className="flex items-center gap-2">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                        router.visit(
-                            `/admin/ecommerce/categories/${row.original.id}/edit`,
-                        )
-                    }
-                >
-                    <PencilIcon className="mr-1 h-3 w-3" />
-                    Edit
+                <Button asChild variant="outline" size="sm">
+                    <Link href={`/admin/ecommerce/categories/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <PencilIcon className="mr-1 h-3 w-3" />
+                        Edit
+                    </Link>
                 </Button>
                 <ConfirmButton
                     variant="destructive"

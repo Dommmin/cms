@@ -1,4 +1,5 @@
 import { usePage } from '@inertiajs/react';
+import type { SharedLocale } from '@/types/global';
 import { Laptop, Moon, Sun } from 'lucide-react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { CommandPalette } from '@/components/command-palette';
@@ -29,7 +30,8 @@ export function AppSidebarHeader({
     breadcrumbs?: BreadcrumbItemType[];
 }) {
     const { appearance, updateAppearance } = useAppearance();
-    const { locales } = usePage().props;
+    const rawLocales = usePage().props.locales;
+    const locales: SharedLocale[] = Array.isArray(rawLocales) ? rawLocales : [];
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? locales[0]?.code ?? 'en';
     const [adminLocale, setAdminLocale] = useAdminLocale(defaultLocale);
 

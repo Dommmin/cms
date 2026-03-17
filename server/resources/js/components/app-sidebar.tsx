@@ -21,6 +21,7 @@ import {
     Receipt,
     Truck,
     RotateCcw,
+    Star,
     Mail,
     Users2,
     Megaphone,
@@ -62,263 +63,272 @@ import {
     SidebarGroup,
 } from '@/components/ui/sidebar';
 
+import { useAdminT } from '@/hooks/use-admin-t';
 import { dashboard } from '@/routes/admin';
 import type { NavItem } from '@/types';
 import AppLogo from './app-logo';
 
-const baseNavItems: NavItem[] = [
+const footerNavItems: NavItem[] = [];
+
+export function AppSidebar() {
+    const t = useAdminT();
+
+    const baseNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: t('nav.dashboard', 'Dashboard'),
         href: dashboard(),
         icon: LayoutGrid,
     },
     {
-        title: 'Media',
+        title: t('nav.media', 'Media'),
         href: '/admin/media',
         icon: Image,
     },
     {
-        title: 'CMS',
+        title: t('nav.cms', 'CMS'),
         icon: Folder,
         children: [
             {
-                title: 'Pages',
+                title: t('nav.pages', 'Pages'),
                 href: '/admin/cms/pages',
                 icon: LayoutGrid,
             },
             {
-                title: 'Global Blocks',
+                title: t('nav.global_blocks', 'Global Blocks'),
                 href: '/admin/cms/reusable-blocks',
                 icon: LibraryBig,
             },
             {
-                title: 'Menus',
+                title: t('nav.menus', 'Menus'),
                 href: '/admin/menus',
                 icon: Menu,
             },
             {
-                title: 'Themes',
+                title: t('nav.themes', 'Themes'),
                 href: '/admin/themes',
                 icon: Palette,
             },
             {
-                title: 'Forms',
+                title: t('nav.forms', 'Forms'),
                 href: '/admin/forms',
                 icon: ClipboardList,
             },
             {
-                title: 'FAQ',
+                title: t('nav.faq', 'FAQ'),
                 href: '/admin/faqs',
                 icon: HelpCircle,
             },
             {
-                title: 'Section Templates',
+                title: t('nav.section_templates', 'Section Templates'),
                 href: '/admin/section-templates',
                 icon: LibraryBig,
             },
             {
-                title: 'Stores',
+                title: t('nav.stores', 'Stores'),
                 href: '/admin/stores',
                 icon: MapPin,
             },
             {
-                title: 'Blog Posts',
+                title: t('nav.blog_posts', 'Blog Posts'),
                 href: '/admin/blog/posts',
                 icon: BookOpen,
             },
             {
-                title: 'Blog Categories',
+                title: t('nav.blog_categories', 'Blog Categories'),
                 href: '/admin/blog/categories',
                 icon: FolderOpen,
             },
         ],
     },
     {
-        title: 'Shop',
+        title: t('nav.shop', 'Shop'),
         icon: ShoppingBag,
         children: [
             {
-                title: 'Products',
+                title: t('nav.products', 'Products'),
                 href: '/admin/ecommerce/products',
                 icon: Package,
             },
             {
-                title: 'Categories',
+                title: t('nav.categories', 'Categories'),
                 href: '/admin/ecommerce/categories',
                 icon: List,
             },
             {
-                title: 'Brands',
+                title: t('nav.brands', 'Brands'),
                 href: '/admin/ecommerce/brands',
                 icon: Tag,
             },
             {
-                title: 'Product Types',
+                title: t('nav.product_types', 'Product Types'),
                 href: '/admin/ecommerce/product-types',
                 icon: Box,
             },
             {
-                title: 'Attributes',
+                title: t('nav.attributes', 'Attributes'),
                 href: '/admin/ecommerce/attributes',
                 icon: List,
             },
             {
-                title: 'Product Flags',
+                title: t('nav.product_flags', 'Product Flags'),
                 href: '/admin/ecommerce/product-flags',
                 icon: Flag,
             },
             {
-                title: 'Orders',
+                title: t('nav.orders', 'Orders'),
                 href: '/admin/ecommerce/orders',
                 icon: ShoppingCart,
             },
             {
-                title: 'Customers',
+                title: t('nav.customers', 'Customers'),
                 href: '/admin/ecommerce/customers',
                 icon: UserCircle,
             },
             {
-                title: 'Discounts',
+                title: t('nav.discounts', 'Discounts'),
                 href: '/admin/ecommerce/discounts',
                 icon: Percent,
             },
             {
-                title: 'Promotions',
+                title: t('nav.promotions', 'Promotions'),
                 href: '/admin/ecommerce/promotions',
                 icon: Tag,
             },
             {
-                title: 'Tax Rates',
+                title: t('nav.tax_rates', 'Tax Rates'),
                 href: '/admin/ecommerce/tax-rates',
                 icon: Receipt,
             },
             {
-                title: 'Shipping',
+                title: t('nav.shipping', 'Shipping'),
                 href: '/admin/ecommerce/shipping-methods',
                 icon: Truck,
             },
             {
-                title: 'Returns',
+                title: t('nav.returns', 'Returns'),
                 href: '/admin/ecommerce/returns',
                 icon: RotateCcw,
+            },
+            {
+                title: t('nav.reviews', 'Reviews'),
+                href: '/admin/ecommerce/reviews',
+                icon: Star,
             },
         ],
     },
     {
-        title: 'Newsletter',
+        title: t('nav.newsletter', 'Newsletter'),
         icon: Mail,
         children: [
             {
-                title: 'Subscribers',
+                title: t('nav.subscribers', 'Subscribers'),
                 href: '/admin/newsletter/subscribers',
                 icon: Users2,
             },
             {
-                title: 'Segments',
+                title: t('nav.segments', 'Segments'),
                 href: '/admin/newsletter/segments',
                 icon: List,
             },
             {
-                title: 'Campaigns',
+                title: t('nav.campaigns', 'Campaigns'),
                 href: '/admin/newsletter/campaigns',
                 icon: Megaphone,
             },
         ],
     },
     {
-        title: 'Finance',
+        title: t('nav.finance', 'Finance'),
         icon: Coins,
         children: [
             {
-                title: 'Currencies',
+                title: t('nav.currencies', 'Currencies'),
                 href: '/admin/currencies',
                 icon: Coins,
             },
             {
-                title: 'Exchange Rates',
+                title: t('nav.exchange_rates', 'Exchange Rates'),
                 href: '/admin/exchange-rates',
                 icon: ArrowRightLeft,
             },
         ],
     },
     {
-        title: 'Users',
+        title: t('nav.users', 'Users'),
         href: '/admin/users',
         icon: Users,
     },
     {
-        title: 'Notifications',
+        title: t('nav.notifications', 'Notifications'),
         href: '/admin/notifications',
         icon: Bell,
     },
     {
-        title: 'Activity Log',
+        title: t('nav.activity_log', 'Activity Log'),
         href: '/admin/activity-log',
         icon: Activity,
     },
     {
-        title: 'Cookie Consents',
+        title: t('nav.cookie_consents', 'Cookie Consents'),
         href: '/admin/cookie-consents',
         icon: Cookie,
     },
     {
-        title: 'i18n',
+        title: t('nav.i18n', 'i18n'),
         icon: Languages,
         children: [
             {
-                title: 'Locales',
+                title: t('nav.locales', 'Locales'),
                 href: '/admin/locales',
                 icon: Flag,
             },
             {
-                title: 'Translations',
+                title: t('nav.translations', 'Translations'),
                 href: '/admin/translations',
                 icon: Languages,
             },
         ],
     },
     {
-        title: 'Affiliates',
+        title: t('nav.affiliates', 'Affiliates'),
         icon: Link2,
         children: [
             {
-                title: 'Codes',
+                title: t('nav.affiliate_codes', 'Codes'),
                 href: '/admin/affiliates/codes',
                 icon: GitBranch,
             },
             {
-                title: 'Referrals',
+                title: t('nav.referrals', 'Referrals'),
                 href: '/admin/affiliates/referrals',
                 icon: Users2,
             },
         ],
     },
     {
-        title: 'Support',
+        title: t('nav.support', 'Support'),
         icon: MessageCircle,
         children: [
             {
-                title: 'Conversations',
+                title: t('nav.conversations', 'Conversations'),
                 href: '/admin/support',
                 icon: MessageSquare,
             },
             {
-                title: 'Canned Responses',
+                title: t('nav.canned_responses', 'Canned Responses'),
                 href: '/admin/support/canned-responses',
                 icon: ClipboardList,
             },
         ],
     },
     {
-        title: 'Settings',
+        title: t('nav.settings', 'Settings'),
         href: '/admin/settings',
         icon: Settings,
     },
 ];
 
-const footerNavItems: NavItem[] = [];
 
-export function AppSidebar() {
     const page = usePage();
     const currentUrl = page.url;
 
@@ -400,6 +410,8 @@ export function AppSidebar() {
                                                                         href={
                                                                             subItem.href
                                                                         }
+                                                                        prefetch
+                                                                        cacheFor={30}
                                                                     >
                                                                         {subItem.icon && (
                                                                             <subItem.icon />
@@ -429,7 +441,7 @@ export function AppSidebar() {
                                         tooltip={item.title}
                                         isActive={isActive(item.href)}
                                     >
-                                        <Link href={item.href}>
+                                        <Link href={item.href} prefetch cacheFor={30}>
                                             {item.icon && <item.icon />}
                                             <span>{item.title}</span>
                                         </Link>

@@ -1,11 +1,11 @@
 import { Link } from '@inertiajs/react';
-import { Bell, BellOff, BellRing, Circle, Package, Star, AlertTriangle } from 'lucide-react';
+import { Bell, BellOff, BellRing, Circle, Package, Star, AlertTriangle, MessageCircle, CheckCheck } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface AdminNotification {
     id: string;
-    type: 'new_order' | 'pending_review' | 'low_stock';
+    type: 'new_order' | 'pending_review' | 'low_stock' | 'unread_support';
     title: string;
     message: string;
     created_at: string;
@@ -16,18 +16,21 @@ const TYPE_ICON: Record<AdminNotification['type'], React.ElementType> = {
     new_order: Package,
     pending_review: Star,
     low_stock: AlertTriangle,
+    unread_support: MessageCircle,
 };
 
 const TYPE_COLOR: Record<AdminNotification['type'], string> = {
     new_order: 'text-green-600',
     pending_review: 'text-yellow-600',
     low_stock: 'text-red-600',
+    unread_support: 'text-blue-600',
 };
 
 const TYPE_BROWSER_ICON: Record<AdminNotification['type'], string> = {
     new_order: '/favicon.ico',
     pending_review: '/favicon.ico',
     low_stock: '/favicon.ico',
+    unread_support: '/favicon.ico',
 };
 
 function getBrowserPermission(): NotificationPermission | 'unsupported' {
@@ -46,7 +49,6 @@ export function NotificationBell() {
         getBrowserPermission,
     );
     const panelRef = useRef<HTMLDivElement>(null);
-    const esRef = useRef<EventSource | null>(null);
     const seenIdsRef = useRef(seenIds);
     const browserNotifiedIds = useRef<Set<string>>(new Set());
     seenIdsRef.current = seenIds;
@@ -79,39 +81,23 @@ export function NotificationBell() {
         fireBrowserNotifications(newOnes);
     }, [fireBrowserNotifications]);
 
-    const connect = useCallback(() => {
-        if (esRef.current) {
-            esRef.current.close();
+    const fetchNotifications = useCallback(async () => {
+        try {
+            const res = await fetch('/admin/notifications', {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            });
+            if (!res.ok) return;
+            applyUpdate(await res.json());
+        } catch {
+            // ignore network errors
         }
-
-        const es = new EventSource('/admin/notifications/stream');
-        esRef.current = es;
-
-        es.addEventListener('notifications', (e: MessageEvent) => {
-            try {
-                applyUpdate(JSON.parse(e.data));
-            } catch {
-                // ignore parse errors
-            }
-        });
-
-        es.addEventListener('reconnect', () => {
-            es.close();
-            setTimeout(connect, 500);
-        });
-
-        es.onerror = () => {
-            es.close();
-            setTimeout(connect, 5_000);
-        };
     }, [applyUpdate]);
 
     useEffect(() => {
-        connect();
-        return () => {
-            esRef.current?.close();
-        };
-    }, [connect]);
+        fetchNotifications();
+        const id = setInterval(fetchNotifications, 10_000);
+        return () => clearInterval(id);
+    }, [fetchNotifications]);
 
     // Close panel on outside click
     useEffect(() => {
@@ -130,6 +116,11 @@ export function NotificationBell() {
             setSeenIds(new Set(notifications.map((n) => n.id)));
             setUnreadCount(0);
         }
+    }
+
+    function markAllRead() {
+        setSeenIds(new Set(notifications.map((n) => n.id)));
+        setUnreadCount(0);
     }
 
     async function requestBrowserPermission() {
@@ -158,32 +149,44 @@ export function NotificationBell() {
                     <div className="flex items-center justify-between border-b border-border px-4 py-3">
                         <h3 className="text-sm font-semibold">Notifications</h3>
 
-                        {browserPermission === 'default' && (
-                            <button
-                                onClick={requestBrowserPermission}
-                                className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
-                                title="Enable browser notifications"
-                            >
-                                <BellRing className="h-3.5 w-3.5" />
-                                Enable
-                            </button>
-                        )}
-                        {browserPermission === 'granted' && (
-                            <span
-                                className="flex items-center gap-1 text-xs text-muted-foreground"
-                                title="Browser notifications enabled"
-                            >
-                                <BellRing className="h-3.5 w-3.5 text-green-500" />
-                            </span>
-                        )}
-                        {browserPermission === 'denied' && (
-                            <span
-                                className="flex items-center gap-1 text-xs text-muted-foreground"
-                                title="Browser notifications blocked"
-                            >
-                                <BellOff className="h-3.5 w-3.5 text-red-500" />
-                            </span>
-                        )}
+                        <div className="flex items-center gap-1">
+                            {unreadCount > 0 && (
+                                <button
+                                    onClick={markAllRead}
+                                    className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
+                                    title="Mark all as read"
+                                >
+                                    <CheckCheck className="h-3.5 w-3.5" />
+                                    Mark all read
+                                </button>
+                            )}
+                            {browserPermission === 'default' && (
+                                <button
+                                    onClick={requestBrowserPermission}
+                                    className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
+                                    title="Enable browser notifications"
+                                >
+                                    <BellRing className="h-3.5 w-3.5" />
+                                    Enable
+                                </button>
+                            )}
+                            {browserPermission === 'granted' && (
+                                <span
+                                    className="flex items-center gap-1 text-xs text-muted-foreground"
+                                    title="Browser notifications enabled"
+                                >
+                                    <BellRing className="h-3.5 w-3.5 text-green-500" />
+                                </span>
+                            )}
+                            {browserPermission === 'denied' && (
+                                <span
+                                    className="flex items-center gap-1 text-xs text-muted-foreground"
+                                    title="Browser notifications blocked"
+                                >
+                                    <BellOff className="h-3.5 w-3.5 text-red-500" />
+                                </span>
+                            )}
+                        </div>
                     </div>
 
                     {notifications.length === 0 ? (
