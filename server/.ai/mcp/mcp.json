@@ -1,9 +1,14 @@
 {
   "mcpServers": {
     "laravel-boost": {
-      "command": "/opt/homebrew/Cellar/php/8.5.2/bin/php",
+      "command": "docker",
       "args": [
-        "/Users/domin/admin/artisan",
+        "compose",
+        "exec",
+        "-T",
+        "php",
+        "php",
+        "artisan",
         "boost:mcp"
       ]
     },
