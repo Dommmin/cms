@@ -9,19 +9,24 @@
     "guidelines": true,
     "herd_mcp": false,
     "mcp": true,
+    "nightwatch_mcp": false,
     "packages": [
         "laravel/fortify",
         "spatie/laravel-medialibrary",
-        "spatie/laravel-permission"
+        "spatie/laravel-permission",
+        "spatie/laravel-pdf"
     ],
     "sail": false,
     "skills": [
+        "scout-development",
+        "socialite-development",
         "wayfinder-development",
         "pest-testing",
         "inertia-react-development",
         "tailwindcss-development",
-        "developing-with-fortify",
+        "fortify-development",
         "medialibrary-development",
+        "laravel-pdf",
         "laravel-permission-development"
     ]
 }
