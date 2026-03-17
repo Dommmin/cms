@@ -17,6 +17,13 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
@@ -27,8 +34,15 @@ type Locale = {
     name: string;
     native_name: string;
     flag_emoji: string | null;
+    currency_code: string | null;
     is_default: boolean;
     is_active: boolean;
+};
+
+type CurrencyOption = {
+    code: string;
+    name: string;
+    symbol: string;
 };
 
 type LocalesData = {
@@ -44,6 +58,7 @@ type LocalesData = {
 type Props = {
     locales: LocalesData;
     filters: { search?: string };
+    currencies: CurrencyOption[];
 };
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Locales', href: '/admin/locales' }];
@@ -53,6 +68,7 @@ type LocaleForm = {
     name: string;
     native_name: string;
     flag_emoji: string;
+    currency_code: string;
     is_default: boolean;
     is_active: boolean;
 };
@@ -62,11 +78,12 @@ const defaultForm: LocaleForm = {
     name: '',
     native_name: '',
     flag_emoji: '',
+    currency_code: '',
     is_default: false,
     is_active: true,
 };
 
-export default function LocalesIndex({ locales, filters }: Props) {
+export default function LocalesIndex({ locales, filters, currencies }: Props) {
     const [open, setOpen] = useState(false);
     const [editLocale, setEditLocale] = useState<Locale | null>(null);
     const [form, setForm] = useState<LocaleForm>(defaultForm);
@@ -85,6 +102,7 @@ export default function LocalesIndex({ locales, filters }: Props) {
             name: locale.name,
             native_name: locale.native_name,
             flag_emoji: locale.flag_emoji ?? '',
+            currency_code: locale.currency_code ?? '',
             is_default: locale.is_default,
             is_active: locale.is_active,
         });
@@ -131,6 +149,18 @@ export default function LocalesIndex({ locales, filters }: Props) {
                     <p className="text-sm text-muted-foreground">{row.original.native_name}</p>
                 </div>
             ),
+        },
+        {
+            accessorKey: 'currency_code',
+            header: 'Currency',
+            cell: ({ row }) =>
+                row.original.currency_code ? (
+                    <Badge variant="outline" className="font-mono">
+                        {row.original.currency_code}
+                    </Badge>
+                ) : (
+                    <span className="text-muted-foreground">—</span>
+                ),
         },
         {
             accessorKey: 'is_default',
@@ -267,6 +297,25 @@ export default function LocalesIndex({ locales, filters }: Props) {
                                 onChange={(e) => setForm((f) => ({ ...f, native_name: e.target.value }))}
                                 placeholder="English"
                             />
+                        </div>
+                        <div className="space-y-1">
+                            <Label>Currency</Label>
+                            <Select
+                                value={form.currency_code || '_none'}
+                                onValueChange={(v) => setForm((f) => ({ ...f, currency_code: v === '_none' ? '' : v }))}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select currency..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="_none">— None —</SelectItem>
+                                    {currencies.map((c) => (
+                                        <SelectItem key={c.code} value={c.code}>
+                                            {c.code} — {c.name} ({c.symbol})
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div className="flex items-center gap-6">
                             <label className="flex cursor-pointer items-center gap-2">

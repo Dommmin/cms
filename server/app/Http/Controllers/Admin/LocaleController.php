@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreLocaleRequest;
 use App\Http\Requests\Admin\UpdateLocaleRequest;
+use App\Models\Currency;
 use App\Models\Locale;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,9 +24,16 @@ class LocaleController extends Controller
             ->paginate(20)
             ->withQueryString();
 
+        $currencies = Currency::query()
+            ->where('is_active', true)
+            ->orderBy('code')
+            ->get(['code', 'name', 'symbol'])
+            ->toArray();
+
         return inertia('admin/locales/index', [
             'locales' => $locales,
             'filters' => $request->only(['search']),
+            'currencies' => $currencies,
         ]);
     }
 

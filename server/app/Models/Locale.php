@@ -17,6 +17,7 @@ class Locale extends Model
         'name',
         'native_name',
         'flag_emoji',
+        'currency_code',
         'is_default',
         'is_active',
     ];

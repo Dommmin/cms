@@ -16,6 +16,7 @@ class UpdateLocaleRequest extends FormRequest
             'name' => ['required', 'string', 'max:100'],
             'native_name' => ['required', 'string', 'max:100'],
             'flag_emoji' => ['nullable', 'string', 'max:10'],
+            'currency_code' => ['nullable', 'string', 'max:3', 'exists:currencies,code'],
             'is_default' => ['boolean'],
             'is_active' => ['boolean'],
         ];

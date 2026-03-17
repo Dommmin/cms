@@ -35,7 +35,7 @@ class MenuResource extends JsonResource
         return $items->values()->map(fn (MenuItem $item) => [
             'id' => $item->id,
             'label' => $item->getLocalizedLabel($locale),
-            'url' => $item->url,
+            'url' => $item->resolvedUrl($locale),
             'target' => $item->target,
             'position' => $item->position,
             'children' => $item->relationLoaded('children') ? $this->mapItems($item->children) : [],
