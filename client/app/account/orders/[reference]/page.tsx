@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { ArrowLeft, CheckCircle2, Circle, Package, Truck } from "lucide-react";
 
 import { useOrder, useCancelOrder } from "@/hooks/use-orders";
+import { useLocalePath } from "@/hooks/use-locale";
 import { api } from "@/lib/axios";
 import { formatPrice } from "@/lib/format";
 import type { OrderStatus } from "@/types/api";
@@ -97,6 +98,7 @@ function StatusTimeline({ status, history }: { status: OrderStatus; history?: Ar
 
 export default function OrderDetailPage() {
   const { reference } = useParams<{ reference: string }>();
+  const lp = useLocalePath();
   const { data: order, isLoading } = useOrder(reference);
   const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder();
 
@@ -146,7 +148,7 @@ export default function OrderDetailPage() {
     return (
       <div className="py-16 text-center text-muted-foreground">
         Order not found.{" "}
-        <Link href="/account/orders" className="underline">
+        <Link href={lp("/account/orders")} className="underline">
           Back to orders
         </Link>
       </div>
@@ -156,7 +158,7 @@ export default function OrderDetailPage() {
   return (
     <div className="space-y-4">
       <Link
-        href="/account/orders"
+        href={lp("/account/orders")}
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />

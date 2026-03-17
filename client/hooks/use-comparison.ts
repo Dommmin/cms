@@ -74,8 +74,9 @@ export function useComparisonProducts() {
       const { data } = await api.get<{ data: Product[] }>("/products/compare", { params });
       return data.data;
     },
-    enabled: ids.length > 0,
+    enabled: ids.length >= 2,
     staleTime: 60 * 1000,
+    retry: false,
   });
 }
 

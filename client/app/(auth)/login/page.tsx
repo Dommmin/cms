@@ -37,7 +37,7 @@ export default function LoginPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div>
           <label htmlFor="email" className="mb-1 block text-sm font-medium">
             {t("auth.email", "Email address")}

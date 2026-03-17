@@ -19,7 +19,8 @@ export function useConversation(token: string | null) {
     queryFn: () => getConversation(token!),
     enabled: !!token,
     staleTime: 5 * 1000,
-    refetchInterval: 5 * 1000,
+    retry: false,
+    refetchInterval: (query) => (query.state.error ? false : 5 * 1000),
   });
 }
 

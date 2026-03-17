@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { getTranslations } from "@/api/translations";
 import { getLocaleFromPath, localePath, stripLocaleFromPath } from "@/lib/i18n";
@@ -23,7 +23,6 @@ export function TranslationProvider({
   initialLocale?: string;
 }) {
   const pathname = usePathname();
-  const router = useRouter();
 
   // Derive locale from URL (source of truth). Fall back to prop on initial SSR render.
   const localeFromPath = getLocaleFromPath(pathname);
@@ -50,12 +49,12 @@ export function TranslationProvider({
 
   const setLocale = useCallback(
     (newLocale: string) => {
-      setLocaleState(newLocale);
-      // Navigate to the same page but with the new locale prefix
+      // Use hard navigation so server components (Header, menu) fully re-render
+      // with the new locale. router.push() only re-renders page segments, not layouts.
       const pathWithoutLocale = stripLocaleFromPath(pathname);
-      router.push(localePath(newLocale, pathWithoutLocale));
+      window.location.href = localePath(newLocale, pathWithoutLocale);
     },
-    [pathname, router]
+    [pathname]
   );
 
   return (

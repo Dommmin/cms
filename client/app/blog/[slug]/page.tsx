@@ -24,7 +24,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
       title: post.seo_title ?? post.title,
       description: post.seo_description ?? post.excerpt ?? undefined,
+      robots: post.meta_robots ?? "index, follow",
       alternates: generateAlternates(`/blog/${slug}`),
+      openGraph: {
+        title: post.seo_title ?? post.title,
+        description: post.seo_description ?? post.excerpt ?? undefined,
+        images: post.og_image
+          ? [post.og_image]
+          : post.featured_image
+            ? [post.featured_image]
+            : [],
+        type: "article",
+      },
+      twitter: { card: "summary_large_image" },
     };
   } catch {
     return {};

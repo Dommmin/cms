@@ -2,29 +2,30 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 import { toast } from "react-toastify";
 
-import { formatPrice } from "@/lib/format";
 import { useTranslation } from "@/hooks/use-translation";
 import { useLocalePath } from "@/hooks/use-locale";
 import { useAddToWishlist, useIsInWishlist, useRemoveFromWishlist } from "@/hooks/use-wishlist";
+import { useAddToCart } from "@/hooks/use-cart";
 import { useMe } from "@/hooks/use-auth";
-import { CompareButton } from "@/components/compare-button";
+import { useCurrency } from "@/hooks/use-currency";
 import type { Product } from "@/types/api";
 
 interface Props {
   product: Product;
-  currency?: string;
 }
 
-export function ProductCard({ product, currency = "USD" }: Props) {
+export function ProductCard({ product }: Props) {
   const { t } = useTranslation();
   const lp = useLocalePath();
-  const price = formatPrice(product.price_min, currency);
+  const { formatPrice } = useCurrency();
+  const price = formatPrice(product.price_min);
 
   const firstVariantId = product.variants?.[0]?.id ?? 0;
   const { data: user } = useMe();
+  const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
   const inWishlist = useIsInWishlist(firstVariantId);
   const { mutate: addToWishlist } = useAddToWishlist();
   const { mutate: removeFromWishlist } = useRemoveFromWishlist();
@@ -97,13 +98,40 @@ export function ProductCard({ product, currency = "USD" }: Props) {
             </span>
           )}
           <h3 className="line-clamp-2 font-medium leading-snug">{product.name}</h3>
-          <div className="mt-auto flex items-baseline gap-2 pt-2">
-            <span className="text-lg font-semibold">{price}</span>
+          <div className="mt-auto pt-2">
+            <div className="flex items-baseline gap-2">
+              <span className="text-lg font-semibold">{price}</span>
+              {product.is_on_sale && product.compare_at_price_min && (
+                <span className="text-sm text-muted-foreground line-through">
+                  {formatPrice(product.compare_at_price_min)}
+                </span>
+              )}
+            </div>
+            {product.is_on_sale && product.omnibus_price_min !== null && (
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {t("product.omnibus_label", "Lowest price in last 30 days")}:{" "}
+                <span className="font-medium">{formatPrice(product.omnibus_price_min)}</span>
+              </p>
+            )}
           </div>
         </div>
       </Link>
       <div className="px-4 pb-4">
-        <CompareButton productId={product.id} className="w-full justify-center" />
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            if (!firstVariantId) return;
+            addToCart(
+              { variant_id: firstVariantId, quantity: 1 },
+              { onSuccess: () => toast.success(t("product.added_to_cart", "Added to cart!")) },
+            );
+          }}
+          disabled={!product.is_active || !firstVariantId || isAddingToCart}
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+        >
+          <ShoppingCart className="h-4 w-4" />
+          {isAddingToCart ? t("product.adding", "Adding…") : t("product.add_to_cart", "Add to Cart")}
+        </button>
       </div>
     </div>
   );

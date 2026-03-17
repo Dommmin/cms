@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { getPage } from "@/api/cms";
@@ -13,14 +14,22 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
-    const { slug } = await params;
-    const page = await getPage(slug.join("/"));
+    const [{ slug }, headersList] = await Promise.all([params, headers()]);
+    const locale = headersList.get("x-locale") ?? "en";
+    const page = await getPage(slug.join("/"), locale);
     return {
       title: page.seo_title ?? page.title,
       description: page.seo_description ?? undefined,
+      robots: page.meta_robots ?? "index, follow",
       alternates: page.seo_canonical
         ? { canonical: page.seo_canonical }
         : undefined,
+      openGraph: {
+        title: page.seo_title ?? page.title,
+        description: page.seo_description ?? undefined,
+        images: page.og_image ? [page.og_image] : [],
+      },
+      twitter: { card: "summary_large_image" },
     };
   } catch {
     return {};
@@ -28,8 +37,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function DynamicPage({ params }: Props) {
-  const { slug } = await params;
-  const page = await getPage(slug.join("/")).catch(() => null);
+  const [{ slug }, headersList] = await Promise.all([params, headers()]);
+  const locale = headersList.get("x-locale") ?? "en";
+  const page = await getPage(slug.join("/"), locale).catch(() => null);
 
   if (!page || !page.is_published) {
     notFound();

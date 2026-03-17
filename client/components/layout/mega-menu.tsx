@@ -13,6 +13,13 @@ interface Props {
   categories: Category[];
 }
 
+/** Apply locale prefix to internal paths; leave external URLs (http//) untouched. */
+function localiseUrl(url: string | null | undefined, lp: (path: string) => string): string {
+  if (!url || url === "#") return "#";
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("//")) return url;
+  return lp(url);
+}
+
 type OpenKey = number | "categories" | null;
 
 export function MegaMenu({ items, categories }: Props) {
@@ -114,7 +121,7 @@ export function MegaMenu({ items, categories }: Props) {
           onMouseLeave={scheduleClose}
         >
           <Link
-            href={item.url ?? "#"}
+            href={localiseUrl(item.url, lp)}
             target={item.target}
             className="flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-accent hover:text-foreground"
           >
@@ -136,7 +143,7 @@ export function MegaMenu({ items, categories }: Props) {
                 {item.children.map((child) => (
                   <Link
                     key={child.id}
-                    href={child.url ?? "#"}
+                    href={localiseUrl(child.url, lp)}
                     target={child.target}
                     onClick={() => setOpenKey(null)}
                     className="block rounded-lg px-3 py-2 text-sm text-foreground/80 hover:bg-accent hover:text-foreground"

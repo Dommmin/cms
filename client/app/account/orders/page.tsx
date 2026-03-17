@@ -55,7 +55,7 @@ export default function OrdersPage() {
           {orders.map((order) => (
             <Link
               key={order.id}
-              href={`/account/orders/${order.reference_number}`}
+              href={lp(`/account/orders/${order.reference_number}`)}
               className="flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-shadow hover:shadow-md"
             >
               <div>

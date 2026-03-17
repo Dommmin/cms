@@ -4,16 +4,6 @@ import type { NextRequest } from 'next/server';
 const LOCALES = ['en', 'pl'];
 const DEFAULT_LOCALE = 'en';
 
-function detectLocale(request: NextRequest): string {
-  const cookieLocale = request.cookies.get('locale')?.value;
-  if (cookieLocale && LOCALES.includes(cookieLocale)) return cookieLocale;
-
-  const acceptLang = request.headers.get('accept-language') ?? '';
-  const preferred = acceptLang.split(',')[0]?.split('-')[0]?.toLowerCase() ?? '';
-  if (LOCALES.includes(preferred)) return preferred;
-
-  return DEFAULT_LOCALE;
-}
 
 function setLocaleCookie(response: NextResponse, locale: string): void {
   response.cookies.set('locale', locale, {
@@ -51,21 +41,24 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  // Case 3: No locale prefix → default locale; set cookie and pass through
-  const detectedLocale = detectLocale(request);
-
-  // If user's preferred locale is non-default, redirect to locale-prefixed URL
-  if (detectedLocale !== DEFAULT_LOCALE && !request.cookies.get('locale')) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = `/${detectedLocale}${pathname}`;
-    return NextResponse.redirect(redirectUrl);
+  // Case 3: No locale prefix → this IS the default locale URL.
+  // For first-time visitors (no cookie yet), check Accept-Language and redirect if needed.
+  if (!request.cookies.get('locale')) {
+    const acceptLang = request.headers.get('accept-language') ?? '';
+    const preferred = acceptLang.split(',')[0]?.split('-')[0]?.toLowerCase() ?? '';
+    if (LOCALES.includes(preferred) && preferred !== DEFAULT_LOCALE) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = `/${preferred}${pathname === '/' ? '' : pathname}`;
+      return NextResponse.redirect(redirectUrl);
+    }
   }
 
-  // Default locale — pass through, just refresh the cookie
+  // URL without locale prefix always means the default locale.
+  // Always set the cookie to DEFAULT_LOCALE so switching back from /pl/ works correctly.
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-locale', detectedLocale);
+  requestHeaders.set('x-locale', DEFAULT_LOCALE);
   const response = NextResponse.next({ request: { headers: requestHeaders } });
-  setLocaleCookie(response, detectedLocale);
+  setLocaleCookie(response, DEFAULT_LOCALE);
   return response;
 }
 

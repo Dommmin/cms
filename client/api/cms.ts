@@ -3,8 +3,8 @@ import type { BlogCategory, BlogPost, Brand, Category, Faq, Menu, Page, Paginate
 
 // ── Pages ─────────────────────────────────────────────────────────────────────
 
-export async function getPage(slug: string): Promise<Page> {
-  const { data } = await serverFetch<{ data: Page }>(`/pages/${slug}`);
+export async function getPage(slug: string, locale?: string): Promise<Page> {
+  const { data } = await serverFetch<{ data: Page }>(`/pages/${slug}`, { locale });
   return data;
 }
 

@@ -90,6 +90,8 @@ export interface ProductVariant {
   price: number;
   /** compare-at price in cents */
   compare_at_price: number | null;
+  /** lowest price in last 30 days (Omnibus Directive), in cents */
+  omnibus_price: number | null;
   stock_quantity: number;
   is_available: boolean;
   attributes: Record<string, string>;
@@ -116,6 +118,10 @@ export interface Product {
   is_active: boolean;
   is_on_sale: boolean;
   discount_percentage?: number | null;
+  /** lowest compare_at_price among on-sale variants, in cents */
+  compare_at_price_min: number | null;
+  /** lowest price in last 30 days for the cheapest on-sale variant (EU Omnibus), in cents */
+  omnibus_price_min: number | null;
   thumbnail: ProductImage | null;
   images: ProductImage[];
   variants: ProductVariant[];
@@ -123,6 +129,11 @@ export interface Product {
   brand: Brand | null;
   attributes: Attribute[];
   created_at: string;
+  seo_title: string | null;
+  seo_description: string | null;
+  meta_robots: string;
+  og_image: string | null;
+  sitemap_exclude: boolean;
 }
 
 // ── Categories ────────────────────────────────────────────────────────────────
@@ -217,6 +228,7 @@ export interface Shipment {
 export interface Payment {
   id: number;
   method: string;
+  payment_method: string | null;
   status: string;
   amount: number;
   paid_at: string | null;
@@ -260,10 +272,24 @@ export interface ShippingMethod {
   id: number;
   name: string;
   description: string | null;
-  /** in cents */
-  price: number;
-  estimated_days: number | null;
   carrier: string | null;
+  /** price in cents */
+  base_price: number;
+  free_shipping_threshold: number | null;
+  estimated_days_min: number | null;
+  estimated_days_max: number | null;
+  requires_pickup_point: boolean;
+  /** true = InPost native geowidget, false = unified Leaflet picker */
+  uses_native_widget: boolean;
+}
+
+export interface PickupPoint {
+  id: string;
+  name: string;
+  address: string;
+  hours: string | null;
+  lat: number;
+  lng: number;
 }
 
 // ── Wishlist ──────────────────────────────────────────────────────────────────
@@ -380,6 +406,9 @@ export interface BlogPost {
   reading_time: number | null;
   seo_title: string | null;
   seo_description: string | null;
+  meta_robots: string;
+  og_image: string | null;
+  sitemap_exclude: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -474,6 +503,9 @@ export interface Page {
   seo_title: string | null;
   seo_description: string | null;
   seo_canonical: string | null;
+  meta_robots: string;
+  og_image: string | null;
+  sitemap_exclude: boolean;
   sections: PageSection[];
   children?: Page[];
 }

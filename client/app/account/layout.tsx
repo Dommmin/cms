@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Heart, Package, User, LogOut } from "lucide-react";
@@ -16,6 +17,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname();
   const lp = useLocalePath();
   const { t } = useTranslation();
+  const [mounted, setMounted] = useState(false);
 
   const NAV_LINKS = [
     { href: "/account/orders", label: t("account.my_orders", "Orders"), icon: Package },
@@ -26,13 +28,15 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   // Strip locale prefix before comparing against href
   const pathWithoutLocale = stripLocaleFromPath(pathname);
 
-  // If no token at all, redirect to login (client-side guard)
-  if (typeof window !== "undefined" && !getToken()) {
-    window.location.href = lp("/login");
-    return null;
-  }
+  useEffect(() => {
+    setMounted(true);
+    if (!getToken()) {
+      window.location.href = lp("/login");
+    }
+  }, [lp]);
 
-  if (isLoading) {
+  // Show skeleton until mounted (avoids hydration mismatch from typeof window checks)
+  if (!mounted || isLoading) {
     return (
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="h-8 w-48 animate-pulse rounded bg-muted" />
@@ -41,9 +45,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   }
 
   if (!user) {
-    if (typeof window !== "undefined") {
-      window.location.href = lp("/login");
-    }
+    window.location.href = lp("/login");
     return null;
   }
 

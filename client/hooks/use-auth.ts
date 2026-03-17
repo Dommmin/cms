@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 
 import { forgotPassword, getMe, handleSocialCallback, login, logout, register } from "@/api/auth";
 import { getToken, removeToken, setToken } from "@/lib/axios";
@@ -9,6 +8,14 @@ import { cartKeys } from "@/hooks/use-cart";
 import { trackLogin, trackSignUp } from "@/lib/datalayer";
 import type { LoginPayload, RegisterPayload } from "@/types/api";
 import type { SocialProvider } from "@/api/auth";
+
+function getLocalePath(path: string): string {
+  const localeMatch = typeof document !== "undefined"
+    ? document.cookie.match(/(?:^|; )locale=([^;]*)/)
+    : null;
+  const locale = localeMatch ? decodeURIComponent(localeMatch[1]) : "en";
+  return locale === "en" ? path : `/${locale}${path}`;
+}
 
 export const authKeys = {
   me: ["auth", "me"] as const,
@@ -20,12 +27,13 @@ export function useMe() {
     queryFn: getMe,
     enabled: !!getToken(),
     retry: false,
+    staleTime: 5 * 60 * 1000,   // 5 min — user profile doesn't change frequently
+    gcTime: 30 * 60 * 1000,     // 30 min — keep logged-in user in memory
   });
 }
 
 export function useLogin() {
   const queryClient = useQueryClient();
-  const router = useRouter();
 
   return useMutation({
     mutationFn: (payload: LoginPayload) => login(payload),
@@ -34,14 +42,13 @@ export function useLogin() {
       queryClient.setQueryData(authKeys.me, user);
       queryClient.invalidateQueries({ queryKey: cartKeys.cart });
       trackLogin();
-      router.push("/");
+      window.location.href = getLocalePath("/");
     },
   });
 }
 
 export function useRegister() {
   const queryClient = useQueryClient();
-  const router = useRouter();
 
   return useMutation({
     mutationFn: (payload: RegisterPayload) => register(payload),
@@ -50,21 +57,24 @@ export function useRegister() {
       queryClient.setQueryData(authKeys.me, user);
       queryClient.invalidateQueries({ queryKey: cartKeys.cart });
       trackSignUp();
-      router.push("/");
+      window.location.href = getLocalePath("/");
     },
   });
 }
 
 export function useLogout() {
   const queryClient = useQueryClient();
-  const router = useRouter();
 
   return useMutation({
     mutationFn: logout,
     onSettled: () => {
       removeToken();
       queryClient.clear();
-      router.push("/login");
+      const localeMatch = typeof document !== "undefined"
+        ? document.cookie.match(/(?:^|; )locale=([^;]*)/)
+        : null;
+      const locale = localeMatch ? decodeURIComponent(localeMatch[1]) : "en";
+      window.location.href = locale === "en" ? "/login" : `/${locale}/login`;
     },
   });
 }

@@ -35,6 +35,23 @@ export default function ComparePage() {
     );
   }
 
+  if (ids.length === 1) {
+    return (
+      <div className="mx-auto max-w-4xl px-4 py-24 text-center sm:px-6 lg:px-8">
+        <h1 className="mb-4 text-2xl font-bold">{t("compare.one_title", "Add one more product")}</h1>
+        <p className="mb-6 text-muted-foreground">
+          {t("compare.one_desc", "You need at least 2 products to compare. Add another product from the listing.")}
+        </p>
+        <Link
+          href={lp("/products")}
+          className="inline-flex items-center rounded-xl bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:opacity-90"
+        >
+          {t("compare.browse", "Browse products")}
+        </Link>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">

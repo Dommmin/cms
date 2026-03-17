@@ -7,7 +7,8 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart, useRemoveCartItem, useUpdateCartItem } from "@/hooks/use-cart";
 import { useTranslation } from "@/hooks/use-translation";
 import { useLocalePath } from "@/hooks/use-locale";
-import { formatPrice } from "@/lib/format";
+import { useCurrency } from "@/hooks/use-currency";
+import { getToken } from "@/lib/axios";
 
 export default function CartPage() {
   const { data: cart, isLoading } = useCart();
@@ -15,6 +16,9 @@ export default function CartPage() {
   const { mutate: removeItem } = useRemoveCartItem();
   const { t } = useTranslation();
   const lp = useLocalePath();
+  const { formatPrice } = useCurrency();
+  const token = getToken();
+  const checkoutHref = lp(token ? "/checkout" : "/checkout/options");
 
   if (isLoading) {
     return (
@@ -75,9 +79,12 @@ export default function CartPage() {
 
                 {/* Info */}
                 <div className="flex flex-1 flex-col gap-1">
-                  <p className="font-medium leading-tight">
+                  <Link
+                    href={lp(`/products/${item.product?.slug ?? ""}`)}
+                    className="font-medium leading-tight hover:underline"
+                  >
                     {item.product?.name ?? "Product"}
-                  </p>
+                  </Link>
                   {item.variant?.sku && (
                     <p className="text-xs text-muted-foreground">SKU: {item.variant.sku}</p>
                   )}
@@ -141,7 +148,7 @@ export default function CartPage() {
             </div>
           </div>
           <Link
-            href={lp("/checkout")}
+            href={checkoutHref}
             className="block w-full rounded-xl bg-primary py-3 text-center font-semibold text-primary-foreground hover:opacity-90"
           >
             {t("cart.proceed", "Proceed to Checkout")}

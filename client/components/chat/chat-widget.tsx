@@ -39,7 +39,15 @@ export function ChatWidget({ isAuthenticated = false, userName, userEmail }: Pro
     localStorage.setItem(OPEN_KEY, String(isOpen));
   }, [isOpen]);
 
-  const { data: conversation, isLoading: isLoadingMessages } = useConversation(token);
+  const { data: conversation, isLoading: isLoadingMessages, isError: isConversationError } = useConversation(token);
+
+  // If the conversation no longer exists (404 or any error), reset to start a new one
+  useEffect(() => {
+    if (isConversationError && token) {
+      handleReset();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConversationError]);
   const startConversation = useStartConversation();
   const sendMessage = useSendMessage(token ?? "");
 

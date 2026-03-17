@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { addToWishlist, getWishlist, removeFromWishlist } from "@/api/wishlist";
+import { getToken } from "@/lib/axios";
 
 export const wishlistKeys = {
   wishlist: ["wishlist"] as const,
@@ -12,6 +13,9 @@ export function useWishlist() {
   return useQuery({
     queryKey: wishlistKeys.wishlist,
     queryFn: getWishlist,
+    enabled: !!getToken(),
+    staleTime: 2 * 60 * 1000,   // 2 min — wishlist rarely changes in background
+    gcTime: 10 * 60 * 1000,
   });
 }
 
