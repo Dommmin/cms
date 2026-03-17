@@ -1,6 +1,143 @@
 # Features Backlog
 
-> Last updated: 2026-03-05
+> Last updated: 2026-03-17
+
+---
+
+## ✏️ Lexical Rich Text Editor — Full Implementation
+
+**Status:** ✅ Fully implemented (2026-03-17).
+
+**Reference:** https://playground.lexical.dev/ · https://github.com/facebook/lexical/tree/main/packages/lexical-playground
+
+### Current state (what exists)
+- Text: bold, italic, underline, strikethrough ✅
+- Headings: H1, H2, H3 ✅
+- Lists: ordered, unordered ✅
+- Code block (with syntax highlighting) ✅
+- Link — via `window.prompt()` (no edit/remove UI) ⚠️
+- Table — hardcoded 3×3, no toolbar controls ⚠️
+- Undo/redo ✅
+- Markdown shortcuts ✅
+- HTML serialization/deserialization ✅
+- Toolbar: plain text labels (`B`, `I`, `U`, `H1`, `OL`, etc.) — no icons, no shadcn/ui styling ❌
+- `ImageNode`, `YouTubeNode`, `ImageGalleryNode` exist in source but are **not registered or accessible from toolbar** ❌
+
+### Toolbar UX
+- [x] Replace all text labels with **Lucide icons** (`Bold`, `Italic`, `Underline`, `Strikethrough`, `Link`, `List`, `ListOrdered`, `Code`, `Image`, `Youtube`, `Table`, `Undo2`, `Redo2`, etc.)
+- [x] Proper **shadcn/ui** styled toolbar using `Toggle` / `ToggleGroup` components with active state
+- [x] Separator `<Separator orientation="vertical" />` dividers between tool groups
+- [x] **Block type dropdown** (replaces individual H1/H2/H3 buttons): Paragraph / H1 / H2 / H3 / H4 / H5 / H6 / Quote / Code / Bullet list / Numbered list / Check list
+- [x] **Floating format toolbar** — bubble menu that appears above text selection with: Bold / Italic / Underline / Strikethrough / Code / Link / Text color / Highlight (`FloatingTextFormatPlugin`)
+- [x] Tooltip (`<TooltipProvider>`) on every toolbar button with keyboard shortcut hint
+
+### Text formatting (missing)
+- [x] Subscript / Superscript
+- [x] Inline code (`` `text` `` — distinct from code block)
+- [x] Text highlight / background color (color picker popover)
+- [x] Text color (color picker popover) — color grid in ToolbarPlugin
+- [x] Font size selector (dropdown: 10–36px) — `$patchStyleText` in ToolbarPlugin
+- [x] Font family selector (dropdown: default, serif, monospace, cursive)
+- [x] Clear all formatting button (Eraser icon)
+
+### Block types (missing)
+- [x] Quote / Blockquote — `QuoteNode` in toolbar
+- [x] Check list — `CheckListPlugin` + `ListItemNode` with checkbox rendering
+- [x] H4, H5, H6 headings
+
+### Text alignment (missing)
+- [x] Left / Center / Right / Justify — `FORMAT_ELEMENT_COMMAND`
+
+### Insert menu / dropdown (missing)
+- [x] Horizontal rule (`<hr>`)
+- [x] Image from URL — via MediaPickerModal in Insert menu
+- [x] Image upload — via MediaPickerModal in Insert menu
+- [x] YouTube embed — `InsertYouTubeDialog` with URL input
+- [x] Table — `InsertTableDialog` (rows × columns input)
+- [x] Collapsible section — `CollapsibleContainerNode`/`CollapsibleTitleNode`/`CollapsibleContentNode` custom nodes; renders as `<details>/<summary>/<div>`; in Insert dropdown
+- [x] Columns layout — `LayoutContainerNode`/`LayoutItemNode` (CSS grid); 2-col (`1fr 1fr`) and 3-col (`1fr 1fr 1fr`) in Insert dropdown
+- [x] Emoji picker — dialog with 7 category groups, ~140 emojis (in Insert dropdown)
+- [x] Special characters / symbols — dialog with 4 groups (Typography, Currency, Arrows, Math) in Insert dropdown
+
+### Links (improvement required)
+- [x] Floating link editor popover — `FloatingLinkEditorPlugin`
+- [x] `AutoLinkPlugin` — automatic conversion of typed URLs/emails to links
+
+### Table improvements (missing)
+- [x] `TableActionMenuPlugin` — right-click context menu: insert row above/below, insert column left/right, delete row, delete column, unmerge cell (`TableActionMenuPlugin.tsx`)
+- [x] Cell background color — 9-color preset palette in `TableActionMenuPlugin` context menu; `TablePlugin hasCellBackgroundColor` enabled
+
+### Code blocks (improvement required)
+- [x] Language selector dropdown on code blocks (40+ languages — in toolbar, context-sensitive)
+- [x] Copy code button in top-right corner of code block (`CopyCodePlugin`, appears on hover)
+
+### Other (missing)
+- [x] **Character and word count** display at bottom of editor (`WordCountPlugin`, `showWordCount` prop)
+- [x] **Draggable block plugin** — drag handle on left of each block for reordering (`DraggableBlockPlugin_EXPERIMENTAL` from `@lexical/react`)
+- [x] **Slash command menu** `/` — type `/` at start of line to open block-type insert menu (like Notion) (`SlashCommandPlugin.tsx`)
+- [x] Max height + scroll container — `maxHeight` prop on `<Editor>`
+- [x] Read-only mode prop — `editable={false}` prop on `<Editor>`
+- [x] Spellcheck toggle — `SpellCheck` icon in toolbar, toggles `editor.getRootElement().spellcheck`
+
+### Notes
+- All plugins should respect the existing `nodes.ts` registration pattern — add nodes there before using them
+- ImageNode and YouTubeNode are already defined in `image-node.tsx` and `youtube-node.tsx` but are **not in `nodes.ts`** and have no triggering UI
+- Toolbar styles must be consistent with shadcn/ui design system used in the rest of the admin SPA
+- Follow the Lexical playground source: `packages/lexical-playground/src/plugins/`
+
+---
+
+## 🔧 Admin Bar — Frontend Editing Mode
+
+**Status:** ✅ Fully implemented (2026-03-17). Level 1 (Admin Bar) + Level 2 (Block Overlays).
+
+**Concept:** When an admin is viewing the public Next.js frontend in preview mode, a sticky bar at the top and inline block overlays give direct access to the admin editor — similar to WordPress Admin Bar but focused on CMS edit actions.
+
+**How it works:**
+1. Admin clicks "Preview" on any Page / Product / BlogPost / Category edit page in admin panel
+2. Server sets a signed `admin_preview` cookie (2h TTL, not HttpOnly) with `{ userId, role, entity: { type, id } }`
+3. Client reads cookie via `useAdminPreview()` hook on every page load
+4. `AdminBar` component renders at top of page (z-50, sticky, 40px height offset to body)
+5. Each Next.js page passes its entity context to `AdminBar` via props
+6. AdminBar shows entity name + "Edit in admin" button + "Exit preview" button
+
+### Level 1 — Admin Bar (priority)
+
+**Backend (Laravel):**
+- [x] `GET /admin/preview?url={frontendUrl}` — sets `admin_preview` cookie (2h, not HttpOnly), redirects to `url`; requires auth + admin role
+- [x] "Preview" button on edit pages: Page, BlogPost, Product, Category — links to frontend URL in new tab and triggers cookie set
+- [x] `frontendUrl` is already in shared Inertia props — use it to build preview links: `frontendUrl + /{locale}/{slug}`
+
+**Frontend (Next.js):**
+- [x] `useAdminPreview()` hook — reads `admin_preview` cookie, returns `{ isPreview: boolean, entity: EntityContext | null }`
+- [x] `AdminBar` component — sticky top bar:
+  - Dark background (`bg-gray-950`)
+  - Left: Settings icon + "Admin Preview" label
+  - Center: entity type badge + entity name
+  - Right: "Edit in Admin" button (opens admin URL in new tab) + "Exit Preview" button (clears cookie, reloads)
+  - Height: 40px, `position: fixed`, `z-index: 9999`
+- [x] Entity context passed from each page:
+
+| Next.js page | Entity type | Admin edit URL |
+|---|---|---|
+| `app/[...slug]/page.tsx` | `page` | `/admin/cms/pages/{id}/edit` |
+| `app/blog/[slug]/page.tsx` | `blog_post` | `/admin/blog/posts/{id}/edit` |
+| `app/products/[slug]/page.tsx` | `product` | `/admin/ecommerce/products/{id}/edit` |
+| `app/products/page.tsx` | — | `/admin/ecommerce/products` |
+
+### Level 2 — Block Overlays (Page Builder, after Level 1)
+
+**Goal:** Hovering over a page builder block shows an edit button that opens the page builder scrolled to that block.
+
+**Backend:**
+- [x] `data-section-id` already in `SectionRenderer` (was existing); `data-block-id` added to `BlockCard` in page builder
+- No server-side change needed — block IDs are already in the page API response
+
+**Frontend:**
+- [x] `AdminBlockOverlay` component (`client/components/admin/admin-block-overlay.tsx`) — hover overlay with indigo border + block type label + "Edit" button → `builder?block={blockId}` (opens in new tab)
+- [x] `PageRenderer` reads `admin_preview` cookie server-side, passes `isPreview` + `pageId` + `adminBaseUrl` to `SectionRenderer`
+- [x] `SectionRenderer` wraps each active block with `<AdminBlockOverlay>` when `isPreview` is true
+- [x] Page builder: `useEffect` reads `?block=` from URL, scrolls to `[data-block-id="{id}"]` card and adds pulse ring animation
 
 ---
 

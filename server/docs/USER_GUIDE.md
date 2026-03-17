@@ -944,3 +944,38 @@ Get notified by email when product variants fall below their stock threshold.
 
 The blog automatically provides an RSS feed at `GET /feed`. Share this URL with customers and RSS readers. You can filter by locale using `?locale=en` query parameter. The feed is cached for 1 hour.
 
+
+---
+
+### Preview Mode — Admin Bar
+
+Preview mode lets you view any Page, Blog Post, Product, or Category on the live public website with an admin bar at the top.
+
+1. Open the edit page for a Page / Blog Post / Product / Category.
+2. Click the **Preview** button in the top-right action bar (eye icon).
+3. A new browser tab opens with the public page. A dark bar at the top confirms you are in preview mode.
+4. The bar shows the entity type and name (e.g. "Page: About Us").
+5. Click **Edit in Admin** to jump back to the edit page.
+6. Click **Exit Preview** to leave preview mode and reload.
+
+**Block Overlays (Page Builder pages only):**
+When previewing a page built with the Page Builder, hover over any block to see an edit button. Clicking it opens the Page Builder scrolled to that exact block.
+
+---
+
+### Rich Text Editor
+
+The admin panel uses a full-featured rich text editor (Lexical) for Blog Post content, Page excerpts, and Product descriptions.
+
+**Toolbar features:**
+- **Block type** — switch between Paragraph, H1–H6, Quote, Code Block, Bullet/Numbered/Check list
+- **Text formatting** — Bold, Italic, Underline, Strikethrough, Inline Code, Subscript, Superscript, Highlight, Clear formatting
+- **Alignment** — Left, Center, Right, Justify
+- **Links** — click the link button; a floating editor lets you edit, open, or remove the link
+- **Insert** — Horizontal Rule, Image (from Media Library), YouTube Video, Table (rows × columns)
+- **Code blocks** — language selector dropdown; "Copy" button appears on hover
+
+**Keyboard shortcuts:**
+`Ctrl+B` Bold · `Ctrl+I` Italic · `Ctrl+U` Underline · `Ctrl+Z` Undo · `Ctrl+Shift+Z` Redo
+
+**Word count** is shown at the bottom of the editor.

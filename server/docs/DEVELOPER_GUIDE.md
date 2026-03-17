@@ -289,7 +289,17 @@ $gateway = app(PaymentGatewayManager::class)->driver(PaymentProviderEnum::P24);
 $payment = $gateway->createPayment($order, $data);
 ```
 
-Registered gateways: `P24Gateway`, `PayUGateway`, `CashOnDeliveryGateway`.
+Registered gateways: `P24Gateway` (in `Infrastructure/Payments/P24/`), `PayUGateway` (in `Infrastructure/Payments/PayU/`), `CashOnDeliveryGateway`.
+
+`processPayment(Payment $payment, array $options = [])` accepts: `customer_ip`, `payment_method` (`blik`|`card`|`apple_pay`|`google_pay`|`bank_transfer`), `blik_code`, `payment_token`, `return_url`, `continue_url`. Returns `['action' => 'redirect'|'wait'|'none', 'redirect_url' => ?string, 'message' => string]`.
+
+**PayU sub-services:** `PayUTokenService` (OAuth2 token caching), `PayUClient` (HTTP calls with auto-retry on 401), `PayUWebhookVerifier` (MD5 signature check).
+
+**P24 sub-services:** `P24Client` (Basic Auth HTTP), `P24SignatureService` (SHA256 signature generation/verification).
+
+**Webhooks:** `POST /api/v1/webhooks/payu` and `POST /api/v1/webhooks/p24` → dispatches `ProcessPaymentWebhook` job (3 tries, 10s backoff). PayU webhook verifies signature synchronously before queuing.
+
+**Payment status polling:** `GET /api/v1/payments/{payment}/status` — authenticated, returns `{status, order_reference}`. Frontend polls every 3s while `status === 'pending'` (BLIK flow).
 
 ### ShippingCarrierManager
 
@@ -593,7 +603,7 @@ Invalid transitions throw `Spatie\ModelStates\Exceptions\CouldNotPerformTransiti
 interface PaymentGatewayInterface
 {
     public function createPayment(Order $order, array $data): Payment;
-    public function processPayment(Payment $payment): array;
+    public function processPayment(Payment $payment, array $options = []): array;
     public function verifyPayment(Payment $payment): bool;
     public function refundPayment(Payment $payment, int $amount): bool;
     public function handleWebhook(array $payload): void;
@@ -1859,3 +1869,70 @@ Products are identified/grouped by `sku_prefix`. Each `attribute_*` column auto-
 Errors:
 - `422` — fewer than 2 or more than 4 IDs, or mixed product types
 - `404` — fewer than 2 active products found from the provided IDs
+
+---
+
+## Admin Bar — Preview Mode
+
+### Backend
+
+`App\Http\Controllers\Admin\PreviewController` — invokable controller at `GET /admin/preview`.
+
+**Parameters:**
+- `url` (required) — full frontend URL to redirect to
+- `entity_type` (optional) — `page|blog_post|product|category`
+- `entity_id` (optional) — integer
+- `entity_name` (optional) — display name
+- `admin_url` (optional) — relative admin edit path (e.g. `/admin/cms/pages/5/edit`)
+
+**Behaviour:** Sets a non-HttpOnly `admin_preview` cookie (2h TTL) with JSON payload `{ entity: { type, id, name, admin_url } }`. The `admin_url` is prepended with `config('app.url')` if it starts with `/`. Redirects to `url`.
+
+**Preview buttons** are rendered on Page, BlogPost, Product, and Category edit pages as `<a href="/admin/preview?url=...&entity_*=...">` links with `target="_blank"`.
+
+### Frontend (Next.js)
+
+- `client/hooks/use-admin-preview.ts` — `useAdminPreview()` reads the `admin_preview` cookie on mount (client-only), parses JSON, returns `{ isPreview: boolean, entity: AdminPreviewEntity | null }`
+- `client/components/admin/admin-bar.tsx` — `<AdminBar />` renders the fixed dark bar; reads `useAdminPreview()` internally; "Exit Preview" clears the cookie and reloads
+- Wired in `client/app/layout.tsx` — `<AdminBar />` is at the top of the body; `pt-10` is added when `admin_preview` cookie is detected server-side
+- `client/components/admin/admin-block-overlay.tsx` — `<AdminBlockOverlay>` wraps each page builder block in `SectionRenderer` when `isPreview` is true; hover shows block type label + "Edit" button linking to `builder?block={blockId}`
+- `client/components/page-builder/page-renderer.tsx` — reads `admin_preview` cookie server-side, passes `isPreview` + `pageId` + `adminBaseUrl` to `SectionRenderer`
+- Page builder (`resources/js/pages/admin/cms/pages/builder.tsx`) — on mount, reads `?block=` from URL, scrolls to the card with `data-block-id="{id}"` and pulses it
+
+---
+
+## Lexical Rich Text Editor
+
+**Location:** `resources/js/components/ui/rich-text-editor/lexical/`
+
+### Props (Editor component)
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `value` | `string` | — | HTML content (controlled) |
+| `onChange` | `(html: string) => void` | — | Called on every change |
+| `placeholder` | `string` | `'Start writing...'` | Placeholder text |
+| `className` | `string` | — | CSS class on container |
+| `maxHeight` | `number \| string` | — | Max height + scroll (e.g. `600` = `600px`) |
+| `editable` | `boolean` | `true` | Set `false` for read-only display |
+| `showWordCount` | `boolean` | `true` | Show word/character count footer |
+
+### Plugin files
+
+| Plugin | Purpose |
+|--------|---------|
+| `ToolbarPlugin` | Full toolbar: block type, text format, alignment, link, insert |
+| `FloatingLinkEditorPlugin` | Floating popover when cursor is inside a link |
+| `FloatingTextFormatPlugin` | Bubble menu above text selection |
+| `AutoLinkPlugin` | Auto-converts typed URLs/emails to links |
+| `HtmlPlugin` | Serializes/deserializes HTML |
+| `MarkdownPlugin` | Markdown shortcut transforms |
+| `CopyCodePlugin` | Injects "Copy" button on `<code>` blocks via MutationObserver |
+| `WordCountPlugin` | Shows word + character count in footer |
+
+### Adding a new node type
+
+1. Define the node in `resources/js/components/ui/rich-text-editor/` (follow `image-node.tsx` as a pattern)
+2. Register it in `lexical/nodes.ts`
+3. Add a theme class in `lexical/theme.ts`
+4. Add CSS in `resources/css/editor.css`
+5. Add toolbar trigger in `ToolbarPlugin.tsx`
