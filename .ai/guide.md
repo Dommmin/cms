@@ -61,7 +61,8 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - **Dashboard Widgets** — configurable per-user
 - **Cookie Consents** — GDPR, read-only admin view
 - **Schema.org** — WebSite, Org, BlogPosting, Product, LocalBusiness, FAQPage (client)
-- **Sitemap** — auto-generated
+- **Sitemap** — auto-generated, respects `sitemap_exclude` per product/post
+- **Enterprise SEO** — `meta_robots`, `og_image`, `sitemap_exclude` on Product/BlogPost/Page/Category; `generateMetadata()` on all public pages; OG + Twitter Card tags; dynamic robots.txt from `seo.robots_txt` setting; `SeoPanel` admin component with SERP preview + character counters
 - **DataLayer / GTM** — view_item, remove_from_cart, begin_checkout, purchase, search events wired (client)
 - **GDPR Data Export** — "Download my data" button in profile page, calls `GET /api/v1/profile/export`
 - **Promo Badge %** — `discount_percentage` field in ProductData/ProductResource, shown on product cards
@@ -69,6 +70,9 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - **Product Comparison** — `use-comparison.ts`, `<CompareButton />`, `<ComparisonBar />`, `/compare` page (max 4)
 - **Block Templates Library** — `SectionTemplate` model/seeder (8 templates), admin CRUD at `/admin/section-templates`, in sidebar
 - **Social Login** — Google + GitHub via `laravel/socialite` v5, `SocialLoginController`, `GET /api/v1/auth/social/{provider}/redirect` + `POST callback`, `<SocialLoginButtons />`, callback page at `/(auth)/social/callback`
+- **Admin Bar (Preview Mode)** — `GET /admin/preview?url=&entity_type=&entity_id=&entity_name=&admin_url=` sets `admin_preview` cookie (2h, non-HttpOnly), redirects to frontend URL; "Preview" buttons on Page/BlogPost/Product/Category edit pages; `useAdminPreview()` hook + `<AdminBar />` component in Next.js root layout (fixed dark bar, z-9999, entity badge, "Edit in Admin" + "Exit Preview")
+- **Lexical RTE** — full-featured rich text editor at `resources/js/components/ui/rich-text-editor/`; block type dropdown (P/H1–H6/Quote/Code/Bullet/Number/Check), inline formatting (B/I/U/S/Code/Subscript/Superscript/Highlight/Eraser), alignment, floating link editor, floating bubble menu, insert (HR/Image/YouTube/Table/2-3 Columns/Collapsible/Emoji/Special chars), code language selector, copy-code button, word/character count footer, `maxHeight` + `editable` + `showWordCount` props; font size (10–36px), font family, text color picker (24 colors), spellcheck; `TableActionMenuPlugin` (right-click: row/col ops + cell bg color), `SlashCommandPlugin` (type `/`), `DraggableBlockPlugin`; custom nodes: `LayoutContainerNode`, `LayoutItemNode`, `CollapsibleContainerNode`, `CollapsibleTitleNode`, `CollapsibleContentNode`
+- **Admin Bar Level 2 (Block Overlays)** — `<AdminBlockOverlay>` wraps each block in `SectionRenderer` when `admin_preview` cookie is set; hover shows block type label + "Edit" button (links to `builder?block={id}`); page builder scrolls to + highlights the block on load when `?block={id}` in URL
 
 ---
 
@@ -183,4 +187,4 @@ docker compose exec php vendor/bin/pint --dirty
 
 ## Current Test Count
 
-291 passing, 1 skipped, 1 pre-existing fail (ThemeSeederTest — missing 3rd theme slug) (as of 2026-03-09)
+291 passing, 1 skipped, 1 pre-existing fail (ThemeSeederTest — missing 3rd theme slug) (as of 2026-03-10)
