@@ -1,10 +1,14 @@
 import { cn } from "@/lib/utils";
 import type { PageSection } from "@/types/api";
+import { AdminBlockOverlay } from "@/components/admin/admin-block-overlay";
 
 import { BlockRenderer } from "./block-renderer";
 
 interface Props {
   section: PageSection;
+  isPreview?: boolean;
+  pageId?: number;
+  adminBaseUrl?: string;
 }
 
 const variantStyles: Record<string, string> = {
@@ -32,7 +36,7 @@ const sectionPaddingStyles: Record<string, string> = {
   xl: "py-28",
 };
 
-export function SectionRenderer({ section }: Props) {
+export function SectionRenderer({ section, isPreview, pageId, adminBaseUrl }: Props) {
   const variant = section.variant ?? "light";
   const layout = section.layout ?? "contained";
 
@@ -55,9 +59,21 @@ export function SectionRenderer({ section }: Props) {
     >
       <div className={containerClass}>
         {activeBlocks.map((block) => (
-          <div key={block.id} className="w-full">
-            <BlockRenderer block={block} />
-          </div>
+          isPreview && pageId && adminBaseUrl ? (
+            <AdminBlockOverlay
+              key={block.id}
+              blockId={block.id}
+              blockType={block.type}
+              pageId={pageId}
+              adminBaseUrl={adminBaseUrl}
+            >
+              <BlockRenderer block={block} />
+            </AdminBlockOverlay>
+          ) : (
+            <div key={block.id} className="w-full">
+              <BlockRenderer block={block} />
+            </div>
+          )
         ))}
       </div>
     </section>

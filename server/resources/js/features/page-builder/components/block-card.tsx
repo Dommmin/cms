@@ -96,6 +96,7 @@ export function BlockCard({
             <Card
                 ref={setNodeRef}
                 style={style}
+                data-block-id={block.id}
                 className={cn(
                     'border-l-4',
                     block.reusable_block_id

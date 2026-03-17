@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import type { Page } from "@/types/api";
 
 import { ModuleRenderer } from "./module-renderer";
@@ -17,7 +18,7 @@ interface Props {
  * This component is a Server Component — it has no interactivity of its own.
  * Interactive child blocks (newsletter, forms, accordion, tabs) are 'use client'.
  */
-export function PageRenderer({ page }: Props) {
+export async function PageRenderer({ page }: Props) {
   if (!page.is_published) {
     return null;
   }
@@ -26,6 +27,10 @@ export function PageRenderer({ page }: Props) {
     return <ModuleRenderer page={page} />;
   }
 
+  const cookieStore = await cookies();
+  const isPreview = !!cookieStore.get("admin_preview")?.value;
+  const adminBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") ?? "";
+
   const activeSections = page.sections
     .filter((s) => s.is_active)
     .sort((a, b) => a.position - b.position);
@@ -33,7 +38,13 @@ export function PageRenderer({ page }: Props) {
   return (
     <main>
       {activeSections.map((section) => (
-        <SectionRenderer key={section.id} section={section} />
+        <SectionRenderer
+          key={section.id}
+          section={section}
+          isPreview={isPreview}
+          pageId={page.id}
+          adminBaseUrl={adminBaseUrl}
+        />
       ))}
     </main>
   );

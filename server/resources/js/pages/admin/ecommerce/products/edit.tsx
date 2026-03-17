@@ -1,6 +1,7 @@
 import { useAdminLocale } from '@/hooks/use-admin-locale';
-import { Form, Head, router, usePage } from '@inertiajs/react';
-import { ArrowLeftIcon, Clock, ExternalLink, ImageIcon, Search, Settings } from 'lucide-react';
+import { Form, Head, Link, router, usePage } from '@inertiajs/react';
+import { ArrowLeftIcon, Clock, ExternalLink, EyeIcon, ImageIcon, Search, Settings } from 'lucide-react';
+import { SeoPanel } from '@/components/seo-panel';
 import { VersionHistory } from '@/components/version-history';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -32,7 +33,7 @@ import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 
-type Category = { id: number; name: string; slug: string };
+type Category = { id: number; name: string | Record<string, string>; slug: string };
 type ProductType = { id: number; name: string };
 type Brand = { id: number; name: string };
 type ProductFlag = {
@@ -87,6 +88,9 @@ type FormData = {
     is_saleable: boolean;
     seo_title: string;
     seo_description: string;
+    meta_robots: string;
+    og_image: string | null;
+    sitemap_exclude: boolean;
     flags: number[];
     variant: ProductVariant;
     categories: number[];
@@ -132,7 +136,7 @@ const tabFieldMap: Record<TabKey, string[]> = {
         'variant.is_active',
     ],
     media: ['images'],
-    metadata: ['seo_title', 'seo_description'],
+    metadata: ['seo_title', 'seo_description', 'meta_robots', 'og_image', 'sitemap_exclude'],
     price_history: [],
 };
 
@@ -203,6 +207,9 @@ export default function Edit({
         is_saleable: boolean;
         seo_title?: string;
         seo_description?: string;
+        meta_robots?: string;
+        og_image?: string | null;
+        sitemap_exclude?: boolean;
         variant?: ProductVariant;
         images?: ProductImage[];
         categories?: Category[];
@@ -239,6 +246,9 @@ export default function Edit({
         is_saleable: product.is_saleable,
         seo_title: product.seo_title ?? '',
         seo_description: product.seo_description ?? '',
+        meta_robots: product.meta_robots ?? 'index, follow',
+        og_image: product.og_image ?? null,
+        sitemap_exclude: product.sitemap_exclude ?? false,
         flags: product.flag_ids ?? [],
         variant: product.variant
             ? {
@@ -327,10 +337,17 @@ export default function Edit({
         setSelectedImages(updated);
     };
 
-    const categoryOptions = categoriesList.map((c) => ({
-        value: c.id,
-        label: c.name,
-    }));
+    const categoryOptions = categoriesList.map((c) => {
+        const rawName = c.name;
+        const label =
+            typeof rawName === 'object' && rawName !== null
+                ? ((rawName as Record<string, string>)[activeLocale]
+                    ?? (rawName as Record<string, string>)[defaultLocale]
+                    ?? Object.values(rawName as Record<string, string>)[0]
+                    ?? '')
+                : (rawName as string);
+        return { value: c.id, label };
+    });
 
     const typeOptions = types.map((t) => ({
         value: t.id,
@@ -360,10 +377,7 @@ export default function Edit({
                     description={`Update details for ${product.name?.[defaultLocale] ?? ''}`}
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            asChild
-                        >
+                        <Button variant="outline" asChild>
                             <a
                                 href={`${frontendUrl}/products/${product.slug}`}
                                 target="_blank"
@@ -373,24 +387,26 @@ export default function Edit({
                                 View on Site
                             </a>
                         </Button>
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                router.visit(
-                                    `/admin/ecommerce/products/${product.id}/variants`,
-                                )
-                            }
-                        >
-                            Manage Variants
+                        <Button variant="outline" asChild>
+                            <a
+                                href={`/admin/preview?${new URLSearchParams({ url: `${frontendUrl}/products/${product.slug}`, entity_type: 'product', entity_id: String(product.id), entity_name: product.name?.[defaultLocale] ?? product.slug, admin_url: `/admin/ecommerce/products/${product.id}/edit` }).toString()}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <EyeIcon className="mr-2 h-4 w-4" />
+                                Preview
+                            </a>
                         </Button>
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                router.visit('/admin/ecommerce/products')
-                            }
-                        >
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Products
+                        <Button asChild variant="outline">
+                            <Link href={`/admin/ecommerce/products/${product.id}/variants`} prefetch cacheFor={30}>
+                                Manage Variants
+                            </Link>
+                        </Button>
+                        <Button asChild variant="outline">
+                            <Link href="/admin/ecommerce/products" prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                Back to Products
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
@@ -402,7 +418,7 @@ export default function Edit({
                     className="space-y-6"
                     onError={(errors) => {
                         setActiveTab(tabForErrors(errors as FormErrors));
-                        toast.error('Formularz zawiera błędy. Sprawdź zaznaczoną zakładkę.');
+                        toast.error('The form contains errors. Check the highlighted tab.');
                     }}
                 >
                     {({ processing, errors }) => (
@@ -491,7 +507,6 @@ export default function Edit({
                                                     ))}
                                                     <Input
                                                         id="name"
-                                                        required
                                                         autoFocus
                                                         placeholder="Product name"
                                                         value={formData.name[activeLocale] ?? ''}
@@ -530,7 +545,7 @@ export default function Edit({
                                                             }}
                                                             className="h-4 w-4 rounded border-input"
                                                         />
-                                                        Ustaw slug ręcznie
+                                                        Set slug manually
                                                     </label>
                                                 </div>
 
@@ -1183,63 +1198,29 @@ export default function Edit({
 
                                 {/* SEO Tab */}
                                 <TabsContent value="metadata" forceRender className="mt-6">
-                                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                                        <div className="space-y-6 lg:col-span-2">
-                                            <div className="space-y-6 rounded-xl border bg-card p-6">
-                                                <div className="grid gap-2">
-                                                    <Label htmlFor="seo_title">SEO Title</Label>
-                                                    <Input
-                                                        id="seo_title"
-                                                        name="seo_title"
-                                                        placeholder="SEO title"
-                                                        defaultValue={formData.seo_title}
-                                                        onChange={(e) =>
-                                                            handleFormChange('seo_title', e.target.value)
-                                                        }
-                                                    />
-                                                    <InputError message={errors.seo_title} />
-                                                </div>
-
-                                                <div className="grid gap-2">
-                                                    <Label htmlFor="seo_description">
-                                                        SEO Description
-                                                    </Label>
-                                                    <textarea
-                                                        id="seo_description"
-                                                        name="seo_description"
-                                                        rows={3}
-                                                        placeholder="SEO description"
-                                                        defaultValue={formData.seo_description}
-                                                        onChange={(e) =>
-                                                            handleFormChange(
-                                                                'seo_description',
-                                                                e.target.value,
-                                                            )
-                                                        }
-                                                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                                                    />
-                                                    <InputError message={errors.seo_description} />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="rounded-xl border bg-card p-6">
-                                            <h3 className="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                                                Preview
-                                            </h3>
-                                            <div className="space-y-1">
-                                                <p className="truncate text-sm font-medium text-blue-600 dark:text-blue-400">
-                                                    {formData.seo_title || formData.name[defaultLocale] || 'Page title'}
-                                                </p>
-                                                <p className="text-xs text-green-700 dark:text-green-500">
-                                                    example.com › products › {formData.slug || 'product-slug'}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground line-clamp-2">
-                                                    {formData.seo_description ||
-                                                        'No description provided. Add an SEO description to improve search visibility.'}
-                                                </p>
-                                            </div>
-                                        </div>
+                                    <div className="rounded-xl border bg-card p-6">
+                                        <SeoPanel
+                                            data={{
+                                                seo_title: formData.seo_title,
+                                                seo_description: formData.seo_description,
+                                                meta_robots: formData.meta_robots,
+                                                og_image: formData.og_image,
+                                                sitemap_exclude: formData.sitemap_exclude,
+                                            }}
+                                            onChange={(field, value) =>
+                                                handleFormChange(
+                                                    field as keyof Omit<typeof formData, 'name' | 'slug' | 'description' | 'short_description'>,
+                                                    value as never,
+                                                )
+                                            }
+                                            errors={errors as Record<string, string>}
+                                            urlPath={`products/${formData.slug || 'product-slug'}`}
+                                            titleFallback={
+                                                typeof formData.name === 'object'
+                                                    ? (Object.values(formData.name)[0] as string)
+                                                    : String(formData.name)
+                                            }
+                                        />
                                     </div>
                                 </TabsContent>
 

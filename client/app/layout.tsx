@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import { AdminBar } from "@/components/admin/admin-bar";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { GoogleTagManager } from "@/components/layout/google-tag-manager";
 import { CookieConsent, type CookieSettings } from "@/components/cookie-consent";
@@ -29,13 +30,39 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "Store",
-    template: "%s | Store",
-  },
-  description: "Your online store",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const publicSettings = await serverFetch<{
+    settings: {
+      general?: { site_name?: string; site_description?: string };
+      seo?: {
+        google_site_verification?: string;
+        bing_site_verification?: string;
+        disable_indexing?: string | boolean;
+      };
+    };
+  }>("/settings/public").catch(() => null);
+
+  const siteName = publicSettings?.settings.general?.site_name ?? "Store";
+  const siteDescription = publicSettings?.settings.general?.site_description;
+  const disableIndexing =
+    publicSettings?.settings.seo?.disable_indexing === "true" ||
+    publicSettings?.settings.seo?.disable_indexing === true;
+
+  return {
+    title: {
+      default: siteName,
+      template: `%s | ${siteName}`,
+    },
+    description: siteDescription ?? "Your online store",
+    robots: disableIndexing ? { index: false, follow: false } : undefined,
+    verification: {
+      google: publicSettings?.settings.seo?.google_site_verification ?? undefined,
+    },
+    other: publicSettings?.settings.seo?.bing_site_verification
+      ? { "msvalidate.01": publicSettings.settings.seo.bing_site_verification }
+      : undefined,
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -44,6 +71,7 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const locale = cookieStore.get("locale")?.value ?? "en";
+  const isAdminPreview = !!cookieStore.get("admin_preview")?.value;
 
   type PublicSettingsResponse = {
     settings: {
@@ -99,9 +127,10 @@ export default async function RootLayout({
           })}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased${isAdminPreview ? " pt-10" : ""}`}>
         <QueryProvider>
           <TranslationProvider initialLocale={locale}>
+            <AdminBar />
             <div className="flex min-h-screen flex-col">
               <AnnouncementBar />
               <Header />

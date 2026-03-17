@@ -1,6 +1,7 @@
 import { useAdminLocale } from '@/hooks/use-admin-locale';
-import { Head, router, usePage } from '@inertiajs/react';
-import { ArrowLeftIcon } from 'lucide-react';
+import { Link, Head, router, usePage } from '@inertiajs/react';
+import { ArrowLeftIcon, EyeIcon } from 'lucide-react';
+import { SeoPanel } from '@/components/seo-panel';
 import { VersionHistory } from '@/components/version-history';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
@@ -25,6 +26,11 @@ type CategoryEditProps = {
     description?: Record<string, string>;
     parent_id?: number | null;
     is_active: boolean;
+    seo_title?: string | null;
+    seo_description?: string | null;
+    meta_robots?: string | null;
+    og_image?: string | null;
+    sitemap_exclude?: boolean;
 };
 
 export default function Edit({
@@ -34,7 +40,7 @@ export default function Edit({
     category: CategoryEditProps;
     categories?: Category[];
 }) {
-    const { locales } = usePage().props as { locales: SharedLocale[] };
+    const { locales, frontendUrl } = usePage().props as { locales: SharedLocale[]; frontendUrl: string };
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
 
     const normalizedCategories: Category[] = Array.isArray(categories)
@@ -54,6 +60,13 @@ export default function Edit({
     );
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
+    const [seoData, setSeoData] = useState({
+        seo_title: category.seo_title ?? '',
+        seo_description: category.seo_description ?? '',
+        meta_robots: category.meta_robots ?? 'index, follow',
+        og_image: category.og_image ?? null,
+        sitemap_exclude: category.sitemap_exclude ?? false,
+    });
 
     const parentCategories = normalizedCategories.filter(
         (cat) => cat.id !== category.id,
@@ -84,6 +97,7 @@ export default function Edit({
                 slug,
                 parent_id: parentId,
                 is_active: isActive,
+                ...seoData,
             },
             {
                 onSuccess: () => router.visit('/admin/ecommerce/categories'),
@@ -114,14 +128,21 @@ export default function Edit({
                     description={`Update details for ${nameValues[defaultLocale] ?? ''}`}
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                router.visit('/admin/ecommerce/categories')
-                            }
-                        >
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Categories
+                        <Button variant="outline" asChild>
+                            <a
+                                href={`/admin/preview?${new URLSearchParams({ url: `${frontendUrl}/products?category=${category.slug}`, entity_type: 'category', entity_id: String(category.id), entity_name: nameValues[defaultLocale] ?? category.slug, admin_url: `/admin/ecommerce/categories/${category.id}/edit` }).toString()}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <EyeIcon className="mr-2 h-4 w-4" />
+                                Preview
+                            </a>
+                        </Button>
+                        <Button asChild variant="outline">
+                            <Link href='/admin/ecommerce/categories' prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                Back to Categories
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
@@ -206,7 +227,7 @@ export default function Edit({
                                 }}
                                 className="h-4 w-4 rounded border-input"
                             />
-                            Ustaw slug ręcznie
+                            Set slug manually
                         </label>
                     </div>
 
@@ -289,6 +310,20 @@ export default function Edit({
                         <Label htmlFor="is_active" className="font-normal">
                             Active
                         </Label>
+                    </div>
+
+                    {/* SEO */}
+                    <div className="space-y-4 rounded-lg border p-4">
+                        <h3 className="text-sm font-medium">SEO</h3>
+                        <SeoPanel
+                            data={seoData}
+                            onChange={(field, value) =>
+                                setSeoData((prev) => ({ ...prev, [field]: value }))
+                            }
+                            errors={errors}
+                            urlPath={`products?category=${slug}`}
+                            titleFallback={nameValues[defaultLocale] ?? ''}
+                        />
                     </div>
 
                     <StickyFormActions

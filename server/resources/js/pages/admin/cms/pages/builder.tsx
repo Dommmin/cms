@@ -44,6 +44,29 @@ export default function BuilderPage({
         { title: 'Builder', href: '' },
     ];
 
+    // Scroll to block when ?block={id} is in URL
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const blockId = params.get('block');
+        if (!blockId) return;
+
+        const tryScroll = () => {
+            const el = document.querySelector<HTMLElement>(`[data-block-id="${blockId}"]`);
+            if (!el) return false;
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2');
+            setTimeout(() => el.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2'), 2500);
+            return true;
+        };
+
+        // Retry a few times — the block cards render after sections are mounted
+        let attempts = 0;
+        const interval = setInterval(() => {
+            if (tryScroll() || ++attempts >= 10) clearInterval(interval);
+        }, 200);
+        return () => clearInterval(interval);
+    }, []);
+
     // Auto-save with debounce when in split view
     useEffect(() => {
         if (!isSplitView) return;

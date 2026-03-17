@@ -1,6 +1,7 @@
 import { useAdminLocale } from '@/hooks/use-admin-locale';
-import { Head, router, usePage } from '@inertiajs/react';
-import { ArrowLeftIcon, ExternalLink } from 'lucide-react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { ArrowLeftIcon, ExternalLink, EyeIcon } from 'lucide-react';
+import { SeoPanel } from '@/components/seo-panel';
 import { VersionHistory } from '@/components/version-history';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -44,6 +45,9 @@ type BlogPost = {
     published_at: string | null;
     seo_title: string | null;
     seo_description: string | null;
+    meta_robots: string | null;
+    og_image: string | null;
+    sitemap_exclude: boolean;
 };
 
 type Props = {
@@ -66,6 +70,9 @@ type FormData = {
     featured_image: string;
     seo_title: string;
     seo_description: string;
+    meta_robots: string;
+    og_image: string | null;
+    sitemap_exclude: boolean;
 };
 
 export default function EditBlogPost({ post, categories }: Props) {
@@ -101,6 +108,9 @@ export default function EditBlogPost({ post, categories }: Props) {
         featured_image: post.featured_image ?? '',
         seo_title: post.seo_title ?? '',
         seo_description: post.seo_description ?? '',
+        meta_robots: post.meta_robots ?? 'index, follow',
+        og_image: post.og_image ?? null,
+        sitemap_exclude: post.sitemap_exclude ?? false,
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
@@ -187,12 +197,21 @@ export default function EditBlogPost({ post, categories }: Props) {
                                 </a>
                             </Button>
                         )}
-                        <Button
-                            variant="outline"
-                            onClick={() => router.visit('/admin/blog/posts')}
-                        >
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back
+                        <Button variant="outline" asChild>
+                            <a
+                                href={`/admin/preview?${new URLSearchParams({ url: `${frontendUrl}/blog/${post.slug}`, entity_type: 'blog_post', entity_id: String(post.id), entity_name: data.title[defaultLocale] ?? post.slug, admin_url: `/admin/blog/posts/${post.id}/edit` }).toString()}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <EyeIcon className="mr-2 h-4 w-4" />
+                                Preview
+                            </a>
+                        </Button>
+                        <Button asChild variant="outline">
+                            <Link href="/admin/blog/posts" prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                Back
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
@@ -324,41 +343,25 @@ export default function EditBlogPost({ post, categories }: Props) {
                             {/* SEO */}
                             <div className="space-y-4 rounded-lg border p-4">
                                 <h3 className="text-sm font-medium">SEO</h3>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="seo_title">SEO Title</Label>
-                                    <Input
-                                        id="seo_title"
-                                        value={data.seo_title}
-                                        onChange={(e) =>
-                                            setData((prev) => ({
-                                                ...prev,
-                                                seo_title: e.target.value,
-                                            }))
-                                        }
-                                        placeholder="Custom page title for search engines"
-                                    />
-                                    <InputError message={errors.seo_title} />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="seo_description">
-                                        SEO Description
-                                    </Label>
-                                    <Textarea
-                                        id="seo_description"
-                                        value={data.seo_description}
-                                        onChange={(e) =>
-                                            setData((prev) => ({
-                                                ...prev,
-                                                seo_description: e.target.value,
-                                            }))
-                                        }
-                                        placeholder="Meta description for search engines"
-                                        rows={2}
-                                    />
-                                    <InputError
-                                        message={errors.seo_description}
-                                    />
-                                </div>
+                                <SeoPanel
+                                    data={{
+                                        seo_title: data.seo_title,
+                                        seo_description: data.seo_description,
+                                        meta_robots: data.meta_robots,
+                                        og_image: data.og_image,
+                                        sitemap_exclude: data.sitemap_exclude,
+                                    }}
+                                    onChange={(field, value) =>
+                                        setData((prev) => ({ ...prev, [field]: value }))
+                                    }
+                                    errors={errors}
+                                    urlPath={`blog/${data.slug ?? post.slug}`}
+                                    titleFallback={
+                                        typeof data.title === 'object'
+                                            ? Object.values(data.title)[0]
+                                            : post.slug
+                                    }
+                                />
                             </div>
                         </div>
 

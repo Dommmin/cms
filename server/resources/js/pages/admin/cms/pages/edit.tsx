@@ -1,6 +1,6 @@
 import { useAdminLocale } from '@/hooks/use-admin-locale';
-import { Form, Head, router, usePage } from '@inertiajs/react';
-import { ArrowLeftIcon, GlobeIcon, LayoutIcon, PencilIcon } from 'lucide-react';
+import { Form, Head, Link, router, usePage } from '@inertiajs/react';
+import { ArrowLeftIcon, EyeIcon, GlobeIcon, LayoutIcon, PencilIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
@@ -32,6 +32,7 @@ type PageData = {
     parent_id: number | null;
     title: Record<string, string>;
     slug: string;
+    slug_translations: Record<string, string> | null;
     excerpt: Record<string, string> | null;
     layout: string;
     page_type: string;
@@ -40,6 +41,9 @@ type PageData = {
     seo_title: string | null;
     seo_description: string | null;
     seo_canonical: string | null;
+    meta_robots: string | null;
+    og_image: string | null;
+    sitemap_exclude: boolean;
     is_published: boolean;
 };
 
@@ -49,7 +53,7 @@ type Props = {
 };
 
 export default function Edit({ page, modules }: Props) {
-    const { locales } = usePage().props as { locales: SharedLocale[] };
+    const { locales, frontendUrl } = usePage().props as { locales: SharedLocale[]; frontendUrl: string };
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
     const [activeLocale, setActiveLocale] = useAdminLocale(defaultLocale);
 
@@ -71,6 +75,12 @@ export default function Edit({ page, modules }: Props) {
     const [excerptValues, setExcerptValues] = useState<Record<string, string>>(
         page.excerpt ?? { [defaultLocale]: '' },
     );
+    const [slugTranslations, setSlugTranslations] = useState<Record<string, string>>(
+        page.slug_translations ?? {},
+    );
+
+    // Non-default locales that can have translated slugs
+    const translatableLocales = locales.filter((l) => !l.is_default);
 
     const displayTitle = titleValues[defaultLocale] ?? Object.values(titleValues)[0] ?? '';
 
@@ -91,24 +101,28 @@ export default function Edit({ page, modules }: Props) {
                         }
                     >
                         <PageHeaderActions>
-                            <Button
-                                variant="outline"
-                                onClick={() => router.visit('/admin/cms/pages')}
-                            >
-                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                Back
+                            <Button asChild variant="outline">
+                                <a
+                                    href={`/admin/preview?${new URLSearchParams({ url: `${frontendUrl}/${page.slug}`, entity_type: 'page', entity_id: String(page.id), entity_name: displayTitle, admin_url: `/admin/cms/pages/${page.id}/edit` }).toString()}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <EyeIcon className="mr-2 h-4 w-4" />
+                                    Preview
+                                </a>
+                            </Button>
+                            <Button asChild variant="outline">
+                                <Link href="/admin/cms/pages" prefetch cacheFor={30}>
+                                    <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                    Back
+                                </Link>
                             </Button>
                             {pageType === 'blocks' && (
-                                <Button
-                                    variant="default"
-                                    onClick={() =>
-                                        router.visit(
-                                            `/admin/cms/pages/${page.id}/builder`,
-                                        )
-                                    }
-                                >
-                                    <PencilIcon className="mr-2 h-4 w-4" />
-                                    Open Builder
+                                <Button asChild variant="default">
+                                    <Link href={`/admin/cms/pages/${page.id}/builder`} prefetch cacheFor={30}>
+                                        <PencilIcon className="mr-2 h-4 w-4" />
+                                        Open Builder
+                                    </Link>
                                 </Button>
                             )}
                             {page.is_published ? (
@@ -203,6 +217,15 @@ export default function Edit({ page, modules }: Props) {
                                         value={excerptValues[locale.code] ?? ''}
                                     />
                                 ))}
+                                {/* Hidden inputs for slug translations */}
+                                {translatableLocales.map((locale) => (
+                                    <input
+                                        key={`slug_translations-${locale.code}`}
+                                        type="hidden"
+                                        name={`slug_translations[${locale.code}]`}
+                                        value={slugTranslations[locale.code] ?? ''}
+                                    />
+                                ))}
 
                                 <div className="grid gap-2">
                                     <div className="flex items-center justify-between">
@@ -227,15 +250,53 @@ export default function Edit({ page, modules }: Props) {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="slug">Slug</Label>
+                                    <Label htmlFor="slug">Slug (default)</Label>
                                     <Input
                                         id="slug"
                                         name="slug"
                                         required
                                         defaultValue={page.slug}
                                     />
+                                    <p className="text-xs text-muted-foreground">
+                                        The canonical slug used as the default URL.
+                                    </p>
                                     <InputError message={errors.slug} />
                                 </div>
+
+                                {translatableLocales.length > 0 && (
+                                    <div className="grid gap-3 rounded-lg border p-4">
+                                        <div>
+                                            <Label className="text-sm font-medium">Slug Translations</Label>
+                                            <p className="mt-0.5 text-xs text-muted-foreground">
+                                                Define locale-specific slugs. Leave blank to use the default slug.
+                                            </p>
+                                        </div>
+                                        {translatableLocales.map((locale) => (
+                                            <div key={locale.code} className="grid gap-1">
+                                                <Label htmlFor={`slug_translation_${locale.code}`} className="text-xs text-muted-foreground">
+                                                    {locale.name} ({locale.code})
+                                                </Label>
+                                                <Input
+                                                    id={`slug_translation_${locale.code}`}
+                                                    placeholder={page.slug}
+                                                    value={slugTranslations[locale.code] ?? ''}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value
+                                                            .toLowerCase()
+                                                            .replace(/[^a-z0-9-]/g, '-')
+                                                            .replace(/-+/g, '-')
+                                                            .replace(/^-|-$/g, '');
+                                                        setSlugTranslations((prev) => ({
+                                                            ...prev,
+                                                            [locale.code]: val,
+                                                        }));
+                                                    }}
+                                                />
+                                                <InputError message={(errors as Record<string, string>)[`slug_translations.${locale.code}`]} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
 
                                 <div className="grid gap-2">
                                     <div className="flex items-center justify-between">
@@ -430,6 +491,45 @@ export default function Edit({ page, modules }: Props) {
                                     <InputError
                                         message={errors.seo_canonical}
                                     />
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="meta_robots">Meta Robots</Label>
+                                    <select
+                                        id="meta_robots"
+                                        name="meta_robots"
+                                        defaultValue={page.meta_robots ?? 'index, follow'}
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                                    >
+                                        <option value="index, follow">Index &amp; Follow (Recommended)</option>
+                                        <option value="noindex, follow">No Index, Follow</option>
+                                        <option value="index, nofollow">Index, No Follow</option>
+                                        <option value="noindex, nofollow">No Index, No Follow</option>
+                                    </select>
+                                    <InputError message={errors.meta_robots} />
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="og_image">OG Image URL</Label>
+                                    <Input
+                                        id="og_image"
+                                        name="og_image"
+                                        defaultValue={page.og_image ?? ''}
+                                        placeholder="https://example.com/og-image.jpg"
+                                    />
+                                    <InputError message={errors.og_image} />
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="checkbox"
+                                        id="sitemap_exclude"
+                                        name="sitemap_exclude"
+                                        value="1"
+                                        defaultChecked={page.sitemap_exclude ?? false}
+                                        className="h-4 w-4 rounded border-input"
+                                    />
+                                    <Label htmlFor="sitemap_exclude">Exclude from XML sitemap</Label>
                                 </div>
 
                                 <div className="flex items-center gap-4">
