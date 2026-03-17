@@ -20,6 +20,9 @@ class ProductData extends Data
         public int $price_max,
         public bool $is_on_sale = false,
         public ?int $discount_percentage = null,
+        public ?string $seo_title = null,
+        public ?string $seo_description = null,
+        public bool $sitemap_exclude = false,
         /** @var CategoryData|null Included when relation loaded */
         public ?CategoryData $category = null,
         /** @var BrandData|null Included when relation loaded */

@@ -9,6 +9,7 @@ use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\PriceHistory;
 use App\Models\Product;
 use App\Models\ProductFlag;
 use App\Models\ProductType;
@@ -307,22 +308,22 @@ class EcommerceDemoSeeder extends Seeder
                 continue;
             }
 
-            $slug = Str::slug($item['name']).'-'.Str::lower(Str::random(4));
-            // Avoid duplicate slugs on re-seed
-            $existing = Product::query()->where('name', $item['name'])->first();
-            if ($existing) {
-                $slug = $existing->slug;
-            }
+            $namePl = $item['name_pl'] ?? $item['name'];
+            $existing = Product::query()->where('name->en', $item['name'])->first();
+            $slug = $existing?->slug ?? Str::slug($item['name']).'-'.Str::lower(Str::random(4));
 
             $product = Product::query()->updateOrCreate(
-                ['name' => $item['name']],
+                ['slug' => $slug],
                 [
-                    'slug' => $slug,
+                    'name' => ['en' => $item['name'], 'pl' => $namePl],
                     'product_type_id' => $type->id,
                     'category_id' => $category->id,
                     'brand_id' => $brand?->id,
-                    'description' => $this->generateDescription($item['name']),
-                    'short_description' => $item['short_description'] ?? $item['name'].' — quality craftsmanship for everyday use.',
+                    'description' => $this->generateDescription($item['name'], $namePl),
+                    'short_description' => [
+                        'en' => $item['short_description'] ?? $item['name'].' — quality craftsmanship for everyday use.',
+                        'pl' => $item['short_description_pl'] ?? $namePl.' — najwyższa jakość na co dzień.',
+                    ],
                     'sku_prefix' => mb_strtoupper(Str::substr(Str::slug($item['name']), 0, 4)),
                     'is_active' => true,
                     'is_saleable' => true,
@@ -378,6 +379,63 @@ class EcommerceDemoSeeder extends Seeder
                     'attribute_value_id' => $valueId,
                 ]);
             }
+
+            // Seed price history for on-sale products (EU Omnibus Directive demo data).
+            //
+            // Strategy: record 4–9 price points spread over the last 90 days.
+            // All entries within the last 30 days have prices ABOVE the current
+            // sale price, so lowestPriceInLast30Days() returns a meaningful
+            // intermediate price — not the current price — making the omnibus
+            // label ("Lowest in last 30 days: €X") visually useful.
+            if (isset($item['has_compare']) && $item['has_compare'] && $variant->compare_at_price) {
+                $comparePrice = $variant->compare_at_price; // e.g. 12499
+                $salePrice    = $variant->price;            // e.g. 9999
+                // Gap between RRP and sale price to interpolate through
+                $gap  = $comparePrice - $salePrice;
+
+                // Remove the entry auto-created by ProductVariantPriceObserver
+                // on variant creation — it records the current sale price at now(),
+                // which would make lowestPriceInLast30Days() return the sale price
+                // itself and suppress the omnibus label.
+                $variant->priceHistory()->where('recorded_at', '>=', today())->delete();
+
+                // ── Entries older than 30 days (outside omnibus window) ──────
+                // 3–5 records at or near the RRP, 35–90 days ago
+                $oldCount = random_int(3, 5);
+                for ($i = 0; $i < $oldCount; $i++) {
+                    $daysAgo = random_int(35 + $i * 8, 50 + $i * 10);
+                    // Slight random variation around the RRP (±3 %)
+                    $price = (int) round($comparePrice * (1 + (random_int(-3, 3) / 100)));
+                    PriceHistory::query()->create([
+                        'product_variant_id' => $variant->id,
+                        'price'              => $price,
+                        'recorded_at'        => now()->subDays($daysAgo),
+                    ]);
+                }
+
+                // ── Entries within the last 30 days (inside omnibus window) ─
+                // 1–4 records showing a gradual price drop toward the sale,
+                // but all still ABOVE the current sale price.
+                $recentCount = random_int(1, 4);
+                for ($j = 0; $j < $recentCount; $j++) {
+                    // Space them evenly from day 29 down to day 5
+                    $daysAgo = (int) round(29 - ($j * (24 / max($recentCount, 1))));
+                    $daysAgo = max(5, $daysAgo);
+                    // Interpolate price: starts near compare, ends at salePrice + 10 %
+                    $ratio   = ($j + 1) / ($recentCount + 1);
+                    $price   = (int) round($comparePrice - $gap * $ratio * 0.8);
+                    $price   = max($price, (int) round($salePrice * 1.08)); // always ≥ sale+8 %
+                    PriceHistory::query()->create([
+                        'product_variant_id' => $variant->id,
+                        'price'              => $price,
+                        'recorded_at'        => now()->subDays($daysAgo),
+                    ]);
+                }
+                // NOTE: the current sale price is intentionally NOT recorded.
+                // lowestPriceInLast30Days() falls back to $variant->price when
+                // price_history has no entry <= $salePrice in the window, so the
+                // omnibus label shows the lowest intermediate price instead.
+            }
         }
     }
 
@@ -430,12 +488,18 @@ class EcommerceDemoSeeder extends Seeder
         };
     }
 
-    private function generateDescription(string $name): string
+    private function generateDescription(string $nameEn, string $namePl): array
     {
-        return sprintf(
-            '<p>%s is crafted with attention to detail and premium materials. Designed for everyday use, it combines functionality with modern aesthetics to fit seamlessly into your lifestyle.</p><p>Each piece undergoes rigorous quality control to ensure lasting durability and consistent performance. Whether you\'re looking for comfort, style, or practicality — this delivers on every front.</p>',
-            $name,
-        );
+        return [
+            'en' => sprintf(
+                '<p>%s is crafted with attention to detail and premium materials. Designed for everyday use, it combines functionality with modern aesthetics to fit seamlessly into your lifestyle.</p><p>Each piece undergoes rigorous quality control to ensure lasting durability and consistent performance. Whether you\'re looking for comfort, style, or practicality — this delivers on every front.</p>',
+                $nameEn,
+            ),
+            'pl' => sprintf(
+                '<p>%s wykonany jest z dbałością o szczegóły i najwyższej jakości materiałów. Zaprojektowany z myślą o codziennym użytkowaniu, łączy funkcjonalność z nowoczesną estetyką.</p><p>Każdy produkt przechodzi rygorystyczną kontrolę jakości, aby zapewnić trwałość i niezawodność. Niezależnie czy szukasz komfortu, stylu czy praktyczności — tu znajdziesz wszystko.</p>',
+                $namePl,
+            ),
+        ];
     }
 
     // ── Product Definitions (100 products) ───────────────────────────────────
@@ -444,130 +508,130 @@ class EcommerceDemoSeeder extends Seeder
     {
         return [
             // ── Men's Clothing (14) ───────────────────────────────────────────
-            ['name' => 'Essential Cotton Tee',      'category' => 'mens-clothing',    'brand' => 'Northstar',   'type' => 'clothing',   'base_price' => 4999,  'flags' => ['new'],                 'colors' => ['black', 'navy'],     'has_compare' => false],
-            ['name' => 'Premium Supima Tee',        'category' => 'mens-clothing',    'brand' => 'Aurelia',     'type' => 'clothing',   'base_price' => 7999,  'flags' => ['bestseller'],           'colors' => ['white', 'slate'],    'has_compare' => true],
-            ['name' => 'Graphic Print Tee',         'category' => 'mens-clothing',    'brand' => 'Northstar',   'type' => 'clothing',   'base_price' => 5999,  'flags' => ['new', 'limited'],       'colors' => ['black', 'olive'],    'has_compare' => false],
-            ['name' => 'Long Sleeve Waffle Tee',    'category' => 'mens-clothing',    'brand' => 'Crafted Co',  'type' => 'clothing',   'base_price' => 6999,  'flags' => [],                       'colors' => ['sand', 'forest'],    'has_compare' => false],
-            ['name' => 'Classic Polo Shirt',        'category' => 'mens-clothing',    'brand' => 'Aurelia',     'type' => 'clothing',   'base_price' => 8999,  'flags' => ['bestseller'],           'colors' => ['navy', 'white'],     'has_compare' => true, 'sizes' => ['m', 'l']],
-            ['name' => 'Slim Fit Jeans',            'category' => 'mens-clothing',    'brand' => 'Northstar',   'type' => 'clothing',   'base_price' => 12999, 'flags' => [],                       'colors' => ['navy', 'black'],     'has_compare' => false, 'sizes' => ['m', 'l']],
-            ['name' => 'Relaxed Straight Jeans',    'category' => 'mens-clothing',    'brand' => 'Crafted Co',  'type' => 'clothing',   'base_price' => 13999, 'flags' => ['bestseller'],           'colors' => ['slate', 'navy'],     'has_compare' => true, 'sizes' => ['m', 'l']],
-            ['name' => 'Cargo Combat Trousers',     'category' => 'mens-clothing',    'brand' => 'Northstar',   'type' => 'clothing',   'base_price' => 11999, 'flags' => ['new'],                  'colors' => ['olive', 'black'],    'has_compare' => false, 'sizes' => ['m', 'l']],
-            ['name' => 'Tailored Chino Trousers',   'category' => 'mens-clothing',    'brand' => 'Aurelia',     'type' => 'clothing',   'base_price' => 10999, 'flags' => [],                       'colors' => ['sand', 'navy'],      'has_compare' => false, 'sizes' => ['m', 'l']],
-            ['name' => 'Fleece Jogger Pants',       'category' => 'mens-clothing',    'brand' => 'Kinetic',     'type' => 'clothing',   'base_price' => 8999,  'flags' => [],                       'colors' => ['black', 'slate'],    'has_compare' => false],
-            ['name' => 'Classic Pullover Hoodie',   'category' => 'mens-clothing',    'brand' => 'Northstar',   'type' => 'clothing',   'base_price' => 14999, 'flags' => ['bestseller'],           'colors' => ['black', 'forest'],   'has_compare' => true],
-            ['name' => 'Zip-Up Tech Hoodie',        'category' => 'mens-clothing',    'brand' => 'Kinetic',     'type' => 'clothing',   'base_price' => 16999, 'flags' => ['new'],                  'colors' => ['navy', 'olive'],     'has_compare' => false],
-            ['name' => 'Satin Bomber Jacket',       'category' => 'mens-clothing',    'brand' => 'Aurelia',     'type' => 'clothing',   'base_price' => 24999, 'flags' => ['new', 'limited'],       'colors' => ['black', 'olive'],    'has_compare' => true, 'sizes' => ['m', 'l']],
-            ['name' => 'Indigo Denim Jacket',       'category' => 'mens-clothing',    'brand' => 'Crafted Co',  'type' => 'clothing',   'base_price' => 18999, 'flags' => [],                       'colors' => ['navy', 'slate'],     'has_compare' => false, 'sizes' => ['m', 'l']],
+            ['name' => 'Essential Cotton Tee',      'name_pl' => 'Bawełniany T-shirt Basic',           'category' => 'mens-clothing',    'brand' => 'Northstar',   'type' => 'clothing',    'base_price' => 4999,  'flags' => ['new'],                  'colors' => ['black', 'navy'],       'has_compare' => false],
+            ['name' => 'Premium Supima Tee',        'name_pl' => 'Premium T-shirt Supima',             'category' => 'mens-clothing',    'brand' => 'Aurelia',     'type' => 'clothing',    'base_price' => 7999,  'flags' => ['bestseller'],            'colors' => ['white', 'slate'],      'has_compare' => true],
+            ['name' => 'Graphic Print Tee',         'name_pl' => 'T-shirt z Nadrukiem',                'category' => 'mens-clothing',    'brand' => 'Northstar',   'type' => 'clothing',    'base_price' => 5999,  'flags' => ['new', 'limited'],        'colors' => ['black', 'olive'],      'has_compare' => false],
+            ['name' => 'Long Sleeve Waffle Tee',    'name_pl' => 'Longsleeve Waflowy',                 'category' => 'mens-clothing',    'brand' => 'Crafted Co',  'type' => 'clothing',    'base_price' => 6999,  'flags' => [],                        'colors' => ['sand', 'forest'],      'has_compare' => false],
+            ['name' => 'Classic Polo Shirt',        'name_pl' => 'Klasyczna Koszulka Polo',            'category' => 'mens-clothing',    'brand' => 'Aurelia',     'type' => 'clothing',    'base_price' => 8999,  'flags' => ['bestseller'],            'colors' => ['navy', 'white'],       'has_compare' => true,  'sizes' => ['m', 'l']],
+            ['name' => 'Slim Fit Jeans',            'name_pl' => 'Dopasowane Dżinsy',                  'category' => 'mens-clothing',    'brand' => 'Northstar',   'type' => 'clothing',    'base_price' => 12999, 'flags' => [],                        'colors' => ['navy', 'black'],       'has_compare' => false, 'sizes' => ['m', 'l']],
+            ['name' => 'Relaxed Straight Jeans',    'name_pl' => 'Luźne Proste Dżinsy',               'category' => 'mens-clothing',    'brand' => 'Crafted Co',  'type' => 'clothing',    'base_price' => 13999, 'flags' => ['bestseller'],            'colors' => ['slate', 'navy'],       'has_compare' => true,  'sizes' => ['m', 'l']],
+            ['name' => 'Cargo Combat Trousers',     'name_pl' => 'Spodnie Cargo',                      'category' => 'mens-clothing',    'brand' => 'Northstar',   'type' => 'clothing',    'base_price' => 11999, 'flags' => ['new'],                   'colors' => ['olive', 'black'],      'has_compare' => false, 'sizes' => ['m', 'l']],
+            ['name' => 'Tailored Chino Trousers',   'name_pl' => 'Eleganckie Spodnie Chino',           'category' => 'mens-clothing',    'brand' => 'Aurelia',     'type' => 'clothing',    'base_price' => 10999, 'flags' => [],                        'colors' => ['sand', 'navy'],        'has_compare' => false, 'sizes' => ['m', 'l']],
+            ['name' => 'Fleece Jogger Pants',       'name_pl' => 'Dresowe Spodnie Jogger',             'category' => 'mens-clothing',    'brand' => 'Kinetic',     'type' => 'clothing',    'base_price' => 8999,  'flags' => [],                        'colors' => ['black', 'slate'],      'has_compare' => false],
+            ['name' => 'Classic Pullover Hoodie',   'name_pl' => 'Klasyczna Bluza z Kapturem',         'category' => 'mens-clothing',    'brand' => 'Northstar',   'type' => 'clothing',    'base_price' => 14999, 'flags' => ['bestseller'],            'colors' => ['black', 'forest'],     'has_compare' => true],
+            ['name' => 'Zip-Up Tech Hoodie',        'name_pl' => 'Techniczna Bluza na Zamek',          'category' => 'mens-clothing',    'brand' => 'Kinetic',     'type' => 'clothing',    'base_price' => 16999, 'flags' => ['new'],                   'colors' => ['navy', 'olive'],       'has_compare' => false],
+            ['name' => 'Satin Bomber Jacket',       'name_pl' => 'Satynowa Kurtka Bomber',             'category' => 'mens-clothing',    'brand' => 'Aurelia',     'type' => 'clothing',    'base_price' => 24999, 'flags' => ['new', 'limited'],        'colors' => ['black', 'olive'],      'has_compare' => true,  'sizes' => ['m', 'l']],
+            ['name' => 'Indigo Denim Jacket',       'name_pl' => 'Dżinsowa Kurtka Indigo',             'category' => 'mens-clothing',    'brand' => 'Crafted Co',  'type' => 'clothing',    'base_price' => 18999, 'flags' => [],                        'colors' => ['navy', 'slate'],       'has_compare' => false, 'sizes' => ['m', 'l']],
 
             // ── Women's Clothing (14) ─────────────────────────────────────────
-            ['name' => 'Floral Midi Dress',         'category' => 'womens-clothing',  'brand' => 'Aurelia',     'type' => 'clothing',   'base_price' => 13999, 'flags' => ['new'],                  'colors' => ['blush', 'terracotta'], 'sizes' => ['s', 'm'], 'has_compare' => false],
-            ['name' => 'Satin Evening Slip Dress',  'category' => 'womens-clothing',  'brand' => 'Aurelia',     'type' => 'clothing',   'base_price' => 18999, 'flags' => ['limited'],              'colors' => ['black', 'cream'],    'sizes' => ['s', 'm'], 'has_compare' => true],
-            ['name' => 'Wrap Jersey Dress',         'category' => 'womens-clothing',  'brand' => 'Crafted Co',  'type' => 'clothing',   'base_price' => 11999, 'flags' => ['bestseller'],           'colors' => ['terracotta', 'navy'], 'sizes' => ['s', 'm'], 'has_compare' => false],
-            ['name' => 'Linen Summer Dress',        'category' => 'womens-clothing',  'brand' => 'Crafted Co',  'type' => 'clothing',   'base_price' => 14999, 'flags' => ['new', 'eco'],           'colors' => ['cream', 'sand'],     'sizes' => ['s', 'm'], 'has_compare' => false],
-            ['name' => 'Knit Mini Dress',           'category' => 'womens-clothing',  'brand' => 'Aurelia',     'type' => 'clothing',   'base_price' => 12999, 'flags' => [],                       'colors' => ['blush', 'slate'],    'sizes' => ['xs', 's'], 'has_compare' => false],
-            ['name' => 'High Rise Skinny Jeans',    'category' => 'womens-clothing',  'brand' => 'Northstar',   'type' => 'clothing',   'base_price' => 11999, 'flags' => ['bestseller'],           'colors' => ['navy', 'black'],     'sizes' => ['s', 'm'], 'has_compare' => true],
-            ['name' => 'Vintage Mom Jeans',         'category' => 'womens-clothing',  'brand' => 'Crafted Co',  'type' => 'clothing',   'base_price' => 12999, 'flags' => ['new'],                  'colors' => ['slate', 'sand'],     'sizes' => ['s', 'm'], 'has_compare' => false],
-            ['name' => 'Wide Leg Linen Trousers',   'category' => 'womens-clothing',  'brand' => 'Aurelia',     'type' => 'clothing',   'base_price' => 10999, 'flags' => ['eco'],                  'colors' => ['cream', 'terracotta'], 'sizes' => ['s', 'm'], 'has_compare' => false],
-            ['name' => 'Tailored Linen Shorts',     'category' => 'womens-clothing',  'brand' => 'Crafted Co',  'type' => 'clothing',   'base_price' => 7999,  'flags' => ['new'],                  'colors' => ['sand', 'olive'],     'sizes' => ['xs', 's'], 'has_compare' => false],
-            ['name' => 'Yoga Flare Leggings',       'category' => 'womens-clothing',  'brand' => 'Kinetic',     'type' => 'clothing',   'base_price' => 9999,  'flags' => [],                       'colors' => ['black', 'blush'],    'sizes' => ['xs', 's'], 'has_compare' => false],
-            ['name' => 'Oversized Comfort Hoodie',  'category' => 'womens-clothing',  'brand' => 'Northstar',   'type' => 'clothing',   'base_price' => 13999, 'flags' => ['bestseller'],           'colors' => ['cream', 'blush'],    'sizes' => ['s', 'm'], 'has_compare' => true],
-            ['name' => 'Ribbed Knit Cardigan',      'category' => 'womens-clothing',  'brand' => 'Aurelia',     'type' => 'clothing',   'base_price' => 15999, 'flags' => ['eco'],                  'colors' => ['sand', 'terracotta'], 'sizes' => ['s', 'm'], 'has_compare' => false],
-            ['name' => 'Relaxed Linen Blouse',      'category' => 'womens-clothing',  'brand' => 'Crafted Co',  'type' => 'clothing',   'base_price' => 8999,  'flags' => ['eco', 'new'],           'colors' => ['white', 'cream'],    'sizes' => ['s', 'm'], 'has_compare' => false],
-            ['name' => 'Cropped Blazer',            'category' => 'womens-clothing',  'brand' => 'Aurelia',     'type' => 'clothing',   'base_price' => 22999, 'flags' => ['new', 'limited'],       'colors' => ['black', 'sand'],     'sizes' => ['s', 'm'], 'has_compare' => true],
+            ['name' => 'Floral Midi Dress',         'name_pl' => 'Kwiecista Sukienka Midi',            'category' => 'womens-clothing',  'brand' => 'Aurelia',     'type' => 'clothing',    'base_price' => 13999, 'flags' => ['new'],                   'colors' => ['blush', 'terracotta'], 'sizes' => ['s', 'm'],   'has_compare' => false],
+            ['name' => 'Satin Evening Slip Dress',  'name_pl' => 'Satynowa Sukienka Wieczorowa',       'category' => 'womens-clothing',  'brand' => 'Aurelia',     'type' => 'clothing',    'base_price' => 18999, 'flags' => ['limited'],               'colors' => ['black', 'cream'],      'sizes' => ['s', 'm'],   'has_compare' => true],
+            ['name' => 'Wrap Jersey Dress',         'name_pl' => 'Sukienka Jersey Zawijana',           'category' => 'womens-clothing',  'brand' => 'Crafted Co',  'type' => 'clothing',    'base_price' => 11999, 'flags' => ['bestseller'],            'colors' => ['terracotta', 'navy'],  'sizes' => ['s', 'm'],   'has_compare' => false],
+            ['name' => 'Linen Summer Dress',        'name_pl' => 'Letnia Lniana Sukienka',             'category' => 'womens-clothing',  'brand' => 'Crafted Co',  'type' => 'clothing',    'base_price' => 14999, 'flags' => ['new', 'eco'],            'colors' => ['cream', 'sand'],       'sizes' => ['s', 'm'],   'has_compare' => false],
+            ['name' => 'Knit Mini Dress',           'name_pl' => 'Mini Sukienka Dzianinowa',           'category' => 'womens-clothing',  'brand' => 'Aurelia',     'type' => 'clothing',    'base_price' => 12999, 'flags' => [],                        'colors' => ['blush', 'slate'],      'sizes' => ['xs', 's'],  'has_compare' => false],
+            ['name' => 'High Rise Skinny Jeans',    'name_pl' => 'Rurki z Wysokim Stanem',             'category' => 'womens-clothing',  'brand' => 'Northstar',   'type' => 'clothing',    'base_price' => 11999, 'flags' => ['bestseller'],            'colors' => ['navy', 'black'],       'sizes' => ['s', 'm'],   'has_compare' => true],
+            ['name' => 'Vintage Mom Jeans',         'name_pl' => 'Vintage Dżinsy Mom',                 'category' => 'womens-clothing',  'brand' => 'Crafted Co',  'type' => 'clothing',    'base_price' => 12999, 'flags' => ['new'],                   'colors' => ['slate', 'sand'],       'sizes' => ['s', 'm'],   'has_compare' => false],
+            ['name' => 'Wide Leg Linen Trousers',   'name_pl' => 'Szerokie Lniane Spodnie',            'category' => 'womens-clothing',  'brand' => 'Aurelia',     'type' => 'clothing',    'base_price' => 10999, 'flags' => ['eco'],                   'colors' => ['cream', 'terracotta'], 'sizes' => ['s', 'm'],   'has_compare' => false],
+            ['name' => 'Tailored Linen Shorts',     'name_pl' => 'Eleganckie Lniane Szorty',           'category' => 'womens-clothing',  'brand' => 'Crafted Co',  'type' => 'clothing',    'base_price' => 7999,  'flags' => ['new'],                   'colors' => ['sand', 'olive'],       'sizes' => ['xs', 's'],  'has_compare' => false],
+            ['name' => 'Yoga Flare Leggings',       'name_pl' => 'Legginsy Joga Flare',                'category' => 'womens-clothing',  'brand' => 'Kinetic',     'type' => 'clothing',    'base_price' => 9999,  'flags' => [],                        'colors' => ['black', 'blush'],      'sizes' => ['xs', 's'],  'has_compare' => false],
+            ['name' => 'Oversized Comfort Hoodie',  'name_pl' => 'Oversizowa Bluza Comfort',           'category' => 'womens-clothing',  'brand' => 'Northstar',   'type' => 'clothing',    'base_price' => 13999, 'flags' => ['bestseller'],            'colors' => ['cream', 'blush'],      'sizes' => ['s', 'm'],   'has_compare' => true],
+            ['name' => 'Ribbed Knit Cardigan',      'name_pl' => 'Prążkowany Sweter Kardigan',         'category' => 'womens-clothing',  'brand' => 'Aurelia',     'type' => 'clothing',    'base_price' => 15999, 'flags' => ['eco'],                   'colors' => ['sand', 'terracotta'],  'sizes' => ['s', 'm'],   'has_compare' => false],
+            ['name' => 'Relaxed Linen Blouse',      'name_pl' => 'Swobodna Lniana Bluzka',             'category' => 'womens-clothing',  'brand' => 'Crafted Co',  'type' => 'clothing',    'base_price' => 8999,  'flags' => ['eco', 'new'],            'colors' => ['white', 'cream'],      'sizes' => ['s', 'm'],   'has_compare' => false],
+            ['name' => 'Cropped Blazer',            'name_pl' => 'Krótki Blezer',                      'category' => 'womens-clothing',  'brand' => 'Aurelia',     'type' => 'clothing',    'base_price' => 22999, 'flags' => ['new', 'limited'],        'colors' => ['black', 'sand'],       'sizes' => ['s', 'm'],   'has_compare' => true],
 
             // ── Kids' Clothing (7) ────────────────────────────────────────────
-            ['name' => 'Kids Classic Tee',          'category' => 'kids-clothing',    'brand' => 'Northstar',   'type' => 'clothing',   'base_price' => 2999,  'flags' => [],              'colors' => ['white', 'navy'], 'sizes' => ['xs', 's'], 'has_compare' => false],
-            ['name' => 'Kids Zip Hoodie',           'category' => 'kids-clothing',    'brand' => 'Northstar',   'type' => 'clothing',   'base_price' => 5999,  'flags' => ['new'],         'colors' => ['navy', 'olive'], 'sizes' => ['xs', 's'], 'has_compare' => false],
-            ['name' => 'Kids Slim Jeans',           'category' => 'kids-clothing',    'brand' => 'Crafted Co',  'type' => 'clothing',   'base_price' => 5999,  'flags' => [],              'colors' => ['navy', 'black'], 'sizes' => ['xs', 's'], 'has_compare' => false],
-            ['name' => 'Kids Cotton Shorts',        'category' => 'kids-clothing',    'brand' => 'Northstar',   'type' => 'clothing',   'base_price' => 2499,  'flags' => [],              'colors' => ['sand', 'olive'], 'sizes' => ['xs', 's'], 'has_compare' => false],
-            ['name' => 'Kids Floral Dress',         'category' => 'kids-clothing',    'brand' => 'Aurelia',     'type' => 'clothing',   'base_price' => 4999,  'flags' => ['new'],         'colors' => ['blush', 'cream'], 'sizes' => ['xs', 's'], 'has_compare' => false],
-            ['name' => 'Kids Pyjama Set',           'category' => 'kids-clothing',    'brand' => 'Crafted Co',  'type' => 'clothing',   'base_price' => 4499,  'flags' => ['eco'],         'colors' => ['cream', 'blush'], 'sizes' => ['xs', 's'], 'has_compare' => false],
-            ['name' => 'Kids Lightweight Raincoat', 'category' => 'kids-clothing',    'brand' => 'Kinetic',     'type' => 'clothing',   'base_price' => 8999,  'flags' => ['new'],         'colors' => ['navy', 'forest'], 'sizes' => ['xs', 's'], 'has_compare' => false],
+            ['name' => 'Kids Classic Tee',          'name_pl' => 'Dziecięcy T-shirt Classic',          'category' => 'kids-clothing',    'brand' => 'Northstar',   'type' => 'clothing',    'base_price' => 2999,  'flags' => [],                        'colors' => ['white', 'navy'],       'sizes' => ['xs', 's'],  'has_compare' => false],
+            ['name' => 'Kids Zip Hoodie',           'name_pl' => 'Dziecięca Bluza na Zamek',           'category' => 'kids-clothing',    'brand' => 'Northstar',   'type' => 'clothing',    'base_price' => 5999,  'flags' => ['new'],                   'colors' => ['navy', 'olive'],       'sizes' => ['xs', 's'],  'has_compare' => false],
+            ['name' => 'Kids Slim Jeans',           'name_pl' => 'Dziecięce Dopasowane Dżinsy',        'category' => 'kids-clothing',    'brand' => 'Crafted Co',  'type' => 'clothing',    'base_price' => 5999,  'flags' => [],                        'colors' => ['navy', 'black'],       'sizes' => ['xs', 's'],  'has_compare' => false],
+            ['name' => 'Kids Cotton Shorts',        'name_pl' => 'Dziecięce Bawełniane Szorty',        'category' => 'kids-clothing',    'brand' => 'Northstar',   'type' => 'clothing',    'base_price' => 2499,  'flags' => [],                        'colors' => ['sand', 'olive'],       'sizes' => ['xs', 's'],  'has_compare' => false],
+            ['name' => 'Kids Floral Dress',         'name_pl' => 'Dziecięca Kwiecista Sukienka',       'category' => 'kids-clothing',    'brand' => 'Aurelia',     'type' => 'clothing',    'base_price' => 4999,  'flags' => ['new'],                   'colors' => ['blush', 'cream'],      'sizes' => ['xs', 's'],  'has_compare' => false],
+            ['name' => 'Kids Pyjama Set',           'name_pl' => 'Dziecięca Piżama',                   'category' => 'kids-clothing',    'brand' => 'Crafted Co',  'type' => 'clothing',    'base_price' => 4499,  'flags' => ['eco'],                   'colors' => ['cream', 'blush'],      'sizes' => ['xs', 's'],  'has_compare' => false],
+            ['name' => 'Kids Lightweight Raincoat', 'name_pl' => 'Dziecięcy Lekki Płaszcz Przeciwdeszczowy', 'category' => 'kids-clothing', 'brand' => 'Kinetic',   'type' => 'clothing',    'base_price' => 8999,  'flags' => ['new'],                   'colors' => ['navy', 'forest'],      'sizes' => ['xs', 's'],  'has_compare' => false],
 
             // ── Footwear (10) ─────────────────────────────────────────────────
-            ['name' => 'White Leather Sneakers',    'category' => 'footwear',         'brand' => 'Northstar',   'type' => 'footwear',   'base_price' => 13999, 'flags' => ['bestseller'],           'colors' => ['white', 'black'],    'has_compare' => true],
-            ['name' => 'Canvas Low-Top',            'category' => 'footwear',         'brand' => 'Northstar',   'type' => 'footwear',   'base_price' => 7999,  'flags' => [],                       'colors' => ['white', 'navy'],     'has_compare' => false],
-            ['name' => 'Performance Running Shoe',  'category' => 'footwear',         'brand' => 'Kinetic',     'type' => 'footwear',   'base_price' => 17999, 'flags' => ['new'],                  'colors' => ['black', 'slate'],    'has_compare' => false],
-            ['name' => 'Oxford Brogue Shoes',       'category' => 'footwear',         'brand' => 'Crafted Co',  'type' => 'footwear',   'base_price' => 22999, 'flags' => ['limited'],              'colors' => ['black', 'sand'],     'has_compare' => true],
-            ['name' => 'Suede Chelsea Boots',       'category' => 'footwear',         'brand' => 'Aurelia',     'type' => 'footwear',   'base_price' => 26999, 'flags' => ['bestseller'],           'colors' => ['black', 'terracotta'], 'has_compare' => true],
-            ['name' => 'High-Top Canvas Trainers',  'category' => 'footwear',         'brand' => 'Northstar',   'type' => 'footwear',   'base_price' => 9999,  'flags' => ['new'],                  'colors' => ['black', 'olive'],    'has_compare' => false],
-            ['name' => 'Leather Penny Loafers',     'category' => 'footwear',         'brand' => 'Crafted Co',  'type' => 'footwear',   'base_price' => 19999, 'flags' => [],                       'colors' => ['black', 'sand'],     'has_compare' => false],
-            ['name' => 'Minimalist Leather Sandals', 'category' => 'footwear',         'brand' => 'Aurelia',     'type' => 'footwear',   'base_price' => 10999, 'flags' => ['eco'],                  'colors' => ['sand', 'black'],     'has_compare' => false],
-            ['name' => 'Waterproof Hiking Boots',   'category' => 'footwear',         'brand' => 'Kinetic',     'type' => 'footwear',   'base_price' => 29999, 'flags' => ['new'],                  'colors' => ['forest', 'black'],   'has_compare' => false],
-            ['name' => 'Slip-On Espadrilles',       'category' => 'footwear',         'brand' => 'Crafted Co',  'type' => 'footwear',   'base_price' => 8499,  'flags' => ['eco'],                  'colors' => ['sand', 'navy'],      'has_compare' => false],
+            ['name' => 'White Leather Sneakers',    'name_pl' => 'Białe Skórzane Sneakersy',           'category' => 'footwear',         'brand' => 'Northstar',   'type' => 'footwear',    'base_price' => 13999, 'flags' => ['bestseller'],            'colors' => ['white', 'black'],      'has_compare' => true],
+            ['name' => 'Canvas Low-Top',            'name_pl' => 'Płócienne Buty Low-Top',             'category' => 'footwear',         'brand' => 'Northstar',   'type' => 'footwear',    'base_price' => 7999,  'flags' => [],                        'colors' => ['white', 'navy'],       'has_compare' => false],
+            ['name' => 'Performance Running Shoe',  'name_pl' => 'Buty do Biegania Performance',       'category' => 'footwear',         'brand' => 'Kinetic',     'type' => 'footwear',    'base_price' => 17999, 'flags' => ['new'],                   'colors' => ['black', 'slate'],      'has_compare' => false],
+            ['name' => 'Oxford Brogue Shoes',       'name_pl' => 'Eleganckie Brogsy Oxford',           'category' => 'footwear',         'brand' => 'Crafted Co',  'type' => 'footwear',    'base_price' => 22999, 'flags' => ['limited'],               'colors' => ['black', 'sand'],       'has_compare' => true],
+            ['name' => 'Suede Chelsea Boots',       'name_pl' => 'Zamszowe Chelsea Boots',             'category' => 'footwear',         'brand' => 'Aurelia',     'type' => 'footwear',    'base_price' => 26999, 'flags' => ['bestseller'],            'colors' => ['black', 'terracotta'], 'has_compare' => true],
+            ['name' => 'High-Top Canvas Trainers',  'name_pl' => 'Wysokie Trampki Płócienne',          'category' => 'footwear',         'brand' => 'Northstar',   'type' => 'footwear',    'base_price' => 9999,  'flags' => ['new'],                   'colors' => ['black', 'olive'],      'has_compare' => false],
+            ['name' => 'Leather Penny Loafers',     'name_pl' => 'Skórzane Mokasyny',                  'category' => 'footwear',         'brand' => 'Crafted Co',  'type' => 'footwear',    'base_price' => 19999, 'flags' => [],                        'colors' => ['black', 'sand'],       'has_compare' => false],
+            ['name' => 'Minimalist Leather Sandals', 'name_pl' => 'Minimalistyczne Sandały Skórzane',   'category' => 'footwear',         'brand' => 'Aurelia',     'type' => 'footwear',    'base_price' => 10999, 'flags' => ['eco'],                   'colors' => ['sand', 'black'],       'has_compare' => false],
+            ['name' => 'Waterproof Hiking Boots',   'name_pl' => 'Wodoodporne Buty Trekkingowe',       'category' => 'footwear',         'brand' => 'Kinetic',     'type' => 'footwear',    'base_price' => 29999, 'flags' => ['new'],                   'colors' => ['forest', 'black'],     'has_compare' => false],
+            ['name' => 'Slip-On Espadrilles',       'name_pl' => 'Espadryle Wsuwane',                  'category' => 'footwear',         'brand' => 'Crafted Co',  'type' => 'footwear',    'base_price' => 8499,  'flags' => ['eco'],                   'colors' => ['sand', 'navy'],        'has_compare' => false],
 
             // ── Bags & Accessories (10) ───────────────────────────────────────
-            ['name' => 'Organic Canvas Tote',       'category' => 'bags-accessories', 'brand' => 'Northstar',   'type' => 'accessories', 'base_price' => 4999,  'flags' => ['eco', 'bestseller'],    'colors' => ['black', 'cream'],    'has_compare' => false],
-            ['name' => 'Leather Crossbody Bag',     'category' => 'bags-accessories', 'brand' => 'Aurelia',     'type' => 'accessories', 'base_price' => 18999, 'flags' => ['bestseller'],           'colors' => ['black', 'terracotta'], 'has_compare' => true],
-            ['name' => 'Roll-Top Backpack',         'category' => 'bags-accessories', 'brand' => 'Northstar',   'type' => 'accessories', 'base_price' => 22999, 'flags' => ['new'],                  'colors' => ['black', 'olive'],    'has_compare' => false],
-            ['name' => 'Slim Laptop Sleeve',        'category' => 'bags-accessories', 'brand' => 'Mono Works',  'type' => 'accessories', 'base_price' => 8999,  'flags' => [],                       'colors' => ['slate', 'black'],    'has_compare' => false],
-            ['name' => 'Braided Leather Belt',      'category' => 'bags-accessories', 'brand' => 'Crafted Co',  'type' => 'accessories', 'base_price' => 5999,  'flags' => ['eco'],                  'colors' => ['black', 'sand'],     'has_compare' => false],
-            ['name' => 'Chunky Wool Beanie',        'category' => 'bags-accessories', 'brand' => 'Crafted Co',  'type' => 'accessories', 'base_price' => 3999,  'flags' => ['new'],                  'colors' => ['navy', 'terracotta'], 'has_compare' => false],
-            ['name' => 'Structured Baseball Cap',   'category' => 'bags-accessories', 'brand' => 'Northstar',   'type' => 'accessories', 'base_price' => 3499,  'flags' => [],                       'colors' => ['black', 'navy'],     'has_compare' => false],
-            ['name' => 'Cashmere Blend Scarf',      'category' => 'bags-accessories', 'brand' => 'Aurelia',     'type' => 'accessories', 'base_price' => 9999,  'flags' => ['eco', 'limited'],       'colors' => ['cream', 'blush'],    'has_compare' => true],
-            ['name' => 'Slim Card Wallet',          'category' => 'bags-accessories', 'brand' => 'Mono Works',  'type' => 'accessories', 'base_price' => 4999,  'flags' => ['bestseller'],           'colors' => ['black', 'sand'],     'has_compare' => false],
-            ['name' => 'Polarised Sunglasses',      'category' => 'bags-accessories', 'brand' => 'Aurelia',     'type' => 'accessories', 'base_price' => 12999, 'flags' => ['new'],                  'colors' => ['black', 'terracotta'], 'has_compare' => true],
+            ['name' => 'Organic Canvas Tote',       'name_pl' => 'Organiczna Torba Bawełniana',        'category' => 'bags-accessories', 'brand' => 'Northstar',   'type' => 'accessories', 'base_price' => 4999,  'flags' => ['eco', 'bestseller'],     'colors' => ['black', 'cream'],      'has_compare' => false],
+            ['name' => 'Leather Crossbody Bag',     'name_pl' => 'Skórzana Torebka na Ramię',          'category' => 'bags-accessories', 'brand' => 'Aurelia',     'type' => 'accessories', 'base_price' => 18999, 'flags' => ['bestseller'],            'colors' => ['black', 'terracotta'], 'has_compare' => true],
+            ['name' => 'Roll-Top Backpack',         'name_pl' => 'Plecak Roll-Top',                    'category' => 'bags-accessories', 'brand' => 'Northstar',   'type' => 'accessories', 'base_price' => 22999, 'flags' => ['new'],                   'colors' => ['black', 'olive'],      'has_compare' => false],
+            ['name' => 'Slim Laptop Sleeve',        'name_pl' => 'Smukły Pokrowiec na Laptopa',        'category' => 'bags-accessories', 'brand' => 'Mono Works',  'type' => 'accessories', 'base_price' => 8999,  'flags' => [],                        'colors' => ['slate', 'black'],      'has_compare' => false],
+            ['name' => 'Braided Leather Belt',      'name_pl' => 'Pleciony Skórzany Pasek',            'category' => 'bags-accessories', 'brand' => 'Crafted Co',  'type' => 'accessories', 'base_price' => 5999,  'flags' => ['eco'],                   'colors' => ['black', 'sand'],       'has_compare' => false],
+            ['name' => 'Chunky Wool Beanie',        'name_pl' => 'Gruba Wełniana Czapka',              'category' => 'bags-accessories', 'brand' => 'Crafted Co',  'type' => 'accessories', 'base_price' => 3999,  'flags' => ['new'],                   'colors' => ['navy', 'terracotta'],  'has_compare' => false],
+            ['name' => 'Structured Baseball Cap',   'name_pl' => 'Strukturalna Czapka z Daszkiem',     'category' => 'bags-accessories', 'brand' => 'Northstar',   'type' => 'accessories', 'base_price' => 3499,  'flags' => [],                        'colors' => ['black', 'navy'],       'has_compare' => false],
+            ['name' => 'Cashmere Blend Scarf',      'name_pl' => 'Szalik z Domieszką Kaszmiru',        'category' => 'bags-accessories', 'brand' => 'Aurelia',     'type' => 'accessories', 'base_price' => 9999,  'flags' => ['eco', 'limited'],        'colors' => ['cream', 'blush'],      'has_compare' => true],
+            ['name' => 'Slim Card Wallet',          'name_pl' => 'Smukły Portfel na Karty',            'category' => 'bags-accessories', 'brand' => 'Mono Works',  'type' => 'accessories', 'base_price' => 4999,  'flags' => ['bestseller'],            'colors' => ['black', 'sand'],       'has_compare' => false],
+            ['name' => 'Polarised Sunglasses',      'name_pl' => 'Polaryzacyjne Okulary Słoneczne',    'category' => 'bags-accessories', 'brand' => 'Aurelia',     'type' => 'accessories', 'base_price' => 12999, 'flags' => ['new'],                   'colors' => ['black', 'terracotta'], 'has_compare' => true],
 
             // ── Living Room (7) ───────────────────────────────────────────────
-            ['name' => 'Travertine Stone Vase',     'category' => 'living-room',      'brand' => 'Mono Works',  'type' => 'home-decor', 'base_price' => 6999,  'flags' => ['new'],       'weight' => 1.5, 'has_compare' => false],
-            ['name' => 'Woven Macramé Wall Art',    'category' => 'living-room',      'brand' => 'Crafted Co',  'type' => 'home-decor', 'base_price' => 8999,  'flags' => ['eco'],       'weight' => 0.8, 'has_compare' => false],
-            ['name' => 'Belgian Linen Cushion Set', 'category' => 'living-room',      'brand' => 'Crafted Co',  'type' => 'home-decor', 'base_price' => 7999,  'flags' => ['bestseller'], 'weight' => 1.0, 'has_compare' => true],
-            ['name' => 'Chunky Knit Throw Blanket', 'category' => 'living-room',      'brand' => 'Crafted Co',  'type' => 'home-decor', 'base_price' => 11999, 'flags' => ['eco', 'bestseller'], 'weight' => 1.2, 'has_compare' => true],
-            ['name' => 'Solid Oak Side Table',      'category' => 'living-room',      'brand' => 'Crafted Co',  'type' => 'home-decor', 'base_price' => 29999, 'flags' => ['bestseller'], 'weight' => 8.0, 'has_compare' => false],
-            ['name' => 'Marble & Brass Tray',       'category' => 'living-room',      'brand' => 'Mono Works',  'type' => 'home-decor', 'base_price' => 5999,  'flags' => ['new'],       'weight' => 1.8, 'has_compare' => false],
-            ['name' => 'Handwoven Rattan Basket',   'category' => 'living-room',      'brand' => 'Crafted Co',  'type' => 'home-decor', 'base_price' => 4999,  'flags' => ['eco'],       'weight' => 0.6, 'has_compare' => false],
+            ['name' => 'Travertine Stone Vase',     'name_pl' => 'Wazon z Trawertynu',                 'category' => 'living-room',      'brand' => 'Mono Works',  'type' => 'home-decor',  'base_price' => 6999,  'flags' => ['new'],                   'weight' => 1.5, 'has_compare' => false],
+            ['name' => 'Woven Macramé Wall Art',    'name_pl' => 'Tkana Dekoracja Ścienna Makrama',    'category' => 'living-room',      'brand' => 'Crafted Co',  'type' => 'home-decor',  'base_price' => 8999,  'flags' => ['eco'],                   'weight' => 0.8, 'has_compare' => false],
+            ['name' => 'Belgian Linen Cushion Set', 'name_pl' => 'Zestaw Poduszek z Belgijskiego Lnu', 'category' => 'living-room',      'brand' => 'Crafted Co',  'type' => 'home-decor',  'base_price' => 7999,  'flags' => ['bestseller'],            'weight' => 1.0, 'has_compare' => true],
+            ['name' => 'Chunky Knit Throw Blanket', 'name_pl' => 'Grubo Dziergany Koc',               'category' => 'living-room',      'brand' => 'Crafted Co',  'type' => 'home-decor',  'base_price' => 11999, 'flags' => ['eco', 'bestseller'],     'weight' => 1.2, 'has_compare' => true],
+            ['name' => 'Solid Oak Side Table',      'name_pl' => 'Stolik z Litego Dębu',              'category' => 'living-room',      'brand' => 'Crafted Co',  'type' => 'home-decor',  'base_price' => 29999, 'flags' => ['bestseller'],            'weight' => 8.0, 'has_compare' => false],
+            ['name' => 'Marble & Brass Tray',       'name_pl' => 'Taca Marmurowo-Mosiężna',           'category' => 'living-room',      'brand' => 'Mono Works',  'type' => 'home-decor',  'base_price' => 5999,  'flags' => ['new'],                   'weight' => 1.8, 'has_compare' => false],
+            ['name' => 'Handwoven Rattan Basket',   'name_pl' => 'Ręcznie Tkany Kosz Rattanowy',      'category' => 'living-room',      'brand' => 'Crafted Co',  'type' => 'home-decor',  'base_price' => 4999,  'flags' => ['eco'],                   'weight' => 0.6, 'has_compare' => false],
 
             // ── Bedroom (5) ───────────────────────────────────────────────────
-            ['name' => 'Washed Linen Duvet Cover',  'category' => 'bedroom',          'brand' => 'Crafted Co',  'type' => 'home-decor', 'base_price' => 16999, 'flags' => ['eco', 'bestseller'], 'weight' => 1.0, 'has_compare' => true],
-            ['name' => 'Cloud-Soft Pillow Set',     'category' => 'bedroom',          'brand' => 'Crafted Co',  'type' => 'home-decor', 'base_price' => 9999,  'flags' => ['bestseller'], 'weight' => 1.5, 'has_compare' => false],
-            ['name' => 'Adjustable Bedside Lamp',   'category' => 'bedroom',          'brand' => 'Mono Works',  'type' => 'home-decor', 'base_price' => 8999,  'flags' => ['new'],       'weight' => 1.2, 'has_compare' => false],
-            ['name' => 'Hand-Poured Soy Candle',    'category' => 'bedroom',          'brand' => 'Crafted Co',  'type' => 'home-decor', 'base_price' => 2999,  'flags' => ['eco'],       'weight' => 0.3, 'has_compare' => false],
-            ['name' => 'Silk Sleep Eye Mask',       'category' => 'bedroom',          'brand' => 'Aurelia',     'type' => 'accessories', 'base_price' => 2499,  'flags' => [],            'colors' => ['black', 'blush'], 'has_compare' => false],
+            ['name' => 'Washed Linen Duvet Cover',  'name_pl' => 'Prana Lniana Pościel',              'category' => 'bedroom',          'brand' => 'Crafted Co',  'type' => 'home-decor',  'base_price' => 16999, 'flags' => ['eco', 'bestseller'],     'weight' => 1.0, 'has_compare' => true],
+            ['name' => 'Cloud-Soft Pillow Set',     'name_pl' => 'Zestaw Poduszek Cloud-Soft',        'category' => 'bedroom',          'brand' => 'Crafted Co',  'type' => 'home-decor',  'base_price' => 9999,  'flags' => ['bestseller'],            'weight' => 1.5, 'has_compare' => false],
+            ['name' => 'Adjustable Bedside Lamp',   'name_pl' => 'Regulowana Lampka Nocna',           'category' => 'bedroom',          'brand' => 'Mono Works',  'type' => 'home-decor',  'base_price' => 8999,  'flags' => ['new'],                   'weight' => 1.2, 'has_compare' => false],
+            ['name' => 'Hand-Poured Soy Candle',    'name_pl' => 'Ręcznie Wylewana Świeca Sojowa',    'category' => 'bedroom',          'brand' => 'Crafted Co',  'type' => 'home-decor',  'base_price' => 2999,  'flags' => ['eco'],                   'weight' => 0.3, 'has_compare' => false],
+            ['name' => 'Silk Sleep Eye Mask',       'name_pl' => 'Jedwabna Maska do Snu',             'category' => 'bedroom',          'brand' => 'Aurelia',     'type' => 'accessories', 'base_price' => 2499,  'flags' => [],                        'colors' => ['black', 'blush'],      'has_compare' => false],
 
             // ── Kitchen & Dining (8) ──────────────────────────────────────────
-            ['name' => 'Ceramic Mug Set (4-pack)',  'category' => 'kitchen-dining',   'brand' => 'Mono Works',  'type' => 'kitchenware', 'base_price' => 5999,  'flags' => ['sale'],      'weight' => 1.2, 'has_compare' => true],
-            ['name' => 'Pour-Over Coffee Kit',      'category' => 'kitchen-dining',   'brand' => 'Mono Works',  'type' => 'kitchenware', 'base_price' => 8999,  'flags' => ['bestseller'], 'weight' => 0.8, 'has_compare' => false],
-            ['name' => 'Seasoned Cast Iron Skillet', 'category' => 'kitchen-dining',   'brand' => 'Crafted Co',  'type' => 'kitchenware', 'base_price' => 14999, 'flags' => ['bestseller'], 'weight' => 3.5, 'has_compare' => false],
-            ['name' => 'Bamboo Cutting Board',      'category' => 'kitchen-dining',   'brand' => 'Crafted Co',  'type' => 'kitchenware', 'base_price' => 3999,  'flags' => ['eco'],       'weight' => 1.0, 'has_compare' => false],
-            ['name' => 'Digital Kitchen Scale',     'category' => 'kitchen-dining',   'brand' => 'Mono Works',  'type' => 'kitchenware', 'base_price' => 4999,  'flags' => ['new'],       'weight' => 0.5, 'has_compare' => false],
-            ['name' => 'Borosilicate French Press', 'category' => 'kitchen-dining',   'brand' => 'Mono Works',  'type' => 'kitchenware', 'base_price' => 6999,  'flags' => ['new'],       'weight' => 0.7, 'has_compare' => false],
-            ['name' => 'Hand-Thrown Salad Bowl Set', 'category' => 'kitchen-dining',   'brand' => 'Crafted Co',  'type' => 'kitchenware', 'base_price' => 8999,  'flags' => ['eco', 'bestseller'], 'weight' => 1.5, 'has_compare' => false],
-            ['name' => 'Glass Meal Prep Containers', 'category' => 'kitchen-dining',   'brand' => 'Mono Works',  'type' => 'kitchenware', 'base_price' => 4999,  'flags' => ['eco'],       'weight' => 1.2, 'has_compare' => false],
+            ['name' => 'Ceramic Mug Set (4-pack)',  'name_pl' => 'Zestaw Ceramicznych Kubków (4 szt.)', 'category' => 'kitchen-dining',   'brand' => 'Mono Works',  'type' => 'kitchenware', 'base_price' => 5999,  'flags' => ['sale'],                  'weight' => 1.2, 'has_compare' => true],
+            ['name' => 'Pour-Over Coffee Kit',      'name_pl' => 'Zestaw do Kawy Pour-Over',          'category' => 'kitchen-dining',   'brand' => 'Mono Works',  'type' => 'kitchenware', 'base_price' => 8999,  'flags' => ['bestseller'],            'weight' => 0.8, 'has_compare' => false],
+            ['name' => 'Seasoned Cast Iron Skillet', 'name_pl' => 'Doprawiona Żeliwna Patelnia',       'category' => 'kitchen-dining',   'brand' => 'Crafted Co',  'type' => 'kitchenware', 'base_price' => 14999, 'flags' => ['bestseller'],            'weight' => 3.5, 'has_compare' => false],
+            ['name' => 'Bamboo Cutting Board',      'name_pl' => 'Bambusowa Deska do Krojenia',       'category' => 'kitchen-dining',   'brand' => 'Crafted Co',  'type' => 'kitchenware', 'base_price' => 3999,  'flags' => ['eco'],                   'weight' => 1.0, 'has_compare' => false],
+            ['name' => 'Digital Kitchen Scale',     'name_pl' => 'Cyfrowa Waga Kuchenna',             'category' => 'kitchen-dining',   'brand' => 'Mono Works',  'type' => 'kitchenware', 'base_price' => 4999,  'flags' => ['new'],                   'weight' => 0.5, 'has_compare' => false],
+            ['name' => 'Borosilicate French Press', 'name_pl' => 'Prasa Francuska z Borokrzemianu',   'category' => 'kitchen-dining',   'brand' => 'Mono Works',  'type' => 'kitchenware', 'base_price' => 6999,  'flags' => ['new'],                   'weight' => 0.7, 'has_compare' => false],
+            ['name' => 'Hand-Thrown Salad Bowl Set', 'name_pl' => 'Zestaw Misek do Sałatek',           'category' => 'kitchen-dining',   'brand' => 'Crafted Co',  'type' => 'kitchenware', 'base_price' => 8999,  'flags' => ['eco', 'bestseller'],     'weight' => 1.5, 'has_compare' => false],
+            ['name' => 'Glass Meal Prep Containers', 'name_pl' => 'Szklane Pojemniki do Meal Prep',    'category' => 'kitchen-dining',   'brand' => 'Mono Works',  'type' => 'kitchenware', 'base_price' => 4999,  'flags' => ['eco'],                   'weight' => 1.2, 'has_compare' => false],
 
             // ── Skincare (7) ──────────────────────────────────────────────────
-            ['name' => 'Vitamin C Brightening Serum', 'category' => 'skincare',        'brand' => 'Vitalis',     'type' => 'beauty',     'base_price' => 7999,  'flags' => ['bestseller'], 'has_compare' => true],
-            ['name' => 'Daily Hydrating Moisturiser', 'category' => 'skincare',        'brand' => 'Vitalis',     'type' => 'beauty',     'base_price' => 6499,  'flags' => ['bestseller'], 'has_compare' => false],
-            ['name' => 'Retinol Eye Cream',         'category' => 'skincare',         'brand' => 'Vitalis',     'type' => 'beauty',     'base_price' => 8999,  'flags' => ['new'],       'has_compare' => false],
-            ['name' => 'Rose Water Toning Mist',    'category' => 'skincare',         'brand' => 'Vitalis',     'type' => 'beauty',     'base_price' => 4999,  'flags' => ['eco'],       'has_compare' => false],
-            ['name' => 'Gentle Micellar Cleanser',  'category' => 'skincare',         'brand' => 'Vitalis',     'type' => 'beauty',     'base_price' => 5999,  'flags' => [],            'has_compare' => false],
-            ['name' => 'SPF 50+ Face Shield',       'category' => 'skincare',         'brand' => 'Vitalis',     'type' => 'beauty',     'base_price' => 7499,  'flags' => ['new', 'bestseller'], 'has_compare' => false],
-            ['name' => 'Glow Facial Oil Blend',     'category' => 'skincare',         'brand' => 'Vitalis',     'type' => 'beauty',     'base_price' => 9999,  'flags' => ['limited'],   'has_compare' => true],
+            ['name' => 'Vitamin C Brightening Serum', 'name_pl' => 'Rozświetlające Serum z Witaminą C', 'category' => 'skincare',         'brand' => 'Vitalis',     'type' => 'beauty',      'base_price' => 7999,  'flags' => ['bestseller'],            'has_compare' => true],
+            ['name' => 'Daily Hydrating Moisturiser', 'name_pl' => 'Codzienny Nawilżający Krem',       'category' => 'skincare',         'brand' => 'Vitalis',     'type' => 'beauty',      'base_price' => 6499,  'flags' => ['bestseller'],            'has_compare' => false],
+            ['name' => 'Retinol Eye Cream',         'name_pl' => 'Krem pod Oczy z Retinolem',         'category' => 'skincare',         'brand' => 'Vitalis',     'type' => 'beauty',      'base_price' => 8999,  'flags' => ['new'],                   'has_compare' => false],
+            ['name' => 'Rose Water Toning Mist',    'name_pl' => 'Tonizująca Mgiełka z Wodą Różaną',  'category' => 'skincare',         'brand' => 'Vitalis',     'type' => 'beauty',      'base_price' => 4999,  'flags' => ['eco'],                   'has_compare' => false],
+            ['name' => 'Gentle Micellar Cleanser',  'name_pl' => 'Delikatny Płyn Micelarny',          'category' => 'skincare',         'brand' => 'Vitalis',     'type' => 'beauty',      'base_price' => 5999,  'flags' => [],                        'has_compare' => false],
+            ['name' => 'SPF 50+ Face Shield',       'name_pl' => 'Krem Ochronny z Filtrem SPF 50+',  'category' => 'skincare',         'brand' => 'Vitalis',     'type' => 'beauty',      'base_price' => 7499,  'flags' => ['new', 'bestseller'],     'has_compare' => false],
+            ['name' => 'Glow Facial Oil Blend',     'name_pl' => 'Rozświetlający Olejek do Twarzy',   'category' => 'skincare',         'brand' => 'Vitalis',     'type' => 'beauty',      'base_price' => 9999,  'flags' => ['limited'],               'has_compare' => true],
 
             // ── Body Care (5) ─────────────────────────────────────────────────
-            ['name' => 'Nourishing Body Lotion',    'category' => 'body-care',        'brand' => 'Vitalis',     'type' => 'beauty',     'base_price' => 4999,  'flags' => ['bestseller'], 'has_compare' => false],
-            ['name' => 'Brown Sugar Exfoliating Scrub', 'category' => 'body-care',     'brand' => 'Vitalis',     'type' => 'beauty',     'base_price' => 5999,  'flags' => ['eco'],       'has_compare' => false],
-            ['name' => 'Botanical Shower Gel Set',  'category' => 'body-care',        'brand' => 'Vitalis',     'type' => 'beauty',     'base_price' => 7999,  'flags' => ['new'],       'has_compare' => false],
-            ['name' => 'Natural Dry Body Brush',    'category' => 'body-care',        'brand' => 'Crafted Co',  'type' => 'home-decor', 'base_price' => 2999,  'flags' => ['eco'],       'weight' => 0.2, 'has_compare' => false],
-            ['name' => 'Himalayan Bath Salt Soak',  'category' => 'body-care',        'brand' => 'Vitalis',     'type' => 'beauty',     'base_price' => 4499,  'flags' => ['eco'],       'has_compare' => false],
+            ['name' => 'Nourishing Body Lotion',    'name_pl' => 'Odżywczy Balsam do Ciała',          'category' => 'body-care',        'brand' => 'Vitalis',     'type' => 'beauty',      'base_price' => 4999,  'flags' => ['bestseller'],            'has_compare' => false],
+            ['name' => 'Brown Sugar Exfoliating Scrub', 'name_pl' => 'Złuszczający Peeling z Brązowym Cukrem', 'category' => 'body-care', 'brand' => 'Vitalis',      'type' => 'beauty',      'base_price' => 5999,  'flags' => ['eco'],                   'has_compare' => false],
+            ['name' => 'Botanical Shower Gel Set',  'name_pl' => 'Botaniczny Zestaw Żeli pod Prysznic', 'category' => 'body-care',       'brand' => 'Vitalis',     'type' => 'beauty',      'base_price' => 7999,  'flags' => ['new'],                   'has_compare' => false],
+            ['name' => 'Natural Dry Body Brush',    'name_pl' => 'Naturalna Szczotka do Suchego Masażu', 'category' => 'body-care',      'brand' => 'Crafted Co',  'type' => 'home-decor',  'base_price' => 2999,  'flags' => ['eco'],                   'weight' => 0.2, 'has_compare' => false],
+            ['name' => 'Himalayan Bath Salt Soak',  'name_pl' => 'Himalajska Sól do Kąpieli',         'category' => 'body-care',        'brand' => 'Vitalis',     'type' => 'beauty',      'base_price' => 4499,  'flags' => ['eco'],                   'has_compare' => false],
 
             // ── Hair Care (4) ─────────────────────────────────────────────────
-            ['name' => 'Intensive Repair Hair Mask', 'category' => 'hair-care',        'brand' => 'Vitalis',     'type' => 'beauty',     'base_price' => 6999,  'flags' => ['bestseller'], 'has_compare' => false],
-            ['name' => 'Hydrating Argan Shampoo',   'category' => 'hair-care',        'brand' => 'Vitalis',     'type' => 'beauty',     'base_price' => 5499,  'flags' => ['eco'],       'has_compare' => false],
-            ['name' => 'Weightless Leave-In Conditioner', 'category' => 'hair-care',   'brand' => 'Vitalis',     'type' => 'beauty',     'base_price' => 5999,  'flags' => [],            'has_compare' => false],
-            ['name' => 'Biotin Hair Growth Serum',  'category' => 'hair-care',        'brand' => 'Vitalis',     'type' => 'beauty',     'base_price' => 9999,  'flags' => ['new'],       'has_compare' => false],
+            ['name' => 'Intensive Repair Hair Mask', 'name_pl' => 'Intensywna Maska Naprawcza do Włosów', 'category' => 'hair-care',      'brand' => 'Vitalis',     'type' => 'beauty',      'base_price' => 6999,  'flags' => ['bestseller'],            'has_compare' => false],
+            ['name' => 'Hydrating Argan Shampoo',   'name_pl' => 'Nawilżający Szampon Arganowy',       'category' => 'hair-care',        'brand' => 'Vitalis',     'type' => 'beauty',      'base_price' => 5499,  'flags' => ['eco'],                   'has_compare' => false],
+            ['name' => 'Weightless Leave-In Conditioner', 'name_pl' => 'Lekka Odżywka bez Spłukiwania', 'category' => 'hair-care',        'brand' => 'Vitalis',     'type' => 'beauty',      'base_price' => 5999,  'flags' => [],                        'has_compare' => false],
+            ['name' => 'Biotin Hair Growth Serum',  'name_pl' => 'Serum na Porost Włosów z Biotyną',  'category' => 'hair-care',        'brand' => 'Vitalis',     'type' => 'beauty',      'base_price' => 9999,  'flags' => ['new'],                   'has_compare' => false],
 
             // ── Activewear (5) ────────────────────────────────────────────────
-            ['name' => '2-in-1 Running Shorts',     'category' => 'activewear',       'brand' => 'Kinetic',     'type' => 'clothing',   'base_price' => 6999,  'flags' => ['bestseller'], 'colors' => ['black', 'navy'],  'sizes' => ['s', 'm'], 'has_compare' => false],
-            ['name' => 'High-Waist Sport Leggings', 'category' => 'activewear',       'brand' => 'Kinetic',     'type' => 'clothing',   'base_price' => 9999,  'flags' => ['bestseller'], 'colors' => ['black', 'olive'], 'sizes' => ['xs', 's'], 'has_compare' => false],
-            ['name' => 'Breathable Athletic Tee',   'category' => 'activewear',       'brand' => 'Kinetic',     'type' => 'clothing',   'base_price' => 5499,  'flags' => ['new'],       'colors' => ['white', 'slate'], 'sizes' => ['s', 'm'], 'has_compare' => false],
-            ['name' => 'Lightweight Workout Hoodie', 'category' => 'activewear',       'brand' => 'Kinetic',     'type' => 'clothing',   'base_price' => 12999, 'flags' => [],            'colors' => ['black', 'forest'], 'sizes' => ['s', 'm'], 'has_compare' => false],
-            ['name' => 'Seamless Sports Bra',       'category' => 'activewear',       'brand' => 'Kinetic',     'type' => 'clothing',   'base_price' => 5999,  'flags' => ['bestseller'], 'colors' => ['black', 'blush'], 'sizes' => ['xs', 's'], 'has_compare' => false],
+            ['name' => '2-in-1 Running Shorts',     'name_pl' => 'Spodenki 2-w-1 do Biegania',        'category' => 'activewear',       'brand' => 'Kinetic',     'type' => 'clothing',    'base_price' => 6999,  'flags' => ['bestseller'],            'colors' => ['black', 'navy'],       'sizes' => ['s', 'm'],   'has_compare' => false],
+            ['name' => 'High-Waist Sport Leggings', 'name_pl' => 'Legginsy Sportowe z Wysokim Stanem', 'category' => 'activewear',       'brand' => 'Kinetic',     'type' => 'clothing',    'base_price' => 9999,  'flags' => ['bestseller'],            'colors' => ['black', 'olive'],      'sizes' => ['xs', 's'],  'has_compare' => false],
+            ['name' => 'Breathable Athletic Tee',   'name_pl' => 'Przewiewny T-shirt Sportowy',        'category' => 'activewear',       'brand' => 'Kinetic',     'type' => 'clothing',    'base_price' => 5499,  'flags' => ['new'],                   'colors' => ['white', 'slate'],      'sizes' => ['s', 'm'],   'has_compare' => false],
+            ['name' => 'Lightweight Workout Hoodie', 'name_pl' => 'Lekka Bluza Treningowa',             'category' => 'activewear',       'brand' => 'Kinetic',     'type' => 'clothing',    'base_price' => 12999, 'flags' => [],                        'colors' => ['black', 'forest'],     'sizes' => ['s', 'm'],   'has_compare' => false],
+            ['name' => 'Seamless Sports Bra',       'name_pl' => 'Bezszwowy Stanik Sportowy',          'category' => 'activewear',       'brand' => 'Kinetic',     'type' => 'clothing',    'base_price' => 5999,  'flags' => ['bestseller'],            'colors' => ['black', 'blush'],      'sizes' => ['xs', 's'],  'has_compare' => false],
 
             // ── Sport Equipment (4) ───────────────────────────────────────────
-            ['name' => 'Natural Rubber Yoga Mat',   'category' => 'sport-equipment',  'brand' => 'Kinetic',     'type' => 'sport',      'base_price' => 8999,  'flags' => ['eco', 'bestseller'], 'weight' => 2.0, 'has_compare' => false],
-            ['name' => 'Resistance Bands Set (5)',   'category' => 'sport-equipment',  'brand' => 'Kinetic',     'type' => 'sport',      'base_price' => 3999,  'flags' => ['bestseller'], 'weight' => 0.5, 'has_compare' => false],
-            ['name' => 'Speed Jump Rope Pro',        'category' => 'sport-equipment',  'brand' => 'Kinetic',     'type' => 'sport',      'base_price' => 2999,  'flags' => [],            'weight' => 0.3, 'has_compare' => false],
-            ['name' => 'Insulated Water Bottle 1L', 'category' => 'sport-equipment',  'brand' => 'Mono Works',  'type' => 'accessories', 'base_price' => 4999,  'flags' => ['eco', 'bestseller'], 'colors' => ['black', 'slate'], 'has_compare' => false],
+            ['name' => 'Natural Rubber Yoga Mat',   'name_pl' => 'Mata do Jogi z Naturalnego Kauczuku', 'category' => 'sport-equipment',  'brand' => 'Kinetic',     'type' => 'sport',       'base_price' => 8999,  'flags' => ['eco', 'bestseller'],     'weight' => 2.0, 'has_compare' => false],
+            ['name' => 'Resistance Bands Set (5)',   'name_pl' => 'Zestaw Taśm Oporowych (5 szt.)',    'category' => 'sport-equipment',  'brand' => 'Kinetic',     'type' => 'sport',       'base_price' => 3999,  'flags' => ['bestseller'],            'weight' => 0.5, 'has_compare' => false],
+            ['name' => 'Speed Jump Rope Pro',        'name_pl' => 'Profesjonalna Skakanka Speed',       'category' => 'sport-equipment',  'brand' => 'Kinetic',     'type' => 'sport',       'base_price' => 2999,  'flags' => [],                        'weight' => 0.3, 'has_compare' => false],
+            ['name' => 'Insulated Water Bottle 1L', 'name_pl' => 'Izolowany Bidon 1L',                'category' => 'sport-equipment',  'brand' => 'Mono Works',  'type' => 'accessories', 'base_price' => 4999,  'flags' => ['eco', 'bestseller'],     'colors' => ['black', 'slate'],      'has_compare' => false],
         ];
     }
 }

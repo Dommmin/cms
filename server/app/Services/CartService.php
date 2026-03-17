@@ -28,6 +28,12 @@ class CartService
                     $this->mergeGuestCartIntoCustomer($user, $cartToken);
                     $user->load('customer');
                 }
+            } elseif ($cartToken) {
+                // Safety-net merge: if AuthController::mergeGuestCartIntoCustomer was
+                // called with a null token (e.g. localStorage wasn't populated yet) the
+                // guest cart survives. Merge it now. mergeGuestCartIntoCustomer returns
+                // early when the guest cart is absent, so this is safe to call always.
+                $this->mergeGuestCartIntoCustomer($user, $cartToken);
             }
 
             $cart = $user->customer->cart;

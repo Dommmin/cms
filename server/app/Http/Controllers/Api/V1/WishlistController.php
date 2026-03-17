@@ -29,11 +29,11 @@ class WishlistController extends Controller
 
         $wishlist = $this->getOrCreateWishlist($request);
 
-        $alreadyExists = $wishlist->items()->where('variant_id', $request->variant_id)->exists();
+        $alreadyExists = $wishlist->items()->where('product_variant_id', $request->variant_id)->exists();
 
         if (! $alreadyExists) {
             $wishlist->items()->create([
-                'variant_id' => $request->variant_id,
+                'product_variant_id' => $request->variant_id,
             ]);
         }
 
@@ -45,7 +45,7 @@ class WishlistController extends Controller
     public function removeItem(Request $request, int $variantId): JsonResponse
     {
         $wishlist = $this->getOrCreateWishlist($request);
-        $wishlist->items()->where('variant_id', $variantId)->delete();
+        $wishlist->items()->where('product_variant_id', $variantId)->delete();
         $wishlist->load('items.variant.product');
 
         return response()->json(['data' => new WishlistResource($wishlist)]);

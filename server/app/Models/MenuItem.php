@@ -43,13 +43,13 @@ class MenuItem extends Model
         return $this->hasMany(self::class, 'parent_id')->where('is_active', true)->orderBy('position');
     }
 
-    /** Oblicza final URL na podstawie link_type */
-    public function resolvedUrl(): string
+    /** Oblicza final URL na podstawie link_type z uwzględnieniem locale. */
+    public function resolvedUrl(string $locale = 'en'): string
     {
         return match ($this->link_type) {
-            MenuLinkTypeEnum::Category => '/category/'.Category::query()->find($this->linked_entity_id)?->slug,
+            MenuLinkTypeEnum::Category => '/products?category='.Category::query()->find($this->linked_entity_id)?->slug,
             MenuLinkTypeEnum::Product => '/products/'.Product::query()->find($this->linked_entity_id)?->slug,
-            MenuLinkTypeEnum::Page => '/'.Page::query()->find($this->linked_entity_id)?->slug,
+            MenuLinkTypeEnum::Page => '/'.Page::query()->find($this->linked_entity_id)?->getSlugForLocale($locale),
             default => $this->url ?? '#',
         };
     }

@@ -81,6 +81,36 @@ class MediaController extends Controller
         return back()->with('success', 'File deleted');
     }
 
+    public function upload(StoreMediaRequest $request): JsonResponse
+    {
+        $files = $request->file('files', []);
+
+        if (! $request->hasFile('files') && $request->hasFile('file')) {
+            $files = [$request->file('file')];
+        }
+
+        $uploaded = [];
+
+        foreach ($files as $file) {
+            $cmsMedia = CmsMedia::create();
+            $media = $cmsMedia->addMedia($file)
+                ->withCustomProperties(['alt' => '', 'caption' => '', 'description' => '', 'author' => ''])
+                ->toMediaCollection($request->input('collection', 'default'));
+
+            $uploaded[] = [
+                'id' => $media->id,
+                'name' => $media->name,
+                'file_name' => $media->file_name,
+                'mime_type' => $media->mime_type,
+                'size' => $media->size,
+                'url' => $media->getUrl(),
+                'created_at' => $media->created_at,
+            ];
+        }
+
+        return response()->json($uploaded);
+    }
+
     public function bulkDestroy(BulkDestroyMediaRequest $request): RedirectResponse
     {
         $request->validated();

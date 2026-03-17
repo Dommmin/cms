@@ -15,7 +15,7 @@ class WishlistItem extends Model
     protected $table = 'wishlist_items';
 
     protected $fillable = [
-        'wishlist_id', 'variant_id', 'notes',
+        'wishlist_id', 'product_variant_id', 'notes',
     ];
 
     public function wishlist(): BelongsTo
@@ -25,6 +25,6 @@ class WishlistItem extends Model
 
     public function variant(): BelongsTo
     {
-        return $this->belongsTo(ProductVariant::class);
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
 }

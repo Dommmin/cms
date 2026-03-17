@@ -37,7 +37,29 @@ class ProductResource extends JsonResource
                 : null;
             $product->setAttribute('discount_percentage', $maxDiscount ?: null);
 
-            return ProductData::from($product)->toArray();
+            $data = ProductData::from($product)->toArray();
+
+            if ($product->relationLoaded('activeVariants')) {
+                $variants = $product->activeVariants;
+                $data['variants'] = $variants->map(fn ($v) => [
+                    'id' => $v->id,
+                    'price' => $v->price,
+                    'compare_at_price' => $v->compare_at_price,
+                ])->values()->all();
+
+                $cheapestOnSale = $variants
+                    ->filter(fn ($v) => $v->compare_at_price && $v->compare_at_price > $v->price)
+                    ->sortBy('price')
+                    ->first();
+                $data['compare_at_price_min'] = $cheapestOnSale?->compare_at_price;
+                $data['omnibus_price_min'] = $cheapestOnSale?->lowestPriceInLast30Days();
+            } else {
+                $data['variants'] = [];
+                $data['compare_at_price_min'] = null;
+                $data['omnibus_price_min'] = null;
+            }
+
+            return $data;
         }
 
         return (array) $product;

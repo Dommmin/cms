@@ -6,7 +6,9 @@ namespace App\Http\Middleware;
 
 use App\Models\Locale;
 use App\Models\Theme;
+use App\Models\Translation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Inertia\Middleware;
@@ -21,6 +23,27 @@ class HandleInertiaRequests extends Middleware
      * @var string
      */
     protected $rootView = 'app';
+
+    /**
+     * Load admin UI translations keyed by [locale][key].
+     *
+     * @return array<string, array<string, string>>
+     */
+    private function loadAdminTranslations(): array
+    {
+        return Cache::remember('admin_translations', 3600, function (): array {
+            $rows = Translation::query()
+                ->where('group', 'admin')
+                ->get(['locale_code', 'key', 'value']);
+
+            $result = [];
+            foreach ($rows as $row) {
+                $result[$row->locale_code][$row->key] = $row->value;
+            }
+
+            return $result;
+        });
+    }
 
     /**
      * Determines the current asset version.
@@ -69,6 +92,7 @@ class HandleInertiaRequests extends Middleware
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'frontendUrl' => config('app.frontend_url', 'http://localhost:3000'),
             'locales' => Locale::query()->active()->orderByDesc('is_default')->orderBy('name')->get(['code', 'name', 'native_name', 'flag_emoji', 'is_default']),
+            'adminTranslations' => $this->loadAdminTranslations(),
         ];
     }
 }

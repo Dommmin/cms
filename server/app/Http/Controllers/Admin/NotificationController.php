@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\ProductReview;
 use App\Models\ProductVariant;
+use App\Models\SupportConversation;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -128,6 +129,23 @@ class NotificationController extends Controller
             ]);
         }
 
-        return $notifications;
+        $unreadConversations = SupportConversation::query()
+            ->whereHas('unreadMessages')
+            ->orderByDesc('last_reply_at')
+            ->limit(5)
+            ->get();
+
+        foreach ($unreadConversations as $conversation) {
+            $notifications->push([
+                'id' => "support-{$conversation->id}",
+                'type' => 'unread_support',
+                'title' => 'New support message',
+                'message' => $conversation->subject,
+                'created_at' => ($conversation->last_reply_at ?? $conversation->created_at)->toISOString(),
+                'url' => "/admin/support/{$conversation->id}",
+            ]);
+        }
+
+        return $notifications->sortByDesc('created_at')->values();
     }
 }

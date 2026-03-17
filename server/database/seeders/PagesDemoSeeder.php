@@ -85,7 +85,8 @@ class PagesDemoSeeder extends Seeder
             ['slug' => 'home'],
             [
                 'parent_id' => null,
-                'title' => 'Home',
+                'title' => ['en' => 'Home', 'pl' => 'Strona główna'],
+                'slug_translations' => ['pl' => 'strona-glowna'],
                 'page_type' => 'blocks',
                 'is_published' => true,
                 'published_at' => now(),
@@ -243,7 +244,8 @@ class PagesDemoSeeder extends Seeder
             ['slug' => 'about-us'],
             [
                 'parent_id' => null,
-                'title' => 'About Us',
+                'title' => ['en' => 'About Us', 'pl' => 'O nas'],
+                'slug_translations' => ['pl' => 'o-nas'],
                 'page_type' => 'blocks',
                 'is_published' => true,
                 'published_at' => now(),
@@ -325,7 +327,8 @@ class PagesDemoSeeder extends Seeder
         $legalPages = [
             [
                 'slug' => 'privacy-policy',
-                'title' => 'Privacy Policy',
+                'title' => ['en' => 'Privacy Policy', 'pl' => 'Polityka prywatności'],
+                'slug_translations' => ['pl' => 'polityka-prywatnosci'],
                 'position' => 20,
                 'seo_title' => 'Privacy Policy',
                 'seo_description' => 'Learn how we collect, use, and protect your personal data.',
@@ -333,7 +336,8 @@ class PagesDemoSeeder extends Seeder
             ],
             [
                 'slug' => 'terms-of-service',
-                'title' => 'Terms of Service',
+                'title' => ['en' => 'Terms of Service', 'pl' => 'Regulamin'],
+                'slug_translations' => ['pl' => 'regulamin'],
                 'position' => 21,
                 'seo_title' => 'Terms of Service',
                 'seo_description' => 'Our terms and conditions governing the use of our website and services.',
@@ -347,6 +351,7 @@ class PagesDemoSeeder extends Seeder
                 [
                     'parent_id' => null,
                     'title' => $def['title'],
+                    'slug_translations' => $def['slug_translations'],
                     'page_type' => 'module',
                     'module_name' => 'content',
                     'module_config' => ['html' => $def['content']],
@@ -375,7 +380,8 @@ class PagesDemoSeeder extends Seeder
             ['slug' => 'faq'],
             [
                 'parent_id' => null,
-                'title' => 'Frequently Asked Questions',
+                'title' => ['en' => 'Frequently Asked Questions', 'pl' => 'Najczęstsze pytania'],
+                'slug_translations' => ['pl' => 'faq'],
                 'page_type' => 'module',
                 'module_name' => 'faq',
                 'module_config' => [
@@ -407,7 +413,8 @@ class PagesDemoSeeder extends Seeder
             ['slug' => 'shipping-policy'],
             [
                 'parent_id' => null,
-                'title' => 'Shipping Policy',
+                'title' => ['en' => 'Shipping Policy', 'pl' => 'Polityka wysyłki'],
+                'slug_translations' => ['pl' => 'polityka-wysylki'],
                 'page_type' => 'module',
                 'module_name' => 'content',
                 'module_config' => ['html' => $this->shippingPolicyHtml()],
@@ -433,7 +440,8 @@ class PagesDemoSeeder extends Seeder
             ['slug' => 'return-policy'],
             [
                 'parent_id' => null,
-                'title' => 'Return & Refund Policy',
+                'title' => ['en' => 'Return & Refund Policy', 'pl' => 'Polityka zwrotów'],
+                'slug_translations' => ['pl' => 'polityka-zwrotow'],
                 'page_type' => 'module',
                 'module_name' => 'content',
                 'module_config' => ['html' => $this->returnPolicyHtml()],
@@ -459,7 +467,8 @@ class PagesDemoSeeder extends Seeder
             ['slug' => 'cookie-policy'],
             [
                 'parent_id' => null,
-                'title' => 'Cookie Policy',
+                'title' => ['en' => 'Cookie Policy', 'pl' => 'Polityka cookies'],
+                'slug_translations' => ['pl' => 'polityka-cookies'],
                 'page_type' => 'module',
                 'module_name' => 'content',
                 'module_config' => ['html' => $this->cookiePolicyHtml()],
@@ -487,7 +496,8 @@ class PagesDemoSeeder extends Seeder
             ['slug' => 'contact'],
             [
                 'parent_id' => null,
-                'title' => 'Contact Us',
+                'title' => ['en' => 'Contact Us', 'pl' => 'Kontakt'],
+                'slug_translations' => ['pl' => 'kontakt'],
                 'page_type' => 'blocks',
                 'is_published' => true,
                 'published_at' => now(),

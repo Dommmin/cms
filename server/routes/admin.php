@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\AdminSearchController;
+use App\Http\Controllers\Admin\PreviewController;
 use App\Http\Controllers\Admin\AffiliateCodeController;
 use App\Http\Controllers\Admin\AppNotificationController;
 use App\Http\Controllers\Admin\BlockRelationController;
@@ -39,12 +40,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('dashboard/widgets', [DashboardWidgetController::class, 'store'])->name('dashboard.widgets.store');
     Route::patch('dashboard/widgets/{dashboardWidget}', [DashboardWidgetController::class, 'update'])->name('dashboard.widgets.update');
+    Route::delete('dashboard/widgets/{dashboardWidget}', [DashboardWidgetController::class, 'destroy'])->name('dashboard.widgets.destroy');
     Route::post('dashboard/widgets/reset', [DashboardWidgetController::class, 'reset'])->name('dashboard.widgets.reset');
     Route::get('/search', AdminSearchController::class)->name('search');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/stream', [NotificationController::class, 'stream'])->name('notifications.stream');
     Route::get('/activity-log', [ActivityLogController::class, 'index'])->middleware('role:admin')->name('activity-log.index');
+    Route::get('/preview', PreviewController::class)->name('preview');
 
     // Model Versioning
     Route::prefix('versions/{type}/{id}')->name('versions.')->group(function () {
@@ -149,6 +153,9 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
 
     Route::get('media/search', [MediaController::class, 'search'])
         ->name('media.search');
+
+    Route::post('media/upload', [MediaController::class, 'upload'])
+        ->name('media.upload');
 
     Route::get('block-relations/search', [BlockRelationController::class, 'search'])
         ->name('block-relations.search');

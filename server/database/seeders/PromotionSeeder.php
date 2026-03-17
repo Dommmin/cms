@@ -151,7 +151,7 @@ class PromotionSeeder extends Seeder
         if ($electronicsCategory && ! $electronicsSale->categories()->where('categories.id', $electronicsCategory->id)->exists()) {
             $electronicsSale->categories()->attach($electronicsCategory->id, [
                 'discount_value' => 50,
-                'discount_type' => 'fixed',
+                'discount_type' => 'fixed_amount',
             ]);
         }
 

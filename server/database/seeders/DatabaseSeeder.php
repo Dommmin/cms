@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             ShippingMethodSeeder::class,
             MenuSeeder::class,
             BlogSeeder::class,
+            CurrencySeeder::class,
             LocaleSeeder::class,
             TranslationSeeder::class,
             DashboardWidgetSeeder::class,

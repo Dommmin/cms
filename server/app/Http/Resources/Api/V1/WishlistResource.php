@@ -24,19 +24,20 @@ class WishlistResource extends JsonResource
             'name' => $wishlist->name,
             'items' => $wishlist->items->map(fn (WishlistItem $item) => [
                 'id' => $item->id,
-                'variant_id' => $item->variant_id,
+                'variant_id' => $item->product_variant_id,
                 'notes' => $item->notes,
+                'product' => $item->relationLoaded('variant') && $item->variant?->relationLoaded('product') && $item->variant->product ? [
+                    'id' => $item->variant->product->id,
+                    'name' => $item->variant->product->name,
+                    'slug' => $item->variant->product->slug,
+                    'thumbnail' => null,
+                ] : null,
                 'variant' => $item->relationLoaded('variant') && $item->variant ? [
                     'id' => $item->variant->id,
                     'sku' => $item->variant->sku,
-                    'name' => $item->variant->name,
                     'price' => $item->variant->price,
                     'in_stock' => $item->variant->isInStock(),
-                    'product' => $item->variant->relationLoaded('product') && $item->variant->product ? [
-                        'id' => $item->variant->product->id,
-                        'name' => $item->variant->product->name,
-                        'slug' => $item->variant->product->slug,
-                    ] : null,
+                    'attributes' => $item->variant->attributes ?? [],
                 ] : null,
             ]),
         ];

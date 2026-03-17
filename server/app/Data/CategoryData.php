@@ -20,5 +20,9 @@ class CategoryData extends Data
         public int $position,
         public ?string $seo_title,
         public ?string $seo_description,
+        public ?string $canonical_url = null,
+        public string $meta_robots = 'index, follow',
+        public ?string $og_image = null,
+        public bool $sitemap_exclude = false,
     ) {}
 }

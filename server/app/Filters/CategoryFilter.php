@@ -14,6 +14,6 @@ class CategoryFilter implements Filter
 {
     public function __invoke(Builder $query, mixed $value, string $property): void
     {
-        $query->whereHas('categories', fn (Builder $q) => $q->where('slug', $value)->where('is_active', true));
+        $query->whereHas('category', fn (Builder $q) => $q->where('slug', $value)->where('is_active', true));
     }
 }

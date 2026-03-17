@@ -17,6 +17,7 @@ class LocaleSeeder extends Seeder
                 'name' => 'English',
                 'native_name' => 'English',
                 'flag_emoji' => '🇬🇧',
+                'currency_code' => 'USD',
                 'is_default' => true,
                 'is_active' => true,
             ],
@@ -25,6 +26,7 @@ class LocaleSeeder extends Seeder
                 'name' => 'Polish',
                 'native_name' => 'Polski',
                 'flag_emoji' => '🇵🇱',
+                'currency_code' => 'PLN',
                 'is_default' => false,
                 'is_active' => true,
             ],
@@ -32,6 +34,8 @@ class LocaleSeeder extends Seeder
 
         foreach ($locales as $locale) {
             Locale::firstOrCreate(['code' => $locale['code']], $locale);
+            // Update currency_code for existing records
+            Locale::where('code', $locale['code'])->update(['currency_code' => $locale['currency_code']]);
         }
     }
 }

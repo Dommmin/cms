@@ -106,15 +106,25 @@ class ProductVariant extends Model
     }
 
     /**
-     * Lowest price in the last 30 days (Omnibus Directive). Returns current price if no history.
+     * Lowest price recorded in the last 30 days (EU Omnibus Directive).
+     * Returns null when no price history exists (frontend hides the label).
+     * Uses the eager-loaded relation when available to avoid N+1 queries.
      */
-    public function lowestPriceInLast30Days(): int
+    public function lowestPriceInLast30Days(): ?int
     {
-        $lowest = $this->priceHistory()
-            ->where('recorded_at', '>=', now()->subDays(30))
-            ->min('price');
+        $cutoff = now()->subDays(30);
 
-        return $lowest ?? $this->price;
+        if ($this->relationLoaded('priceHistory')) {
+            $lowest = $this->priceHistory
+                ->filter(fn ($h) => $h->recorded_at >= $cutoff)
+                ->min('price');
+        } else {
+            $lowest = $this->priceHistory()
+                ->where('recorded_at', '>=', $cutoff)
+                ->min('price');
+        }
+
+        return $lowest;
     }
 
     /**

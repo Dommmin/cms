@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\AddressController;
+use App\Http\Controllers\Api\V1\PaymentController;
+use App\Http\Controllers\Api\V1\WebhookController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\SocialLoginController;
@@ -12,6 +14,7 @@ use App\Http\Controllers\Api\V1\BrandController;
 use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\CheckoutController;
+use App\Http\Controllers\Api\V1\PickupPointsController;
 use App\Http\Controllers\Api\V1\ConsentController;
 use App\Http\Controllers\Api\V1\FaqController;
 use App\Http\Controllers\Api\V1\FormController;
@@ -44,6 +47,12 @@ Route::get('health', function (ResultStore $resultStore) {
     return response()->json($checkResults);
 })->name('api.health');
 
+// ── Payment webhooks (public, no auth, no throttle) ─────────────────────────
+Route::prefix('v1/webhooks')->name('api.v1.webhooks.')->group(function (): void {
+    Route::post('payu', [WebhookController::class, 'payu'])->name('payu');
+    Route::post('p24', [WebhookController::class, 'p24'])->name('p24');
+});
+
 Route::prefix('v1')->name('api.v1.')->group(function (): void {
 
     // ── Authentication ──────────────────────────────────────────────────────
@@ -71,7 +80,7 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
     Route::middleware('throttle:api.public')->group(function (): void {
         Route::get('locales', [ApiLocaleController::class, 'index'])->name('locales.index');
         Route::get('translations/{locale}', [TranslationController::class, 'show'])->name('translations.show');
-        Route::get('pages/{slug}', [PageController::class, 'show'])->name('pages.show');
+        Route::get('pages/{slug}', [PageController::class, 'show'])->where('slug', '.*')->name('pages.show');
         Route::get('menus/{location}', [MenuController::class, 'show'])->name('menus.show');
         Route::get('settings/public', [ProfileController::class, 'publicSettings'])->name('settings.public');
 
@@ -108,6 +117,9 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::get('newsletter/confirm/{token}', [NewsletterController::class, 'confirmSubscription'])->name('newsletter.confirm');
         Route::get('newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribeByToken'])->name('newsletter.unsubscribe.token');
         Route::get('checkout/shipping-methods', [CheckoutController::class, 'shippingMethods'])->name('checkout.shipping-methods');
+        Route::get('checkout/payment-methods', [CheckoutController::class, 'paymentMethods'])->name('checkout.payment-methods');
+        Route::get('checkout/pickup-points', [PickupPointsController::class, 'index'])->name('checkout.pickup-points');
+        Route::post('checkout', [CheckoutController::class, 'checkout'])->middleware('idempotent')->name('checkout');
     });
 
     // ── Cart (guest + auth) ──────────────────────────────────────────────────
@@ -144,8 +156,11 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
             Route::delete('items/{variantId}', [WishlistController::class, 'removeItem'])->name('items.destroy');
         });
 
-        // Checkout
-        Route::post('checkout', [CheckoutController::class, 'checkout'])->middleware('idempotent')->name('checkout');
+        // (checkout moved to public group below)
+
+        // Payments
+        Route::get('payments/{payment}/status', [PaymentController::class, 'status'])->name('payments.status');
+        Route::post('payments/apple-pay/validate-merchant', [PaymentController::class, 'validateApplePayMerchant'])->name('payments.apple-pay.validate');
 
         // Orders
         Route::prefix('orders')->name('orders.')->group(function (): void {

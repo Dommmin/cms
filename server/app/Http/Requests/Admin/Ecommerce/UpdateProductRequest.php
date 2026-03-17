@@ -21,7 +21,8 @@ class UpdateProductRequest extends FormRequest
         $productId = is_object($product) ? $product->getKey() : $product;
 
         return [
-            'name' => 'required',
+            'name' => 'required|array',
+            'name.en' => 'required|string|max:255',
             'name.*' => 'nullable|string|max:255',
             'slug' => [
                 'required',
