@@ -53,6 +53,8 @@ class UpdatePageRequest extends FormRequest
                 'exists:content_entries,id',
             ],
             'module_config.category' => ['nullable', 'string', 'max:255'],
+            'slug_translations' => ['nullable', 'array'],
+            'slug_translations.*' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9-]+$/'],
             'seo_title' => ['nullable', 'string', 'max:255'],
             'seo_description' => ['nullable', 'string', 'max:500'],
             'seo_canonical' => ['nullable', 'string', 'max:255'],

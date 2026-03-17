@@ -13,14 +13,17 @@ class PageController extends Controller
 {
     public function show(string $slug): JsonResponse
     {
-        $page = Page::query()
-            ->where('slug', $slug)
-            ->where('is_published', true)
-            ->with([
-                'sections' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
-                'sections.blocks' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
-            ])
-            ->firstOrFail();
+        $locale = app()->getLocale();
+        $segments = array_filter(explode('/', $slug), fn (string $s) => $s !== '');
+
+        $page = Page::findByLocalizedPath(array_values($segments), $locale);
+
+        abort_unless($page !== null, 404);
+
+        $page->load([
+            'sections' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
+            'sections.blocks' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
+        ]);
 
         return response()->json(['data' => new PageResource($page)]);
     }

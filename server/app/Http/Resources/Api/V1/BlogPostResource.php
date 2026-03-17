@@ -31,6 +31,9 @@ class BlogPostResource extends JsonResource
             'published_at' => $this->published_at?->toIso8601String(),
             'seo_title' => $this->seo_title,
             'seo_description' => $this->seo_description,
+            'meta_robots' => $this->meta_robots ?? 'index, follow',
+            'og_image' => $this->og_image,
+            'sitemap_exclude' => (bool) $this->sitemap_exclude,
             'author' => $this->whenLoaded('author', fn () => [
                 'id' => $this->author->id,
                 'name' => $this->author->name,

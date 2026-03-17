@@ -27,6 +27,7 @@ class PageResource extends JsonResource
             'id' => $page->id,
             'title' => $page->title,
             'slug' => $page->slug,
+            'slug_translations' => $page->slug_translations ?? [],
             'is_published' => $page->is_published,
             'page_type' => $page->page_type instanceof BackedEnum ? $page->page_type->value : $page->page_type,
             'module_name' => $page->module_name,
@@ -35,6 +36,9 @@ class PageResource extends JsonResource
             'seo_title' => $page->seo_title,
             'seo_description' => $page->seo_description,
             'seo_canonical' => $page->seo_canonical,
+            'meta_robots' => $page->meta_robots ?? 'index, follow',
+            'og_image' => $page->og_image,
+            'sitemap_exclude' => (bool) $page->sitemap_exclude,
             'sections' => $page->relationLoaded('sections') ? $page->sections->map(fn ($section) => [
                 'id' => $section->id,
                 'section_type' => $section->section_type,

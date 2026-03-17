@@ -49,6 +49,9 @@ class BlogPost extends Model
         'reading_time',
         'seo_title',
         'seo_description',
+        'meta_robots',
+        'og_image',
+        'sitemap_exclude',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -107,6 +110,7 @@ class BlogPost extends Model
             'status' => BlogPostStatusEnum::class,
             'views_count' => 'integer',
             'reading_time' => 'integer',
+            'sitemap_exclude' => 'boolean',
         ];
     }
 }

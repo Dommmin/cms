@@ -47,6 +47,7 @@ class Product extends Model
         'is_saleable' => 'boolean',
         'available_from' => 'datetime',
         'available_until' => 'datetime',
+        'sitemap_exclude' => 'boolean',
     ];
 
     public function getActivitylogOptions(): LogOptions

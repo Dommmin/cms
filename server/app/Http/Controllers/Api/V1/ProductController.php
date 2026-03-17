@@ -43,7 +43,7 @@ class ProductController extends Controller
                 AllowedSort::custom('price', new VariantPriceSort),
             ])
             ->defaultSort('name')
-            ->with(['thumbnail', 'category', 'brand', 'activeVariants:id,product_id,price,compare_at_price'])
+            ->with(['thumbnail', 'category', 'brand', 'activeVariants:id,product_id,price,compare_at_price', 'activeVariants.priceHistory'])
             ->paginate(24)
             ->withQueryString();
 
@@ -58,9 +58,11 @@ class ProductController extends Controller
             ->with([
                 'category',
                 'brand',
-                'images',
+                'thumbnail.media',
+                'images.media',
                 'activeVariants.attributeValues.attribute',
                 'activeVariants.attributeValues.attributeValue',
+                'activeVariants.priceHistory',
                 'reviews' => fn ($q) => $q->where('status', 'approved')->with('customer')->limit(10),
             ])
             ->firstOrFail();
@@ -79,8 +81,20 @@ class ProductController extends Controller
                 'short_description' => $product->short_description,
                 'price_min' => $range['min'],
                 'price_max' => $range['max'],
-                'thumbnail' => null,
-                'images' => [],
+                'thumbnail' => $product->thumbnail ? [
+                    'id' => $product->thumbnail->id,
+                    'url' => $product->thumbnail->media?->getUrl() ?? '',
+                    'thumb_url' => $product->thumbnail->media?->getUrl() ?? '',
+                    'alt' => $product->thumbnail->media?->name ?? $product->name,
+                    'position' => $product->thumbnail->position,
+                ] : null,
+                'images' => $product->images->map(fn ($img) => [
+                    'id' => $img->id,
+                    'url' => $img->media?->getUrl() ?? '',
+                    'thumb_url' => $img->media?->getUrl() ?? '',
+                    'alt' => $img->media?->name ?? $product->name,
+                    'position' => $img->position,
+                ])->values()->all(),
                 'average_rating' => $product->averageRating(),
                 'reviews_count' => $product->reviews->count(),
                 'category' => $product->category ? [
@@ -99,6 +113,11 @@ class ProductController extends Controller
                 ] : null,
                 'attributes' => [],
                 'created_at' => $product->created_at?->toIso8601String(),
+                'seo_title' => $product->seo_title,
+                'seo_description' => $product->seo_description,
+                'meta_robots' => $product->meta_robots ?? 'index, follow',
+                'og_image' => $product->og_image,
+                'sitemap_exclude' => (bool) $product->sitemap_exclude,
                 'variants' => $product->activeVariants->map(fn ($variant) => [
                     'id' => $variant->id,
                     'sku' => $variant->sku,
@@ -110,6 +129,7 @@ class ProductController extends Controller
                     'attributes' => $variant->attributeValues->mapWithKeys(
                         fn ($av) => [$av->attribute->name => $av->attributeValue->value]
                     )->all(),
+                    'omnibus_price' => $variant->lowestPriceInLast30Days(),
                 ]),
             ],
         ]);
@@ -131,6 +151,7 @@ class ProductController extends Controller
             ->available()
             ->whereIn('id', $ids)
             ->with([
+                'thumbnail',
                 'category',
                 'brand',
                 'activeVariants.attributeValues.attribute',
@@ -154,8 +175,14 @@ class ProductController extends Controller
             'id' => $product->id,
             'name' => $product->name,
             'slug' => $product->slug,
+            'is_active' => $product->is_active,
+            'short_description' => $product->short_description,
             'price_min' => $product->priceRange()['min'],
             'price_max' => $product->priceRange()['max'],
+            'thumbnail' => $product->thumbnail ? [
+                'url' => $product->thumbnail->getUrl(),
+                'alt' => $product->thumbnail->name,
+            ] : null,
             'category' => $product->category ? [
                 'id' => $product->category->id,
                 'name' => $product->category->name,

@@ -62,10 +62,10 @@ class Page extends Model
     protected $table = 'pages';
 
     protected $fillable = [
-        'parent_id', 'title', 'slug', 'content', 'rich_content', 'excerpt', 'layout',
+        'parent_id', 'title', 'slug', 'slug_translations', 'content', 'rich_content', 'excerpt', 'layout',
         'builder_snapshot', 'page_type', 'module_name', 'module_config',
         'theme_id', 'is_published', 'published_at', 'published_version_id', 'draft_version_id', 'position',
-        'seo_title', 'seo_description', 'seo_canonical', 'available_locales',
+        'seo_title', 'seo_description', 'seo_canonical', 'meta_robots', 'og_image', 'sitemap_exclude', 'available_locales',
     ];
 
     /**
@@ -85,6 +85,40 @@ class Page extends Model
             } else {
                 $query->where('parent_id', $page->id);
             }
+            $page = $query->first();
+            if (! $page) {
+                return null;
+            }
+        }
+
+        return $page;
+    }
+
+    /**
+     * Find a published page by locale-aware path segments.
+     * Each segment is matched against canonical slug OR slug_translations->{locale}.
+     */
+    public static function findByLocalizedPath(array $segments, string $locale = 'en'): ?self
+    {
+        if ($segments === []) {
+            return null;
+        }
+
+        $page = null;
+        foreach ($segments as $segment) {
+            $query = self::query()
+                ->where('is_published', true)
+                ->where(function ($q) use ($segment, $locale): void {
+                    $q->where('slug', $segment)
+                        ->orWhere("slug_translations->{$locale}", $segment);
+                });
+
+            if ($page === null) {
+                $query->whereNull('parent_id');
+            } else {
+                $query->where('parent_id', $page->id);
+            }
+
             $page = $query->first();
             if (! $page) {
                 return null;
@@ -211,6 +245,16 @@ class Page extends Model
         ]);
     }
 
+    /**
+     * Return the slug for a given locale, falling back to the canonical slug.
+     */
+    public function getSlugForLocale(string $locale): string
+    {
+        $translations = $this->slug_translations ?? [];
+
+        return $translations[$locale] ?? $this->slug;
+    }
+
     protected function casts(): array
     {
         return [
@@ -218,9 +262,11 @@ class Page extends Model
             'page_type' => PageTypeEnum::class,
             'module_config' => 'array',
             'builder_snapshot' => 'array',
+            'slug_translations' => 'array',
             'available_locales' => 'array',
             'is_published' => 'boolean',
             'published_at' => 'datetime',
+            'sitemap_exclude' => 'boolean',
         ];
     }
 }

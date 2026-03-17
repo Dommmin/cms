@@ -77,6 +77,14 @@ class PageController extends Controller
             $data['module_config'] = null;
         }
 
+        // Remove empty slug translations so we don't store {"pl": ""} in the DB
+        if (isset($data['slug_translations'])) {
+            $data['slug_translations'] = array_filter(
+                $data['slug_translations'],
+                fn ($v) => is_string($v) && $v !== '',
+            ) ?: null;
+        }
+
         $page->update($data);
 
         return back()->with('success', 'Page updated');

@@ -39,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Products
   try {
     const products = await serverFetch<PaginatedResponse<Product>>('/products?per_page=500');
-    for (const product of products.data) {
+    for (const product of products.data.filter(p => !p.sitemap_exclude)) {
       entries.push(
         sitemapEntry(
           `/products/${product.slug}`,
@@ -56,7 +56,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Blog posts
   try {
     const posts = await serverFetch<PaginatedResponse<BlogPost>>('/blog/posts?per_page=500');
-    for (const post of posts.data) {
+    for (const post of posts.data.filter(p => !p.sitemap_exclude)) {
       entries.push(
         sitemapEntry(
           `/blog/${post.slug}`,
