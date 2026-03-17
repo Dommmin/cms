@@ -1,7 +1,7 @@
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
-import { $createParagraphNode, $getRoot } from 'lexical';
+import { $createParagraphNode, $getRoot, $isDecoratorNode, $isElementNode } from 'lexical';
 import { useEffect, useRef, type JSX } from 'react';
 
 interface HtmlPluginProps {
@@ -36,7 +36,16 @@ export default function HtmlPlugin({ value, onChange }: HtmlPluginProps): JSX.El
                 return;
             }
 
-            root.append(...importedNodes);
+            const safeNodes = importedNodes.map((node) => {
+                if ($isElementNode(node) || $isDecoratorNode(node)) {
+                    return node;
+                }
+                // Text/inline nodes can't be direct root children — wrap in paragraph
+                const para = $createParagraphNode();
+                para.append(node);
+                return para;
+            });
+            root.append(...safeNodes);
         });
 
         lastSyncedValue.current = value;
