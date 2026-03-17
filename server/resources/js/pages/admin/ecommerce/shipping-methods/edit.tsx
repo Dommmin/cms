@@ -1,11 +1,15 @@
-import { Head, router, useForm } from '@inertiajs/react';
+import { useAdminLocale } from '@/hooks/use-admin-locale';
+import { Link, Head, router, usePage } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
+import { useState } from 'react';
 import InputError from '@/components/input-error';
+import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
     Select,
     SelectContent,
@@ -16,6 +20,7 @@ import {
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
+import type { SharedLocale } from '@/types/global';
 
 interface Carrier {
     value: string;
@@ -24,7 +29,8 @@ interface Carrier {
 
 interface ShippingMethod {
     id: number;
-    name: string;
+    name: Record<string, string>;
+    description: Record<string, string> | null;
     carrier: string;
     is_active: boolean;
     base_price: number;
@@ -36,18 +42,6 @@ interface ShippingMethod {
     shipments_count: number;
 }
 
-interface FormData {
-    name: string;
-    carrier: string;
-    is_active: boolean;
-    base_price: string;
-    price_per_kg: string;
-    min_weight: string;
-    max_weight: string;
-    min_order_value: string;
-    free_shipping_threshold: string;
-}
-
 const formId = 'shipping-method-edit-form';
 
 export default function Edit({
@@ -57,79 +51,150 @@ export default function Edit({
     method: ShippingMethod;
     carriers: Carrier[];
 }) {
+    const { locales } = usePage().props as { locales: SharedLocale[] };
+    const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
+    const [activeLocale, setActiveLocale] = useAdminLocale(defaultLocale);
+
+    const [nameValues, setNameValues] = useState<Record<string, string>>(
+        method.name ?? { [defaultLocale]: '' },
+    );
+    const [descValues, setDescValues] = useState<Record<string, string>>(
+        method.description ?? { [defaultLocale]: '' },
+    );
+
+    const [carrier, setCarrier] = useState(method.carrier);
+    const [isActive, setIsActive] = useState(method.is_active);
+    const [basePrice, setBasePrice] = useState((method.base_price / 100).toFixed(2));
+    const [pricePerKg, setPricePerKg] = useState((method.price_per_kg / 100).toFixed(2));
+    const [minWeight, setMinWeight] = useState(method.min_weight?.toString() ?? '');
+    const [maxWeight, setMaxWeight] = useState(method.max_weight?.toString() ?? '');
+    const [minOrderValue, setMinOrderValue] = useState(
+        method.min_order_value ? (method.min_order_value / 100).toFixed(2) : '',
+    );
+    const [freeShippingThreshold, setFreeShippingThreshold] = useState(
+        method.free_shipping_threshold ? (method.free_shipping_threshold / 100).toFixed(2) : '',
+    );
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [processing, setProcessing] = useState(false);
+
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Shipping Methods', href: '/admin/ecommerce/shipping-methods' },
-        { title: method.name, href: '' },
+        { title: nameValues[defaultLocale] ?? nameValues['en'] ?? 'Edit', href: '' },
     ];
-
-    const { data, setData, put, processing, errors } = useForm<FormData>({
-        name: method.name,
-        carrier: method.carrier,
-        is_active: method.is_active,
-        base_price: (method.base_price / 100).toFixed(2),
-        price_per_kg: (method.price_per_kg / 100).toFixed(2),
-        min_weight: method.min_weight?.toString() ?? '',
-        max_weight: method.max_weight?.toString() ?? '',
-        min_order_value: method.min_order_value
-            ? (method.min_order_value / 100).toFixed(2)
-            : '',
-        free_shipping_threshold: method.free_shipping_threshold
-            ? (method.free_shipping_threshold / 100).toFixed(2)
-            : '',
-    });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/admin/ecommerce/shipping-methods/${method.id}`);
+        setErrors({});
+        setProcessing(true);
+
+        const formData: Record<string, unknown> = {
+            carrier,
+            is_active: isActive,
+            base_price: Math.round(parseFloat(basePrice || '0') * 100),
+            price_per_kg: Math.round(parseFloat(pricePerKg || '0') * 100),
+            min_weight: minWeight ? parseFloat(minWeight) : null,
+            max_weight: maxWeight ? parseFloat(maxWeight) : null,
+            min_order_value: minOrderValue ? Math.round(parseFloat(minOrderValue) * 100) : null,
+            free_shipping_threshold: freeShippingThreshold
+                ? Math.round(parseFloat(freeShippingThreshold) * 100)
+                : null,
+        };
+
+        locales.forEach((locale) => {
+            formData[`name[${locale.code}]`] = nameValues[locale.code] ?? '';
+            formData[`description[${locale.code}]`] = descValues[locale.code] ?? '';
+        });
+
+        router.put(`/admin/ecommerce/shipping-methods/${method.id}`, formData, {
+            onError: (errs) => {
+                setErrors(errs as Record<string, string>);
+                setProcessing(false);
+            },
+            onSuccess: () => setProcessing(false),
+        });
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Edit: ${method.name}`} />
+            <Head title={`Edit: ${nameValues[defaultLocale] ?? nameValues['en'] ?? ''}`} />
 
             <Wrapper>
                 <PageHeader
                     title="Edit Shipping Method"
-                    description={`Update settings for ${method.name}`}
+                    description={`Update settings for ${nameValues[defaultLocale] ?? nameValues['en'] ?? ''}`}
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                router.visit('/admin/ecommerce/shipping-methods')
-                            }
-                        >
+                        <Button asChild variant="outline">
+                <Link href='/admin/ecommerce/shipping-methods' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
                             Back
-                        </Button>
+                        
+                </Link>
+            </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
                 <form id={formId} onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                         <div className="space-y-6 lg:col-span-2">
+                            {/* Basic Info with locale tabs */}
                             <div className="space-y-4 rounded-xl border bg-card p-6">
                                 <h2 className="font-semibold">Basic Information</h2>
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="name">Name *</Label>
-                                    <Input
-                                        id="name"
-                                        value={data.name}
-                                        onChange={(e) => setData('name', e.target.value)}
-                                        placeholder="e.g. DPD Standard"
-                                        required
-                                        autoFocus
-                                    />
-                                    <InputError message={errors.name} />
-                                </div>
+                                <LocaleTabSwitcher
+                                    locales={locales}
+                                    activeLocale={activeLocale}
+                                    onLocaleChange={setActiveLocale}
+                                />
+
+                                {locales.map((locale) => (
+                                    <div
+                                        key={locale.code}
+                                        className={locale.code !== activeLocale ? 'hidden' : 'space-y-4'}
+                                    >
+                                        <div className="grid gap-2">
+                                            <Label htmlFor={`name-${locale.code}`}>
+                                                Name {locale.code === defaultLocale && '*'}
+                                            </Label>
+                                            <Input
+                                                id={`name-${locale.code}`}
+                                                value={nameValues[locale.code] ?? ''}
+                                                onChange={(e) =>
+                                                    setNameValues((prev) => ({
+                                                        ...prev,
+                                                        [locale.code]: e.target.value,
+                                                    }))
+                                                }
+                                                placeholder={`e.g. DPD Standard (${locale.code.toUpperCase()})`}
+                                                required={locale.code === defaultLocale}
+                                            />
+                                            <InputError message={errors[`name.${locale.code}`]} />
+                                        </div>
+
+                                        <div className="grid gap-2">
+                                            <Label htmlFor={`description-${locale.code}`}>
+                                                Description
+                                            </Label>
+                                            <Textarea
+                                                id={`description-${locale.code}`}
+                                                value={descValues[locale.code] ?? ''}
+                                                onChange={(e) =>
+                                                    setDescValues((prev) => ({
+                                                        ...prev,
+                                                        [locale.code]: e.target.value,
+                                                    }))
+                                                }
+                                                placeholder={`Short description (${locale.code.toUpperCase()})`}
+                                                rows={3}
+                                            />
+                                            <InputError message={errors[`description.${locale.code}`]} />
+                                        </div>
+                                    </div>
+                                ))}
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="carrier">Carrier *</Label>
-                                    <Select
-                                        value={data.carrier}
-                                        onValueChange={(v) => setData('carrier', v)}
-                                    >
+                                    <Select value={carrier} onValueChange={setCarrier}>
                                         <SelectTrigger id="carrier">
                                             <SelectValue placeholder="Select carrier..." />
                                         </SelectTrigger>
@@ -145,10 +210,11 @@ export default function Edit({
                                 </div>
                             </div>
 
+                            {/* Pricing */}
                             <div className="space-y-4 rounded-xl border bg-card p-6">
                                 <h2 className="font-semibold">Pricing</h2>
                                 <p className="text-sm text-muted-foreground">
-                                    Prices are in PLN. Enter values in full PLN (e.g. 9.99).
+                                    Prices are in PLN (base currency). Enter values in full PLN (e.g. 9.99).
                                 </p>
 
                                 <div className="grid grid-cols-2 gap-4">
@@ -159,8 +225,8 @@ export default function Edit({
                                             type="number"
                                             step="0.01"
                                             min="0"
-                                            value={data.base_price}
-                                            onChange={(e) => setData('base_price', e.target.value)}
+                                            value={basePrice}
+                                            onChange={(e) => setBasePrice(e.target.value)}
                                             placeholder="9.99"
                                             required
                                         />
@@ -174,10 +240,8 @@ export default function Edit({
                                             type="number"
                                             step="0.01"
                                             min="0"
-                                            value={data.price_per_kg}
-                                            onChange={(e) =>
-                                                setData('price_per_kg', e.target.value)
-                                            }
+                                            value={pricePerKg}
+                                            onChange={(e) => setPricePerKg(e.target.value)}
                                             placeholder="0.00"
                                         />
                                         <InputError message={errors.price_per_kg} />
@@ -194,10 +258,8 @@ export default function Edit({
                                             type="number"
                                             step="0.01"
                                             min="0"
-                                            value={data.min_order_value}
-                                            onChange={(e) =>
-                                                setData('min_order_value', e.target.value)
-                                            }
+                                            value={minOrderValue}
+                                            onChange={(e) => setMinOrderValue(e.target.value)}
                                             placeholder="Optional"
                                         />
                                         <InputError message={errors.min_order_value} />
@@ -212,10 +274,8 @@ export default function Edit({
                                             type="number"
                                             step="0.01"
                                             min="0"
-                                            value={data.free_shipping_threshold}
-                                            onChange={(e) =>
-                                                setData('free_shipping_threshold', e.target.value)
-                                            }
+                                            value={freeShippingThreshold}
+                                            onChange={(e) => setFreeShippingThreshold(e.target.value)}
                                             placeholder="e.g. 200"
                                         />
                                         <InputError message={errors.free_shipping_threshold} />
@@ -223,6 +283,7 @@ export default function Edit({
                                 </div>
                             </div>
 
+                            {/* Weight limits */}
                             <div className="space-y-4 rounded-xl border bg-card p-6">
                                 <h2 className="font-semibold">Weight Limits</h2>
 
@@ -234,8 +295,8 @@ export default function Edit({
                                             type="number"
                                             step="0.001"
                                             min="0"
-                                            value={data.min_weight}
-                                            onChange={(e) => setData('min_weight', e.target.value)}
+                                            value={minWeight}
+                                            onChange={(e) => setMinWeight(e.target.value)}
                                             placeholder="Optional"
                                         />
                                         <InputError message={errors.min_weight} />
@@ -248,8 +309,8 @@ export default function Edit({
                                             type="number"
                                             step="0.001"
                                             min="0"
-                                            value={data.max_weight}
-                                            onChange={(e) => setData('max_weight', e.target.value)}
+                                            value={maxWeight}
+                                            onChange={(e) => setMaxWeight(e.target.value)}
                                             placeholder="Optional"
                                         />
                                         <InputError message={errors.max_weight} />
@@ -258,6 +319,7 @@ export default function Edit({
                             </div>
                         </div>
 
+                        {/* Sidebar */}
                         <div className="space-y-6">
                             <div className="rounded-xl border bg-card p-6">
                                 <h3 className="mb-4 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
@@ -267,8 +329,8 @@ export default function Edit({
                                     <input
                                         type="checkbox"
                                         id="is_active"
-                                        checked={data.is_active}
-                                        onChange={(e) => setData('is_active', e.target.checked)}
+                                        checked={isActive}
+                                        onChange={(e) => setIsActive(e.target.checked)}
                                         className="h-4 w-4 rounded border-input"
                                     />
                                     <Label htmlFor="is_active" className="font-normal">
@@ -289,21 +351,20 @@ export default function Edit({
                                     <div className="flex justify-between">
                                         <dt className="text-muted-foreground">Carrier</dt>
                                         <dd className="font-medium">
-                                            {carriers.find((c) => c.value === data.carrier)?.label ||
-                                                data.carrier}
+                                            {carriers.find((c) => c.value === carrier)?.label || carrier}
                                         </dd>
                                     </div>
                                     <div className="flex justify-between">
                                         <dt className="text-muted-foreground">Base price</dt>
                                         <dd className="font-medium">
-                                            {data.base_price ? `${data.base_price} PLN` : '—'}
+                                            {basePrice ? `${basePrice} PLN` : '—'}
                                         </dd>
                                     </div>
-                                    {data.free_shipping_threshold && (
+                                    {freeShippingThreshold && (
                                         <div className="flex justify-between">
                                             <dt className="text-muted-foreground">Free from</dt>
                                             <dd className="font-medium text-green-600 dark:text-green-400">
-                                                {data.free_shipping_threshold} PLN
+                                                {freeShippingThreshold} PLN
                                             </dd>
                                         </div>
                                     )}

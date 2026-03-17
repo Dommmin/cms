@@ -8,12 +8,15 @@ use App\Enums\ShippingCarrierEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Translatable\HasTranslations;
 
 class ShippingMethod extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
 
     protected $table = 'shipping_methods';
+
+    public array $translatable = ['name', 'description'];
 
     protected $fillable = [
         'carrier', 'name', 'description', 'is_active', 'min_weight', 'max_weight',
@@ -42,6 +45,12 @@ class ShippingMethod extends Model
         $cost = $this->base_price + (int) round($weightKg * $this->price_per_kg);
 
         return max(0, $cost);
+    }
+
+    /** Czy metoda wymaga wyboru punktu odbioru (paczkomat)? */
+    public function requiresPickupPoint(): bool
+    {
+        return $this->carrier instanceof ShippingCarrierEnum && $this->carrier->requiresPickupPoint();
     }
 
     /** Czy metoda jest dostępna dla tej wagi? */
