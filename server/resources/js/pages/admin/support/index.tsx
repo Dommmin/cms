@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router, usePoll } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon, MessageCircleIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -70,6 +70,9 @@ function formatRelativeTime(dateStr: string | null): string {
 }
 
 export default function SupportIndex({ conversations, filters, agents, open_count, statuses }: Props) {
+    // Refresh unread counts and new conversations every 30 seconds
+    usePoll(30000);
+
     const columns: ColumnDef<Conversation>[] = [
         {
             accessorKey: 'subject',
@@ -133,13 +136,11 @@ export default function SupportIndex({ conversations, filters, agents, open_coun
             header: 'Actions',
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => router.visit(`/admin/support/${row.original.id}`)}
-                    >
-                        <EyeIcon className="mr-1 h-3 w-3" />
-                        View
+                    <Button asChild variant="outline" size="sm">
+                        <Link href={`/admin/support/${row.original.id}`} prefetch cacheFor={60}>
+                            <EyeIcon className="mr-1 h-3 w-3" />
+                            View
+                        </Link>
                     </Button>
                     <ConfirmButton
                         variant="destructive"
@@ -168,8 +169,10 @@ export default function SupportIndex({ conversations, filters, agents, open_coun
                     description="Manage customer support conversations"
                 >
                     <PageHeaderActions>
-                        <Button variant="outline" onClick={() => router.visit('/admin/support/canned-responses')}>
-                            Canned Responses
+                        <Button asChild variant="outline">
+                            <Link href="/admin/support/canned-responses" prefetch cacheFor={30}>
+                                Canned Responses
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>

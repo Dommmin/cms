@@ -1,4 +1,4 @@
-import { Head, router, useForm } from '@inertiajs/react';
+import { Link, Head, router, useForm } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -54,13 +54,13 @@ export default function CreateCode({ users }: Props) {
                     description="Add a new referral code for an affiliate"
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() => router.visit('/admin/affiliates/codes')}
-                        >
+                        <Button asChild variant="outline">
+                <Link href='/admin/affiliates/codes' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
                             Back
-                        </Button>
+                        
+                </Link>
+            </Button>
                     </PageHeaderActions>
                 </PageHeader>
 

@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -112,17 +112,11 @@ export default function FormSubmissionsIndex({ submissions, filters }: IndexProp
             header: 'Actions',
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                            router.visit(
-                                `/admin/forms/${row.original.form_id}/submissions/${row.original.id}`,
-                            )
-                        }
-                    >
-                        <EyeIcon className="mr-1 h-3 w-3" />
-                        View
+                    <Button asChild variant="outline" size="sm">
+                        <Link href={`/admin/forms/${row.original.form_id}/submissions/${row.original.id}`} prefetch cacheFor={60}>
+                            <EyeIcon className="mr-1 h-3 w-3" />
+                            View
+                        </Link>
                     </Button>
                     <ConfirmButton
                         variant="destructive"

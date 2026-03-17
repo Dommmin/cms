@@ -139,12 +139,12 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
             header: 'Actions',
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
-                    <Link href={`/admin/blog/posts/${row.original.id}/edit`}>
-                        <Button variant="outline" size="sm">
+                    <Button asChild variant="outline" size="sm">
+                        <Link href={`/admin/blog/posts/${row.original.id}/edit`} prefetch cacheFor={30}>
                             <PencilIcon className="mr-1 h-3 w-3" />
                             Edit
-                        </Button>
-                    </Link>
+                        </Link>
+                    </Button>
                     {row.original.status !== 'published' ? (
                         <Button
                             variant="outline"

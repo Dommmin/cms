@@ -1,5 +1,5 @@
 import { useAdminLocale } from '@/hooks/use-admin-locale';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Link, Head, router, usePage } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -132,13 +132,13 @@ export default function CreateBlogPost({ categories }: Props) {
             <Wrapper>
                 <PageHeader title="Create Blog Post" description="Write a new blog post">
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() => router.visit('/admin/blog/posts')}
-                        >
+                        <Button asChild variant="outline">
+                <Link href='/admin/blog/posts' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
                             Back
-                        </Button>
+                        
+                </Link>
+            </Button>
                     </PageHeaderActions>
                 </PageHeader>
 

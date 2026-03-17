@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Flag, PencilIcon, Plus, TrashIcon } from 'lucide-react';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -52,14 +52,11 @@ export default function ProductFlagsIndex({ flags, filters }: IndexProps) {
                     description={`${flags.total} product flags`}
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                router.visit('/admin/ecommerce/product-flags/create')
-                            }
-                        >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Flag
+                        <Button asChild variant="outline">
+                            <Link href="/admin/ecommerce/product-flags/create" prefetch cacheFor={30}>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add Flag
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
@@ -129,17 +126,11 @@ export default function ProductFlagsIndex({ flags, filters }: IndexProps) {
                             header: 'Actions',
                             cell: ({ row }) => (
                                 <div className="flex items-center gap-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() =>
-                                            router.visit(
-                                                `/admin/ecommerce/product-flags/${row.original.id}/edit`,
-                                            )
-                                        }
-                                    >
-                                        <PencilIcon className="mr-1 h-3 w-3" />
-                                        Edit
+                                    <Button asChild variant="outline" size="sm">
+                                        <Link href={`/admin/ecommerce/product-flags/${row.original.id}/edit`} prefetch cacheFor={30}>
+                                            <PencilIcon className="mr-1 h-3 w-3" />
+                                            Edit
+                                        </Link>
                                     </Button>
                                     <ConfirmButton
                                         variant="destructive"

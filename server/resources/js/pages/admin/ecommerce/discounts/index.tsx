@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Plus, Percent, PencilIcon, TrashIcon } from 'lucide-react';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -62,16 +62,11 @@ export default function DiscountsIndex({ discounts, filters }: IndexProps) {
                     description={`${discounts.total} discount codes`}
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                router.visit(
-                                    '/admin/ecommerce/discounts/create',
-                                )
-                            }
-                        >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Discount
+                        <Button asChild variant="outline">
+                            <Link href="/admin/ecommerce/discounts/create" prefetch cacheFor={30}>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add Discount
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>

@@ -1,5 +1,5 @@
 import { useAdminLocale } from '@/hooks/use-admin-locale';
-import { Form, Head, router, usePage } from '@inertiajs/react';
+import { Link, Form, Head, router, usePage } from '@inertiajs/react';
 import { ArrowLeftIcon, ImageIcon, Settings, Search } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -276,15 +276,13 @@ export default function Create({
                     description="Create a new product"
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                router.visit('/admin/ecommerce/products')
-                            }
-                        >
+                        <Button asChild variant="outline">
+                <Link href='/admin/ecommerce/products' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
                             Back to Products
-                        </Button>
+                        
+                </Link>
+            </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -375,7 +373,6 @@ export default function Create({
                                             ))}
                                             <Input
                                                 id="name"
-                                                required
                                                 autoFocus
                                                 placeholder="Product name"
                                                 value={formData.name[activeLocale] ?? ''}

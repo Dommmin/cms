@@ -361,16 +361,11 @@ export default function Index({
                                                             <Power className="h-4 w-4" />
                                                         )}
                                                     </Button>
-                                                    <Link
-                                                        href={`/admin/ecommerce/promotions/${promotion.id}/edit`}
-                                                    >
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                        >
+                                                    <Button asChild variant="outline" size="sm">
+                                                        <Link href={`/admin/ecommerce/promotions/${promotion.id}/edit`} prefetch cacheFor={30}>
                                                             <Edit className="h-4 w-4" />
-                                                        </Button>
-                                                    </Link>
+                                                        </Link>
+                                                    </Button>
                                                     <Button
                                                         variant="outline"
                                                         size="sm"

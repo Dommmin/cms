@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Link, Head, router } from '@inertiajs/react';
 import {
     ArrowLeftIcon,
     ChevronDownIcon,
@@ -282,13 +282,13 @@ export default function Edit({ menu, locations }: Props) {
             <Wrapper>
                 <PageHeader title="Edit Menu" description="Manage menu items and settings">
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() => router.visit('/admin/menus')}
-                        >
+                        <Button asChild variant="outline">
+                <Link href='/admin/menus' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
                             Back
-                        </Button>
+                        
+                </Link>
+            </Button>
                     </PageHeaderActions>
                 </PageHeader>
 

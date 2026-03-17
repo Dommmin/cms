@@ -1,4 +1,4 @@
-import { Form, Head, router } from '@inertiajs/react';
+import { Link, Form, Head, router } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import InputError from '@/components/input-error';
@@ -53,13 +53,13 @@ export default function Create({ modules }: Props) {
                     description="Add a new CMS page"
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() => router.visit('/admin/cms/pages')}
-                        >
+                        <Button asChild variant="outline">
+                <Link href='/admin/cms/pages' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
                             Back to Pages
-                        </Button>
+                        
+                </Link>
+            </Button>
                     </PageHeaderActions>
                 </PageHeader>
 

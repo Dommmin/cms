@@ -1,4 +1,4 @@
-import { Form, Head, router } from '@inertiajs/react';
+import { Link, Form, Head, router } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -69,13 +69,13 @@ export default function Edit({ theme }: Props) {
                     description="Update theme settings"
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() => router.visit('/admin/themes')}
-                        >
+                        <Button asChild variant="outline">
+                <Link href='/admin/themes' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
                             Back to Themes
-                        </Button>
+                        
+                </Link>
+            </Button>
                     </PageHeaderActions>
                 </PageHeader>
 

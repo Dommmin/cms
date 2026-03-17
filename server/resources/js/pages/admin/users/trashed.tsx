@@ -1,4 +1,4 @@
-import { Form, Head, router } from '@inertiajs/react';
+import { Form, Head, Link, router } from '@inertiajs/react';
 import { ArrowLeftIcon, RotateCcwIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -56,12 +56,11 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
                     description="Soft-deleted accounts — restore or permanently remove"
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() => router.visit('/admin/users')}
-                        >
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Users
+                        <Button asChild variant="outline">
+                            <Link href="/admin/users" prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                Back to Users
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>

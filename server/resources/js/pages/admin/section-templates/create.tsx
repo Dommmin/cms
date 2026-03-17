@@ -1,4 +1,4 @@
-import { Form, Head, router } from '@inertiajs/react';
+import { Link, Form, Head, router } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 
 import InputError from '@/components/input-error';
@@ -37,13 +37,13 @@ export default function CreateSectionTemplate({ categories }: Props) {
                     description="Add a new reusable section template"
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() => router.visit('/admin/section-templates')}
-                        >
+                        <Button asChild variant="outline">
+                <Link href='/admin/section-templates' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
                             Back
-                        </Button>
+                        
+                </Link>
+            </Button>
                     </PageHeaderActions>
                 </PageHeader>
 

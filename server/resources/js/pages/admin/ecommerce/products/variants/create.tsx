@@ -1,4 +1,4 @@
-import { Form, Head, router } from '@inertiajs/react';
+import { Link, Form, Head, router } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -8,11 +8,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
 
 type Product = {
     id: number;
-    name: string;
+    name: string | Record<string, string>;
 };
 
 type TaxRate = {
@@ -39,32 +40,31 @@ export default function CreateVariant({
     attributes: VariantAttribute[];
 }) {
     const formId = 'product-variant-create-form';
+    const productName = resolveLocalizedText(product.name);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Products', href: '/admin/ecommerce/products' },
-        { title: product.name, href: `/admin/ecommerce/products/${product.id}/edit` },
+        { title: productName, href: `/admin/ecommerce/products/${product.id}/edit` },
         { title: 'Variants', href: `/admin/ecommerce/products/${product.id}/variants` },
         { title: 'Create', href: `/admin/ecommerce/products/${product.id}/variants/create` },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Create Variant: ${product.name}`} />
+            <Head title={`Create Variant: ${productName}`} />
             <Wrapper>
                 <PageHeader
-                    title={`Create Variant: ${product.name}`}
+                    title={`Create Variant: ${productName}`}
                     description="Add a new product variant"
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                router.visit(`/admin/ecommerce/products/${product.id}/variants`)
-                            }
-                        >
+                        <Button asChild variant="outline">
+                <Link href={`/admin/ecommerce/products/${product.id}/variants`} prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
                             Back to Variants
-                        </Button>
+                        
+                </Link>
+            </Button>
                     </PageHeaderActions>
                 </PageHeader>
 

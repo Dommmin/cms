@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeftIcon, CheckCircle, Clock, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
@@ -159,12 +159,11 @@ export default function Show({ return: returnRequest }: { return: ReturnRequest 
                                 Process Refund
                             </ConfirmButton>
                         )}
-                        <Button
-                            variant="outline"
-                            onClick={() => router.visit('/admin/ecommerce/returns')}
-                        >
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back
+                        <Button asChild variant="outline">
+                            <Link href="/admin/ecommerce/returns" prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                Back
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
@@ -335,17 +334,14 @@ export default function Show({ return: returnRequest }: { return: ReturnRequest 
                                 <div>
                                     <dt className="text-xs text-muted-foreground">Order</dt>
                                     <dd className="mt-0.5">
-                                        <button
-                                            type="button"
+                                        <Link
+                                            href={`/admin/ecommerce/orders/${returnRequest.order.id}`}
+                                            prefetch
+                                            cacheFor={60}
                                             className="font-mono text-primary hover:underline"
-                                            onClick={() =>
-                                                router.visit(
-                                                    `/admin/ecommerce/orders/${returnRequest.order.id}`,
-                                                )
-                                            }
                                         >
                                             {returnRequest.order.order_number}
-                                        </button>
+                                        </Link>
                                     </dd>
                                 </div>
                                 {returnRequest.refund_amount !== null && (

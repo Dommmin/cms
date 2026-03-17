@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Box, PencilIcon, Plus, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
@@ -54,16 +54,11 @@ export default function ProductTypesIndex({ types, filters }: IndexProps) {
                     description={`${types.total} product types configured`}
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                router.visit(
-                                    '/admin/ecommerce/product-types/create',
-                                )
-                            }
-                        >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Type
+                        <Button asChild variant="outline">
+                            <Link href="/admin/ecommerce/product-types/create" prefetch cacheFor={30}>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add Type
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
@@ -116,17 +111,11 @@ export default function ProductTypesIndex({ types, filters }: IndexProps) {
                             header: 'Actions',
                             cell: ({ row }) => (
                                 <div className="flex items-center gap-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() =>
-                                            router.visit(
-                                                `/admin/ecommerce/product-types/${row.original.id}/edit`,
-                                            )
-                                        }
-                                    >
-                                        <PencilIcon className="mr-1 h-3 w-3" />
-                                        Edit
+                                    <Button asChild variant="outline" size="sm">
+                                        <Link href={`/admin/ecommerce/product-types/${row.original.id}/edit`} prefetch cacheFor={30}>
+                                            <PencilIcon className="mr-1 h-3 w-3" />
+                                            Edit
+                                        </Link>
                                     </Button>
                                     <ConfirmButton
                                         variant="destructive"

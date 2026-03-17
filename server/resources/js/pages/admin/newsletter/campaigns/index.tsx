@@ -138,24 +138,20 @@ export default function CampaignsIndex({ campaigns, filters }: Props) {
             header: 'Actions',
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
-                    <Link
-                        href={`/admin/newsletter/campaigns/${row.original.id}`}
-                    >
-                        <Button variant="outline" size="sm">
+                    <Button asChild variant="outline" size="sm">
+                        <Link href={`/admin/newsletter/campaigns/${row.original.id}`} prefetch cacheFor={60}>
                             <EyeIcon className="mr-1 h-3 w-3" />
                             View
-                        </Button>
-                    </Link>
+                        </Link>
+                    </Button>
                     {row.original.status === 'draft' && (
                         <>
-                            <Link
-                                href={`/admin/newsletter/campaigns/${row.original.id}/edit`}
-                            >
-                                <Button variant="outline" size="sm">
+                            <Button asChild variant="outline" size="sm">
+                                <Link href={`/admin/newsletter/campaigns/${row.original.id}/edit`} prefetch cacheFor={30}>
                                     <PencilIcon className="mr-1 h-3 w-3" />
                                     Edit
-                                </Button>
-                            </Link>
+                                </Link>
+                            </Button>
                             <Button
                                 variant="outline"
                                 size="sm"

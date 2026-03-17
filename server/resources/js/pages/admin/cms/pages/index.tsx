@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Link, Head } from '@inertiajs/react';
 import { FileTextIcon } from 'lucide-react';
 import { pageColumns, type PageRow } from '@/components/columns/page-columns';
 import DataTable from '@/components/data-table';
@@ -43,14 +43,11 @@ export default function Index({
                     description="Manage CMS pages and content"
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                router.visit('/admin/cms/pages/create')
-                            }
-                        >
-                            <FileTextIcon className="mr-2 h-4 w-4" />
-                            Create Page
+                        <Button asChild variant="outline">
+                            <Link href="/admin/cms/pages/create" prefetch cacheFor={30}>
+                                <FileTextIcon className="mr-2 h-4 w-4" />
+                                Create Page
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>

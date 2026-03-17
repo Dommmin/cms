@@ -1,4 +1,4 @@
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePoll } from '@inertiajs/react';
 import { ArrowLeftIcon, SendIcon, LockIcon, UserIcon, ShoppingBagIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -78,6 +78,9 @@ const statusColors: Record<string, string> = {
 export default function SupportShow({ conversation, agents, canned_responses, statuses }: Props) {
     const [isInternal, setIsInternal] = useState(false);
 
+    // Refresh conversation every 5 seconds to pick up new customer messages
+    usePoll(5000, { only: ['conversation'] });
+
     const replyForm = useForm({ body: '', is_internal: false });
 
     function submitReply(e: React.FormEvent) {
@@ -120,9 +123,11 @@ export default function SupportShow({ conversation, agents, canned_responses, st
                         <Badge className={statusColors[conversation.status]}>
                             {statuses.find((s) => s.value === conversation.status)?.label ?? conversation.status}
                         </Badge>
-                        <Button variant="outline" size="sm" onClick={() => router.visit('/admin/support')}>
-                            <ArrowLeftIcon className="mr-1 h-4 w-4" />
-                            Back
+                        <Button asChild variant="outline" size="sm">
+                            <Link href="/admin/support" prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-1 h-4 w-4" />
+                                Back
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
@@ -253,13 +258,10 @@ export default function SupportShow({ conversation, agents, canned_responses, st
                                     <p className="text-sm text-muted-foreground">{conversation.email}</p>
                                 )}
                                 {conversation.customer && (
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="mt-2 w-full"
-                                        onClick={() => router.visit(`/admin/ecommerce/customers/${conversation.customer!.id}`)}
-                                    >
-                                        View Profile
+                                    <Button asChild variant="outline" size="sm" className="mt-2 w-full">
+                                        <Link href={`/admin/ecommerce/customers/${conversation.customer!.id}`} prefetch cacheFor={60}>
+                                            View Profile
+                                        </Link>
                                     </Button>
                                 )}
                             </div>
@@ -275,17 +277,18 @@ export default function SupportShow({ conversation, agents, canned_responses, st
                                 <ul className="space-y-2">
                                     {conversation.customer.orders.map((order) => (
                                         <li key={order.id}>
-                                            <button
-                                                type="button"
-                                                className="w-full rounded-md border bg-muted/30 px-3 py-2 text-left text-sm hover:bg-muted transition-colors"
-                                                onClick={() => router.visit(`/admin/ecommerce/orders/${order.id}`)}
+                                            <Link
+                                                href={`/admin/ecommerce/orders/${order.id}`}
+                                                prefetch
+                                                cacheFor={60}
+                                                className="block w-full rounded-md border bg-muted/30 px-3 py-2 text-left text-sm hover:bg-muted transition-colors"
                                             >
                                                 <div className="flex items-center justify-between">
                                                     <span className="font-medium">#{order.reference_number}</span>
                                                     <Badge variant="outline" className="text-xs">{order.status}</Badge>
                                                 </div>
                                                 <p className="text-muted-foreground">{Number(order.total).toFixed(2)} zł</p>
-                                            </button>
+                                            </Link>
                                         </li>
                                     ))}
                                 </ul>

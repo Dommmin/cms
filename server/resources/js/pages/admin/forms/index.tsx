@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
     ClipboardListIcon,
@@ -83,27 +83,17 @@ export default function Index({
             header: 'Actions',
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                            router.visit(
-                                `/admin/forms/${row.original.id}/submissions`,
-                            )
-                        }
-                    >
-                        <EyeIcon className="mr-1 h-3 w-3" />
-                        Submissions
+                    <Button asChild variant="outline" size="sm">
+                        <Link href={`/admin/forms/${row.original.id}/submissions`} prefetch cacheFor={30}>
+                            <EyeIcon className="mr-1 h-3 w-3" />
+                            Submissions
+                        </Link>
                     </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                            router.visit(`/admin/forms/${row.original.id}/edit`)
-                        }
-                    >
-                        <PencilIcon className="mr-1 h-3 w-3" />
-                        Edit
+                    <Button asChild variant="outline" size="sm">
+                        <Link href={`/admin/forms/${row.original.id}/edit`} prefetch cacheFor={30}>
+                            <PencilIcon className="mr-1 h-3 w-3" />
+                            Edit
+                        </Link>
                     </Button>
                     <ConfirmButton
                         variant="destructive"
@@ -134,12 +124,11 @@ export default function Index({
                     description="Manage contact forms and surveys"
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() => router.visit('/admin/forms/create')}
-                        >
-                            <ClipboardListIcon className="mr-2 h-4 w-4" />
-                            Create Form
+                        <Button asChild variant="outline">
+                            <Link href="/admin/forms/create" prefetch cacheFor={30}>
+                                <ClipboardListIcon className="mr-2 h-4 w-4" />
+                                Create Form
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>

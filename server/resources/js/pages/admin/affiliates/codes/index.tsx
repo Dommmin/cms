@@ -107,12 +107,12 @@ export default function CodesIndex({ codes, filters }: Props) {
             header: 'Actions',
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
-                    <Link href={`/admin/affiliates/codes/${row.original.id}/edit`}>
-                        <Button variant="outline" size="sm">
+                    <Button asChild variant="outline" size="sm">
+                        <Link href={`/admin/affiliates/codes/${row.original.id}/edit`} prefetch cacheFor={30}>
                             <PencilIcon className="mr-1 h-3 w-3" />
                             Edit
-                        </Button>
-                    </Link>
+                        </Link>
+                    </Button>
                     <ConfirmButton
                         variant="destructive"
                         size="sm"

@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Link, Head, router } from '@inertiajs/react';
 import { Package, PlusIcon, DownloadIcon } from 'lucide-react';
 import {
     productColumns,
@@ -47,15 +47,13 @@ export default function ProductsIndex({
                                 Export CSV
                             </a>
                         </Button>
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                router.visit('/admin/ecommerce/products/create')
-                            }
-                        >
+                        <Button asChild variant="outline">
+                <Link href='/admin/ecommerce/products/create' prefetch cacheFor={30}>
                             <PlusIcon className="mr-2 h-4 w-4" />
                             Add Product
-                        </Button>
+                        
+                </Link>
+            </Button>
                     </PageHeaderActions>
                 </PageHeader>
 

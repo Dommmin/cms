@@ -4,6 +4,7 @@ import { RotateCcw, EyeIcon } from 'lucide-react';
 import DataTable from '@/components/data-table';
 import { PageHeader } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
@@ -127,12 +128,12 @@ export default function ReturnsIndex({ returns, filters }: Props) {
             header: 'Actions',
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
-                    <Link href={`/admin/ecommerce/returns/${row.original.id}`}>
-                        <Badge variant="outline" className="cursor-pointer">
+                    <Button asChild variant="outline" size="sm">
+                        <Link href={`/admin/ecommerce/returns/${row.original.id}`} prefetch cacheFor={60}>
                             <EyeIcon className="mr-1 h-3 w-3" />
                             View
-                        </Badge>
-                    </Link>
+                        </Link>
+                    </Button>
                 </div>
             ),
         },

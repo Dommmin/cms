@@ -1,4 +1,4 @@
-import { router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import {
     ArrowLeftIcon,
@@ -312,10 +312,13 @@ export default function Edit({ form }: { form: FormData }) {
             <Wrapper>
                 <PageHeader title={form.name} description="Edit form settings and fields">
                     <PageHeaderActions>
-                        <Button variant="outline" onClick={() => router.visit('/admin/forms')}>
+                        <Button asChild variant="outline">
+                <Link href='/admin/forms' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
                             Back to Forms
-                        </Button>
+                        
+                </Link>
+            </Button>
                     </PageHeaderActions>
                 </PageHeader>
 

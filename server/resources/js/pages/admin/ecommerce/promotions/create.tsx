@@ -1,4 +1,4 @@
-import { Head, router, useForm } from '@inertiajs/react';
+import { Link, Head, router, useForm } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -152,13 +152,13 @@ export default function Create({
             <Wrapper>
                 <PageHeader title="Dodaj Promocję" description="Utwórz nową promocję produktową">
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() => router.visit('/admin/ecommerce/promotions')}
-                        >
+                        <Button asChild variant="outline">
+                <Link href='/admin/ecommerce/promotions' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
                             Powrót
-                        </Button>
+                        
+                </Link>
+            </Button>
                     </PageHeaderActions>
                 </PageHeader>
 

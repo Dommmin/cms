@@ -1,4 +1,4 @@
-import { Form, Head, router } from '@inertiajs/react';
+import { Link, Form, Head, router } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -35,10 +35,13 @@ export default function EditCannedResponse({ canned_response }: Props) {
             <Wrapper>
                 <PageHeader title="Edit Canned Response" description={`Editing: ${canned_response.title}`}>
                     <PageHeaderActions>
-                        <Button variant="outline" onClick={() => router.visit('/admin/support/canned-responses')}>
+                        <Button asChild variant="outline">
+                <Link href='/admin/support/canned-responses' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
                             Back
-                        </Button>
+                        
+                </Link>
+            </Button>
                     </PageHeaderActions>
                 </PageHeader>
 

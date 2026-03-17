@@ -1,5 +1,5 @@
 import { useAdminLocale } from '@/hooks/use-admin-locale';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Link, Head, router, usePage } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
@@ -86,13 +86,13 @@ export default function Create({
             <Wrapper>
                 <PageHeader title="Create Category" description="Create a new category">
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() => router.visit('/admin/ecommerce/categories')}
-                        >
+                        <Button asChild variant="outline">
+                <Link href='/admin/ecommerce/categories' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
                             Back to Categories
-                        </Button>
+                        
+                </Link>
+            </Button>
                     </PageHeaderActions>
                 </PageHeader>
 

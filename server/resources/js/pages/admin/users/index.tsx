@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Trash2Icon, UserIcon } from 'lucide-react';
 import { userColumns } from '@/components/columns/user-columns';
 import DataTable from '@/components/data-table';
@@ -45,19 +45,17 @@ export default function Index({
                     description="Manage panel users and their roles"
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() => router.visit('/admin/users/trashed')}
-                        >
-                            <Trash2Icon className="mr-2 h-4 w-4" />
-                            Trash
+                        <Button asChild variant="outline">
+                            <Link href="/admin/users/trashed" prefetch cacheFor={30}>
+                                <Trash2Icon className="mr-2 h-4 w-4" />
+                                Trash
+                            </Link>
                         </Button>
-                        <Button
-                            variant="outline"
-                            onClick={() => router.visit('/admin/users/create')}
-                        >
-                            <UserIcon className="mr-2 h-4 w-4" />
-                            Create User
+                        <Button asChild variant="outline">
+                            <Link href="/admin/users/create" prefetch cacheFor={30}>
+                                <UserIcon className="mr-2 h-4 w-4" />
+                                Create User
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>

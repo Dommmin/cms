@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
     PlusIcon,
@@ -150,17 +150,11 @@ export default function NotificationsIndex({ notifications, filters }: Props) {
             header: 'Actions',
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                            router.visit(
-                                `/admin/notifications/${row.original.id}`,
-                            )
-                        }
-                    >
-                        <EyeIcon className="mr-1 h-3 w-3" />
-                        View
+                    <Button asChild variant="outline" size="sm">
+                        <Link href={`/admin/notifications/${row.original.id}`} prefetch cacheFor={60}>
+                            <EyeIcon className="mr-1 h-3 w-3" />
+                            View
+                        </Link>
                     </Button>
                     {row.original.status === 'failed' && (
                         <Button
@@ -214,14 +208,11 @@ export default function NotificationsIndex({ notifications, filters }: Props) {
                     description="Manage system notifications"
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                router.visit('/admin/notifications/create')
-                            }
-                        >
-                            <PlusIcon className="mr-2 h-4 w-4" />
-                            Create Notification
+                        <Button asChild variant="outline">
+                            <Link href="/admin/notifications/create" prefetch cacheFor={30}>
+                                <PlusIcon className="mr-2 h-4 w-4" />
+                                Create Notification
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>

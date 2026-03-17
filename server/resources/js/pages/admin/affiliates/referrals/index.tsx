@@ -108,6 +108,8 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
                 row.original.order ? (
                     <Link
                         href={`/admin/ecommerce/orders/${row.original.order.id}`}
+                        prefetch
+                        cacheFor={60}
                         className="text-sm font-medium text-primary hover:underline"
                     >
                         #{row.original.order.reference_number}

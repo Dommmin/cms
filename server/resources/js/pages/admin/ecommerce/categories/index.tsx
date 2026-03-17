@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Folder, PlusIcon } from 'lucide-react';
 import {
     categoryColumns,
@@ -41,16 +41,11 @@ export default function CategoriesIndex({
                     description="Manage product categories"
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                router.visit(
-                                    '/admin/ecommerce/categories/create',
-                                )
-                            }
-                        >
-                            <PlusIcon className="mr-2 h-4 w-4" />
-                            Add Category
+                        <Button asChild variant="outline">
+                            <Link href="/admin/ecommerce/categories/create" prefetch cacheFor={30}>
+                                <PlusIcon className="mr-2 h-4 w-4" />
+                                Add Category
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>

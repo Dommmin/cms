@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Link, Head, router } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
@@ -50,13 +50,13 @@ export default function ShowNotification({ notification }: Props) {
                     description="Notification details"
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() => router.visit('/admin/notifications')}
-                        >
+                        <Button asChild variant="outline">
+                <Link href='/admin/notifications' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
                             Back to Notifications
-                        </Button>
+                        
+                </Link>
+            </Button>
                     </PageHeaderActions>
                 </PageHeader>
 

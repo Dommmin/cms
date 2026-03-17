@@ -5,6 +5,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
 
 type Variant = {
@@ -19,7 +20,7 @@ type Variant = {
 
 type Product = {
     id: number;
-    name: string;
+    name: string | Record<string, string>;
 };
 
 export default function ProductVariantsIndex({
@@ -29,37 +30,33 @@ export default function ProductVariantsIndex({
     product: Product;
     variants: Variant[];
 }) {
+    const productName = resolveLocalizedText(product.name);
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Products', href: '/admin/ecommerce/products' },
-        { title: product.name, href: `/admin/ecommerce/products/${product.id}/edit` },
+        { title: productName, href: `/admin/ecommerce/products/${product.id}/edit` },
         { title: 'Variants', href: `/admin/ecommerce/products/${product.id}/variants` },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Variants: ${product.name}`} />
+            <Head title={`Variants: ${productName}`} />
             <Wrapper>
                 <PageHeader
-                    title={`Variants: ${product.name}`}
+                    title={`Variants: ${productName}`}
                     description="Manage product variants, stock and pricing"
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                router.visit(`/admin/ecommerce/products/${product.id}/edit`)
-                            }
-                        >
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Product
+                        <Button asChild variant="outline">
+                            <Link href={`/admin/ecommerce/products/${product.id}/edit`} prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                Back to Product
+                            </Link>
                         </Button>
-                        <Button
-                            onClick={() =>
-                                router.visit(`/admin/ecommerce/products/${product.id}/variants/create`)
-                            }
-                        >
-                            <PlusIcon className="mr-2 h-4 w-4" />
-                            Add Variant
+                        <Button asChild>
+                            <Link href={`/admin/ecommerce/products/${product.id}/variants/create`} prefetch cacheFor={30}>
+                                <PlusIcon className="mr-2 h-4 w-4" />
+                                Add Variant
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
@@ -130,17 +127,16 @@ export default function ProductVariantsIndex({
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex justify-end gap-2">
-                                                <Link
-                                                    href={`/admin/ecommerce/products/${product.id}/variants/${variant.id}/edit`}
-                                                >
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
+                                                <Button asChild variant="outline" size="sm">
+                                                    <Link
+                                                        href={`/admin/ecommerce/products/${product.id}/variants/${variant.id}/edit`}
+                                                        prefetch
+                                                        cacheFor={30}
                                                     >
                                                         <PencilIcon className="mr-1 h-3 w-3" />
                                                         Edit
-                                                    </Button>
-                                                </Link>
+                                                    </Link>
+                                                </Button>
                                                 <ConfirmButton
                                                     variant="destructive"
                                                     size="sm"

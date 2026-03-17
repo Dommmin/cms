@@ -1,4 +1,4 @@
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
     PlusIcon,
@@ -114,15 +114,11 @@ export default function ThemesIndex({ themes, filters }: Props) {
                             Activate
                         </Button>
                     )}
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                            router.visit(`/admin/themes/${row.original.id}/edit`)
-                        }
-                    >
-                        <PencilIcon className="mr-1 h-3 w-3" />
-                        Edit
+                    <Button asChild variant="outline" size="sm">
+                        <Link href={`/admin/themes/${row.original.id}/edit`} prefetch cacheFor={30}>
+                            <PencilIcon className="mr-1 h-3 w-3" />
+                            Edit
+                        </Link>
                     </Button>
                     <Button
                         variant="outline"
@@ -184,12 +180,11 @@ export default function ThemesIndex({ themes, filters }: Props) {
                         >
                             Disable Theme
                         </Button>
-                        <Button
-                            variant="outline"
-                            onClick={() => router.visit('/admin/themes/create')}
-                        >
-                            <PlusIcon className="mr-2 h-4 w-4" />
-                            Create Theme
+                        <Button asChild variant="outline">
+                            <Link href="/admin/themes/create" prefetch cacheFor={30}>
+                                <PlusIcon className="mr-2 h-4 w-4" />
+                                Create Theme
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>

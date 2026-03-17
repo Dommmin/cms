@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -48,16 +48,11 @@ export default function SubmissionShow({
                     ).toLocaleString()}
                 >
                     <PageHeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                router.visit(
-                                    `/admin/forms/${form.id}/submissions`,
-                                )
-                            }
-                        >
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Submissions
+                        <Button asChild variant="outline">
+                            <Link href={`/admin/forms/${form.id}/submissions`} prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                Back to Submissions
+                            </Link>
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>

@@ -305,6 +305,8 @@ export default function OrderShow({
                     <PageHeaderActions>
                         <Link
                             href="/admin/ecommerce/orders"
+                            prefetch
+                            cacheFor={30}
                             className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm hover:bg-accent"
                         >
                             <ArrowLeft className="h-4 w-4" />

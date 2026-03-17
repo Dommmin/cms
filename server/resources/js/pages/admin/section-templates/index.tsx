@@ -96,12 +96,12 @@ export default function SectionTemplatesIndex({ templates, filters }: Props) {
                         <Copy className="mr-1 h-3 w-3" />
                         Duplicate
                     </Button>
-                    <Link href={`/admin/section-templates/${row.original.id}/edit`}>
-                        <Button variant="outline" size="sm">
+                    <Button asChild variant="outline" size="sm">
+                        <Link href={`/admin/section-templates/${row.original.id}/edit`} prefetch cacheFor={30}>
                             <PencilIcon className="mr-1 h-3 w-3" />
                             Edit
-                        </Button>
-                    </Link>
+                        </Link>
+                    </Button>
                     <ConfirmButton
                         variant="destructive"
                         size="sm"
