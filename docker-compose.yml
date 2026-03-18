@@ -26,6 +26,7 @@ services:
       context: .
       dockerfile: ./.docker/node/Dockerfile
     container_name: ${COMPOSE_PROJECT_NAME}_node
+    restart: on-failure
     user: "${UID:-1000}:${GID:-1000}"
     working_dir: /var/www/client
     volumes:

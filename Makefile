@@ -47,7 +47,7 @@ build:
 install:
 	docker compose exec php composer install
 	docker compose exec -e NODE_OPTIONS="--max-old-space-size=512" php npm install
-	docker compose exec node npm install
+	docker compose run --rm node npm install
 
 # Run migrations
 migrate:
@@ -84,7 +84,7 @@ quality:
 setup: build up
 	docker compose exec php composer install
 	docker compose exec -e NODE_OPTIONS="--max-old-space-size=512" php npm install
-	docker compose exec node npm install
+	docker compose run --rm node npm install
 	docker compose exec php php artisan key:generate
 	docker compose exec php php artisan migrate
 	@echo "Project setup completed!"
