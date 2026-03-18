@@ -128,7 +128,7 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                                         </Link>
                                     </Button>
                                     <ConfirmButton
-                                        variant="destructive"
+                                        variant="outline"
                                         size="sm"
                                         title="Delete Brand"
                                         description={`Are you sure you want to delete "${row.original.name}"?`}

@@ -106,7 +106,7 @@ export default function ShippingMethodsIndex({ methods, filters }: Props) {
                         </Link>
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Shipping Method"
                         description={`Are you sure you want to delete "${row.original.name}"?`}

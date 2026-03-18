@@ -172,7 +172,7 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                     </Badge>
                 ) : (
                     <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
                         onClick={() => {
                             router.post(
@@ -205,7 +205,7 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                         Edit
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Locale"
                         description="This will delete the locale and all its translations. This action cannot be undone."

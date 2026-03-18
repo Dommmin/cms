@@ -138,7 +138,7 @@ export default function ProductVariantsIndex({
                                                     </Link>
                                                 </Button>
                                                 <ConfirmButton
-                                                    variant="destructive"
+                                                    variant="outline"
                                                     size="sm"
                                                     title="Delete Variant"
                                                     description={`Delete variant "${variant.name}"?`}

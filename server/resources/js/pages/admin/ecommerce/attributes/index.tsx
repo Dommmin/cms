@@ -128,7 +128,7 @@ export default function AttributesIndex({ attributes, filters }: IndexProps) {
                                         </Link>
                                     </Button>
                                     <ConfirmButton
-                                        variant="destructive"
+                                        variant="outline"
                                         size="sm"
                                         title="Delete Attribute"
                                         description={`Are you sure you want to delete "${row.original.name}"?`}

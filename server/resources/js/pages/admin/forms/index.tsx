@@ -96,7 +96,7 @@ export default function Index({
                         </Link>
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Form"
                         description={`Are you sure you want to delete "${row.original.name}"? This will also delete all submissions.`}

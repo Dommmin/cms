@@ -83,7 +83,7 @@ export default function SectionTemplatesIndex({ templates, filters }: Props) {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
                         onClick={() =>
                             router.post(
@@ -103,7 +103,7 @@ export default function SectionTemplatesIndex({ templates, filters }: Props) {
                         </Link>
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Template"
                         description="Are you sure you want to delete this template? This cannot be undone."

@@ -180,6 +180,7 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     // i18n — Locales & Translations
     Route::resource('locales', LocaleController::class)->except(['show', 'create', 'edit']);
     Route::post('locales/{locale}/set-default', [LocaleController::class, 'setDefault'])->name('locales.set-default');
+    Route::post('translations/sync', [AdminTranslationController::class, 'sync'])->name('translations.sync');
     Route::resource('translations', AdminTranslationController::class)->except(['show', 'create', 'edit']);
 
     // Affiliates & Referrals (admin only)

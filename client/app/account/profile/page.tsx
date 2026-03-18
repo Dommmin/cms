@@ -13,6 +13,8 @@ import {
   useDeleteAddress,
   useSetDefaultAddress,
 } from "@/hooks/use-profile";
+import { useTranslation } from "@/hooks/use-translation";
+import { useLocalePath } from "@/hooks/use-locale";
 import { api } from "@/lib/axios";
 import type { Address } from "@/types/api";
 
@@ -22,11 +24,10 @@ const EMPTY_ADDRESS: AddressForm = {
   type: "shipping",
   first_name: "",
   last_name: "",
-  company: null,
-  address_line_1: "",
-  address_line_2: null,
+  company_name: null,
+  street: "",
+  street2: null,
   city: "",
-  state: null,
   postal_code: "",
   country_code: "PL",
   phone: null,
@@ -37,6 +38,8 @@ export default function ProfilePage() {
   const { mutate: updateProfile, isPending: savingProfile } = useUpdateProfile();
   const { mutate: updatePassword, isPending: savingPassword } = useUpdatePassword();
   const { mutate: deleteAccount, isPending: deletingAccount } = useDeleteAccount();
+  const { t } = useTranslation();
+  const lp = useLocalePath();
 
   const { data: addresses = [] } = useAddresses();
   const { mutate: createAddress, isPending: addingAddress } = useCreateAddress();
@@ -51,6 +54,7 @@ export default function ProfilePage() {
   });
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [newAddress, setNewAddress] = useState<AddressForm>({ ...EMPTY_ADDRESS });
+  const [addressErrors, setAddressErrors] = useState<Record<string, string[]>>({});
   const [exportingData, setExportingData] = useState(false);
 
   async function handleExportData() {
@@ -94,25 +98,31 @@ export default function ProfilePage() {
 
   function handleAddAddress(e: React.FormEvent) {
     e.preventDefault();
+    setAddressErrors({});
     createAddress(newAddress, {
       onSuccess: () => {
         setShowAddAddress(false);
         setNewAddress({ ...EMPTY_ADDRESS });
+        setAddressErrors({});
+      },
+      onError: (err: any) => {
+        const errors = err?.response?.data?.errors;
+        if (errors) setAddressErrors(errors);
       },
     });
   }
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold">Profile</h1>
+      <h1 className="text-2xl font-bold">{t("account.profile_title", "Profile")}</h1>
 
       {/* ── Personal info ─────────────────────────────────────────── */}
       <section className="rounded-xl border border-border p-6">
-        <h2 className="mb-4 text-base font-semibold">Personal information</h2>
+        <h2 className="mb-4 text-base font-semibold">{t("account.personal_info", "Personal information")}</h2>
         <form onSubmit={handleProfileSubmit} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium">Name</label>
+              <label className="mb-1 block text-sm font-medium">{t("auth.full_name", "Full Name")}</label>
               <input
                 type="text"
                 defaultValue={profile?.name}
@@ -123,7 +133,7 @@ export default function ProfilePage() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium">Email</label>
+              <label className="mb-1 block text-sm font-medium">{t("auth.email", "Email address")}</label>
               <input
                 type="email"
                 defaultValue={profile?.email}
@@ -139,17 +149,17 @@ export default function ProfilePage() {
             disabled={savingProfile}
             className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
           >
-            {savingProfile ? "Saving…" : "Save changes"}
+            {savingProfile ? t("account.saving", "Saving…") : t("account.save_changes", "Save changes")}
           </button>
         </form>
       </section>
 
       {/* ── Change password ───────────────────────────────────────── */}
       <section className="rounded-xl border border-border p-6">
-        <h2 className="mb-4 text-base font-semibold">Change password</h2>
+        <h2 className="mb-4 text-base font-semibold">{t("account.change_password", "Change password")}</h2>
         <form onSubmit={handlePasswordSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium">Current password</label>
+            <label className="mb-1 block text-sm font-medium">{t("auth.password", "Password")}</label>
             <input
               type="password"
               required
@@ -162,7 +172,7 @@ export default function ProfilePage() {
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium">New password</label>
+              <label className="mb-1 block text-sm font-medium">{t("auth.password", "New password")}</label>
               <input
                 type="password"
                 required
@@ -175,7 +185,7 @@ export default function ProfilePage() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium">Confirm new password</label>
+              <label className="mb-1 block text-sm font-medium">{t("auth.confirm_password", "Confirm new password")}</label>
               <input
                 type="password"
                 required
@@ -195,7 +205,7 @@ export default function ProfilePage() {
             disabled={savingPassword}
             className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
           >
-            {savingPassword ? "Saving…" : "Update password"}
+            {savingPassword ? t("account.saving", "Saving…") : t("account.update_password", "Update password")}
           </button>
         </form>
       </section>
@@ -203,12 +213,12 @@ export default function ProfilePage() {
       {/* ── Addresses ─────────────────────────────────────────────── */}
       <section className="rounded-xl border border-border p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold">Saved addresses</h2>
+          <h2 className="text-base font-semibold">{t("account.saved_addresses", "Saved addresses")}</h2>
           <button
             onClick={() => setShowAddAddress((v) => !v)}
             className="text-sm font-medium text-primary hover:opacity-80"
           >
-            {showAddAddress ? "Cancel" : "+ Add address"}
+            {showAddAddress ? t("common.cancel", "Cancel") : t("account.add_address", "+ Add address")}
           </button>
         </div>
 
@@ -216,52 +226,67 @@ export default function ProfilePage() {
           <form onSubmit={handleAddAddress} className="mb-6 space-y-3 rounded-lg bg-muted/30 p-4">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">First name *</label>
+                <label className="mb-1 block text-xs text-muted-foreground">{t("address.first_name", "First Name *")}</label>
                 <input
                   required
                   value={newAddress.first_name}
                   onChange={(e) => setNewAddress((p) => ({ ...p, first_name: e.target.value }))}
                   className="w-full rounded-lg border border-input bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
                 />
+                {addressErrors.first_name && (
+                  <p className="mt-1 text-xs text-destructive">{addressErrors.first_name[0]}</p>
+                )}
               </div>
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">Last name *</label>
+                <label className="mb-1 block text-xs text-muted-foreground">{t("address.last_name", "Last Name *")}</label>
                 <input
                   required
                   value={newAddress.last_name}
                   onChange={(e) => setNewAddress((p) => ({ ...p, last_name: e.target.value }))}
                   className="w-full rounded-lg border border-input bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
                 />
+                {addressErrors.last_name && (
+                  <p className="mt-1 text-xs text-destructive">{addressErrors.last_name[0]}</p>
+                )}
               </div>
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-xs text-muted-foreground">Street address *</label>
+                <label className="mb-1 block text-xs text-muted-foreground">{t("address.street", "Street & Number *")}</label>
                 <input
                   required
-                  value={newAddress.address_line_1}
-                  onChange={(e) => setNewAddress((p) => ({ ...p, address_line_1: e.target.value }))}
+                  value={newAddress.street}
+                  onChange={(e) => setNewAddress((p) => ({ ...p, street: e.target.value }))}
                   className="w-full rounded-lg border border-input bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
                 />
+                {addressErrors.street && (
+                  <p className="mt-1 text-xs text-destructive">{addressErrors.street[0]}</p>
+                )}
               </div>
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">Postal code *</label>
+                <label className="mb-1 block text-xs text-muted-foreground">{t("address.postal_code", "Postal Code *")}</label>
                 <input
                   required
                   value={newAddress.postal_code}
                   onChange={(e) => setNewAddress((p) => ({ ...p, postal_code: e.target.value }))}
                   className="w-full rounded-lg border border-input bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
                 />
+                {addressErrors.postal_code && (
+                  <p className="mt-1 text-xs text-destructive">{addressErrors.postal_code[0]}</p>
+                )}
               </div>
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">City *</label>
+                <label className="mb-1 block text-xs text-muted-foreground">{t("address.city", "City *")}</label>
                 <input
                   required
                   value={newAddress.city}
                   onChange={(e) => setNewAddress((p) => ({ ...p, city: e.target.value }))}
                   className="w-full rounded-lg border border-input bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
                 />
+                {addressErrors.city && (
+                  <p className="mt-1 text-xs text-destructive">{addressErrors.city[0]}</p>
+                )}
               </div>
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">Country code *</label>
+                <label className="mb-1 block text-xs text-muted-foreground">{t("address.country", "Country *")}</label>
                 <input
                   required
                   maxLength={2}
@@ -269,9 +294,12 @@ export default function ProfilePage() {
                   onChange={(e) => setNewAddress((p) => ({ ...p, country_code: e.target.value.toUpperCase() }))}
                   className="w-full rounded-lg border border-input bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
                 />
+                {addressErrors.country_code && (
+                  <p className="mt-1 text-xs text-destructive">{addressErrors.country_code[0]}</p>
+                )}
               </div>
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">Phone</label>
+                <label className="mb-1 block text-xs text-muted-foreground">{t("address.phone", "Phone *")}</label>
                 <input
                   type="tel"
                   value={newAddress.phone ?? ""}
@@ -285,13 +313,13 @@ export default function ProfilePage() {
               disabled={addingAddress}
               className="rounded-lg bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
             >
-              {addingAddress ? "Saving…" : "Save address"}
+              {addingAddress ? t("account.saving", "Saving…") : t("account.save_address", "Save address")}
             </button>
           </form>
         )}
 
         {addresses.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No saved addresses.</p>
+          <p className="text-sm text-muted-foreground">{t("account.no_addresses", "No saved addresses.")}</p>
         ) : (
           <ul className="space-y-3">
             {addresses.map((addr) => (
@@ -304,11 +332,11 @@ export default function ProfilePage() {
                     {addr.first_name} {addr.last_name}
                     {addr.is_default && (
                       <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
-                        Default
+                        {t("address.default_suffix", "(default)")}
                       </span>
                     )}
                   </p>
-                  <p className="text-muted-foreground">{addr.address_line_1}</p>
+                  <p className="text-muted-foreground">{addr.street}</p>
                   <p className="text-muted-foreground">
                     {addr.postal_code} {addr.city}, {addr.country_code}
                   </p>
@@ -319,14 +347,14 @@ export default function ProfilePage() {
                       onClick={() => setDefault(addr.id)}
                       className="text-primary hover:opacity-80"
                     >
-                      Set default
+                      {t("account.set_default", "Set default")}
                     </button>
                   )}
                   <button
                     onClick={() => deleteAddress(addr.id)}
                     className="text-destructive hover:opacity-80"
                   >
-                    Remove
+                    {t("common.delete", "Remove")}
                   </button>
                 </div>
               </li>
@@ -337,9 +365,9 @@ export default function ProfilePage() {
 
       {/* ── Danger zone ───────────────────────────────────────────── */}
       <section className="rounded-xl border border-destructive/30 p-6">
-        <h2 className="mb-2 text-base font-semibold text-destructive">Danger zone</h2>
+        <h2 className="mb-2 text-base font-semibold text-destructive">{t("account.danger_zone", "Danger zone")}</h2>
         <p className="mb-4 text-sm text-muted-foreground">
-          Permanently delete your account and all associated data. This cannot be undone.
+          {t("account.danger_zone_desc", "Permanently delete your account and all associated data. This cannot be undone.")}
         </p>
         <div className="flex flex-wrap gap-3">
           <button
@@ -347,13 +375,13 @@ export default function ProfilePage() {
             disabled={exportingData}
             className="rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-accent disabled:opacity-50"
           >
-            {exportingData ? "Downloading…" : "Download my data"}
+            {exportingData ? t("account.downloading_data", "Downloading…") : t("account.download_data", "Download my data")}
           </button>
           <button
             onClick={() => {
               if (
                 confirm(
-                  "Are you sure you want to delete your account? This cannot be undone.",
+                  t("account.delete_confirm", "Are you sure you want to delete your account? This cannot be undone."),
                 )
               ) {
                 deleteAccount();
@@ -362,7 +390,7 @@ export default function ProfilePage() {
             disabled={deletingAccount}
             className="rounded-lg border border-destructive px-4 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 disabled:opacity-50"
           >
-            {deletingAccount ? "Deleting…" : "Delete account"}
+            {deletingAccount ? t("account.deleting_account", "Deleting…") : t("account.delete_account", "Delete account")}
           </button>
         </div>
       </section>

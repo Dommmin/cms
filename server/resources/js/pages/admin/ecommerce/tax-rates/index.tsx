@@ -137,7 +137,7 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                                         </Link>
                                     </Button>
                                     <ConfirmButton
-                                        variant="destructive"
+                                        variant="outline"
                                         size="sm"
                                         title="Delete Tax Rate"
                                         description={`Are you sure you want to delete "${row.original.name}"?`}

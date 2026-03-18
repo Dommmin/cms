@@ -406,7 +406,7 @@ export default function Index({
                             <div className="flex items-center justify-between border-b px-4 py-3">
                                 <h3 className="font-semibold">Details</h3>
                                 <Button
-                                    variant="ghost"
+                                    variant="outline"
                                     size="icon"
                                     onClick={() => setSelectedItem(null)}
                                 >
@@ -595,7 +595,7 @@ export default function Index({
                                         View Full Size
                                     </Button>
                                     <ConfirmButton
-                                        variant="destructive"
+                                        variant="outline"
                                         className="w-full"
                                         title="Delete File"
                                         description={`Are you sure you want to delete "${selectedItem.name}"? This action cannot be undone.`}

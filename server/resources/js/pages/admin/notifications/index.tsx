@@ -178,7 +178,7 @@ export default function NotificationsIndex({ notifications, filters }: Props) {
                         </Button>
                     )}
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Notification"
                         description="Are you sure you want to delete this notification?"

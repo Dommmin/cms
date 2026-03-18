@@ -118,7 +118,7 @@ export default function ProductTypesIndex({ types, filters }: IndexProps) {
                                         </Link>
                                     </Button>
                                     <ConfirmButton
-                                        variant="destructive"
+                                        variant="outline"
                                         size="sm"
                                         title="Delete Product Type"
                                         description={`Delete product type "${row.original.name}"?`}

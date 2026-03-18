@@ -114,7 +114,7 @@ export default function CodesIndex({ codes, filters }: Props) {
                         </Link>
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Code"
                         description="Delete this affiliate code? This cannot be undone."

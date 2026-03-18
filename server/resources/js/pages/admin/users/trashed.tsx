@@ -126,7 +126,7 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
                                                 </Form>
 
                                                 <Button
-                                                    variant="destructive"
+                                                    variant="outline"
                                                     size="sm"
                                                     onClick={() =>
                                                         setConfirmUserId(
@@ -201,7 +201,7 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
                             {({ processing }) => (
                                 <Button
                                     type="submit"
-                                    variant="destructive"
+                                    variant="outline"
                                     disabled={processing}
                                     onClick={() => setConfirmUserId(null)}
                                 >

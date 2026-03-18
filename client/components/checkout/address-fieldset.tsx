@@ -145,9 +145,9 @@ function addressToPayload(addr: Address): AddressPayload {
   return {
     first_name: addr.first_name ?? "",
     last_name: addr.last_name ?? "",
-    company_name: addr.company ?? "",
-    street: addr.address_line_1 ?? "",
-    street2: addr.address_line_2 ?? "",
+    company_name: addr.company_name ?? "",
+    street: addr.street ?? "",
+    street2: addr.street2 ?? "",
     city: addr.city ?? "",
     postal_code: addr.postal_code ?? "",
     country_code: addr.country_code ?? "PL",
@@ -182,7 +182,7 @@ function SavedAddressPicker({
         </option>
         {addresses.map((addr) => (
           <option key={addr.id} value={addr.id}>
-            {addr.first_name} {addr.last_name}, {addr.address_line_1}, {addr.city}
+            {addr.first_name} {addr.last_name}, {addr.street}, {addr.city}
             {addr.is_default ? ` ${t("address.default_suffix", "(default)")}` : ""}
           </option>
         ))}

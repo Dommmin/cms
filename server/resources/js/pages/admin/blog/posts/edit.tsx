@@ -4,6 +4,7 @@ import { ArrowLeftIcon, ExternalLink, EyeIcon } from 'lucide-react';
 import { SeoPanel } from '@/components/seo-panel';
 import { VersionHistory } from '@/components/version-history';
 import { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import toast from 'react-hot-toast';
 import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
@@ -114,22 +115,19 @@ export default function EditBlogPost({ post, categories }: Props) {
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
-    const [autoSlug, setAutoSlug] = useState(false);
+    const [isSlugManual, setIsSlugManual] = useState(
+        post.slug !== slugify(post.title?.[defaultLocale] ?? ''),
+    );
 
     const handleTitleChange = (locale: string, value: string) => {
         setData((prev) => ({
             ...prev,
             title: { ...prev.title, [locale]: value },
             slug:
-                autoSlug && locale === defaultLocale
+                !isSlugManual && locale === defaultLocale
                     ? slugify(value)
                     : prev.slug,
         }));
-    };
-
-    const handleSlugChange = (slug: string) => {
-        setAutoSlug(slug === slugify(data.title[defaultLocale] ?? ''));
-        setData((prev) => ({ ...prev, slug }));
     };
 
     const handleContentTypeChange = (newType: 'richtext' | 'markdown') => {
@@ -219,150 +217,167 @@ export default function EditBlogPost({ post, categories }: Props) {
                 <form onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                         {/* Main Column */}
-                        <div className="space-y-6 lg:col-span-2">
-                            {/* Locale switcher */}
-                            {locales.length > 1 && (
-                                <div className="flex items-center gap-2 rounded-lg border p-3">
-                                    <span className="text-sm font-medium text-muted-foreground">
-                                        Editing:
-                                    </span>
-                                    <LocaleTabSwitcher
-                                        locales={locales}
-                                        activeLocale={activeLocale}
-                                        onLocaleChange={setActiveLocale}
-                                    />
-                                </div>
-                            )}
+                        <div className="lg:col-span-2">
+                            <Tabs defaultValue="general" className="space-y-6">
+                                <TabsList>
+                                    <TabsTrigger value="general">General</TabsTrigger>
+                                    <TabsTrigger value="seo">SEO</TabsTrigger>
+                                </TabsList>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="title">Title *</Label>
-                                <Input
-                                    id="title"
-                                    value={data.title[activeLocale] ?? ''}
-                                    onChange={(e) =>
-                                        handleTitleChange(
-                                            activeLocale,
-                                            e.target.value,
-                                        )
-                                    }
-                                    placeholder="Post title"
-                                />
-                                <InputError message={errors.title} />
-                            </div>
+                                <TabsContent value="general" className="space-y-6">
+                                    {/* Locale switcher */}
+                                    {locales.length > 1 && (
+                                        <div className="flex items-center gap-2 rounded-lg border p-3">
+                                            <span className="text-sm font-medium text-muted-foreground">
+                                                Editing:
+                                            </span>
+                                            <LocaleTabSwitcher
+                                                locales={locales}
+                                                activeLocale={activeLocale}
+                                                onLocaleChange={setActiveLocale}
+                                            />
+                                        </div>
+                                    )}
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="slug">Slug</Label>
-                                <Input
-                                    id="slug"
-                                    value={data.slug}
-                                    onChange={(e) =>
-                                        handleSlugChange(e.target.value)
-                                    }
-                                    placeholder="post-slug"
-                                />
-                                <InputError message={errors.slug} />
-                            </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="title">Title *</Label>
+                                        <Input
+                                            id="title"
+                                            value={data.title[activeLocale] ?? ''}
+                                            onChange={(e) =>
+                                                handleTitleChange(activeLocale, e.target.value)
+                                            }
+                                            placeholder="Post title"
+                                        />
+                                        <InputError message={errors.title} />
+                                    </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="excerpt">Excerpt</Label>
-                                <Textarea
-                                    id="excerpt"
-                                    value={data.excerpt[activeLocale] ?? ''}
-                                    onChange={(e) =>
-                                        setData((prev) => ({
-                                            ...prev,
-                                            excerpt: {
-                                                ...prev.excerpt,
-                                                [activeLocale]: e.target.value,
-                                            },
-                                        }))
-                                    }
-                                    placeholder="Short description of the post"
-                                    rows={3}
-                                />
-                                <InputError message={errors.excerpt} />
-                            </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="slug">Slug</Label>
+                                        <Input
+                                            id="slug"
+                                            value={data.slug}
+                                            readOnly={!isSlugManual}
+                                            onChange={(e) =>
+                                                setData((prev) => ({ ...prev, slug: slugify(e.target.value) }))
+                                            }
+                                            placeholder="post-slug"
+                                        />
+                                        <InputError message={errors.slug} />
+                                        <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                                            <input
+                                                type="checkbox"
+                                                checked={isSlugManual}
+                                                onChange={(e) => {
+                                                    const manual = e.target.checked;
+                                                    setIsSlugManual(manual);
+                                                    if (!manual) {
+                                                        setData((prev) => ({
+                                                            ...prev,
+                                                            slug: slugify(prev.title[defaultLocale] ?? ''),
+                                                        }));
+                                                    }
+                                                }}
+                                                className="h-4 w-4 rounded border-input"
+                                            />
+                                            Set slug manually
+                                        </label>
+                                    </div>
 
-                            <div className="grid gap-2">
-                                <div className="flex items-center justify-between">
-                                    <Label>Content *</Label>
-                                    <Select
-                                        value={data.content_type}
-                                        onValueChange={(val) =>
-                                            handleContentTypeChange(
-                                                val as 'richtext' | 'markdown',
-                                            )
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="excerpt">Excerpt</Label>
+                                        <Textarea
+                                            id="excerpt"
+                                            value={data.excerpt[activeLocale] ?? ''}
+                                            onChange={(e) =>
+                                                setData((prev) => ({
+                                                    ...prev,
+                                                    excerpt: {
+                                                        ...prev.excerpt,
+                                                        [activeLocale]: e.target.value,
+                                                    },
+                                                }))
+                                            }
+                                            placeholder="Short description of the post"
+                                            rows={3}
+                                        />
+                                        <InputError message={errors.excerpt} />
+                                    </div>
+
+                                    <div className="grid gap-2">
+                                        <div className="flex items-center justify-between">
+                                            <Label>Content *</Label>
+                                            <Select
+                                                value={data.content_type}
+                                                onValueChange={(val) =>
+                                                    handleContentTypeChange(val as 'richtext' | 'markdown')
+                                                }
+                                            >
+                                                <SelectTrigger className="w-40">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="richtext">Rich Text</SelectItem>
+                                                    <SelectItem value="markdown">Markdown</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        {data.content_type === 'richtext' ? (
+                                            <RichTextEditor
+                                                key={`richtext-${activeLocale}`}
+                                                value={data.content[activeLocale] ?? ''}
+                                                onChange={(val) =>
+                                                    setData((prev) => ({
+                                                        ...prev,
+                                                        content: {
+                                                            ...prev.content,
+                                                            [activeLocale]: val,
+                                                        },
+                                                    }))
+                                                }
+                                                placeholder="Write your post content..."
+                                            />
+                                        ) : (
+                                            <MarkdownEditor
+                                                key={`markdown-${activeLocale}`}
+                                                value={data.content[activeLocale] ?? ''}
+                                                onChange={(val) =>
+                                                    setData((prev) => ({
+                                                        ...prev,
+                                                        content: {
+                                                            ...prev.content,
+                                                            [activeLocale]: val,
+                                                        },
+                                                    }))
+                                                }
+                                            />
+                                        )}
+                                        <InputError message={errors.content} />
+                                    </div>
+                                </TabsContent>
+
+                                <TabsContent value="seo" className="space-y-6">
+                                    <SeoPanel
+                                        data={{
+                                            seo_title: data.seo_title,
+                                            seo_description: data.seo_description,
+                                            meta_robots: data.meta_robots,
+                                            og_image: data.og_image,
+                                            sitemap_exclude: data.sitemap_exclude,
+                                        }}
+                                        onChange={(field, value) =>
+                                            setData((prev) => ({ ...prev, [field]: value }))
                                         }
-                                    >
-                                        <SelectTrigger className="w-40">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="richtext">
-                                                Rich Text
-                                            </SelectItem>
-                                            <SelectItem value="markdown">
-                                                Markdown
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                {data.content_type === 'richtext' ? (
-                                    <RichTextEditor
-                                        key={`richtext-${activeLocale}`}
-                                        value={data.content[activeLocale] ?? ''}
-                                        onChange={(val) =>
-                                            setData((prev) => ({
-                                                ...prev,
-                                                content: {
-                                                    ...prev.content,
-                                                    [activeLocale]: val,
-                                                },
-                                            }))
-                                        }
-                                        placeholder="Write your post content..."
-                                    />
-                                ) : (
-                                    <MarkdownEditor
-                                        key={`markdown-${activeLocale}`}
-                                        value={data.content[activeLocale] ?? ''}
-                                        onChange={(val) =>
-                                            setData((prev) => ({
-                                                ...prev,
-                                                content: {
-                                                    ...prev.content,
-                                                    [activeLocale]: val,
-                                                },
-                                            }))
+                                        errors={errors}
+                                        urlPath={`blog/${data.slug ?? post.slug}`}
+                                        titleFallback={
+                                            typeof data.title === 'object'
+                                                ? Object.values(data.title)[0]
+                                                : post.slug
                                         }
                                     />
-                                )}
-                                <InputError message={errors.content} />
-                            </div>
-
-                            {/* SEO */}
-                            <div className="space-y-4 rounded-lg border p-4">
-                                <h3 className="text-sm font-medium">SEO</h3>
-                                <SeoPanel
-                                    data={{
-                                        seo_title: data.seo_title,
-                                        seo_description: data.seo_description,
-                                        meta_robots: data.meta_robots,
-                                        og_image: data.og_image,
-                                        sitemap_exclude: data.sitemap_exclude,
-                                    }}
-                                    onChange={(field, value) =>
-                                        setData((prev) => ({ ...prev, [field]: value }))
-                                    }
-                                    errors={errors}
-                                    urlPath={`blog/${data.slug ?? post.slug}`}
-                                    titleFallback={
-                                        typeof data.title === 'object'
-                                            ? Object.values(data.title)[0]
-                                            : post.slug
-                                    }
-                                />
-                            </div>
+                                </TabsContent>
+                            </Tabs>
                         </div>
 
                         {/* Sidebar */}

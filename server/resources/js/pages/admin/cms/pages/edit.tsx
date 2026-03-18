@@ -2,6 +2,7 @@ import { useAdminLocale } from '@/hooks/use-admin-locale';
 import { Form, Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowLeftIcon, EyeIcon, GlobeIcon, LayoutIcon, PencilIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { slugify } from '@/lib/slug';
 import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -16,6 +17,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
@@ -47,12 +49,19 @@ type PageData = {
     is_published: boolean;
 };
 
+type ParentPage = {
+    id: number;
+    title: string | Record<string, string>;
+    slug: string;
+};
+
 type Props = {
     page: PageData;
     modules: Record<string, ModuleConfig>;
+    pages: ParentPage[];
 };
 
-export default function Edit({ page, modules }: Props) {
+export default function Edit({ page, modules, pages }: Props) {
     const { locales, frontendUrl } = usePage().props as { locales: SharedLocale[]; frontendUrl: string };
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
     const [activeLocale, setActiveLocale] = useAdminLocale(defaultLocale);
@@ -77,6 +86,13 @@ export default function Edit({ page, modules }: Props) {
     );
     const [slugTranslations, setSlugTranslations] = useState<Record<string, string>>(
         page.slug_translations ?? {},
+    );
+    const [parentId, setParentId] = useState<string>(
+        page.parent_id ? String(page.parent_id) : 'none',
+    );
+    const [slug, setSlug] = useState(page.slug);
+    const [isSlugManual, setIsSlugManual] = useState(
+        page.slug !== slugify(page.title?.[defaultLocale] ?? ''),
     );
 
     // Non-default locales that can have translated slugs
@@ -118,7 +134,7 @@ export default function Edit({ page, modules }: Props) {
                                 </Link>
                             </Button>
                             {pageType === 'blocks' && (
-                                <Button asChild variant="default">
+                                <Button asChild variant="outline">
                                     <Link href={`/admin/cms/pages/${page.id}/builder`} prefetch cacheFor={30}>
                                         <PencilIcon className="mr-2 h-4 w-4" />
                                         Open Builder
@@ -144,7 +160,7 @@ export default function Edit({ page, modules }: Props) {
                                 </Button>
                             ) : (
                                 <Button
-                                    variant="default"
+                                    variant="outline"
                                     onClick={() => {
                                         router.post(
                                             `/admin/cms/pages/${page.id}/publish`,
@@ -181,7 +197,7 @@ export default function Edit({ page, modules }: Props) {
                         action={`/admin/cms/pages/${page.id}`}
                         method="put"
                         options={{ preserveScroll: true }}
-                        className="max-w-2xl space-y-6"
+                        className="max-w-2xl"
                     >
                         {({ processing, errors }) => (
                             <>
@@ -199,6 +215,11 @@ export default function Edit({ page, modules }: Props) {
                                     type="hidden"
                                     name="module_name"
                                     value={moduleName ?? ''}
+                                />
+                                <input
+                                    type="hidden"
+                                    name="parent_id"
+                                    value={parentId === 'none' ? '' : parentId}
                                 />
                                 {/* Hidden inputs for all locale title/excerpt values */}
                                 {locales.map((locale) => (
@@ -227,6 +248,32 @@ export default function Edit({ page, modules }: Props) {
                                     />
                                 ))}
 
+                                <Tabs defaultValue="general" className="space-y-6">
+                                    <TabsList>
+                                        <TabsTrigger value="general">General</TabsTrigger>
+                                        <TabsTrigger value="seo">SEO</TabsTrigger>
+                                    </TabsList>
+
+                                    <TabsContent value="general" className="space-y-6">
+                                        {pages.length > 0 && (
+                                            <div className="grid gap-2">
+                                                <Label>Parent page</Label>
+                                                <Select value={parentId} onValueChange={setParentId}>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="No parent (top-level)" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="none">— No parent (top-level) —</SelectItem>
+                                                        {pages.map((p) => (
+                                                            <SelectItem key={p.id} value={String(p.id)}>
+                                                                /{typeof p.title === 'string' ? p.title : Object.values(p.title)[0]}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <InputError message={(errors as any).parent_id} />
+                                            </div>
+                                        )}
                                 <div className="grid gap-2">
                                     <div className="flex items-center justify-between">
                                         <Label>Title</Label>
@@ -239,12 +286,16 @@ export default function Edit({ page, modules }: Props) {
                                     <Input
                                         required
                                         value={titleValues[activeLocale] ?? ''}
-                                        onChange={(e) =>
+                                        onChange={(e) => {
+                                            const value = e.target.value;
                                             setTitleValues((prev) => ({
                                                 ...prev,
-                                                [activeLocale]: e.target.value,
-                                            }))
-                                        }
+                                                [activeLocale]: value,
+                                            }));
+                                            if (!isSlugManual && activeLocale === defaultLocale) {
+                                                setSlug(slugify(value));
+                                            }
+                                        }}
                                     />
                                     <InputError message={errors.title} />
                                 </div>
@@ -255,12 +306,26 @@ export default function Edit({ page, modules }: Props) {
                                         id="slug"
                                         name="slug"
                                         required
-                                        defaultValue={page.slug}
+                                        value={slug}
+                                        readOnly={!isSlugManual}
+                                        onChange={(e) => setSlug(slugify(e.target.value))}
                                     />
-                                    <p className="text-xs text-muted-foreground">
-                                        The canonical slug used as the default URL.
-                                    </p>
                                     <InputError message={errors.slug} />
+                                    <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <input
+                                            type="checkbox"
+                                            checked={isSlugManual}
+                                            onChange={(e) => {
+                                                const manual = e.target.checked;
+                                                setIsSlugManual(manual);
+                                                if (!manual) {
+                                                    setSlug(slugify(titleValues[defaultLocale] ?? ''));
+                                                }
+                                            }}
+                                            className="h-4 w-4 rounded border-input"
+                                        />
+                                        Set slug manually
+                                    </label>
                                 </div>
 
                                 {translatableLocales.length > 0 && (
@@ -452,93 +517,85 @@ export default function Edit({ page, modules }: Props) {
                                             />
                                         </div>
                                     )}
+                                    </TabsContent>
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="seo_title">SEO title</Label>
-                                    <Input
-                                        id="seo_title"
-                                        name="seo_title"
-                                        defaultValue={page.seo_title ?? ''}
-                                    />
-                                    <InputError message={errors.seo_title} />
-                                </div>
+                                    <TabsContent value="seo" className="space-y-6">
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="seo_title">SEO title</Label>
+                                            <Input
+                                                id="seo_title"
+                                                name="seo_title"
+                                                defaultValue={page.seo_title ?? ''}
+                                            />
+                                            <InputError message={errors.seo_title} />
+                                        </div>
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="seo_description">
-                                        SEO description
-                                    </Label>
-                                    <Textarea
-                                        id="seo_description"
-                                        name="seo_description"
-                                        defaultValue={
-                                            page.seo_description ?? ''
-                                        }
-                                    />
-                                    <InputError
-                                        message={errors.seo_description}
-                                    />
-                                </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="seo_description">SEO description</Label>
+                                            <Textarea
+                                                id="seo_description"
+                                                name="seo_description"
+                                                defaultValue={page.seo_description ?? ''}
+                                            />
+                                            <InputError message={errors.seo_description} />
+                                        </div>
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="seo_canonical">
-                                        Canonical URL
-                                    </Label>
-                                    <Input
-                                        id="seo_canonical"
-                                        name="seo_canonical"
-                                        defaultValue={page.seo_canonical ?? ''}
-                                    />
-                                    <InputError
-                                        message={errors.seo_canonical}
-                                    />
-                                </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="seo_canonical">Canonical URL</Label>
+                                            <Input
+                                                id="seo_canonical"
+                                                name="seo_canonical"
+                                                defaultValue={page.seo_canonical ?? ''}
+                                            />
+                                            <InputError message={errors.seo_canonical} />
+                                        </div>
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="meta_robots">Meta Robots</Label>
-                                    <select
-                                        id="meta_robots"
-                                        name="meta_robots"
-                                        defaultValue={page.meta_robots ?? 'index, follow'}
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                                    >
-                                        <option value="index, follow">Index &amp; Follow (Recommended)</option>
-                                        <option value="noindex, follow">No Index, Follow</option>
-                                        <option value="index, nofollow">Index, No Follow</option>
-                                        <option value="noindex, nofollow">No Index, No Follow</option>
-                                    </select>
-                                    <InputError message={errors.meta_robots} />
-                                </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="meta_robots">Meta Robots</Label>
+                                            <select
+                                                id="meta_robots"
+                                                name="meta_robots"
+                                                defaultValue={page.meta_robots ?? 'index, follow'}
+                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                                            >
+                                                <option value="index, follow">Index &amp; Follow (Recommended)</option>
+                                                <option value="noindex, follow">No Index, Follow</option>
+                                                <option value="index, nofollow">Index, No Follow</option>
+                                                <option value="noindex, nofollow">No Index, No Follow</option>
+                                            </select>
+                                            <InputError message={errors.meta_robots} />
+                                        </div>
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="og_image">OG Image URL</Label>
-                                    <Input
-                                        id="og_image"
-                                        name="og_image"
-                                        defaultValue={page.og_image ?? ''}
-                                        placeholder="https://example.com/og-image.jpg"
-                                    />
-                                    <InputError message={errors.og_image} />
-                                </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="og_image">OG Image URL</Label>
+                                            <Input
+                                                id="og_image"
+                                                name="og_image"
+                                                defaultValue={page.og_image ?? ''}
+                                                placeholder="https://example.com/og-image.jpg"
+                                            />
+                                            <InputError message={errors.og_image} />
+                                        </div>
 
-                                <div className="flex items-center gap-3">
-                                    <input
-                                        type="checkbox"
-                                        id="sitemap_exclude"
-                                        name="sitemap_exclude"
-                                        value="1"
-                                        defaultChecked={page.sitemap_exclude ?? false}
-                                        className="h-4 w-4 rounded border-input"
-                                    />
-                                    <Label htmlFor="sitemap_exclude">Exclude from XML sitemap</Label>
-                                </div>
+                                        <div className="flex items-center gap-3">
+                                            <input
+                                                type="checkbox"
+                                                id="sitemap_exclude"
+                                                name="sitemap_exclude"
+                                                value="1"
+                                                defaultChecked={page.sitemap_exclude ?? false}
+                                                className="h-4 w-4 rounded border-input"
+                                            />
+                                            <Label htmlFor="sitemap_exclude">Exclude from XML sitemap</Label>
+                                        </div>
+                                    </TabsContent>
 
-                                <div className="flex items-center gap-4">
-                                    <Button type="submit" disabled={processing}>
-                                        {processing
-                                            ? 'Saving...'
-                                            : 'Save Changes'}
-                                    </Button>
-                                </div>
+                                    <div className="flex items-center gap-4 pt-2">
+                                        <Button type="submit" disabled={processing}>
+                                            {processing ? 'Saving...' : 'Save Changes'}
+                                        </Button>
+                                    </div>
+                                </Tabs>
                             </>
                         )}
                     </Form>

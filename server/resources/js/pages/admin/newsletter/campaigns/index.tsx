@@ -189,7 +189,7 @@ export default function CampaignsIndex({ campaigns, filters }: Props) {
                         <CopyIcon className="mr-1 h-3 w-3" />
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Campaign"
                         description={`Are you sure you want to delete "${row.original.name}"?`}

@@ -160,7 +160,7 @@ export default function ReusableBlocksIndex({
                                                 Edit
                                             </Button>
                                             <Button
-                                                variant="ghost"
+                                                variant="outline"
                                                 size="sm"
                                                 className="text-destructive hover:text-destructive"
                                                 onClick={() => setDeleteBlock(block)}
@@ -241,7 +241,7 @@ export default function ReusableBlocksIndex({
                         >
                             Cancel
                         </Button>
-                        <Button variant="destructive" onClick={handleDelete}>
+                        <Button variant="outline" onClick={handleDelete}>
                             Delete
                         </Button>
                     </DialogFooter>

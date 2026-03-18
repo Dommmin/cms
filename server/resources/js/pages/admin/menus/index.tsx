@@ -112,7 +112,7 @@ export default function MenusIndex({ menus, filters, locations }: Props) {
                         <CopyIcon className="mr-1 h-3 w-3" />
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Menu"
                         description={`Are you sure you want to delete "${row.original.name}"? All menu items will be deleted.`}

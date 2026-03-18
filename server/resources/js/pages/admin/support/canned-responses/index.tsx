@@ -71,7 +71,7 @@ export default function CannedResponsesIndex({ canned_responses }: Props) {
                         </Link>
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Response"
                         description="Are you sure you want to delete this canned response?"

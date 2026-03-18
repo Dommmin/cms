@@ -104,7 +104,7 @@ interface ConfirmButtonProps {
     description?: string;
     confirmLabel?: string;
     cancelLabel?: string;
-    variant?: 'default' | 'destructive';
+    variant?: 'default' | 'destructive' | 'outline';
     size?: 'default' | 'sm' | 'lg' | 'icon';
     disabled?: boolean;
     className?: string;
@@ -117,7 +117,7 @@ export function ConfirmButton({
     description = 'This action cannot be undone.',
     confirmLabel = 'Confirm',
     cancelLabel = 'Cancel',
-    variant = 'default',
+    variant = 'outline',
     size = 'default',
     disabled = false,
     className,
@@ -128,7 +128,7 @@ export function ConfirmButton({
     return (
         <>
             <Button
-                variant={variant === 'destructive' ? 'destructive' : 'default'}
+                variant="outline"
                 size={size}
                 disabled={disabled}
                 onClick={() => setOpen(true)}

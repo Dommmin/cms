@@ -99,7 +99,7 @@ export const productColumns: ColumnDef<ProductRow>[] = [
                     </Link>
                 </Button>
                 <ConfirmButton
-                    variant="destructive"
+                    variant="outline"
                     size="sm"
                     title="Delete Product"
                     description={`Are you sure you want to delete "${resolveLocalizedText(row.original.name)}"? This action cannot be undone.`}

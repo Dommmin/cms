@@ -119,7 +119,7 @@ export default function FormSubmissionsIndex({ submissions, filters }: IndexProp
                         </Link>
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Submission"
                         description="Are you sure you want to delete this submission?"

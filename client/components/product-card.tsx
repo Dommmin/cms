@@ -10,7 +10,7 @@ import { useLocalePath } from "@/hooks/use-locale";
 import { useAddToWishlist, useIsInWishlist, useRemoveFromWishlist } from "@/hooks/use-wishlist";
 import { useAddToCart } from "@/hooks/use-cart";
 import { useMe } from "@/hooks/use-auth";
-import { useCurrency } from "@/hooks/use-currency";
+import { PriceDisplay } from "@/components/price-display";
 import type { Product } from "@/types/api";
 
 interface Props {
@@ -20,9 +20,6 @@ interface Props {
 export function ProductCard({ product }: Props) {
   const { t } = useTranslation();
   const lp = useLocalePath();
-  const { formatPrice } = useCurrency();
-  const price = formatPrice(product.price_min);
-
   const firstVariantId = product.variants?.[0]?.id ?? 0;
   const { data: user } = useMe();
   const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
@@ -47,7 +44,7 @@ export function ProductCard({ product }: Props) {
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-lg">
-      <Link href={lp(`/products/${product.slug}`)} className="flex flex-col">
+      <Link href={lp(`/products/${product.slug}`)} className="flex flex-1 flex-col">
         <div className="relative aspect-square overflow-hidden bg-muted">
           {product.thumbnail?.url ? (
             <Image
@@ -98,22 +95,13 @@ export function ProductCard({ product }: Props) {
             </span>
           )}
           <h3 className="line-clamp-2 font-medium leading-snug">{product.name}</h3>
-          <div className="mt-auto pt-2">
-            <div className="flex items-baseline gap-2">
-              <span className="text-lg font-semibold">{price}</span>
-              {product.is_on_sale && product.compare_at_price_min && (
-                <span className="text-sm text-muted-foreground line-through">
-                  {formatPrice(product.compare_at_price_min)}
-                </span>
-              )}
-            </div>
-            {product.is_on_sale && product.omnibus_price_min !== null && (
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                {t("product.omnibus_label", "Lowest price in last 30 days")}:{" "}
-                <span className="font-medium">{formatPrice(product.omnibus_price_min)}</span>
-              </p>
-            )}
-          </div>
+          <PriceDisplay
+            price={product.price_min}
+            compareAtPrice={product.compare_at_price_min}
+            omnibusPrice={product.omnibus_price_min}
+            isOnSale={product.is_on_sale}
+            className="mt-auto pt-2"
+          />
         </div>
       </Link>
       <div className="px-4 pb-4">

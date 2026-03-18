@@ -91,7 +91,7 @@ export default function SegmentsIndex({ segments, filters }: Props) {
                         </Link>
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Segment"
                         description={`Are you sure you want to delete "${row.original.name}"?`}

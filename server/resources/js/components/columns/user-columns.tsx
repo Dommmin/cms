@@ -33,7 +33,7 @@ export const userColumns: ColumnDef<User>[] = [
                     row.original.roles.map((role: { name: string }) => (
                         <Badge
                             key={role.name}
-                            variant="secondary"
+                            variant="outline"
                             className="text-xs"
                         >
                             {role.name}
@@ -76,7 +76,7 @@ export const userColumns: ColumnDef<User>[] = [
                     </Link>
                 </Button>
                 <ConfirmButton
-                    variant="destructive"
+                    variant="outline"
                     size="sm"
                     title="Delete User"
                     description={`Are you sure you want to delete "${row.original.name}"? This action cannot be undone.`}

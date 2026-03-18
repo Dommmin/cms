@@ -94,7 +94,7 @@ export default function BlogCategoriesIndex({ categories, filters }: Props) {
                         </Link>
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Category"
                         description="Are you sure you want to delete this category? Posts will not be deleted."

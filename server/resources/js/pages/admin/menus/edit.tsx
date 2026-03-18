@@ -130,7 +130,7 @@ function MenuItemEditor({
                     <div className="flex shrink-0 items-center gap-1">
                         {depth === 0 && (
                             <Button
-                                variant="ghost"
+                                variant="outline"
                                 size="sm"
                                 type="button"
                                 onClick={onAddChild}
@@ -141,7 +141,7 @@ function MenuItemEditor({
                         )}
                         {hasChildren && (
                             <Button
-                                variant="ghost"
+                                variant="outline"
                                 size="sm"
                                 type="button"
                                 onClick={() => setExpanded((p) => !p)}
@@ -155,7 +155,7 @@ function MenuItemEditor({
                             </Button>
                         )}
                         <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
                             type="button"
                             onClick={onDelete}

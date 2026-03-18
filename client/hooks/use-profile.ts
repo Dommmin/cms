@@ -115,6 +115,10 @@ export function useSetDefaultAddress() {
     mutationFn: (id: number) => setDefaultAddress(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: profileKeys.addresses });
+      toast.success("Default address updated.");
+    },
+    onError: () => {
+      toast.error("Failed to update default address.");
     },
   });
 }

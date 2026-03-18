@@ -153,7 +153,7 @@ export function VersionHistory({ modelType, modelId }: Props) {
                                             </span>
                                             {v.event !== 'deleted' && v.version_number > 1 && (
                                                 <Button
-                                                    variant="ghost"
+                                                    variant="outline"
                                                     size="sm"
                                                     className="h-6 px-2"
                                                     disabled={restoring === v.version_number}

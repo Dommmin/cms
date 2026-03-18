@@ -138,7 +138,7 @@ export default function ThemesIndex({ themes, filters }: Props) {
                         Duplicate
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Theme"
                         description={`Are you sure you want to delete "${row.original.name}"?`}

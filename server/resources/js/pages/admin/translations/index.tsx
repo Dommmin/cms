@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { CheckIcon, PlusIcon, TrashIcon, XIcon } from 'lucide-react';
+import { CheckIcon, RefreshCwIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
@@ -8,15 +8,7 @@ import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
     Select,
     SelectContent,
@@ -56,6 +48,7 @@ type Props = {
         locale?: string;
         group?: string;
         search?: string;
+        missing?: string;
     };
 };
 
@@ -65,17 +58,28 @@ const ALL_GROUPS_VALUE = 'all-groups';
 export default function TranslationsIndex({ translations, locales, groups, filters }: Props) {
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editValue, setEditValue] = useState('');
-    const [createOpen, setCreateOpen] = useState(false);
-    const [createForm, setCreateForm] = useState({
-        locale_code: filters.locale ?? 'en',
-        group: '',
-        key: '',
-        value: '',
-    });
-    const [createProcessing, setCreateProcessing] = useState(false);
+    const [syncing, setSyncing] = useState(false);
 
-    const handleFilterChange = (key: string, value: string) => {
-        router.get('/admin/translations', { ...filters, [key]: value || undefined, page: undefined }, { preserveState: true, replace: true });
+    const handleSync = () => {
+        setSyncing(true);
+        router.post(
+            '/admin/translations/sync',
+            {},
+            {
+                onSuccess: () => toast.success('Translations synced'),
+                onError: () => toast.error('Sync failed'),
+                onFinish: () => setSyncing(false),
+                preserveScroll: true,
+            },
+        );
+    };
+
+    const handleFilterChange = (key: string, value: string | boolean) => {
+        router.get(
+            '/admin/translations',
+            { ...filters, [key]: value || undefined, page: undefined },
+            { preserveState: true, replace: true },
+        );
     };
 
     const handleGroupFilterChange = (value: string) => {
@@ -106,18 +110,7 @@ export default function TranslationsIndex({ translations, locales, groups, filte
         );
     };
 
-    const handleCreate = () => {
-        setCreateProcessing(true);
-        router.post('/admin/translations', createForm, {
-            onSuccess: () => {
-                setCreateOpen(false);
-                toast.success('Translation created');
-                setCreateForm((f) => ({ ...f, group: '', key: '', value: '' }));
-            },
-            onError: () => toast.error('Failed to create translation'),
-            onFinish: () => setCreateProcessing(false),
-        });
-    };
+    const isMissing = filters.missing === '1' || filters.missing === 'true';
 
     const columns: ColumnDef<Translation>[] = [
         {
@@ -153,10 +146,10 @@ export default function TranslationsIndex({ translations, locales, groups, filte
                                     if (e.key === 'Escape') setEditingId(null);
                                 }}
                             />
-                            <Button variant="ghost" size="sm" onClick={() => saveEdit(row.original)}>
+                            <Button variant="outline" size="sm" onClick={() => saveEdit(row.original)}>
                                 <CheckIcon className="h-4 w-4 text-green-600" />
                             </Button>
-                            <Button variant="ghost" size="sm" onClick={() => setEditingId(null)}>
+                            <Button variant="outline" size="sm" onClick={() => setEditingId(null)}>
                                 <XIcon className="h-4 w-4 text-muted-foreground" />
                             </Button>
                         </div>
@@ -164,10 +157,10 @@ export default function TranslationsIndex({ translations, locales, groups, filte
                 }
                 return (
                     <span
-                        className="cursor-pointer text-sm hover:underline"
+                        className={`cursor-pointer text-sm hover:underline ${!row.original.value ? 'italic text-muted-foreground' : ''}`}
                         onClick={() => startEdit(row.original)}
                     >
-                        {row.original.value}
+                        {row.original.value || '— missing —'}
                     </span>
                 );
             },
@@ -181,7 +174,7 @@ export default function TranslationsIndex({ translations, locales, groups, filte
                         Edit
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Translation"
                         description="Are you sure you want to delete this translation?"
@@ -192,7 +185,6 @@ export default function TranslationsIndex({ translations, locales, groups, filte
                             });
                         }}
                     >
-                        <TrashIcon className="h-3 w-3" />
                         Delete
                     </ConfirmButton>
                 </div>
@@ -204,11 +196,11 @@ export default function TranslationsIndex({ translations, locales, groups, filte
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Translations" />
             <Wrapper>
-                <PageHeader title="Translations" description="Manage storefront translations">
+                <PageHeader title="Translations" description="Translations are discovered automatically from frontend t() calls.">
                     <PageHeaderActions>
-                        <Button onClick={() => setCreateOpen(true)}>
-                            <PlusIcon className="mr-2 h-4 w-4" />
-                            Add Translation
+                        <Button variant="outline" onClick={handleSync} disabled={syncing}>
+                            <RefreshCwIcon className={`mr-2 h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
+                            {syncing ? 'Syncing…' : 'Sync from source'}
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
@@ -241,6 +233,15 @@ export default function TranslationsIndex({ translations, locales, groups, filte
                             ))}
                         </SelectContent>
                     </Select>
+
+                    <Button
+                        variant={isMissing ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => handleFilterChange('missing', isMissing ? '' : '1')}
+                    >
+                        Missing only
+                        {isMissing && ' ✓'}
+                    </Button>
                 </div>
 
                 <DataTable
@@ -260,72 +261,6 @@ export default function TranslationsIndex({ translations, locales, groups, filte
                     baseUrl="/admin/translations"
                 />
             </Wrapper>
-
-            <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Add Translation</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 py-2">
-                        <div className="space-y-1">
-                            <Label>Locale</Label>
-                            <Select
-                                value={createForm.locale_code}
-                                onValueChange={(v) => setCreateForm((f) => ({ ...f, locale_code: v }))}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {locales.map((l) => (
-                                        <SelectItem key={l.code} value={l.code}>
-                                            {l.flag_emoji} {l.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1">
-                                <Label>Group</Label>
-                                <Input
-                                    value={createForm.group}
-                                    onChange={(e) => setCreateForm((f) => ({ ...f, group: e.target.value }))}
-                                    placeholder="nav"
-                                    list="groups-list"
-                                />
-                                <datalist id="groups-list">
-                                    {groups.map((g) => <option key={g} value={g} />)}
-                                </datalist>
-                            </div>
-                            <div className="space-y-1">
-                                <Label>Key</Label>
-                                <Input
-                                    value={createForm.key}
-                                    onChange={(e) => setCreateForm((f) => ({ ...f, key: e.target.value }))}
-                                    placeholder="home"
-                                />
-                            </div>
-                        </div>
-                        <div className="space-y-1">
-                            <Label>Value</Label>
-                            <Input
-                                value={createForm.value}
-                                onChange={(e) => setCreateForm((f) => ({ ...f, value: e.target.value }))}
-                                placeholder="Translation text"
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setCreateOpen(false)}>
-                            Cancel
-                        </Button>
-                        <Button onClick={handleCreate} disabled={createProcessing}>
-                            {createProcessing ? 'Saving...' : 'Save'}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </AppLayout>
     );
 }

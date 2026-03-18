@@ -150,7 +150,7 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
                     <div className="flex items-center gap-2">
                         {r.status === 'pending' && (
                             <ConfirmButton
-                                variant="default"
+                                variant="outline"
                                 size="sm"
                                 title="Approve Referral"
                                 description="Approve this referral and mark the commission as ready to pay?"
@@ -168,7 +168,7 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
                         )}
                         {r.status === 'approved' && (
                             <ConfirmButton
-                                variant="default"
+                                variant="outline"
                                 size="sm"
                                 title="Mark as Paid"
                                 description={`Mark commission of ${fmt(r.commission_amount)} as paid to ${r.affiliate_code.user.name}?`}
@@ -185,7 +185,7 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
                         )}
                         {['pending', 'approved'].includes(r.status) && (
                             <ConfirmButton
-                                variant="destructive"
+                                variant="outline"
                                 size="sm"
                                 title="Cancel Referral"
                                 description="Cancel this referral? The commission will not be paid."

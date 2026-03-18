@@ -81,7 +81,7 @@ export default function CookieConsentsIndex({
             cell: ({ row }) =>
                 row.original.granted ? (
                     <Badge
-                        variant="default"
+                        variant="outline"
                         className="bg-green-100 text-green-800"
                     >
                         <CheckCircleIcon className="mr-1 h-3 w-3" />
@@ -89,7 +89,7 @@ export default function CookieConsentsIndex({
                     </Badge>
                 ) : (
                     <Badge
-                        variant="secondary"
+                        variant="outline"
                         className="bg-red-100 text-red-800"
                     >
                         <XCircleIcon className="mr-1 h-3 w-3" />

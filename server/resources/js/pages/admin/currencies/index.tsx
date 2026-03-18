@@ -124,7 +124,7 @@ export default function CurrenciesIndex({ currencies, filters }: Props) {
                         </Link>
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Currency"
                         description={`Are you sure you want to delete "${row.original.code}"?`}

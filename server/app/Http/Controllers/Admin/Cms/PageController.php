@@ -36,8 +36,15 @@ class PageController extends Controller
 
     public function create(): Response
     {
+        $pages = Page::query()
+            ->whereNull('parent_id')
+            ->with(['children:id,title,parent_id'])
+            ->orderBy('title')
+            ->get(['id', 'title', 'slug']);
+
         return inertia('admin/cms/pages/create', [
             'modules' => config('cms.modules'),
+            'pages'   => $pages,
         ]);
     }
 
@@ -59,12 +66,19 @@ class PageController extends Controller
 
     public function edit(Page $page): Response
     {
+        $pages = Page::query()
+            ->whereNull('parent_id')
+            ->where('id', '!=', $page->id)
+            ->orderBy('title')
+            ->get(['id', 'title', 'slug']);
+
         return inertia('admin/cms/pages/edit', [
             'page' => array_merge($page->toArray(), [
                 'title' => $page->getTranslations('title'),
                 'excerpt' => $page->getTranslations('excerpt'),
             ]),
             'modules' => config('cms.modules'),
+            'pages' => $pages,
         ]);
     }
 

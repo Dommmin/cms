@@ -15,6 +15,7 @@ import { resolveLocalizedText } from '@/lib/localized-text';
 export type PageRow = {
     id: number;
     parent_id: number | null;
+    parent?: { id: number; title: string | Record<string, string>; slug: string } | null;
     title: string | Record<string, string>;
     slug: string;
     page_type: string;
@@ -29,19 +30,30 @@ export const pageColumns: ColumnDef<PageRow>[] = [
         header: 'Title',
         cell: ({ row }) => (
             <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
-                    <FileTextIcon className="h-4 w-4" />
+                {row.original.parent_id ? (
+                    <span className="ml-4 text-muted-foreground">↳</span>
+                ) : (
+                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
+                        <FileTextIcon className="h-4 w-4" />
+                    </div>
+                )}
+                <div>
+                    <span className="font-medium">{resolveLocalizedText(row.original.title)}</span>
+                    {row.original.parent && (
+                        <p className="text-xs text-muted-foreground">
+                            under /{resolveLocalizedText(row.original.parent.title)}
+                        </p>
+                    )}
                 </div>
-                <span className="font-medium">{resolveLocalizedText(row.original.title)}</span>
             </div>
         ),
     },
     {
         accessorKey: 'slug',
-        header: 'Slug',
+        header: 'Path',
         cell: ({ row }) => (
             <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
-                {row.original.slug}
+                {row.original.parent ? `/${row.original.parent.slug}/` : '/'}{row.original.slug}
             </code>
         ),
     },
@@ -108,7 +120,7 @@ export const pageColumns: ColumnDef<PageRow>[] = [
                     </Button>
                 ) : (
                     <Button
-                        variant="default"
+                        variant="outline"
                         size="sm"
                         onClick={() =>
                             router.post(
@@ -121,7 +133,7 @@ export const pageColumns: ColumnDef<PageRow>[] = [
                     </Button>
                 )}
                 <ConfirmButton
-                    variant="destructive"
+                    variant="outline"
                     size="sm"
                     title="Delete Page"
                     description={`Are you sure you want to delete "${resolveLocalizedText(row.original.title)}"? This action cannot be undone.`}

@@ -11,6 +11,7 @@ import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
@@ -150,8 +151,15 @@ export default function Edit({
                 <form
                     id="category-edit-form"
                     onSubmit={handleSubmit}
-                    className="max-w-xl space-y-6"
+                    className="max-w-xl"
                 >
+                    <Tabs defaultValue="general" className="space-y-6">
+                        <TabsList>
+                            <TabsTrigger value="general">General</TabsTrigger>
+                            <TabsTrigger value="seo">SEO</TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="general" className="space-y-6">
                     <div className="grid gap-2">
                         <div className="flex items-center justify-between">
                             <Label>Name</Label>
@@ -311,20 +319,20 @@ export default function Edit({
                             Active
                         </Label>
                     </div>
+                        </TabsContent>
 
-                    {/* SEO */}
-                    <div className="space-y-4 rounded-lg border p-4">
-                        <h3 className="text-sm font-medium">SEO</h3>
-                        <SeoPanel
-                            data={seoData}
-                            onChange={(field, value) =>
-                                setSeoData((prev) => ({ ...prev, [field]: value }))
-                            }
-                            errors={errors}
-                            urlPath={`products?category=${slug}`}
-                            titleFallback={nameValues[defaultLocale] ?? ''}
-                        />
-                    </div>
+                        <TabsContent value="seo" className="space-y-6">
+                            <SeoPanel
+                                data={seoData}
+                                onChange={(field, value) =>
+                                    setSeoData((prev) => ({ ...prev, [field]: value }))
+                                }
+                                errors={errors}
+                                urlPath={`products?category=${slug}`}
+                                titleFallback={nameValues[defaultLocale] ?? ''}
+                            />
+                        </TabsContent>
+                    </Tabs>
 
                     <StickyFormActions
                         formId="category-edit-form"

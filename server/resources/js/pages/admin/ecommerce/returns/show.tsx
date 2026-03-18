@@ -129,7 +129,7 @@ export default function Show({ return: returnRequest }: { return: ReturnRequest 
                     <PageHeaderActions>
                         {canApprove && (
                             <ConfirmButton
-                                variant="default"
+                                variant="outline"
                                 title="Approve Return"
                                 description="Are you sure you want to approve this return request?"
                                 onConfirm={handleApprove}
@@ -140,7 +140,7 @@ export default function Show({ return: returnRequest }: { return: ReturnRequest 
                         )}
                         {canReject && (
                             <ConfirmButton
-                                variant="destructive"
+                                variant="outline"
                                 title="Reject Return"
                                 description="Are you sure you want to reject this return request?"
                                 onConfirm={handleReject}
@@ -151,7 +151,7 @@ export default function Show({ return: returnRequest }: { return: ReturnRequest 
                         )}
                         {canProcessRefund && (
                             <ConfirmButton
-                                variant="default"
+                                variant="outline"
                                 title="Process Refund"
                                 description="Are you sure you want to process the refund for this return?"
                                 onConfirm={handleProcessRefund}

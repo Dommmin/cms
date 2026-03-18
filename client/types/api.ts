@@ -184,15 +184,15 @@ export interface Address {
   type: "billing" | "shipping";
   first_name: string;
   last_name: string;
-  company: string | null;
-  address_line_1: string;
-  address_line_2: string | null;
+  company_name: string | null;
+  street: string;
+  street2: string | null;
   city: string;
-  state: string | null;
   postal_code: string;
   country_code: string;
   phone: string | null;
   is_default: boolean;
+  full_address?: string;
 }
 
 // ── Orders ────────────────────────────────────────────────────────────────────
@@ -298,7 +298,12 @@ export interface WishlistItem {
   id: number;
   variant_id: number;
   product: Pick<Product, "id" | "name" | "slug" | "thumbnail" | "price_min">;
-  variant: Pick<ProductVariant, "id" | "sku" | "price" | "attributes">;
+  variant: Pick<ProductVariant, "id" | "sku" | "price" | "attributes"> & {
+    compare_at_price: number | null;
+    omnibus_price: number | null;
+    is_on_sale: boolean;
+    in_stock: boolean;
+  };
   added_at: string;
 }
 

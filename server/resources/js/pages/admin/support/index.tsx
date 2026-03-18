@@ -143,7 +143,7 @@ export default function SupportIndex({ conversations, filters, agents, open_coun
                         </Link>
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Conversation"
                         description="This will permanently delete the conversation and all its messages."

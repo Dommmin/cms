@@ -175,7 +175,7 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
                         </Button>
                     )}
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Post"
                         description="Are you sure you want to delete this post? This action cannot be undone."

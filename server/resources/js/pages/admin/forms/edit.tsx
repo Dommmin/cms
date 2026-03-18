@@ -187,7 +187,7 @@ function FieldEditor({
                                         />
                                         <Button
                                             type="button"
-                                            variant="ghost"
+                                            variant="outline"
                                             size="sm"
                                             onClick={() => removeOption(i)}
                                             className="text-destructive"
@@ -226,7 +226,7 @@ function FieldEditor({
 
                 <Button
                     type="button"
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     onClick={onDelete}
                     className="shrink-0 text-destructive"

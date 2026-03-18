@@ -103,7 +103,7 @@ export default function ExchangeRatesIndex({
                         </Link>
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Rate"
                         description={`Are you sure you want to delete this exchange rate?`}

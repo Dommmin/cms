@@ -109,7 +109,7 @@ export default function FaqsIndex({ faqs, filters, categories }: Props) {
                         </Link>
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete FAQ"
                         description={`Are you sure you want to delete this FAQ? This action cannot be undone.`}

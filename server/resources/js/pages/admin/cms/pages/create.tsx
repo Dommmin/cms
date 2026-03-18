@@ -1,6 +1,7 @@
 import { Link, Form, Head, router } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { slugify } from '@/lib/slug';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
@@ -24,8 +26,16 @@ type ModuleConfig = {
     description?: string;
 };
 
+type ParentPage = {
+    id: number;
+    title: string;
+    slug: string;
+    children?: { id: number; title: string }[];
+};
+
 type Props = {
     modules: Record<string, ModuleConfig>;
+    pages: ParentPage[];
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -33,7 +43,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Create', href: '/admin/cms/pages/create' },
 ];
 
-export default function Create({ modules }: Props) {
+export default function Create({ modules, pages }: Props) {
     const moduleOptions = useMemo(
         () => Object.entries(modules ?? {}),
         [modules],
@@ -42,6 +52,17 @@ export default function Create({ modules }: Props) {
     const [layout, setLayout] = useState<string>('default');
     const [pageType, setPageType] = useState<string>('blocks');
     const [moduleName, setModuleName] = useState<string | null>(null);
+    const [parentId, setParentId] = useState<string>('none');
+    const [title, setTitle] = useState('');
+    const [slug, setSlug] = useState('');
+    const [isSlugManual, setIsSlugManual] = useState(false);
+
+    const handleTitleChange = (value: string) => {
+        setTitle(value);
+        if (!isSlugManual) {
+            setSlug(slugify(value));
+        }
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -66,215 +87,191 @@ export default function Create({ modules }: Props) {
                 <Form
                     action="/admin/cms/pages"
                     method="post"
-                    className="max-w-2xl space-y-6"
+                    className="max-w-2xl"
                 >
                     {({ processing, errors }) => (
                         <>
                             <input type="hidden" name="layout" value={layout} />
-                            <input
-                                type="hidden"
-                                name="page_type"
-                                value={pageType}
-                            />
-                            <input
-                                type="hidden"
-                                name="module_name"
-                                value={moduleName ?? ''}
-                            />
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="title">Title</Label>
-                                <Input
-                                    id="title"
-                                    name="title"
-                                    required
-                                    autoFocus
-                                    placeholder="Page title"
-                                />
-                                <InputError message={errors.title} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="slug">Slug</Label>
-                                <Input
-                                    id="slug"
-                                    name="slug"
-                                    required
-                                    placeholder="page-slug"
-                                />
-                                <InputError message={errors.slug} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="excerpt">Excerpt</Label>
-                                <Textarea
-                                    id="excerpt"
-                                    name="excerpt"
-                                    placeholder="Short description..."
-                                />
-                                <InputError message={errors.excerpt} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label>Layout</Label>
-                                <Select
-                                    value={layout}
-                                    onValueChange={setLayout}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select layout" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="default">
-                                            Standard
-                                        </SelectItem>
-                                        <SelectItem value="full_width">
-                                            Full width
-                                        </SelectItem>
-                                        <SelectItem value="sidebar">
-                                            Sidebar
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <InputError message={errors.layout} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label>Page type</Label>
-                                <Select
-                                    value={pageType}
-                                    onValueChange={(value) => {
-                                        setPageType(value);
-                                        if (value !== 'module') {
-                                            setModuleName(null);
-                                        }
-                                    }}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select page type" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="blocks">
-                                            Blocks
-                                        </SelectItem>
-                                        <SelectItem value="module">
-                                            Module
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <InputError message={errors.page_type} />
-                            </div>
-
-                            {pageType === 'module' && (
-                                <div className="grid gap-2">
-                                    <Label>Module</Label>
-                                    <Select
-                                        value={moduleName ?? ''}
-                                        onValueChange={(value) =>
-                                            setModuleName(
-                                                value === '' ? null : value,
-                                            )
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select module" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {moduleOptions.map(([key, mod]) => (
-                                                <SelectItem
-                                                    key={key}
-                                                    value={key}
-                                                >
-                                                    {mod.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <InputError message={errors.module_name} />
-                                </div>
+                            <input type="hidden" name="page_type" value={pageType} />
+                            <input type="hidden" name="module_name" value={moduleName ?? ''} />
+                            {parentId !== 'none' && (
+                                <input type="hidden" name="parent_id" value={parentId} />
                             )}
 
-                            {pageType === 'module' &&
-                                moduleName === 'content' && (
+                            <Tabs defaultValue="general" className="space-y-6">
+                                <TabsList>
+                                    <TabsTrigger value="general">General</TabsTrigger>
+                                    <TabsTrigger value="seo">SEO</TabsTrigger>
+                                </TabsList>
+
+                                <TabsContent value="general" className="space-y-6">
+                                    {pages.length > 0 && (
+                                        <div className="grid gap-2">
+                                            <Label>Parent page</Label>
+                                            <Select value={parentId} onValueChange={setParentId}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="No parent (top-level)" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="none">— No parent (top-level) —</SelectItem>
+                                                    {pages.map((p) => (
+                                                        <SelectItem key={p.id} value={String(p.id)}>
+                                                            /{p.slug}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <InputError message={(errors as any).parent_id} />
+                                        </div>
+                                    )}
+
                                     <div className="grid gap-2">
-                                        <Label htmlFor="content_id">
-                                            Content entry ID
-                                        </Label>
+                                        <Label htmlFor="title">Title</Label>
                                         <Input
-                                            id="content_id"
-                                            name="module_config[content_id]"
-                                            type="number"
-                                            placeholder="e.g. 1"
+                                            id="title"
+                                            name="title"
+                                            required
+                                            autoFocus
+                                            placeholder="Page title"
+                                            value={title}
+                                            onChange={(e) => handleTitleChange(e.target.value)}
                                         />
-                                        <InputError
-                                            message={
-                                                (errors as any)[
-                                                    'module_config.content_id'
-                                                ]
-                                            }
-                                        />
+                                        <InputError message={errors.title} />
                                     </div>
-                                )}
 
-                            {pageType === 'module' && moduleName === 'faq' && (
-                                <div className="grid gap-2">
-                                    <Label htmlFor="category">
-                                        FAQ category (optional)
-                                    </Label>
-                                    <Input
-                                        id="category"
-                                        name="module_config[category]"
-                                        placeholder="e.g. payments"
-                                    />
-                                    <InputError
-                                        message={
-                                            (errors as any)[
-                                                'module_config.category'
-                                            ]
-                                        }
-                                    />
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="slug">Slug</Label>
+                                        <Input
+                                            id="slug"
+                                            name="slug"
+                                            required
+                                            placeholder="page-slug"
+                                            value={slug}
+                                            readOnly={!isSlugManual}
+                                            onChange={(e) => setSlug(slugify(e.target.value))}
+                                        />
+                                        <InputError message={errors.slug} />
+                                        <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                                            <input
+                                                type="checkbox"
+                                                checked={isSlugManual}
+                                                onChange={(e) => {
+                                                    const manual = e.target.checked;
+                                                    setIsSlugManual(manual);
+                                                    if (!manual) {
+                                                        setSlug(slugify(title));
+                                                    }
+                                                }}
+                                                className="h-4 w-4 rounded border-input"
+                                            />
+                                            Set slug manually
+                                        </label>
+                                    </div>
+
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="excerpt">Excerpt</Label>
+                                        <Textarea id="excerpt" name="excerpt" placeholder="Short description..." />
+                                        <InputError message={errors.excerpt} />
+                                    </div>
+
+                                    <div className="grid gap-2">
+                                        <Label>Layout</Label>
+                                        <Select value={layout} onValueChange={setLayout}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select layout" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="default">Standard</SelectItem>
+                                                <SelectItem value="full_width">Full width</SelectItem>
+                                                <SelectItem value="sidebar">Sidebar</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <InputError message={errors.layout} />
+                                    </div>
+
+                                    <div className="grid gap-2">
+                                        <Label>Page type</Label>
+                                        <Select
+                                            value={pageType}
+                                            onValueChange={(value) => {
+                                                setPageType(value);
+                                                if (value !== 'module') setModuleName(null);
+                                            }}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select page type" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="blocks">Blocks</SelectItem>
+                                                <SelectItem value="module">Module</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <InputError message={errors.page_type} />
+                                    </div>
+
+                                    {pageType === 'module' && (
+                                        <div className="grid gap-2">
+                                            <Label>Module</Label>
+                                            <Select
+                                                value={moduleName ?? ''}
+                                                onValueChange={(value) => setModuleName(value === '' ? null : value)}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select module" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {moduleOptions.map(([key, mod]) => (
+                                                        <SelectItem key={key} value={key}>{mod.label}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <InputError message={errors.module_name} />
+                                        </div>
+                                    )}
+
+                                    {pageType === 'module' && moduleName === 'content' && (
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="content_id">Content entry ID</Label>
+                                            <Input id="content_id" name="module_config[content_id]" type="number" placeholder="e.g. 1" />
+                                            <InputError message={(errors as any)['module_config.content_id']} />
+                                        </div>
+                                    )}
+
+                                    {pageType === 'module' && moduleName === 'faq' && (
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="category">FAQ category (optional)</Label>
+                                            <Input id="category" name="module_config[category]" placeholder="e.g. payments" />
+                                            <InputError message={(errors as any)['module_config.category']} />
+                                        </div>
+                                    )}
+                                </TabsContent>
+
+                                <TabsContent value="seo" className="space-y-6">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="seo_title">SEO title</Label>
+                                        <Input id="seo_title" name="seo_title" placeholder="SEO title" />
+                                        <InputError message={errors.seo_title} />
+                                    </div>
+
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="seo_description">SEO description</Label>
+                                        <Textarea id="seo_description" name="seo_description" placeholder="SEO description" />
+                                        <InputError message={errors.seo_description} />
+                                    </div>
+
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="seo_canonical">Canonical URL</Label>
+                                        <Input id="seo_canonical" name="seo_canonical" placeholder="https://..." />
+                                        <InputError message={errors.seo_canonical} />
+                                    </div>
+                                </TabsContent>
+
+                                <div className="flex items-center gap-4 pt-2">
+                                    <Button type="submit" disabled={processing}>
+                                        {processing ? 'Creating...' : 'Create Page'}
+                                    </Button>
                                 </div>
-                            )}
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="seo_title">SEO title</Label>
-                                <Input
-                                    id="seo_title"
-                                    name="seo_title"
-                                    placeholder="SEO title"
-                                />
-                                <InputError message={errors.seo_title} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="seo_description">
-                                    SEO description
-                                </Label>
-                                <Textarea
-                                    id="seo_description"
-                                    name="seo_description"
-                                    placeholder="SEO description"
-                                />
-                                <InputError message={errors.seo_description} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="seo_canonical">
-                                    Canonical URL
-                                </Label>
-                                <Input
-                                    id="seo_canonical"
-                                    name="seo_canonical"
-                                    placeholder="https://..."
-                                />
-                                <InputError message={errors.seo_canonical} />
-                            </div>
-
-                            <div className="flex items-center gap-4">
-                                <Button type="submit" disabled={processing}>
-                                    {processing ? 'Creating...' : 'Create Page'}
-                                </Button>
-                            </div>
+                            </Tabs>
                         </>
                     )}
                 </Form>

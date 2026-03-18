@@ -16,6 +16,7 @@ class UserIndexQuery
     public function execute()
     {
         return User::query()
+            ->with('roles:id,name')
             ->when($this->request->search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");

@@ -112,7 +112,7 @@ export default function StoresIndex({ stores, filters }: Props) {
                         </Link>
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Store"
                         description="Are you sure you want to delete this store? This action cannot be undone."

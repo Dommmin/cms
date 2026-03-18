@@ -7,8 +7,9 @@ import { ArrowLeft, CheckCircle2, Circle, Package, Truck } from "lucide-react";
 
 import { useOrder, useCancelOrder } from "@/hooks/use-orders";
 import { useLocalePath } from "@/hooks/use-locale";
+import { useCurrency } from "@/hooks/use-currency";
+import { useTranslation } from "@/hooks/use-translation";
 import { api } from "@/lib/axios";
-import { formatPrice } from "@/lib/format";
 import type { OrderStatus } from "@/types/api";
 
 const STATUS_COLORS: Record<string, string> = {
@@ -24,19 +25,20 @@ const STATUS_COLORS: Record<string, string> = {
 const STATUS_STEPS: OrderStatus[] = ["pending", "confirmed", "processing", "shipped", "delivered"];
 
 const RETURN_TYPES = [
-  { value: "return", label: "Return" },
-  { value: "exchange", label: "Exchange" },
-  { value: "complaint", label: "Complaint" },
+  { value: "return", labelKey: "order.return_type_return" as const },
+  { value: "exchange", labelKey: "order.return_type_exchange" as const },
+  { value: "complaint", labelKey: "order.return_type_complaint" as const },
 ];
 
 function StatusTimeline({ status, history }: { status: OrderStatus; history?: Array<{ status: string; note: string | null; created_at: string }> }) {
+  const { t } = useTranslation();
   const isCancelled = status === "cancelled" || status === "refunded";
   const currentIndex = STATUS_STEPS.indexOf(status);
 
   if (isCancelled) {
     return (
       <div className="rounded-xl border border-border bg-card p-4">
-        <h3 className="mb-3 font-semibold">Order Status</h3>
+        <h3 className="mb-3 font-semibold">{t("order.status", "Order Status")}</h3>
         <div className="flex items-center gap-2 text-sm text-red-600">
           <Circle className="h-4 w-4 fill-red-100" />
           <span className="capitalize font-medium">{status}</span>
@@ -47,7 +49,7 @@ function StatusTimeline({ status, history }: { status: OrderStatus; history?: Ar
 
   return (
     <div className="rounded-xl border border-border bg-card p-4">
-      <h3 className="mb-4 font-semibold">Order Progress</h3>
+      <h3 className="mb-4 font-semibold">{t("order.progress", "Order Progress")}</h3>
       <ol className="relative flex items-start justify-between">
         {STATUS_STEPS.map((step, i) => {
           const isDone = i < currentIndex;
@@ -101,6 +103,8 @@ export default function OrderDetailPage() {
   const lp = useLocalePath();
   const { data: order, isLoading } = useOrder(reference);
   const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder();
+  const { formatPrice } = useCurrency();
+  const { t } = useTranslation();
 
   const [showReturnForm, setShowReturnForm] = useState(false);
   const [returnType, setReturnType] = useState("return");
@@ -147,9 +151,9 @@ export default function OrderDetailPage() {
   if (!order) {
     return (
       <div className="py-16 text-center text-muted-foreground">
-        Order not found.{" "}
+        {t("order.not_found", "Order not found.")}{" "}
         <Link href={lp("/account/orders")} className="underline">
-          Back to orders
+          {t("order.back_to_orders", "Back to Orders")}
         </Link>
       </div>
     );
@@ -162,7 +166,7 @@ export default function OrderDetailPage() {
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to Orders
+        {t("order.back_to_orders", "Back to Orders")}
       </Link>
 
       {/* Header */}
@@ -170,7 +174,7 @@ export default function OrderDetailPage() {
         <div>
           <h1 className="text-2xl font-bold">Order #{order.reference_number}</h1>
           <p className="text-sm text-muted-foreground">
-            Placed{" "}
+            {t("order.placed", "Placed")}{" "}
             {new Date(order.created_at).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
@@ -190,7 +194,7 @@ export default function OrderDetailPage() {
       {/* Return success */}
       {returnSuccess && (
         <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800">
-          Your return request has been submitted. We&apos;ll get back to you within 1-2 business days.
+          {t("order.return_submitted", "Your return request has been submitted. We'll get back to you within 1-2 business days.")}
         </div>
       )}
 
@@ -202,22 +206,22 @@ export default function OrderDetailPage() {
         <div className="rounded-xl border border-border bg-card p-4">
           <h3 className="mb-3 flex items-center gap-2 font-semibold">
             <Truck className="h-4 w-4 text-muted-foreground" />
-            Shipment
+            {t("order.shipment", "Shipment")}
           </h3>
           <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
             {order.shipment.carrier && (
               <>
-                <dt className="text-muted-foreground">Carrier</dt>
+                <dt className="text-muted-foreground">{t("order.carrier", "Carrier")}</dt>
                 <dd className="font-medium">{order.shipment.carrier}</dd>
               </>
             )}
             {order.shipment.tracking_number && (
               <>
-                <dt className="text-muted-foreground">Tracking</dt>
+                <dt className="text-muted-foreground">{t("order.tracking", "Tracking")}</dt>
                 <dd className="font-medium font-mono">{order.shipment.tracking_number}</dd>
               </>
             )}
-            <dt className="text-muted-foreground">Status</dt>
+            <dt className="text-muted-foreground">{t("order.status", "Status")}</dt>
             <dd className="capitalize font-medium">{order.shipment.status}</dd>
           </dl>
         </div>
@@ -226,7 +230,7 @@ export default function OrderDetailPage() {
       {/* Items */}
       <div className="rounded-xl border border-border bg-card">
         <div className="border-b border-border px-4 py-3">
-          <h2 className="font-semibold">Items</h2>
+          <h2 className="font-semibold">{t("order.items", "Items")}</h2>
         </div>
         <ul className="divide-y divide-border">
           {order.items?.map((item) => (
@@ -236,9 +240,9 @@ export default function OrderDetailPage() {
                 <div>
                   <p className="text-sm font-medium">{item.product_name}</p>
                   {item.variant_sku && (
-                    <p className="text-xs text-muted-foreground">SKU: {item.variant_sku}</p>
+                    <p className="text-xs text-muted-foreground">{t("order.sku", "SKU")}: {item.variant_sku}</p>
                   )}
-                  <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
+                  <p className="text-xs text-muted-foreground">{t("order.qty", "Qty")}: {item.quantity}</p>
                 </div>
               </div>
               <p className="text-sm font-medium">{formatPrice(item.subtotal)}</p>
@@ -247,29 +251,29 @@ export default function OrderDetailPage() {
         </ul>
         <div className="space-y-1 border-t border-border px-4 py-3 text-sm">
           <div className="flex justify-between text-muted-foreground">
-            <span>Subtotal</span>
+            <span>{t("order.subtotal", "Subtotal")}</span>
             <span>{formatPrice(order.subtotal)}</span>
           </div>
           {order.shipping_cost > 0 && (
             <div className="flex justify-between text-muted-foreground">
-              <span>Shipping</span>
+              <span>{t("order.shipping", "Shipping")}</span>
               <span>{formatPrice(order.shipping_cost)}</span>
             </div>
           )}
           {order.tax_amount > 0 && (
             <div className="flex justify-between text-muted-foreground">
-              <span>Tax</span>
+              <span>{t("order.tax", "Tax")}</span>
               <span>{formatPrice(order.tax_amount)}</span>
             </div>
           )}
           {order.discount_amount > 0 && (
             <div className="flex justify-between text-green-600">
-              <span>Discount</span>
+              <span>{t("order.discount", "Discount")}</span>
               <span>-{formatPrice(order.discount_amount)}</span>
             </div>
           )}
           <div className="flex justify-between font-semibold pt-1 border-t border-border">
-            <span>Total</span>
+            <span>{t("order.total", "Total")}</span>
             <span>{formatPrice(order.total)}</span>
           </div>
         </div>
@@ -280,11 +284,11 @@ export default function OrderDetailPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           {order.shipping_address && (
             <div className="rounded-xl border border-border bg-card p-4">
-              <h3 className="mb-2 font-semibold text-sm">Shipping Address</h3>
+              <h3 className="mb-2 font-semibold text-sm">{t("order.shipping_address", "Shipping Address")}</h3>
               <address className="not-italic text-sm text-muted-foreground leading-relaxed">
                 {order.shipping_address.first_name} {order.shipping_address.last_name}<br />
-                {order.shipping_address.address_line_1}<br />
-                {order.shipping_address.address_line_2 && <>{order.shipping_address.address_line_2}<br /></>}
+                {order.shipping_address.street}<br />
+                {order.shipping_address.street2 && <>{order.shipping_address.street2}<br /></>}
                 {order.shipping_address.city}, {order.shipping_address.postal_code}<br />
                 {order.shipping_address.country_code}
               </address>
@@ -292,11 +296,11 @@ export default function OrderDetailPage() {
           )}
           {order.billing_address && (
             <div className="rounded-xl border border-border bg-card p-4">
-              <h3 className="mb-2 font-semibold text-sm">Billing Address</h3>
+              <h3 className="mb-2 font-semibold text-sm">{t("order.billing_address", "Billing Address")}</h3>
               <address className="not-italic text-sm text-muted-foreground leading-relaxed">
                 {order.billing_address.first_name} {order.billing_address.last_name}<br />
-                {order.billing_address.address_line_1}<br />
-                {order.billing_address.address_line_2 && <>{order.billing_address.address_line_2}<br /></>}
+                {order.billing_address.street}<br />
+                {order.billing_address.street2 && <>{order.billing_address.street2}<br /></>}
                 {order.billing_address.city}, {order.billing_address.postal_code}<br />
                 {order.billing_address.country_code}
               </address>
@@ -308,11 +312,11 @@ export default function OrderDetailPage() {
       {/* Payment */}
       {order.payment && (
         <div className="rounded-xl border border-border bg-card p-4">
-          <h3 className="mb-2 font-semibold text-sm">Payment</h3>
+          <h3 className="mb-2 font-semibold text-sm">{t("order.payment", "Payment")}</h3>
           <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-            <dt className="text-muted-foreground">Method</dt>
+            <dt className="text-muted-foreground">{t("order.payment_method", "Method")}</dt>
             <dd className="capitalize">{order.payment.method}</dd>
-            <dt className="text-muted-foreground">Status</dt>
+            <dt className="text-muted-foreground">{t("order.payment_status", "Status")}</dt>
             <dd className="capitalize">{order.payment.status}</dd>
           </dl>
         </div>
@@ -326,7 +330,7 @@ export default function OrderDetailPage() {
             disabled={isCancelling}
             className="rounded-xl border border-destructive px-4 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 disabled:opacity-50"
           >
-            {isCancelling ? "Cancelling…" : "Cancel Order"}
+            {isCancelling ? t("order.cancelling", "Cancelling…") : t("order.cancel", "Cancel Order")}
           </button>
         </div>
       )}
@@ -337,7 +341,7 @@ export default function OrderDetailPage() {
             onClick={() => setShowReturnForm(!showReturnForm)}
             className="rounded-xl border border-input px-4 py-2 text-sm font-medium hover:bg-accent"
           >
-            {showReturnForm ? "Hide Return Form" : "Request Return / Complaint"}
+            {showReturnForm ? t("order.hide_return_form", "Hide Return Form") : t("order.show_return_form", "Request Return / Complaint")}
           </button>
         </div>
       )}
@@ -348,12 +352,12 @@ export default function OrderDetailPage() {
           onSubmit={handleReturnSubmit}
           className="rounded-xl border border-border bg-card p-4"
         >
-          <h3 className="mb-4 font-semibold">Return / Complaint Request</h3>
+          <h3 className="mb-4 font-semibold">{t("order.return_request", "Return / Complaint Request")}</h3>
 
           <div className="mb-4">
-            <label className="mb-1 block text-sm font-medium">Request Type</label>
+            <label className="mb-1 block text-sm font-medium">{t("order.request_type", "Request Type")}</label>
             <div className="flex gap-3">
-              {RETURN_TYPES.map(({ value, label }) => (
+              {RETURN_TYPES.map(({ value, labelKey }) => (
                 <label key={value} className="flex items-center gap-1.5 text-sm">
                   <input
                     type="radio"
@@ -362,14 +366,14 @@ export default function OrderDetailPage() {
                     checked={returnType === value}
                     onChange={() => setReturnType(value)}
                   />
-                  {label}
+                  {t(labelKey, value)}
                 </label>
               ))}
             </div>
           </div>
 
           <div className="mb-4">
-            <label className="mb-1 block text-sm font-medium">Select Items</label>
+            <label className="mb-1 block text-sm font-medium">{t("order.select_items", "Select Items")}</label>
             <div className="space-y-2">
               {order.items?.map((item) => (
                 <label key={item.id} className="flex items-center gap-2 text-sm">
@@ -387,7 +391,7 @@ export default function OrderDetailPage() {
 
           <div className="mb-4">
             <label htmlFor="reason" className="mb-1 block text-sm font-medium">
-              Reason
+              {t("order.reason", "Reason")}
             </label>
             <textarea
               id="reason"
@@ -395,7 +399,7 @@ export default function OrderDetailPage() {
               value={returnReason}
               onChange={(e) => setReturnReason(e.target.value)}
               rows={3}
-              placeholder="Please describe the reason for your return/complaint…"
+              placeholder={t("order.reason", "Please describe the reason for your return/complaint…")}
               className="w-full rounded-xl border border-input bg-background px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
@@ -405,7 +409,7 @@ export default function OrderDetailPage() {
             disabled={isSubmittingReturn || selectedItems.length === 0}
             className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50"
           >
-            {isSubmittingReturn ? "Submitting…" : "Submit Request"}
+            {isSubmittingReturn ? t("order.submitting", "Submitting…") : t("order.submit_request", "Submit Request")}
           </button>
         </form>
       )}

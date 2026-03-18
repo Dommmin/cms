@@ -115,7 +115,7 @@ export default function SubscribersIndex({ subscribers, filters }: Props) {
                         </Link>
                     </Button>
                     <ConfirmButton
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         title="Delete Subscriber"
                         description={`Are you sure you want to delete "${row.original.email}"?`}

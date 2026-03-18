@@ -1,5 +1,5 @@
-import { Link, Head, router } from '@inertiajs/react';
-import { Package, PlusIcon, DownloadIcon } from 'lucide-react';
+import { Link, Head } from '@inertiajs/react';
+import { PlusIcon, DownloadIcon } from 'lucide-react';
 import {
     productColumns,
     type ProductRow,
@@ -48,12 +48,11 @@ export default function ProductsIndex({
                             </a>
                         </Button>
                         <Button asChild variant="outline">
-                <Link href='/admin/ecommerce/products/create' prefetch cacheFor={30}>
-                            <PlusIcon className="mr-2 h-4 w-4" />
-                            Add Product
-                        
-                </Link>
-            </Button>
+                            <Link href='/admin/ecommerce/products/create' prefetch cacheFor={30}>
+                                <PlusIcon className="mr-2 h-4 w-4" />
+                                Add Product
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 

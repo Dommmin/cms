@@ -11,6 +11,7 @@ use App\Models\Locale;
 use App\Models\Translation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Response;
 
@@ -21,10 +22,12 @@ class TranslationController extends Controller
         $locale = $request->input('locale', 'en');
         $group = $request->input('group');
         $search = $request->input('search');
+        $missing = $request->boolean('missing');
 
         $translations = Translation::query()
             ->where('locale_code', $locale)
             ->when($group, fn ($q) => $q->where('group', $group))
+            ->when($missing, fn ($q) => $q->where(fn ($q) => $q->whereNull('value')->orWhere('value', '')))
             ->when($search, fn ($q) => $q->where(function ($q) use ($search) {
                 $q->where('key', 'like', "%{$search}%")
                     ->orWhere('value', 'like', "%{$search}%");
@@ -41,7 +44,7 @@ class TranslationController extends Controller
             'translations' => $translations,
             'locales' => $locales,
             'groups' => $groups,
-            'filters' => $request->only(['locale', 'group', 'search']),
+            'filters' => $request->only(['locale', 'group', 'search', 'missing']),
         ]);
     }
 
@@ -66,6 +69,13 @@ class TranslationController extends Controller
         Cache::forget("translations.{$translation->locale_code}");
 
         return redirect()->back()->with('success', 'Translation updated');
+    }
+
+    public function sync(): RedirectResponse
+    {
+        Artisan::call('translations:sync');
+
+        return redirect()->back()->with('success', 'Translations synced from frontend files');
     }
 
     public function destroy(Translation $translation): RedirectResponse
