@@ -1,5 +1,7 @@
 FROM node:24-bookworm
 
+RUN npm install -g npm@latest
+
 WORKDIR /var/www/html
 
 COPY .docker/node/entrypoint.sh /entrypoint.sh
