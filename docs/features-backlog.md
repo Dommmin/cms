@@ -391,12 +391,12 @@
 
 ### Decyzja: **Natywna implementacja** (zamiast zewnętrznego Chatwoot/Intercom)
 
-| Opcja | Zalety | Wady |
-|---|---|---|
-| **Natywna** ✅ | Pełna kontrola danych (GDPR), integracja z orderami/klientami, spójny admin UI | Więcej kodu do napisania |
-| Chatwoot (self-hosted) | Gotowe UI agenta, websockets | Dodatkowy serwis Docker, osobna DB |
-| Tawk.to / Crisp (SaaS) | Darmowe, szybki start | Brak kontroli danych, GDPR ryzyko |
-| Intercom / Zendesk (SaaS) | Bogaty w funkcje | Drogie (od $89/mies.), vendor lock-in |
+| Opcja                     | Zalety                                                                         | Wady                                  |
+|---------------------------|--------------------------------------------------------------------------------|---------------------------------------|
+| **Natywna** ✅             | Pełna kontrola danych (GDPR), integracja z orderami/klientami, spójny admin UI | Więcej kodu do napisania              |
+| Chatwoot (self-hosted)    | Gotowe UI agenta, websockets                                                   | Dodatkowy serwis Docker, osobna DB    |
+| Tawk.to / Crisp (SaaS)    | Darmowe, szybki start                                                          | Brak kontroli danych, GDPR ryzyko     |
+| Intercom / Zendesk (SaaS) | Bogaty w funkcje                                                               | Drogie (od $89/mies.), vendor lock-in |
 
 **Verdict: natywna implementacja** — spójna z architekturą, GDPR-safe, pełna integracja z orderami.
 

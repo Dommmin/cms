@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 interface Attribute {
@@ -45,20 +46,22 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function AttributesIndex({ attributes, filters }: IndexProps) {
+    const __ = useTranslation();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Attributes" />
 
             <Wrapper>
                 <PageHeader
-                    title="Attributes"
+                    title={__('page.attributes', 'Attributes')}
                     description={`${attributes.total} product attributes`}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link href="/admin/ecommerce/attributes/create" prefetch cacheFor={30}>
                                 <Plus className="mr-2 h-4 w-4" />
-                                Add Attribute
+                                {__('action.add_attribute', 'Add Attribute')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -68,7 +71,7 @@ export default function AttributesIndex({ attributes, filters }: IndexProps) {
                     columns={[
                         {
                             accessorKey: 'name',
-                            header: 'Attribute',
+                            header: __('column.attribute', 'Attribute'),
                             cell: ({ row }) => (
                                 <div className="flex items-center gap-2">
                                     <div className="flex h-8 w-8 items-center justify-center rounded bg-green-100">
@@ -87,7 +90,7 @@ export default function AttributesIndex({ attributes, filters }: IndexProps) {
                         },
                         {
                             accessorKey: 'type',
-                            header: 'Type',
+                            header: __('column.type', 'Type'),
                             cell: ({ row }) => (
                                 <span className="inline-flex items-center rounded bg-gray-100 px-2 py-1 text-xs">
                                     {row.original.type}
@@ -96,11 +99,11 @@ export default function AttributesIndex({ attributes, filters }: IndexProps) {
                         },
                         {
                             accessorKey: 'values_count',
-                            header: 'Values',
+                            header: __('column.values', 'Values'),
                         },
                         {
                             accessorKey: 'is_filterable',
-                            header: 'Usage',
+                            header: __('column.usage', 'Usage'),
                             cell: ({ row }) => (
                                 <div className="flex gap-1">
                                     {row.original.is_filterable && (
@@ -118,20 +121,20 @@ export default function AttributesIndex({ attributes, filters }: IndexProps) {
                         },
                         {
                             id: 'actions',
-                            header: 'Actions',
+                            header: __('column.actions', 'Actions'),
                             cell: ({ row }) => (
                                 <div className="flex items-center gap-2">
                                     <Button asChild variant="outline" size="sm">
                                         <Link href={`/admin/ecommerce/attributes/${row.original.id}/edit`} prefetch cacheFor={30}>
                                             <PencilIcon className="mr-1 h-3 w-3" />
-                                            Edit
+                                            {__('action.edit', 'Edit')}
                                         </Link>
                                     </Button>
                                     <ConfirmButton
                                         variant="outline"
                                         size="sm"
-                                        title="Delete Attribute"
-                                        description={`Are you sure you want to delete "${row.original.name}"?`}
+                                        title={__('dialog.delete_title', 'Delete Attribute')}
+                                        description={`${__('dialog.are_you_sure', 'Are you sure you want to delete')} "${row.original.name}"?`}
                                         onConfirm={() => {
                                             router.delete(
                                                 `/admin/ecommerce/attributes/${row.original.id}`,
@@ -154,7 +157,7 @@ export default function AttributesIndex({ attributes, filters }: IndexProps) {
                         next_page_url: attributes.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search attributes..."
+                    searchPlaceholder={__('placeholder.search_attributes', 'Search attributes...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/ecommerce/attributes"
                 />

@@ -1,12 +1,13 @@
 import { Head } from '@inertiajs/react';
 import {
-    reviewColumns,
+    useReviewColumns,
     type ReviewRow,
 } from '@/components/columns/review-columns';
 import DataTable from '@/components/data-table';
 import { PageHeader } from '@/components/page-header';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 type Props = {
@@ -27,6 +28,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function ReviewsIndex({ reviews, filters }: Props) {
+    const __ = useTranslation();
+    const reviewColumns = useReviewColumns();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Reviews" />

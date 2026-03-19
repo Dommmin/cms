@@ -6,6 +6,7 @@ import {
     flexRender,
 } from '@tanstack/react-table';
 import { useCallback, useState } from 'react';
+import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
 import {
     Select,
@@ -37,13 +38,14 @@ export default function DataTable<T>({
     data,
     pagination,
     searchable = false,
-    searchPlaceholder = 'Search...',
+    searchPlaceholder,
     searchValue = '',
     onSearch,
     onPerPageChange,
     baseUrl,
     className,
 }: DataTableProps<T>) {
+    const __ = useTranslation();
     const [search, setSearch] = useState(searchValue);
     const perPageOptions = pagination
         ? Array.from(
@@ -81,7 +83,7 @@ export default function DataTable<T>({
                 <div className="flex items-center gap-2">
                     <input
                         type="text"
-                        placeholder={searchPlaceholder}
+                        placeholder={searchPlaceholder ?? __('placeholder.search', 'Search...')}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         onKeyDown={(e) => {
@@ -92,7 +94,7 @@ export default function DataTable<T>({
                         className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                     />
                     <Button variant="secondary" onClick={handleSearch}>
-                        Search
+                        {__('action.search', 'Search')}
                     </Button>
                 </div>
             )}
@@ -126,7 +128,7 @@ export default function DataTable<T>({
                                     colSpan={columns.length}
                                     className="h-24 text-center text-muted-foreground"
                                 >
-                                    No results.
+                                    {__('empty.no_results', 'No results.')}
                                 </td>
                             </tr>
                         ) : (
@@ -157,16 +159,16 @@ export default function DataTable<T>({
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                         <span className="text-sm text-muted-foreground">
-                            Showing{' '}
+                            {__('misc.showing', 'Showing')}{' '}
                             {(pagination.current_page - 1) *
                                 pagination.per_page +
                                 1}{' '}
-                            to{' '}
+                            –{' '}
                             {Math.min(
                                 pagination.current_page * pagination.per_page,
                                 pagination.total,
                             )}{' '}
-                            of {pagination.total} results
+                            {__('misc.of', 'of')} {pagination.total}
                         </span>
                     </div>
 
@@ -213,12 +215,12 @@ export default function DataTable<T>({
                                     prefetch
                                 >
                                     <Button variant="outline" size="sm">
-                                        Previous
+                                        {__('misc.previous', 'Previous')}
                                     </Button>
                                 </Link>
                             ) : (
                                 <Button variant="outline" size="sm" disabled>
-                                    Previous
+                                    {__('misc.previous', 'Previous')}
                                 </Button>
                             )}
 
@@ -229,12 +231,12 @@ export default function DataTable<T>({
                                     prefetch
                                 >
                                     <Button variant="outline" size="sm">
-                                        Next
+                                        {__('misc.next', 'Next')}
                                     </Button>
                                 </Link>
                             ) : (
                                 <Button variant="outline" size="sm" disabled>
-                                    Next
+                                    {__('misc.next', 'Next')}
                                 </Button>
                             )}
                         </div>

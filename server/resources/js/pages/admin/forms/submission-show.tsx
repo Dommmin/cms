@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 type SubmissionData = {
@@ -36,6 +37,8 @@ export default function SubmissionShow({
     form: FormData;
     submission: SubmissionData;
 }) {
+    const __ = useTranslation();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Submission #${submission.id}`} />
@@ -51,7 +54,7 @@ export default function SubmissionShow({
                         <Button asChild variant="outline">
                             <Link href={`/admin/forms/${form.id}/submissions`} prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                Back to Submissions
+                                {__('action.back_to_submissions', 'Back to Submissions')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -61,7 +64,7 @@ export default function SubmissionShow({
                     <Card>
                         <CardHeader>
                             <CardTitle className="text-lg">
-                                Submitted Data
+                                {__('misc.submitted_data', 'Submitted Data')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -99,13 +102,13 @@ export default function SubmissionShow({
 
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-lg">Metadata</CardTitle>
+                            <CardTitle className="text-lg">{__('misc.metadata', 'Metadata')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <dl className="space-y-4">
                                 <div>
                                     <dt className="text-sm font-medium text-muted-foreground">
-                                        Form
+                                        {__('label.form', 'Form')}
                                     </dt>
                                     <dd className="mt-1 text-sm">
                                         {form.name}
@@ -113,7 +116,7 @@ export default function SubmissionShow({
                                 </div>
                                 <div>
                                     <dt className="text-sm font-medium text-muted-foreground">
-                                        IP Address
+                                        {__('label.ip_address', 'IP Address')}
                                     </dt>
                                     <dd className="mt-1 font-mono text-sm">
                                         {submission.ip_address || '-'}
@@ -121,7 +124,7 @@ export default function SubmissionShow({
                                 </div>
                                 <div>
                                     <dt className="text-sm font-medium text-muted-foreground">
-                                        Page URL
+                                        {__('label.page_url', 'Page URL')}
                                     </dt>
                                     <dd className="mt-1 text-sm">
                                         {submission.page_url || '-'}
@@ -129,7 +132,7 @@ export default function SubmissionShow({
                                 </div>
                                 <div>
                                     <dt className="text-sm font-medium text-muted-foreground">
-                                        User Agent
+                                        {__('label.user_agent', 'User Agent')}
                                     </dt>
                                     <dd className="mt-1 text-xs break-all text-muted-foreground">
                                         {submission.user_agent || '-'}
@@ -137,7 +140,7 @@ export default function SubmissionShow({
                                 </div>
                                 <div>
                                     <dt className="text-sm font-medium text-muted-foreground">
-                                        Submitted At
+                                        {__('label.submitted_at', 'Submitted At')}
                                     </dt>
                                     <dd className="mt-1 text-sm">
                                         {new Date(

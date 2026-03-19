@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 export default function Create({
@@ -21,6 +22,7 @@ export default function Create({
         is_shippable: boolean;
     };
 }) {
+    const __ = useTranslation();
     const isEditing = !!productType;
     const formId = isEditing ? 'product-type-edit-form' : 'product-type-create-form';
     const breadcrumbs: BreadcrumbItem[] = [
@@ -48,22 +50,21 @@ export default function Create({
             <Wrapper>
                 <PageHeader
                     title={
-                        isEditing ? 'Edit Product Type' : 'Create Product Type'
+                        isEditing ? __('page.edit_product_type', 'Edit Product Type') : __('page.create_product_type', 'Create Product Type')
                     }
                     description={
                         isEditing
                             ? `Update details for ${productType.name}`
-                            : 'Create a new product type'
+                            : __('page.create_product_type_desc', 'Create a new product type')
                     }
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                 <Link href='/admin/ecommerce/product-types' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Product Types
-                        
-                </Link>
-            </Button>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                {__('action.back', 'Back')}
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -80,7 +81,7 @@ export default function Create({
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
+                                <Label htmlFor="name">{__('label.name', 'Name')}</Label>
                                 <Input
                                     id="name"
                                     name="name"
@@ -93,7 +94,7 @@ export default function Create({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="slug">Slug</Label>
+                                <Label htmlFor="slug">{__('label.slug', 'Slug')}</Label>
                                 <Input
                                     id="slug"
                                     name="slug"
@@ -125,7 +126,7 @@ export default function Create({
                                         htmlFor="has_variants"
                                         className="font-normal"
                                     >
-                                        Has variants (e.g., size, color)
+                                        {__('label.has_variants', 'Has variants (e.g., size, color)')}
                                     </Label>
                                 </div>
 
@@ -149,7 +150,7 @@ export default function Create({
                                         htmlFor="is_shippable"
                                         className="font-normal"
                                     >
-                                        Is shippable
+                                        {__('label.is_shippable', 'Is shippable')}
                                     </Label>
                                 </div>
                             </div>
@@ -157,7 +158,7 @@ export default function Create({
                             <StickyFormActions
                                 formId={formId}
                                 processing={processing}
-                                submitLabel={isEditing ? 'Save Changes' : 'Create Product Type'}
+                                submitLabel={isEditing ? __('action.save_changes', 'Save Changes') : __('action.create_product_type', 'Create Product Type')}
                             />
                         </>
                     )}

@@ -22,6 +22,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import type { BlockTypeConfig } from '@/features/page-builder';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 type GlobalBlock = {
@@ -54,6 +55,8 @@ export default function ReusableBlocksIndex({
     const [editActive, setEditActive] = useState(true);
     const [deleteBlock, setDeleteBlock] = useState<GlobalBlock | null>(null);
 
+    const __ = useTranslation();
+
     const openEdit = (block: GlobalBlock) => {
         setEditBlock(block);
         setEditName(block.name);
@@ -68,10 +71,10 @@ export default function ReusableBlocksIndex({
             { name: editName, description: editDesc, is_active: editActive },
             {
                 onSuccess: () => {
-                    toast.success('Global block updated');
+                    toast.success(__('misc.block_updated', 'Global block updated'));
                     setEditBlock(null);
                 },
-                onError: () => toast.error('Update failed'),
+                onError: () => toast.error(__('misc.update_failed', 'Update failed')),
             },
         );
     };
@@ -80,26 +83,25 @@ export default function ReusableBlocksIndex({
         if (!deleteBlock) return;
         router.delete(`/admin/cms/reusable-blocks/${deleteBlock.id}`, {
             onSuccess: () => {
-                toast.success('Global block deleted (pages unlinked)');
+                toast.success(__('misc.block_deleted', 'Global block deleted (pages unlinked)'));
                 setDeleteBlock(null);
             },
-            onError: () => toast.error('Delete failed'),
+            onError: () => toast.error(__('misc.delete_failed', 'Delete failed')),
         });
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Global Block Library" />
+            <Head title={__('page.global_block_library', 'Global Block Library')} />
 
             <div className="mx-auto max-w-5xl space-y-6 p-6">
                 {/* Header */}
                 <div className="flex items-center gap-3">
                     <LibraryBig className="h-6 w-6 text-primary" />
                     <div>
-                        <h1 className="text-2xl font-bold">Global Block Library</h1>
+                        <h1 className="text-2xl font-bold">{__('page.global_block_library', 'Global Block Library')}</h1>
                         <p className="text-sm text-muted-foreground">
-                            Blocks that are shared across multiple pages. Editing a block here
-                            propagates to all pages that reference it.
+                            {__('page.global_block_library_desc', 'Blocks that are shared across multiple pages. Editing a block here propagates to all pages that reference it.')}
                         </p>
                     </div>
                 </div>
@@ -107,10 +109,9 @@ export default function ReusableBlocksIndex({
                 {blocks.length === 0 ? (
                     <div className="rounded-lg border border-dashed p-16 text-center">
                         <Globe2Icon className="mx-auto mb-4 h-10 w-10 text-muted-foreground/50" />
-                        <h3 className="text-lg font-semibold">No global blocks yet</h3>
+                        <h3 className="text-lg font-semibold">{__('empty.no_global_blocks', 'No global blocks yet')}</h3>
                         <p className="mt-1 text-sm text-muted-foreground">
-                            Open any Page Builder, create a block, and click the{' '}
-                            <strong>Save as Global</strong> icon to add it here.
+                            {__('empty.no_global_blocks_desc', 'Open any Page Builder, create a block, and click the')} <strong>{__('misc.save_as_global', 'Save as Global')}</strong> {__('misc.icon_to_add', 'icon to add it here.')}
                         </p>
                     </div>
                 ) : (
@@ -127,7 +128,7 @@ export default function ReusableBlocksIndex({
                                                 variant={block.is_active ? 'default' : 'secondary'}
                                                 className="shrink-0 text-xs"
                                             >
-                                                {block.is_active ? 'Active' : 'Inactive'}
+                                                {block.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
                                             </Badge>
                                         </div>
                                         {block.description && (
@@ -145,8 +146,8 @@ export default function ReusableBlocksIndex({
                                             <span>
                                                 {block.page_blocks_count}{' '}
                                                 {block.page_blocks_count === 1
-                                                    ? 'page'
-                                                    : 'pages'}
+                                                    ? __('misc.page', 'page')
+                                                    : __('misc.pages', 'pages')}
                                             </span>
                                         </div>
                                         <div className="flex gap-2">
@@ -157,7 +158,7 @@ export default function ReusableBlocksIndex({
                                                 onClick={() => openEdit(block)}
                                             >
                                                 <Pencil className="mr-1.5 h-3.5 w-3.5" />
-                                                Edit
+                                                {__('action.edit', 'Edit')}
                                             </Button>
                                             <Button
                                                 variant="outline"
@@ -180,11 +181,11 @@ export default function ReusableBlocksIndex({
             <Dialog open={!!editBlock} onOpenChange={(o) => !o && setEditBlock(null)}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Edit Global Block</DialogTitle>
+                        <DialogTitle>{__('dialog.edit_global_block', 'Edit Global Block')}</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-2">
                         <div className="space-y-1.5">
-                            <Label htmlFor="edit-name">Name</Label>
+                            <Label htmlFor="edit-name">{__('label.name', 'Name')}</Label>
                             <Input
                                 id="edit-name"
                                 value={editName}
@@ -192,7 +193,7 @@ export default function ReusableBlocksIndex({
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <Label htmlFor="edit-desc">Description</Label>
+                            <Label htmlFor="edit-desc">{__('label.description', 'Description')}</Label>
                             <Input
                                 id="edit-desc"
                                 value={editDesc}
@@ -201,9 +202,9 @@ export default function ReusableBlocksIndex({
                         </div>
                         <div className="flex items-center justify-between rounded-lg border p-3">
                             <div>
-                                <p className="text-sm font-medium">Active</p>
+                                <p className="text-sm font-medium">{__('label.active', 'Active')}</p>
                                 <p className="text-xs text-muted-foreground">
-                                    Inactive blocks are hidden on all pages
+                                    {__('misc.inactive_blocks_hidden', 'Inactive blocks are hidden on all pages')}
                                 </p>
                             </div>
                             <Switch
@@ -214,10 +215,10 @@ export default function ReusableBlocksIndex({
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setEditBlock(null)}>
-                            Cancel
+                            {__('action.cancel', 'Cancel')}
                         </Button>
                         <Button onClick={handleUpdate} disabled={!editName.trim()}>
-                            Save Changes
+                            {__('action.save_changes', 'Save Changes')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -227,7 +228,7 @@ export default function ReusableBlocksIndex({
             <Dialog open={!!deleteBlock} onOpenChange={(o) => !o && setDeleteBlock(null)}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Delete Global Block?</DialogTitle>
+                        <DialogTitle>{__('dialog.delete_global_block', 'Delete Global Block?')}</DialogTitle>
                     </DialogHeader>
                     <p className="text-sm text-muted-foreground">
                         <strong>"{deleteBlock?.name}"</strong> will be deleted and unlinked
@@ -239,10 +240,10 @@ export default function ReusableBlocksIndex({
                             variant="outline"
                             onClick={() => setDeleteBlock(null)}
                         >
-                            Cancel
+                            {__('action.cancel', 'Cancel')}
                         </Button>
                         <Button variant="outline" onClick={handleDelete}>
-                            Delete
+                            {__('action.delete', 'Delete')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

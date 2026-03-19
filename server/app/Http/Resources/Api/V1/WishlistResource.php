@@ -32,13 +32,21 @@ class WishlistResource extends JsonResource
                     'slug' => $item->variant->product->slug,
                     'thumbnail' => null,
                 ] : null,
-                'variant' => $item->relationLoaded('variant') && $item->variant ? [
-                    'id' => $item->variant->id,
-                    'sku' => $item->variant->sku,
-                    'price' => $item->variant->price,
-                    'in_stock' => $item->variant->isInStock(),
-                    'attributes' => $item->variant->attributes ?? [],
-                ] : null,
+                'variant' => $item->relationLoaded('variant') && $item->variant ? (function () use ($item) {
+                    $variant = $item->variant;
+                    $isOnSale = $variant->compare_at_price && $variant->compare_at_price > $variant->price;
+
+                    return [
+                        'id' => $variant->id,
+                        'sku' => $variant->sku,
+                        'price' => $variant->price,
+                        'compare_at_price' => $isOnSale ? $variant->compare_at_price : null,
+                        'omnibus_price' => $isOnSale ? $variant->lowestPriceInLast30Days() : null,
+                        'is_on_sale' => $isOnSale,
+                        'in_stock' => $variant->isInStock(),
+                        'attributes' => $variant->attributes ?? [],
+                    ];
+                })() : null,
             ]),
         ];
     }

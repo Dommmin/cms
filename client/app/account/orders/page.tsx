@@ -6,7 +6,7 @@ import { Package } from "lucide-react";
 import { useOrders } from "@/hooks/use-orders";
 import { useTranslation } from "@/hooks/use-translation";
 import { useLocalePath } from "@/hooks/use-locale";
-import { formatPrice } from "@/lib/format";
+import { useCurrency } from "@/hooks/use-currency";
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -21,6 +21,7 @@ export default function OrdersPage() {
   const { data, isLoading } = useOrders();
   const { t } = useTranslation();
   const lp = useLocalePath();
+  const { formatPrice } = useCurrency();
 
   if (isLoading) {
     return (

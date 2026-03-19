@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 type Customer = {
@@ -58,10 +59,11 @@ const statusColors: Record<string, string> = {
 };
 
 export default function ReturnsIndex({ returns, filters }: Props) {
+    const __ = useTranslation();
     const columns: ColumnDef<ReturnRequest>[] = [
         {
             accessorKey: 'reference_number',
-            header: 'Reference',
+            header: __('column.id', 'Reference'),
             cell: ({ row }) => (
                 <span className="font-mono font-medium">
                     {row.original.reference_number}
@@ -70,7 +72,7 @@ export default function ReturnsIndex({ returns, filters }: Props) {
         },
         {
             accessorKey: 'order',
-            header: 'Order',
+            header: __('column.orders', 'Order'),
             cell: ({ row }) => (
                 <span className="font-mono">
                     {row.original.order.order_number}
@@ -79,10 +81,10 @@ export default function ReturnsIndex({ returns, filters }: Props) {
         },
         {
             id: 'customer',
-            header: 'Customer',
+            header: __('column.customer', 'Customer'),
             cell: ({ row }) => {
                 const customer = row.original.order.customer;
-                if (!customer) return <span className="text-muted-foreground">Guest</span>;
+                if (!customer) return <span className="text-muted-foreground">{__('misc.guest', 'Guest')}</span>;
                 return (
                     <div>
                         <p className="font-medium">{customer.first_name} {customer.last_name}</p>
@@ -93,7 +95,7 @@ export default function ReturnsIndex({ returns, filters }: Props) {
         },
         {
             accessorKey: 'return_type',
-            header: 'Type',
+            header: __('column.type', 'Type'),
             cell: ({ row }) => (
                 <Badge variant="outline" className="text-xs">
                     {row.original.return_type}
@@ -102,7 +104,7 @@ export default function ReturnsIndex({ returns, filters }: Props) {
         },
         {
             accessorKey: 'status',
-            header: 'Status',
+            header: __('column.status', 'Status'),
             cell: ({ row }) => (
                 <Badge
                     className={
@@ -116,7 +118,7 @@ export default function ReturnsIndex({ returns, filters }: Props) {
         },
         {
             accessorKey: 'created_at',
-            header: 'Requested',
+            header: __('column.created_at', 'Requested'),
             cell: ({ row }) => (
                 <span className="text-sm">
                     {new Date(row.original.created_at).toLocaleDateString()}
@@ -125,13 +127,13 @@ export default function ReturnsIndex({ returns, filters }: Props) {
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link href={`/admin/ecommerce/returns/${row.original.id}`} prefetch cacheFor={60}>
                             <EyeIcon className="mr-1 h-3 w-3" />
-                            View
+                            {__('action.show', 'View')}
                         </Link>
                     </Button>
                 </div>
@@ -144,8 +146,8 @@ export default function ReturnsIndex({ returns, filters }: Props) {
             <Head title="Returns" />
             <Wrapper>
                 <PageHeader
-                    title="Returns"
-                    description="Manage return requests"
+                    title={__('page.returns', 'Returns')}
+                    description={__('page.returns_desc', 'Manage return requests')}
                 />
 
                 <DataTable
@@ -160,7 +162,7 @@ export default function ReturnsIndex({ returns, filters }: Props) {
                         next_page_url: returns.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search returns..."
+                    searchPlaceholder={__('placeholder.search', 'Search returns...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/ecommerce/returns"
                 />

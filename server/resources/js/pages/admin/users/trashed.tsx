@@ -2,6 +2,7 @@ import { Form, Head, Link, router } from '@inertiajs/react';
 import { ArrowLeftIcon, RotateCcwIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
+import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -43,6 +44,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Trashed({ users }: { users: PaginatedUsers }) {
+    const __ = useTranslation();
     const [confirmUserId, setConfirmUserId] = useState<number | null>(null);
     const confirmUser = users.data.find((u) => u.id === confirmUserId);
 
@@ -52,14 +54,14 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
 
             <Wrapper>
                 <PageHeader
-                    title="Deleted Users"
-                    description="Soft-deleted accounts — restore or permanently remove"
+                    title={__('page.users_trashed', 'Deleted Users')}
+                    description={__('page.users_trashed_desc', 'Soft-deleted accounts — restore or permanently remove')}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link href="/admin/users" prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                Back to Users
+                                {__('action.back', 'Back')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -67,7 +69,7 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
 
                 {users.data.length === 0 ? (
                     <p className="text-muted-foreground text-sm">
-                        No deleted users found.
+                        {__('empty.no_users', 'No deleted users found.')}
                     </p>
                 ) : (
                     <div className="rounded-md border">
@@ -75,16 +77,16 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
                             <thead>
                                 <tr className="border-b bg-muted/50">
                                     <th className="px-4 py-3 text-left font-medium">
-                                        Name
+                                        {__('column.name', 'Name')}
                                     </th>
                                     <th className="px-4 py-3 text-left font-medium">
-                                        Email
+                                        {__('column.email', 'Email')}
                                     </th>
                                     <th className="px-4 py-3 text-left font-medium">
-                                        Deleted At
+                                        {__('column.updated_at', 'Deleted At')}
                                     </th>
                                     <th className="px-4 py-3 text-right font-medium">
-                                        Actions
+                                        {__('column.actions', 'Actions')}
                                     </th>
                                 </tr>
                             </thead>
@@ -120,7 +122,7 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
                                                             }
                                                         >
                                                             <RotateCcwIcon className="mr-1 h-3 w-3" />
-                                                            Restore
+                                                            {__('action.restore', 'Restore')}
                                                         </Button>
                                                     )}
                                                 </Form>
@@ -135,7 +137,7 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
                                                     }
                                                 >
                                                     <Trash2Icon className="mr-1 h-3 w-3" />
-                                                    Delete Permanently
+                                                    {__('action.delete', 'Delete Permanently')}
                                                 </Button>
                                             </div>
                                         </td>
@@ -183,9 +185,9 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
             >
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Permanently Delete User</DialogTitle>
+                        <DialogTitle>{__('dialog.delete_title', 'Permanently Delete User')}</DialogTitle>
                         <DialogDescription>
-                            This action cannot be undone. The user{' '}
+                            {__('dialog.cannot_be_undone', 'This action cannot be undone.')} The user{' '}
                             <strong>{confirmUser?.name}</strong> will be
                             permanently removed from the database.
                         </DialogDescription>
@@ -195,7 +197,7 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
                             variant="outline"
                             onClick={() => setConfirmUserId(null)}
                         >
-                            Cancel
+                            {__('action.cancel', 'Cancel')}
                         </Button>
                         <Form {...forceDelete.form(confirmUserId ?? 0)}>
                             {({ processing }) => (
@@ -205,7 +207,7 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
                                     disabled={processing}
                                     onClick={() => setConfirmUserId(null)}
                                 >
-                                    Delete Permanently
+                                    {__('action.delete', 'Delete Permanently')}
                                 </Button>
                             )}
                         </Form>

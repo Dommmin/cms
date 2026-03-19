@@ -16,6 +16,7 @@ class PageIndexQuery
     public function execute()
     {
         return Page::query()
+            ->with(['parent:id,title,slug'])
             ->when($this->request->search, function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%")
                     ->orWhere('slug', 'like', "%{$search}%");
@@ -26,7 +27,7 @@ class PageIndexQuery
             ->when($this->request->has('is_home'), function ($query) {
                 $query->where('is_home', $this->request->boolean('is_home'));
             })
-            ->orderBy('title')
+            ->orderByRaw('COALESCE(parent_id, id), parent_id IS NOT NULL, title')
             ->paginate(20)
             ->withQueryString();
     }

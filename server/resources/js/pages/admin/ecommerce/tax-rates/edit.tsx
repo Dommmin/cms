@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 const COMMON_COUNTRIES = [
@@ -33,6 +34,7 @@ export default function Edit({
         is_default: boolean;
     };
 }) {
+    const __ = useTranslation();
     const formId = 'tax-rate-edit-form';
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -52,17 +54,16 @@ export default function Edit({
 
             <Wrapper>
                 <PageHeader
-                    title="Edit Tax Rate"
+                    title={__('page.edit_tax_rate', 'Edit Tax Rate')}
                     description={`Update details for ${taxRate.name}`}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                 <Link href='/admin/ecommerce/tax-rates' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Tax Rates
-                        
-                </Link>
-            </Button>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                {__('action.back', 'Back')}
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -75,7 +76,7 @@ export default function Edit({
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
+                                <Label htmlFor="name">{__('label.name', 'Name')}</Label>
                                 <Input
                                     id="name"
                                     name="name"
@@ -140,7 +141,7 @@ export default function Edit({
                                         htmlFor="is_active"
                                         className="font-normal"
                                     >
-                                        Active
+                                        {__('label.is_active', 'Active')}
                                     </Label>
                                 </div>
 
@@ -157,7 +158,7 @@ export default function Edit({
                                         htmlFor="is_default"
                                         className="font-normal"
                                     >
-                                        Default tax rate
+                                        {__('label.is_default', 'Default tax rate')}
                                     </Label>
                                 </div>
                             </div>
@@ -165,7 +166,7 @@ export default function Edit({
                             <StickyFormActions
                                 formId={formId}
                                 processing={processing}
-                                submitLabel="Save Changes"
+                                submitLabel={__('action.save_changes', 'Save Changes')}
                             />
                         </>
                     )}

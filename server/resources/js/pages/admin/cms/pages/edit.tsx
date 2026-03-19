@@ -21,6 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
 
@@ -71,6 +72,7 @@ export default function Edit({ page, modules, pages }: Props) {
         [modules],
     );
 
+    const __ = useTranslation();
     const [layout, setLayout] = useState<string>(page.layout ?? 'default');
     const [pageType, setPageType] = useState<string>(
         page.page_type ?? 'blocks',
@@ -113,7 +115,7 @@ export default function Edit({ page, modules, pages }: Props) {
                     <PageHeader
                         title={displayTitle}
                         description={
-                            page.is_published ? 'Published page' : 'Draft'
+                            page.is_published ? __('status.published_page', '{__('action.publish', 'Publish')}ed page') : __('status.draft', 'Draft')
                         }
                     >
                         <PageHeaderActions>
@@ -124,20 +126,20 @@ export default function Edit({ page, modules, pages }: Props) {
                                     rel="noopener noreferrer"
                                 >
                                     <EyeIcon className="mr-2 h-4 w-4" />
-                                    Preview
+                                    {__('action.preview', 'Preview')}
                                 </a>
                             </Button>
                             <Button asChild variant="outline">
                                 <Link href="/admin/cms/pages" prefetch cacheFor={30}>
                                     <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                    Back
+                                    {__('action.back', 'Back')}
                                 </Link>
                             </Button>
                             {pageType === 'blocks' && (
                                 <Button asChild variant="outline">
                                     <Link href={`/admin/cms/pages/${page.id}/builder`} prefetch cacheFor={30}>
                                         <PencilIcon className="mr-2 h-4 w-4" />
-                                        Open Builder
+                                        {__('action.open_builder', 'Open Builder')}
                                     </Link>
                                 </Button>
                             )}
@@ -156,7 +158,7 @@ export default function Edit({ page, modules, pages }: Props) {
                                     }}
                                 >
                                     <GlobeIcon className="mr-2 h-4 w-4" />
-                                    Unpublish
+                                    {__('action.unpublish', 'Unpublish')}
                                 </Button>
                             ) : (
                                 <Button
@@ -173,7 +175,7 @@ export default function Edit({ page, modules, pages }: Props) {
                                     }}
                                 >
                                     <GlobeIcon className="mr-2 h-4 w-4" />
-                                    Publish
+                                    {__('action.publish', 'Publish')}
                                 </Button>
                             )}
                         </PageHeaderActions>
@@ -185,7 +187,7 @@ export default function Edit({ page, modules, pages }: Props) {
                                 page.is_published ? 'default' : 'secondary'
                             }
                         >
-                            {page.is_published ? 'Published' : 'Draft'}
+                            {page.is_published ? '{__('action.publish', 'Publish')}ed' : 'Draft'}
                         </Badge>
                         <Badge variant="outline">
                             <LayoutIcon className="mr-1 h-3 w-3" />
@@ -250,20 +252,20 @@ export default function Edit({ page, modules, pages }: Props) {
 
                                 <Tabs defaultValue="general" className="space-y-6">
                                     <TabsList>
-                                        <TabsTrigger value="general">General</TabsTrigger>
-                                        <TabsTrigger value="seo">SEO</TabsTrigger>
+                                        <TabsTrigger value="general">{__('tab.general', 'General')}</TabsTrigger>
+                                        <TabsTrigger value="seo">{__('tab.seo', 'SEO')}</TabsTrigger>
                                     </TabsList>
 
                                     <TabsContent value="general" className="space-y-6">
                                         {pages.length > 0 && (
                                             <div className="grid gap-2">
-                                                <Label>Parent page</Label>
+                                                <Label>{__('label.parent_page', 'Parent page')}</Label>
                                                 <Select value={parentId} onValueChange={setParentId}>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="No parent (top-level)" />
+                                                        <SelectValue placeholder={__('placeholder.no_parent', 'No parent (top-level)')} />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="none">— No parent (top-level) —</SelectItem>
+                                                        <SelectItem value="none">{__('misc.no_parent', '— No parent (top-level) —')}</SelectItem>
                                                         {pages.map((p) => (
                                                             <SelectItem key={p.id} value={String(p.id)}>
                                                                 /{typeof p.title === 'string' ? p.title : Object.values(p.title)[0]}
@@ -276,7 +278,7 @@ export default function Edit({ page, modules, pages }: Props) {
                                         )}
                                 <div className="grid gap-2">
                                     <div className="flex items-center justify-between">
-                                        <Label>Title</Label>
+                                        <Label>{__('label.title', 'Title')}</Label>
                                         <LocaleTabSwitcher
                                             locales={locales}
                                             activeLocale={activeLocale}
@@ -301,7 +303,7 @@ export default function Edit({ page, modules, pages }: Props) {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="slug">Slug (default)</Label>
+                                    <Label htmlFor="slug">{__('label.slug_default', 'Slug (default)')}</Label>
                                     <Input
                                         id="slug"
                                         name="slug"
@@ -324,16 +326,16 @@ export default function Edit({ page, modules, pages }: Props) {
                                             }}
                                             className="h-4 w-4 rounded border-input"
                                         />
-                                        Set slug manually
+                                        {__('misc.set_slug_manually', 'Set slug manually')}
                                     </label>
                                 </div>
 
                                 {translatableLocales.length > 0 && (
                                     <div className="grid gap-3 rounded-lg border p-4">
                                         <div>
-                                            <Label className="text-sm font-medium">Slug Translations</Label>
+                                            <Label className="text-sm font-medium">{__('label.slug_translations', 'Slug Translations')}</Label>
                                             <p className="mt-0.5 text-xs text-muted-foreground">
-                                                Define locale-specific slugs. Leave blank to use the default slug.
+                                                {__('misc.slug_translations_desc', 'Define locale-specific slugs. Leave blank to use the default slug.')}
                                             </p>
                                         </div>
                                         {translatableLocales.map((locale) => (
@@ -365,7 +367,7 @@ export default function Edit({ page, modules, pages }: Props) {
 
                                 <div className="grid gap-2">
                                     <div className="flex items-center justify-between">
-                                        <Label>Excerpt</Label>
+                                        <Label>{__('label.excerpt', 'Excerpt')}</Label>
                                         <LocaleTabSwitcher
                                             locales={locales}
                                             activeLocale={activeLocale}
@@ -386,23 +388,23 @@ export default function Edit({ page, modules, pages }: Props) {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label>Layout</Label>
+                                    <Label>{__('label.layout', 'Layout')}</Label>
                                     <Select
                                         value={layout}
                                         onValueChange={setLayout}
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select layout" />
+                                            <SelectValue placeholder={__('placeholder.select_layout', 'Select layout')} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="default">
-                                                Standard
+                                                {__('layout.standard', 'Standard')}
                                             </SelectItem>
                                             <SelectItem value="full_width">
-                                                Full width
+                                                {__('layout.full_width', 'Full width')}
                                             </SelectItem>
                                             <SelectItem value="sidebar">
-                                                Sidebar
+                                                {__('layout.sidebar', 'Sidebar')}
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
@@ -410,7 +412,7 @@ export default function Edit({ page, modules, pages }: Props) {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label>Page type</Label>
+                                    <Label>{__('label.page_type', 'Page type')}</Label>
                                     <Select
                                         value={pageType}
                                         onValueChange={(value) => {
@@ -421,14 +423,14 @@ export default function Edit({ page, modules, pages }: Props) {
                                         }}
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select page type" />
+                                            <SelectValue placeholder={__('placeholder.select_page_type', 'Select page type')} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="blocks">
-                                                Blocks
+                                                {__('type.blocks', 'Blocks')}
                                             </SelectItem>
                                             <SelectItem value="module">
-                                                Module
+                                                {__('type.module', 'Module')}
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
@@ -437,7 +439,7 @@ export default function Edit({ page, modules, pages }: Props) {
 
                                 {pageType === 'module' && (
                                     <div className="grid gap-2">
-                                        <Label>Module</Label>
+                                        <Label>{__('label.module', 'Module')}</Label>
                                         <Select
                                             value={moduleName ?? ''}
                                             onValueChange={(value) =>
@@ -447,7 +449,7 @@ export default function Edit({ page, modules, pages }: Props) {
                                             }
                                         >
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select module" />
+                                                <SelectValue placeholder={__('placeholder.select_module', 'Select module')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {moduleOptions.map(
@@ -472,7 +474,7 @@ export default function Edit({ page, modules, pages }: Props) {
                                     moduleName === 'content' && (
                                         <div className="grid gap-2">
                                             <Label htmlFor="content_id">
-                                                Content entry ID
+                                                {__('label.content_entry_id', 'Content entry ID')}
                                             </Label>
                                             <Input
                                                 id="content_id"
@@ -498,7 +500,7 @@ export default function Edit({ page, modules, pages }: Props) {
                                     moduleName === 'faq' && (
                                         <div className="grid gap-2">
                                             <Label htmlFor="category">
-                                                FAQ category (optional)
+                                                {__('label.faq_category_optional', 'FAQ category (optional)')}
                                             </Label>
                                             <Input
                                                 id="category"
@@ -521,7 +523,7 @@ export default function Edit({ page, modules, pages }: Props) {
 
                                     <TabsContent value="seo" className="space-y-6">
                                         <div className="grid gap-2">
-                                            <Label htmlFor="seo_title">SEO title</Label>
+                                            <Label htmlFor="seo_title">{__('label.seo_title', 'SEO title')}</Label>
                                             <Input
                                                 id="seo_title"
                                                 name="seo_title"
@@ -531,7 +533,7 @@ export default function Edit({ page, modules, pages }: Props) {
                                         </div>
 
                                         <div className="grid gap-2">
-                                            <Label htmlFor="seo_description">SEO description</Label>
+                                            <Label htmlFor="seo_description">{__('label.seo_description', 'SEO description')}</Label>
                                             <Textarea
                                                 id="seo_description"
                                                 name="seo_description"
@@ -541,7 +543,7 @@ export default function Edit({ page, modules, pages }: Props) {
                                         </div>
 
                                         <div className="grid gap-2">
-                                            <Label htmlFor="seo_canonical">Canonical URL</Label>
+                                            <Label htmlFor="seo_canonical">{__('label.canonical_url', 'Canonical URL')}</Label>
                                             <Input
                                                 id="seo_canonical"
                                                 name="seo_canonical"
@@ -551,7 +553,7 @@ export default function Edit({ page, modules, pages }: Props) {
                                         </div>
 
                                         <div className="grid gap-2">
-                                            <Label htmlFor="meta_robots">Meta Robots</Label>
+                                            <Label htmlFor="meta_robots">{__('label.meta_robots', 'Meta Robots')}</Label>
                                             <select
                                                 id="meta_robots"
                                                 name="meta_robots"
@@ -567,7 +569,7 @@ export default function Edit({ page, modules, pages }: Props) {
                                         </div>
 
                                         <div className="grid gap-2">
-                                            <Label htmlFor="og_image">OG Image URL</Label>
+                                            <Label htmlFor="og_image">{__('label.og_image_url', 'OG Image URL')}</Label>
                                             <Input
                                                 id="og_image"
                                                 name="og_image"
@@ -586,13 +588,13 @@ export default function Edit({ page, modules, pages }: Props) {
                                                 defaultChecked={page.sitemap_exclude ?? false}
                                                 className="h-4 w-4 rounded border-input"
                                             />
-                                            <Label htmlFor="sitemap_exclude">Exclude from XML sitemap</Label>
+                                            <Label htmlFor="sitemap_exclude">{__('label.exclude_sitemap', 'Exclude from XML sitemap')}</Label>
                                         </div>
                                     </TabsContent>
 
                                     <div className="flex items-center gap-4 pt-2">
                                         <Button type="submit" disabled={processing}>
-                                            {processing ? 'Saving...' : 'Save Changes'}
+                                            {processing ? __('misc.saving', 'Saving...') : __('action.save_changes', 'Save Changes')}
                                         </Button>
                                     </div>
                                 </Tabs>

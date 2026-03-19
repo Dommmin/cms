@@ -8,7 +8,7 @@ import { clearComparison, removeFromCompare, useComparisonIds, useComparisonProd
 import { useAddToCart } from "@/hooks/use-cart";
 import { useLocalePath } from "@/hooks/use-locale";
 import { useTranslation } from "@/hooks/use-translation";
-import { formatPrice } from "@/lib/format";
+import { PriceDisplay } from "@/components/price-display";
 import { toast } from "react-toastify";
 
 export default function ComparePage() {
@@ -67,7 +67,15 @@ export default function ComparePage() {
   const rows = [
     {
       label: t("compare.price", "Price"),
-      render: (p: typeof products[0]) => formatPrice(p.price_min),
+      render: (p: typeof products[0]) => (
+        <PriceDisplay
+          price={p.price_min}
+          compareAtPrice={p.compare_at_price_min}
+          omnibusPrice={p.omnibus_price_min}
+          isOnSale={p.is_on_sale}
+          size="base"
+        />
+      ),
     },
     {
       label: t("compare.brand", "Brand"),

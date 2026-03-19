@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 interface TaxRate {
@@ -44,20 +45,22 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
+    const __ = useTranslation();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Tax Rates" />
 
             <Wrapper>
                 <PageHeader
-                    title="Tax Rates"
+                    title={__('page.tax_rates', 'Tax Rates')}
                     description={`${taxRates.total} tax rates configured`}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link href="/admin/ecommerce/tax-rates/create" prefetch cacheFor={30}>
                                 <Plus className="mr-2 h-4 w-4" />
-                                Add Rate
+                                {__('action.add_rate', 'Add Rate')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -67,7 +70,7 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                     columns={[
                         {
                             accessorKey: 'name',
-                            header: 'Name',
+                            header: __('column.name', 'Name'),
                             cell: ({ row }) => (
                                 <div className="flex items-center gap-2">
                                     <div className="flex h-8 w-8 items-center justify-center rounded bg-red-100">
@@ -81,7 +84,7 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                         },
                         {
                             accessorKey: 'rate',
-                            header: 'Rate',
+                            header: __('column.rate', 'Rate'),
                             cell: ({ row }) => (
                                 <span className="text-lg font-semibold">
                                     {row.original.rate}%
@@ -90,12 +93,12 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                         },
                         {
                             accessorKey: 'country_code',
-                            header: 'Country',
+                            header: __('column.country', 'Country'),
                             cell: ({ row }) => row.original.country_code || '-',
                         },
                         {
                             accessorKey: 'is_active',
-                            header: 'Status',
+                            header: __('column.status', 'Status'),
                             cell: ({ row }) => (
                                 <Badge
                                     variant={
@@ -105,14 +108,14 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                                     }
                                 >
                                     {row.original.is_active
-                                        ? 'Active'
-                                        : 'Inactive'}
+                                        ? __('status.active', 'Active')
+                                        : __('status.inactive', 'Inactive')}
                                 </Badge>
                             ),
                         },
                         {
                             accessorKey: 'is_default',
-                            header: 'Default',
+                            header: __('column.default', 'Default'),
                             cell: ({ row }) =>
                                 row.original.is_default ? (
                                     <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2 py-1 text-xs text-yellow-700">
@@ -127,19 +130,19 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                         },
                         {
                             id: 'actions',
-                            header: 'Actions',
+                            header: __('column.actions', 'Actions'),
                             cell: ({ row }) => (
                                 <div className="flex items-center gap-2">
                                     <Button asChild variant="outline" size="sm">
                                         <Link href={`/admin/ecommerce/tax-rates/${row.original.id}/edit`} prefetch cacheFor={30}>
                                             <PencilIcon className="mr-1 h-3 w-3" />
-                                            Edit
+                                            {__('action.edit', 'Edit')}
                                         </Link>
                                     </Button>
                                     <ConfirmButton
                                         variant="outline"
                                         size="sm"
-                                        title="Delete Tax Rate"
+                                        title={__('dialog.delete_title', 'Delete Tax Rate')}
                                         description={`Are you sure you want to delete "${row.original.name}"?`}
                                         onConfirm={() => {
                                             router.delete(
@@ -163,7 +166,7 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                         next_page_url: taxRates.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search tax rates..."
+                    searchPlaceholder={__('placeholder.search_tax_rates', 'Search tax rates...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/ecommerce/tax-rates"
                 />

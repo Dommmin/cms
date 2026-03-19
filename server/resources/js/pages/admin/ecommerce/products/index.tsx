@@ -1,13 +1,14 @@
 import { Link, Head } from '@inertiajs/react';
 import { PlusIcon, DownloadIcon } from 'lucide-react';
 import {
-    productColumns,
+    useProductColumns,
     type ProductRow,
 } from '@/components/columns/product-columns';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -32,25 +33,28 @@ export default function ProductsIndex({
     products: ProductData;
     filters: { search?: string };
 }) {
+    const __ = useTranslation();
+    const productColumns = useProductColumns();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Products" />
             <Wrapper>
                 <PageHeader
-                    title="Products"
-                    description="Manage products catalog"
+                    title={__('page.products', 'Products')}
+                    description={__('page.products_desc', 'Manage products catalog')}
                 >
                     <PageHeaderActions>
                         <Button variant="outline" asChild>
                             <a href="/admin/ecommerce/products/export">
                                 <DownloadIcon className="mr-2 h-4 w-4" />
-                                Export CSV
+                                {__('action.export_csv', 'Export CSV')}
                             </a>
                         </Button>
                         <Button asChild variant="outline">
                             <Link href='/admin/ecommerce/products/create' prefetch cacheFor={30}>
                                 <PlusIcon className="mr-2 h-4 w-4" />
-                                Add Product
+                                {__('action.add', 'Add Product')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -68,7 +72,7 @@ export default function ProductsIndex({
                         next_page_url: products.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search products..."
+                    searchPlaceholder={__('placeholder.search_products', 'Search products...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/ecommerce/products"
                 />

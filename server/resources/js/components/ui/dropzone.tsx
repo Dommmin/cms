@@ -1,7 +1,8 @@
 import { Upload, X, Image, FileText, Film, Music } from 'lucide-react';
 import { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { cn } from '@/lib/utils';
+import { useTranslation } from '@/hooks/use-translation';
+import { cn, formatFileSize } from '@/lib/utils';
 
 export interface DropzoneProps {
     onFilesUploaded?: (files: File[]) => void;
@@ -13,19 +14,17 @@ export interface DropzoneProps {
     uploading?: boolean;
 }
 
+export interface FilePreviewProps {
+    file: File;
+    onRemove?: () => void;
+    className?: string;
+}
+
 function getFileIcon(mimeType: string) {
     if (mimeType.startsWith('image/')) return Image;
     if (mimeType.startsWith('video/')) return Film;
     if (mimeType.startsWith('audio/')) return Music;
     return FileText;
-}
-
-function formatFileSize(bytes: number) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
 export function Dropzone({
@@ -42,6 +41,7 @@ export function Dropzone({
     className,
     uploading = false,
 }: DropzoneProps) {
+    const __ = useTranslation();
     const onDrop = useCallback(
         (acceptedFiles: File[]) => {
             if (onFilesUploaded) {
@@ -69,7 +69,7 @@ export function Dropzone({
             {...getRootProps()}
             className={cn(
                 'relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 transition-colors',
-                'hover:border-gray-400 hover:bg-gray-50',
+                'hover:border-gray-400 hover:bg-gray-50 dark:hover:bg-black',
                 isDragActive && 'border-blue-500 bg-blue-50',
                 isDragReject && 'border-red-500 bg-red-50',
                 (disabled || uploading) && 'cursor-not-allowed opacity-50',
@@ -82,7 +82,7 @@ export function Dropzone({
                 {uploading ? (
                     <>
                         <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600" />
-                        <p className="text-sm font-medium text-gray-700">Uploading...</p>
+                        <p className="text-sm font-medium text-gray-700">{__('action.uploading', 'Uploading...')}</p>
                     </>
                 ) : (
                     <>
@@ -100,14 +100,13 @@ export function Dropzone({
                             />
                         </div>
                         <div className="space-y-1">
-                            <p className="text-sm font-medium text-gray-900">
+                            <p className="text-sm font-medium text-gray-900 dark:text-gray-300">
                                 {isDragActive
-                                    ? 'Drop files here'
-                                    : 'Drag & drop files here'}
+                                    ? __('misc.drop_files_here', 'Drop files here')
+                                    : __('misc.drag_drop_here', 'Drag & drop files here')}
                             </p>
                             <p className="text-xs text-gray-500">
-                                or click to select files (max {maxFiles}, up to{' '}
-                                {formatFileSize(maxSize)})
+                                {`${__('misc.or_click_select', 'or click to select files')} (max ${maxFiles}, up to ${formatFileSize(maxSize)})`}
                             </p>
                         </div>
                     </>
@@ -115,12 +114,6 @@ export function Dropzone({
             </div>
         </div>
     );
-}
-
-export interface FilePreviewProps {
-    file: File;
-    onRemove?: () => void;
-    className?: string;
 }
 
 export function FilePreview({ file, onRemove, className }: FilePreviewProps) {

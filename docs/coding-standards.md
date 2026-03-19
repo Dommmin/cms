@@ -89,14 +89,32 @@ foreach ($users as $user) {
 
 ### Components
 - Named exports for reusable components, default exports for pages
-- Props interface defined inline or as `type Props = { ... }`
 - Destructure props in function signature
 
+#### Props types
+- **Simple, single-component props** → define inline or as `type Props = { ... }` in the same file
+- **Complex components** (multiple exported prop interfaces, or types shared across files) → extract to a `*.types.ts` file alongside the component
+- **Rule of thumb**: if you `export interface` more than one props type from the same file, move them to a separate types file
+
 ```tsx
+// Simple — inline is fine
 export default function UserCard({ user, onDelete }: { user: User; onDelete: () => void }) {
   return <div>{user.name}</div>
 }
+
+// Complex — separate types file (e.g. dropzone.types.ts)
+// dropzone.types.ts
+export interface DropzoneProps { ... }
+export interface FilePreviewProps { ... }
+
+// dropzone.tsx
+import type { DropzoneProps, FilePreviewProps } from './dropzone.types';
 ```
+
+#### Helper functions
+- **Generic utilities** (`formatFileSize`, `formatDate`, `ucfirst`, etc.) → `lib/utils.ts`. Check there before writing a new helper.
+- **Component-specific helpers** (e.g. `getFileIcon` for a dropzone) → colocate in the same file or in a component subdirectory
+- **Never duplicate** a utility that already exists in `lib/utils.ts`
 
 ### State
 - `useState` for simple local state
@@ -196,3 +214,29 @@ $user = User::create(['name' => 'Test', 'email' => 'test@test.com', ...]);
 2. Pint clean (`vendor/bin/pint --dirty`)
 3. No `console.log` or debug code left
 4. Docs updated if behavior changed
+
+---
+
+## Translations (Admin SPA)
+
+Admin UI strings use `useTranslation()` → `__(key, fallback)`. Keys are dot-notation (`action.save`, `misc.loading`).
+
+### Workflow — always follow this order
+
+1. Use `__('group.key', 'English fallback')` in TSX/TS components
+2. Run `make sync-translations` — discovers all `__()` calls and adds missing keys to every `lang/*/admin.php`
+3. Translate the new empty values in `lang/pl/admin.php` (and any other non-English locale files)
+4. Run `make clear` to invalidate the 1-hour translations cache
+
+### Rules
+- **Never** hardcode UI strings — always use `__()`
+- **Always** provide an English fallback as the second argument: `__('action.save', 'Save')`
+- **Never** pass an object as the second argument — it's a string fallback, not an interpolation map. For dynamic values, build the string with a template literal after the `__()` call:
+  ```tsx
+  // Wrong ❌
+  __('misc.items_per_page', { count: 10 })
+
+  // Correct ✅
+  `${__('misc.or_click_select', 'or click to select')} (max ${maxFiles})`
+  ```
+- After any addition of `__()` calls, run `make sync-translations` before committing

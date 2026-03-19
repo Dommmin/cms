@@ -1,11 +1,12 @@
 import { Link, Head } from '@inertiajs/react';
 import { FileTextIcon } from 'lucide-react';
-import { pageColumns, type PageRow } from '@/components/columns/page-columns';
+import { usePageColumns, type PageRow } from '@/components/columns/page-columns';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 
 import type { BreadcrumbItem } from '@/types';
 
@@ -33,20 +34,23 @@ export default function Index({
     pages: PagesData;
     filters: { search?: string };
 }) {
+    const __ = useTranslation();
+    const pageColumns = usePageColumns();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Pages" />
 
             <Wrapper>
                 <PageHeader
-                    title="Pages"
-                    description="Manage CMS pages and content"
+                    title={__('page.pages', 'Pages')}
+                    description={__('page.pages_desc', 'Manage CMS pages and content')}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link href="/admin/cms/pages/create" prefetch cacheFor={30}>
                                 <FileTextIcon className="mr-2 h-4 w-4" />
-                                Create Page
+                                {__('page.create_page', 'Create Page')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -64,7 +68,7 @@ export default function Index({
                         next_page_url: pages.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search by title or slug..."
+                    searchPlaceholder={__('placeholder.search_pages', 'Search by title or slug...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/cms/pages"
                 />

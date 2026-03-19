@@ -6,8 +6,9 @@ namespace App\Http\Middleware;
 
 use App\Models\Locale;
 use App\Models\Theme;
-use App\Models\Translation;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
@@ -24,21 +25,15 @@ class HandleInertiaRequests extends Middleware
      */
     protected $rootView = 'app';
 
-    /**
-     * Load admin UI translations keyed by [locale][key].
-     *
-     * @return array<string, array<string, string>>
-     */
     private function loadAdminTranslations(): array
     {
-        return Cache::remember('admin_translations', 3600, function (): array {
-            $rows = Translation::query()
-                ->where('group', 'admin')
-                ->get(['locale_code', 'key', 'value']);
-
+        return Cache::remember('admin_translations_v2', 3600, function (): array {
             $result = [];
-            foreach ($rows as $row) {
-                $result[$row->locale_code][$row->key] = $row->value;
+
+            foreach (glob(lang_path('*/admin.php')) ?: [] as $file) {
+                $locale = basename(dirname($file));
+                $translations = require $file;
+                $result[$locale] = Arr::dot($translations);
             }
 
             return $result;
@@ -77,7 +72,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'can' => [
-                'manageUsers' => Gate::allows('viewAny', \App\Models\User::class),
+                'manageUsers' => Gate::allows('viewAny', User::class),
             ],
             'flash' => [
                 'success' => $flashSuccess,
@@ -91,7 +86,7 @@ class HandleInertiaRequests extends Middleware
             ] : null,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'frontendUrl' => config('app.frontend_url', 'http://localhost:3000'),
-            'locales' => Locale::query()->active()->orderByDesc('is_default')->orderBy('name')->get(['code', 'name', 'native_name', 'flag_emoji', 'is_default']),
+            'locales' => Locale::getLocales(),
             'adminTranslations' => $this->loadAdminTranslations(),
         ];
     }

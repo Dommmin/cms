@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Copy, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 
 import { ConfirmButton } from '@/components/confirm-dialog';
@@ -44,10 +45,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function SectionTemplatesIndex({ templates, filters }: Props) {
+    const __ = useTranslation();
     const columns: ColumnDef<SectionTemplate>[] = [
         {
             accessorKey: 'name',
-            header: 'Name',
+            header: __('column.name', 'Name'),
             cell: ({ row }) => (
                 <div>
                     <p className="font-medium">{row.original.name}</p>
@@ -60,7 +62,7 @@ export default function SectionTemplatesIndex({ templates, filters }: Props) {
         },
         {
             accessorKey: 'category',
-            header: 'Category',
+            header: __('column.category', 'Category'),
             cell: ({ row }) =>
                 row.original.category ? (
                     <Badge variant="outline">{row.original.category}</Badge>
@@ -70,16 +72,16 @@ export default function SectionTemplatesIndex({ templates, filters }: Props) {
         },
         {
             accessorKey: 'is_global',
-            header: 'Scope',
+            header: __('column.scope', 'Scope'),
             cell: ({ row }) => (
                 <Badge variant={row.original.is_global ? 'default' : 'secondary'}>
-                    {row.original.is_global ? 'Global' : 'Local'}
+                    {row.original.is_global ? __('misc.global', 'Global') : __('misc.local', 'Local')}
                 </Badge>
             ),
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button
@@ -94,19 +96,19 @@ export default function SectionTemplatesIndex({ templates, filters }: Props) {
                         }
                     >
                         <Copy className="mr-1 h-3 w-3" />
-                        Duplicate
+                        {__('action.duplicate', 'Duplicate')}
                     </Button>
                     <Button asChild variant="outline" size="sm">
                         <Link href={`/admin/section-templates/${row.original.id}/edit`} prefetch cacheFor={30}>
                             <PencilIcon className="mr-1 h-3 w-3" />
-                            Edit
+                            {__('action.edit', 'Edit')}
                         </Link>
                     </Button>
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Template"
-                        description="Are you sure you want to delete this template? This cannot be undone."
+                        title={__('dialog.delete_title', 'Delete Template')}
+                        description={__('dialog.cannot_be_undone', 'Are you sure you want to delete this template? This cannot be undone.')}
                         onConfirm={() =>
                             router.delete(
                                 `/admin/section-templates/${row.original.id}`,
@@ -115,7 +117,7 @@ export default function SectionTemplatesIndex({ templates, filters }: Props) {
                         }
                     >
                         <TrashIcon className="mr-1 h-3 w-3" />
-                        Delete
+                        {__('action.delete', 'Delete')}
                     </ConfirmButton>
                 </div>
             ),
@@ -127,14 +129,14 @@ export default function SectionTemplatesIndex({ templates, filters }: Props) {
             <Head title="Section Templates" />
             <Wrapper>
                 <PageHeader
-                    title="Section Templates"
-                    description="Reusable section presets for the page builder"
+                    title={__('page.section_templates', 'Section Templates')}
+                    description={__('page.section_templates_desc', 'Reusable section presets for the page builder')}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/section-templates/create">
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
-                                New Template
+                                {__('action.create', 'New Template')}
                             </Button>
                         </Link>
                     </PageHeaderActions>
@@ -152,7 +154,7 @@ export default function SectionTemplatesIndex({ templates, filters }: Props) {
                         next_page_url: templates.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search templates..."
+                    searchPlaceholder={__('placeholder.search', 'Search templates...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/section-templates"
                 />

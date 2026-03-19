@@ -1,4 +1,4 @@
-.PHONY: up stop down build install shell migrate fresh test setup-test-db logs pail seed fresh-seed help
+.PHONY: up stop down build install shell migrate fresh test setup-test-db logs pail seed fresh-seed clear sync-translations npm-build pint help
 
 # Set environment variables
 export UID = $(shell id -u)
@@ -8,20 +8,27 @@ export UNAME = $(shell whoami)
 # Help
 help:
 	@echo "Available commands:"
-	@echo "  up - Start the application"
-	@echo "  down - Stop the application"
-	@echo "  stop - Stop the application"
-	@echo "  build - Build containers"
-	@echo "  install - Install dependencies"
-	@echo "  migrate - Run migrations"
-	@echo "  fresh - Fresh migrations"
-	@echo "  test - Run tests"
-	@echo "  setup-test-db - Setup test database"
-	@echo "  logs - Show logs"
-	@echo "  pail - Inspect php logs in live mode"
-	@echo "  seed - Seed database"
-	@echo "  fresh-seed - Fresh migrations and seed database"
-	@echo "  help - Show this help"
+	@echo "  up                 - Start the application"
+	@echo "  down               - Stop the application"
+	@echo "  stop               - Stop the application"
+	@echo "  build              - Build containers"
+	@echo "  install            - Install dependencies"
+	@echo "  migrate            - Run migrations"
+	@echo "  fresh              - Fresh migrations"
+	@echo "  seed               - Seed database"
+	@echo "  fresh-seed         - Fresh migrations and seed database"
+	@echo "  test               - Run tests"
+	@echo "  setup-test-db      - Setup test database"
+	@echo "  clear              - Clear all Laravel caches"
+	@echo "  sync-translations  - Sync admin translation keys from TSX files"
+	@echo "  npm-build          - Build frontend assets (node container)"
+	@echo "  pint               - Format PHP files with Pint"
+	@echo "  quality            - Run all quality checks (Pint, PHPStan, ESLint)"
+	@echo "  logs               - Show logs"
+	@echo "  pail               - Inspect php logs in live mode"
+	@echo "  shell              - Enter php container"
+	@echo "  node_shell         - Enter node container"
+	@echo "  help               - Show this help"
 
 # Start the application
 up:
@@ -97,12 +104,24 @@ logs:
 shell:
 	docker compose exec php bash
 
-# Clear all caches
+# Clear all caches (including translations cache)
 clear:
 	docker compose exec php php artisan cache:clear
 	docker compose exec php php artisan config:clear
 	docker compose exec php php artisan route:clear
 	docker compose exec php php artisan view:clear
+
+# Sync admin translation keys from TSX files into lang/*/admin.php
+sync-translations:
+	docker compose exec php php artisan admin:sync-translations
+
+# Build frontend assets (Next.js admin SPA)
+npm-build:
+	docker compose exec node npm run build
+
+# Format PHP files with Pint
+pint:
+	docker compose exec php vendor/bin/pint --dirty
 
 # Inspect php logs in live mode
 pail:

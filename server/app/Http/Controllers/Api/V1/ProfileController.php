@@ -103,7 +103,7 @@ class ProfileController extends Controller
         $orders = $customer
             ? Order::query()
                 ->where('customer_id', $customer->id)
-                ->with(['items.variant', 'shipments'])
+                ->with(['items.variant', 'shipment'])
                 ->get()
                 ->map(fn ($o) => [
                     'reference_number' => $o->reference_number,

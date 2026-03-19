@@ -10,6 +10,7 @@ import {
     SendIcon,
     ClockIcon,
 } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -66,10 +67,11 @@ const statusColors: Record<string, string> = {
 };
 
 export default function CampaignsIndex({ campaigns, filters }: Props) {
+    const __ = useTranslation();
     const columns: ColumnDef<Campaign>[] = [
         {
             accessorKey: 'name',
-            header: 'Name',
+            header: __('column.name', 'Name'),
             cell: ({ row }) => (
                 <div>
                     <div className="font-medium">{row.original.name}</div>
@@ -81,19 +83,19 @@ export default function CampaignsIndex({ campaigns, filters }: Props) {
         },
         {
             accessorKey: 'segment',
-            header: 'Segment',
+            header: __('column.segment', 'Segment'),
             cell: ({ row }) =>
                 row.original.segment ? (
                     <span className="text-sm">{row.original.segment.name}</span>
                 ) : (
                     <span className="text-muted-foreground">
-                        All subscribers
+                        {__('misc.all_subscribers', 'All subscribers')}
                     </span>
                 ),
         },
         {
             accessorKey: 'type',
-            header: 'Type',
+            header: __('column.type', 'Type'),
             cell: ({ row }) => (
                 <Badge variant="outline" className="text-xs">
                     {row.original.type}
@@ -102,7 +104,7 @@ export default function CampaignsIndex({ campaigns, filters }: Props) {
         },
         {
             accessorKey: 'status',
-            header: 'Status',
+            header: __('column.status', 'Status'),
             cell: ({ row }) => (
                 <Badge
                     className={
@@ -116,14 +118,14 @@ export default function CampaignsIndex({ campaigns, filters }: Props) {
         },
         {
             accessorKey: 'total_sent',
-            header: 'Sent',
+            header: __('column.sent', 'Sent'),
             cell: ({ row }) => (
                 <span className="text-sm">{row.original.total_sent}</span>
             ),
         },
         {
             accessorKey: 'scheduled_at',
-            header: 'Scheduled',
+            header: __('column.scheduled_at', 'Scheduled'),
             cell: ({ row }) =>
                 row.original.scheduled_at ? (
                     <span className="text-sm">
@@ -135,13 +137,13 @@ export default function CampaignsIndex({ campaigns, filters }: Props) {
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link href={`/admin/newsletter/campaigns/${row.original.id}`} prefetch cacheFor={60}>
                             <EyeIcon className="mr-1 h-3 w-3" />
-                            View
+                            {__('action.show', 'View')}
                         </Link>
                     </Button>
                     {row.original.status === 'draft' && (
@@ -149,7 +151,7 @@ export default function CampaignsIndex({ campaigns, filters }: Props) {
                             <Button asChild variant="outline" size="sm">
                                 <Link href={`/admin/newsletter/campaigns/${row.original.id}/edit`} prefetch cacheFor={30}>
                                     <PencilIcon className="mr-1 h-3 w-3" />
-                                    Edit
+                                    {__('action.edit', 'Edit')}
                                 </Link>
                             </Button>
                             <Button
@@ -191,7 +193,7 @@ export default function CampaignsIndex({ campaigns, filters }: Props) {
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Campaign"
+                        title={__('dialog.delete_title', 'Delete Campaign')}
                         description={`Are you sure you want to delete "${row.original.name}"?`}
                         onConfirm={() => {
                             router.delete(
@@ -215,14 +217,14 @@ export default function CampaignsIndex({ campaigns, filters }: Props) {
             <Head title="Newsletter Campaigns" />
             <Wrapper>
                 <PageHeader
-                    title="Campaigns"
-                    description="Manage email campaigns"
+                    title={__('page.campaigns', 'Campaigns')}
+                    description={__('page.campaigns_desc', 'Manage email campaigns')}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/newsletter/campaigns/create">
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
-                                Create Campaign
+                                {__('action.create', 'Create Campaign')}
                             </Button>
                         </Link>
                     </PageHeaderActions>
@@ -240,7 +242,7 @@ export default function CampaignsIndex({ campaigns, filters }: Props) {
                         next_page_url: campaigns.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search campaigns..."
+                    searchPlaceholder={__('placeholder.search', 'Search campaigns...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/newsletter/campaigns"
                 />

@@ -5,6 +5,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 interface Customer {
@@ -43,6 +44,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function CustomersIndex({ customers, filters }: IndexProps) {
+    const __ = useTranslation();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Customers" />
@@ -56,7 +59,7 @@ export default function CustomersIndex({ customers, filters }: IndexProps) {
                         <Button variant="outline" asChild>
                             <a href="/admin/ecommerce/customers/export">
                                 <DownloadIcon className="mr-2 h-4 w-4" />
-                                Export CSV
+                                {__('action.export_csv', 'Export CSV')}
                             </a>
                         </Button>
                     </PageHeaderActions>
@@ -66,7 +69,7 @@ export default function CustomersIndex({ customers, filters }: IndexProps) {
                     columns={[
                         {
                             accessorKey: 'name',
-                            header: 'Customer',
+                            header: __('column.customer', 'Customer'),
                             cell: ({ row }) => (
                                 <div className="flex items-center gap-2">
                                     <div className="flex h-8 w-8 items-center justify-center rounded bg-indigo-100">
@@ -88,15 +91,15 @@ export default function CustomersIndex({ customers, filters }: IndexProps) {
                         },
                         {
                             accessorKey: 'email',
-                            header: 'Email',
+                            header: __('column.email', 'Email'),
                         },
                         {
                             accessorKey: 'orders_count',
-                            header: 'Orders',
+                            header: __('column.orders', 'Orders'),
                         },
                         {
                             accessorKey: 'orders_sum_total',
-                            header: 'Total Spent',
+                            header: __('column.total_spent', 'Total Spent'),
                             cell: ({ row }) => (
                                 <span className="font-medium">
                                     $
@@ -117,7 +120,7 @@ export default function CustomersIndex({ customers, filters }: IndexProps) {
                         next_page_url: customers.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search customers..."
+                    searchPlaceholder={__('placeholder.search', 'Search customers...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/ecommerce/customers"
                 />

@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 interface ProductFlag {
@@ -21,6 +22,7 @@ interface ProductFlag {
 }
 
 export default function Edit({ flag }: { flag: ProductFlag }) {
+    const __ = useTranslation();
     const formId = 'product-flag-edit-form';
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -37,17 +39,16 @@ export default function Edit({ flag }: { flag: ProductFlag }) {
 
             <Wrapper>
                 <PageHeader
-                    title="Edit Product Flag"
+                    title={__('page.edit_product_flag', 'Edit Product Flag')}
                     description={`Update details for "${flag.name}"`}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                 <Link href='/admin/ecommerce/product-flags' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Flags
-                        
-                </Link>
-            </Button>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                {__('action.back', 'Back')}
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -60,7 +61,7 @@ export default function Edit({ flag }: { flag: ProductFlag }) {
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
+                                <Label htmlFor="name">{__('label.name', 'Name')}</Label>
                                 <Input
                                     id="name"
                                     name="name"
@@ -73,7 +74,7 @@ export default function Edit({ flag }: { flag: ProductFlag }) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="slug">Slug</Label>
+                                <Label htmlFor="slug">{__('label.slug', 'Slug')}</Label>
                                 <Input
                                     id="slug"
                                     name="slug"
@@ -85,7 +86,7 @@ export default function Edit({ flag }: { flag: ProductFlag }) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="color">Color</Label>
+                                <Label htmlFor="color">{__('label.color', 'Color')}</Label>
                                 <div className="flex items-center gap-2">
                                     <input
                                         id="color-picker"
@@ -111,7 +112,7 @@ export default function Edit({ flag }: { flag: ProductFlag }) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="description">Description</Label>
+                                <Label htmlFor="description">{__('label.description', 'Description')}</Label>
                                 <textarea
                                     id="description"
                                     name="description"
@@ -133,14 +134,14 @@ export default function Edit({ flag }: { flag: ProductFlag }) {
                                     className="h-4 w-4 rounded border-input"
                                 />
                                 <Label htmlFor="is_active" className="font-normal">
-                                    Active
+                                    {__('label.is_active', 'Active')}
                                 </Label>
                             </div>
 
                             <StickyFormActions
                                 formId={formId}
                                 processing={processing}
-                                submitLabel="Save Changes"
+                                submitLabel={__('action.save_changes', 'Save Changes')}
                             />
                         </>
                     )}

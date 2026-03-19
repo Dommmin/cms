@@ -11,6 +11,7 @@ import { MegaMenu } from "./mega-menu";
 import { MobileMenu } from "./mobile-menu";
 import { SearchBar } from "./search-bar";
 import { ThemeToggle } from "./theme-toggle";
+import { WishlistButton } from "./wishlist-button";
 
 export async function Header() {
   const [headersList, cookieStore] = await Promise.all([headers(), cookies()]);
@@ -46,6 +47,7 @@ export async function Header() {
           <SearchBar />
           <LocaleSwitcher />
           <ThemeToggle />
+          <WishlistButton />
           <CartButton />
           <AuthButton />
           {/* Mobile menu trigger */}

@@ -51,8 +51,11 @@ export function useCurrency() {
     }
 
     const divisor = 10 ** currency.decimal_places;
-    const rate = currency.is_base ? 1.0 : currency.exchange_rate;
-    const amount = (cents / divisor) * rate;
+    const rate = currency.is_base ? 1 : currency.exchange_rate;
+
+    // Multiply first, then divide — keeps arithmetic in integer space as long
+    // as possible and avoids floating-point drift (e.g. 142.49 vs 142.50).
+    const amount = Math.round(cents * rate) / divisor;
 
     // Pick a sensible locale for formatting based on currency
     const intlLocale =

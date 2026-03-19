@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -53,10 +54,11 @@ function formatDiscount(code: AffiliateCode): string {
 }
 
 export default function CodesIndex({ codes, filters }: Props) {
+    const __ = useTranslation();
     const columns: ColumnDef<AffiliateCode>[] = [
         {
             accessorKey: 'code',
-            header: 'Code',
+            header: __('column.code', 'Code'),
             cell: ({ row }) => (
                 <div>
                     <p className="font-mono font-semibold">{row.original.code}</p>
@@ -66,17 +68,17 @@ export default function CodesIndex({ codes, filters }: Props) {
         },
         {
             accessorKey: 'discount_type',
-            header: 'Discount',
+            header: __('column.discount', 'Discount'),
             cell: ({ row }) => <span className="text-sm">{formatDiscount(row.original)}</span>,
         },
         {
             accessorKey: 'commission_rate',
-            header: 'Commission',
+            header: __('column.commission', 'Commission'),
             cell: ({ row }) => <span className="text-sm">{row.original.commission_rate}%</span>,
         },
         {
             accessorKey: 'uses_count',
-            header: 'Uses',
+            header: __('column.uses', 'Uses'),
             cell: ({ row }) => (
                 <span className="text-sm">
                     {row.original.uses_count}
@@ -86,7 +88,7 @@ export default function CodesIndex({ codes, filters }: Props) {
         },
         {
             accessorKey: 'referrals_sum_commission_amount',
-            header: 'Total Commission',
+            header: __('column.total', 'Total Commission'),
             cell: ({ row }) => (
                 <span className="text-sm font-medium">
                     {((row.original.referrals_sum_commission_amount ?? 0) / 100).toFixed(2)}
@@ -95,29 +97,29 @@ export default function CodesIndex({ codes, filters }: Props) {
         },
         {
             accessorKey: 'is_active',
-            header: 'Status',
+            header: __('column.status', 'Status'),
             cell: ({ row }) => (
                 <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
-                    {row.original.is_active ? 'Active' : 'Inactive'}
+                    {row.original.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
                 </Badge>
             ),
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link href={`/admin/affiliates/codes/${row.original.id}/edit`} prefetch cacheFor={30}>
                             <PencilIcon className="mr-1 h-3 w-3" />
-                            Edit
+                            {__('action.edit', 'Edit')}
                         </Link>
                     </Button>
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Code"
-                        description="Delete this affiliate code? This cannot be undone."
+                        title={__('dialog.delete_title', 'Delete Code')}
+                        description={__('dialog.cannot_be_undone', 'Delete this affiliate code? This cannot be undone.')}
                         onConfirm={() =>
                             router.delete(`/admin/affiliates/codes/${row.original.id}`, {
                                 onSuccess: () => toast.success('Code deleted'),
@@ -125,7 +127,7 @@ export default function CodesIndex({ codes, filters }: Props) {
                         }
                     >
                         <TrashIcon className="mr-1 h-3 w-3" />
-                        Delete
+                        {__('action.delete', 'Delete')}
                     </ConfirmButton>
                 </div>
             ),
@@ -137,17 +139,17 @@ export default function CodesIndex({ codes, filters }: Props) {
             <Head title="Affiliate Codes" />
             <Wrapper>
                 <PageHeader
-                    title="Affiliate Codes"
-                    description="Manage referral codes and track affiliate performance"
+                    title={__('page.affiliates', 'Affiliate Codes')}
+                    description={__('page.affiliates_desc', 'Manage referral codes and track affiliate performance')}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/affiliates/referrals">
-                            <Button variant="outline">View Referrals</Button>
+                            <Button variant="outline">{__('action.show', 'View Referrals')}</Button>
                         </Link>
                         <Link href="/admin/affiliates/codes/create">
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
-                                New Code
+                                {__('action.create', 'New Code')}
                             </Button>
                         </Link>
                     </PageHeaderActions>
@@ -165,7 +167,7 @@ export default function CodesIndex({ codes, filters }: Props) {
                         next_page_url: codes.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search codes or affiliates..."
+                    searchPlaceholder={__('placeholder.search', 'Search codes or affiliates...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/affiliates/codes"
                 />

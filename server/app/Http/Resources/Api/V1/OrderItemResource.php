@@ -22,10 +22,10 @@ class OrderItemResource extends JsonResource
             'id' => $item->id,
             'product_name' => $item->product_name,
             'variant_name' => $item->variant_name,
-            'sku' => $item->sku,
+            'variant_sku' => $item->sku,
             'quantity' => $item->quantity,
             'unit_price' => $item->unit_price,
-            'total_price' => $item->total_price,
+            'subtotal' => $item->total_price,
         ];
     }
 }

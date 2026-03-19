@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { RefreshCw, PlusIcon, PencilIcon, TrashIcon } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -51,10 +52,11 @@ export default function ExchangeRatesIndex({
     currencies,
     filters,
 }: Props) {
+    const __ = useTranslation();
     const columns: ColumnDef<ExchangeRate>[] = [
         {
             accessorKey: 'currency',
-            header: 'Currency',
+            header: __('label.currency', 'Currency'),
             cell: ({ row }) => (
                 <div className="font-mono font-medium">
                     {row.original.currency.code}
@@ -63,7 +65,7 @@ export default function ExchangeRatesIndex({
         },
         {
             accessorKey: 'rate',
-            header: 'Rate',
+            header: __('column.rate', 'Rate'),
             cell: ({ row }) => (
                 <span className="font-mono">
                     {row.original.rate.toFixed(6)}
@@ -72,7 +74,7 @@ export default function ExchangeRatesIndex({
         },
         {
             accessorKey: 'source',
-            header: 'Source',
+            header: __('column.source', 'Source'),
             cell: ({ row }) =>
                 row.original.source ? (
                     <Badge variant="outline" className="text-xs">
@@ -84,7 +86,7 @@ export default function ExchangeRatesIndex({
         },
         {
             accessorKey: 'fetched_at',
-            header: 'Fetched',
+            header: __('column.fetched_at', 'Fetched'),
             cell: ({ row }) => (
                 <span className="text-sm">
                     {new Date(row.original.fetched_at).toLocaleString()}
@@ -93,19 +95,19 @@ export default function ExchangeRatesIndex({
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link href={`/admin/exchange-rates/${row.original.id}/edit`} prefetch cacheFor={30}>
                             <PencilIcon className="mr-1 h-3 w-3" />
-                            Edit
+                            {__('action.edit', 'Edit')}
                         </Link>
                     </Button>
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Rate"
+                        title={__('dialog.delete_title', 'Delete Rate')}
                         description={`Are you sure you want to delete this exchange rate?`}
                         onConfirm={() => {
                             router.delete(
@@ -129,14 +131,14 @@ export default function ExchangeRatesIndex({
             <Head title="Exchange Rates" />
             <Wrapper>
                 <PageHeader
-                    title="Exchange Rates"
-                    description="Manage currency exchange rates"
+                    title={__('page.exchange_rates', 'Exchange Rates')}
+                    description={__('page.exchange_rates_desc', 'Manage currency exchange rates')}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/exchange-rates/create">
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
-                                Add Rate
+                                {__('action.add', 'Add Rate')}
                             </Button>
                         </Link>
                     </PageHeaderActions>

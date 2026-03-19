@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,29 +39,21 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Settings', href: '/admin/settings' },
 ];
 
-const GROUP_META: Record<string, { label: string; icon: React.ComponentType<{ className?: string }> }> = {
-    general:      { label: 'General',      icon: SettingsIcon },
-    mail:         { label: 'Mail',         icon: MailIcon },
-    seo:          { label: 'SEO',          icon: SearchIcon },
-    social:       { label: 'Social Media', icon: ShareIcon },
-    ecommerce:    { label: 'E-commerce',   icon: ShoppingBagIcon },
-    integrations: { label: 'Integrations', icon: ZapIcon },
+const GROUP_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+    general:      SettingsIcon,
+    mail:         MailIcon,
+    seo:          SearchIcon,
+    social:       ShareIcon,
+    ecommerce:    ShoppingBagIcon,
+    integrations: ZapIcon,
 };
-
-function groupLabel(group: string): string {
-    return GROUP_META[group]?.label ?? group.charAt(0).toUpperCase() + group.slice(1);
-}
-
-function GroupIcon({ group, className }: { group: string; className?: string }) {
-    const Icon = GROUP_META[group]?.icon ?? GlobeIcon;
-    return <Icon className={className} />;
-}
 
 function SettingField({ setting, value, onChange }: {
     setting: Setting;
     value: string;
     onChange: (val: string) => void;
 }) {
+    const __ = useTranslation();
     const isEncrypted = setting.type === 'encrypted';
     const isBoolean = setting.type === 'boolean';
     const isInteger = setting.type === 'integer';
@@ -74,7 +67,7 @@ function SettingField({ setting, value, onChange }: {
                 {setting.label ?? setting.key}
                 {setting.is_public && (
                     <span className="ml-2 rounded bg-green-100 px-1.5 py-0.5 text-[10px] font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                        public
+                        {__('misc.public', 'public')}
                     </span>
                 )}
             </Label>
@@ -90,7 +83,7 @@ function SettingField({ setting, value, onChange }: {
                         onChange={(e) => onChange(e.target.checked ? 'true' : 'false')}
                         className="h-4 w-4 rounded border-gray-300"
                     />
-                    <Label htmlFor={inputId} className="text-sm font-normal">Enabled</Label>
+                    <Label htmlFor={inputId} className="text-sm font-normal">{__('status.enabled', 'Enabled')}</Label>
                 </div>
             ) : isLong ? (
                 <Textarea
@@ -115,11 +108,30 @@ function SettingField({ setting, value, onChange }: {
 }
 
 export default function Index({ settings, groups, currentGroup }: Props) {
+    const __ = useTranslation();
     const initialValues = Object.fromEntries(
         settings.data.map((s) => [s.key, s.value == null ? '' : String(s.value)]),
     );
     const [values, setValues] = useState<Record<string, string>>(initialValues);
     const [processing, setProcessing] = useState(false);
+
+    const groupLabels: Record<string, string> = {
+        general:      __('nav.settings', 'General'),
+        mail:         __('settings.group_mail', 'Mail'),
+        seo:          __('nav.settings', 'SEO'),
+        social:       __('settings.group_social', 'Social Media'),
+        ecommerce:    __('nav.shop', 'E-commerce'),
+        integrations: __('settings.group_integrations', 'Integrations'),
+    };
+
+    function groupLabel(group: string): string {
+        return groupLabels[group] ?? (group.charAt(0).toUpperCase() + group.slice(1));
+    }
+
+    function GroupIcon({ group, className }: { group: string; className?: string }) {
+        const Icon = GROUP_ICONS[group] ?? GlobeIcon;
+        return <Icon className={className} />;
+    }
 
     const handleChange = (key: string, val: string) => {
         setValues((prev) => ({ ...prev, [key]: val }));
@@ -136,8 +148,8 @@ export default function Index({ settings, groups, currentGroup }: Props) {
             { settings: values },
             {
                 preserveScroll: true,
-                onSuccess: () => toast.success('Settings saved'),
-                onError: () => toast.error('Failed to save settings'),
+                onSuccess: () => toast.success(__('settings.saved', 'Settings saved')),
+                onError: () => toast.error(__('settings.save_failed', 'Failed to save settings')),
                 onFinish: () => setProcessing(false),
             },
         );
@@ -145,12 +157,12 @@ export default function Index({ settings, groups, currentGroup }: Props) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Settings" />
+            <Head title={__('page.settings', 'Settings')} />
 
             <Wrapper>
                 <PageHeader
-                    title="Settings"
-                    description="Configure your application"
+                    title={__('page.settings', 'Settings')}
+                    description={__('settings.description', 'Configure your application')}
                 />
 
                 <div className="flex gap-6">
@@ -179,7 +191,7 @@ export default function Index({ settings, groups, currentGroup }: Props) {
                     <div className="min-w-0 flex-1">
                         {settings.data.length === 0 ? (
                             <div className="rounded-lg border border-dashed p-12 text-center">
-                                <p className="text-sm text-muted-foreground">No settings in this group.</p>
+                                <p className="text-sm text-muted-foreground">{__('settings.no_settings', 'No settings in this group.')}</p>
                             </div>
                         ) : (
                             <div className="space-y-6">
@@ -203,10 +215,10 @@ export default function Index({ settings, groups, currentGroup }: Props) {
 
                                 <div className="flex items-center gap-4">
                                     <Button onClick={handleSave} disabled={processing}>
-                                        {processing ? 'Saving...' : 'Save Settings'}
+                                        {processing ? __('misc.saving', 'Saving...') : __('settings.save_btn', 'Save Settings')}
                                     </Button>
                                     <p className="text-xs text-muted-foreground">
-                                        Changes are applied immediately.
+                                        {__('settings.applied_immediately', 'Changes are applied immediately.')}
                                     </p>
                                 </div>
                             </div>

@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 import type { User } from '@/types/auth';
 
@@ -18,6 +19,7 @@ export default function Edit({
     user: User;
     roles?: { id: number; name: string }[];
 }) {
+    const __ = useTranslation();
     const formId = `edit-user-form-${user.id}`;
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -43,8 +45,8 @@ export default function Edit({
                         <Button asChild variant="outline">
                 <Link href='/admin/users' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Users
-                        
+                            {__('action.back', 'Back')}
+
                 </Link>
             </Button>
                     </PageHeaderActions>
@@ -60,7 +62,7 @@ export default function Edit({
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
+                                <Label htmlFor="name">{__('label.name', 'Name')}</Label>
                                 <Input
                                     id="name"
                                     name="name"
@@ -71,7 +73,7 @@ export default function Edit({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email</Label>
+                                <Label htmlFor="email">{__('label.email', 'Email')}</Label>
                                 <Input
                                     id="email"
                                     name="email"
@@ -112,7 +114,7 @@ export default function Edit({
 
                             {roles.length > 0 && (
                                 <div className="grid gap-2">
-                                    <Label htmlFor="roles">Roles</Label>
+                                    <Label htmlFor="roles">{__('label.roles', 'Roles')}</Label>
                                     <div className="space-y-2">
                                         {roles.map((role) => (
                                             <div
@@ -147,7 +149,7 @@ export default function Edit({
                             <StickyFormActions
                                 formId={formId}
                                 processing={processing}
-                                submitLabel="Save Changes"
+                                submitLabel={__('action.save_changes', 'Save Changes')}
                             />
                         </>
                     )}

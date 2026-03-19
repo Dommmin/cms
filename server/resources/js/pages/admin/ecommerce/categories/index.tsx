@@ -1,7 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Folder, PlusIcon } from 'lucide-react';
 import {
-    categoryColumns,
+    useCategoryColumns,
     type CategoryRow,
 } from '@/components/columns/category-columns';
 import DataTable from '@/components/data-table';
@@ -9,6 +9,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 type CategoryData = {
@@ -32,19 +33,22 @@ export default function CategoriesIndex({
     categories: CategoryData;
     filters: { search?: string };
 }) {
+    const __ = useTranslation();
+    const categoryColumns = useCategoryColumns();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Categories" />
             <Wrapper>
                 <PageHeader
-                    title="Categories"
-                    description="Manage product categories"
+                    title={__('page.categories', 'Categories')}
+                    description={__('page.categories_desc', 'Manage product categories')}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link href="/admin/ecommerce/categories/create" prefetch cacheFor={30}>
                                 <PlusIcon className="mr-2 h-4 w-4" />
-                                Add Category
+                                {__('action.add', 'Add Category')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -62,7 +66,7 @@ export default function CategoriesIndex({
                         next_page_url: categories.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search categories..."
+                    searchPlaceholder={__('placeholder.search_categories', 'Search categories...')}
                     searchValue={filters?.search ?? ''}
                     baseUrl="/admin/ecommerce/categories"
                 />

@@ -7,6 +7,7 @@ import {
     TrashIcon,
     StarIcon,
 } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -53,41 +54,42 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function CurrenciesIndex({ currencies, filters }: Props) {
+    const __ = useTranslation();
     const columns: ColumnDef<Currency>[] = [
         {
             accessorKey: 'code',
-            header: 'Code',
+            header: __('label.code', 'Code'),
             cell: ({ row }) => (
                 <div className="font-mono font-medium">{row.original.code}</div>
             ),
         },
         {
             accessorKey: 'name',
-            header: 'Name',
+            header: __('column.name', 'Name'),
             cell: ({ row }) => <div>{row.original.name}</div>,
         },
         {
             accessorKey: 'symbol',
-            header: 'Symbol',
+            header: __('label.symbol', 'Symbol'),
             cell: ({ row }) => (
                 <span className="font-mono">{row.original.symbol}</span>
             ),
         },
         {
             accessorKey: 'decimal_places',
-            header: 'Decimals',
+            header: __('column.decimals', 'Decimals'),
             cell: ({ row }) => <span>{row.original.decimal_places}</span>,
         },
         {
             accessorKey: 'exchange_rates',
-            header: 'Rate',
+            header: __('column.rate', 'Rate'),
             cell: ({ row }) => {
                 const rate = row.original.exchange_rates?.[0];
                 if (row.original.is_base) {
                     return (
                         <Badge variant="outline">
                             <StarIcon className="mr-1 h-3 w-3" />
-                            Base
+                            {__('misc.default', 'Base')}
                         </Badge>
                     );
                 }
@@ -103,30 +105,30 @@ export default function CurrenciesIndex({ currencies, filters }: Props) {
         },
         {
             accessorKey: 'is_active',
-            header: 'Status',
+            header: __('column.status', 'Status'),
             cell: ({ row }) => (
                 <Badge
                     variant={row.original.is_active ? 'default' : 'secondary'}
                 >
-                    {row.original.is_active ? 'Active' : 'Inactive'}
+                    {row.original.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
                 </Badge>
             ),
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link href={`/admin/currencies/${row.original.id}/edit`} prefetch cacheFor={30}>
                             <PencilIcon className="mr-1 h-3 w-3" />
-                            Edit
+                            {__('action.edit', 'Edit')}
                         </Link>
                     </Button>
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Currency"
+                        title={__('dialog.delete_title', 'Delete Currency')}
                         description={`Are you sure you want to delete "${row.original.code}"?`}
                         onConfirm={() => {
                             router.delete(
@@ -151,14 +153,14 @@ export default function CurrenciesIndex({ currencies, filters }: Props) {
             <Head title="Currencies" />
             <Wrapper>
                 <PageHeader
-                    title="Currencies"
-                    description="Manage currencies and exchange rates"
+                    title={__('page.currencies', 'Currencies')}
+                    description={__('page.currencies_desc', 'Manage currencies and exchange rates')}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/currencies/create">
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
-                                Add Currency
+                                {__('action.add', 'Add Currency')}
                             </Button>
                         </Link>
                     </PageHeaderActions>
@@ -176,7 +178,7 @@ export default function CurrenciesIndex({ currencies, filters }: Props) {
                         next_page_url: currencies.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search currencies..."
+                    searchPlaceholder={__('placeholder.search', 'Search currencies...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/currencies"
                 />

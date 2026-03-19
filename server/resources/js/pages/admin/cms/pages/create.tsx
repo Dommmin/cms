@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 
 import type { BreadcrumbItem } from '@/types';
 
@@ -44,6 +45,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Create({ modules, pages }: Props) {
+    const __ = useTranslation();
+
     const moduleOptions = useMemo(
         () => Object.entries(modules ?? {}),
         [modules],
@@ -70,17 +73,16 @@ export default function Create({ modules, pages }: Props) {
 
             <Wrapper>
                 <PageHeader
-                    title="Create Page"
-                    description="Add a new CMS page"
+                    title={__('page.create_page', 'Create Page')}
+                    description={__('page.create_page_desc', 'Add a new CMS page')}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/cms/pages' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Pages
-                        
-                </Link>
-            </Button>
+                            <Link href='/admin/cms/pages' prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                {__('action.back', 'Back')}
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -100,14 +102,14 @@ export default function Create({ modules, pages }: Props) {
 
                             <Tabs defaultValue="general" className="space-y-6">
                                 <TabsList>
-                                    <TabsTrigger value="general">General</TabsTrigger>
-                                    <TabsTrigger value="seo">SEO</TabsTrigger>
+                                    <TabsTrigger value="general">{__('tab.general', 'General')}</TabsTrigger>
+                                    <TabsTrigger value="seo">{__('tab.seo', 'SEO')}</TabsTrigger>
                                 </TabsList>
 
                                 <TabsContent value="general" className="space-y-6">
                                     {pages.length > 0 && (
                                         <div className="grid gap-2">
-                                            <Label>Parent page</Label>
+                                            <Label>{__('label.parent_page', 'Parent page')}</Label>
                                             <Select value={parentId} onValueChange={setParentId}>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="No parent (top-level)" />
@@ -126,7 +128,7 @@ export default function Create({ modules, pages }: Props) {
                                     )}
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="title">Title</Label>
+                                        <Label htmlFor="title">{__('label.title', 'Title')}</Label>
                                         <Input
                                             id="title"
                                             name="title"
@@ -140,7 +142,7 @@ export default function Create({ modules, pages }: Props) {
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="slug">Slug</Label>
+                                        <Label htmlFor="slug">{__('label.slug', 'Slug')}</Label>
                                         <Input
                                             id="slug"
                                             name="slug"
@@ -164,18 +166,18 @@ export default function Create({ modules, pages }: Props) {
                                                 }}
                                                 className="h-4 w-4 rounded border-input"
                                             />
-                                            Set slug manually
+                                            {__('misc.slug_auto_hint', 'Set slug manually')}
                                         </label>
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="excerpt">Excerpt</Label>
+                                        <Label htmlFor="excerpt">{__('label.excerpt', 'Excerpt')}</Label>
                                         <Textarea id="excerpt" name="excerpt" placeholder="Short description..." />
                                         <InputError message={errors.excerpt} />
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label>Layout</Label>
+                                        <Label>{__('label.layout', 'Layout')}</Label>
                                         <Select value={layout} onValueChange={setLayout}>
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Select layout" />
@@ -190,7 +192,7 @@ export default function Create({ modules, pages }: Props) {
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label>Page type</Label>
+                                        <Label>{__('label.page_type', 'Page type')}</Label>
                                         <Select
                                             value={pageType}
                                             onValueChange={(value) => {
@@ -211,7 +213,7 @@ export default function Create({ modules, pages }: Props) {
 
                                     {pageType === 'module' && (
                                         <div className="grid gap-2">
-                                            <Label>Module</Label>
+                                            <Label>{__('label.module', 'Module')}</Label>
                                             <Select
                                                 value={moduleName ?? ''}
                                                 onValueChange={(value) => setModuleName(value === '' ? null : value)}
@@ -248,19 +250,19 @@ export default function Create({ modules, pages }: Props) {
 
                                 <TabsContent value="seo" className="space-y-6">
                                     <div className="grid gap-2">
-                                        <Label htmlFor="seo_title">SEO title</Label>
+                                        <Label htmlFor="seo_title">{__('label.seo_title', 'SEO title')}</Label>
                                         <Input id="seo_title" name="seo_title" placeholder="SEO title" />
                                         <InputError message={errors.seo_title} />
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="seo_description">SEO description</Label>
+                                        <Label htmlFor="seo_description">{__('label.seo_description', 'SEO description')}</Label>
                                         <Textarea id="seo_description" name="seo_description" placeholder="SEO description" />
                                         <InputError message={errors.seo_description} />
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="seo_canonical">Canonical URL</Label>
+                                        <Label htmlFor="seo_canonical">{__('label.canonical_url', 'Canonical URL')}</Label>
                                         <Input id="seo_canonical" name="seo_canonical" placeholder="https://..." />
                                         <InputError message={errors.seo_canonical} />
                                     </div>
@@ -268,7 +270,7 @@ export default function Create({ modules, pages }: Props) {
 
                                 <div className="flex items-center gap-4 pt-2">
                                     <Button type="submit" disabled={processing}>
-                                        {processing ? 'Creating...' : 'Create Page'}
+                                        {processing ? __('misc.processing', 'Creating...') : __('action.create_page', 'Create Page')}
                                     </Button>
                                 </div>
                             </Tabs>

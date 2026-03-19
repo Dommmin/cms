@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 interface Brand {
@@ -44,20 +45,22 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function BrandsIndex({ brands, filters }: IndexProps) {
+    const __ = useTranslation();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Brands" />
 
             <Wrapper>
                 <PageHeader
-                    title="Brands"
+                    title={__('page.brands', 'Brands')}
                     description={`${brands.total} product brands`}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link href="/admin/ecommerce/brands/create" prefetch cacheFor={30}>
                                 <Plus className="mr-2 h-4 w-4" />
-                                Add Brand
+                                {__('action.add_brand', 'Add Brand')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -67,7 +70,7 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                     columns={[
                         {
                             accessorKey: 'name',
-                            header: 'Brand',
+                            header: __('column.brand', 'Brand'),
                             cell: ({ row }) => (
                                 <div className="flex items-center gap-2">
                                     <div className="flex h-8 w-8 items-center justify-center rounded bg-purple-100">
@@ -88,7 +91,7 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                         },
                         {
                             accessorKey: 'slug',
-                            header: 'Slug',
+                            header: __('column.slug', 'Slug'),
                             cell: ({ row }) => (
                                 <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
                                     /{row.original.slug}
@@ -97,11 +100,11 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                         },
                         {
                             accessorKey: 'products_count',
-                            header: 'Products',
+                            header: __('column.products', 'Products'),
                         },
                         {
                             accessorKey: 'is_active',
-                            header: 'Status',
+                            header: __('column.status', 'Status'),
                             cell: ({ row }) => (
                                 <Badge
                                     variant={
@@ -111,27 +114,27 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                                     }
                                 >
                                     {row.original.is_active
-                                        ? 'Active'
-                                        : 'Inactive'}
+                                        ? __('status.active', 'Active')
+                                        : __('status.inactive', 'Inactive')}
                                 </Badge>
                             ),
                         },
                         {
                             id: 'actions',
-                            header: 'Actions',
+                            header: __('column.actions', 'Actions'),
                             cell: ({ row }) => (
                                 <div className="flex items-center gap-2">
                                     <Button asChild variant="outline" size="sm">
                                         <Link href={`/admin/ecommerce/brands/${row.original.id}/edit`} prefetch cacheFor={30}>
                                             <PencilIcon className="mr-1 h-3 w-3" />
-                                            Edit
+                                            {__('action.edit', 'Edit')}
                                         </Link>
                                     </Button>
                                     <ConfirmButton
                                         variant="outline"
                                         size="sm"
-                                        title="Delete Brand"
-                                        description={`Are you sure you want to delete "${row.original.name}"?`}
+                                        title={__('dialog.delete_title', 'Delete Brand')}
+                                        description={`${__('dialog.are_you_sure', 'Are you sure you want to delete')} "${row.original.name}"?`}
                                         onConfirm={() => {
                                             router.delete(
                                                 `/admin/ecommerce/brands/${row.original.id}`,
@@ -154,7 +157,7 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                         next_page_url: brands.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search brands..."
+                    searchPlaceholder={__('placeholder.search_brands', 'Search brands...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/ecommerce/brands"
                 />

@@ -1,4 +1,5 @@
 import { useAdminLocale } from '@/hooks/use-admin-locale';
+import { useTranslation } from '@/hooks/use-translation';
 import { Link, Head, router, usePage } from '@inertiajs/react';
 import { ArrowLeftIcon, EyeIcon } from 'lucide-react';
 import { SeoPanel } from '@/components/seo-panel';
@@ -48,6 +49,7 @@ export default function Edit({
         ? categories
         : (Object.values(categories) as Category[]);
 
+    const __ = useTranslation();
     const [activeLocale, setActiveLocale] = useAdminLocale(defaultLocale);
     const [nameValues, setNameValues] = useState<Record<string, string>>(
         category.name ?? { [defaultLocale]: '' },
@@ -136,13 +138,13 @@ export default function Edit({
                                 rel="noopener noreferrer"
                             >
                                 <EyeIcon className="mr-2 h-4 w-4" />
-                                Preview
+                                {__('action.preview', 'Preview')}
                             </a>
                         </Button>
                         <Button asChild variant="outline">
                             <Link href='/admin/ecommerce/categories' prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                Back to Categories
+                                {__('action.back', 'Back')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -155,14 +157,14 @@ export default function Edit({
                 >
                     <Tabs defaultValue="general" className="space-y-6">
                         <TabsList>
-                            <TabsTrigger value="general">General</TabsTrigger>
-                            <TabsTrigger value="seo">SEO</TabsTrigger>
+                            <TabsTrigger value="general">{__('tab.general', 'General')}</TabsTrigger>
+                            <TabsTrigger value="seo">{__('tab.seo', 'SEO')}</TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="general" className="space-y-6">
                     <div className="grid gap-2">
                         <div className="flex items-center justify-between">
-                            <Label>Name</Label>
+                            <Label>{__('label.name', 'Name')}</Label>
                             <LocaleTabSwitcher
                                 locales={locales}
                                 activeLocale={activeLocale}
@@ -210,7 +212,7 @@ export default function Edit({
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="slug">Slug</Label>
+                        <Label htmlFor="slug">{__('label.slug', 'Slug')}</Label>
                         <Input
                             id="slug"
                             value={slug}
@@ -235,12 +237,12 @@ export default function Edit({
                                 }}
                                 className="h-4 w-4 rounded border-input"
                             />
-                            Set slug manually
+                            {__('misc.slug_auto_hint', 'Set slug manually')}
                         </label>
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="parent_id">Parent Category</Label>
+                        <Label htmlFor="parent_id">{__('label.category', 'Parent Category')}</Label>
                         <select
                             id="parent_id"
                             name="parent_id"
@@ -259,7 +261,7 @@ export default function Edit({
 
                     <div className="grid gap-2">
                         <div className="flex items-center justify-between">
-                            <Label>Description</Label>
+                            <Label>{__('label.description', 'Description')}</Label>
                             <LocaleTabSwitcher
                                 locales={locales}
                                 activeLocale={activeLocale}
@@ -316,7 +318,7 @@ export default function Edit({
                             className="h-4 w-4 rounded border-input"
                         />
                         <Label htmlFor="is_active" className="font-normal">
-                            Active
+                            {__('label.is_active', 'Active')}
                         </Label>
                     </div>
                         </TabsContent>
@@ -337,7 +339,7 @@ export default function Edit({
                     <StickyFormActions
                         formId="category-edit-form"
                         processing={processing}
-                        submitLabel="Save Changes"
+                        submitLabel={__('action.save_changes', 'Save Changes')}
                     />
 
                     <VersionHistory modelType="category" modelId={category.id} />

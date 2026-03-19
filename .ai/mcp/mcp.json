@@ -5,19 +5,29 @@
       "args": [
         "compose",
         "exec",
-        "-T",
         "php",
         "php",
         "artisan",
         "boost:mcp"
       ]
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": [
+        "shadcn@latest",
+        "mcp"
+      ]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/domin/projects/laravel/cms"
+      ]
+    },
+    "context7": {
+      "url": "https://mcp.context7.com/mcp"
     }
-  },
-  "shadcn": {
-    "command": "npx",
-    "args": [
-      "shadcn@latest",
-      "mcp"
-    ]}
   }
 }

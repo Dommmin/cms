@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 type Category = { id: number; name: string | Record<string, string> };
@@ -69,10 +70,11 @@ const STATUS_BADGE: Record<string, 'default' | 'secondary' | 'destructive' | 'ou
 };
 
 export default function BlogPostsIndex({ posts, filters, statuses, categories }: Props) {
+    const __ = useTranslation();
     const columns: ColumnDef<BlogPost>[] = [
         {
             accessorKey: 'title',
-            header: 'Title',
+            header: __('column.title', 'Title'),
             cell: ({ row }) => (
                 <div className="max-w-sm">
                     <div className="flex items-center gap-1">
@@ -91,7 +93,7 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
         },
         {
             accessorKey: 'status',
-            header: 'Status',
+            header: __('column.status', 'Status'),
             cell: ({ row }) => (
                 <Badge variant={STATUS_BADGE[row.original.status] ?? 'secondary'}>
                     {row.original.status}
@@ -100,7 +102,7 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
         },
         {
             accessorKey: 'content_type',
-            header: 'Type',
+            header: __('column.type', 'Type'),
             cell: ({ row }) => (
                 <Badge variant="outline" className="capitalize">
                     {row.original.content_type}
@@ -109,7 +111,7 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
         },
         {
             accessorKey: 'author',
-            header: 'Author',
+            header: __('column.author', 'Author'),
             cell: ({ row }) => (
                 <span className="text-sm text-muted-foreground">
                     {row.original.author?.name ?? '—'}
@@ -118,7 +120,7 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
         },
         {
             accessorKey: 'published_at',
-            header: 'Published',
+            header: __('column.published_at', 'Published'),
             cell: ({ row }) => (
                 <span className="text-sm text-muted-foreground">
                     {row.original.published_at
@@ -136,13 +138,13 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link href={`/admin/blog/posts/${row.original.id}/edit`} prefetch cacheFor={30}>
                             <PencilIcon className="mr-1 h-3 w-3" />
-                            Edit
+                            {__('action.edit', 'Edit')}
                         </Link>
                     </Button>
                     {row.original.status !== 'published' ? (
@@ -157,7 +159,7 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
                                 );
                             }}
                         >
-                            Publish
+                            {__('action.publish', 'Publish')}
                         </Button>
                     ) : (
                         <Button
@@ -171,14 +173,14 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
                                 );
                             }}
                         >
-                            Unpublish
+                            {__('action.unpublish', 'Unpublish')}
                         </Button>
                     )}
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Post"
-                        description="Are you sure you want to delete this post? This action cannot be undone."
+                        title={__('dialog.delete_title', 'Delete Post')}
+                        description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
                             router.delete(`/admin/blog/posts/${row.original.id}`, {
                                 onSuccess: () => toast.success('Post deleted'),
@@ -186,7 +188,7 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
                         }}
                     >
                         <TrashIcon className="mr-1 h-3 w-3" />
-                        Delete
+                        {__('action.delete', 'Delete')}
                     </ConfirmButton>
                 </div>
             ),
@@ -198,14 +200,14 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
             <Head title="Blog Posts" />
             <Wrapper>
                 <PageHeader
-                    title="Blog Posts"
-                    description="Manage your blog content"
+                    title={__('page.blog_posts', 'Blog Posts')}
+                    description={__('page.blog_posts_desc', 'Manage your blog content')}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/blog/posts/create">
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
-                                New Post
+                                {__('page.create_post', 'New Post')}
                             </Button>
                         </Link>
                     </PageHeaderActions>
@@ -223,7 +225,7 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
                         next_page_url: posts.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search posts..."
+                    searchPlaceholder={__('placeholder.search_posts', 'Search posts...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/blog/posts"
                 />

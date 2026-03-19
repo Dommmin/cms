@@ -21,26 +21,26 @@
 
 Everything from the original plan has been implemented and tested.
 
-| Artifact | Status |
-|---|---|
-| `app/Models/BlogCategory.php` + factory | ✅ |
-| `app/Models/BlogPost.php` + factory | ✅ |
-| `app/Enums/BlogPostStatusEnum.php` | ✅ |
-| `app/Http/Controllers/Admin/BlogPostController.php` | ✅ |
-| `app/Http/Controllers/Admin/BlogCategoryController.php` | ✅ |
-| `app/Queries/Admin/BlogPostIndexQuery.php` | ✅ |
-| `app/Queries/Admin/BlogCategoryIndexQuery.php` | ✅ |
-| `app/Http/Requests/Admin/StoreBlogPostRequest.php` | ✅ |
-| `app/Http/Requests/Admin/UpdateBlogPostRequest.php` | ✅ |
-| `app/Http/Requests/Admin/StoreBlogCategoryRequest.php` | ✅ |
-| `app/Http/Requests/Admin/UpdateBlogCategoryRequest.php` | ✅ |
-| `routes/admin/blog.php` | ✅ |
-| `resources/js/pages/admin/blog/posts/{index,create,edit}.tsx` | ✅ |
-| `resources/js/pages/admin/blog/categories/{index,create,edit}.tsx` | ✅ |
-| Blog Posts + Blog Categories in sidebar (under CMS) | ✅ |
-| `tests/Feature/Admin/BlogPostControllerTest.php` (9 tests) | ✅ |
-| `tests/Feature/Admin/BlogCategoryControllerTest.php` (9 tests) | ✅ |
-| Migrations: `blog_categories`, `blog_posts` | ✅ |
+| Artifact                                                           | Status |
+|--------------------------------------------------------------------|--------|
+| `app/Models/BlogCategory.php` + factory                            | ✅      |
+| `app/Models/BlogPost.php` + factory                                | ✅      |
+| `app/Enums/BlogPostStatusEnum.php`                                 | ✅      |
+| `app/Http/Controllers/Admin/BlogPostController.php`                | ✅      |
+| `app/Http/Controllers/Admin/BlogCategoryController.php`            | ✅      |
+| `app/Queries/Admin/BlogPostIndexQuery.php`                         | ✅      |
+| `app/Queries/Admin/BlogCategoryIndexQuery.php`                     | ✅      |
+| `app/Http/Requests/Admin/StoreBlogPostRequest.php`                 | ✅      |
+| `app/Http/Requests/Admin/UpdateBlogPostRequest.php`                | ✅      |
+| `app/Http/Requests/Admin/StoreBlogCategoryRequest.php`             | ✅      |
+| `app/Http/Requests/Admin/UpdateBlogCategoryRequest.php`            | ✅      |
+| `routes/admin/blog.php`                                            | ✅      |
+| `resources/js/pages/admin/blog/posts/{index,create,edit}.tsx`      | ✅      |
+| `resources/js/pages/admin/blog/categories/{index,create,edit}.tsx` | ✅      |
+| Blog Posts + Blog Categories in sidebar (under CMS)                | ✅      |
+| `tests/Feature/Admin/BlogPostControllerTest.php` (9 tests)         | ✅      |
+| `tests/Feature/Admin/BlogCategoryControllerTest.php` (9 tests)     | ✅      |
+| Migrations: `blog_categories`, `blog_posts`                        | ✅      |
 
 **Blog routes available:**
 - `GET/POST /admin/blog/posts` — index / store
@@ -55,20 +55,20 @@ Everything from the original plan has been implemented and tested.
 
 ### Rich Text Editor Upgrades ✅
 
-| Fix / Feature | Status |
-|---|---|
-| `resizable-image-extension.tsx` — inline atom node with ReactNodeViewRenderer | ✅ |
-| Width presets toolbar (25% / 50% / 75% / 100%) shown on image selection | ✅ |
-| Float alignment (left / none / right) via toolbar | ✅ |
-| Drag-resize handle (bottom-right corner, `nwse-resize`) | ✅ |
-| Clicking outside image deselects it (inline span, not block div) | ✅ |
-| Text before/after image in same paragraph | ✅ |
-| `TrailingNode` extension — always a paragraph after block nodes | ✅ |
-| `GapCursor` CSS in `app.css` | ✅ |
-| Fixed `setContent(value, { emitUpdate: false })` — Tiptap v3 API | ✅ |
-| Fixed `TextStyle` import — named export in Tiptap v3 | ✅ |
-| `isImageSelected` using `NodeSelection` — reliable image toolbar trigger | ✅ |
-| `ImageGallery` extension (insert multi-image gallery block) | ✅ |
+| Fix / Feature                                                                 | Status |
+|-------------------------------------------------------------------------------|--------|
+| `resizable-image-extension.tsx` — inline atom node with ReactNodeViewRenderer | ✅      |
+| Width presets toolbar (25% / 50% / 75% / 100%) shown on image selection       | ✅      |
+| Float alignment (left / none / right) via toolbar                             | ✅      |
+| Drag-resize handle (bottom-right corner, `nwse-resize`)                       | ✅      |
+| Clicking outside image deselects it (inline span, not block div)              | ✅      |
+| Text before/after image in same paragraph                                     | ✅      |
+| `TrailingNode` extension — always a paragraph after block nodes               | ✅      |
+| `GapCursor` CSS in `app.css`                                                  | ✅      |
+| Fixed `setContent(value, { emitUpdate: false })` — Tiptap v3 API              | ✅      |
+| Fixed `TextStyle` import — named export in Tiptap v3                          | ✅      |
+| `isImageSelected` using `NodeSelection` — reliable image toolbar trigger      | ✅      |
+| `ImageGallery` extension (insert multi-image gallery block)                   | ✅      |
 
 ---
 
@@ -82,24 +82,24 @@ Everything from the original plan has been implemented and tested.
 
 The following admin modules were already fully implemented before this sprint:
 
-| Module | Controller | Pages | Routes | Tests |
-|---|---|---|---|---|
-| **CMS Pages** + Page Builder | ✅ | ✅ | `routes/admin/cms.php` | ✅ partial |
-| **Reusable Blocks** | ✅ | ✅ | `routes/admin/cms.php` | ✅ |
-| **Menus** | ✅ | ✅ | `routes/admin.php` | ✅ |
-| **Themes** | ✅ | ✅ | `routes/admin.php` | ✅ |
-| **Forms + Submissions** | ✅ | ✅ | `routes/admin.php` | ❌ |
-| **FAQ** | ✅ | ✅ | `routes/admin.php` | ⚠️ failing |
-| **Media** | ✅ | ✅ | `routes/admin.php` | ❌ |
-| **Settings** (6 groups) | ✅ | ✅ | `routes/admin.php` | ❌ |
-| **Users** | ✅ | ✅ | `routes/admin.php` | ⚠️ 1 failing |
-| **Notifications** | ✅ | ✅ | `routes/admin.php` | ✅ |
-| **Cookie Consents** | ✅ | ✅ | `routes/admin.php` | ❌ |
-| **Currencies** | ✅ | ✅ | `routes/admin.php` | ⚠️ failing |
-| **Exchange Rates** | ✅ | ✅ | `routes/admin.php` | ❌ |
-| **Newsletter** (subscribers/segments/campaigns) | ✅ | ✅ | `routes/admin.php` | ❌ |
-| **Ecommerce** (products, orders, customers, etc.) | ✅ | ✅ | `routes/admin/ecommerce.php` | ✅ partial |
-| **Dashboard** + widgets | ✅ | ✅ | `routes/admin.php` | ❌ |
+| Module                                            | Controller | Pages | Routes                       | Tests        |
+|---------------------------------------------------|------------|-------|------------------------------|--------------|
+| **CMS Pages** + Page Builder                      | ✅          | ✅     | `routes/admin/cms.php`       | ✅ partial    |
+| **Reusable Blocks**                               | ✅          | ✅     | `routes/admin/cms.php`       | ✅            |
+| **Menus**                                         | ✅          | ✅     | `routes/admin.php`           | ✅            |
+| **Themes**                                        | ✅          | ✅     | `routes/admin.php`           | ✅            |
+| **Forms + Submissions**                           | ✅          | ✅     | `routes/admin.php`           | ❌            |
+| **FAQ**                                           | ✅          | ✅     | `routes/admin.php`           | ⚠️ failing   |
+| **Media**                                         | ✅          | ✅     | `routes/admin.php`           | ❌            |
+| **Settings** (6 groups)                           | ✅          | ✅     | `routes/admin.php`           | ❌            |
+| **Users**                                         | ✅          | ✅     | `routes/admin.php`           | ⚠️ 1 failing |
+| **Notifications**                                 | ✅          | ✅     | `routes/admin.php`           | ✅            |
+| **Cookie Consents**                               | ✅          | ✅     | `routes/admin.php`           | ❌            |
+| **Currencies**                                    | ✅          | ✅     | `routes/admin.php`           | ⚠️ failing   |
+| **Exchange Rates**                                | ✅          | ✅     | `routes/admin.php`           | ❌            |
+| **Newsletter** (subscribers/segments/campaigns)   | ✅          | ✅     | `routes/admin.php`           | ❌            |
+| **Ecommerce** (products, orders, customers, etc.) | ✅          | ✅     | `routes/admin/ecommerce.php` | ✅ partial    |
+| **Dashboard** + widgets                           | ✅          | ✅     | `routes/admin.php`           | ❌            |
 
 ---
 
@@ -111,20 +111,20 @@ Tests:    114 passing, 38 failing, 1 skipped
 
 ### Passing test groups (all green)
 
-| File | Tests |
-|---|---|
-| `BlogPostControllerTest` | 9 ✅ |
-| `BlogCategoryControllerTest` | 9 ✅ |
-| `ProductControllerTest` | varies ✅ |
-| `ProductTypeControllerTest` | varies ✅ |
-| `ProductVariantControllerTest` | varies ✅ |
-| `CategoryControllerTest` | varies ✅ |
-| `MenuControllerTest` | varies ✅ |
-| `ThemeControllerTest` | varies ✅ |
+| File                            | Tests    |
+|---------------------------------|----------|
+| `BlogPostControllerTest`        | 9 ✅      |
+| `BlogCategoryControllerTest`    | 9 ✅      |
+| `ProductControllerTest`         | varies ✅ |
+| `ProductTypeControllerTest`     | varies ✅ |
+| `ProductVariantControllerTest`  | varies ✅ |
+| `CategoryControllerTest`        | varies ✅ |
+| `MenuControllerTest`            | varies ✅ |
+| `ThemeControllerTest`           | varies ✅ |
 | `AppNotificationControllerTest` | varies ✅ |
-| `BlockRelationSearchTest` | varies ✅ |
-| `CmsPagesTest` | varies ✅ |
-| `CmsPagesCrudTest` | varies ✅ |
+| `BlockRelationSearchTest`       | varies ✅ |
+| `CmsPagesTest`                  | varies ✅ |
+| `CmsPagesCrudTest`              | varies ✅ |
 
 ---
 
@@ -242,18 +242,18 @@ Most admin controllers only check `auth` middleware (user is logged in). Fine-gr
 
 Priority order based on impact vs effort:
 
-| # | Task | Priority | Effort |
-|---|---|---|---|
-| 1 | Fix 38 failing tests (Auth routes, FaqController, CurrencyController) | 🔴 High | Low |
-| 2 | Public blog API endpoints (list + show with views increment) | 🔴 High | Low |
-| 3 | Scheduled publishing job for `published_at` | 🟡 Medium | Low |
-| 4 | Blog post frontend preview (reuse PagePreviewToken pattern) | 🟡 Medium | Medium |
-| 5 | Media picker integration in RTE toolbar (replace URL dialog) | 🟡 Medium | Medium |
-| 6 | RSS feed + sitemap for blog | 🟡 Medium | Low |
-| 7 | Role/permission guards on admin controllers | 🟡 Medium | Medium |
-| 8 | Newsletter → Blog integration (quick campaign creation) | 🟢 Low | Medium |
-| 9 | Test coverage for untested controllers | 🟢 Low | High |
-| 10 | Blog comments (native or Disqus) | 🟢 Low | High |
+| #  | Task                                                                  | Priority  | Effort |
+|----|-----------------------------------------------------------------------|-----------|--------|
+| 1  | Fix 38 failing tests (Auth routes, FaqController, CurrencyController) | 🔴 High   | Low    |
+| 2  | Public blog API endpoints (list + show with views increment)          | 🔴 High   | Low    |
+| 3  | Scheduled publishing job for `published_at`                           | 🟡 Medium | Low    |
+| 4  | Blog post frontend preview (reuse PagePreviewToken pattern)           | 🟡 Medium | Medium |
+| 5  | Media picker integration in RTE toolbar (replace URL dialog)          | 🟡 Medium | Medium |
+| 6  | RSS feed + sitemap for blog                                           | 🟡 Medium | Low    |
+| 7  | Role/permission guards on admin controllers                           | 🟡 Medium | Medium |
+| 8  | Newsletter → Blog integration (quick campaign creation)               | 🟢 Low    | Medium |
+| 9  | Test coverage for untested controllers                                | 🟢 Low    | High   |
+| 10 | Blog comments (native or Disqus)                                      | 🟢 Low    | High   |
 
 ---
 

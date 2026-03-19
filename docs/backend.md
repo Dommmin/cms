@@ -88,28 +88,28 @@ server/
 
 ## Key Packages
 
-| Package | Purpose |
-|---------|---------|
-| `laravel/fortify` | Headless auth (admin) |
-| `laravel/sanctum` | API token auth |
-| `laravel/inertia` | Admin SPA bridge |
-| `laravel/wayfinder` | TypeScript route generation |
-| `laravel/scout` | Full-text search (Typesense) |
-| `laravel/telescope` | Dev debugging |
-| `laravel/boost` | AI dev tools (dev only) |
-| `spatie/laravel-permission` | Roles + permissions |
-| `spatie/laravel-medialibrary` | File uploads + conversions |
-| `spatie/laravel-translatable` | Multi-language model fields |
-| `spatie/laravel-model-states` | State machine (orders) |
-| `spatie/laravel-query-builder` | API filtering/sorting |
-| `spatie/laravel-activitylog` | Audit log |
-| `spatie/laravel-health` | Health checks |
-| `spatie/laravel-pdf` | PDF generation (Gotenberg) |
-| `spatie/laravel-sluggable` | Auto slug generation |
-| `spatie/laravel-data` | Type-safe DTOs |
-| `maatwebsite/excel` | Import/export Excel |
-| `dedoc/scramble` | Auto API docs |
-| `grazulex/laravel-api-idempotency` | Idempotency middleware |
+| Package                            | Purpose                      |
+|------------------------------------|------------------------------|
+| `laravel/fortify`                  | Headless auth (admin)        |
+| `laravel/sanctum`                  | API token auth               |
+| `laravel/inertia`                  | Admin SPA bridge             |
+| `laravel/wayfinder`                | TypeScript route generation  |
+| `laravel/scout`                    | Full-text search (Typesense) |
+| `laravel/telescope`                | Dev debugging                |
+| `laravel/boost`                    | AI dev tools (dev only)      |
+| `spatie/laravel-permission`        | Roles + permissions          |
+| `spatie/laravel-medialibrary`      | File uploads + conversions   |
+| `spatie/laravel-translatable`      | Multi-language model fields  |
+| `spatie/laravel-model-states`      | State machine (orders)       |
+| `spatie/laravel-query-builder`     | API filtering/sorting        |
+| `spatie/laravel-activitylog`       | Audit log                    |
+| `spatie/laravel-health`            | Health checks                |
+| `spatie/laravel-pdf`               | PDF generation (Gotenberg)   |
+| `spatie/laravel-sluggable`         | Auto slug generation         |
+| `spatie/laravel-data`              | Type-safe DTOs               |
+| `maatwebsite/excel`                | Import/export Excel          |
+| `dedoc/scramble`                   | Auto API docs                |
+| `grazulex/laravel-api-idempotency` | Idempotency middleware       |
 
 ---
 
@@ -117,16 +117,16 @@ server/
 
 Business logic goes in `app/Services/`. Controllers should be thin.
 
-| Service | Responsibility |
-|---------|---------------|
-| `CartService` | Cart operations, token management |
-| `CheckoutService` | Order creation, payment, shipping |
-| `PromotionService` | Discount + promotion calculation |
-| `PaymentGatewayManager` | Strategy pattern for payment providers |
+| Service                  | Responsibility                         |
+|--------------------------|----------------------------------------|
+| `CartService`            | Cart operations, token management      |
+| `CheckoutService`        | Order creation, payment, shipping      |
+| `PromotionService`       | Discount + promotion calculation       |
+| `PaymentGatewayManager`  | Strategy pattern for payment providers |
 | `ShippingCarrierManager` | Strategy pattern for shipping carriers |
-| `PageBuilderSyncService` | Page builder draft/publish sync |
-| `PageVersionService` | Page version management |
-| `ModuleRegistryService` | Page module type registry |
+| `PageBuilderSyncService` | Page builder draft/publish sync        |
+| `PageVersionService`     | Page version management                |
+| `ModuleRegistryService`  | Page module type registry              |
 
 ---
 

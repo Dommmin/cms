@@ -1,4 +1,5 @@
 import { useAdminLocale } from '@/hooks/use-admin-locale';
+import { useTranslation } from '@/hooks/use-translation';
 import { Link, Head, router, usePage } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -34,6 +35,7 @@ export default function Create({
         ? categories
         : (Object.values(categories) as Category[]);
 
+    const __ = useTranslation();
     const [activeLocale, setActiveLocale] = useAdminLocale(defaultLocale);
     const [nameValues, setNameValues] = useState<Record<string, string>>({ [defaultLocale]: '' });
     const [descValues, setDescValues] = useState<Record<string, string>>({ [defaultLocale]: '' });
@@ -84,13 +86,13 @@ export default function Create({
             <Head title="Create Category" />
 
             <Wrapper>
-                <PageHeader title="Create Category" description="Create a new category">
+                <PageHeader title={__('page.create_page', 'Create Category')} description={__('page.create_page_desc', 'Create a new category')}>
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                 <Link href='/admin/ecommerce/categories' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Categories
-                        
+                            {__('action.back', 'Back')}
+
                 </Link>
             </Button>
                     </PageHeaderActions>
@@ -104,7 +106,7 @@ export default function Create({
                     {/* Name with locale tabs */}
                     <div className="grid gap-2">
                         <div className="flex items-center justify-between">
-                            <Label>Name *</Label>
+                            <Label>{__('label.name', 'Name')} *</Label>
                             <LocaleTabSwitcher
                                 locales={locales}
                                 activeLocale={activeLocale}
@@ -142,7 +144,7 @@ export default function Create({
 
                     {/* Slug */}
                     <div className="grid gap-2">
-                        <Label htmlFor="slug">Slug</Label>
+                        <Label htmlFor="slug">{__('label.slug', 'Slug')}</Label>
                         <Input
                             id="slug"
                             value={slug}
@@ -163,13 +165,13 @@ export default function Create({
                                 }}
                                 className="h-4 w-4 rounded border-input"
                             />
-                            Ustaw slug ręcznie
+                            {__('misc.slug_auto_hint', 'Set slug manually')}
                         </label>
                     </div>
 
                     {/* Parent Category */}
                     <div className="grid gap-2">
-                        <Label htmlFor="parent_id">Parent Category</Label>
+                        <Label htmlFor="parent_id">{__('label.category', 'Parent Category')}</Label>
                         <select
                             id="parent_id"
                             name="parent_id"
@@ -189,7 +191,7 @@ export default function Create({
                     {/* Description with locale tabs */}
                     <div className="grid gap-2">
                         <div className="flex items-center justify-between">
-                            <Label>Description</Label>
+                            <Label>{__('label.description', 'Description')}</Label>
                             <LocaleTabSwitcher
                                 locales={locales}
                                 activeLocale={activeLocale}
@@ -243,7 +245,7 @@ export default function Create({
                             className="h-4 w-4 rounded border-input"
                         />
                         <Label htmlFor="is_active" className="font-normal">
-                            Active
+                            {__('label.is_active', 'Active')}
                         </Label>
                     </div>
 

@@ -8,6 +8,7 @@ services:
     user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./server:/var/www/html:delegated
+      - ./client:/var/www/client:delegated
       - ./.docker/php/php.ini:/usr/local/etc/php/conf.d/php.ini
       - ./.docker/php/www.conf:/usr/local/etc/php-fpm.d/www.conf
       - ./.docker/php/supervisord.conf:/etc/supervisor/supervisord.conf

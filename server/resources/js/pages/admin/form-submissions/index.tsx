@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon, TrashIcon } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -59,24 +60,25 @@ function payloadPreview(payload: Record<string, unknown>): string {
 }
 
 export default function FormSubmissionsIndex({ submissions, filters }: IndexProps) {
+    const __ = useTranslation();
     const columns: ColumnDef<Submission>[] = [
         {
             accessorKey: 'id',
-            header: 'ID',
+            header: __('column.id', 'ID'),
             cell: ({ row }) => (
                 <span className="font-mono text-xs">#{row.original.id}</span>
             ),
         },
         {
             accessorKey: 'form',
-            header: 'Form',
+            header: __('column.form', 'Form'),
             cell: ({ row }) => (
                 <span className="font-medium">{row.original.form?.name ?? `#${row.original.form_id}`}</span>
             ),
         },
         {
             accessorKey: 'payload',
-            header: 'Data',
+            header: __('column.data', 'Data'),
             cell: ({ row }) => (
                 <span className="text-sm text-muted-foreground">
                     {payloadPreview(row.original.payload)}
@@ -85,7 +87,7 @@ export default function FormSubmissionsIndex({ submissions, filters }: IndexProp
         },
         {
             accessorKey: 'status',
-            header: 'Status',
+            header: __('column.status', 'Status'),
             cell: ({ row }) =>
                 row.original.status ? (
                     <Badge variant="secondary">{row.original.status}</Badge>
@@ -95,7 +97,7 @@ export default function FormSubmissionsIndex({ submissions, filters }: IndexProp
         },
         {
             accessorKey: 'ip',
-            header: 'IP',
+            header: __('column.ip', 'IP'),
             cell: ({ row }) => (
                 <span className="font-mono text-xs text-muted-foreground">
                     {row.original.ip ?? '—'}
@@ -104,25 +106,25 @@ export default function FormSubmissionsIndex({ submissions, filters }: IndexProp
         },
         {
             accessorKey: 'created_at',
-            header: 'Date',
+            header: __('column.date', 'Date'),
             cell: ({ row }) => new Date(row.original.created_at).toLocaleString(),
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link href={`/admin/forms/${row.original.form_id}/submissions/${row.original.id}`} prefetch cacheFor={60}>
                             <EyeIcon className="mr-1 h-3 w-3" />
-                            View
+                            {__('action.show', 'View')}
                         </Link>
                     </Button>
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Submission"
-                        description="Are you sure you want to delete this submission?"
+                        title={__('dialog.delete_title', 'Delete Submission')}
+                        description={__('dialog.cannot_be_undone', 'Are you sure you want to delete this submission?')}
                         onConfirm={() => {
                             router.delete(
                                 `/admin/forms/${row.original.form_id}/submissions/${row.original.id}`,
@@ -145,8 +147,8 @@ export default function FormSubmissionsIndex({ submissions, filters }: IndexProp
 
             <Wrapper>
                 <PageHeader
-                    title="Form Submissions"
-                    description={`${submissions.total} total submissions`}
+                    title={__('page.form_submissions', 'Form Submissions')}
+                    description={`${submissions.total} ${__('misc.total_submissions', 'total submissions')}`}
                 />
 
                 <DataTable
@@ -161,7 +163,7 @@ export default function FormSubmissionsIndex({ submissions, filters }: IndexProp
                         next_page_url: submissions.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search submissions..."
+                    searchPlaceholder={__('placeholder.search', 'Search submissions...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/form-submissions"
                 />

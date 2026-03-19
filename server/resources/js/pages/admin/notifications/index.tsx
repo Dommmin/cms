@@ -6,6 +6,7 @@ import {
     TrashIcon,
     RefreshCwIcon,
 } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -72,10 +73,11 @@ const channelIcons: Record<string, string> = {
 };
 
 export default function NotificationsIndex({ notifications, filters }: Props) {
+    const __ = useTranslation();
     const columns: ColumnDef<AppNotification>[] = [
         {
             accessorKey: 'type',
-            header: 'Type',
+            header: __('column.type', 'Type'),
             cell: ({ row }) => (
                 <Badge variant="outline" className="text-xs">
                     {row.original.type}
@@ -84,7 +86,7 @@ export default function NotificationsIndex({ notifications, filters }: Props) {
         },
         {
             accessorKey: 'channel',
-            header: 'Channel',
+            header: __('column.channel', 'Channel'),
             cell: ({ row }) => (
                 <span>
                     {channelIcons[row.original.channel] || '📨'}{' '}
@@ -94,7 +96,7 @@ export default function NotificationsIndex({ notifications, filters }: Props) {
         },
         {
             accessorKey: 'customer',
-            header: 'Customer',
+            header: __('column.customer', 'Customer'),
             cell: ({ row }) =>
                 row.original.customer ? (
                     <div>
@@ -112,7 +114,7 @@ export default function NotificationsIndex({ notifications, filters }: Props) {
         },
         {
             accessorKey: 'status',
-            header: 'Status',
+            header: __('column.status', 'Status'),
             cell: ({ row }) => (
                 <Badge
                     className={
@@ -126,7 +128,7 @@ export default function NotificationsIndex({ notifications, filters }: Props) {
         },
         {
             accessorKey: 'sent_at',
-            header: 'Sent',
+            header: __('column.sent', 'Sent'),
             cell: ({ row }) =>
                 row.original.sent_at ? (
                     <span className="text-sm">
@@ -138,7 +140,7 @@ export default function NotificationsIndex({ notifications, filters }: Props) {
         },
         {
             accessorKey: 'created_at',
-            header: 'Created',
+            header: __('column.created_at', 'Created'),
             cell: ({ row }) => (
                 <span className="text-sm">
                     {new Date(row.original.created_at).toLocaleString()}
@@ -147,13 +149,13 @@ export default function NotificationsIndex({ notifications, filters }: Props) {
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link href={`/admin/notifications/${row.original.id}`} prefetch cacheFor={60}>
                             <EyeIcon className="mr-1 h-3 w-3" />
-                            View
+                            {__('action.show', 'View')}
                         </Link>
                     </Button>
                     {row.original.status === 'failed' && (
@@ -174,14 +176,14 @@ export default function NotificationsIndex({ notifications, filters }: Props) {
                             }}
                         >
                             <RefreshCwIcon className="mr-1 h-3 w-3" />
-                            Resend
+                            {__('action.resend', 'Resend')}
                         </Button>
                     )}
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Notification"
-                        description="Are you sure you want to delete this notification?"
+                        title={__('dialog.delete_title', 'Delete Notification')}
+                        description={__('dialog.cannot_be_undone', 'Are you sure you want to delete this notification?')}
                         onConfirm={() => {
                             router.delete(
                                 `/admin/notifications/${row.original.id}`,
@@ -204,14 +206,14 @@ export default function NotificationsIndex({ notifications, filters }: Props) {
             <Head title="Notifications" />
             <Wrapper>
                 <PageHeader
-                    title="Notifications"
-                    description="Manage system notifications"
+                    title={__('page.notifications', 'Notifications')}
+                    description={__('page.notifications_desc', 'Manage system notifications')}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link href="/admin/notifications/create" prefetch cacheFor={30}>
                                 <PlusIcon className="mr-2 h-4 w-4" />
-                                Create Notification
+                                {__('action.create', 'Create Notification')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -229,7 +231,7 @@ export default function NotificationsIndex({ notifications, filters }: Props) {
                         next_page_url: notifications.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search notifications..."
+                    searchPlaceholder={__('placeholder.search', 'Search notifications...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/notifications"
                 />

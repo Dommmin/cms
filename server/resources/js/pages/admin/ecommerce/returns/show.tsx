@@ -1,11 +1,13 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeftIcon, CheckCircle, Clock, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { formatDateTime } from '@/lib/utils';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -76,14 +78,10 @@ const statusColors: Record<string, string> = {
     closed: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400',
 };
 
-function formatDate(isoString: string): string {
-    return new Date(isoString).toLocaleString('pl-PL', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-    });
-}
 
 export default function Show({ return: returnRequest }: { return: ReturnRequest }) {
+    const __ = useTranslation();
+
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Returns', href: '/admin/ecommerce/returns' },
         { title: returnRequest.reference_number, href: '' },
@@ -124,45 +122,45 @@ export default function Show({ return: returnRequest }: { return: ReturnRequest 
             <Wrapper>
                 <PageHeader
                     title={returnRequest.reference_number}
-                    description={`Return request • ${formatDate(returnRequest.created_at)}`}
+                    description={`Return request • ${formatDateTime(returnRequest.created_at)}`}
                 >
                     <PageHeaderActions>
                         {canApprove && (
                             <ConfirmButton
                                 variant="outline"
-                                title="Approve Return"
-                                description="Are you sure you want to approve this return request?"
+                                title={__('dialog.approve_return', 'Approve Return')}
+                                description={__('dialog.approve_return_desc', 'Are you sure you want to approve this return request?')}
                                 onConfirm={handleApprove}
                             >
                                 <CheckCircle className="mr-2 h-4 w-4" />
-                                Approve
+                                {__('action.approve', 'Approve')}
                             </ConfirmButton>
                         )}
                         {canReject && (
                             <ConfirmButton
                                 variant="outline"
-                                title="Reject Return"
-                                description="Are you sure you want to reject this return request?"
+                                title={__('dialog.reject_return', 'Reject Return')}
+                                description={__('dialog.reject_return_desc', 'Are you sure you want to reject this return request?')}
                                 onConfirm={handleReject}
                             >
                                 <XCircle className="mr-2 h-4 w-4" />
-                                Reject
+                                {__('action.reject', 'Reject')}
                             </ConfirmButton>
                         )}
                         {canProcessRefund && (
                             <ConfirmButton
                                 variant="outline"
-                                title="Process Refund"
-                                description="Are you sure you want to process the refund for this return?"
+                                title={__('dialog.process_refund', 'Process Refund')}
+                                description={__('dialog.process_refund_desc', 'Are you sure you want to process the refund for this return?')}
                                 onConfirm={handleProcessRefund}
                             >
-                                Process Refund
+                                {__('action.process_refund', 'Process Refund')}
                             </ConfirmButton>
                         )}
                         <Button asChild variant="outline">
                             <Link href="/admin/ecommerce/returns" prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                Back
+                                {__('action.back', 'Back')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -174,7 +172,7 @@ export default function Show({ return: returnRequest }: { return: ReturnRequest 
                         {/* Return items */}
                         <div className="rounded-xl border bg-card">
                             <div className="border-b px-6 py-4">
-                                <h2 className="font-semibold">Return Items</h2>
+                                <h2 className="font-semibold">{__('misc.return_items', 'Return Items')}</h2>
                             </div>
                             {returnRequest.items.length === 0 ? (
                                 <div className="px-6 py-8 text-center text-sm text-muted-foreground">
@@ -222,7 +220,7 @@ export default function Show({ return: returnRequest }: { return: ReturnRequest 
 
                         {/* Notes */}
                         <div className="space-y-4 rounded-xl border bg-card p-6">
-                            <h2 className="font-semibold">Notes</h2>
+                            <h2 className="font-semibold">{__('misc.notes', 'Notes')}</h2>
 
                             <div className="grid gap-1.5">
                                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -260,7 +258,7 @@ export default function Show({ return: returnRequest }: { return: ReturnRequest 
 
                         {/* Status timeline */}
                         <div className="rounded-xl border bg-card p-6">
-                            <h2 className="mb-4 font-semibold">Status History</h2>
+                            <h2 className="mb-4 font-semibold">{__('misc.status_history', 'Status History')}</h2>
                             {returnRequest.status_history.length === 0 ? (
                                 <p className="text-sm text-muted-foreground">No history yet.</p>
                             ) : (
@@ -278,7 +276,7 @@ export default function Show({ return: returnRequest }: { return: ReturnRequest 
                                                     {entry.new_status}
                                                 </Badge>
                                                 <span className="text-xs text-muted-foreground">
-                                                    {formatDate(entry.changed_at)}
+                                                    {formatDateTime(entry.changed_at)}
                                                 </span>
                                                 <span className="text-xs text-muted-foreground">
                                                     by {entry.changed_by}
@@ -389,7 +387,7 @@ export default function Show({ return: returnRequest }: { return: ReturnRequest 
                                     </div>
                                 </dl>
                             ) : (
-                                <p className="text-sm text-muted-foreground">Guest order</p>
+                                <p className="text-sm text-muted-foreground">{__('misc.guest_order', 'Guest order')}</p>
                             )}
                         </div>
 
@@ -399,7 +397,7 @@ export default function Show({ return: returnRequest }: { return: ReturnRequest 
                             </h3>
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                 <Clock className="h-3 w-3" />
-                                <span>Created {formatDate(returnRequest.created_at)}</span>
+                                <span>Created {formatDateTime(returnRequest.created_at)}</span>
                             </div>
                         </div>
                     </div>

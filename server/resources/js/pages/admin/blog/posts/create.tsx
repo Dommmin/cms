@@ -1,4 +1,5 @@
 import { useAdminLocale } from '@/hooks/use-admin-locale';
+import { useTranslation } from '@/hooks/use-translation';
 import { Link, Head, router, usePage } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -58,6 +59,7 @@ type FormData = {
 export default function CreateBlogPost({ categories }: Props) {
     const { locales } = usePage<{ locales: SharedLocale[] }>().props;
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
+    const __ = useTranslation();
     const [activeLocale, setActiveLocale] = useAdminLocale(defaultLocale);
 
     const [data, setData] = useState<FormData>({
@@ -149,8 +151,8 @@ export default function CreateBlogPost({ categories }: Props) {
                         <div className="lg:col-span-2">
                             <Tabs defaultValue="general" className="space-y-6">
                                 <TabsList>
-                                    <TabsTrigger value="general">General</TabsTrigger>
-                                    <TabsTrigger value="seo">SEO</TabsTrigger>
+                                    <TabsTrigger value="general">{__('tab.general', 'General')}</TabsTrigger>
+                                    <TabsTrigger value="seo">{__('tab.seo', 'SEO')}</TabsTrigger>
                                 </TabsList>
 
                                 <TabsContent value="general" className="space-y-6">
@@ -169,7 +171,7 @@ export default function CreateBlogPost({ categories }: Props) {
                                     )}
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="title">Title *</Label>
+                                        <Label htmlFor="title">{__('label.title', 'Title')} *</Label>
                                         <Input
                                             id="title"
                                             value={data.title[activeLocale] ?? ''}
@@ -180,7 +182,7 @@ export default function CreateBlogPost({ categories }: Props) {
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="slug">Slug</Label>
+                                        <Label htmlFor="slug">{__('label.slug', 'Slug')}</Label>
                                         <Input
                                             id="slug"
                                             value={data.slug}
@@ -207,12 +209,12 @@ export default function CreateBlogPost({ categories }: Props) {
                                                 }}
                                                 className="h-4 w-4 rounded border-input"
                                             />
-                                            Set slug manually
+                                            {__('misc.slug_auto_hint', 'Set slug manually')}
                                         </label>
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="excerpt">Excerpt</Label>
+                                        <Label htmlFor="excerpt">{__('label.excerpt', 'Excerpt')}</Label>
                                         <Textarea
                                             id="excerpt"
                                             value={data.excerpt[activeLocale] ?? ''}
@@ -233,7 +235,7 @@ export default function CreateBlogPost({ categories }: Props) {
 
                                     <div className="grid gap-2">
                                         <div className="flex items-center justify-between">
-                                            <Label>Content *</Label>
+                                            <Label>{__('label.content', 'Content')} *</Label>
                                             <Select
                                                 value={data.content_type}
                                                 onValueChange={(val) =>

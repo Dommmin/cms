@@ -23,6 +23,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 const FIELD_TYPES = [
@@ -75,7 +76,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Edit', href: '#' },
 ];
 
-function slugify(str: string) {
+/** Converts a label to a snake_case form field name (not a URL slug). */
+function toFieldName(str: string) {
     return str
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '_')
@@ -123,7 +125,7 @@ function FieldEditor({
                                 onChange={(e) => {
                                     onChange({
                                         label: e.target.value,
-                                        name: slugify(e.target.value),
+                                        name: toFieldName(e.target.value),
                                     });
                                 }}
                                 placeholder="e.g., Full Name"
@@ -156,7 +158,7 @@ function FieldEditor({
                             <Label className="text-xs text-muted-foreground">Field name (slug) *</Label>
                             <Input
                                 value={field.name}
-                                onChange={(e) => onChange({ name: slugify(e.target.value) })}
+                                onChange={(e) => onChange({ name: toFieldName(e.target.value) })}
                                 placeholder="e.g., full_name"
                             />
                             <InputError message={errors[`fields.${index}.name`]} />
@@ -239,6 +241,8 @@ function FieldEditor({
 }
 
 export default function Edit({ form }: { form: FormData }) {
+    const __ = useTranslation();
+
     const [name, setName] = useState(form.name);
     const [slug, setSlug] = useState(form.slug);
     const [description, setDescription] = useState(form.description ?? '');
@@ -310,25 +314,24 @@ export default function Edit({ form }: { form: FormData }) {
             <Head title={`Edit: ${form.name}`} />
 
             <Wrapper>
-                <PageHeader title={form.name} description="Edit form settings and fields">
+                <PageHeader title={form.name} description={__('page.edit_form_desc', 'Edit form settings and fields')}>
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/forms' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Forms
-                        
-                </Link>
-            </Button>
+                            <Link href='/admin/forms' prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                {__('action.back', 'Back')}
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
                 <div className="space-y-6">
                     {/* Settings */}
                     <div className="rounded-lg border bg-card p-6">
-                        <h3 className="mb-4 font-medium">Form Settings</h3>
+                        <h3 className="mb-4 font-medium">{__('misc.form_settings', 'Form Settings')}</h3>
                         <div className="grid max-w-2xl gap-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name *</Label>
+                                <Label htmlFor="name">{__('label.name', 'Name')} *</Label>
                                 <Input
                                     id="name"
                                     value={name}
@@ -338,7 +341,7 @@ export default function Edit({ form }: { form: FormData }) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="slug">Slug *</Label>
+                                <Label htmlFor="slug">{__('label.slug', 'Slug')} *</Label>
                                 <Input
                                     id="slug"
                                     value={slug}
@@ -348,7 +351,7 @@ export default function Edit({ form }: { form: FormData }) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="description">Description</Label>
+                                <Label htmlFor="description">{__('label.description', 'Description')}</Label>
                                 <Textarea
                                     id="description"
                                     value={description}
@@ -359,7 +362,7 @@ export default function Edit({ form }: { form: FormData }) {
 
                             <div className="grid gap-2">
                                 <Label htmlFor="notify_emails">
-                                    Notify Emails{' '}
+                                    {__('label.notify_emails', 'Notify Emails')}{' '}
                                     <span className="font-normal text-muted-foreground">(one per line)</span>
                                 </Label>
                                 <Textarea
@@ -380,7 +383,7 @@ export default function Edit({ form }: { form: FormData }) {
                                     onChange={(e) => setIsActive(e.target.checked)}
                                     className="h-4 w-4 rounded border-gray-300"
                                 />
-                                <Label htmlFor="is_active" className="font-normal">Active</Label>
+                                <Label htmlFor="is_active" className="font-normal">{__('label.is_active', 'Active')}</Label>
                             </div>
                         </div>
                     </div>
@@ -389,14 +392,14 @@ export default function Edit({ form }: { form: FormData }) {
                     <div className="rounded-lg border bg-card p-6">
                         <div className="mb-4 flex items-center justify-between">
                             <div>
-                                <h3 className="font-medium">Form Fields</h3>
+                                <h3 className="font-medium">{__('misc.form_fields', 'Form Fields')}</h3>
                                 <p className="mt-0.5 text-xs text-muted-foreground">
-                                    Define the fields users will fill in.
+                                    {__('misc.form_fields_desc', 'Define the fields users will fill in.')}
                                 </p>
                             </div>
                             <Button type="button" variant="outline" size="sm" onClick={addField}>
                                 <PlusIcon className="mr-1 h-4 w-4" />
-                                Add Field
+                                {__('action.add_field', 'Add Field')}
                             </Button>
                         </div>
 
@@ -415,7 +418,7 @@ export default function Edit({ form }: { form: FormData }) {
                             {fields.length === 0 && (
                                 <div className="rounded-lg border border-dashed p-8 text-center">
                                     <p className="text-sm text-muted-foreground">
-                                        No fields yet. Click "Add Field" to start building your form.
+                                        {__('empty.no_fields', 'No fields yet. Click "Add Field" to start building your form.')}
                                     </p>
                                 </div>
                             )}
@@ -424,7 +427,7 @@ export default function Edit({ form }: { form: FormData }) {
 
                     <div className="flex items-center gap-4">
                         <Button onClick={handleSave} disabled={processing}>
-                            {processing ? 'Saving...' : 'Save Form'}
+                            {processing ? __('misc.saving', 'Saving...') : __('action.save_form', 'Save Form')}
                         </Button>
                     </div>
                 </div>

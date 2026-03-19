@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { CheckCircle, XCircle } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -73,10 +74,11 @@ function fmt(cents: number): string {
 }
 
 export default function ReferralsIndex({ referrals, stats, filters }: Props) {
+    const __ = useTranslation();
     const columns: ColumnDef<Referral>[] = [
         {
             accessorKey: 'affiliate_code',
-            header: 'Affiliate',
+            header: __('column.affiliate', 'Affiliate'),
             cell: ({ row }) => (
                 <div>
                     <p className="font-mono font-semibold">{row.original.affiliate_code.code}</p>
@@ -88,7 +90,7 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
         },
         {
             accessorKey: 'referred_user',
-            header: 'Customer',
+            header: __('column.customer', 'Customer'),
             cell: ({ row }) =>
                 row.original.referred_user ? (
                     <div>
@@ -103,7 +105,7 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
         },
         {
             accessorKey: 'order',
-            header: 'Order',
+            header: __('column.orders', 'Order'),
             cell: ({ row }) =>
                 row.original.order ? (
                     <Link
@@ -120,12 +122,12 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
         },
         {
             accessorKey: 'order_total',
-            header: 'Order Total',
+            header: __('column.total', 'Order Total'),
             cell: ({ row }) => <span className="text-sm">{fmt(row.original.order_total)}</span>,
         },
         {
             accessorKey: 'commission_amount',
-            header: 'Commission',
+            header: __('column.commission', 'Commission'),
             cell: ({ row }) => (
                 <span className="text-sm font-semibold text-green-600">
                     {fmt(row.original.commission_amount)}
@@ -134,7 +136,7 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
         },
         {
             accessorKey: 'status',
-            header: 'Status',
+            header: __('column.status', 'Status'),
             cell: ({ row }) => (
                 <Badge variant={STATUS_VARIANT[row.original.status] ?? 'outline'}>
                     {row.original.status}
@@ -143,7 +145,7 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => {
                 const r = row.original;
                 return (
@@ -152,8 +154,8 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
                             <ConfirmButton
                                 variant="outline"
                                 size="sm"
-                                title="Approve Referral"
-                                description="Approve this referral and mark the commission as ready to pay?"
+                                title={__('dialog.approve_referral', 'Approve Referral')}
+                                description={__('dialog.approve_referral_desc', 'Approve this referral and mark the commission as ready to pay?')}
                                 onConfirm={() =>
                                     router.post(
                                         `/admin/affiliates/referrals/${r.id}/approve`,
@@ -163,14 +165,14 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
                                 }
                             >
                                 <CheckCircle className="mr-1 h-3 w-3" />
-                                Approve
+                                {__('action.approve', 'Approve')}
                             </ConfirmButton>
                         )}
                         {r.status === 'approved' && (
                             <ConfirmButton
                                 variant="outline"
                                 size="sm"
-                                title="Mark as Paid"
+                                title={__('dialog.mark_paid', 'Mark as Paid')}
                                 description={`Mark commission of ${fmt(r.commission_amount)} as paid to ${r.affiliate_code.user.name}?`}
                                 onConfirm={() =>
                                     router.post(
@@ -180,15 +182,15 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
                                     )
                                 }
                             >
-                                Mark Paid
+                                {__('action.mark_paid', 'Mark Paid')}
                             </ConfirmButton>
                         )}
                         {['pending', 'approved'].includes(r.status) && (
                             <ConfirmButton
                                 variant="outline"
                                 size="sm"
-                                title="Cancel Referral"
-                                description="Cancel this referral? The commission will not be paid."
+                                title={__('dialog.cancel_referral', 'Cancel Referral')}
+                                description={__('dialog.cancel_referral_desc', 'Cancel this referral? The commission will not be paid.')}
                                 onConfirm={() =>
                                     router.post(
                                         `/admin/affiliates/referrals/${r.id}/cancel`,
@@ -198,7 +200,7 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
                                 }
                             >
                                 <XCircle className="mr-1 h-3 w-3" />
-                                Cancel
+                                {__('action.cancel', 'Cancel')}
                             </ConfirmButton>
                         )}
                     </div>
@@ -212,12 +214,12 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
             <Head title="Referrals" />
             <Wrapper>
                 <PageHeader
-                    title="Referral Tracking"
-                    description="Monitor commissions and payout status"
+                    title={__('page.referrals', 'Referral Tracking')}
+                    description={__('page.referrals_desc', 'Monitor commissions and payout status')}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/affiliates/codes">
-                            <Button variant="outline">Manage Codes</Button>
+                            <Button variant="outline">{__('action.manage', 'Manage Codes')}</Button>
                         </Link>
                     </PageHeaderActions>
                 </PageHeader>
@@ -227,7 +229,7 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
                     <Card>
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Total Referrals
+                                {__('misc.total_referrals', 'Total Referrals')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -237,7 +239,7 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
                     <Card>
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Pending Commission
+                                {__('misc.pending_commission', 'Pending Commission')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -249,7 +251,7 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
                     <Card>
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Approved Commission
+                                {__('misc.approved_commission', 'Approved Commission')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -261,7 +263,7 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
                     <Card>
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Paid Commission
+                                {__('misc.paid_commission', 'Paid Commission')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -284,7 +286,7 @@ export default function ReferralsIndex({ referrals, stats, filters }: Props) {
                         next_page_url: referrals.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search by code..."
+                    searchPlaceholder={__('placeholder.search', 'Search by code...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/affiliates/referrals"
                 />

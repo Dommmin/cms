@@ -24,6 +24,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
@@ -92,6 +93,7 @@ export default function EditBlogPost({ post, categories }: Props) {
         },
     ];
 
+    const __ = useTranslation();
     const [data, setData] = useState<FormData>({
         title: post.title ?? { [defaultLocale]: '' },
         slug: post.slug,
@@ -165,10 +167,10 @@ export default function EditBlogPost({ post, categories }: Props) {
         };
 
         router.post(`/admin/blog/posts/${post.id}`, payload, {
-            onSuccess: () => toast.success('Post updated successfully'),
+            onSuccess: () => toast.success(__('misc.post_updated', 'Post updated successfully')),
             onError: (errs) => {
                 setErrors(errs);
-                toast.error('Please fix the errors below');
+                toast.error(__('misc.fix_errors', 'Please fix the errors below'));
             },
             onFinish: () => setProcessing(false),
         });
@@ -179,7 +181,7 @@ export default function EditBlogPost({ post, categories }: Props) {
             <Head title={`Edit: ${data.title[defaultLocale] ?? ''}`} />
             <Wrapper>
                 <PageHeader
-                    title="Edit Blog Post"
+                    title={__('page.edit_blog_post', 'Edit Blog Post')}
                     description={data.title[defaultLocale] ?? ''}
                 >
                     <PageHeaderActions>
@@ -191,7 +193,7 @@ export default function EditBlogPost({ post, categories }: Props) {
                                     rel="noopener noreferrer"
                                 >
                                     <ExternalLink className="mr-2 h-4 w-4" />
-                                    View on Site
+                                    {__('action.view_on_site', 'View on Site')}
                                 </a>
                             </Button>
                         )}
@@ -202,13 +204,13 @@ export default function EditBlogPost({ post, categories }: Props) {
                                 rel="noopener noreferrer"
                             >
                                 <EyeIcon className="mr-2 h-4 w-4" />
-                                Preview
+                                {__('action.preview', 'Preview')}
                             </a>
                         </Button>
                         <Button asChild variant="outline">
                             <Link href="/admin/blog/posts" prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                Back
+                                {__('action.back', 'Back')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -220,8 +222,8 @@ export default function EditBlogPost({ post, categories }: Props) {
                         <div className="lg:col-span-2">
                             <Tabs defaultValue="general" className="space-y-6">
                                 <TabsList>
-                                    <TabsTrigger value="general">General</TabsTrigger>
-                                    <TabsTrigger value="seo">SEO</TabsTrigger>
+                                    <TabsTrigger value="general">{__('tab.general', 'General')}</TabsTrigger>
+                                    <TabsTrigger value="seo">{__('tab.seo', 'SEO')}</TabsTrigger>
                                 </TabsList>
 
                                 <TabsContent value="general" className="space-y-6">
@@ -229,7 +231,7 @@ export default function EditBlogPost({ post, categories }: Props) {
                                     {locales.length > 1 && (
                                         <div className="flex items-center gap-2 rounded-lg border p-3">
                                             <span className="text-sm font-medium text-muted-foreground">
-                                                Editing:
+                                                {__('misc.editing', 'Editing:')}
                                             </span>
                                             <LocaleTabSwitcher
                                                 locales={locales}
@@ -240,7 +242,7 @@ export default function EditBlogPost({ post, categories }: Props) {
                                     )}
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="title">Title *</Label>
+                                        <Label htmlFor="title">{__('label.title', 'Title')} *</Label>
                                         <Input
                                             id="title"
                                             value={data.title[activeLocale] ?? ''}
@@ -253,7 +255,7 @@ export default function EditBlogPost({ post, categories }: Props) {
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="slug">Slug</Label>
+                                        <Label htmlFor="slug">{__('label.slug', 'Slug')}</Label>
                                         <Input
                                             id="slug"
                                             value={data.slug}
@@ -280,12 +282,12 @@ export default function EditBlogPost({ post, categories }: Props) {
                                                 }}
                                                 className="h-4 w-4 rounded border-input"
                                             />
-                                            Set slug manually
+                                            {__('misc.set_slug_manually', 'Set slug manually')}
                                         </label>
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="excerpt">Excerpt</Label>
+                                        <Label htmlFor="excerpt">{__('label.excerpt', 'Excerpt')}</Label>
                                         <Textarea
                                             id="excerpt"
                                             value={data.excerpt[activeLocale] ?? ''}
@@ -306,7 +308,7 @@ export default function EditBlogPost({ post, categories }: Props) {
 
                                     <div className="grid gap-2">
                                         <div className="flex items-center justify-between">
-                                            <Label>Content *</Label>
+                                            <Label>{__('label.content', 'Content')} *</Label>
                                             <Select
                                                 value={data.content_type}
                                                 onValueChange={(val) =>
@@ -317,8 +319,8 @@ export default function EditBlogPost({ post, categories }: Props) {
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="richtext">Rich Text</SelectItem>
-                                                    <SelectItem value="markdown">Markdown</SelectItem>
+                                                    <SelectItem value="richtext">{__('type.rich_text', 'Rich Text')}</SelectItem>
+                                                    <SelectItem value="markdown">{__('type.markdown', 'Markdown')}</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -384,11 +386,11 @@ export default function EditBlogPost({ post, categories }: Props) {
                         <div className="space-y-4">
                             <div className="space-y-4 rounded-lg border p-4">
                                 <h3 className="text-sm font-medium">
-                                    Publishing
+                                    {__('misc.publishing', 'Publishing')}
                                 </h3>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="status">Status</Label>
+                                    <Label htmlFor="status">{__('column.status', 'Status')}</Label>
                                     <Select
                                         value={data.status}
                                         onValueChange={(val) =>
@@ -403,16 +405,16 @@ export default function EditBlogPost({ post, categories }: Props) {
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="draft">
-                                                Draft
+                                                {__('status.draft', 'Draft')}
                                             </SelectItem>
                                             <SelectItem value="scheduled">
-                                                Scheduled
+                                                {__('status.scheduled', 'Scheduled')}
                                             </SelectItem>
                                             <SelectItem value="published">
-                                                Published
+                                                {__('status.published', 'Published')}
                                             </SelectItem>
                                             <SelectItem value="archived">
-                                                Archived
+                                                {__('status.archived', 'Archived')}
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
@@ -422,7 +424,7 @@ export default function EditBlogPost({ post, categories }: Props) {
                                 {data.status === 'scheduled' && (
                                     <div className="grid gap-2">
                                         <Label htmlFor="published_at">
-                                            Publish At *
+                                            {__('label.publish_at', 'Publish At')} *
                                         </Label>
                                         <Input
                                             id="published_at"
@@ -458,17 +460,17 @@ export default function EditBlogPost({ post, categories }: Props) {
                                         htmlFor="is_featured"
                                         className="font-normal"
                                     >
-                                        Featured post
+                                        {__('label.featured_post', 'Featured post')}
                                     </Label>
                                 </div>
 
                                 {locales.length > 1 && (
                                     <div className="space-y-2 border-t pt-3">
                                         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                                            Visible in locales
+                                            {__('misc.visible_in_locales', 'Visible in locales')}
                                         </p>
                                         <p className="text-xs text-muted-foreground">
-                                            Leave all unchecked to show in all languages.
+                                            {__('misc.leave_all_unchecked', 'Leave all unchecked to show in all languages.')}
                                         </p>
                                         {locales.map((locale) => (
                                             <div key={locale.code} className="flex items-center gap-2">
@@ -504,12 +506,12 @@ export default function EditBlogPost({ post, categories }: Props) {
 
                             <div className="space-y-4 rounded-lg border p-4">
                                 <h3 className="text-sm font-medium">
-                                    Organization
+                                    {__('misc.organization', 'Organization')}
                                 </h3>
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="blog_category_id">
-                                        Category
+                                        {__('label.category', 'Category')}
                                     </Label>
                                     <Select
                                         value={data.blog_category_id}
@@ -521,7 +523,7 @@ export default function EditBlogPost({ post, categories }: Props) {
                                         }
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select a category" />
+                                            <SelectValue placeholder={__('placeholder.select_category', 'Select a category')} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {categories.map((cat) => (
@@ -540,7 +542,7 @@ export default function EditBlogPost({ post, categories }: Props) {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="tags">Tags</Label>
+                                    <Label htmlFor="tags">{__('label.tags', 'Tags')}</Label>
                                     <Input
                                         id="tags"
                                         value={data.tags}
@@ -553,7 +555,7 @@ export default function EditBlogPost({ post, categories }: Props) {
                                         placeholder="tag1, tag2, tag3"
                                     />
                                     <p className="text-xs text-muted-foreground">
-                                        Separate tags with commas
+                                        {__('misc.tags_comma_separated', 'Separate tags with commas')}
                                     </p>
                                     <InputError message={errors.tags} />
                                 </div>
@@ -561,11 +563,11 @@ export default function EditBlogPost({ post, categories }: Props) {
 
                             <div className="space-y-4 rounded-lg border p-4">
                                 <h3 className="text-sm font-medium">
-                                    Featured Image
+                                    {__('misc.featured_image', 'Featured Image')}
                                 </h3>
                                 <div className="grid gap-2">
                                     <Label htmlFor="featured_image">
-                                        Image URL
+                                        {__('label.image_url', 'Image URL')}
                                     </Label>
                                     <Input
                                         id="featured_image"
@@ -589,7 +591,7 @@ export default function EditBlogPost({ post, categories }: Props) {
                                 disabled={processing}
                                 className="w-full"
                             >
-                                {processing ? 'Saving...' : 'Save Changes'}
+                                {processing ? __('misc.saving', 'Saving...') : __('action.save_changes', 'Save Changes')}
                             </Button>
 
                             <VersionHistory modelType="blog-post" modelId={post.id} />

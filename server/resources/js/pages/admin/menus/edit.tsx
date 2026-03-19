@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 type MenuItemData = {
@@ -195,6 +196,8 @@ function MenuItemEditor({
 }
 
 export default function Edit({ menu, locations }: Props) {
+    const __ = useTranslation();
+
     const [name, setName] = useState(menu.name);
     const [location, setLocation] = useState(menu.location ?? 'none');
     const [isActive, setIsActive] = useState(menu.is_active);
@@ -280,25 +283,24 @@ export default function Edit({ menu, locations }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit: ${menu.name}`} />
             <Wrapper>
-                <PageHeader title="Edit Menu" description="Manage menu items and settings">
+                <PageHeader title={__('page.edit_menu', 'Edit Menu')} description={__('page.edit_menu_desc', 'Manage menu items and settings')}>
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/menus' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back
-                        
-                </Link>
-            </Button>
+                            <Link href='/admin/menus' prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                {__('action.back', 'Back')}
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
                 <div className="space-y-6">
                     {/* Menu Settings */}
                     <div className="rounded-lg border bg-card p-6">
-                        <h3 className="mb-4 font-medium">Menu Settings</h3>
+                        <h3 className="mb-4 font-medium">{__('misc.menu_settings', 'Menu Settings')}</h3>
                         <div className="grid max-w-2xl gap-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name *</Label>
+                                <Label htmlFor="name">{__('label.name', 'Name')} *</Label>
                                 <Input
                                     id="name"
                                     value={name}
@@ -309,13 +311,13 @@ export default function Edit({ menu, locations }: Props) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="location">Location</Label>
+                                <Label htmlFor="location">{__('label.location', 'Location')}</Label>
                                 <Select value={location} onValueChange={setLocation}>
                                     <SelectTrigger id="location">
-                                        <SelectValue placeholder="Select location" />
+                                        <SelectValue placeholder={__('placeholder.select_location', 'Select location')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="none">No location</SelectItem>
+                                        <SelectItem value="none">{__('misc.no_location', 'No location')}</SelectItem>
                                         {locations.map((loc) => (
                                             <SelectItem key={loc.value} value={loc.value}>
                                                 {loc.label}
@@ -324,7 +326,7 @@ export default function Edit({ menu, locations }: Props) {
                                     </SelectContent>
                                 </Select>
                                 <p className="text-xs text-muted-foreground">
-                                    Where this menu appears on the public site.
+                                    {__('misc.location_hint', 'Where this menu appears on the public site.')}
                                 </p>
                                 <InputError message={errors.location} />
                             </div>
@@ -338,7 +340,7 @@ export default function Edit({ menu, locations }: Props) {
                                     className="h-4 w-4 rounded border-gray-300"
                                 />
                                 <Label htmlFor="is_active" className="font-normal">
-                                    Active
+                                    {__('label.is_active', 'Active')}
                                 </Label>
                             </div>
                         </div>
@@ -348,16 +350,14 @@ export default function Edit({ menu, locations }: Props) {
                     <div className="rounded-lg border bg-card p-6">
                         <div className="mb-4 flex items-center justify-between">
                             <div>
-                                <h3 className="font-medium">Menu Items</h3>
+                                <h3 className="font-medium">{__('misc.menu_items', 'Menu Items')}</h3>
                                 <p className="mt-0.5 text-xs text-muted-foreground">
-                                    Add links. Use the{' '}
-                                    <PlusIcon className="inline h-3 w-3" /> button on an item to
-                                    add a sub-item (dropdown).
+                                    {__('misc.menu_items_desc', 'Add links. Use the')} <PlusIcon className="inline h-3 w-3" /> {__('misc.menu_items_desc2', 'button on an item to add a sub-item (dropdown).')}
                                 </p>
                             </div>
                             <Button type="button" variant="outline" size="sm" onClick={addItem}>
                                 <PlusIcon className="mr-1 h-4 w-4" />
-                                Add Item
+                                {__('action.add_item', 'Add Item')}
                             </Button>
                         </div>
 
@@ -375,7 +375,7 @@ export default function Edit({ menu, locations }: Props) {
                             {items.length === 0 && (
                                 <div className="rounded-lg border border-dashed p-8 text-center">
                                     <p className="text-sm text-muted-foreground">
-                                        No items yet. Click "Add Item" to start building your menu.
+                                        {__('empty.no_items', 'No items yet. Click "Add Item" to start building your menu.')}
                                     </p>
                                 </div>
                             )}
@@ -384,7 +384,7 @@ export default function Edit({ menu, locations }: Props) {
 
                     <div className="flex items-center gap-4">
                         <Button onClick={handleSave} disabled={processing}>
-                            {processing ? 'Saving...' : 'Save Menu'}
+                            {processing ? __('misc.saving', 'Saving...') : __('action.save_menu', 'Save Menu')}
                         </Button>
                     </div>
                 </div>

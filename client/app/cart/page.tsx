@@ -9,6 +9,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { useLocalePath } from "@/hooks/use-locale";
 import { useCurrency } from "@/hooks/use-currency";
 import { getToken } from "@/lib/axios";
+import { PriceDisplay } from "@/components/price-display";
 
 export default function CartPage() {
   const { data: cart, isLoading } = useCart();
@@ -88,7 +89,11 @@ export default function CartPage() {
                   {item.variant?.sku && (
                     <p className="text-xs text-muted-foreground">SKU: {item.variant.sku}</p>
                   )}
-                  <p className="text-sm font-semibold">{formatPrice(item.unit_price)}</p>
+                  <PriceDisplay
+                    price={item.unit_price}
+                    compareAtPrice={item.variant?.compare_at_price}
+                    size="sm"
+                  />
 
                   {/* Quantity stepper */}
                   <div className="mt-1 flex items-center gap-2">

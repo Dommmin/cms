@@ -1,7 +1,7 @@
 import { Head, router } from '@inertiajs/react';
 import { ShoppingCart, EyeIcon, DownloadIcon } from 'lucide-react';
 import {
-    orderColumns,
+    useOrderColumns,
     type OrderRow,
 } from '@/components/columns/order-columns';
 import DataTable from '@/components/data-table';
@@ -9,6 +9,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 type OrderData = {
@@ -32,19 +33,22 @@ export default function OrdersIndex({
     orders: OrderData;
     filters: { search?: string };
 }) {
+    const __ = useTranslation();
+    const orderColumns = useOrderColumns();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Orders" />
             <Wrapper>
                 <PageHeader
-                    title="Orders"
-                    description="Manage customer orders"
+                    title={__('page.orders', 'Orders')}
+                    description={__('page.orders_desc', 'Manage customer orders')}
                 >
                     <PageHeaderActions>
                         <Button variant="outline" asChild>
                             <a href="/admin/ecommerce/orders/export">
                                 <DownloadIcon className="mr-2 h-4 w-4" />
-                                Export CSV
+                                {__('action.export_csv', 'Export CSV')}
                             </a>
                         </Button>
                     </PageHeaderActions>
@@ -62,7 +66,7 @@ export default function OrdersIndex({
                         next_page_url: orders.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search orders..."
+                    searchPlaceholder={__('placeholder.search_orders', 'Search orders...')}
                     searchValue={filters?.search ?? ''}
                     baseUrl="/admin/ecommerce/orders"
                 />

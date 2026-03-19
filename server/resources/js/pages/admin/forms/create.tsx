@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -16,20 +17,21 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Create() {
+    const __ = useTranslation();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Form" />
 
             <Wrapper>
-                <PageHeader title="Create Form" description="Add a new form">
+                <PageHeader title={__('page.create_form', 'Create Form')} description={__('page.create_form_desc', 'Add a new form')}>
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/forms' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Forms
-                        
-                </Link>
-            </Button>
+                            <Link href='/admin/forms' prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                {__('action.back', 'Back')}
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -41,7 +43,7 @@ export default function Create() {
                     {({ errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
+                                <Label htmlFor="name">{__('label.name', 'Name')}</Label>
                                 <Input
                                     id="name"
                                     name="name"
@@ -53,7 +55,7 @@ export default function Create() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="slug">Slug</Label>
+                                <Label htmlFor="slug">{__('label.slug', 'Slug')}</Label>
                                 <Input
                                     id="slug"
                                     name="slug"
@@ -64,7 +66,7 @@ export default function Create() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="description">Description</Label>
+                                <Label htmlFor="description">{__('label.description', 'Description')}</Label>
                                 <Textarea
                                     id="description"
                                     name="description"
@@ -75,7 +77,7 @@ export default function Create() {
 
                             <div className="grid gap-2">
                                 <Label htmlFor="notify_emails">
-                                    Notify Emails (one per line)
+                                    {__('label.notify_emails', 'Notify Emails (one per line)')}
                                 </Label>
                                 <Textarea
                                     id="notify_emails"
@@ -99,12 +101,12 @@ export default function Create() {
                                     htmlFor="is_active"
                                     className="font-normal"
                                 >
-                                    Active
+                                    {__('label.is_active', 'Active')}
                                 </Label>
                             </div>
 
                             <div className="flex items-center gap-4">
-                                <Button type="submit">Create Form</Button>
+                                <Button type="submit">{__('action.create_form', 'Create Form')}</Button>
                             </div>
                         </>
                     )}

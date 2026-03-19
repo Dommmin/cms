@@ -1,6 +1,7 @@
 import { Head, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PlusIcon, StarIcon, TrashIcon, ToggleLeftIcon, ToggleRightIcon } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
@@ -84,6 +85,7 @@ const defaultForm: LocaleForm = {
 };
 
 export default function LocalesIndex({ locales, filters, currencies }: Props) {
+    const __ = useTranslation();
     const [open, setOpen] = useState(false);
     const [editLocale, setEditLocale] = useState<Locale | null>(null);
     const [form, setForm] = useState<LocaleForm>(defaultForm);
@@ -130,7 +132,7 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
     const columns: ColumnDef<Locale>[] = [
         {
             accessorKey: 'code',
-            header: 'Code',
+            header: __('label.code', 'Code'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <span className="text-lg">{row.original.flag_emoji ?? ''}</span>
@@ -142,7 +144,7 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
         },
         {
             accessorKey: 'name',
-            header: 'Name',
+            header: __('column.name', 'Name'),
             cell: ({ row }) => (
                 <div>
                     <p className="font-medium">{row.original.name}</p>
@@ -152,7 +154,7 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
         },
         {
             accessorKey: 'currency_code',
-            header: 'Currency',
+            header: __('label.currency', 'Currency'),
             cell: ({ row }) =>
                 row.original.currency_code ? (
                     <Badge variant="outline" className="font-mono">
@@ -164,11 +166,11 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
         },
         {
             accessorKey: 'is_default',
-            header: 'Default',
+            header: __('misc.default', 'Default'),
             cell: ({ row }) =>
                 row.original.is_default ? (
                     <Badge variant="default" className="gap-1">
-                        <StarIcon className="h-3 w-3" /> Default
+                        <StarIcon className="h-3 w-3" /> {__('misc.default', 'Default')}
                     </Badge>
                 ) : (
                     <Button
@@ -182,33 +184,33 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                             );
                         }}
                     >
-                        Set Default
+                        {__('action.set_default', 'Set Default')}
                     </Button>
                 ),
         },
         {
             accessorKey: 'is_active',
-            header: 'Active',
+            header: __('label.is_active', 'Active'),
             cell: ({ row }) =>
                 row.original.is_active ? (
-                    <Badge variant="default">Active</Badge>
+                    <Badge variant="default">{__('status.active', 'Active')}</Badge>
                 ) : (
-                    <Badge variant="secondary">Inactive</Badge>
+                    <Badge variant="secondary">{__('status.inactive', 'Inactive')}</Badge>
                 ),
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" onClick={() => openEdit(row.original)}>
-                        Edit
+                        {__('action.edit', 'Edit')}
                     </Button>
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Locale"
-                        description="This will delete the locale and all its translations. This action cannot be undone."
+                        title={__('dialog.delete_title', 'Delete Locale')}
+                        description={__('dialog.cannot_be_undone', 'This will delete the locale and all its translations. This action cannot be undone.')}
                         onConfirm={() => {
                             router.delete(`/admin/locales/${row.original.id}`, {
                                 onSuccess: () => toast.success('Locale deleted'),
@@ -218,7 +220,7 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                         disabled={row.original.is_default}
                     >
                         <TrashIcon className="h-3 w-3" />
-                        Delete
+                        {__('action.delete', 'Delete')}
                     </ConfirmButton>
                 </div>
             ),
@@ -229,11 +231,11 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Locales" />
             <Wrapper>
-                <PageHeader title="Locales" description="Manage supported languages">
+                <PageHeader title={__('page.locales', 'Locales')} description={__('page.locales_desc', 'Manage supported languages')}>
                     <PageHeaderActions>
                         <Button onClick={openCreate}>
                             <PlusIcon className="mr-2 h-4 w-4" />
-                            Add Locale
+                            {__('action.add', 'Add Locale')}
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
@@ -250,7 +252,7 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                         next_page_url: locales.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search locales..."
+                    searchPlaceholder={__('placeholder.search', 'Search locales...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/locales"
                 />
@@ -259,12 +261,12 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{editLocale ? 'Edit Locale' : 'Add Locale'}</DialogTitle>
+                        <DialogTitle>{editLocale ? __('action.edit', 'Edit Locale') : __('action.add', 'Add Locale')}</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-2">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
-                                <Label>Code</Label>
+                                <Label>{__('label.code', 'Code')}</Label>
                                 <Input
                                     value={form.code}
                                     onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
@@ -274,7 +276,7 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                                 />
                             </div>
                             <div className="space-y-1">
-                                <Label>Flag Emoji</Label>
+                                <Label>{__('label.flag_emoji', 'Flag Emoji')}</Label>
                                 <Input
                                     value={form.flag_emoji}
                                     onChange={(e) => setForm((f) => ({ ...f, flag_emoji: e.target.value }))}
@@ -283,7 +285,7 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                             </div>
                         </div>
                         <div className="space-y-1">
-                            <Label>Name</Label>
+                            <Label>{__('label.name', 'Name')}</Label>
                             <Input
                                 value={form.name}
                                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
@@ -291,7 +293,7 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                             />
                         </div>
                         <div className="space-y-1">
-                            <Label>Native Name</Label>
+                            <Label>{__('label.native_name', 'Native Name')}</Label>
                             <Input
                                 value={form.native_name}
                                 onChange={(e) => setForm((f) => ({ ...f, native_name: e.target.value }))}
@@ -299,7 +301,7 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                             />
                         </div>
                         <div className="space-y-1">
-                            <Label>Currency</Label>
+                            <Label>{__('label.currency', 'Currency')}</Label>
                             <Select
                                 value={form.currency_code || '_none'}
                                 onValueChange={(v) => setForm((f) => ({ ...f, currency_code: v === '_none' ? '' : v }))}
@@ -330,7 +332,7 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                                     checked={form.is_active}
                                     onChange={(e) => setForm((f) => ({ ...f, is_active: e.target.checked }))}
                                 />
-                                <span className="text-sm">Active</span>
+                                <span className="text-sm">{__('status.active', 'Active')}</span>
                             </label>
                             <label className="flex cursor-pointer items-center gap-2">
                                 {form.is_default ? (
@@ -344,16 +346,16 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                                     checked={form.is_default}
                                     onChange={(e) => setForm((f) => ({ ...f, is_default: e.target.checked }))}
                                 />
-                                <span className="text-sm">Default</span>
+                                <span className="text-sm">{__('misc.default', 'Default')}</span>
                             </label>
                         </div>
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setOpen(false)}>
-                            Cancel
+                            {__('action.cancel', 'Cancel')}
                         </Button>
                         <Button onClick={handleSubmit} disabled={processing}>
-                            {processing ? 'Saving...' : 'Save'}
+                            {processing ? __('misc.processing', 'Saving...') : __('action.save', 'Save')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

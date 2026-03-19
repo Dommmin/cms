@@ -5,6 +5,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
 
@@ -31,6 +32,7 @@ export default function ProductVariantsIndex({
     variants: Variant[];
 }) {
     const productName = resolveLocalizedText(product.name);
+    const __ = useTranslation();
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Products', href: '/admin/ecommerce/products' },
         { title: productName, href: `/admin/ecommerce/products/${product.id}/edit` },
@@ -39,23 +41,23 @@ export default function ProductVariantsIndex({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Variants: ${productName}`} />
+            <Head title={`${__('misc.variants', 'Variants')}: ${productName}`} />
             <Wrapper>
                 <PageHeader
-                    title={`Variants: ${productName}`}
-                    description="Manage product variants, stock and pricing"
+                    title={`${__('misc.variants', 'Variants')}: ${productName}`}
+                    description={__('page.variants_desc', 'Manage product variants, stock and pricing')}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link href={`/admin/ecommerce/products/${product.id}/edit`} prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                Back to Product
+                                {__('action.back_to_product', 'Back to Product')}
                             </Link>
                         </Button>
                         <Button asChild>
                             <Link href={`/admin/ecommerce/products/${product.id}/variants/create`} prefetch cacheFor={30}>
                                 <PlusIcon className="mr-2 h-4 w-4" />
-                                Add Variant
+                                {__('action.add_variant', 'Add Variant')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -66,22 +68,22 @@ export default function ProductVariantsIndex({
                         <thead className="bg-muted/50">
                             <tr>
                                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                                    Name
+                                    {__('column.name', 'Name')}
                                 </th>
                                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                                    SKU
+                                    {__('column.sku', 'SKU')}
                                 </th>
                                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                                    Price
+                                    {__('column.price', 'Price')}
                                 </th>
                                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                                    Stock
+                                    {__('column.stock', 'Stock')}
                                 </th>
                                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                                    Status
+                                    {__('column.status', 'Status')}
                                 </th>
                                 <th className="px-4 py-3 text-right font-medium text-muted-foreground">
-                                    Actions
+                                    {__('column.actions', 'Actions')}
                                 </th>
                             </tr>
                         </thead>
@@ -92,7 +94,7 @@ export default function ProductVariantsIndex({
                                         colSpan={6}
                                         className="px-4 py-8 text-center text-muted-foreground"
                                     >
-                                        No variants yet.
+                                        {__('empty.variants', 'No variants yet.')}
                                     </td>
                                 </tr>
                             ) : (
@@ -104,7 +106,7 @@ export default function ProductVariantsIndex({
                                             </div>
                                             {variant.is_default && (
                                                 <div className="text-xs text-muted-foreground">
-                                                    Default variant
+                                                    {__('misc.default_variant', 'Default variant')}
                                                 </div>
                                             )}
                                         </td>
@@ -122,8 +124,8 @@ export default function ProductVariantsIndex({
                                         </td>
                                         <td className="px-4 py-3">
                                             {variant.is_active
-                                                ? 'Active'
-                                                : 'Inactive'}
+                                                ? __('status.active', 'Active')
+                                                : __('status.inactive', 'Inactive')}
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex justify-end gap-2">
@@ -134,14 +136,14 @@ export default function ProductVariantsIndex({
                                                         cacheFor={30}
                                                     >
                                                         <PencilIcon className="mr-1 h-3 w-3" />
-                                                        Edit
+                                                        {__('action.edit', 'Edit')}
                                                     </Link>
                                                 </Button>
                                                 <ConfirmButton
                                                     variant="outline"
                                                     size="sm"
-                                                    title="Delete Variant"
-                                                    description={`Delete variant "${variant.name}"?`}
+                                                    title={__('dialog.delete_title', 'Delete Variant')}
+                                                    description={`${__('dialog.delete_variant_desc', 'Delete variant')} "${variant.name}"?`}
                                                     onConfirm={() => {
                                                         router.delete(
                                                             `/admin/ecommerce/products/${product.id}/variants/${variant.id}`,

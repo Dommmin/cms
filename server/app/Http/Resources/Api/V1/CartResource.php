@@ -28,7 +28,7 @@ class CartResource extends JsonResource
             'discount_amount' => 0,
             'total' => $subtotal,
             'discount_code' => $cart->discount_code,
-            'currency' => 'USD',
+            'currency' => 'PLN',
             'items_count' => $cart->itemCount(),
         ];
     }

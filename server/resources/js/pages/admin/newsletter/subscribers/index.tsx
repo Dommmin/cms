@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Mail, PlusIcon, PencilIcon, TrashIcon, EyeIcon } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -42,17 +43,18 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function SubscribersIndex({ subscribers, filters }: Props) {
+    const __ = useTranslation();
     const columns: ColumnDef<Subscriber>[] = [
         {
             accessorKey: 'email',
-            header: 'Email',
+            header: __('label.email', 'Email'),
             cell: ({ row }) => (
                 <div className="font-medium">{row.original.email}</div>
             ),
         },
         {
             accessorKey: 'first_name',
-            header: 'Name',
+            header: __('column.name', 'Name'),
             cell: ({ row }) =>
                 row.original.first_name ? (
                     <span>{row.original.first_name}</span>
@@ -62,7 +64,7 @@ export default function SubscribersIndex({ subscribers, filters }: Props) {
         },
         {
             accessorKey: 'tags',
-            header: 'Tags',
+            header: __('column.tags', 'Tags'),
             cell: ({ row }) =>
                 row.original.tags && row.original.tags.length > 0 ? (
                     <div className="flex flex-wrap gap-1">
@@ -82,42 +84,42 @@ export default function SubscribersIndex({ subscribers, filters }: Props) {
         },
         {
             accessorKey: 'is_active',
-            header: 'Status',
+            header: __('column.status', 'Status'),
             cell: ({ row }) => (
                 <Badge
                     variant={row.original.is_active ? 'default' : 'secondary'}
                 >
-                    {row.original.is_active ? 'Active' : 'Inactive'}
+                    {row.original.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
                 </Badge>
             ),
         },
         {
             accessorKey: 'created_at',
-            header: 'Subscribed',
+            header: __('column.created_at', 'Subscribed'),
             cell: ({ row }) =>
                 new Date(row.original.created_at).toLocaleDateString(),
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link href={`/admin/newsletter/subscribers/${row.original.id}`} prefetch cacheFor={60}>
                             <EyeIcon className="mr-1 h-3 w-3" />
-                            View
+                            {__('action.show', 'View')}
                         </Link>
                     </Button>
                     <Button asChild variant="outline" size="sm">
                         <Link href={`/admin/newsletter/subscribers/${row.original.id}/edit`} prefetch cacheFor={30}>
                             <PencilIcon className="mr-1 h-3 w-3" />
-                            Edit
+                            {__('action.edit', 'Edit')}
                         </Link>
                     </Button>
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Subscriber"
+                        title={__('dialog.delete_title', 'Delete Subscriber')}
                         description={`Are you sure you want to delete "${row.original.email}"?`}
                         onConfirm={() => {
                             router.delete(
@@ -141,14 +143,14 @@ export default function SubscribersIndex({ subscribers, filters }: Props) {
             <Head title="Newsletter Subscribers" />
             <Wrapper>
                 <PageHeader
-                    title="Subscribers"
-                    description="Manage newsletter subscribers"
+                    title={__('page.subscribers', 'Subscribers')}
+                    description={__('page.subscribers_desc', 'Manage newsletter subscribers')}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/newsletter/subscribers/create">
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
-                                Add Subscriber
+                                {__('action.add', 'Add Subscriber')}
                             </Button>
                         </Link>
                     </PageHeaderActions>
@@ -166,7 +168,7 @@ export default function SubscribersIndex({ subscribers, filters }: Props) {
                         next_page_url: subscribers.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search subscribers..."
+                    searchPlaceholder={__('placeholder.search', 'Search subscribers...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/newsletter/subscribers"
                 />

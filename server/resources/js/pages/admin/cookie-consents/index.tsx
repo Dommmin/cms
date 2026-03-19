@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Cookie, EyeIcon, CheckCircleIcon, XCircleIcon } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import DataTable from '@/components/data-table';
 import { PageHeader } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
@@ -49,10 +50,11 @@ export default function CookieConsentsIndex({
     categories,
     stats,
 }: Props) {
+    const __ = useTranslation();
     const columns: ColumnDef<CookieConsent>[] = [
         {
             accessorKey: 'session_id',
-            header: 'Session',
+            header: __('column.session', 'Session'),
             cell: ({ row }) => (
                 <span className="font-mono text-xs">
                     {row.original.session_id.slice(0, 12)}...
@@ -61,14 +63,14 @@ export default function CookieConsentsIndex({
         },
         {
             accessorKey: 'ip',
-            header: 'IP',
+            header: __('column.ip', 'IP'),
             cell: ({ row }) => (
                 <span className="font-mono text-sm">{row.original.ip}</span>
             ),
         },
         {
             accessorKey: 'category',
-            header: 'Category',
+            header: __('column.category', 'Category'),
             cell: ({ row }) => (
                 <Badge variant="outline" className="text-xs">
                     {row.original.category}
@@ -77,7 +79,7 @@ export default function CookieConsentsIndex({
         },
         {
             accessorKey: 'granted',
-            header: 'Status',
+            header: __('column.status', 'Status'),
             cell: ({ row }) =>
                 row.original.granted ? (
                     <Badge
@@ -85,7 +87,7 @@ export default function CookieConsentsIndex({
                         className="bg-green-100 text-green-800"
                     >
                         <CheckCircleIcon className="mr-1 h-3 w-3" />
-                        Granted
+                        {__('status.granted', 'Granted')}
                     </Badge>
                 ) : (
                     <Badge
@@ -93,13 +95,13 @@ export default function CookieConsentsIndex({
                         className="bg-red-100 text-red-800"
                     >
                         <XCircleIcon className="mr-1 h-3 w-3" />
-                        Denied
+                        {__('status.denied', 'Denied')}
                     </Badge>
                 ),
         },
         {
             accessorKey: 'created_at',
-            header: 'Date',
+            header: __('column.date', 'Date'),
             cell: ({ row }) => (
                 <span className="text-sm">
                     {new Date(row.original.created_at).toLocaleString()}
@@ -108,12 +110,12 @@ export default function CookieConsentsIndex({
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <Link href={`/admin/cookie-consents/${row.original.id}`}>
                     <Button variant="outline" size="sm">
                         <EyeIcon className="mr-1 h-3 w-3" />
-                        View
+                        {__('action.show', 'View')}
                     </Button>
                 </Link>
             ),
@@ -125,15 +127,15 @@ export default function CookieConsentsIndex({
             <Head title="Cookie Consents" />
             <Wrapper>
                 <PageHeader
-                    title="Cookie Consents"
-                    description="Manage and view cookie consent records"
+                    title={__('page.cookie_consents', 'Cookie Consents')}
+                    description={__('page.cookie_consents_desc', 'Manage and view cookie consent records')}
                 />
 
                 {/* Stats */}
                 <div className="mb-6 grid grid-cols-3 gap-4">
                     <div className="rounded-lg border bg-card p-4">
                         <div className="text-sm text-muted-foreground">
-                            Total
+                            {__('misc.total', 'Total')}
                         </div>
                         <div className="text-2xl font-bold">
                             {stats.total_consents}
@@ -141,7 +143,7 @@ export default function CookieConsentsIndex({
                     </div>
                     <div className="rounded-lg border bg-card p-4">
                         <div className="text-sm text-muted-foreground">
-                            Granted
+                            {__('status.granted', 'Granted')}
                         </div>
                         <div className="text-2xl font-bold text-green-600">
                             {stats.granted_count}
@@ -149,7 +151,7 @@ export default function CookieConsentsIndex({
                     </div>
                     <div className="rounded-lg border bg-card p-4">
                         <div className="text-sm text-muted-foreground">
-                            Denied
+                            {__('status.denied', 'Denied')}
                         </div>
                         <div className="text-2xl font-bold text-red-600">
                             {stats.denied_count}
@@ -169,7 +171,7 @@ export default function CookieConsentsIndex({
                         next_page_url: consents.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search by session or IP..."
+                    searchPlaceholder={__('placeholder.search', 'Search by session or IP...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/cookie-consents"
                 />

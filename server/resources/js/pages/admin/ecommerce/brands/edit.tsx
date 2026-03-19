@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 export default function Edit({
@@ -21,6 +22,7 @@ export default function Edit({
         is_active: boolean;
     };
 }) {
+    const __ = useTranslation();
     const formId = 'brand-edit-form';
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -40,17 +42,16 @@ export default function Edit({
 
             <Wrapper>
                 <PageHeader
-                    title="Edit Brand"
+                    title={__('page.edit_brand', 'Edit Brand')}
                     description={`Update details for ${brand.name}`}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/ecommerce/brands' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Brands
-                        
-                </Link>
-            </Button>
+                            <Link href='/admin/ecommerce/brands' prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                {__('action.back', 'Back')}
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -63,7 +64,7 @@ export default function Edit({
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
+                                <Label htmlFor="name">{__('label.name', 'Name')}</Label>
                                 <Input
                                     id="name"
                                     name="name"
@@ -76,7 +77,7 @@ export default function Edit({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="slug">Slug</Label>
+                                <Label htmlFor="slug">{__('label.slug', 'Slug')}</Label>
                                 <Input
                                     id="slug"
                                     name="slug"
@@ -88,7 +89,7 @@ export default function Edit({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="description">Description</Label>
+                                <Label htmlFor="description">{__('label.description', 'Description')}</Label>
                                 <textarea
                                     id="description"
                                     name="description"
@@ -113,14 +114,14 @@ export default function Edit({
                                     htmlFor="is_active"
                                     className="font-normal"
                                 >
-                                    Active
+                                    {__('label.is_active', 'Active')}
                                 </Label>
                             </div>
 
                             <StickyFormActions
                                 formId={formId}
                                 processing={processing}
-                                submitLabel="Save Changes"
+                                submitLabel={__('action.save_changes', 'Save Changes')}
                             />
                         </>
                     )}

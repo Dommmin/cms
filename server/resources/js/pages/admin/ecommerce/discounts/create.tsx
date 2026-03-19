@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 const DISCOUNT_TYPES = [
@@ -30,6 +31,7 @@ export default function Create({
         min_order_value?: number;
     };
 }) {
+    const __ = useTranslation();
     const isEditing = !!discount;
     const formId = isEditing ? 'discount-edit-form' : 'discount-create-form';
     const breadcrumbs: BreadcrumbItem[] = isEditing
@@ -71,8 +73,8 @@ export default function Create({
                         <Button asChild variant="outline">
                 <Link href='/admin/ecommerce/discounts' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Discounts
-                        
+                            {__('action.back', 'Back')}
+
                 </Link>
             </Button>
                     </PageHeaderActions>
@@ -91,7 +93,7 @@ export default function Create({
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
+                                <Label htmlFor="name">{__('label.name', 'Name')}</Label>
                                 <Input
                                     id="name"
                                     name="name"
@@ -104,7 +106,7 @@ export default function Create({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="code">Code</Label>
+                                <Label htmlFor="code">{__('label.code', 'Code')}</Label>
                                 <Input
                                     id="code"
                                     name="code"
@@ -117,7 +119,7 @@ export default function Create({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="type">Discount Type</Label>
+                                <Label htmlFor="type">{__('label.type', 'Discount Type')}</Label>
                                 <select
                                     id="type"
                                     name="type"
@@ -139,7 +141,7 @@ export default function Create({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="value">Value</Label>
+                                <Label htmlFor="value">{__('label.value', 'Value')}</Label>
                                 <Input
                                     id="value"
                                     name="value"
@@ -197,14 +199,14 @@ export default function Create({
                                     htmlFor="is_active"
                                     className="font-normal"
                                 >
-                                    Active
+                                    {__('label.is_active', 'Active')}
                                 </Label>
                             </div>
 
                             <StickyFormActions
                                 formId={formId}
                                 processing={processing}
-                                submitLabel={isEditing ? 'Save Changes' : 'Create Discount'}
+                                submitLabel={isEditing ? __('action.save_changes', 'Save Changes') : __('action.create', 'Create Discount')}
                             />
                         </>
                     )}

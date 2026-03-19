@@ -85,18 +85,18 @@ Navigate to `/admin` in your browser. You will see the login page.
 
 The left sidebar contains all major sections:
 
-| Section | What It Contains |
-|---|---|
-| Dashboard | Overview widgets and quick stats |
-| CMS | Pages, Menus, Themes, Forms, FAQ, Stores |
-| Blog | Posts and Categories |
-| Shop | Products, Orders, Customers, Discounts, Returns |
-| Newsletter | Subscribers, Segments, Campaigns |
-| Finance | Currencies, Exchange Rates |
-| Users | User accounts and roles |
-| Notifications | Push/email/SMS notifications to users |
-| Activity Log | Audit trail of all admin actions |
-| Settings | System configuration |
+| Section       | What It Contains                                |
+|---------------|-------------------------------------------------|
+| Dashboard     | Overview widgets and quick stats                |
+| CMS           | Pages, Menus, Themes, Forms, FAQ, Stores        |
+| Blog          | Posts and Categories                            |
+| Shop          | Products, Orders, Customers, Discounts, Returns |
+| Newsletter    | Subscribers, Segments, Campaigns                |
+| Finance       | Currencies, Exchange Rates                      |
+| Users         | User accounts and roles                         |
+| Notifications | Push/email/SMS notifications to users           |
+| Activity Log  | Audit trail of all admin actions                |
+| Settings      | System configuration                            |
 
 The top bar contains:
 - **Search** — global search across all content
@@ -111,13 +111,13 @@ The dashboard shows an overview of your platform's activity. It is made up of **
 
 **Widget types available:**
 
-| Type | Description |
-|---|---|
-| Statistic Card | A single number (e.g. total orders today) |
-| Chart | A line or bar chart over time |
-| Table | A small data table (e.g. recent orders) |
-| Recent Activity | Latest actions in the activity log |
-| Quick Actions | Buttons to common tasks |
+| Type            | Description                               |
+|-----------------|-------------------------------------------|
+| Statistic Card  | A single number (e.g. total orders today) |
+| Chart           | A line or bar chart over time             |
+| Table           | A small data table (e.g. recent orders)   |
+| Recent Activity | Latest actions in the activity log        |
+| Quick Actions   | Buttons to common tasks                   |
 
 **Real-time notifications** appear in the top-right bell icon. The system checks for new notifications every few seconds automatically — no need to refresh the page.
 
@@ -131,9 +131,9 @@ Pages are the building blocks of your website. Navigate to **CMS > Pages**.
 
 **Page types:**
 
-| Type | Description |
-|---|---|
-| Blocks | Built using the visual page builder with drag-and-drop sections |
+| Type   | Description                                                        |
+|--------|--------------------------------------------------------------------|
+| Blocks | Built using the visual page builder with drag-and-drop sections    |
 | Module | Linked to a data source (e.g. a product catalogue or blog listing) |
 
 **Key actions on a page:**
@@ -163,24 +163,24 @@ A page is made up of **sections**. Each section contains one or more **blocks**.
 
 **Available block types:**
 
-| Block | Purpose |
-|---|---|
-| Hero Banner | Full-width banner with heading, text, and CTA button |
-| Rich Text | Formatted text content (headings, lists, links) |
-| Featured Products | Display a selection of products |
-| Categories Grid | Show product categories as a visual grid |
-| Promotional Banner | Marketing banner with image and text |
-| Newsletter Signup | Email capture form |
-| Testimonials | Customer quotes |
-| Image Gallery | Photo gallery |
-| Video Embed | Embedded video |
-| Custom HTML | Raw HTML for advanced users |
-| Two Columns | Side-by-side layout |
-| Three Columns | Three-column layout |
-| Accordion | Expandable FAQ-style items |
-| Tabs | Tabbed content |
-| Form Embed | Embed a contact/custom form |
-| Map | Location map |
+| Block              | Purpose                                              |
+|--------------------|------------------------------------------------------|
+| Hero Banner        | Full-width banner with heading, text, and CTA button |
+| Rich Text          | Formatted text content (headings, lists, links)      |
+| Featured Products  | Display a selection of products                      |
+| Categories Grid    | Show product categories as a visual grid             |
+| Promotional Banner | Marketing banner with image and text                 |
+| Newsletter Signup  | Email capture form                                   |
+| Testimonials       | Customer quotes                                      |
+| Image Gallery      | Photo gallery                                        |
+| Video Embed        | Embedded video                                       |
+| Custom HTML        | Raw HTML for advanced users                          |
+| Two Columns        | Side-by-side layout                                  |
+| Three Columns      | Three-column layout                                  |
+| Accordion          | Expandable FAQ-style items                           |
+| Tabs               | Tabbed content                                       |
+| Form Embed         | Embed a contact/custom form                          |
+| Map                | Location map                                         |
 
 **Useful features:**
 
@@ -216,10 +216,10 @@ Menus control the navigation links on your website (header, footer, etc.). Navig
 
 **Menu locations:**
 
-| Location | Description |
-|---|---|
-| Header | Main top navigation |
-| Footer | Links at the bottom of the page |
+| Location     | Description                                |
+|--------------|--------------------------------------------|
+| Header       | Main top navigation                        |
+| Footer       | Links at the bottom of the page            |
 | Footer Legal | Legal links (privacy, terms) in the footer |
 
 **Adding menu items:**
@@ -337,19 +337,19 @@ Navigate to **Shop > Products**.
 
 **Key fields:**
 
-| Field | Description |
-|---|---|
-| Name | Product name (translatable) |
-| Description | Full description (translatable) |
+| Field             | Description                                    |
+|-------------------|------------------------------------------------|
+| Name              | Product name (translatable)                    |
+| Description       | Full description (translatable)                |
 | Short Description | Brief summary shown in listings (translatable) |
-| SKU | Stock keeping unit code |
-| Active | Whether the product is visible on the site |
-| Saleable | Whether the product can be purchased |
-| Brand | Linked brand |
-| Product Type | Determines which attributes are available |
-| Categories | Which categories the product appears in |
-| Images | Upload photos; mark one as the thumbnail |
-| SEO | Meta title, description, and slug |
+| SKU               | Stock keeping unit code                        |
+| Active            | Whether the product is visible on the site     |
+| Saleable          | Whether the product can be purchased           |
+| Brand             | Linked brand                                   |
+| Product Type      | Determines which attributes are available      |
+| Categories        | Which categories the product appears in        |
+| Images            | Upload photos; mark one as the thumbnail       |
+| SEO               | Meta title, description, and slug              |
 
 **Variants:**
 
@@ -402,13 +402,13 @@ Navigate to **Shop > Product Types** to create types and assign attributes to th
 
 **Attribute types:**
 
-| Type | Description |
-|---|---|
-| Text | Free-form text |
-| Select | Single choice from a list of values |
-| Multiselect | Multiple choices |
-| Numeric | A number |
-| Color | A colour picker |
+| Type        | Description                         |
+|-------------|-------------------------------------|
+| Text        | Free-form text                      |
+| Select      | Single choice from a list of values |
+| Multiselect | Multiple choices                    |
+| Numeric     | A number                            |
+| Color       | A colour picker                     |
 
 Each attribute has **Attribute Values** — the specific options (e.g. "Red", "Blue", "Green" for a Colour attribute).
 
@@ -468,16 +468,16 @@ Discounts are code-based reductions customers apply at checkout.
 
 **Key settings:**
 
-| Setting | Description |
-|---|---|
-| Code | The discount code customers enter |
-| Type | Percentage or fixed amount |
-| Value | How much discount |
-| Minimum order value | Minimum cart total to qualify |
-| Usage limit | Maximum number of uses |
-| Valid from / until | Active date range |
-| Stackable | Whether this discount can combine with others |
-| Product targeting | Restrict to specific products or categories |
+| Setting             | Description                                   |
+|---------------------|-----------------------------------------------|
+| Code                | The discount code customers enter             |
+| Type                | Percentage or fixed amount                    |
+| Value               | How much discount                             |
+| Minimum order value | Minimum cart total to qualify                 |
+| Usage limit         | Maximum number of uses                        |
+| Valid from / until  | Active date range                             |
+| Stackable           | Whether this discount can combine with others |
+| Product targeting   | Restrict to specific products or categories   |
 
 **Conditions** can be added to a discount (e.g. only valid for orders above a certain amount, or for first-time customers).
 
@@ -511,12 +511,12 @@ Navigate to **Shop > Shipping Methods**.
 
 **Supported carriers:**
 
-| Carrier | Description |
-|---|---|
-| InPost | Parcel locker delivery |
-| DPD | Courier delivery |
-| DHL | Courier delivery |
-| Pickup | In-store pickup |
+| Carrier | Description            |
+|---------|------------------------|
+| InPost  | Parcel locker delivery |
+| DPD     | Courier delivery       |
+| DHL     | Courier delivery       |
+| Pickup  | In-store pickup        |
 
 Each shipping method has:
 - Name and description
@@ -578,11 +578,11 @@ Segments let you group subscribers for targeted campaigns.
 
 **Audience types:**
 
-| Type | Description |
-|---|---|
-| All | All active subscribers |
-| Segment | A manually defined group |
-| Tags | Subscribers with specific tags |
+| Type    | Description                    |
+|---------|--------------------------------|
+| All     | All active subscribers         |
+| Segment | A manually defined group       |
+| Tags    | Subscribers with specific tags |
 
 Bulk actions: activate or deactivate multiple segments at once.
 
@@ -594,11 +594,11 @@ Campaigns are newsletter emails you send to subscribers.
 
 **Campaign types:**
 
-| Type | Description |
-|---|---|
-| Broadcast | One-time send to all or a segment |
+| Type      | Description                         |
+|-----------|-------------------------------------|
+| Broadcast | One-time send to all or a segment   |
 | Automated | Triggered automatically by an event |
-| Scheduled | Sent at a specific date and time |
+| Scheduled | Sent at a specific date and time    |
 
 **Campaign actions:**
 
@@ -626,9 +626,9 @@ Navigate to **Users** to manage admin panel accounts.
 
 **Roles:**
 
-| Role | Access Level |
-|---|---|
-| Admin | Full access to all features |
+| Role   | Access Level                                                                       |
+|--------|------------------------------------------------------------------------------------|
+| Admin  | Full access to all features                                                        |
 | Editor | Access to content (CMS, Blog, Products) but not system settings or user management |
 
 **Managing users:**
@@ -648,11 +648,11 @@ Navigate to **Notifications** to send in-app, email, or SMS notifications to pla
 
 **Notification channels:**
 
-| Channel | Description |
-|---|---|
-| Email | Sent to the user's email address |
-| SMS | Sent to the user's phone number |
-| Push | In-app push notification |
+| Channel | Description                      |
+|---------|----------------------------------|
+| Email   | Sent to the user's email address |
+| SMS     | Sent to the user's phone number  |
+| Push    | In-app push notification         |
 
 **Actions:**
 
@@ -700,11 +700,11 @@ Click **Restore** next to any version. The record is restored to that state and 
 
 **Version limits:**
 
-| Model | Maximum Versions Kept |
-|---|---|
-| Product | 50 |
-| Blog Post | 30 |
-| Category | 30 |
+| Model     | Maximum Versions Kept |
+|-----------|-----------------------|
+| Product   | 50                    |
+| Blog Post | 30                    |
+| Category  | 30                    |
 
 Older versions are automatically removed when the limit is reached.
 
@@ -782,15 +782,15 @@ Site name, default language, timezone, and other global options.
 
 Configure how the platform sends emails:
 
-| Setting | Description |
-|---|---|
-| Mail Driver | `smtp`, `sendmail`, `mailgun`, `ses`, etc. |
-| SMTP Host | Your mail server address |
-| SMTP Port | Usually 587 (TLS) or 465 (SSL) |
-| SMTP Username | Your mail account username |
+| Setting       | Description                                   |
+|---------------|-----------------------------------------------|
+| Mail Driver   | `smtp`, `sendmail`, `mailgun`, `ses`, etc.    |
+| SMTP Host     | Your mail server address                      |
+| SMTP Port     | Usually 587 (TLS) or 465 (SSL)                |
+| SMTP Username | Your mail account username                    |
 | SMTP Password | Your mail account password (stored encrypted) |
-| From Address | The "from" email address |
-| From Name | The "from" display name |
+| From Address  | The "from" email address                      |
+| From Name     | The "from" display name                       |
 
 > Changes to mail settings take effect within 1 hour (they are cached). To apply immediately, ask a developer to clear the application cache.
 
@@ -798,12 +798,12 @@ Configure how the platform sends emails:
 
 Enable or disable major platform features:
 
-| Feature | Description |
-|---|---|
-| Blog | Enables the blog module and its public API endpoints |
-| E-commerce | Enables the shop, products, orders, and checkout |
-| Reviews | Enables customer product reviews |
-| Newsletter | Enables newsletter subscription and campaigns |
+| Feature    | Description                                          |
+|------------|------------------------------------------------------|
+| Blog       | Enables the blog module and its public API endpoints |
+| E-commerce | Enables the shop, products, orders, and checkout     |
+| Reviews    | Enables customer product reviews                     |
+| Newsletter | Enables newsletter subscription and campaigns        |
 
 Disabling a feature hides it from the public website but does not delete its data.
 

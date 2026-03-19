@@ -1,5 +1,6 @@
 import { Link, Form, Head, router } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -26,19 +27,21 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Create({ locations }: Props) {
+    const __ = useTranslation();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Create Menu" />
+            <Head title={__('page.create_menu', 'Create Menu')} />
             <Wrapper>
                 <PageHeader
-                    title="Create Menu"
-                    description="Add a new navigation menu"
+                    title={__('page.create_menu', 'Create Menu')}
+                    description={__('page.create_menu_desc', 'Add a new navigation menu')}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                 <Link href='/admin/menus' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back
+                            {__('action.back', 'Back')}
                         
                 </Link>
             </Button>
@@ -53,7 +56,7 @@ export default function Create({ locations }: Props) {
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name *</Label>
+                                <Label htmlFor="name">{__('label.name', 'Name')} *</Label>
                                 <Input
                                     id="name"
                                     name="name"
@@ -64,13 +67,13 @@ export default function Create({ locations }: Props) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="location">Location</Label>
+                                <Label htmlFor="location">{__('label.location', 'Location')}</Label>
                                 <Select name="location">
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Select location" />
+                                        <SelectValue placeholder={__('placeholder.select_location', 'Select location')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="none">No location</SelectItem>
+                                        <SelectItem value="none">{__('misc.no_location', 'No location')}</SelectItem>
                                         {locations.map((loc) => (
                                             <SelectItem
                                                 key={loc.value}
@@ -97,13 +100,13 @@ export default function Create({ locations }: Props) {
                                     htmlFor="is_active"
                                     className="font-normal"
                                 >
-                                    Active
+                                    {__('label.active', 'Active')}
                                 </Label>
                             </div>
 
                             <div className="flex items-center gap-4">
                                 <Button type="submit" disabled={processing}>
-                                    {processing ? 'Creating...' : 'Create Menu'}
+                                    {processing ? __('misc.creating', 'Creating...') : __('action.create_menu', 'Create Menu')}
                                 </Button>
                             </div>
                         </>

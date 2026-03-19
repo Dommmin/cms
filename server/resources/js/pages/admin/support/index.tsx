@@ -1,6 +1,7 @@
 import { Head, Link, router, usePoll } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon, MessageCircleIcon, TrashIcon } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -70,13 +71,14 @@ function formatRelativeTime(dateStr: string | null): string {
 }
 
 export default function SupportIndex({ conversations, filters, agents, open_count, statuses }: Props) {
+    const __ = useTranslation();
     // Refresh unread counts and new conversations every 30 seconds
     usePoll(30000);
 
     const columns: ColumnDef<Conversation>[] = [
         {
             accessorKey: 'subject',
-            header: 'Subject',
+            header: __('column.subject', 'Subject'),
             cell: ({ row }) => (
                 <div className="flex items-start gap-2">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-muted">
@@ -98,7 +100,7 @@ export default function SupportIndex({ conversations, filters, agents, open_coun
         },
         {
             accessorKey: 'status',
-            header: 'Status',
+            header: __('column.status', 'Status'),
             cell: ({ row }) => (
                 <Badge className={statusColors[row.original.status] ?? ''}>
                     {statuses.find((s) => s.value === row.original.status)?.label ?? row.original.status}
@@ -107,24 +109,24 @@ export default function SupportIndex({ conversations, filters, agents, open_coun
         },
         {
             accessorKey: 'assigned_to',
-            header: 'Assigned to',
+            header: __('column.assigned_to', 'Assigned to'),
             cell: ({ row }) =>
                 row.original.assigned_to ? (
                     <span className="text-sm">{row.original.assigned_to.name}</span>
                 ) : (
-                    <span className="text-muted-foreground">Unassigned</span>
+                    <span className="text-muted-foreground">{__('misc.unassigned', 'Unassigned')}</span>
                 ),
         },
         {
             accessorKey: 'messages_count',
-            header: 'Messages',
+            header: __('column.messages', 'Messages'),
             cell: ({ row }) => (
                 <span className="text-sm text-muted-foreground">{row.original.messages_count}</span>
             ),
         },
         {
             accessorKey: 'last_reply_at',
-            header: 'Last reply',
+            header: __('column.last_reply', 'Last reply'),
             cell: ({ row }) => (
                 <span className="text-sm text-muted-foreground">
                     {formatRelativeTime(row.original.last_reply_at)}
@@ -133,20 +135,20 @@ export default function SupportIndex({ conversations, filters, agents, open_coun
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link href={`/admin/support/${row.original.id}`} prefetch cacheFor={60}>
                             <EyeIcon className="mr-1 h-3 w-3" />
-                            View
+                            {__('action.show', 'View')}
                         </Link>
                     </Button>
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Conversation"
-                        description="This will permanently delete the conversation and all its messages."
+                        title={__('dialog.delete_title', 'Delete Conversation')}
+                        description={__('dialog.cannot_be_undone', 'This will permanently delete the conversation and all its messages.')}
                         onConfirm={() => {
                             router.delete(`/admin/support/${row.original.id}`, {
                                 onSuccess: () => toast.success('Conversation deleted'),
@@ -166,12 +168,12 @@ export default function SupportIndex({ conversations, filters, agents, open_coun
             <Wrapper>
                 <PageHeader
                     title={`Support${open_count > 0 ? ` (${open_count} open)` : ''}`}
-                    description="Manage customer support conversations"
+                    description={__('page.support_desc', 'Manage customer support conversations')}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link href="/admin/support/canned-responses" prefetch cacheFor={30}>
-                                Canned Responses
+                                {__('nav.canned_responses', 'Canned Responses')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -189,7 +191,7 @@ export default function SupportIndex({ conversations, filters, agents, open_coun
                         next_page_url: conversations.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search by subject, email or name..."
+                    searchPlaceholder={__('placeholder.search', 'Search by subject, email or name...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/support"
                 />

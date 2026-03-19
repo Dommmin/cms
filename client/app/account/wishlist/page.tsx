@@ -8,13 +8,15 @@ import { toast } from "react-toastify";
 import { useWishlist, useRemoveFromWishlist } from "@/hooks/use-wishlist";
 import { useAddToCart } from "@/hooks/use-cart";
 import { useLocalePath } from "@/hooks/use-locale";
-import { formatPrice } from "@/lib/format";
+import { useTranslation } from "@/hooks/use-translation";
+import { PriceDisplay } from "@/components/price-display";
 
 export default function WishlistPage() {
   const { data: wishlist, isLoading } = useWishlist();
   const { mutate: removeFromWishlist } = useRemoveFromWishlist();
   const { mutate: addToCart } = useAddToCart();
   const lp = useLocalePath();
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
@@ -103,16 +105,21 @@ export default function WishlistPage() {
               )}
 
               <div className="mt-auto flex items-center justify-between gap-2">
-                <span className="font-semibold">{formatPrice(item.variant.price)}</span>
+                <PriceDisplay
+                  price={item.variant.price}
+                  compareAtPrice={item.variant.compare_at_price}
+                  omnibusPrice={item.variant.omnibus_price}
+                  isOnSale={item.variant.is_on_sale}
+                />
                 <button
                   onClick={() =>
                     addToCart(
                       { variant_id: item.variant_id, quantity: 1 },
-                      { onSuccess: () => toast.success("Added to cart!") },
+                      { onSuccess: () => toast.success(t("product.added_to_cart", "Added to cart!")) },
                     )
                   }
                   aria-label="Add to cart"
-                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground hover:opacity-90"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground hover:opacity-90"
                 >
                   <ShoppingCart className="h-4 w-4" />
                 </button>

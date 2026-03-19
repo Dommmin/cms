@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 type ShippingMethod = {
@@ -41,17 +42,18 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function ShippingMethodsIndex({ methods, filters }: Props) {
+    const __ = useTranslation();
     const columns: ColumnDef<ShippingMethod>[] = [
         {
             accessorKey: 'name',
-            header: 'Name',
+            header: __('column.name', 'Name'),
             cell: ({ row }) => (
                 <div className="font-medium">{row.original.name}</div>
             ),
         },
         {
             accessorKey: 'carrier',
-            header: 'Carrier',
+            header: __('column.carrier', 'Carrier'),
             cell: ({ row }) => (
                 <Badge variant="outline" className="text-xs">
                     {row.original.carrier}
@@ -60,7 +62,7 @@ export default function ShippingMethodsIndex({ methods, filters }: Props) {
         },
         {
             accessorKey: 'base_price',
-            header: 'Base Price',
+            header: __('column.base_price', 'Base Price'),
             cell: ({ row }) => (
                 <span className="font-mono">
                     {row.original.base_price / 100} PLN
@@ -69,7 +71,7 @@ export default function ShippingMethodsIndex({ methods, filters }: Props) {
         },
         {
             accessorKey: 'price_per_kg',
-            header: 'Per Kg',
+            header: __('column.per_kg', 'Per Kg'),
             cell: ({ row }) => (
                 <span className="font-mono">
                     {row.original.price_per_kg / 100} PLN
@@ -78,37 +80,37 @@ export default function ShippingMethodsIndex({ methods, filters }: Props) {
         },
         {
             accessorKey: 'shipments_count',
-            header: 'Shipments',
+            header: __('column.shipments', 'Shipments'),
             cell: ({ row }) => (
                 <span className="text-sm">{row.original.shipments_count}</span>
             ),
         },
         {
             accessorKey: 'is_active',
-            header: 'Status',
+            header: __('column.status', 'Status'),
             cell: ({ row }) => (
                 <Badge
                     variant={row.original.is_active ? 'default' : 'secondary'}
                 >
-                    {row.original.is_active ? 'Active' : 'Inactive'}
+                    {row.original.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
                 </Badge>
             ),
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link href={`/admin/ecommerce/shipping-methods/${row.original.id}/edit`} prefetch cacheFor={30}>
                             <PencilIcon className="mr-1 h-3 w-3" />
-                            Edit
+                            {__('action.edit', 'Edit')}
                         </Link>
                     </Button>
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Shipping Method"
+                        title={__('dialog.delete_title', 'Delete Shipping Method')}
                         description={`Are you sure you want to delete "${row.original.name}"?`}
                         onConfirm={() => {
                             router.delete(
@@ -135,14 +137,14 @@ export default function ShippingMethodsIndex({ methods, filters }: Props) {
             <Head title="Shipping Methods" />
             <Wrapper>
                 <PageHeader
-                    title="Shipping Methods"
-                    description="Manage shipping methods"
+                    title={__('page.shipping_methods', 'Shipping Methods')}
+                    description={__('page.shipping_methods_desc', 'Manage shipping methods')}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/ecommerce/shipping-methods/create">
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
-                                Add Method
+                                {__('action.add_method', 'Add Method')}
                             </Button>
                         </Link>
                     </PageHeaderActions>

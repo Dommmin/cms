@@ -31,11 +31,11 @@ Click **Add Section** in the top toolbar. A new blank section appears at the bot
 
 Expand the section (click the chevron or the row title) and configure:
 
-| Field | Description |
-|---|---|
+| Field            | Description                                                                                                                              |
+|------------------|------------------------------------------------------------------------------------------------------------------------------------------|
 | **Section Type** | Determines what kind of content area this is (e.g. Hero Banner, Content Area). Each type may offer different layout and variant options. |
-| **Layout** | Controls the structural layout (e.g. "Full Width", "Contained"). Available options depend on the selected Section Type. |
-| **Variant** | Visual variant/style (e.g. "Centered", "Left Aligned"). Optional, depends on Section Type. |
+| **Layout**       | Controls the structural layout (e.g. "Full Width", "Contained"). Available options depend on the selected Section Type.                  |
+| **Variant**      | Visual variant/style (e.g. "Centered", "Left Aligned"). Optional, depends on Section Type.                                               |
 
 #### Reordering Sections
 
@@ -373,19 +373,19 @@ Defined in `allowed_relations` (outside `schema`). Each key is a slot name store
 
 Available relation types (from `config/blocks.php` → `relation_types`):
 
-| Key | Type |
-|---|---|
-| `media.image` | Spatie Media image |
-| `media.icon` | Spatie Media icon |
-| `media.file` | Spatie Media file/PDF |
-| `media.video` | Spatie Media video |
-| `product` | Product model |
-| `category` | Category model |
-| `brand` | Brand model |
-| `page` | Page model |
-| `menu` | Menu model |
-| `form` | Form model |
-| `faq` | Faq model |
+| Key           | Type                  |
+|---------------|-----------------------|
+| `media.image` | Spatie Media image    |
+| `media.icon`  | Spatie Media icon     |
+| `media.file`  | Spatie Media file/PDF |
+| `media.video` | Spatie Media video    |
+| `product`     | Product model         |
+| `category`    | Category model        |
+| `brand`       | Brand model           |
+| `page`        | Page model            |
+| `menu`        | Menu model            |
+| `form`        | Form model            |
+| `faq`         | Faq model             |
 
 ---
 

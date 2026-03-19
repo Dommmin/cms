@@ -14,6 +14,7 @@ import {
     SaveIcon,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -24,6 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
+import { formatFileSize } from '@/lib/utils';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -67,13 +69,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Media', href: '/admin/media' },
 ];
 
-function formatBytes(bytes: number): string {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
 
 function getFileIcon(mimeType: string) {
     if (mimeType.startsWith('image/')) return ImageIcon;
@@ -88,6 +83,7 @@ export default function Index({
     media: MediaData;
     filters: { search?: string; extension?: string };
 }) {
+    const __ = useTranslation();
     const [uploadingFiles, setUploadingFiles] = useState<File[]>([]);
     const [isUploading, setIsUploading] = useState(false);
     const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
@@ -154,12 +150,12 @@ export default function Index({
 
         router.post('/admin/media', formData, {
             onSuccess: () => {
-                toast.success(`${files.length} file(s) uploaded`);
+                toast.success(__('misc.files_uploaded', `${files.length} file(s) uploaded`));
                 setUploadingFiles([]);
                 setIsUploading(false);
             },
             onError: (errors) => {
-                toast.error('Upload failed');
+                toast.error(__('misc.upload_failed', 'Upload failed'));
                 console.error(errors);
                 setIsUploading(false);
             },
@@ -177,14 +173,14 @@ export default function Index({
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => {
-                toast.success('Media updated');
+                toast.success(__('misc.media_updated', 'Media updated'));
                 // Update local state so the grid alt text reflects immediately
                 setSelectedItem({
                     ...selectedItem,
                     custom_properties: { ...metaForm },
                 });
             },
-            onError: () => toast.error('Failed to save metadata'),
+            onError: () => toast.error(__('misc.failed_save_metadata', 'Failed to save metadata')),
             onFinish: () => setIsSavingMeta(false),
         });
     };
@@ -203,12 +199,12 @@ export default function Index({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Media" />
+            <Head title={__('page.media', 'Media')} />
 
             <Wrapper>
                 <PageHeader
-                    title="Media Library"
-                    description="Manage files and images"
+                    title={__('page.media', 'Media Library')}
+                    description={__('page.media_desc', 'Manage files and images')}
                 >
                     <PageHeaderActions>
                         <Button
@@ -218,7 +214,7 @@ export default function Index({
                             }
                         >
                             <UploadIcon className="mr-2 h-4 w-4" />
-                            Upload File
+                            {__('action.upload_file', 'Upload File')}
                         </Button>
                         <input
                             id="file-upload"
@@ -279,7 +275,7 @@ export default function Index({
                     <div className="relative max-w-md flex-1">
                         <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
-                            placeholder="Search files..."
+                            placeholder={__('placeholder.search_files', 'Search files...')}
                             value={search}
                             onChange={(e) => handleSearch(e.target.value)}
                             className="pl-9"
@@ -349,7 +345,7 @@ export default function Index({
                                                     <CheckIcon className="h-4 w-4 text-primary-foreground" />
                                                 </div>
                                             )}
-                                            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
+                                            <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/60 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
                                                 <p className="truncate text-xs text-white">
                                                     {item.name}
                                                 </p>
@@ -404,7 +400,7 @@ export default function Index({
                     {selectedItem && (
                         <div className="w-80 shrink-0 overflow-y-auto border-l bg-muted/30">
                             <div className="flex items-center justify-between border-b px-4 py-3">
-                                <h3 className="font-semibold">Details</h3>
+                                <h3 className="font-semibold">{__('misc.details', 'Details')}</h3>
                                 <Button
                                     variant="outline"
                                     size="icon"
@@ -450,7 +446,7 @@ export default function Index({
                                     </div>
                                     <div>
                                         <Label className="text-xs text-muted-foreground">
-                                            File name
+                                            {__('label.file_name', 'File name')}
                                         </Label>
                                         <p className="truncate text-sm">
                                             {selectedItem.file_name}
@@ -459,7 +455,7 @@ export default function Index({
                                     <div className="flex items-center gap-3">
                                         <div>
                                             <Label className="text-xs text-muted-foreground">
-                                                Type
+                                                {__('column.type', 'Type')}
                                             </Label>
                                             <Badge
                                                 variant="outline"
@@ -470,10 +466,10 @@ export default function Index({
                                         </div>
                                         <div>
                                             <Label className="text-xs text-muted-foreground">
-                                                Size
+                                                {__('column.size', 'Size')}
                                             </Label>
                                             <p className="text-sm">
-                                                {formatBytes(selectedItem.size)}
+                                                {formatFileSize(selectedItem.size)}
                                             </p>
                                         </div>
                                     </div>
@@ -492,14 +488,14 @@ export default function Index({
                                 {/* Editable metadata — available for all file types */}
                                 <div className="space-y-3 border-t pt-3">
                                     <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                                        Metadata
+                                        {__('misc.metadata', 'Metadata')}
                                     </p>
                                     {/* Alt text + caption only make sense for images */}
                                     {selectedItem.mime_type.startsWith('image/') && (
                                         <>
                                             <div className="space-y-1">
                                                 <Label htmlFor="meta-alt" className="text-xs">
-                                                    Alt text
+                                                    {__('label.alt_text', 'Alt text')}
                                                 </Label>
                                                 <Input
                                                     id="meta-alt"
@@ -516,7 +512,7 @@ export default function Index({
                                             </div>
                                             <div className="space-y-1">
                                                 <Label htmlFor="meta-caption" className="text-xs">
-                                                    Caption
+                                                    {__('label.caption', 'Caption')}
                                                 </Label>
                                                 <Input
                                                     id="meta-caption"
@@ -535,7 +531,7 @@ export default function Index({
                                     )}
                                     <div className="space-y-1">
                                         <Label htmlFor="meta-description" className="text-xs">
-                                            Description
+                                            {__('label.description', 'Description')}
                                         </Label>
                                         <Textarea
                                             id="meta-description"
@@ -553,7 +549,7 @@ export default function Index({
                                     </div>
                                     <div className="space-y-1">
                                         <Label htmlFor="meta-author" className="text-xs">
-                                            Author / Copyright
+                                            {__('label.author_copyright', 'Author / Copyright')}
                                         </Label>
                                         <Input
                                             id="meta-author"
@@ -592,12 +588,12 @@ export default function Index({
                                         }
                                     >
                                         <EyeIcon className="mr-2 h-4 w-4" />
-                                        View Full Size
+                                        {__('action.view_full_size', 'View Full Size')}
                                     </Button>
                                     <ConfirmButton
                                         variant="outline"
                                         className="w-full"
-                                        title="Delete File"
+                                        title={__('dialog.delete_file', 'Delete File')}
                                         description={`Are you sure you want to delete "${selectedItem.name}"? This action cannot be undone.`}
                                         onConfirm={() => {
                                             router.delete(
@@ -605,7 +601,7 @@ export default function Index({
                                                 {
                                                     onSuccess: () => {
                                                         toast.success(
-                                                            'File deleted',
+                                                            __('misc.file_deleted', 'File deleted'),
                                                         );
                                                         setSelectedItem(null);
                                                     },
@@ -614,7 +610,7 @@ export default function Index({
                                         }}
                                     >
                                         <TrashIcon className="mr-2 h-4 w-4" />
-                                        Delete
+                                        {__('action.delete', 'Delete')}
                                     </ConfirmButton>
                                 </div>
                             </div>

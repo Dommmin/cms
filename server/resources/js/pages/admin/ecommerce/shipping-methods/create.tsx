@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
 
@@ -39,6 +40,7 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
     const [activeLocale, setActiveLocale] = useAdminLocale(defaultLocale);
 
+    const __ = useTranslation();
     const [nameValues, setNameValues] = useState<Record<string, string>>({ [defaultLocale]: '' });
     const [descValues, setDescValues] = useState<Record<string, string>>({ [defaultLocale]: '' });
     const [carrier, setCarrier] = useState(carriers[0]?.value ?? '');
@@ -86,18 +88,18 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Create Shipping Method" />
+            <Head title={__('page.create_shipping_method', 'Create Shipping Method')} />
 
             <Wrapper>
                 <PageHeader
-                    title="Add Shipping Method"
-                    description="Create a new shipping method"
+                    title={__('page.add_shipping_method', 'Add Shipping Method')}
+                    description={__('page.add_shipping_method_desc', 'Create a new shipping method')}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                 <Link href='/admin/ecommerce/shipping-methods' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back
+                            {__('action.back', 'Back')}
                         
                 </Link>
             </Button>
@@ -109,7 +111,7 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
                         <div className="space-y-6 lg:col-span-2">
                             {/* Basic Info with locale tabs */}
                             <div className="space-y-4 rounded-xl border bg-card p-6">
-                                <h2 className="font-semibold">Basic Information</h2>
+                                <h2 className="font-semibold">{__('misc.basic_information', 'Basic Information')}</h2>
 
                                 <LocaleTabSwitcher
                                     locales={locales}
@@ -124,7 +126,7 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
                                     >
                                         <div className="grid gap-2">
                                             <Label htmlFor={`name-${locale.code}`}>
-                                                Name {locale.code === defaultLocale && '*'}
+                                                {__('label.name', 'Name')} {locale.code === defaultLocale && '*'}
                                             </Label>
                                             <Input
                                                 id={`name-${locale.code}`}
@@ -144,7 +146,7 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
 
                                         <div className="grid gap-2">
                                             <Label htmlFor={`description-${locale.code}`}>
-                                                Description
+                                                {__('label.description', 'Description')}
                                             </Label>
                                             <Textarea
                                                 id={`description-${locale.code}`}
@@ -164,7 +166,7 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
                                 ))}
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="carrier">Carrier *</Label>
+                                    <Label htmlFor="carrier">{__('label.carrier', 'Carrier')} *</Label>
                                     <Select value={carrier} onValueChange={setCarrier}>
                                         <SelectTrigger id="carrier">
                                             <SelectValue placeholder="Select carrier..." />
@@ -183,14 +185,14 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
 
                             {/* Pricing */}
                             <div className="space-y-4 rounded-xl border bg-card p-6">
-                                <h2 className="font-semibold">Pricing</h2>
+                                <h2 className="font-semibold">{__('misc.pricing', 'Pricing')}</h2>
                                 <p className="text-sm text-muted-foreground">
-                                    Prices are in PLN (base currency). Enter values in full PLN (e.g. 9.99).
+                                    {__('misc.prices_pln_note', 'Prices are in PLN (base currency). Enter values in full PLN (e.g. 9.99).')}
                                 </p>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="grid gap-2">
-                                        <Label htmlFor="base_price">Base Price (PLN) *</Label>
+                                        <Label htmlFor="base_price">{__('label.base_price', 'Base Price (PLN)')} *</Label>
                                         <Input
                                             id="base_price"
                                             type="number"
@@ -205,7 +207,7 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="price_per_kg">Price per Kg (PLN)</Label>
+                                        <Label htmlFor="price_per_kg">{__('label.price_per_kg', 'Price per Kg (PLN)')}</Label>
                                         <Input
                                             id="price_per_kg"
                                             type="number"
@@ -222,7 +224,7 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="grid gap-2">
                                         <Label htmlFor="min_order_value">
-                                            Min. Order Value (PLN)
+                                            {__('label.min_order_value', 'Min. Order Value (PLN)')}
                                         </Label>
                                         <Input
                                             id="min_order_value"
@@ -238,7 +240,7 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
 
                                     <div className="grid gap-2">
                                         <Label htmlFor="free_shipping_threshold">
-                                            Free Shipping Threshold (PLN)
+                                            {__('label.free_shipping_threshold', 'Free Shipping Threshold (PLN)')}
                                         </Label>
                                         <Input
                                             id="free_shipping_threshold"
@@ -256,11 +258,11 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
 
                             {/* Weight limits */}
                             <div className="space-y-4 rounded-xl border bg-card p-6">
-                                <h2 className="font-semibold">Weight Limits</h2>
+                                <h2 className="font-semibold">{__('misc.weight_limits', 'Weight Limits')}</h2>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="grid gap-2">
-                                        <Label htmlFor="min_weight">Min. Weight (kg)</Label>
+                                        <Label htmlFor="min_weight">{__('label.min_weight', 'Min. Weight (kg)')}</Label>
                                         <Input
                                             id="min_weight"
                                             type="number"
@@ -274,7 +276,7 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="max_weight">Max. Weight (kg)</Label>
+                                        <Label htmlFor="max_weight">{__('label.max_weight', 'Max. Weight (kg)')}</Label>
                                         <Input
                                             id="max_weight"
                                             type="number"
@@ -294,7 +296,7 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
                         <div className="space-y-6">
                             <div className="rounded-xl border bg-card p-6">
                                 <h3 className="mb-4 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                                    Status
+                                    {__('column.status', 'Status')}
                                 </h3>
                                 <div className="flex items-center gap-2">
                                     <input
@@ -305,31 +307,31 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
                                         className="h-4 w-4 rounded border-input"
                                     />
                                     <Label htmlFor="is_active" className="font-normal">
-                                        Active
+                                        {__('label.active', 'Active')}
                                     </Label>
                                 </div>
                             </div>
 
                             <div className="rounded-xl border bg-card p-6">
                                 <h3 className="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                                    Summary
+                                    {__('misc.summary', 'Summary')}
                                 </h3>
                                 <dl className="space-y-2 text-sm">
                                     <div className="flex justify-between">
-                                        <dt className="text-muted-foreground">Carrier</dt>
+                                        <dt className="text-muted-foreground">{__('column.carrier', 'Carrier')}</dt>
                                         <dd className="font-medium">
                                             {carriers.find((c) => c.value === carrier)?.label || '—'}
                                         </dd>
                                     </div>
                                     <div className="flex justify-between">
-                                        <dt className="text-muted-foreground">Base price</dt>
+                                        <dt className="text-muted-foreground">{__('label.base_price', 'Base price')}</dt>
                                         <dd className="font-medium">
                                             {basePrice ? `${basePrice} PLN` : '—'}
                                         </dd>
                                     </div>
                                     {freeShippingThreshold && (
                                         <div className="flex justify-between">
-                                            <dt className="text-muted-foreground">Free from</dt>
+                                            <dt className="text-muted-foreground">{__('misc.free_from', 'Free from')}</dt>
                                             <dd className="font-medium text-green-600 dark:text-green-400">
                                                 {freeShippingThreshold} PLN
                                             </dd>
@@ -343,7 +345,7 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
                     <StickyFormActions
                         formId={formId}
                         processing={processing}
-                        submitLabel="Create Shipping Method"
+                        submitLabel={__('action.create_shipping_method', 'Create Shipping Method')}
                     />
                 </form>
             </Wrapper>

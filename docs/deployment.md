@@ -27,16 +27,16 @@ make fresh          # Fresh migrate + seed
 
 ### Services after `make up`
 
-| Service | URL |
-|---------|-----|
-| Admin panel | https://localhost/admin |
-| Public frontend | http://localhost:3000 |
-| Laravel API | https://localhost/api/v1 |
-| API docs (Scramble) | https://localhost/docs/api |
-| Telescope | https://localhost/telescope |
-| MailHog | http://localhost:8025 |
-| MySQL | localhost:3306 |
-| Redis | localhost:6379 |
+| Service             | URL                         |
+|---------------------|-----------------------------|
+| Admin panel         | https://localhost/admin     |
+| Public frontend     | http://localhost:3000       |
+| Laravel API         | https://localhost/api/v1    |
+| API docs (Scramble) | https://localhost/docs/api  |
+| Telescope           | https://localhost/telescope |
+| MailHog             | http://localhost:8025       |
+| MySQL               | localhost:3306              |
+| Redis               | localhost:6379              |
 
 ### Makefile Commands
 
@@ -163,11 +163,11 @@ Before deploying to production:
 
 Configured in `routes/console.php`:
 
-| Command | Frequency | Purpose |
-|---------|-----------|---------|
-| `blog:publish-scheduled` | Every minute | Auto-publish scheduled blog posts |
-| `activitylog:clean` | Weekly | Prune old activity log entries |
-| `cart:clean` | Daily | Remove abandoned carts |
-| `user:prune --days=30` | Monthly | Permanently delete soft-deleted users (GDPR) |
-| `SendAbandonedCartEmails` (Job) | Hourly | Send abandoned cart recovery emails |
-| `SendLowStockAlerts` (Job) | Daily | Alert on low stock |
+| Command                         | Frequency    | Purpose                                      |
+|---------------------------------|--------------|----------------------------------------------|
+| `blog:publish-scheduled`        | Every minute | Auto-publish scheduled blog posts            |
+| `activitylog:clean`             | Weekly       | Prune old activity log entries               |
+| `cart:clean`                    | Daily        | Remove abandoned carts                       |
+| `user:prune --days=30`          | Monthly      | Permanently delete soft-deleted users (GDPR) |
+| `SendAbandonedCartEmails` (Job) | Hourly       | Send abandoned cart recovery emails          |
+| `SendLowStockAlerts` (Job)      | Daily        | Alert on low stock                           |

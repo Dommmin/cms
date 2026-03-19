@@ -139,16 +139,16 @@ server/app/
 
 ### Route Files
 
-| File | Prefix | Purpose |
-|---|---|---|
-| `routes/web.php` | `/` | Includes admin and settings routes |
-| `routes/admin.php` | `/admin` | Admin panel (requires `admin` middleware) |
-| `routes/admin/cms.php` | `/admin` | CMS sub-routes |
-| `routes/admin/blog.php` | `/admin` | Blog sub-routes |
-| `routes/admin/ecommerce.php` | `/admin` | E-commerce sub-routes |
-| `routes/settings.php` | `/settings` | Admin settings pages |
-| `routes/api.php` | `/api/v1` | Public REST API |
-| `routes/console.php` | — | Scheduled commands |
+| File                         | Prefix      | Purpose                                   |
+|------------------------------|-------------|-------------------------------------------|
+| `routes/web.php`             | `/`         | Includes admin and settings routes        |
+| `routes/admin.php`           | `/admin`    | Admin panel (requires `admin` middleware) |
+| `routes/admin/cms.php`       | `/admin`    | CMS sub-routes                            |
+| `routes/admin/blog.php`      | `/admin`    | Blog sub-routes                           |
+| `routes/admin/ecommerce.php` | `/admin`    | E-commerce sub-routes                     |
+| `routes/settings.php`        | `/settings` | Admin settings pages                      |
+| `routes/api.php`             | `/api/v1`   | Public REST API                           |
+| `routes/console.php`         | —           | Scheduled commands                        |
 
 ### Middleware
 
@@ -185,11 +185,11 @@ Middleware is registered in `bootstrap/app.php` with no `Kernel.php`:
 
 ### Rate Limiting (defined in `AppServiceProvider`)
 
-| Limiter name | Limit | Applied to |
-|---|---|---|
-| `api.strict` | 10 req/min per IP | Auth endpoints (`/api/v1/auth/*`) |
-| `api.public` | 60 req/min per IP | Public endpoints |
-| `api.auth` | 300 req/min per user | Authenticated API endpoints |
+| Limiter name | Limit                | Applied to                        |
+|--------------|----------------------|-----------------------------------|
+| `api.strict` | 10 req/min per IP    | Auth endpoints (`/api/v1/auth/*`) |
+| `api.public` | 60 req/min per IP    | Public endpoints                  |
+| `api.auth`   | 300 req/min per user | Authenticated API endpoints       |
 
 ---
 
@@ -199,12 +199,12 @@ Middleware is registered in `bootstrap/app.php` with no `Kernel.php`:
 
 Fortify provides the headless auth backend. Views are configured in `FortifyServiceProvider` to render Inertia pages:
 
-| Inertia Page | Route |
-|---|---|
-| `auth/login` | `GET /login` |
-| `auth/register` | `GET /register` |
-| `auth/forgot-password` | `GET /forgot-password` |
-| `auth/reset-password` | `GET /reset-password` |
+| Inertia Page                | Route                       |
+|-----------------------------|-----------------------------|
+| `auth/login`                | `GET /login`                |
+| `auth/register`             | `GET /register`             |
+| `auth/forgot-password`      | `GET /forgot-password`      |
+| `auth/reset-password`       | `GET /reset-password`       |
 | `auth/two-factor-challenge` | `GET /two-factor-challenge` |
 
 2FA uses TOTP (time-based one-time passwords). The `two_factor_*` columns are added to the `users` table via the migration `2025_08_14_170933_add_two_factor_columns_to_users_table.php`.
@@ -225,19 +225,19 @@ Roles: `admin`, `editor`
 
 Policies live in `app/Policies/`:
 
-| Policy | Model |
-|---|---|
-| `CartPolicy` | Cart |
-| `CategoryPolicy` | Category |
+| Policy             | Model                |
+|--------------------|----------------------|
+| `CartPolicy`       | Cart                 |
+| `CategoryPolicy`   | Category             |
 | `NewsletterPolicy` | NewsletterSubscriber |
-| `OrderPolicy` | Order |
-| `ProductPolicy` | Product |
-| `ReturnPolicy` | ReturnRequest |
-| `ReviewPolicy` | ProductReview |
-| `RolePolicy` | Role |
-| `SettingsPolicy` | Setting |
-| `UserPolicy` | User |
-| `WishlistPolicy` | Wishlist |
+| `OrderPolicy`      | Order                |
+| `ProductPolicy`    | Product              |
+| `ReturnPolicy`     | ReturnRequest        |
+| `ReviewPolicy`     | ProductReview        |
+| `RolePolicy`       | Role                 |
+| `SettingsPolicy`   | Setting              |
+| `UserPolicy`       | User                 |
+| `WishlistPolicy`   | Wishlist             |
 
 Gates are registered in `AuthServiceProvider`. The `can.manageUsers` shared Inertia prop is resolved via `Gate::allows('viewAny', User::class)`.
 
@@ -416,12 +416,12 @@ All models live in `app/Models/`. Key relationships and casts are listed below.
 
 ### Translatable Models
 
-| Model | Translatable Fields |
-|---|---|
-| `Product` | `name`, `description`, `short_description` |
-| `Category` | `name`, `description` |
-| `BlogPost` | `title`, `excerpt`, `content` |
-| `Page` | `title`, `excerpt`, `content`, `rich_content` |
+| Model      | Translatable Fields                           |
+|------------|-----------------------------------------------|
+| `Product`  | `name`, `description`, `short_description`    |
+| `Category` | `name`, `description`                         |
+| `BlogPost` | `title`, `excerpt`, `content`                 |
+| `Page`     | `title`, `excerpt`, `content`, `rich_content` |
 
 The `SetLocale` middleware on the API group reads `?locale=` and sets the application locale for the request. Translatable models return the appropriate language transparently.
 
@@ -476,15 +476,15 @@ Page
 
 Observers are registered in `AppServiceProvider::registerObservers()`.
 
-| Observer | Model | Purpose |
-|---|---|---|
-| `ProductObserver` | `Product` | Syncs search index, handles slug generation |
-| `ProductVariantPriceObserver` | `ProductVariant` | Records price change to `PriceHistory` on `saving` |
-| `CategoryObserver` | `Category` | Flushes category cache |
-| `PageObserver` | `Page` | Flushes page cache via `PageCacheService` |
-| `WishlistObserver` | `Wishlist` | Side effects on wishlist changes |
-| `NewsletterSubscriberObserver` | `NewsletterSubscriber` | Handles opt-in/opt-out logic |
-| `NewsletterClickObserver` | `NewsletterClick` | Tracks click statistics on campaigns |
+| Observer                       | Model                  | Purpose                                            |
+|--------------------------------|------------------------|----------------------------------------------------|
+| `ProductObserver`              | `Product`              | Syncs search index, handles slug generation        |
+| `ProductVariantPriceObserver`  | `ProductVariant`       | Records price change to `PriceHistory` on `saving` |
+| `CategoryObserver`             | `Category`             | Flushes category cache                             |
+| `PageObserver`                 | `Page`                 | Flushes page cache via `PageCacheService`          |
+| `WishlistObserver`             | `Wishlist`             | Side effects on wishlist changes                   |
+| `NewsletterSubscriberObserver` | `NewsletterSubscriber` | Handles opt-in/opt-out logic                       |
+| `NewsletterClickObserver`      | `NewsletterClick`      | Tracks click statistics on campaigns               |
 
 To add a new observer, see [Section 14.12](#1412-adding-a-new-observer).
 
@@ -534,31 +534,31 @@ Shared rule sets used in Fortify actions and settings requests.
 
 All enums are in `app/Enums/` and use PHP 8.1+ backed enum syntax.
 
-| Enum | Values |
-|---|---|
-| `AttributeTypeEnum` | `text`, `select`, `multiselect`, `numeric`, `color` |
-| `AudienceTypeEnum` | `all`, `segment`, `tags` |
-| `BlogPostStatusEnum` | `draft`, `scheduled`, `published`, `archived` |
-| `CampaignStatusEnum` | (various campaign states) |
-| `CampaignTriggerEnum` | (trigger conditions) |
-| `CampaignTypeEnum` | `broadcast`, `automated`, `scheduled` |
-| `MenuLinkTypeEnum` | `custom`, `category`, `product`, `page` |
-| `MenuLocationEnum` | `header`, `footer`, `footer_legal` |
-| `NotificationChannelEnum` | `email`, `sms`, `push` |
-| `NotificationStatusEnum` | (notification states) |
-| `NotificationTypeEnum` | (notification content types) |
-| `OrderStatusEnum` | `pending`, `awaiting_payment`, `paid`, `processing`, `shipped`, `delivered`, `cancelled`, `refunded` — used for labels, colors, and admin form validation. **Not** used as a model cast (see Order State Machine below). |
-| `PageBlockTypeEnum` | `hero_banner`, `rich_text`, `featured_products`, `categories_grid`, `promotional_banner`, `newsletter_signup`, `testimonials`, `image_gallery`, `video_embed`, `custom_html`, `two_columns`, `three_columns`, `accordion`, `tabs`, `form_embed`, `map` |
-| `PageTypeEnum` | `blocks`, `module` |
-| `PaymentProviderEnum` | `p24`, `payu`, `stripe`, `cash_on_delivery` |
-| `ReturnStatusEnum` | `pending`, `approved`, `rejected`, `return_label_sent`, `awaiting_return`, `received`, `inspected`, `refunded`, `closed` |
-| `ReturnTypeEnum` | (return request types) |
-| `ReviewStatusEnum` | (review moderation states) |
-| `SettingTypeEnum` | (setting value types including encrypted) |
-| `ShipmentStatusEnum` | (shipment tracking states) |
-| `ShippingCarrierEnum` | `inpost`, `dpd`, `dhl`, `pickup` |
-| `WidgetSize` | (dashboard widget size options) |
-| `WidgetType` | `stat`, `chart`, `table`, `recent_activity`, `quick_actions` |
+| Enum                      | Values                                                                                                                                                                                                                                                 |
+|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `AttributeTypeEnum`       | `text`, `select`, `multiselect`, `numeric`, `color`                                                                                                                                                                                                    |
+| `AudienceTypeEnum`        | `all`, `segment`, `tags`                                                                                                                                                                                                                               |
+| `BlogPostStatusEnum`      | `draft`, `scheduled`, `published`, `archived`                                                                                                                                                                                                          |
+| `CampaignStatusEnum`      | (various campaign states)                                                                                                                                                                                                                              |
+| `CampaignTriggerEnum`     | (trigger conditions)                                                                                                                                                                                                                                   |
+| `CampaignTypeEnum`        | `broadcast`, `automated`, `scheduled`                                                                                                                                                                                                                  |
+| `MenuLinkTypeEnum`        | `custom`, `category`, `product`, `page`                                                                                                                                                                                                                |
+| `MenuLocationEnum`        | `header`, `footer`, `footer_legal`                                                                                                                                                                                                                     |
+| `NotificationChannelEnum` | `email`, `sms`, `push`                                                                                                                                                                                                                                 |
+| `NotificationStatusEnum`  | (notification states)                                                                                                                                                                                                                                  |
+| `NotificationTypeEnum`    | (notification content types)                                                                                                                                                                                                                           |
+| `OrderStatusEnum`         | `pending`, `awaiting_payment`, `paid`, `processing`, `shipped`, `delivered`, `cancelled`, `refunded` — used for labels, colors, and admin form validation. **Not** used as a model cast (see Order State Machine below).                               |
+| `PageBlockTypeEnum`       | `hero_banner`, `rich_text`, `featured_products`, `categories_grid`, `promotional_banner`, `newsletter_signup`, `testimonials`, `image_gallery`, `video_embed`, `custom_html`, `two_columns`, `three_columns`, `accordion`, `tabs`, `form_embed`, `map` |
+| `PageTypeEnum`            | `blocks`, `module`                                                                                                                                                                                                                                     |
+| `PaymentProviderEnum`     | `p24`, `payu`, `stripe`, `cash_on_delivery`                                                                                                                                                                                                            |
+| `ReturnStatusEnum`        | `pending`, `approved`, `rejected`, `return_label_sent`, `awaiting_return`, `received`, `inspected`, `refunded`, `closed`                                                                                                                               |
+| `ReturnTypeEnum`          | (return request types)                                                                                                                                                                                                                                 |
+| `ReviewStatusEnum`        | (review moderation states)                                                                                                                                                                                                                             |
+| `SettingTypeEnum`         | (setting value types including encrypted)                                                                                                                                                                                                              |
+| `ShipmentStatusEnum`      | (shipment tracking states)                                                                                                                                                                                                                             |
+| `ShippingCarrierEnum`     | `inpost`, `dpd`, `dhl`, `pickup`                                                                                                                                                                                                                       |
+| `WidgetSize`              | (dashboard widget size options)                                                                                                                                                                                                                        |
+| `WidgetType`              | `stat`, `chart`, `table`, `recent_activity`, `quick_actions`                                                                                                                                                                                           |
 
 ### Order State Machine
 
@@ -566,14 +566,14 @@ The `Order` model uses `spatie/laravel-model-states` (`HasStates` trait). State 
 
 **Allowed transitions:**
 
-| From | To |
-|---|---|
-| `pending` | `processing`, `cancelled` |
-| `awaiting_payment` | `paid`, `cancelled` |
-| `paid` | `processing`, `refunded` |
-| `processing` | `shipped`, `cancelled` |
-| `shipped` | `delivered` |
-| `delivered` | `refunded` |
+| From               | To                        |
+|--------------------|---------------------------|
+| `pending`          | `processing`, `cancelled` |
+| `awaiting_payment` | `paid`, `cancelled`       |
+| `paid`             | `processing`, `refunded`  |
+| `processing`       | `shipped`, `cancelled`    |
+| `shipped`          | `delivered`               |
+| `delivered`        | `refunded`                |
 
 **Usage:**
 
@@ -652,24 +652,24 @@ Auto-generated OpenAPI docs via `dedoc/scramble` at `/docs/api`. The Scramble co
 
 ### Public API Endpoints Summary
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/api/v1/auth/register` | Register a new user |
-| `POST` | `/api/v1/auth/login` | Login, returns Sanctum token |
-| `POST` | `/api/v1/auth/logout` | Revoke token |
-| `GET` | `/api/v1/auth/me` | Authenticated user details |
-| `GET` | `/api/v1/products` | Product listing (filterable) |
-| `GET` | `/api/v1/products/{slug}` | Product detail |
-| `GET` | `/api/v1/categories` | Category tree |
-| `GET` | `/api/v1/blog/posts` | Blog post listing |
-| `GET` | `/api/v1/blog/posts/{slug}` | Blog post detail |
-| `GET` | `/api/v1/pages/{slug}` | CMS page content |
-| `GET` | `/api/v1/menus/{location}` | Menu for a location |
-| `GET` | `/api/v1/cart` | Current cart |
-| `POST` | `/api/v1/cart/items` | Add item to cart |
-| `POST` | `/api/v1/checkout` | Place order (auth required) |
-| `GET` | `/api/v1/locales` | Available locales |
-| `GET` | `/api/v1/translations/{locale}` | Translation strings (flat JSON) |
+| Method | Endpoint                        | Description                     |
+|--------|---------------------------------|---------------------------------|
+| `POST` | `/api/v1/auth/register`         | Register a new user             |
+| `POST` | `/api/v1/auth/login`            | Login, returns Sanctum token    |
+| `POST` | `/api/v1/auth/logout`           | Revoke token                    |
+| `GET`  | `/api/v1/auth/me`               | Authenticated user details      |
+| `GET`  | `/api/v1/products`              | Product listing (filterable)    |
+| `GET`  | `/api/v1/products/{slug}`       | Product detail                  |
+| `GET`  | `/api/v1/categories`            | Category tree                   |
+| `GET`  | `/api/v1/blog/posts`            | Blog post listing               |
+| `GET`  | `/api/v1/blog/posts/{slug}`     | Blog post detail                |
+| `GET`  | `/api/v1/pages/{slug}`          | CMS page content                |
+| `GET`  | `/api/v1/menus/{location}`      | Menu for a location             |
+| `GET`  | `/api/v1/cart`                  | Current cart                    |
+| `POST` | `/api/v1/cart/items`            | Add item to cart                |
+| `POST` | `/api/v1/checkout`              | Place order (auth required)     |
+| `GET`  | `/api/v1/locales`               | Available locales               |
+| `GET`  | `/api/v1/translations/{locale}` | Translation strings (flat JSON) |
 
 ---
 
@@ -677,17 +677,17 @@ Auto-generated OpenAPI docs via `dedoc/scramble` at `/docs/api`. The Scramble co
 
 ### Technology Stack
 
-| Library | Version | Purpose |
-|---|---|---|
-| `@inertiajs/react` | v2 | Server-driven SPA protocol |
-| `react` | v19 | UI framework |
-| `tailwindcss` | v4 | Utility CSS |
-| `@dnd-kit/core` | — | Drag-and-drop (page builder) |
-| `@lexical/react` | — | Rich text editor |
-| `@tanstack/react-table` | — | Data tables |
-| `recharts` | — | Charts (dashboard widgets) |
-| `radix-ui` / `@radix-ui/*` | — | Accessible primitives (shadcn/ui pattern) |
-| `lucide-react` | — | Icons |
+| Library                    | Version | Purpose                                   |
+|----------------------------|---------|-------------------------------------------|
+| `@inertiajs/react`         | v2      | Server-driven SPA protocol                |
+| `react`                    | v19     | UI framework                              |
+| `tailwindcss`              | v4      | Utility CSS                               |
+| `@dnd-kit/core`            | —       | Drag-and-drop (page builder)              |
+| `@lexical/react`           | —       | Rich text editor                          |
+| `@tanstack/react-table`    | —       | Data tables                               |
+| `recharts`                 | —       | Charts (dashboard widgets)                |
+| `radix-ui` / `@radix-ui/*` | —       | Accessible primitives (shadcn/ui pattern) |
+| `lucide-react`             | —       | Icons                                     |
 
 ### Pages Directory
 
@@ -719,11 +719,11 @@ resources/js/pages/
 
 ### Layouts
 
-| Layout file | Used for |
-|---|---|
-| `layouts/app-layout.tsx` | All admin panel pages |
-| `layouts/auth-layout.tsx` | Login, register, password reset pages |
-| `layouts/settings/layout.tsx` | Settings sub-pages |
+| Layout file                   | Used for                              |
+|-------------------------------|---------------------------------------|
+| `layouts/app-layout.tsx`      | All admin panel pages                 |
+| `layouts/auth-layout.tsx`     | Login, register, password reset pages |
+| `layouts/settings/layout.tsx` | Settings sub-pages                    |
 
 ### Shared Inertia Props
 
@@ -1330,15 +1330,15 @@ public function index(): Response
 
 Settings are stored in the `settings` database table:
 
-| Column | Type | Description |
-|---|---|---|
-| `group` | string | Logical group name (e.g. `mail`, `features`) |
-| `key` | string | Setting key within the group |
-| `label` | string | Human-readable label shown in admin |
-| `value` | JSON | The stored value |
-| `type` | `SettingTypeEnum` | Data type (string, boolean, integer, encrypted, etc.) |
-| `description` | text | Help text shown in admin |
-| `is_public` | boolean | Whether the setting is exposed via the public settings API endpoint |
+| Column        | Type              | Description                                                         |
+|---------------|-------------------|---------------------------------------------------------------------|
+| `group`       | string            | Logical group name (e.g. `mail`, `features`)                        |
+| `key`         | string            | Setting key within the group                                        |
+| `label`       | string            | Human-readable label shown in admin                                 |
+| `value`       | JSON              | The stored value                                                    |
+| `type`        | `SettingTypeEnum` | Data type (string, boolean, integer, encrypted, etc.)               |
+| `description` | text              | Help text shown in admin                                            |
+| `is_public`   | boolean           | Whether the setting is exposed via the public settings API endpoint |
 
 ### API
 
@@ -1361,11 +1361,11 @@ Settings with `type = SettingTypeEnum::Encrypted` are automatically encrypted wi
 
 Feature flags map directly to settings in group `features`:
 
-| Key | Default | Controls |
-|---|---|---|
-| `blog` | `false` | Blog module and its API endpoints |
-| `ecommerce` | `false` | Shop, products, orders, checkout |
-| `reviews` | `false` | Product review system |
+| Key          | Default | Controls                              |
+|--------------|---------|---------------------------------------|
+| `blog`       | `false` | Blog module and its API endpoints     |
+| `ecommerce`  | `false` | Shop, products, orders, checkout      |
+| `reviews`    | `false` | Product review system                 |
 | `newsletter` | `false` | Newsletter subscription and campaigns |
 
 Check via `FeatureFlagService::isEnabled(string $feature): bool`.
@@ -1511,14 +1511,14 @@ it('creates a my model', function () {
 
 ## 22. Code Quality Tools
 
-| Tool | Command | Purpose |
-|---|---|---|
-| **Pint** | `vendor/bin/pint --dirty` | PHP code formatter (run before all PHP commits) |
+| Tool                   | Command                      | Purpose                                              |
+|------------------------|------------------------------|------------------------------------------------------|
+| **Pint**               | `vendor/bin/pint --dirty`    | PHP code formatter (run before all PHP commits)      |
 | **PHPStan / Larastan** | `vendor/bin/phpstan analyse` | Static analysis (level configured in `phpstan.neon`) |
-| **Rector** | `vendor/bin/rector process` | Automated PHP refactoring (config in `rector.php`) |
-| **ESLint** | `npm run lint` | TypeScript/React linting |
-| **Prettier** | `npm run format` | TypeScript/React formatting |
-| **TypeScript** | `npm run types` | Type-checking (no emit) |
+| **Rector**             | `vendor/bin/rector process`  | Automated PHP refactoring (config in `rector.php`)   |
+| **ESLint**             | `npm run lint`               | TypeScript/React linting                             |
+| **Prettier**           | `npm run format`             | TypeScript/React formatting                          |
+| **TypeScript**         | `npm run types`              | Type-checking (no emit)                              |
 
 ### Pre-commit Workflow
 
@@ -1566,55 +1566,55 @@ npm run format
 
 ### PHP (production)
 
-| Package | Purpose |
-|---|---|
-| `dedoc/scramble` | Auto-generated OpenAPI documentation |
-| `grazulex/laravel-api-idempotency` | Idempotency middleware for cart mutation endpoints |
-| `grazulex/laravel-api-throttle-smart` | Smart throttling with configurable limits |
-| `inertiajs/inertia-laravel` | Inertia.js server-side adapter |
-| `laravel/fortify` | Headless authentication (login, register, 2FA) |
-| `laravel/sanctum` | API token authentication |
-| `laravel/scout` | Full-text search (configured for Typesense) |
-| `laravel/telescope` | Debug assistant (dev only) |
-| `laravel/wayfinder` | Auto-generates TypeScript route functions |
-| `spatie/laravel-activitylog` | Audit trail for model changes |
-| `spatie/laravel-data` | Typed DTOs |
-| `spatie/laravel-medialibrary` | File uploads and image conversions |
-| `spatie/laravel-permission` | Roles and permissions |
-| `spatie/laravel-query-builder` | Filterable/sortable Eloquent queries via URL |
-| `spatie/laravel-sitemap` | Sitemap generation |
-| `spatie/laravel-sluggable` | Auto-slug generation |
-| `spatie/laravel-translatable` | Model field translations via JSON columns |
-| `typesense/typesense-php` | Typesense search client |
+| Package                               | Purpose                                            |
+|---------------------------------------|----------------------------------------------------|
+| `dedoc/scramble`                      | Auto-generated OpenAPI documentation               |
+| `grazulex/laravel-api-idempotency`    | Idempotency middleware for cart mutation endpoints |
+| `grazulex/laravel-api-throttle-smart` | Smart throttling with configurable limits          |
+| `inertiajs/inertia-laravel`           | Inertia.js server-side adapter                     |
+| `laravel/fortify`                     | Headless authentication (login, register, 2FA)     |
+| `laravel/sanctum`                     | API token authentication                           |
+| `laravel/scout`                       | Full-text search (configured for Typesense)        |
+| `laravel/telescope`                   | Debug assistant (dev only)                         |
+| `laravel/wayfinder`                   | Auto-generates TypeScript route functions          |
+| `spatie/laravel-activitylog`          | Audit trail for model changes                      |
+| `spatie/laravel-data`                 | Typed DTOs                                         |
+| `spatie/laravel-medialibrary`         | File uploads and image conversions                 |
+| `spatie/laravel-permission`           | Roles and permissions                              |
+| `spatie/laravel-query-builder`        | Filterable/sortable Eloquent queries via URL       |
+| `spatie/laravel-sitemap`              | Sitemap generation                                 |
+| `spatie/laravel-sluggable`            | Auto-slug generation                               |
+| `spatie/laravel-translatable`         | Model field translations via JSON columns          |
+| `typesense/typesense-php`             | Typesense search client                            |
 
 ### PHP (development only)
 
-| Package | Purpose |
-|---|---|
-| `barryvdh/laravel-ide-helper` | IDE autocompletion helpers |
-| `fruitcake/laravel-debugbar` | Debug toolbar |
-| `laravel/pail` | Real-time log tailing |
-| `laravel/pint` | PHP code formatter |
-| `larastan/larastan` | PHPStan plugin for Laravel |
-| `pestphp/pest` | Test framework |
-| `rector/rector` | Automated refactoring |
-| `driftingly/rector-laravel` | Laravel-specific Rector rules |
+| Package                       | Purpose                       |
+|-------------------------------|-------------------------------|
+| `barryvdh/laravel-ide-helper` | IDE autocompletion helpers    |
+| `fruitcake/laravel-debugbar`  | Debug toolbar                 |
+| `laravel/pail`                | Real-time log tailing         |
+| `laravel/pint`                | PHP code formatter            |
+| `larastan/larastan`           | PHPStan plugin for Laravel    |
+| `pestphp/pest`                | Test framework                |
+| `rector/rector`               | Automated refactoring         |
+| `driftingly/rector-laravel`   | Laravel-specific Rector rules |
 
 ### JavaScript
 
-| Package | Purpose |
-|---|---|
-| `@dnd-kit/core` + `@dnd-kit/sortable` | Drag-and-drop in the page builder |
-| `@inertiajs/react` | Inertia.js React adapter |
-| `@lexical/react` + plugins | Rich text editor in admin |
-| `@tanstack/react-table` | Data tables |
-| `@radix-ui/*` | Accessible UI primitives |
-| `leaflet` | Maps (store locations) |
-| `lucide-react` | Icons |
-| `recharts` | Dashboard charts |
-| `react-hot-toast` | Toast notifications |
-| `tailwindcss` v4 | Utility CSS |
-| `@laravel/vite-plugin-wayfinder` | Auto-regenerates Wayfinder route types |
+| Package                               | Purpose                                |
+|---------------------------------------|----------------------------------------|
+| `@dnd-kit/core` + `@dnd-kit/sortable` | Drag-and-drop in the page builder      |
+| `@inertiajs/react`                    | Inertia.js React adapter               |
+| `@lexical/react` + plugins            | Rich text editor in admin              |
+| `@tanstack/react-table`               | Data tables                            |
+| `@radix-ui/*`                         | Accessible UI primitives               |
+| `leaflet`                             | Maps (store locations)                 |
+| `lucide-react`                        | Icons                                  |
+| `recharts`                            | Dashboard charts                       |
+| `react-hot-toast`                     | Toast notifications                    |
+| `tailwindcss` v4                      | Utility CSS                            |
+| `@laravel/vite-plugin-wayfinder`      | Auto-regenerates Wayfinder route types |
 
 ---
 
@@ -1622,81 +1622,81 @@ npm run format
 
 ### Core Application
 
-| Variable | Description | Default |
-|---|---|---|
-| `APP_NAME` | Application name | `Laravel` |
-| `APP_ENV` | Environment (`local`, `production`) | `local` |
-| `APP_KEY` | Encryption key (generate with `php artisan key:generate`) | — |
-| `APP_DEBUG` | Enable debug mode | `true` (dev) |
-| `APP_URL` | Application base URL | `http://localhost` |
-| `APP_LOCALE` | Default application locale | `en` |
-| `APP_FALLBACK_LOCALE` | Fallback locale | `en` |
+| Variable              | Description                                               | Default            |
+|-----------------------|-----------------------------------------------------------|--------------------|
+| `APP_NAME`            | Application name                                          | `Laravel`          |
+| `APP_ENV`             | Environment (`local`, `production`)                       | `local`            |
+| `APP_KEY`             | Encryption key (generate with `php artisan key:generate`) | —                  |
+| `APP_DEBUG`           | Enable debug mode                                         | `true` (dev)       |
+| `APP_URL`             | Application base URL                                      | `http://localhost` |
+| `APP_LOCALE`          | Default application locale                                | `en`               |
+| `APP_FALLBACK_LOCALE` | Fallback locale                                           | `en`               |
 
 ### Database
 
-| Variable | Description |
-|---|---|
+| Variable        | Description                        |
+|-----------------|------------------------------------|
 | `DB_CONNECTION` | Driver: `sqlite`, `mysql`, `pgsql` |
-| `DB_HOST` | Database host |
-| `DB_PORT` | Database port |
-| `DB_DATABASE` | Database name |
-| `DB_USERNAME` | Database user |
-| `DB_PASSWORD` | Database password |
+| `DB_HOST`       | Database host                      |
+| `DB_PORT`       | Database port                      |
+| `DB_DATABASE`   | Database name                      |
+| `DB_USERNAME`   | Database user                      |
+| `DB_PASSWORD`   | Database password                  |
 
 ### Cache, Queue & Sessions
 
-| Variable | Description | Default |
-|---|---|---|
-| `CACHE_STORE` | Cache driver (`database`, `redis`, `memcached`) | `database` |
-| `QUEUE_CONNECTION` | Queue driver (`database`, `redis`, `sync`) | `database` |
-| `SESSION_DRIVER` | Session storage | `database` |
-| `SESSION_LIFETIME` | Session lifetime in minutes | `120` |
+| Variable           | Description                                     | Default    |
+|--------------------|-------------------------------------------------|------------|
+| `CACHE_STORE`      | Cache driver (`database`, `redis`, `memcached`) | `database` |
+| `QUEUE_CONNECTION` | Queue driver (`database`, `redis`, `sync`)      | `database` |
+| `SESSION_DRIVER`   | Session storage                                 | `database` |
+| `SESSION_LIFETIME` | Session lifetime in minutes                     | `120`      |
 
 ### Redis
 
-| Variable | Description |
-|---|---|
-| `REDIS_HOST` | Redis host |
-| `REDIS_PORT` | Redis port (default: `6379`) |
-| `REDIS_PASSWORD` | Redis password |
+| Variable         | Description                  |
+|------------------|------------------------------|
+| `REDIS_HOST`     | Redis host                   |
+| `REDIS_PORT`     | Redis port (default: `6379`) |
+| `REDIS_PASSWORD` | Redis password               |
 
 ### Mail
 
 Mail configuration can be set either via `.env` or via the admin Settings panel. The admin panel settings override `.env` values (cached 1 hour).
 
-| Variable | Description |
-|---|---|
-| `MAIL_MAILER` | Driver: `smtp`, `sendmail`, `ses`, `mailgun`, `log` |
-| `MAIL_HOST` | SMTP host |
-| `MAIL_PORT` | SMTP port |
-| `MAIL_USERNAME` | SMTP username |
-| `MAIL_PASSWORD` | SMTP password |
-| `MAIL_FROM_ADDRESS` | From email address |
-| `MAIL_FROM_NAME` | From display name |
+| Variable            | Description                                         |
+|---------------------|-----------------------------------------------------|
+| `MAIL_MAILER`       | Driver: `smtp`, `sendmail`, `ses`, `mailgun`, `log` |
+| `MAIL_HOST`         | SMTP host                                           |
+| `MAIL_PORT`         | SMTP port                                           |
+| `MAIL_USERNAME`     | SMTP username                                       |
+| `MAIL_PASSWORD`     | SMTP password                                       |
+| `MAIL_FROM_ADDRESS` | From email address                                  |
+| `MAIL_FROM_NAME`    | From display name                                   |
 
 ### Search (Typesense)
 
-| Variable | Description |
-|---|---|
-| `SCOUT_DRIVER` | Set to `typesense` to enable |
-| `TYPESENSE_API_KEY` | Typesense API key |
-| `TYPESENSE_HOST` | Typesense host |
-| `TYPESENSE_PORT` | Typesense port (default: `8108`) |
+| Variable            | Description                      |
+|---------------------|----------------------------------|
+| `SCOUT_DRIVER`      | Set to `typesense` to enable     |
+| `TYPESENSE_API_KEY` | Typesense API key                |
+| `TYPESENSE_HOST`    | Typesense host                   |
+| `TYPESENSE_PORT`    | Typesense port (default: `8108`) |
 
 ### AWS S3 (Media Storage)
 
-| Variable | Description |
-|---|---|
-| `AWS_ACCESS_KEY_ID` | AWS access key |
-| `AWS_SECRET_ACCESS_KEY` | AWS secret key |
-| `AWS_DEFAULT_REGION` | AWS region |
-| `AWS_BUCKET` | S3 bucket name |
-| `FILESYSTEM_DISK` | Set to `s3` to use S3 for media |
+| Variable                | Description                     |
+|-------------------------|---------------------------------|
+| `AWS_ACCESS_KEY_ID`     | AWS access key                  |
+| `AWS_SECRET_ACCESS_KEY` | AWS secret key                  |
+| `AWS_DEFAULT_REGION`    | AWS region                      |
+| `AWS_BUCKET`            | S3 bucket name                  |
+| `FILESYSTEM_DISK`       | Set to `s3` to use S3 for media |
 
 ### Vite
 
-| Variable | Description |
-|---|---|
+| Variable        | Description                      |
+|-----------------|----------------------------------|
 | `VITE_APP_NAME` | App name exposed to the frontend |
 
 ---
@@ -1822,18 +1822,18 @@ Accepts `--auth-days` and `--guest-days` options. Runs daily via scheduler in `r
 
 `app/Imports/ProductsImport.php` now implements `OnEachRow` instead of `ToModel`, allowing full control over product/variant creation per row. CSV/XLSX columns:
 
-| Column | Required | Description |
-|---|---|---|
-| `name` | ✅ | Product name |
-| `sku` | ✅ | Product-level SKU (stored as `sku_prefix`) |
-| `price` | ✅ | Base price |
-| `stock` | — | Default stock quantity |
-| `description` | — | Product description |
-| `variant_sku` | — | If present, creates a separate variant |
-| `variant_name` | — | Variant display name |
-| `variant_price` | — | Variant-specific price |
-| `variant_stock` | — | Variant-specific stock |
-| `attribute_*` | — | Dynamic attribute columns (e.g. `attribute_color`, `attribute_size`) |
+| Column          | Required | Description                                                          |
+|-----------------|----------|----------------------------------------------------------------------|
+| `name`          | ✅        | Product name                                                         |
+| `sku`           | ✅        | Product-level SKU (stored as `sku_prefix`)                           |
+| `price`         | ✅        | Base price                                                           |
+| `stock`         | —        | Default stock quantity                                               |
+| `description`   | —        | Product description                                                  |
+| `variant_sku`   | —        | If present, creates a separate variant                               |
+| `variant_name`  | —        | Variant display name                                                 |
+| `variant_price` | —        | Variant-specific price                                               |
+| `variant_stock` | —        | Variant-specific stock                                               |
+| `attribute_*`   | —        | Dynamic attribute columns (e.g. `attribute_color`, `attribute_size`) |
 
 Products are identified/grouped by `sku_prefix`. Each `attribute_*` column auto-creates `Attribute` + `AttributeValue` records and links them via `VariantAttributeValue`.
 
@@ -1906,28 +1906,28 @@ Errors:
 
 ### Props (Editor component)
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `value` | `string` | — | HTML content (controlled) |
-| `onChange` | `(html: string) => void` | — | Called on every change |
-| `placeholder` | `string` | `'Start writing...'` | Placeholder text |
-| `className` | `string` | — | CSS class on container |
-| `maxHeight` | `number \| string` | — | Max height + scroll (e.g. `600` = `600px`) |
-| `editable` | `boolean` | `true` | Set `false` for read-only display |
-| `showWordCount` | `boolean` | `true` | Show word/character count footer |
+| Prop            | Type                     | Default              | Description                                |
+|-----------------|--------------------------|----------------------|--------------------------------------------|
+| `value`         | `string`                 | —                    | HTML content (controlled)                  |
+| `onChange`      | `(html: string) => void` | —                    | Called on every change                     |
+| `placeholder`   | `string`                 | `'Start writing...'` | Placeholder text                           |
+| `className`     | `string`                 | —                    | CSS class on container                     |
+| `maxHeight`     | `number \| string`       | —                    | Max height + scroll (e.g. `600` = `600px`) |
+| `editable`      | `boolean`                | `true`               | Set `false` for read-only display          |
+| `showWordCount` | `boolean`                | `true`               | Show word/character count footer           |
 
 ### Plugin files
 
-| Plugin | Purpose |
-|--------|---------|
-| `ToolbarPlugin` | Full toolbar: block type, text format, alignment, link, insert |
-| `FloatingLinkEditorPlugin` | Floating popover when cursor is inside a link |
-| `FloatingTextFormatPlugin` | Bubble menu above text selection |
-| `AutoLinkPlugin` | Auto-converts typed URLs/emails to links |
-| `HtmlPlugin` | Serializes/deserializes HTML |
-| `MarkdownPlugin` | Markdown shortcut transforms |
-| `CopyCodePlugin` | Injects "Copy" button on `<code>` blocks via MutationObserver |
-| `WordCountPlugin` | Shows word + character count in footer |
+| Plugin                     | Purpose                                                        |
+|----------------------------|----------------------------------------------------------------|
+| `ToolbarPlugin`            | Full toolbar: block type, text format, alignment, link, insert |
+| `FloatingLinkEditorPlugin` | Floating popover when cursor is inside a link                  |
+| `FloatingTextFormatPlugin` | Bubble menu above text selection                               |
+| `AutoLinkPlugin`           | Auto-converts typed URLs/emails to links                       |
+| `HtmlPlugin`               | Serializes/deserializes HTML                                   |
+| `MarkdownPlugin`           | Markdown shortcut transforms                                   |
+| `CopyCodePlugin`           | Injects "Copy" button on `<code>` blocks via MutationObserver  |
+| `WordCountPlugin`          | Shows word + character count in footer                         |
 
 ### Adding a new node type
 

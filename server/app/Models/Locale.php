@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 class Locale extends Model
 {
@@ -27,9 +29,14 @@ class Locale extends Model
         return $this->hasMany(Translation::class, 'locale_code', 'code');
     }
 
-    public function scopeActive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
+    }
+
+    public function scopeDefault(Builder $query): Builder
+    {
+        return $query->where('is_default', true);
     }
 
     protected function casts(): array
@@ -38,5 +45,18 @@ class Locale extends Model
             'is_default' => 'boolean',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * @return Collection<Locale>
+     */
+    public static function getLocales(): Collection
+    {
+        return self::query()
+            ->select(['code', 'name', 'native_name', 'flag_emoji', 'is_default'])
+            ->active()
+            ->orderByDesc('is_default')
+            ->orderBy('name')
+            ->get();
     }
 }

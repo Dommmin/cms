@@ -1,11 +1,12 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Trash2Icon, UserIcon } from 'lucide-react';
-import { userColumns } from '@/components/columns/user-columns';
+import { useUserColumns } from '@/components/columns/user-columns';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 
 import type { BreadcrumbItem } from '@/types';
 import type { User } from '@/types/auth';
@@ -35,26 +36,29 @@ export default function Index({
     users: UserData;
     filters: { search?: string; sort?: string; per_page?: number };
 }) {
+    const __ = useTranslation();
+    const userColumns = useUserColumns();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
 
             <Wrapper>
                 <PageHeader
-                    title="Users"
-                    description="Manage panel users and their roles"
+                    title={__('page.users', 'Users')}
+                    description={__('page.users_desc', 'Manage panel users and their roles')}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link href="/admin/users/trashed" prefetch cacheFor={30}>
                                 <Trash2Icon className="mr-2 h-4 w-4" />
-                                Trash
+                                {__('action.trash', 'Trash')}
                             </Link>
                         </Button>
                         <Button asChild variant="outline">
                             <Link href="/admin/users/create" prefetch cacheFor={30}>
                                 <UserIcon className="mr-2 h-4 w-4" />
-                                Create User
+                                {__('action.create', 'Create User')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -73,7 +77,7 @@ export default function Index({
                         sort: users.sort,
                     }}
                     searchable
-                    searchPlaceholder="Search by name or email..."
+                    searchPlaceholder={__('placeholder.search_users', 'Search by name or email...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/users"
                 />

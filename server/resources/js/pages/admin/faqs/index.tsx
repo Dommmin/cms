@@ -7,6 +7,7 @@ import {
     PencilIcon,
     TrashIcon,
 } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -48,10 +49,11 @@ type Props = {
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'FAQ', href: '/admin/faqs' }];
 
 export default function FaqsIndex({ faqs, filters, categories }: Props) {
+    const __ = useTranslation();
     const columns: ColumnDef<Faq>[] = [
         {
             accessorKey: 'question',
-            header: 'Question',
+            header: __('column.question', 'Question'),
             cell: ({ row }) => (
                 <div className="max-w-md">
                     <p className="line-clamp-2 font-medium">
@@ -67,52 +69,52 @@ export default function FaqsIndex({ faqs, filters, categories }: Props) {
         },
         {
             accessorKey: 'is_active',
-            header: 'Status',
+            header: __('column.status', 'Status'),
             cell: ({ row }) => (
                 <Badge
                     variant={row.original.is_active ? 'default' : 'secondary'}
                 >
-                    {row.original.is_active ? 'Active' : 'Inactive'}
+                    {row.original.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
                 </Badge>
             ),
         },
         {
             accessorKey: 'position',
-            header: 'Position',
+            header: __('column.position', 'Position'),
             cell: ({ row }) => (
                 <span className="text-sm">{row.original.position}</span>
             ),
         },
         {
             accessorKey: 'views_count',
-            header: 'Views',
+            header: __('column.views', 'Views'),
             cell: ({ row }) => (
                 <span className="text-sm">{row.original.views_count}</span>
             ),
         },
         {
             accessorKey: 'helpful_count',
-            header: 'Helpful',
+            header: __('column.helpful', 'Helpful'),
             cell: ({ row }) => (
                 <span className="text-sm">{row.original.helpful_count}</span>
             ),
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link href={`/admin/faqs/${row.original.id}/edit`} prefetch cacheFor={30}>
                             <PencilIcon className="mr-1 h-3 w-3" />
-                            Edit
+                            {__('action.edit', 'Edit')}
                         </Link>
                     </Button>
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete FAQ"
-                        description={`Are you sure you want to delete this FAQ? This action cannot be undone.`}
+                        title={__('dialog.delete_title', 'Delete FAQ')}
+                        description={__('dialog.cannot_be_undone', 'Are you sure you want to delete this FAQ? This action cannot be undone.')}
                         onConfirm={() => {
                             router.delete(`/admin/faqs/${row.original.id}`, {
                                 onSuccess: () => toast.success('FAQ deleted'),
@@ -120,7 +122,7 @@ export default function FaqsIndex({ faqs, filters, categories }: Props) {
                         }}
                     >
                         <TrashIcon className="mr-1 h-3 w-3" />
-                        Delete
+                        {__('action.delete', 'Delete')}
                     </ConfirmButton>
                 </div>
             ),
@@ -132,14 +134,14 @@ export default function FaqsIndex({ faqs, filters, categories }: Props) {
             <Head title="FAQ" />
             <Wrapper>
                 <PageHeader
-                    title="FAQ"
-                    description="Manage frequently asked questions"
+                    title={__('page.faqs', 'FAQ')}
+                    description={__('page.faqs_desc', 'Manage frequently asked questions')}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/faqs/create">
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
-                                Add FAQ
+                                {__('action.add', 'Add FAQ')}
                             </Button>
                         </Link>
                     </PageHeaderActions>
@@ -157,7 +159,7 @@ export default function FaqsIndex({ faqs, filters, categories }: Props) {
                         next_page_url: faqs.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search questions..."
+                    searchPlaceholder={__('placeholder.search', 'Search questions...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/faqs"
                 />

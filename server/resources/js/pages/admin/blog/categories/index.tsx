@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 type BlogCategory = {
@@ -43,10 +44,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function BlogCategoriesIndex({ categories, filters }: Props) {
+    const __ = useTranslation();
     const columns: ColumnDef<BlogCategory>[] = [
         {
             accessorKey: 'name',
-            header: 'Name',
+            header: __('column.name', 'Name'),
             cell: ({ row }) => (
                 <div>
                     <p className="font-medium">{resolveLocalizedText(row.original.name)}</p>
@@ -61,43 +63,43 @@ export default function BlogCategoriesIndex({ categories, filters }: Props) {
         },
         {
             accessorKey: 'is_active',
-            header: 'Status',
+            header: __('column.status', 'Status'),
             cell: ({ row }) => (
                 <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
-                    {row.original.is_active ? 'Active' : 'Inactive'}
+                    {row.original.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
                 </Badge>
             ),
         },
         {
             accessorKey: 'posts_count',
-            header: 'Posts',
+            header: __('column.submissions', 'Posts'),
             cell: ({ row }) => (
                 <span className="text-sm">{row.original.posts_count}</span>
             ),
         },
         {
             accessorKey: 'position',
-            header: 'Position',
+            header: __('column.position', 'Position'),
             cell: ({ row }) => (
                 <span className="text-sm">{row.original.position}</span>
             ),
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link href={`/admin/blog/categories/${row.original.id}/edit`} prefetch cacheFor={30}>
                             <PencilIcon className="mr-1 h-3 w-3" />
-                            Edit
+                            {__('action.edit', 'Edit')}
                         </Link>
                     </Button>
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Category"
-                        description="Are you sure you want to delete this category? Posts will not be deleted."
+                        title={__('dialog.delete_title', 'Delete Category')}
+                        description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
                             router.delete(`/admin/blog/categories/${row.original.id}`, {
                                 onSuccess: () => toast.success('Category deleted'),
@@ -105,7 +107,7 @@ export default function BlogCategoriesIndex({ categories, filters }: Props) {
                         }}
                     >
                         <TrashIcon className="mr-1 h-3 w-3" />
-                        Delete
+                        {__('action.delete', 'Delete')}
                     </ConfirmButton>
                 </div>
             ),
@@ -117,14 +119,14 @@ export default function BlogCategoriesIndex({ categories, filters }: Props) {
             <Head title="Blog Categories" />
             <Wrapper>
                 <PageHeader
-                    title="Blog Categories"
-                    description="Organize blog posts into categories"
+                    title={__('page.blog_categories', 'Blog Categories')}
+                    description={__('page.blog_categories_desc', 'Organize blog posts into categories')}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/blog/categories/create">
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
-                                New Category
+                                {__('action.create', 'New Category')}
                             </Button>
                         </Link>
                     </PageHeaderActions>
@@ -142,7 +144,7 @@ export default function BlogCategoriesIndex({ categories, filters }: Props) {
                         next_page_url: categories.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search categories..."
+                    searchPlaceholder={__('placeholder.search_categories', 'Search categories...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/blog/categories"
                 />

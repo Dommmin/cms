@@ -2,10 +2,10 @@
 
 This project has **two** frontend contexts:
 
-| Context | Path | Framework | Served by |
-|---------|------|-----------|-----------|
-| **Admin SPA** | `server/resources/js/` | Inertia v2 + React 19 | Laravel (PHP) |
-| **Public Frontend** | `client/` | Next.js 16 | Node container |
+| Context             | Path                   | Framework             | Served by      |
+|---------------------|------------------------|-----------------------|----------------|
+| **Admin SPA**       | `server/resources/js/` | Inertia v2 + React 19 | Laravel (PHP)  |
+| **Public Frontend** | `client/`              | Next.js 16            | Node container |
 
 ---
 
@@ -239,8 +239,8 @@ export const metadata: Metadata = {
 }
 
 // JSON-LD
-import { JsonLd } from '@/components/json-ld'
-import { buildProduct } from '@/lib/schema'
+import { JsonLd } from '@/components/json-ld';
+import { buildProduct } from '@/lib/schema';
 
 <JsonLd data={buildProduct(product)} />
 ```
@@ -257,16 +257,16 @@ Available schema builders in `lib/schema.ts`:
 
 ### Key Dependencies
 
-| Package | Use |
-|---------|-----|
-| `next` 16 | Framework |
-| `react` 19 | UI |
-| `@tanstack/react-query` | Server state |
-| `axios` | HTTP client |
-| `react-hook-form` + `zod` | Forms + validation |
-| `tailwindcss` v4 | Styling |
-| `leaflet` + `react-leaflet` | Store map |
-| `recharts` | Charts |
-| `framer-motion` | Animations |
-| `date-fns` | Date formatting |
-| `lucide-react` | Icons |
+| Package                     | Use                |
+|-----------------------------|--------------------|
+| `next` 16                   | Framework          |
+| `react` 19                  | UI                 |
+| `@tanstack/react-query`     | Server state       |
+| `axios`                     | HTTP client        |
+| `react-hook-form` + `zod`   | Forms + validation |
+| `tailwindcss` v4            | Styling            |
+| `leaflet` + `react-leaflet` | Store map          |
+| `recharts`                  | Charts             |
+| `framer-motion`             | Animations         |
+| `date-fns`                  | Date formatting    |
+| `lucide-react`              | Icons              |

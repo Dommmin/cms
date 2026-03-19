@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 type LocaleOption = { code: string; name: string; flag_emoji: string | null };
@@ -56,6 +57,7 @@ const breadcrumbs: BreadcrumbItem[] = [{ title: 'Translations', href: '/admin/tr
 const ALL_GROUPS_VALUE = 'all-groups';
 
 export default function TranslationsIndex({ translations, locales, groups, filters }: Props) {
+    const __ = useTranslation();
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editValue, setEditValue] = useState('');
     const [syncing, setSyncing] = useState(false);
@@ -115,7 +117,7 @@ export default function TranslationsIndex({ translations, locales, groups, filte
     const columns: ColumnDef<Translation>[] = [
         {
             accessorKey: 'group',
-            header: 'Group',
+            header: __('column.group', 'Group'),
             cell: ({ row }) => (
                 <Badge variant="outline" className="font-mono text-xs">
                     {row.original.group}
@@ -124,14 +126,14 @@ export default function TranslationsIndex({ translations, locales, groups, filte
         },
         {
             accessorKey: 'key',
-            header: 'Key',
+            header: __('column.key', 'Key'),
             cell: ({ row }) => (
                 <span className="font-mono text-sm">{row.original.key}</span>
             ),
         },
         {
             accessorKey: 'value',
-            header: 'Value',
+            header: __('column.value', 'Value'),
             cell: ({ row }) => {
                 if (editingId === row.original.id) {
                     return (
@@ -167,17 +169,17 @@ export default function TranslationsIndex({ translations, locales, groups, filte
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" onClick={() => startEdit(row.original)}>
-                        Edit
+                        {__('action.edit', 'Edit')}
                     </Button>
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Translation"
-                        description="Are you sure you want to delete this translation?"
+                        title={__('dialog.delete_title', 'Delete Translation')}
+                        description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
                             router.delete(`/admin/translations/${row.original.id}`, {
                                 onSuccess: () => toast.success('Translation deleted'),
@@ -185,7 +187,7 @@ export default function TranslationsIndex({ translations, locales, groups, filte
                             });
                         }}
                     >
-                        Delete
+                        {__('action.delete', 'Delete')}
                     </ConfirmButton>
                 </div>
             ),
@@ -196,11 +198,11 @@ export default function TranslationsIndex({ translations, locales, groups, filte
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Translations" />
             <Wrapper>
-                <PageHeader title="Translations" description="Translations are discovered automatically from frontend t() calls.">
+                <PageHeader title={__('page.translations', 'Translations')} description={__('page.translations_desc', 'Translations are discovered automatically from frontend ()) calls.')}>
                     <PageHeaderActions>
                         <Button variant="outline" onClick={handleSync} disabled={syncing}>
                             <RefreshCwIcon className={`mr-2 h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
-                            {syncing ? 'Syncing…' : 'Sync from source'}
+                            {syncing ? __('misc.syncing', 'Syncing…') : __('misc.sync_from_source', 'Sync from source')}
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
@@ -239,7 +241,7 @@ export default function TranslationsIndex({ translations, locales, groups, filte
                         size="sm"
                         onClick={() => handleFilterChange('missing', isMissing ? '' : '1')}
                     >
-                        Missing only
+                        {__('misc.missing_only', 'Missing only')}
                         {isMissing && ' ✓'}
                     </Button>
                 </div>
@@ -256,7 +258,7 @@ export default function TranslationsIndex({ translations, locales, groups, filte
                         next_page_url: translations.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search by key or value..."
+                    searchPlaceholder={__('placeholder.search_translations', 'Search by key or value...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/translations"
                 />

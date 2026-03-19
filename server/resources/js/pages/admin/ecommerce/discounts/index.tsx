@@ -1,5 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Plus, Percent, PencilIcon, TrashIcon } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -46,6 +47,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function DiscountsIndex({ discounts, filters }: IndexProps) {
+    const __ = useTranslation();
     const formatDiscount = (type: string, value: number) => {
         if (type === 'percentage') return `${value}%`;
         if (type === 'fixed_amount') return `$${(value / 100).toFixed(2)}`;
@@ -58,14 +60,14 @@ export default function DiscountsIndex({ discounts, filters }: IndexProps) {
 
             <Wrapper>
                 <PageHeader
-                    title="Discounts"
+                    title={__('page.discounts', 'Discounts')}
                     description={`${discounts.total} discount codes`}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link href="/admin/ecommerce/discounts/create" prefetch cacheFor={30}>
                                 <Plus className="mr-2 h-4 w-4" />
-                                Add Discount
+                                {__('action.add', 'Add Discount')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -75,7 +77,7 @@ export default function DiscountsIndex({ discounts, filters }: IndexProps) {
                     columns={[
                         {
                             accessorKey: 'code',
-                            header: 'Code',
+                            header: __('column.code', 'Code'),
                             cell: ({ row }) => (
                                 <div className="flex items-center gap-2">
                                     <div className="flex h-8 w-8 items-center justify-center rounded bg-yellow-100">
@@ -89,11 +91,11 @@ export default function DiscountsIndex({ discounts, filters }: IndexProps) {
                         },
                         {
                             accessorKey: 'name',
-                            header: 'Name',
+                            header: __('column.name', 'Name'),
                         },
                         {
                             accessorKey: 'value',
-                            header: 'Value',
+                            header: __('column.value', 'Value'),
                             cell: ({ row }) =>
                                 formatDiscount(
                                     row.original.type,
@@ -102,7 +104,7 @@ export default function DiscountsIndex({ discounts, filters }: IndexProps) {
                         },
                         {
                             accessorKey: 'uses_count',
-                            header: 'Uses',
+                            header: __('column.uses', 'Uses'),
                             cell: ({ row }) => (
                                 <span>
                                     {row.original.uses_count}
@@ -113,15 +115,15 @@ export default function DiscountsIndex({ discounts, filters }: IndexProps) {
                         },
                         {
                             accessorKey: 'is_active',
-                            header: 'Status',
+                            header: __('column.status', 'Status'),
                             cell: ({ row }) =>
                                 row.original.is_active ? (
                                     <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs text-green-700">
-                                        Active
+                                        {__('status.active', 'Active')}
                                     </span>
                                 ) : (
                                     <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">
-                                        Inactive
+                                        {__('status.inactive', 'Inactive')}
                                     </span>
                                 ),
                         },
@@ -136,7 +138,7 @@ export default function DiscountsIndex({ discounts, filters }: IndexProps) {
                         next_page_url: discounts.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search discounts..."
+                    searchPlaceholder={__('placeholder.search', 'Search discounts...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/ecommerce/discounts"
                 />

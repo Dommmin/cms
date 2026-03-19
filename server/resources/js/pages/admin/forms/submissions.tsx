@@ -8,6 +8,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 type Submission = {
@@ -47,17 +48,19 @@ export default function SubmissionsIndex({
     form: FormData;
     submissions: SubmissionsData;
 }) {
+    const __ = useTranslation();
+
     const columns: ColumnDef<Submission>[] = [
         {
             accessorKey: 'id',
-            header: 'ID',
+            header: __('column.id', 'ID'),
             cell: ({ row }) => (
                 <span className="font-mono">#{row.original.id}</span>
             ),
         },
         {
             accessorKey: 'data',
-            header: 'Data',
+            header: __('column.data', 'Data'),
             cell: ({ row }) => {
                 const data = row.original.data;
                 const preview = Object.entries(data)
@@ -73,7 +76,7 @@ export default function SubmissionsIndex({
         },
         {
             accessorKey: 'ip_address',
-            header: 'IP',
+            header: __('column.ip', 'IP'),
             cell: ({ row }) => (
                 <span className="font-mono text-xs text-muted-foreground">
                     {row.original.ip_address || '-'}
@@ -82,26 +85,26 @@ export default function SubmissionsIndex({
         },
         {
             accessorKey: 'created_at',
-            header: 'Date',
+            header: __('column.date', 'Date'),
             cell: ({ row }) =>
                 new Date(row.original.created_at).toLocaleString(),
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link href={`/admin/forms/${form.id}/submissions/${row.original.id}`} prefetch cacheFor={60}>
                             <EyeIcon className="mr-1 h-3 w-3" />
-                            View
+                            {__('action.view', 'View')}
                         </Link>
                     </Button>
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Submission"
-                        description="Are you sure you want to delete this submission?"
+                        title={__('dialog.delete_title', 'Delete Submission')}
+                        description={__('dialog.are_you_sure', 'Are you sure you want to delete this submission?')}
                         onConfirm={() => {
                             router.delete(
                                 `/admin/forms/${form.id}/submissions/${row.original.id}`,
@@ -130,11 +133,10 @@ export default function SubmissionsIndex({
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href={`/admin/forms/${form.id}/edit`} prefetch cacheFor={30}>
-                            Edit Form
-                        
-                </Link>
-            </Button>
+                            <Link href={`/admin/forms/${form.id}/edit`} prefetch cacheFor={30}>
+                                {__('action.edit_form', 'Edit Form')}
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 

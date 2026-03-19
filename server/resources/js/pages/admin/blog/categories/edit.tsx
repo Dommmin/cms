@@ -2,6 +2,7 @@ import { Link, Head, router } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -43,6 +44,7 @@ export default function EditBlogCategory({ category, parentCategories }: Props) 
         { title: category.name, href: `/admin/blog/categories/${category.id}/edit` },
     ];
 
+    const __ = useTranslation();
     const [data, setData] = useState({
         name: category.name,
         slug: category.slug,
@@ -80,10 +82,10 @@ export default function EditBlogCategory({ category, parentCategories }: Props) 
                 parent_id: data.parent_id || null,
             },
             {
-                onSuccess: () => toast.success('Category updated successfully'),
+                onSuccess: () => toast.success(__('misc.category_updated', 'Category updated successfully')),
                 onError: (errs) => {
                     setErrors(errs);
-                    toast.error('Please fix the errors below');
+                    toast.error(__('misc.fix_errors', 'Please fix the errors below'));
                 },
                 onFinish: () => setProcessing(false),
             },
@@ -95,14 +97,14 @@ export default function EditBlogCategory({ category, parentCategories }: Props) 
             <Head title={`Edit: ${category.name}`} />
             <Wrapper>
                 <PageHeader
-                    title="Edit Blog Category"
+                    title={__('page.edit_blog_category', 'Edit Blog Category')}
                     description={category.name}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                 <Link href='/admin/blog/categories' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back
+                            {__('action.back', 'Back')}
                         
                 </Link>
             </Button>
@@ -111,7 +113,7 @@ export default function EditBlogCategory({ category, parentCategories }: Props) 
 
                 <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
                     <div className="grid gap-2">
-                        <Label htmlFor="name">Name *</Label>
+                        <Label htmlFor="name">{__('label.name', 'Name')} *</Label>
                         <Input
                             id="name"
                             value={data.name}
@@ -123,7 +125,7 @@ export default function EditBlogCategory({ category, parentCategories }: Props) 
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="slug">Slug</Label>
+                        <Label htmlFor="slug">{__('label.slug', 'Slug')}</Label>
                         <Input
                             id="slug"
                             value={data.slug}
@@ -134,7 +136,7 @@ export default function EditBlogCategory({ category, parentCategories }: Props) 
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">{__('label.description', 'Description')}</Label>
                         <Textarea
                             id="description"
                             value={data.description}
@@ -149,7 +151,7 @@ export default function EditBlogCategory({ category, parentCategories }: Props) 
 
                     {parentCategories.length > 0 && (
                         <div className="grid gap-2">
-                            <Label htmlFor="parent_id">Parent Category</Label>
+                            <Label htmlFor="parent_id">{__('label.parent_category', 'Parent Category')}</Label>
                             <Select
                                 value={data.parent_id}
                                 onValueChange={(val) =>
@@ -157,7 +159,7 @@ export default function EditBlogCategory({ category, parentCategories }: Props) 
                                 }
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder="None (root category)" />
+                                    <SelectValue placeholder={__('placeholder.none_root', 'None (root category)')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {parentCategories
@@ -174,7 +176,7 @@ export default function EditBlogCategory({ category, parentCategories }: Props) 
                     )}
 
                     <div className="grid gap-2">
-                        <Label htmlFor="position">Position</Label>
+                        <Label htmlFor="position">{__('label.position', 'Position')}</Label>
                         <Input
                             id="position"
                             type="number"
@@ -201,13 +203,13 @@ export default function EditBlogCategory({ category, parentCategories }: Props) 
                             className="h-4 w-4 rounded border-gray-300"
                         />
                         <Label htmlFor="is_active" className="font-normal">
-                            Active (visible on site)
+                            {__('label.active_visible', 'Active (visible on site)')}
                         </Label>
                     </div>
 
                     <div className="flex items-center gap-4">
                         <Button type="submit" disabled={processing}>
-                            {processing ? 'Saving...' : 'Save Changes'}
+                            {processing ? __('misc.saving', 'Saving...') : __('action.save_changes', 'Save Changes')}
                         </Button>
                     </div>
                 </form>

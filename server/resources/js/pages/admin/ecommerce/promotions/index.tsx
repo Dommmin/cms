@@ -1,5 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Search, Plus, Edit, Trash2, Power, PowerOff } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -78,6 +79,8 @@ export default function Index({
         type?: string;
     };
 }) {
+    const __ = useTranslation();
+
     const handleSearch = (value: string) => {
         router.get(
             '/admin/ecommerce/promotions',

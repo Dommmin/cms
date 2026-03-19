@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
 
@@ -57,6 +58,7 @@ export default function EditVariant({
     taxRates: TaxRate[];
     attributes: VariantAttribute[];
 }) {
+    const __ = useTranslation();
     const formId = 'product-variant-edit-form';
     const productName = resolveLocalizedText(product.name);
 
@@ -80,13 +82,13 @@ export default function EditVariant({
             <Wrapper>
                 <PageHeader
                     title={`Edit Variant: ${variant.name}`}
-                    description="Update variant details"
+                    description={__('page.edit_variant_desc', 'Update variant details')}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link href={`/admin/ecommerce/products/${product.id}/variants`} prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                Back to Variants
+                                {__('action.back_to_variants', 'Back to Variants')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -102,7 +104,7 @@ export default function EditVariant({
                         <div className="space-y-6 rounded-xl border bg-card p-6">
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="name">Name *</Label>
+                                    <Label htmlFor="name">{__('label.name', 'Name')} *</Label>
                                     <Input
                                         id="name"
                                         name="name"
@@ -112,7 +114,7 @@ export default function EditVariant({
                                     <InputError message={errors.name} />
                                 </div>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="sku">SKU *</Label>
+                                    <Label htmlFor="sku">{__('label.sku', 'SKU')} *</Label>
                                     <Input
                                         id="sku"
                                         name="sku"
@@ -125,7 +127,7 @@ export default function EditVariant({
 
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="price">Price (PLN) *</Label>
+                                    <Label htmlFor="price">{__('label.price_pln', 'Price (PLN)')} *</Label>
                                     <Input
                                         id="price"
                                         name="price"
@@ -139,7 +141,7 @@ export default function EditVariant({
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="cost_price">
-                                        Cost Price (PLN)
+                                        {__('label.cost_price_pln', 'Cost Price (PLN)')}
                                     </Label>
                                     <Input
                                         id="cost_price"
@@ -153,7 +155,7 @@ export default function EditVariant({
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="compare_at_price">
-                                        Compare At (PLN)
+                                        {__('label.compare_at_pln', 'Compare At (PLN)')}
                                     </Label>
                                     <Input
                                         id="compare_at_price"
@@ -176,7 +178,7 @@ export default function EditVariant({
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="stock_quantity">
-                                        Stock Quantity *
+                                        {__('label.stock_quantity', 'Stock Quantity')} *
                                     </Label>
                                     <Input
                                         id="stock_quantity"
@@ -192,7 +194,7 @@ export default function EditVariant({
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="stock_threshold">
-                                        Low Stock Threshold
+                                        {__('label.low_stock_threshold', 'Low Stock Threshold')}
                                     </Label>
                                     <Input
                                         id="stock_threshold"
@@ -206,7 +208,7 @@ export default function EditVariant({
                                     />
                                 </div>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="weight">Weight (kg)</Label>
+                                    <Label htmlFor="weight">{__('label.weight_kg', 'Weight (kg)')}</Label>
                                     <Input
                                         id="weight"
                                         name="weight"
@@ -218,7 +220,7 @@ export default function EditVariant({
                                     <InputError message={errors.weight} />
                                 </div>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="tax_rate_id">Tax Rate</Label>
+                                    <Label htmlFor="tax_rate_id">{__('label.tax_rate', 'Tax Rate')}</Label>
                                     <select
                                         id="tax_rate_id"
                                         name="tax_rate_id"
@@ -242,7 +244,7 @@ export default function EditVariant({
                             {attributes.length > 0 && (
                                 <div className="space-y-4">
                                     <h3 className="text-sm font-semibold">
-                                        Variant Attributes
+                                        {__('misc.variant_attributes', 'Variant Attributes')}
                                     </h3>
                                     <input
                                         type="hidden"
@@ -326,7 +328,7 @@ export default function EditVariant({
                                         defaultChecked={variant.is_active}
                                         className="h-4 w-4 rounded border-input"
                                     />
-                                    <span className="text-sm">Active</span>
+                                    <span className="text-sm">{__('label.active', 'Active')}</span>
                                 </label>
                                 <label className="flex items-center gap-2">
                                     <input
@@ -342,7 +344,7 @@ export default function EditVariant({
                                         className="h-4 w-4 rounded border-input"
                                     />
                                     <span className="text-sm">
-                                        Set as default
+                                        {__('label.set_as_default', 'Set as default')}
                                     </span>
                                 </label>
                             </div>
@@ -350,7 +352,7 @@ export default function EditVariant({
                             <StickyFormActions
                                 formId={formId}
                                 processing={processing}
-                                submitLabel="Save Changes"
+                                submitLabel={__('action.save_changes', 'Save Changes')}
                             />
                         </div>
                     )}

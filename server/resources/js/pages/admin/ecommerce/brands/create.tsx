@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 export default function Create({
@@ -21,6 +22,7 @@ export default function Create({
         is_active: boolean;
     };
 }) {
+    const __ = useTranslation();
     const isEditing = !!brand;
     const formId = isEditing ? 'brand-edit-form' : 'brand-create-form';
     const breadcrumbs: BreadcrumbItem[] = isEditing
@@ -51,21 +53,20 @@ export default function Create({
 
             <Wrapper>
                 <PageHeader
-                    title={isEditing ? 'Edit Brand' : 'Create Brand'}
+                    title={isEditing ? __('page.edit_brand', 'Edit Brand') : __('page.create_brand', 'Create Brand')}
                     description={
                         isEditing
                             ? `Update details for ${brand.name}`
-                            : 'Create a new brand'
+                            : __('page.create_brand_desc', 'Create a new brand')
                     }
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/ecommerce/brands' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Brands
-                        
-                </Link>
-            </Button>
+                            <Link href='/admin/ecommerce/brands' prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                {__('action.back', 'Back')}
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -82,7 +83,7 @@ export default function Create({
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
+                                <Label htmlFor="name">{__('label.name', 'Name')}</Label>
                                 <Input
                                     id="name"
                                     name="name"
@@ -95,7 +96,7 @@ export default function Create({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="slug">Slug</Label>
+                                <Label htmlFor="slug">{__('label.slug', 'Slug')}</Label>
                                 <Input
                                     id="slug"
                                     name="slug"
@@ -107,7 +108,7 @@ export default function Create({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="description">Description</Label>
+                                <Label htmlFor="description">{__('label.description', 'Description')}</Label>
                                 <textarea
                                     id="description"
                                     name="description"
@@ -132,14 +133,14 @@ export default function Create({
                                     htmlFor="is_active"
                                     className="font-normal"
                                 >
-                                    Active
+                                    {__('label.is_active', 'Active')}
                                 </Label>
                             </div>
 
                             <StickyFormActions
                                 formId={formId}
                                 processing={processing}
-                                submitLabel={isEditing ? 'Save Changes' : 'Create Brand'}
+                                submitLabel={isEditing ? __('action.save_changes', 'Save Changes') : __('action.create_brand', 'Create Brand')}
                             />
                         </>
                     )}

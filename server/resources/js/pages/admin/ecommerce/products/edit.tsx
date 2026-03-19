@@ -31,6 +31,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
+import { formatDateTime } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 
 type Category = { id: number; name: string | Record<string, string>; slug: string };
@@ -168,13 +169,6 @@ function formatPrice(cents: number): string {
     return (cents / 100).toLocaleString('pl-PL', {
         style: 'currency',
         currency: 'PLN',
-    });
-}
-
-function formatDate(isoString: string): string {
-    return new Date(isoString).toLocaleString('pl-PL', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
     });
 }
 
@@ -1264,7 +1258,7 @@ export default function Edit({
                                                                 className="hover:bg-muted/30"
                                                             >
                                                                 <td className="px-6 py-3 text-muted-foreground">
-                                                                    {formatDate(entry.recorded_at)}
+                                                                    {formatDateTime(entry.recorded_at)}
                                                                 </td>
                                                                 <td className="px-6 py-3 text-right">
                                                                     <span className="font-medium">

@@ -7,6 +7,7 @@ import {
     CopyIcon,
     CheckIcon,
 } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -51,50 +52,51 @@ export default function ThemesIndex({ themes, filters }: Props) {
         activeTheme?: { id: number; slug: string } | null;
     }>();
     const activeTheme = props.activeTheme;
+    const __ = useTranslation();
 
     const columns: ColumnDef<Theme>[] = [
         {
             accessorKey: 'name',
-            header: 'Name',
+            header: __('column.name', 'Name'),
             cell: ({ row }) => (
                 <div className="font-medium">{row.original.name}</div>
             ),
         },
         {
             accessorKey: 'slug',
-            header: 'Slug',
+            header: __('column.slug', 'Slug'),
             cell: ({ row }) => (
                 <span className="font-mono text-sm">{row.original.slug}</span>
             ),
         },
         {
             accessorKey: 'pages_count',
-            header: 'Pages',
+            header: __('column.pages', 'Pages'),
             cell: ({ row }) => (
                 <span className="text-sm">{row.original.pages_count}</span>
             ),
         },
         {
             accessorKey: 'is_active',
-            header: 'Status',
+            header: __('column.status', 'Status'),
             cell: ({ row }) =>
                 row.original.is_active ? (
                     <Badge variant="default">
                         <CheckIcon className="mr-1 h-3 w-3" />
-                        Active
+                        {__('status.active', 'Active')}
                     </Badge>
                 ) : (
-                    <Badge variant="secondary">Inactive</Badge>
+                    <Badge variant="secondary">{__('status.inactive', 'Inactive')}</Badge>
                 ),
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     {row.original.is_active ? (
                         <Button variant="outline" size="sm" disabled>
-                            Active
+                            {__('status.active', 'Active')}
                         </Button>
                     ) : (
                         <Button
@@ -111,13 +113,13 @@ export default function ThemesIndex({ themes, filters }: Props) {
                                 );
                             }}
                         >
-                            Activate
+                            {__('action.activate', 'Activate')}
                         </Button>
                     )}
                     <Button asChild variant="outline" size="sm">
                         <Link href={`/admin/themes/${row.original.id}/edit`} prefetch cacheFor={30}>
                             <PencilIcon className="mr-1 h-3 w-3" />
-                            Edit
+                            {__('action.edit', 'Edit')}
                         </Link>
                     </Button>
                     <Button
@@ -135,12 +137,12 @@ export default function ThemesIndex({ themes, filters }: Props) {
                         }}
                     >
                         <CopyIcon className="mr-1 h-3 w-3" />
-                        Duplicate
+                        {__('action.duplicate', 'Duplicate')}
                     </Button>
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Theme"
+                        title={__('dialog.delete_title', 'Delete Theme')}
                         description={`Are you sure you want to delete "${row.original.name}"?`}
                         onConfirm={() => {
                             router.delete(`/admin/themes/${row.original.id}`, {
@@ -160,7 +162,7 @@ export default function ThemesIndex({ themes, filters }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Themes" />
             <Wrapper>
-                <PageHeader title="Themes" description="Manage site themes">
+                <PageHeader title={__('page.themes', 'Themes')} description={__('page.themes_desc', 'Manage site themes')}>
                     <PageHeaderActions>
                         <Button
                             variant="outline"
@@ -178,12 +180,12 @@ export default function ThemesIndex({ themes, filters }: Props) {
                             }}
                             disabled={!activeTheme}
                         >
-                            Disable Theme
+                            {__('action.disable', 'Disable Theme')}
                         </Button>
                         <Button asChild variant="outline">
                             <Link href="/admin/themes/create" prefetch cacheFor={30}>
                                 <PlusIcon className="mr-2 h-4 w-4" />
-                                Create Theme
+                                {__('action.create', 'Create Theme')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -201,7 +203,7 @@ export default function ThemesIndex({ themes, filters }: Props) {
                         next_page_url: themes.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder="Search themes..."
+                    searchPlaceholder={__('placeholder.search', 'Search themes...')}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/themes"
                 />

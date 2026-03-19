@@ -63,7 +63,7 @@ import {
     SidebarGroup,
 } from '@/components/ui/sidebar';
 
-import { useAdminT } from '@/hooks/use-admin-t';
+import { useTranslation } from '@/hooks/use-translation';
 import { dashboard } from '@/routes/admin';
 import type { NavItem } from '@/types';
 import AppLogo from './app-logo';
@@ -71,258 +71,258 @@ import AppLogo from './app-logo';
 const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
-    const t = useAdminT();
+    const __ = useTranslation();
 
     const baseNavItems: NavItem[] = [
     {
-        title: t('nav.dashboard', 'Dashboard'),
+        title: __('nav.dashboard', 'Dashboard'),
         href: dashboard(),
         icon: LayoutGrid,
     },
     {
-        title: t('nav.media', 'Media'),
+        title: __('nav.media', 'Media'),
         href: '/admin/media',
         icon: Image,
     },
     {
-        title: t('nav.cms', 'CMS'),
+        title: __('nav.cms', 'CMS'),
         icon: Folder,
         children: [
             {
-                title: t('nav.pages', 'Pages'),
+                title: __('nav.pages', 'Pages'),
                 href: '/admin/cms/pages',
                 icon: LayoutGrid,
             },
             {
-                title: t('nav.global_blocks', 'Global Blocks'),
+                title: __('nav.global_blocks', 'Global Blocks'),
                 href: '/admin/cms/reusable-blocks',
                 icon: LibraryBig,
             },
             {
-                title: t('nav.menus', 'Menus'),
+                title: __('nav.menus', 'Menus'),
                 href: '/admin/menus',
                 icon: Menu,
             },
             {
-                title: t('nav.themes', 'Themes'),
+                title: __('nav.themes', 'Themes'),
                 href: '/admin/themes',
                 icon: Palette,
             },
             {
-                title: t('nav.forms', 'Forms'),
+                title: __('nav.forms', 'Forms'),
                 href: '/admin/forms',
                 icon: ClipboardList,
             },
             {
-                title: t('nav.faq', 'FAQ'),
+                title: __('nav.faq', 'FAQ'),
                 href: '/admin/faqs',
                 icon: HelpCircle,
             },
             {
-                title: t('nav.section_templates', 'Section Templates'),
+                title: __('nav.section_templates', 'Section Templates'),
                 href: '/admin/section-templates',
                 icon: LibraryBig,
             },
             {
-                title: t('nav.stores', 'Stores'),
+                title: __('nav.stores', 'Stores'),
                 href: '/admin/stores',
                 icon: MapPin,
             },
             {
-                title: t('nav.blog_posts', 'Blog Posts'),
+                title: __('nav.blog_posts', 'Blog Posts'),
                 href: '/admin/blog/posts',
                 icon: BookOpen,
             },
             {
-                title: t('nav.blog_categories', 'Blog Categories'),
+                title: __('nav.blog_categories', 'Blog Categories'),
                 href: '/admin/blog/categories',
                 icon: FolderOpen,
             },
         ],
     },
     {
-        title: t('nav.shop', 'Shop'),
+        title: __('nav.shop', 'Shop'),
         icon: ShoppingBag,
         children: [
             {
-                title: t('nav.products', 'Products'),
+                title: __('nav.products', 'Products'),
                 href: '/admin/ecommerce/products',
                 icon: Package,
             },
             {
-                title: t('nav.categories', 'Categories'),
+                title: __('nav.categories', 'Categories'),
                 href: '/admin/ecommerce/categories',
                 icon: List,
             },
             {
-                title: t('nav.brands', 'Brands'),
+                title: __('nav.brands', 'Brands'),
                 href: '/admin/ecommerce/brands',
                 icon: Tag,
             },
             {
-                title: t('nav.product_types', 'Product Types'),
+                title: __('nav.product_types', 'Product Types'),
                 href: '/admin/ecommerce/product-types',
                 icon: Box,
             },
             {
-                title: t('nav.attributes', 'Attributes'),
+                title: __('nav.attributes', 'Attributes'),
                 href: '/admin/ecommerce/attributes',
                 icon: List,
             },
             {
-                title: t('nav.product_flags', 'Product Flags'),
+                title: __('nav.product_flags', 'Product Flags'),
                 href: '/admin/ecommerce/product-flags',
                 icon: Flag,
             },
             {
-                title: t('nav.orders', 'Orders'),
+                title: __('nav.orders', 'Orders'),
                 href: '/admin/ecommerce/orders',
                 icon: ShoppingCart,
             },
             {
-                title: t('nav.customers', 'Customers'),
+                title: __('nav.customers', 'Customers'),
                 href: '/admin/ecommerce/customers',
                 icon: UserCircle,
             },
             {
-                title: t('nav.discounts', 'Discounts'),
+                title: __('nav.discounts', 'Discounts'),
                 href: '/admin/ecommerce/discounts',
                 icon: Percent,
             },
             {
-                title: t('nav.promotions', 'Promotions'),
+                title: __('nav.promotions', 'Promotions'),
                 href: '/admin/ecommerce/promotions',
                 icon: Tag,
             },
             {
-                title: t('nav.tax_rates', 'Tax Rates'),
+                title: __('nav.tax_rates', 'Tax Rates'),
                 href: '/admin/ecommerce/tax-rates',
                 icon: Receipt,
             },
             {
-                title: t('nav.shipping', 'Shipping'),
+                title: __('nav.shipping', 'Shipping'),
                 href: '/admin/ecommerce/shipping-methods',
                 icon: Truck,
             },
             {
-                title: t('nav.returns', 'Returns'),
+                title: __('nav.returns', 'Returns'),
                 href: '/admin/ecommerce/returns',
                 icon: RotateCcw,
             },
             {
-                title: t('nav.reviews', 'Reviews'),
+                title: __('nav.reviews', 'Reviews'),
                 href: '/admin/ecommerce/reviews',
                 icon: Star,
             },
         ],
     },
     {
-        title: t('nav.newsletter', 'Newsletter'),
+        title: __('nav.newsletter', 'Newsletter'),
         icon: Mail,
         children: [
             {
-                title: t('nav.subscribers', 'Subscribers'),
+                title: __('nav.subscribers', 'Subscribers'),
                 href: '/admin/newsletter/subscribers',
                 icon: Users2,
             },
             {
-                title: t('nav.segments', 'Segments'),
+                title: __('nav.segments', 'Segments'),
                 href: '/admin/newsletter/segments',
                 icon: List,
             },
             {
-                title: t('nav.campaigns', 'Campaigns'),
+                title: __('nav.campaigns', 'Campaigns'),
                 href: '/admin/newsletter/campaigns',
                 icon: Megaphone,
             },
         ],
     },
     {
-        title: t('nav.finance', 'Finance'),
+        title: __('nav.finance', 'Finance'),
         icon: Coins,
         children: [
             {
-                title: t('nav.currencies', 'Currencies'),
+                title: __('nav.currencies', 'Currencies'),
                 href: '/admin/currencies',
                 icon: Coins,
             },
             {
-                title: t('nav.exchange_rates', 'Exchange Rates'),
+                title: __('nav.exchange_rates', 'Exchange Rates'),
                 href: '/admin/exchange-rates',
                 icon: ArrowRightLeft,
             },
         ],
     },
     {
-        title: t('nav.users', 'Users'),
+        title: __('nav.users', 'Users'),
         href: '/admin/users',
         icon: Users,
     },
     {
-        title: t('nav.notifications', 'Notifications'),
+        title: __('nav.notifications', 'Notifications'),
         href: '/admin/notifications',
         icon: Bell,
     },
     {
-        title: t('nav.activity_log', 'Activity Log'),
+        title: __('nav.activity_log', 'Activity Log'),
         href: '/admin/activity-log',
         icon: Activity,
     },
     {
-        title: t('nav.cookie_consents', 'Cookie Consents'),
+        title: __('nav.cookie_consents', 'Cookie Consents'),
         href: '/admin/cookie-consents',
         icon: Cookie,
     },
     {
-        title: t('nav.i18n', 'i18n'),
+        title: __('nav.i18n', 'i18n'),
         icon: Languages,
         children: [
             {
-                title: t('nav.locales', 'Locales'),
+                title: __('nav.locales', 'Locales'),
                 href: '/admin/locales',
                 icon: Flag,
             },
             {
-                title: t('nav.translations', 'Translations'),
+                title: __('nav.translations', 'Translations'),
                 href: '/admin/translations',
                 icon: Languages,
             },
         ],
     },
     {
-        title: t('nav.affiliates', 'Affiliates'),
+        title: __('nav.affiliates', 'Affiliates'),
         icon: Link2,
         children: [
             {
-                title: t('nav.affiliate_codes', 'Codes'),
+                title: __('nav.affiliate_codes', 'Codes'),
                 href: '/admin/affiliates/codes',
                 icon: GitBranch,
             },
             {
-                title: t('nav.referrals', 'Referrals'),
+                title: __('nav.referrals', 'Referrals'),
                 href: '/admin/affiliates/referrals',
                 icon: Users2,
             },
         ],
     },
     {
-        title: t('nav.support', 'Support'),
+        title: __('nav.support', 'Support'),
         icon: MessageCircle,
         children: [
             {
-                title: t('nav.conversations', 'Conversations'),
+                title: __('nav.conversations', 'Conversations'),
                 href: '/admin/support',
                 icon: MessageSquare,
             },
             {
-                title: t('nav.canned_responses', 'Canned Responses'),
+                title: __('nav.canned_responses', 'Canned Responses'),
                 href: '/admin/support/canned-responses',
                 icon: ClipboardList,
             },
         ],
     },
     {
-        title: t('nav.settings', 'Settings'),
+        title: __('nav.settings', 'Settings'),
         href: '/admin/settings',
         icon: Settings,
     },

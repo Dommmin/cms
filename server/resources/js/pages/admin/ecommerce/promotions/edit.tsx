@@ -17,6 +17,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/hooks/use-translation';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
@@ -94,6 +95,7 @@ export default function Edit({
         { title: promotion.name, href: '' },
     ];
 
+    const __ = useTranslation();
     const { data, setData, put, processing, errors } = useForm<FormData>({
         name: promotion.name,
         slug: promotion.slug,
@@ -202,14 +204,14 @@ export default function Edit({
 
             <Wrapper>
                 <PageHeader
-                    title="Edytuj Promocję"
-                    description={`Modyfikuj ustawienia promocji: ${promotion.name}`}
+                    title={__('page.edit_promotion', 'Edit Promotion')}
+                    description={`${__('misc.updating_promotion', 'Updating promotion')}: ${promotion.name}`}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                 <Link href='/admin/ecommerce/promotions' prefetch cacheFor={30}>
                             <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Powrót
+                            {__('action.back', 'Back')}
                         
                 </Link>
             </Button>
@@ -222,10 +224,10 @@ export default function Edit({
                         <div className="space-y-6 lg:col-span-2">
                             {/* Basic info */}
                             <div className="space-y-4 rounded-xl border bg-card p-6">
-                                <h2 className="font-semibold">Podstawowe Informacje</h2>
+                                <h2 className="font-semibold">{__('misc.basic_info', 'Basic Information')}</h2>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="name">Nazwa Promocji *</Label>
+                                    <Label htmlFor="name">{__('label.promotion_name', 'Promotion Name')} *</Label>
                                     <Input
                                         id="name"
                                         value={data.name}
@@ -237,7 +239,7 @@ export default function Edit({
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="slug">Slug *</Label>
+                                    <Label htmlFor="slug">{__('label.slug', 'Slug')} *</Label>
                                     <Input
                                         id="slug"
                                         value={data.slug}
@@ -249,12 +251,12 @@ export default function Edit({
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="description">Opis</Label>
+                                    <Label htmlFor="description">{__('label.description', 'Description')}</Label>
                                     <Textarea
                                         id="description"
                                         value={data.description}
                                         onChange={(e) => setData('description', e.target.value)}
-                                        placeholder="Szczegółowy opis promocji..."
+                                        placeholder={__('placeholder.promotion_description', 'Detailed description of the promotion...')}
                                         rows={3}
                                     />
                                     <InputError message={errors.description} />
@@ -263,10 +265,10 @@ export default function Edit({
 
                             {/* Promotion settings */}
                             <div className="space-y-4 rounded-xl border bg-card p-6">
-                                <h2 className="font-semibold">Ustawienia Promocji</h2>
+                                <h2 className="font-semibold">{__('misc.promotion_settings', 'Promotion Settings')}</h2>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="type">Typ Promocji</Label>
+                                    <Label htmlFor="type">{__('label.promotion_type', 'Promotion Type')}</Label>
                                     <Select
                                         value={data.type}
                                         onValueChange={(value: FormData['type']) =>
@@ -277,10 +279,10 @@ export default function Edit({
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="percentage">Rabat procentowy</SelectItem>
-                                            <SelectItem value="fixed_amount">Kwota stała</SelectItem>
-                                            <SelectItem value="buy_x_get_y">Kup X weź Y</SelectItem>
-                                            <SelectItem value="free_shipping">Darmowa dostawa</SelectItem>
+                                            <SelectItem value="percentage">{__('type.percentage', 'Percentage Discount')}</SelectItem>
+                                            <SelectItem value="fixed_amount">{__('type.fixed_amount', 'Fixed Amount')}</SelectItem>
+                                            <SelectItem value="buy_x_get_y">{__('type.buy_x_get_y', 'Buy X Get Y')}</SelectItem>
+                                            <SelectItem value="free_shipping">{__('type.free_shipping', 'Free Shipping')}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <InputError message={errors.type} />
@@ -289,7 +291,7 @@ export default function Edit({
                                 {data.type !== 'free_shipping' && (
                                     <div className="grid gap-2">
                                         <Label htmlFor="value">
-                                            Wartość {data.type === 'percentage' ? '(%)' : '(zł)'}
+                                            {__('label.value', 'Value')} {data.type === 'percentage' ? '(%)' : '(PLN)'}
                                         </Label>
                                         <Input
                                             id="value"
@@ -307,7 +309,7 @@ export default function Edit({
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="grid gap-2">
-                                        <Label htmlFor="min_value">Min. wartość zamówienia (zł)</Label>
+                                        <Label htmlFor="min_value">{__('label.min_order_value', 'Min. Order Value (PLN)')}</Label>
                                         <Input
                                             id="min_value"
                                             type="number"
@@ -321,7 +323,7 @@ export default function Edit({
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="max_discount">Maksymalny rabat (zł)</Label>
+                                        <Label htmlFor="max_discount">{__('label.max_discount', 'Max. Discount (PLN)')}</Label>
                                         <Input
                                             id="max_discount"
                                             type="number"
@@ -336,7 +338,7 @@ export default function Edit({
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="apply_to">Zastosuj do</Label>
+                                    <Label htmlFor="apply_to">{__('label.apply_to', 'Apply To')}</Label>
                                     <Select
                                         value={data.apply_to}
                                         onValueChange={(value: FormData['apply_to']) =>
@@ -347,12 +349,12 @@ export default function Edit({
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">Wszystkich produktów</SelectItem>
+                                            <SelectItem value="all">{__('apply_to.all', 'All Products')}</SelectItem>
                                             <SelectItem value="specific_products">
-                                                Wybranych produktów
+                                                {__('apply_to.specific_products', 'Specific Products')}
                                             </SelectItem>
                                             <SelectItem value="specific_categories">
-                                                Wybranych kategorii
+                                                {__('apply_to.specific_categories', 'Specific Categories')}
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
@@ -361,7 +363,7 @@ export default function Edit({
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="grid gap-2">
-                                        <Label htmlFor="starts_at">Data rozpoczęcia</Label>
+                                        <Label htmlFor="starts_at">{__('label.starts_at', 'Start Date')}</Label>
                                         <Input
                                             id="starts_at"
                                             type="datetime-local"
@@ -370,7 +372,7 @@ export default function Edit({
                                         />
                                     </div>
                                     <div className="grid gap-2">
-                                        <Label htmlFor="ends_at">Data zakończenia</Label>
+                                        <Label htmlFor="ends_at">{__('label.ends_at', 'End Date')}</Label>
                                         <Input
                                             id="ends_at"
                                             type="datetime-local"
@@ -387,13 +389,13 @@ export default function Edit({
                                 <div className="rounded-xl border bg-card p-6">
                                     <h2 className="mb-1 font-semibold">
                                         {data.apply_to === 'specific_products'
-                                            ? 'Wybrane Produkty'
-                                            : 'Wybrane Kategorie'}
+                                            ? __('misc.selected_products', 'Selected Products')
+                                            : __('misc.selected_categories', 'Selected Categories')}
                                     </h2>
                                     <p className="mb-4 text-sm text-muted-foreground">
                                         {data.apply_to === 'specific_products'
-                                            ? 'Wybierz produkty objęte promocją'
-                                            : 'Wybierz kategorie objęte promocją'}
+                                            ? __('misc.select_products_desc', 'Select products included in the promotion')
+                                            : __('misc.select_categories_desc', 'Select categories included in the promotion')}
                                     </p>
 
                                     <div className="space-y-3">
@@ -418,7 +420,7 @@ export default function Edit({
                                                         <div>
                                                             <div className="font-medium">{resolveLocalizedText(product.name)}</div>
                                                             <div className="text-sm text-muted-foreground">
-                                                                {(product.price / 100).toFixed(2)} zł
+                                                                {(product.price / 100).toFixed(2)} PLN
                                                             </div>
                                                         </div>
                                                     </div>
@@ -428,7 +430,7 @@ export default function Edit({
                                                                 type="number"
                                                                 step="0.01"
                                                                 min="0"
-                                                                placeholder="Wartość"
+                                                                placeholder={__('placeholder.value', 'Value')}
                                                                 value={
                                                                     data.products[product.id.toString()]
                                                                         .discount_value
@@ -461,7 +463,7 @@ export default function Edit({
                                                                 <SelectContent>
                                                                     <SelectItem value="percentage">%</SelectItem>
                                                                     <SelectItem value="fixed_amount">
-                                                                        zł
+                                                                        PLN
                                                                     </SelectItem>
                                                                 </SelectContent>
                                                             </Select>
@@ -496,7 +498,7 @@ export default function Edit({
                                                                 type="number"
                                                                 step="0.01"
                                                                 min="0"
-                                                                placeholder="Wartość"
+                                                                placeholder={__('placeholder.value', 'Value')}
                                                                 value={
                                                                     data.categories[category.id.toString()]
                                                                         .discount_value
@@ -529,7 +531,7 @@ export default function Edit({
                                                                 <SelectContent>
                                                                     <SelectItem value="percentage">%</SelectItem>
                                                                     <SelectItem value="fixed_amount">
-                                                                        zł
+                                                                        PLN
                                                                     </SelectItem>
                                                                 </SelectContent>
                                                             </Select>
@@ -558,7 +560,7 @@ export default function Edit({
                                             }
                                         />
                                         <Label htmlFor="is_active" className="font-normal">
-                                            Aktywna
+                                            {__('label.active', 'Active')}
                                         </Label>
                                     </div>
                                     <div className="flex items-center gap-2">
@@ -570,7 +572,7 @@ export default function Edit({
                                             }
                                         />
                                         <Label htmlFor="is_stackable" className="font-normal">
-                                            Możliwość łączenia
+                                            {__('label.stackable', 'Stackable')}
                                         </Label>
                                     </div>
                                 </div>
@@ -578,7 +580,7 @@ export default function Edit({
 
                             <div className="rounded-xl border bg-card p-6">
                                 <h3 className="mb-4 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                                    Priorytet
+                                    {__('misc.priority', 'Priority')}
                                 </h3>
                                 <Input
                                     id="priority"
@@ -589,43 +591,43 @@ export default function Edit({
                                     placeholder="0"
                                 />
                                 <p className="mt-1.5 text-xs text-muted-foreground">
-                                    Wyższy priorytet = zastosowany pierwszy
+                                    {__('misc.priority_note', 'Higher priority = applied first')}
                                 </p>
                                 <InputError message={errors.priority} />
                             </div>
 
                             <div className="rounded-xl border bg-card p-6">
                                 <h3 className="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                                    Podgląd
+                                    {__('misc.preview', 'Preview')}
                                 </h3>
                                 <dl className="space-y-2 text-sm">
                                     <div className="flex justify-between">
-                                        <dt className="text-muted-foreground">Nazwa</dt>
+                                        <dt className="text-muted-foreground">{__('label.name', 'Name')}</dt>
                                         <dd className="font-medium">{data.name || '—'}</dd>
                                     </div>
                                     <div className="flex justify-between">
-                                        <dt className="text-muted-foreground">Typ</dt>
+                                        <dt className="text-muted-foreground">{__('column.type', 'Type')}</dt>
                                         <dd className="font-medium">
                                             {data.type === 'percentage'
-                                                ? 'Procentowy'
+                                                ? __('type.percentage', 'Percentage Discount')
                                                 : data.type === 'fixed_amount'
-                                                  ? 'Kwotowy'
+                                                  ? __('type.fixed_amount', 'Fixed Amount')
                                                   : data.type === 'buy_x_get_y'
-                                                    ? 'Kup X weź Y'
-                                                    : 'Darmowa dostawa'}
+                                                    ? __('type.buy_x_get_y', 'Buy X Get Y')
+                                                    : __('type.free_shipping', 'Free Shipping')}
                                         </dd>
                                     </div>
                                     {data.type !== 'free_shipping' && data.value && (
                                         <div className="flex justify-between">
-                                            <dt className="text-muted-foreground">Wartość</dt>
+                                            <dt className="text-muted-foreground">{__('label.value', 'Value')}</dt>
                                             <dd className="font-medium">
                                                 {data.value}
-                                                {data.type === 'percentage' ? '%' : ' zł'}
+                                                {data.type === 'percentage' ? '%' : ' PLN'}
                                             </dd>
                                         </div>
                                     )}
                                     <div className="flex justify-between">
-                                        <dt className="text-muted-foreground">Status</dt>
+                                        <dt className="text-muted-foreground">{__('column.status', 'Status')}</dt>
                                         <dd
                                             className={
                                                 data.is_active
@@ -633,7 +635,7 @@ export default function Edit({
                                                     : 'font-medium text-muted-foreground'
                                             }
                                         >
-                                            {data.is_active ? 'Aktywna' : 'Nieaktywna'}
+                                            {data.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
                                         </dd>
                                     </div>
                                 </dl>
@@ -644,8 +646,8 @@ export default function Edit({
                     <StickyFormActions
                         formId={formId}
                         processing={processing}
-                        submitLabel="Zapisz Zmiany"
-                        processingLabel="Zapisywanie..."
+                        submitLabel={__('action.save_changes', 'Save Changes')}
+                        processingLabel={__('misc.saving', 'Saving...')}
                     />
                 </form>
             </Wrapper>

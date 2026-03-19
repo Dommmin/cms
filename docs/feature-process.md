@@ -125,31 +125,31 @@ docker compose exec php vendor/bin/pint --dirty
 
 After every feature, update ALL of these:
 
-| File | What to update |
-|------|---------------|
-| `ai/guide.md` | Add to "Implemented Features" section |
-| `server/docs/USER_GUIDE.md` | Non-technical editor instructions for using the feature |
+| File                             | What to update                                             |
+|----------------------------------|------------------------------------------------------------|
+| `ai/guide.md`                    | Add to "Implemented Features" section                      |
+| `server/docs/USER_GUIDE.md`      | Non-technical editor instructions for using the feature    |
 | `server/docs/DEVELOPER_GUIDE.md` | Technical details: extension points, services, conventions |
-| `docs/backend.md` | If new service or architectural pattern introduced |
-| `docs/frontend.md` | If new frontend pattern introduced |
+| `docs/backend.md`                | If new service or architectural pattern introduced         |
+| `docs/frontend.md`               | If new frontend pattern introduced                         |
 
 ---
 
 ## Quick Reference: File Naming
 
-| Type | Pattern | Example |
-|------|---------|---------|
-| Model | `app/Models/[Name].php` | `BlogPost.php` |
-| Factory | `database/factories/[Name]Factory.php` | `BlogPostFactory.php` |
-| Migration | `YYYY_MM_DD_HHMMSS_[action]_[name]_table.php` | `create_blog_posts_table.php` |
-| Admin Controller | `app/Http/Controllers/Admin/[Name]Controller.php` | `BlogPostController.php` |
-| API Controller | `app/Http/Controllers/Api/V1/[Name]Controller.php` | `ProductController.php` |
-| Form Request | `app/Http/Requests/Admin/[Store\|Update][Name]Request.php` | `StoreBlogPostRequest.php` |
-| API Resource | `app/Http/Resources/Api/V1/[Name]Resource.php` | `ProductResource.php` |
-| Policy | `app/Policies/[Name]Policy.php` | `BlogPostPolicy.php` |
-| Service | `app/Services/[Name]Service.php` | `CheckoutService.php` |
-| Job | `app/Jobs/[Action][Name].php` | `SendOrderConfirmation.php` |
-| Test (Admin) | `tests/Feature/Admin/[Name]ControllerTest.php` | `BlogPostControllerTest.php` |
-| Test (API) | `tests/Feature/Api/[Name]Test.php` | `ProductTest.php` |
-| Inertia Page | `resources/js/pages/admin/[name]/[action].tsx` | `blog/posts/index.tsx` |
-| Next.js Page | `client/app/[locale]/[name]/page.tsx` | `blog/page.tsx` |
+| Type             | Pattern                                                    | Example                       |
+|------------------|------------------------------------------------------------|-------------------------------|
+| Model            | `app/Models/[Name].php`                                    | `BlogPost.php`                |
+| Factory          | `database/factories/[Name]Factory.php`                     | `BlogPostFactory.php`         |
+| Migration        | `YYYY_MM_DD_HHMMSS_[action]_[name]_table.php`              | `create_blog_posts_table.php` |
+| Admin Controller | `app/Http/Controllers/Admin/[Name]Controller.php`          | `BlogPostController.php`      |
+| API Controller   | `app/Http/Controllers/Api/V1/[Name]Controller.php`         | `ProductController.php`       |
+| Form Request     | `app/Http/Requests/Admin/[Store\|Update][Name]Request.php` | `StoreBlogPostRequest.php`    |
+| API Resource     | `app/Http/Resources/Api/V1/[Name]Resource.php`             | `ProductResource.php`         |
+| Policy           | `app/Policies/[Name]Policy.php`                            | `BlogPostPolicy.php`          |
+| Service          | `app/Services/[Name]Service.php`                           | `CheckoutService.php`         |
+| Job              | `app/Jobs/[Action][Name].php`                              | `SendOrderConfirmation.php`   |
+| Test (Admin)     | `tests/Feature/Admin/[Name]ControllerTest.php`             | `BlogPostControllerTest.php`  |
+| Test (API)       | `tests/Feature/Api/[Name]Test.php`                         | `ProductTest.php`             |
+| Inertia Page     | `resources/js/pages/admin/[name]/[action].tsx`             | `blog/posts/index.tsx`        |
+| Next.js Page     | `client/app/[locale]/[name]/page.tsx`                      | `blog/page.tsx`               |
