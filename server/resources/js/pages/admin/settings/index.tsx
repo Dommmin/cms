@@ -64,7 +64,7 @@ function SettingField({ setting, value, onChange }: {
     return (
         <div className="grid gap-1.5">
             <Label htmlFor={inputId}>
-                {setting.label ?? setting.key}
+                {__(`settings.label.${setting.key}`, setting.label ?? setting.key)}
                 {setting.is_public && (
                     <span className="ml-2 rounded bg-green-100 px-1.5 py-0.5 text-[10px] font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
                         {__('misc.public', 'public')}
@@ -72,7 +72,9 @@ function SettingField({ setting, value, onChange }: {
                 )}
             </Label>
             {setting.description && (
-                <p className="text-xs text-muted-foreground">{setting.description}</p>
+                <p className="text-xs text-muted-foreground">
+                    {__(`settings.desc.${setting.key}`, setting.description)}
+                </p>
             )}
             {isBoolean ? (
                 <div className="flex items-center gap-2 pt-1">
@@ -214,7 +216,7 @@ export default function Index({ settings, groups, currentGroup }: Props) {
                                 </div>
 
                                 <div className="flex items-center gap-4">
-                                    <Button onClick={handleSave} disabled={processing}>
+                                    <Button variant="outline" onClick={handleSave} disabled={processing}>
                                         {processing ? __('misc.saving', 'Saving...') : __('settings.save_btn', 'Save Settings')}
                                     </Button>
                                     <p className="text-xs text-muted-foreground">
