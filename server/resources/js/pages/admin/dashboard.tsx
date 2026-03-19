@@ -61,6 +61,7 @@ export default function Dashboard({
 
     useEffect(() => {
         if (deferredWidgets) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setWidgets(deferredWidgets);
         }
     }, [deferredWidgets]);

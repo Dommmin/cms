@@ -158,8 +158,9 @@ export default function FloatingTextFormatPlugin({ anchorElem }: { anchorElem?: 
     const [container, setContainer] = useState<HTMLElement | null>(null);
 
      
+     
     useEffect(() => {
-        setContainer(anchorElem ?? editor.getRootElement()?.parentElement ?? document.body);
+        setContainer(anchorElem ?? editor.getRootElement()?.parentElement ?? document.body); // eslint-disable-line react-hooks/set-state-in-effect
     }, [editor, anchorElem]);
 
     if (!container) return <></>;

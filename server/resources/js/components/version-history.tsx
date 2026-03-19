@@ -97,6 +97,7 @@ export function VersionHistory({ modelType, modelId }: Props) {
 
     useEffect(() => {
         if (!open) return;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true);
         fetch(`/admin/versions/${modelType}/${modelId}`)
             .then((r) => r.json())

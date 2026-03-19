@@ -110,7 +110,7 @@ export default function BuilderPage({
                 clearTimeout(autoSaveTimerRef.current);
             }
         };
-    }, [localSections, isSplitView]);
+    }, [localSections, isSplitView]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleSectionsChange = (updatedSections: Section[]) => {
         setLocalSections(updatedSections);

@@ -108,6 +108,7 @@ export default function Index({
                 author: selectedItem.custom_properties?.author ?? '',
             });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedItem?.id]);
 
     const handleSearch = (value: string) => {

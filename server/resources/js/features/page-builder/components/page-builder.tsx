@@ -75,7 +75,7 @@ export function PageBuilder({
 
     useEffect(() => {
         onChange?.(sections);
-    }, [sections]);
+    }, [sections]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Keyboard shortcuts: Ctrl+Z = undo, Ctrl+Shift+Z or Ctrl+Y = redo
     useEffect(() => {

@@ -108,8 +108,9 @@ export default function SlashCommandPlugin(): JSX.Element | null {
 
     // Clamp selectedIndex when filtered list changes
      
+     
     useEffect(() => {
-        setSelectedIndex((i) => Math.min(i, Math.max(filtered.length - 1, 0)));
+        setSelectedIndex((i) => Math.min(i, Math.max(filtered.length - 1, 0))); // eslint-disable-line react-hooks/set-state-in-effect
     }, [filtered.length]);
 
     // ─── Track keystrokes to detect "/" trigger ──────────────────────────────

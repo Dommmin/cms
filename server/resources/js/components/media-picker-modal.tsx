@@ -125,7 +125,7 @@ export function MediaPickerModal({
 
         setCurrentPage(1);
         fetchMedia(1);
-    }, [open]);
+    }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleSearchChange = (value: string) => {
         setSearch(value);

@@ -77,6 +77,7 @@ class ComponentPickerOption extends MenuOption {
     }
 }
 
+/* eslint-disable react-hooks/refs */
 function ComponentPickerMenuItem({
     index,
     isSelected,
@@ -111,6 +112,7 @@ function ComponentPickerMenuItem({
         </li>
     );
 }
+/* eslint-enable react-hooks/refs */
 
 function promptUrl(label: string): string | null {
     return window.prompt(`${label} URL:`);

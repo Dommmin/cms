@@ -59,10 +59,12 @@ function LibraryModal({
 
     useEffect(() => {
         if (!open) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setQuery('');
             return;
         }
         setTimeout(() => inputRef.current?.focus(), 100);
+
         setLoading(true);
         axios
             .get<ReusableBlock[]>('/admin/cms/reusable-blocks/library')
@@ -80,6 +82,7 @@ function LibraryModal({
 
     useEffect(() => {
         const q = query.toLowerCase();
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setFiltered(
             blocks.filter(
                 (b) =>

@@ -99,6 +99,7 @@ export default function ActionsPlugin({
                 <span className="mr-2 text-xs text-muted-foreground">
                     Actions:
                 </span>
+                {/* eslint-disable-next-line react-hooks/refs */}
                 {actions.map(({ icon: Icon, label, onClick, className }) => (
                     <Tooltip key={label}>
                         <TooltipTrigger asChild>

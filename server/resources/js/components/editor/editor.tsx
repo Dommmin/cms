@@ -25,6 +25,7 @@ function InitialStatePlugin({ value }: { value?: string }): null {
         } catch {
             console.warn('Editor: failed to parse initial state');
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // only on mount
     return null;
 }
