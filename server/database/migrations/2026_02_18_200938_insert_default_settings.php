@@ -84,15 +84,15 @@ return new class extends Migration
 
         foreach ($settings as $setting) {
             DB::table('settings')->insertOrIgnore([
-                'group'       => $setting['group'],
-                'key'         => $setting['key'],
-                'label'       => $setting['label'],
-                'type'        => $setting['type'],
-                'value'       => $setting['value'] !== null ? json_encode($setting['value']) : null,
+                'group' => $setting['group'],
+                'key' => $setting['key'],
+                'label' => $setting['label'],
+                'type' => $setting['type'],
+                'value' => $setting['value'] !== null ? json_encode($setting['value']) : null,
                 'description' => $setting['description'],
-                'is_public'   => $setting['is_public'],
-                'created_at'  => $now,
-                'updated_at'  => $now,
+                'is_public' => $setting['is_public'],
+                'created_at' => $now,
+                'updated_at' => $now,
             ]);
         }
     }

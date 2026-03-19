@@ -389,9 +389,9 @@ class EcommerceDemoSeeder extends Seeder
             // label ("Lowest in last 30 days: €X") visually useful.
             if (isset($item['has_compare']) && $item['has_compare'] && $variant->compare_at_price) {
                 $comparePrice = $variant->compare_at_price; // e.g. 12499
-                $salePrice    = $variant->price;            // e.g. 9999
+                $salePrice = $variant->price;            // e.g. 9999
                 // Gap between RRP and sale price to interpolate through
-                $gap  = $comparePrice - $salePrice;
+                $gap = $comparePrice - $salePrice;
 
                 // Remove the entry auto-created by ProductVariantPriceObserver
                 // on variant creation — it records the current sale price at now(),
@@ -408,8 +408,8 @@ class EcommerceDemoSeeder extends Seeder
                     $price = (int) round($comparePrice * (1 + (random_int(-3, 3) / 100)));
                     PriceHistory::query()->create([
                         'product_variant_id' => $variant->id,
-                        'price'              => $price,
-                        'recorded_at'        => now()->subDays($daysAgo),
+                        'price' => $price,
+                        'recorded_at' => now()->subDays($daysAgo),
                     ]);
                 }
 
@@ -422,13 +422,13 @@ class EcommerceDemoSeeder extends Seeder
                     $daysAgo = (int) round(29 - ($j * (24 / max($recentCount, 1))));
                     $daysAgo = max(5, $daysAgo);
                     // Interpolate price: starts near compare, ends at salePrice + 10 %
-                    $ratio   = ($j + 1) / ($recentCount + 1);
-                    $price   = (int) round($comparePrice - $gap * $ratio * 0.8);
-                    $price   = max($price, (int) round($salePrice * 1.08)); // always ≥ sale+8 %
+                    $ratio = ($j + 1) / ($recentCount + 1);
+                    $price = (int) round($comparePrice - $gap * $ratio * 0.8);
+                    $price = max($price, (int) round($salePrice * 1.08)); // always ≥ sale+8 %
                     PriceHistory::query()->create([
                         'product_variant_id' => $variant->id,
-                        'price'              => $price,
-                        'recorded_at'        => now()->subDays($daysAgo),
+                        'price' => $price,
+                        'recorded_at' => now()->subDays($daysAgo),
                     ]);
                 }
                 // NOTE: the current sale price is intentionally NOT recorded.

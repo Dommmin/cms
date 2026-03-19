@@ -116,11 +116,21 @@
     list-style: disc;
 }
 
-.editor-ol1 { list-style-type: decimal; }
-.editor-ol2 { list-style-type: upper-alpha; }
-.editor-ol3 { list-style-type: lower-alpha; }
-.editor-ol4 { list-style-type: upper-roman; }
-.editor-ol5 { list-style-type: lower-roman; }
+.editor-ol1 {
+    list-style-type: decimal;
+}
+.editor-ol2 {
+    list-style-type: upper-alpha;
+}
+.editor-ol3 {
+    list-style-type: lower-alpha;
+}
+.editor-ol4 {
+    list-style-type: upper-roman;
+}
+.editor-ol5 {
+    list-style-type: lower-roman;
+}
 
 .editor-list-item {
     margin: 0.25rem 0;
@@ -173,14 +183,26 @@
 
 /* ─── Inline text styles ─────────────────────────────────────────────────────── */
 
-.editor-text-bold { font-weight: 700; }
-.editor-text-italic { font-style: italic; }
-.editor-text-underline { text-decoration: underline; }
-.editor-text-strikethrough { text-decoration: line-through; }
-.editor-text-underline-strikethrough { text-decoration: underline line-through; }
+.editor-text-bold {
+    font-weight: 700;
+}
+.editor-text-italic {
+    font-style: italic;
+}
+.editor-text-underline {
+    text-decoration: underline;
+}
+.editor-text-strikethrough {
+    text-decoration: line-through;
+}
+.editor-text-underline-strikethrough {
+    text-decoration: underline line-through;
+}
 
 .editor-text-code {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-family:
+        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        'Liberation Mono', 'Courier New', monospace;
     font-size: 0.85em;
     background: color-mix(in oklab, var(--muted) 80%, transparent);
     border-radius: 0.25rem;
@@ -248,7 +270,9 @@
     border-radius: 0.5rem;
     padding: 0.875rem 1rem 0.875rem 3rem;
     margin: 0.75rem 0;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-family:
+        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        'Liberation Mono', 'Courier New', monospace;
     font-size: 0.875rem;
     line-height: 1.6;
     overflow-x: auto;
@@ -291,7 +315,9 @@
     color: var(--muted-foreground);
     cursor: pointer;
     opacity: 0;
-    transition: opacity 0.15s, color 0.15s;
+    transition:
+        opacity 0.15s,
+        color 0.15s;
 }
 
 .editor-code:hover .editor-copy-code-btn {
@@ -307,56 +333,89 @@
 
 .editor-token-comment,
 .editor-token-cdata,
-.editor-token-doctype { color: oklch(0.58 0.04 220); font-style: italic; }
+.editor-token-doctype {
+    color: oklch(0.58 0.04 220);
+    font-style: italic;
+}
 
-.editor-token-punctuation { color: oklch(0.5 0.01 270); }
+.editor-token-punctuation {
+    color: oklch(0.5 0.01 270);
+}
 
 .editor-token-property,
 .editor-token-tag,
 .editor-token-boolean,
 .editor-token-number,
 .editor-token-constant,
-.editor-token-symbol { color: oklch(0.52 0.18 10); }
+.editor-token-symbol {
+    color: oklch(0.52 0.18 10);
+}
 
 .editor-token-selector,
 .editor-token-string,
 .editor-token-char,
-.editor-token-builtin { color: oklch(0.48 0.15 145); }
+.editor-token-builtin {
+    color: oklch(0.48 0.15 145);
+}
 
 .editor-token-operator,
-.editor-token-url { color: oklch(0.52 0.14 60); }
+.editor-token-url {
+    color: oklch(0.52 0.14 60);
+}
 
 .editor-token-attr,
 .editor-token-attr-value,
-.editor-token-keyword { color: oklch(0.5 0.2 280); }
+.editor-token-keyword {
+    color: oklch(0.5 0.2 280);
+}
 
 .editor-token-function,
-.editor-token-class-name { color: oklch(0.55 0.18 200); }
+.editor-token-class-name {
+    color: oklch(0.55 0.18 200);
+}
 
-.editor-token-variable { color: oklch(0.52 0.15 40); }
+.editor-token-variable {
+    color: oklch(0.52 0.15 40);
+}
 
 .dark .editor-token-comment,
 .dark .editor-token-cdata,
-.dark .editor-token-doctype { color: oklch(0.65 0.04 220); }
-.dark .editor-token-punctuation { color: oklch(0.72 0.01 270); }
+.dark .editor-token-doctype {
+    color: oklch(0.65 0.04 220);
+}
+.dark .editor-token-punctuation {
+    color: oklch(0.72 0.01 270);
+}
 .dark .editor-token-property,
 .dark .editor-token-tag,
 .dark .editor-token-boolean,
 .dark .editor-token-number,
 .dark .editor-token-constant,
-.dark .editor-token-symbol { color: oklch(0.75 0.18 10); }
+.dark .editor-token-symbol {
+    color: oklch(0.75 0.18 10);
+}
 .dark .editor-token-selector,
 .dark .editor-token-string,
 .dark .editor-token-char,
-.dark .editor-token-builtin { color: oklch(0.72 0.15 145); }
+.dark .editor-token-builtin {
+    color: oklch(0.72 0.15 145);
+}
 .dark .editor-token-operator,
-.dark .editor-token-url { color: oklch(0.75 0.14 60); }
+.dark .editor-token-url {
+    color: oklch(0.75 0.14 60);
+}
 .dark .editor-token-attr,
 .dark .editor-token-attr-value,
-.dark .editor-token-keyword { color: oklch(0.75 0.2 280); }
+.dark .editor-token-keyword {
+    color: oklch(0.75 0.2 280);
+}
 .dark .editor-token-function,
-.dark .editor-token-class-name { color: oklch(0.76 0.18 200); }
-.dark .editor-token-variable { color: oklch(0.76 0.15 40); }
+.dark .editor-token-class-name {
+    color: oklch(0.76 0.18 200);
+}
+.dark .editor-token-variable {
+    color: oklch(0.76 0.15 40);
+}
 
 /* ─── Table ──────────────────────────────────────────────────────────────────── */
 
@@ -429,7 +488,9 @@
 
 /* ─── Embed blocks ───────────────────────────────────────────────────────────── */
 
-.editor-embed-block { user-select: none; }
+.editor-embed-block {
+    user-select: none;
+}
 
 .editor-embed-block-focus {
     outline: 2px solid var(--primary);
@@ -445,8 +506,12 @@
 
 /* ─── LTR / RTL ──────────────────────────────────────────────────────────────── */
 
-.editor-ltr { text-align: left; }
-.editor-rtl { text-align: right; }
+.editor-ltr {
+    text-align: left;
+}
+.editor-rtl {
+    text-align: right;
+}
 
 /* ─── Layout columns ─────────────────────────────────────────────────────────── */
 
