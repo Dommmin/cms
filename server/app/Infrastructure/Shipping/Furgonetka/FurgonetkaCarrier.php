@@ -31,7 +31,7 @@ class FurgonetkaCarrier implements ShippingCarrierInterface
             'service' => $this->serviceCode,
             'sender' => $this->buildSender(),
             'receiver' => [
-                'name' => trim(($address?->first_name ?? '').' '.($address?->last_name ?? '')),
+                'name' => mb_trim(($address?->first_name ?? '').' '.($address?->last_name ?? '')),
                 'company' => $address?->company_name,
                 'email' => $order->customer?->email ?? '',
                 'phone' => $address?->phone ?? '',
@@ -152,7 +152,7 @@ class FurgonetkaCarrier implements ShippingCarrierInterface
 
     private function mapStatus(string $furgonetkaStatus): ?ShipmentStatusEnum
     {
-        return match (strtolower($furgonetkaStatus)) {
+        return match (mb_strtolower($furgonetkaStatus)) {
             'new', 'created', 'label_created' => ShipmentStatusEnum::LABEL_CREATED,
             'picked_up', 'collected' => ShipmentStatusEnum::PICKED_UP,
             'in_transit', 'transit' => ShipmentStatusEnum::IN_TRANSIT,

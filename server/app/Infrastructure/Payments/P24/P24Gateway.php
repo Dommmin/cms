@@ -41,7 +41,7 @@ class P24Gateway implements PaymentGatewayInterface
         $sessionId = "p24-{$payment->id}";
         $merchantId = (int) config('services.p24.merchant_id');
         $posId = (int) config('services.p24.pos_id');
-        $currency = strtoupper($payment->currency_code);
+        $currency = mb_strtoupper($payment->currency_code);
         $returnUrl = $options['return_url'] ?? config('app.frontend_url').'/checkout/success';
         $notifyUrl = config('app.url').'/api/v1/webhooks/p24';
 
@@ -63,7 +63,7 @@ class P24Gateway implements PaymentGatewayInterface
             'currency' => $currency,
             'description' => 'Zamówienie #'.($order->reference_number ?? $order->id),
             'email' => $order->customer?->email ?? '',
-            'client' => trim(($address?->first_name ?? '').' '.($address?->last_name ?? '')),
+            'client' => mb_trim(($address?->first_name ?? '').' '.($address?->last_name ?? '')),
             'phone' => $address?->phone ?? '',
             'country' => $address?->country_code ?? 'PL',
             'urlReturn' => $returnUrl,
@@ -144,7 +144,7 @@ class P24Gateway implements PaymentGatewayInterface
             'sessionId' => $sessionId,
             'orderId' => $orderId,
             'amount' => $amount,
-            'currency' => strtoupper($currency),
+            'currency' => mb_strtoupper($currency),
         ]);
 
         if (! $this->signatureService->verify($expected, $sign)) {
@@ -157,7 +157,7 @@ class P24Gateway implements PaymentGatewayInterface
             'sessionId' => $sessionId,
             'orderId' => $orderId,
             'amount' => $amount,
-            'currency' => strtoupper($currency),
+            'currency' => mb_strtoupper($currency),
         ]);
 
         $verifyResponse = $this->client->verifyTransaction([
@@ -166,7 +166,7 @@ class P24Gateway implements PaymentGatewayInterface
             'sessionId' => $sessionId,
             'orderId' => $orderId,
             'amount' => $amount,
-            'currency' => strtoupper($currency),
+            'currency' => mb_strtoupper($currency),
             'sign' => $verifySign,
         ]);
 

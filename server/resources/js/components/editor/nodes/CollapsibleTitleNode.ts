@@ -1,4 +1,9 @@
-import type { EditorConfig, LexicalEditor, LexicalNode, SerializedElementNode } from 'lexical';
+import type {
+    EditorConfig,
+    LexicalEditor,
+    LexicalNode,
+    SerializedElementNode,
+} from 'lexical';
 import { $applyNodeReplacement, ElementNode } from 'lexical';
 
 export class CollapsibleTitleNode extends ElementNode {

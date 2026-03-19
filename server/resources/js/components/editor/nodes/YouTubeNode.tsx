@@ -1,6 +1,4 @@
 import type {
-    DOMConversionMap,
-    DOMExportOutput,
     EditorConfig,
     LexicalEditor,
     NodeKey,
@@ -10,7 +8,10 @@ import type {
 import { $applyNodeReplacement, DecoratorNode } from 'lexical';
 import { type JSX } from 'react';
 
-export type SerializedYouTubeNode = Spread<{ videoID: string }, SerializedLexicalNode>;
+export type SerializedYouTubeNode = Spread<
+    { videoID: string },
+    SerializedLexicalNode
+>;
 
 export class YouTubeNode extends DecoratorNode<JSX.Element> {
     __id: string;
@@ -47,7 +48,9 @@ export class YouTubeNode extends DecoratorNode<JSX.Element> {
     }
 
     decorate(_editor: LexicalEditor, config: EditorConfig): JSX.Element {
-        const embedBlock = config.theme.embedBlock as { base?: string } | undefined;
+        const embedBlock = config.theme.embedBlock as
+            | { base?: string }
+            | undefined;
         const className = embedBlock?.base ?? '';
         return (
             <div className={className}>

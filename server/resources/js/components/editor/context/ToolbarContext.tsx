@@ -58,9 +58,15 @@ interface ToolbarContextValue {
 
 const ToolbarContext = createContext<ToolbarContextValue | null>(null);
 
-export function ToolbarContextProvider({ children }: { children: React.ReactNode }): JSX.Element {
+export function ToolbarContextProvider({
+    children,
+}: {
+    children: React.ReactNode;
+}): JSX.Element {
     const [blockType, setBlockType] = useState<BlockType>('paragraph');
-    const [selectedElementKey, setSelectedElementKey] = useState<string | null>(null);
+    const [selectedElementKey, setSelectedElementKey] = useState<string | null>(
+        null,
+    );
     const [fontSize, setFontSize] = useState('15px');
     const [fontColor, setFontColor] = useState('#000');
     const [bgColor, setBgColor] = useState('#fff');
@@ -129,6 +135,9 @@ export function ToolbarContextProvider({ children }: { children: React.ReactNode
 
 export function useToolbarContext(): ToolbarContextValue {
     const context = useContext(ToolbarContext);
-    if (!context) throw new Error('useToolbarContext must be used within ToolbarContextProvider');
+    if (!context)
+        throw new Error(
+            'useToolbarContext must be used within ToolbarContextProvider',
+        );
     return context;
 }

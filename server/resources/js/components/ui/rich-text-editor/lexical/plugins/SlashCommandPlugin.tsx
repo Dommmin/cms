@@ -3,16 +3,16 @@
  * Type "/" at the start of an empty line to open a block-type command menu.
  */
 
-import { $isCodeNode } from '@lexical/code';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $createHeadingNode, $createQuoteNode, $isHeadingNode } from '@lexical/rich-text';
-import { $setBlocksType } from '@lexical/selection';
+import { $createCodeNode } from '@lexical/code';
 import {
     INSERT_CHECK_LIST_COMMAND,
     INSERT_ORDERED_LIST_COMMAND,
     INSERT_UNORDERED_LIST_COMMAND,
 } from '@lexical/list';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode';
+import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
+import { $setBlocksType } from '@lexical/selection';
 import { INSERT_TABLE_COMMAND } from '@lexical/table';
 import {
     $createParagraphNode,
@@ -25,7 +25,6 @@ import {
     KEY_ENTER_COMMAND,
     COMMAND_PRIORITY_HIGH,
 } from 'lexical';
-import { $createCodeNode } from '@lexical/code';
 import {
     useCallback,
     useEffect,
@@ -108,6 +107,7 @@ export default function SlashCommandPlugin(): JSX.Element | null {
     const filtered = filterCommands(query);
 
     // Clamp selectedIndex when filtered list changes
+     
     useEffect(() => {
         setSelectedIndex((i) => Math.min(i, Math.max(filtered.length - 1, 0)));
     }, [filtered.length]);

@@ -52,12 +52,12 @@ class FurgonetkaClient
     public function getPickupPoints(string $serviceCode, ?string $postalCode = null, ?float $lat = null, ?float $lng = null): array
     {
         $params = array_filter([
-            'service'   => $serviceCode,
-            'zip'       => $postalCode,
-            'latitude'  => $lat,
+            'service' => $serviceCode,
+            'zip' => $postalCode,
+            'latitude' => $lat,
             'longitude' => $lng,
-            'country'   => 'PL',
-            'limit'     => 30,
+            'country' => 'PL',
+            'limit' => 30,
         ]);
 
         return $this->request('GET', '/v2/points', $params);
@@ -90,9 +90,9 @@ class FurgonetkaClient
 
         $client = Http::withToken($token)->acceptJson();
 
-        return match (strtoupper($method)) {
-            'POST'  => $client->post($baseUrl.$path, $data),
-            'GET'   => $client->get($baseUrl.$path, $data),   // $data as query params
+        return match (mb_strtoupper($method)) {
+            'POST' => $client->post($baseUrl.$path, $data),
+            'GET' => $client->get($baseUrl.$path, $data),   // $data as query params
             default => throw new RuntimeException("Unsupported method: {$method}"),
         };
     }

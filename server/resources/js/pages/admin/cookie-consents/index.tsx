@@ -1,12 +1,12 @@
 import { Head, Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { Cookie, EyeIcon, CheckCircleIcon, XCircleIcon } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
+import { EyeIcon, CheckCircleIcon, XCircleIcon } from 'lucide-react';
 import DataTable from '@/components/data-table';
 import { PageHeader } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -47,7 +47,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function CookieConsentsIndex({
     consents,
     filters,
-    categories,
+    categories: _categories,
     stats,
 }: Props) {
     const __ = useTranslation();
@@ -128,7 +128,10 @@ export default function CookieConsentsIndex({
             <Wrapper>
                 <PageHeader
                     title={__('page.cookie_consents', 'Cookie Consents')}
-                    description={__('page.cookie_consents_desc', 'Manage and view cookie consent records')}
+                    description={__(
+                        'page.cookie_consents_desc',
+                        'Manage and view cookie consent records',
+                    )}
                 />
 
                 {/* Stats */}
@@ -171,7 +174,10 @@ export default function CookieConsentsIndex({
                         next_page_url: consents.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search', 'Search by session or IP...')}
+                    searchPlaceholder={__(
+                        'placeholder.search',
+                        'Search by session or IP...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/cookie-consents"
                 />

@@ -1,16 +1,21 @@
 import { usePage } from '@inertiajs/react';
-import type { SharedLocale } from '@/types/global';
 import { Laptop, Moon, Sun } from 'lucide-react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { CommandPalette } from '@/components/command-palette';
 import { NotificationBell } from '@/components/notification-bell';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { useAdminLocale } from '@/hooks/use-admin-locale';
 import type { Appearance } from '@/hooks/use-appearance';
 import { useAppearance } from '@/hooks/use-appearance';
-import { useAdminLocale } from '@/hooks/use-admin-locale';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
+import type { SharedLocale } from '@/types/global';
 
 const THEME_ICONS: Record<Appearance, React.ReactNode> = {
     light: <Sun className="h-4 w-4" />,
@@ -32,10 +37,12 @@ export function AppSidebarHeader({
     const { appearance, updateAppearance } = useAppearance();
     const rawLocales = usePage().props.locales;
     const locales: SharedLocale[] = Array.isArray(rawLocales) ? rawLocales : [];
-    const defaultLocale = locales.find((l) => l.is_default)?.code ?? locales[0]?.code ?? 'en';
+    const defaultLocale =
+        locales.find((l) => l.is_default)?.code ?? locales[0]?.code ?? 'en';
     const [adminLocale, setAdminLocale] = useAdminLocale(defaultLocale);
 
-    const activeLocaleObj = locales.find((l) => l.code === adminLocale) ?? locales[0];
+    const activeLocaleObj =
+        locales.find((l) => l.code === adminLocale) ?? locales[0];
 
     return (
         <header className="flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/50 px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
@@ -49,14 +56,23 @@ export function AppSidebarHeader({
                 {locales.length > 1 && (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2 text-xs font-medium">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 gap-1.5 px-2 text-xs font-medium"
+                            >
                                 {activeLocaleObj?.flag_emoji && (
-                                    <span className="text-base leading-none">{activeLocaleObj.flag_emoji}</span>
+                                    <span className="text-base leading-none">
+                                        {activeLocaleObj.flag_emoji}
+                                    </span>
                                 )}
                                 <span className="uppercase">{adminLocale}</span>
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="min-w-[140px]">
+                        <DropdownMenuContent
+                            align="end"
+                            className="min-w-[140px]"
+                        >
                             {locales.map((locale) => (
                                 <DropdownMenuItem
                                     key={locale.code}
@@ -64,10 +80,18 @@ export function AppSidebarHeader({
                                     className="gap-2"
                                     data-active={locale.code === adminLocale}
                                 >
-                                    {locale.flag_emoji && <span className="text-base">{locale.flag_emoji}</span>}
-                                    <span className="flex-1">{locale.native_name ?? locale.name}</span>
+                                    {locale.flag_emoji && (
+                                        <span className="text-base">
+                                            {locale.flag_emoji}
+                                        </span>
+                                    )}
+                                    <span className="flex-1">
+                                        {locale.native_name ?? locale.name}
+                                    </span>
                                     {locale.code === adminLocale && (
-                                        <span className="ml-auto text-xs text-muted-foreground">✓</span>
+                                        <span className="ml-auto text-xs text-muted-foreground">
+                                            ✓
+                                        </span>
                                     )}
                                 </DropdownMenuItem>
                             ))}

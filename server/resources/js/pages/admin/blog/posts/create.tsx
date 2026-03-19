@@ -1,5 +1,3 @@
-import { useAdminLocale } from '@/hooks/use-admin-locale';
-import { useTranslation } from '@/hooks/use-translation';
 import { Link, Head, router, usePage } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -23,6 +21,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
+import { useAdminLocale } from '@/hooks/use-admin-locale';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
@@ -94,8 +94,15 @@ export default function CreateBlogPost({ categories }: Props) {
     };
 
     const handleContentTypeChange = (newType: 'richtext' | 'markdown') => {
-        if (Object.values(data.content).some((v) => v) && newType !== data.content_type) {
-            if (!confirm('Switching editor type will not auto-convert your content. Continue?')) {
+        if (
+            Object.values(data.content).some((v) => v) &&
+            newType !== data.content_type
+        ) {
+            if (
+                !confirm(
+                    'Switching editor type will not auto-convert your content. Continue?',
+                )
+            ) {
                 return;
             }
         }
@@ -133,15 +140,21 @@ export default function CreateBlogPost({ categories }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Blog Post" />
             <Wrapper>
-                <PageHeader title="Create Blog Post" description="Write a new blog post">
+                <PageHeader
+                    title="Create Blog Post"
+                    description="Write a new blog post"
+                >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/blog/posts' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back
-                        
-                </Link>
-            </Button>
+                            <Link
+                                href="/admin/blog/posts"
+                                prefetch
+                                cacheFor={30}
+                            >
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                Back
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -151,11 +164,18 @@ export default function CreateBlogPost({ categories }: Props) {
                         <div className="lg:col-span-2">
                             <Tabs defaultValue="general" className="space-y-6">
                                 <TabsList>
-                                    <TabsTrigger value="general">{__('tab.general', 'General')}</TabsTrigger>
-                                    <TabsTrigger value="seo">{__('tab.seo', 'SEO')}</TabsTrigger>
+                                    <TabsTrigger value="general">
+                                        {__('tab.general', 'General')}
+                                    </TabsTrigger>
+                                    <TabsTrigger value="seo">
+                                        {__('tab.seo', 'SEO')}
+                                    </TabsTrigger>
                                 </TabsList>
 
-                                <TabsContent value="general" className="space-y-6">
+                                <TabsContent
+                                    value="general"
+                                    className="space-y-6"
+                                >
                                     {/* Locale switcher */}
                                     {locales.length > 1 && (
                                         <div className="flex items-center gap-2 rounded-lg border p-3">
@@ -171,24 +191,44 @@ export default function CreateBlogPost({ categories }: Props) {
                                     )}
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="title">{__('label.title', 'Title')} *</Label>
+                                        <Label htmlFor="title">
+                                            {__('label.title', 'Title')} *
+                                        </Label>
                                         <Input
                                             id="title"
-                                            value={data.title[activeLocale] ?? ''}
-                                            onChange={(e) => handleTitleChange(e.target.value)}
+                                            value={
+                                                data.title[activeLocale] ?? ''
+                                            }
+                                            onChange={(e) =>
+                                                handleTitleChange(
+                                                    e.target.value,
+                                                )
+                                            }
                                             placeholder="Post title"
                                         />
-                                        <InputError message={errors['title'] ?? errors[`title.${activeLocale}`]} />
+                                        <InputError
+                                            message={
+                                                errors['title'] ??
+                                                errors[`title.${activeLocale}`]
+                                            }
+                                        />
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="slug">{__('label.slug', 'Slug')}</Label>
+                                        <Label htmlFor="slug">
+                                            {__('label.slug', 'Slug')}
+                                        </Label>
                                         <Input
                                             id="slug"
                                             value={data.slug}
                                             readOnly={!isSlugManual}
                                             onChange={(e) =>
-                                                setData((prev) => ({ ...prev, slug: slugify(e.target.value) }))
+                                                setData((prev) => ({
+                                                    ...prev,
+                                                    slug: slugify(
+                                                        e.target.value,
+                                                    ),
+                                                }))
                                             }
                                             placeholder="post-slug"
                                         />
@@ -198,63 +238,97 @@ export default function CreateBlogPost({ categories }: Props) {
                                                 type="checkbox"
                                                 checked={isSlugManual}
                                                 onChange={(e) => {
-                                                    const manual = e.target.checked;
+                                                    const manual =
+                                                        e.target.checked;
                                                     setIsSlugManual(manual);
                                                     if (!manual) {
                                                         setData((prev) => ({
                                                             ...prev,
-                                                            slug: slugify(prev.title[defaultLocale] ?? ''),
+                                                            slug: slugify(
+                                                                prev.title[
+                                                                    defaultLocale
+                                                                ] ?? '',
+                                                            ),
                                                         }));
                                                     }
                                                 }}
                                                 className="h-4 w-4 rounded border-input"
                                             />
-                                            {__('misc.slug_auto_hint', 'Set slug manually')}
+                                            {__(
+                                                'misc.slug_auto_hint',
+                                                'Set slug manually',
+                                            )}
                                         </label>
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="excerpt">{__('label.excerpt', 'Excerpt')}</Label>
+                                        <Label htmlFor="excerpt">
+                                            {__('label.excerpt', 'Excerpt')}
+                                        </Label>
                                         <Textarea
                                             id="excerpt"
-                                            value={data.excerpt[activeLocale] ?? ''}
+                                            value={
+                                                data.excerpt[activeLocale] ?? ''
+                                            }
                                             onChange={(e) =>
                                                 setData((prev) => ({
                                                     ...prev,
                                                     excerpt: {
                                                         ...prev.excerpt,
-                                                        [activeLocale]: e.target.value,
+                                                        [activeLocale]:
+                                                            e.target.value,
                                                     },
                                                 }))
                                             }
                                             placeholder="Short description of the post"
                                             rows={3}
                                         />
-                                        <InputError message={errors[`excerpt.${activeLocale}`]} />
+                                        <InputError
+                                            message={
+                                                errors[
+                                                    `excerpt.${activeLocale}`
+                                                ]
+                                            }
+                                        />
                                     </div>
 
                                     <div className="grid gap-2">
                                         <div className="flex items-center justify-between">
-                                            <Label>{__('label.content', 'Content')} *</Label>
+                                            <Label>
+                                                {__('label.content', 'Content')}{' '}
+                                                *
+                                            </Label>
                                             <Select
                                                 value={data.content_type}
                                                 onValueChange={(val) =>
-                                                    handleContentTypeChange(val as 'richtext' | 'markdown')
+                                                    handleContentTypeChange(
+                                                        val as
+                                                            | 'richtext'
+                                                            | 'markdown',
+                                                    )
                                                 }
                                             >
                                                 <SelectTrigger className="w-40">
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="richtext">Rich Text</SelectItem>
-                                                    <SelectItem value="markdown">Markdown</SelectItem>
+                                                    <SelectItem value="richtext">
+                                                        Rich Text
+                                                    </SelectItem>
+                                                    <SelectItem value="markdown">
+                                                        Markdown
+                                                    </SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
                                         {data.content_type === 'richtext' ? (
                                             <RichTextEditor
                                                 key={`richtext-${activeLocale}`}
-                                                value={data.content[activeLocale] ?? ''}
+                                                value={
+                                                    data.content[
+                                                        activeLocale
+                                                    ] ?? ''
+                                                }
                                                 onChange={(val) =>
                                                     setData((prev) => ({
                                                         ...prev,
@@ -269,7 +343,11 @@ export default function CreateBlogPost({ categories }: Props) {
                                         ) : (
                                             <MarkdownEditor
                                                 key={`markdown-${activeLocale}`}
-                                                value={data.content[activeLocale] ?? ''}
+                                                value={
+                                                    data.content[
+                                                        activeLocale
+                                                    ] ?? ''
+                                                }
                                                 onChange={(val) =>
                                                     setData((prev) => ({
                                                         ...prev,
@@ -281,13 +359,22 @@ export default function CreateBlogPost({ categories }: Props) {
                                                 }
                                             />
                                         )}
-                                        <InputError message={errors['content'] ?? errors[`content.${activeLocale}`]} />
+                                        <InputError
+                                            message={
+                                                errors['content'] ??
+                                                errors[
+                                                    `content.${activeLocale}`
+                                                ]
+                                            }
+                                        />
                                     </div>
                                 </TabsContent>
 
                                 <TabsContent value="seo" className="space-y-6">
                                     <div className="grid gap-2">
-                                        <Label htmlFor="seo_title">SEO Title</Label>
+                                        <Label htmlFor="seo_title">
+                                            SEO Title
+                                        </Label>
                                         <Input
                                             id="seo_title"
                                             value={data.seo_title}
@@ -299,23 +386,30 @@ export default function CreateBlogPost({ categories }: Props) {
                                             }
                                             placeholder="Custom page title for search engines"
                                         />
-                                        <InputError message={errors.seo_title} />
+                                        <InputError
+                                            message={errors.seo_title}
+                                        />
                                     </div>
                                     <div className="grid gap-2">
-                                        <Label htmlFor="seo_description">SEO Description</Label>
+                                        <Label htmlFor="seo_description">
+                                            SEO Description
+                                        </Label>
                                         <Textarea
                                             id="seo_description"
                                             value={data.seo_description}
                                             onChange={(e) =>
                                                 setData((prev) => ({
                                                     ...prev,
-                                                    seo_description: e.target.value,
+                                                    seo_description:
+                                                        e.target.value,
                                                 }))
                                             }
                                             placeholder="Meta description for search engines"
                                             rows={2}
                                         />
-                                        <InputError message={errors.seo_description} />
+                                        <InputError
+                                            message={errors.seo_description}
+                                        />
                                     </div>
                                 </TabsContent>
                             </Tabs>
@@ -324,24 +418,37 @@ export default function CreateBlogPost({ categories }: Props) {
                         {/* Sidebar */}
                         <div className="space-y-4">
                             <div className="space-y-4 rounded-lg border p-4">
-                                <h3 className="text-sm font-medium">Publishing</h3>
+                                <h3 className="text-sm font-medium">
+                                    Publishing
+                                </h3>
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="status">Status</Label>
                                     <Select
                                         value={data.status}
                                         onValueChange={(val) =>
-                                            setData((prev) => ({ ...prev, status: val }))
+                                            setData((prev) => ({
+                                                ...prev,
+                                                status: val,
+                                            }))
                                         }
                                     >
                                         <SelectTrigger>
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="draft">Draft</SelectItem>
-                                            <SelectItem value="scheduled">Scheduled</SelectItem>
-                                            <SelectItem value="published">Published</SelectItem>
-                                            <SelectItem value="archived">Archived</SelectItem>
+                                            <SelectItem value="draft">
+                                                Draft
+                                            </SelectItem>
+                                            <SelectItem value="scheduled">
+                                                Scheduled
+                                            </SelectItem>
+                                            <SelectItem value="published">
+                                                Published
+                                            </SelectItem>
+                                            <SelectItem value="archived">
+                                                Archived
+                                            </SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <InputError message={errors.status} />
@@ -349,7 +456,9 @@ export default function CreateBlogPost({ categories }: Props) {
 
                                 {data.status === 'scheduled' && (
                                     <div className="grid gap-2">
-                                        <Label htmlFor="published_at">Publish At *</Label>
+                                        <Label htmlFor="published_at">
+                                            Publish At *
+                                        </Label>
                                         <Input
                                             id="published_at"
                                             type="datetime-local"
@@ -357,11 +466,14 @@ export default function CreateBlogPost({ categories }: Props) {
                                             onChange={(e) =>
                                                 setData((prev) => ({
                                                     ...prev,
-                                                    published_at: e.target.value,
+                                                    published_at:
+                                                        e.target.value,
                                                 }))
                                             }
                                         />
-                                        <InputError message={errors.published_at} />
+                                        <InputError
+                                            message={errors.published_at}
+                                        />
                                     </div>
                                 )}
 
@@ -378,18 +490,22 @@ export default function CreateBlogPost({ categories }: Props) {
                                         }
                                         className="h-4 w-4 rounded border-gray-300"
                                     />
-                                    <Label htmlFor="is_featured" className="font-normal">
+                                    <Label
+                                        htmlFor="is_featured"
+                                        className="font-normal"
+                                    >
                                         Featured post
                                     </Label>
                                 </div>
 
                                 {locales.length > 1 && (
                                     <div className="space-y-2 border-t pt-3">
-                                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                                             Visible in locales
                                         </p>
                                         <p className="text-xs text-muted-foreground">
-                                            Leave all unchecked to show in all languages.
+                                            Leave all unchecked to show in all
+                                            languages.
                                         </p>
                                         {locales.map((locale) => (
                                             <div
@@ -407,16 +523,24 @@ export default function CreateBlogPost({ categories }: Props) {
                                                     onChange={(e) =>
                                                         setData((prev) => {
                                                             const current =
-                                                                prev.available_locales ?? [];
-                                                            const updated = e.target.checked
-                                                                ? [...current, locale.code]
+                                                                prev.available_locales ??
+                                                                [];
+                                                            const updated = e
+                                                                .target.checked
+                                                                ? [
+                                                                      ...current,
+                                                                      locale.code,
+                                                                  ]
                                                                 : current.filter(
-                                                                      (c) => c !== locale.code,
+                                                                      (c) =>
+                                                                          c !==
+                                                                          locale.code,
                                                                   );
                                                             return {
                                                                 ...prev,
                                                                 available_locales:
-                                                                    updated.length > 0
+                                                                    updated.length >
+                                                                    0
                                                                         ? updated
                                                                         : null,
                                                             };
@@ -428,7 +552,8 @@ export default function CreateBlogPost({ categories }: Props) {
                                                     htmlFor={`locale-${locale.code}`}
                                                     className="font-normal"
                                                 >
-                                                    {locale.name} ({locale.code})
+                                                    {locale.name} ({locale.code}
+                                                    )
                                                 </Label>
                                             </div>
                                         ))}
@@ -437,10 +562,14 @@ export default function CreateBlogPost({ categories }: Props) {
                             </div>
 
                             <div className="space-y-4 rounded-lg border p-4">
-                                <h3 className="text-sm font-medium">Organization</h3>
+                                <h3 className="text-sm font-medium">
+                                    Organization
+                                </h3>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="blog_category_id">Category</Label>
+                                    <Label htmlFor="blog_category_id">
+                                        Category
+                                    </Label>
                                     <Select
                                         value={data.blog_category_id}
                                         onValueChange={(val) =>
@@ -455,13 +584,18 @@ export default function CreateBlogPost({ categories }: Props) {
                                         </SelectTrigger>
                                         <SelectContent>
                                             {categories.map((cat) => (
-                                                <SelectItem key={cat.id} value={String(cat.id)}>
+                                                <SelectItem
+                                                    key={cat.id}
+                                                    value={String(cat.id)}
+                                                >
                                                     {cat.name}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    <InputError message={errors.blog_category_id} />
+                                    <InputError
+                                        message={errors.blog_category_id}
+                                    />
                                 </div>
 
                                 <div className="grid gap-2">
@@ -470,7 +604,10 @@ export default function CreateBlogPost({ categories }: Props) {
                                         id="tags"
                                         value={data.tags}
                                         onChange={(e) =>
-                                            setData((prev) => ({ ...prev, tags: e.target.value }))
+                                            setData((prev) => ({
+                                                ...prev,
+                                                tags: e.target.value,
+                                            }))
                                         }
                                         placeholder="tag1, tag2, tag3"
                                     />
@@ -482,9 +619,13 @@ export default function CreateBlogPost({ categories }: Props) {
                             </div>
 
                             <div className="space-y-4 rounded-lg border p-4">
-                                <h3 className="text-sm font-medium">Featured Image</h3>
+                                <h3 className="text-sm font-medium">
+                                    Featured Image
+                                </h3>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="featured_image">Image URL</Label>
+                                    <Label htmlFor="featured_image">
+                                        Image URL
+                                    </Label>
                                     <Input
                                         id="featured_image"
                                         value={data.featured_image}
@@ -496,11 +637,18 @@ export default function CreateBlogPost({ categories }: Props) {
                                         }
                                         placeholder="/storage/image.jpg"
                                     />
-                                    <InputError message={errors.featured_image} />
+                                    <InputError
+                                        message={errors.featured_image}
+                                    />
                                 </div>
                             </div>
 
-                            <Button type="submit" disabled={processing} className="w-full">
+                            <Button
+                                type="submit"
+                                disabled={processing}
+                                className="w-full"
+                                variant="outline"
+                            >
                                 {processing ? 'Creating...' : 'Create Post'}
                             </Button>
                         </div>

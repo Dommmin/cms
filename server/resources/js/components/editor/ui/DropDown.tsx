@@ -1,6 +1,10 @@
 import { ChevronDown } from 'lucide-react';
 import { type JSX } from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
 interface DropDownItemProps {
@@ -11,12 +15,18 @@ interface DropDownItemProps {
     active?: boolean;
 }
 
-export function DropDownItem({ className, onClick, title, children, active }: DropDownItemProps): JSX.Element {
+export function DropDownItem({
+    className,
+    onClick,
+    title,
+    children,
+    active,
+}: DropDownItemProps): JSX.Element {
     return (
         <button
             type="button"
             className={cn(
-                'flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-accent text-left',
+                'flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-accent',
                 active && 'bg-accent',
                 className,
             )}
@@ -55,7 +65,7 @@ export default function DropDown({
                     aria-label={buttonAriaLabel}
                     title={tooltip}
                     className={cn(
-                        'flex h-8 items-center gap-1 rounded px-2 text-sm hover:bg-accent disabled:opacity-50 select-none',
+                        'flex h-8 items-center gap-1 rounded px-2 text-sm select-none hover:bg-accent disabled:opacity-50',
                         buttonClassName,
                     )}
                 >

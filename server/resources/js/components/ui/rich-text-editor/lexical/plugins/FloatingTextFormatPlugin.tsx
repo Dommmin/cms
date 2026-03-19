@@ -157,6 +157,7 @@ export default function FloatingTextFormatPlugin({ anchorElem }: { anchorElem?: 
     const [editor] = useLexicalComposerContext();
     const [container, setContainer] = useState<HTMLElement | null>(null);
 
+     
     useEffect(() => {
         setContainer(anchorElem ?? editor.getRootElement()?.parentElement ?? document.body);
     }, [editor, anchorElem]);

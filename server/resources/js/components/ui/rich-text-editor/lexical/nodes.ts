@@ -10,8 +10,8 @@ import type { Klass, LexicalNode } from 'lexical';
 import { ImageGalleryNode } from '../image-gallery-node';
 import { ImageNode } from '../image-node';
 import { YouTubeNode } from '../youtube-node';
-import { LayoutContainerNode, LayoutItemNode } from './layout-nodes';
 import { CollapsibleContainerNode, CollapsibleTitleNode, CollapsibleContentNode } from './collapsible-nodes';
+import { LayoutContainerNode, LayoutItemNode } from './layout-nodes';
 
 export const nodes: Array<Klass<LexicalNode>> = [
     HeadingNode,

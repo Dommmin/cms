@@ -8,9 +8,9 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
-import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 type BlogCategory = {
@@ -51,8 +51,12 @@ export default function BlogCategoriesIndex({ categories, filters }: Props) {
             header: __('column.name', 'Name'),
             cell: ({ row }) => (
                 <div>
-                    <p className="font-medium">{resolveLocalizedText(row.original.name)}</p>
-                    <p className="text-xs text-muted-foreground">{row.original.slug}</p>
+                    <p className="font-medium">
+                        {resolveLocalizedText(row.original.name)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                        {row.original.slug}
+                    </p>
                     {row.original.parent && (
                         <Badge variant="outline" className="mt-1 text-xs">
                             {resolveLocalizedText(row.original.parent.name)}
@@ -65,8 +69,12 @@ export default function BlogCategoriesIndex({ categories, filters }: Props) {
             accessorKey: 'is_active',
             header: __('column.status', 'Status'),
             cell: ({ row }) => (
-                <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
-                    {row.original.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
+                <Badge
+                    variant={row.original.is_active ? 'default' : 'secondary'}
+                >
+                    {row.original.is_active
+                        ? __('status.active', 'Active')
+                        : __('status.inactive', 'Inactive')}
                 </Badge>
             ),
         },
@@ -90,7 +98,11 @@ export default function BlogCategoriesIndex({ categories, filters }: Props) {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/blog/categories/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/blog/categories/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>
@@ -101,9 +113,13 @@ export default function BlogCategoriesIndex({ categories, filters }: Props) {
                         title={__('dialog.delete_title', 'Delete Category')}
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
-                            router.delete(`/admin/blog/categories/${row.original.id}`, {
-                                onSuccess: () => toast.success('Category deleted'),
-                            });
+                            router.delete(
+                                `/admin/blog/categories/${row.original.id}`,
+                                {
+                                    onSuccess: () =>
+                                        toast.success('Category deleted'),
+                                },
+                            );
                         }}
                     >
                         <TrashIcon className="mr-1 h-3 w-3" />
@@ -120,11 +136,14 @@ export default function BlogCategoriesIndex({ categories, filters }: Props) {
             <Wrapper>
                 <PageHeader
                     title={__('page.blog_categories', 'Blog Categories')}
-                    description={__('page.blog_categories_desc', 'Organize blog posts into categories')}
+                    description={__(
+                        'page.blog_categories_desc',
+                        'Organize blog posts into categories',
+                    )}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/blog/categories/create">
-                            <Button>
+                            <Button variant="outline">
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.create', 'New Category')}
                             </Button>
@@ -144,7 +163,10 @@ export default function BlogCategoriesIndex({ categories, filters }: Props) {
                         next_page_url: categories.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search_categories', 'Search categories...')}
+                    searchPlaceholder={__(
+                        'placeholder.search_categories',
+                        'Search categories...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/blog/categories"
                 />

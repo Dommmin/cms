@@ -6,8 +6,8 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 interface TaxRate {
@@ -58,7 +58,11 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/ecommerce/tax-rates/create" prefetch cacheFor={30}>
+                            <Link
+                                href="/admin/ecommerce/tax-rates/create"
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <Plus className="mr-2 h-4 w-4" />
                                 {__('action.add_rate', 'Add Rate')}
                             </Link>
@@ -134,7 +138,11 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                             cell: ({ row }) => (
                                 <div className="flex items-center gap-2">
                                     <Button asChild variant="outline" size="sm">
-                                        <Link href={`/admin/ecommerce/tax-rates/${row.original.id}/edit`} prefetch cacheFor={30}>
+                                        <Link
+                                            href={`/admin/ecommerce/tax-rates/${row.original.id}/edit`}
+                                            prefetch
+                                            cacheFor={30}
+                                        >
                                             <PencilIcon className="mr-1 h-3 w-3" />
                                             {__('action.edit', 'Edit')}
                                         </Link>
@@ -142,7 +150,10 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                                     <ConfirmButton
                                         variant="outline"
                                         size="sm"
-                                        title={__('dialog.delete_title', 'Delete Tax Rate')}
+                                        title={__(
+                                            'dialog.delete_title',
+                                            'Delete Tax Rate',
+                                        )}
                                         description={`Are you sure you want to delete "${row.original.name}"?`}
                                         onConfirm={() => {
                                             router.delete(
@@ -166,7 +177,10 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                         next_page_url: taxRates.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search_tax_rates', 'Search tax rates...')}
+                    searchPlaceholder={__(
+                        'placeholder.search_tax_rates',
+                        'Search tax rates...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/ecommerce/tax-rates"
                 />

@@ -1,7 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -9,6 +8,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -43,13 +43,17 @@ export default function CannedResponsesIndex({ canned_responses }: Props) {
         {
             accessorKey: 'title',
             header: __('column.title', 'Title'),
-            cell: ({ row }) => <span className="font-medium">{row.original.title}</span>,
+            cell: ({ row }) => (
+                <span className="font-medium">{row.original.title}</span>
+            ),
         },
         {
             accessorKey: 'shortcut',
             header: __('column.shortcut', 'Shortcut'),
             cell: ({ row }) => (
-                <Badge variant="outline" className="font-mono text-xs">#{row.original.shortcut}</Badge>
+                <Badge variant="outline" className="font-mono text-xs">
+                    #{row.original.shortcut}
+                </Badge>
             ),
         },
         {
@@ -67,7 +71,11 @@ export default function CannedResponsesIndex({ canned_responses }: Props) {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/support/canned-responses/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/support/canned-responses/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>
@@ -76,11 +84,20 @@ export default function CannedResponsesIndex({ canned_responses }: Props) {
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Response')}
-                        description={__('dialog.cannot_be_undone', 'Are you sure you want to delete this canned response?')}
+                        description={__(
+                            'dialog.cannot_be_undone',
+                            'Are you sure you want to delete this canned response?',
+                        )}
                         onConfirm={() => {
-                            router.delete(`/admin/support/canned-responses/${row.original.id}`, {
-                                onSuccess: () => toast.success('Canned response deleted'),
-                            });
+                            router.delete(
+                                `/admin/support/canned-responses/${row.original.id}`,
+                                {
+                                    onSuccess: () =>
+                                        toast.success(
+                                            'Canned response deleted',
+                                        ),
+                                },
+                            );
                         }}
                     >
                         <TrashIcon className="h-3 w-3" />
@@ -94,10 +111,20 @@ export default function CannedResponsesIndex({ canned_responses }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Canned Responses" />
             <Wrapper>
-                <PageHeader title={__('page.canned_responses', 'Canned Responses')} description={__('page.canned_responses_desc', 'Predefined replies for common questions')}>
+                <PageHeader
+                    title={__('page.canned_responses', 'Canned Responses')}
+                    description={__(
+                        'page.canned_responses_desc',
+                        'Predefined replies for common questions',
+                    )}
+                >
                     <PageHeaderActions>
                         <Button asChild>
-                            <Link href="/admin/support/canned-responses/create" prefetch cacheFor={30}>
+                            <Link
+                                href="/admin/support/canned-responses/create"
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.create', 'New Response')}
                             </Link>

@@ -3,11 +3,10 @@ import { Plus, List, PencilIcon, TrashIcon } from 'lucide-react';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 interface Attribute {
@@ -59,7 +58,11 @@ export default function AttributesIndex({ attributes, filters }: IndexProps) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/ecommerce/attributes/create" prefetch cacheFor={30}>
+                            <Link
+                                href="/admin/ecommerce/attributes/create"
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <Plus className="mr-2 h-4 w-4" />
                                 {__('action.add_attribute', 'Add Attribute')}
                             </Link>
@@ -125,7 +128,11 @@ export default function AttributesIndex({ attributes, filters }: IndexProps) {
                             cell: ({ row }) => (
                                 <div className="flex items-center gap-2">
                                     <Button asChild variant="outline" size="sm">
-                                        <Link href={`/admin/ecommerce/attributes/${row.original.id}/edit`} prefetch cacheFor={30}>
+                                        <Link
+                                            href={`/admin/ecommerce/attributes/${row.original.id}/edit`}
+                                            prefetch
+                                            cacheFor={30}
+                                        >
                                             <PencilIcon className="mr-1 h-3 w-3" />
                                             {__('action.edit', 'Edit')}
                                         </Link>
@@ -133,7 +140,10 @@ export default function AttributesIndex({ attributes, filters }: IndexProps) {
                                     <ConfirmButton
                                         variant="outline"
                                         size="sm"
-                                        title={__('dialog.delete_title', 'Delete Attribute')}
+                                        title={__(
+                                            'dialog.delete_title',
+                                            'Delete Attribute',
+                                        )}
                                         description={`${__('dialog.are_you_sure', 'Are you sure you want to delete')} "${row.original.name}"?`}
                                         onConfirm={() => {
                                             router.delete(
@@ -157,7 +167,10 @@ export default function AttributesIndex({ attributes, filters }: IndexProps) {
                         next_page_url: attributes.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search_attributes', 'Search attributes...')}
+                    searchPlaceholder={__(
+                        'placeholder.search_attributes',
+                        'Search attributes...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/ecommerce/attributes"
                 />

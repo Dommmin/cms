@@ -1,5 +1,11 @@
 import { Head, Link, router, useForm, usePoll } from '@inertiajs/react';
-import { ArrowLeftIcon, SendIcon, LockIcon, UserIcon, ShoppingBagIcon } from 'lucide-react';
+import {
+    ArrowLeftIcon,
+    SendIcon,
+    LockIcon,
+    UserIcon,
+    ShoppingBagIcon,
+} from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import InputError from '@/components/input-error';
@@ -54,7 +60,12 @@ type Conversation = {
     customer: Customer | null;
 };
 
-type CannedResponse = { id: number; title: string; shortcut: string; body: string };
+type CannedResponse = {
+    id: number;
+    title: string;
+    shortcut: string;
+    body: string;
+};
 
 type Props = {
     conversation: Conversation;
@@ -75,7 +86,12 @@ const statusColors: Record<string, string> = {
     closed: 'bg-gray-100 text-gray-700',
 };
 
-export default function SupportShow({ conversation, agents, canned_responses, statuses }: Props) {
+export default function SupportShow({
+    conversation,
+    agents,
+    canned_responses,
+    statuses,
+}: Props) {
     const [isInternal, setIsInternal] = useState(false);
 
     // Refresh conversation every 5 seconds to pick up new customer messages
@@ -89,21 +105,31 @@ export default function SupportShow({ conversation, agents, canned_responses, st
         replyForm.post(`/admin/support/${conversation.id}/reply`, {
             onSuccess: () => {
                 replyForm.reset();
-                toast.success(isInternal ? 'Internal note added.' : 'Reply sent.');
+                toast.success(
+                    isInternal ? 'Internal note added.' : 'Reply sent.',
+                );
             },
         });
     }
 
     function handleStatusChange(status: string) {
-        router.post(`/admin/support/${conversation.id}/status`, { status }, {
-            onSuccess: () => toast.success('Status updated.'),
-        });
+        router.post(
+            `/admin/support/${conversation.id}/status`,
+            { status },
+            {
+                onSuccess: () => toast.success('Status updated.'),
+            },
+        );
     }
 
     function handleAssign(userId: string) {
-        router.post(`/admin/support/${conversation.id}/assign`, { assigned_to: userId || null }, {
-            onSuccess: () => toast.success('Assigned.'),
-        });
+        router.post(
+            `/admin/support/${conversation.id}/assign`,
+            { assigned_to: userId || null },
+            {
+                onSuccess: () => toast.success('Assigned.'),
+            },
+        );
     }
 
     function insertCannedResponse(body: string) {
@@ -112,16 +138,21 @@ export default function SupportShow({ conversation, agents, canned_responses, st
 
     const customerName = conversation.customer
         ? `${conversation.customer.first_name} ${conversation.customer.last_name}`
-        : conversation.name ?? conversation.email ?? 'Guest';
+        : (conversation.name ?? conversation.email ?? 'Guest');
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Support — ${conversation.subject}`} />
             <Wrapper>
-                <PageHeader title={conversation.subject} description={`Channel: ${conversation.channel}`}>
+                <PageHeader
+                    title={conversation.subject}
+                    description={`Channel: ${conversation.channel}`}
+                >
                     <PageHeaderActions>
                         <Badge className={statusColors[conversation.status]}>
-                            {statuses.find((s) => s.value === conversation.status)?.label ?? conversation.status}
+                            {statuses.find(
+                                (s) => s.value === conversation.status,
+                            )?.label ?? conversation.status}
                         </Badge>
                         <Button asChild variant="outline" size="sm">
                             <Link href="/admin/support" prefetch cacheFor={30}>
@@ -134,27 +165,32 @@ export default function SupportShow({ conversation, agents, canned_responses, st
 
                 <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
                     {/* ── Left: Chat ─────────────────────────────────────────── */}
-                    <div className="lg:col-span-2 flex flex-col gap-4">
-
+                    <div className="flex flex-col gap-4 lg:col-span-2">
                         {/* Messages */}
-                        <div className="rounded-lg border bg-card p-4 space-y-4 max-h-[500px] overflow-y-auto">
+                        <div className="max-h-[500px] space-y-4 overflow-y-auto rounded-lg border bg-card p-4">
                             {conversation.messages.length === 0 && (
-                                <p className="text-center text-sm text-muted-foreground py-8">No messages yet.</p>
+                                <p className="py-8 text-center text-sm text-muted-foreground">
+                                    No messages yet.
+                                </p>
                             )}
                             {conversation.messages.map((msg) => (
                                 <div
                                     key={msg.id}
                                     className={`flex ${msg.sender_type === 'customer' ? 'justify-start' : 'justify-end'}`}
                                 >
-                                    <div className={`max-w-[75%] rounded-lg px-4 py-2.5 shadow-sm ${
-                                        msg.is_internal
-                                            ? 'bg-yellow-50 border border-yellow-200 text-yellow-900 dark:bg-yellow-950/30 dark:border-yellow-800 dark:text-yellow-200'
-                                            : msg.sender_type === 'customer'
-                                                ? 'bg-muted text-foreground'
-                                                : 'bg-primary text-primary-foreground'
-                                    }`}>
+                                    <div
+                                        className={`max-w-[75%] rounded-lg px-4 py-2.5 shadow-sm ${
+                                            msg.is_internal
+                                                ? 'border border-yellow-200 bg-yellow-50 text-yellow-900 dark:border-yellow-800 dark:bg-yellow-950/30 dark:text-yellow-200'
+                                                : msg.sender_type === 'customer'
+                                                  ? 'bg-muted text-foreground'
+                                                  : 'bg-primary text-primary-foreground'
+                                        }`}
+                                    >
                                         <div className="mb-1 flex items-center gap-2">
-                                            <span className="text-xs font-semibold opacity-70">{msg.sender_name}</span>
+                                            <span className="text-xs font-semibold opacity-70">
+                                                {msg.sender_name}
+                                            </span>
                                             {msg.is_internal && (
                                                 <span className="flex items-center gap-1 text-[10px] font-medium text-yellow-700 dark:text-yellow-300">
                                                     <LockIcon className="h-2.5 w-2.5" />
@@ -162,9 +198,13 @@ export default function SupportShow({ conversation, agents, canned_responses, st
                                                 </span>
                                             )}
                                         </div>
-                                        <p className="whitespace-pre-wrap text-sm leading-relaxed">{msg.body}</p>
+                                        <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                                            {msg.body}
+                                        </p>
                                         <p className="mt-1 text-[10px] opacity-50">
-                                            {new Date(msg.created_at).toLocaleString()}
+                                            {new Date(
+                                                msg.created_at,
+                                            ).toLocaleString()}
                                         </p>
                                     </div>
                                 </div>
@@ -173,10 +213,15 @@ export default function SupportShow({ conversation, agents, canned_responses, st
 
                         {/* Reply form */}
                         {conversation.status !== 'closed' && (
-                            <form onSubmit={submitReply} className="rounded-lg border bg-card p-4 space-y-3">
+                            <form
+                                onSubmit={submitReply}
+                                className="space-y-3 rounded-lg border bg-card p-4"
+                            >
                                 <div className="flex items-center gap-4">
-                                    <Label className="text-sm font-medium">Reply type:</Label>
-                                    <div className="flex rounded-md border overflow-hidden text-sm">
+                                    <Label className="text-sm font-medium">
+                                        Reply type:
+                                    </Label>
+                                    <div className="flex overflow-hidden rounded-md border text-sm">
                                         <button
                                             type="button"
                                             onClick={() => setIsInternal(false)}
@@ -199,14 +244,30 @@ export default function SupportShow({ conversation, agents, canned_responses, st
                                             className="ml-auto rounded-md border bg-background px-2 py-1.5 text-sm"
                                             defaultValue=""
                                             onChange={(e) => {
-                                                const cr = canned_responses.find((c) => String(c.id) === e.target.value);
-                                                if (cr) { insertCannedResponse(cr.body); }
+                                                const cr =
+                                                    canned_responses.find(
+                                                        (c) =>
+                                                            String(c.id) ===
+                                                            e.target.value,
+                                                    );
+                                                if (cr) {
+                                                    insertCannedResponse(
+                                                        cr.body,
+                                                    );
+                                                }
                                                 e.target.value = '';
                                             }}
                                         >
-                                            <option value="" disabled>Quick reply...</option>
+                                            <option value="" disabled>
+                                                Quick reply...
+                                            </option>
                                             {canned_responses.map((cr) => (
-                                                <option key={cr.id} value={cr.id}>#{cr.shortcut} — {cr.title}</option>
+                                                <option
+                                                    key={cr.id}
+                                                    value={cr.id}
+                                                >
+                                                    #{cr.shortcut} — {cr.title}
+                                                </option>
                                             ))}
                                         </select>
                                     )}
@@ -214,15 +275,34 @@ export default function SupportShow({ conversation, agents, canned_responses, st
 
                                 <Textarea
                                     value={replyForm.data.body}
-                                    onChange={(e) => replyForm.setData('body', e.target.value)}
-                                    placeholder={isInternal ? 'Internal note (visible to agents only)...' : 'Type your reply...'}
+                                    onChange={(e) =>
+                                        replyForm.setData(
+                                            'body',
+                                            e.target.value,
+                                        )
+                                    }
+                                    placeholder={
+                                        isInternal
+                                            ? 'Internal note (visible to agents only)...'
+                                            : 'Type your reply...'
+                                    }
                                     rows={4}
-                                    className={isInternal ? 'border-yellow-300 bg-yellow-50/30 dark:bg-yellow-950/10' : ''}
+                                    className={
+                                        isInternal
+                                            ? 'border-yellow-300 bg-yellow-50/30 dark:bg-yellow-950/10'
+                                            : ''
+                                    }
                                 />
                                 <InputError message={replyForm.errors.body} />
 
                                 <div className="flex justify-end">
-                                    <Button type="submit" disabled={replyForm.processing || !replyForm.data.body.trim()}>
+                                    <Button
+                                        type="submit"
+                                        disabled={
+                                            replyForm.processing ||
+                                            !replyForm.data.body.trim()
+                                        }
+                                    >
                                         <SendIcon className="mr-2 h-4 w-4" />
                                         {isInternal ? 'Add Note' : 'Send Reply'}
                                     </Button>
@@ -247,19 +327,32 @@ export default function SupportShow({ conversation, agents, canned_responses, st
                     {/* ── Right: Customer panel ───────────────────────────────── */}
                     <div className="space-y-4">
                         {/* Customer info */}
-                        <div className="rounded-lg border bg-card p-4 space-y-3">
+                        <div className="space-y-3 rounded-lg border bg-card p-4">
                             <div className="flex items-center gap-2">
                                 <UserIcon className="h-4 w-4 text-muted-foreground" />
-                                <h3 className="font-semibold text-sm">Customer</h3>
+                                <h3 className="text-sm font-semibold">
+                                    Customer
+                                </h3>
                             </div>
                             <div className="space-y-1">
                                 <p className="font-medium">{customerName}</p>
                                 {conversation.email && (
-                                    <p className="text-sm text-muted-foreground">{conversation.email}</p>
+                                    <p className="text-sm text-muted-foreground">
+                                        {conversation.email}
+                                    </p>
                                 )}
                                 {conversation.customer && (
-                                    <Button asChild variant="outline" size="sm" className="mt-2 w-full">
-                                        <Link href={`/admin/ecommerce/customers/${conversation.customer!.id}`} prefetch cacheFor={60}>
+                                    <Button
+                                        asChild
+                                        variant="outline"
+                                        size="sm"
+                                        className="mt-2 w-full"
+                                    >
+                                        <Link
+                                            href={`/admin/ecommerce/customers/${conversation.customer!.id}`}
+                                            prefetch
+                                            cacheFor={60}
+                                        >
                                             View Profile
                                         </Link>
                                     </Button>
@@ -268,71 +361,109 @@ export default function SupportShow({ conversation, agents, canned_responses, st
                         </div>
 
                         {/* Recent orders */}
-                        {conversation.customer?.orders && conversation.customer.orders.length > 0 && (
-                            <div className="rounded-lg border bg-card p-4 space-y-3">
-                                <div className="flex items-center gap-2">
-                                    <ShoppingBagIcon className="h-4 w-4 text-muted-foreground" />
-                                    <h3 className="font-semibold text-sm">Recent Orders</h3>
+                        {conversation.customer?.orders &&
+                            conversation.customer.orders.length > 0 && (
+                                <div className="space-y-3 rounded-lg border bg-card p-4">
+                                    <div className="flex items-center gap-2">
+                                        <ShoppingBagIcon className="h-4 w-4 text-muted-foreground" />
+                                        <h3 className="text-sm font-semibold">
+                                            Recent Orders
+                                        </h3>
+                                    </div>
+                                    <ul className="space-y-2">
+                                        {conversation.customer.orders.map(
+                                            (order) => (
+                                                <li key={order.id}>
+                                                    <Link
+                                                        href={`/admin/ecommerce/orders/${order.id}`}
+                                                        prefetch
+                                                        cacheFor={60}
+                                                        className="block w-full rounded-md border bg-muted/30 px-3 py-2 text-left text-sm transition-colors hover:bg-muted"
+                                                    >
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="font-medium">
+                                                                #
+                                                                {
+                                                                    order.reference_number
+                                                                }
+                                                            </span>
+                                                            <Badge
+                                                                variant="outline"
+                                                                className="text-xs"
+                                                            >
+                                                                {order.status}
+                                                            </Badge>
+                                                        </div>
+                                                        <p className="text-muted-foreground">
+                                                            {Number(
+                                                                order.total,
+                                                            ).toFixed(2)}{' '}
+                                                            zł
+                                                        </p>
+                                                    </Link>
+                                                </li>
+                                            ),
+                                        )}
+                                    </ul>
                                 </div>
-                                <ul className="space-y-2">
-                                    {conversation.customer.orders.map((order) => (
-                                        <li key={order.id}>
-                                            <Link
-                                                href={`/admin/ecommerce/orders/${order.id}`}
-                                                prefetch
-                                                cacheFor={60}
-                                                className="block w-full rounded-md border bg-muted/30 px-3 py-2 text-left text-sm hover:bg-muted transition-colors"
-                                            >
-                                                <div className="flex items-center justify-between">
-                                                    <span className="font-medium">#{order.reference_number}</span>
-                                                    <Badge variant="outline" className="text-xs">{order.status}</Badge>
-                                                </div>
-                                                <p className="text-muted-foreground">{Number(order.total).toFixed(2)} zł</p>
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
+                            )}
 
                         {/* Manage */}
-                        <div className="rounded-lg border bg-card p-4 space-y-4">
-                            <h3 className="font-semibold text-sm">Manage</h3>
+                        <div className="space-y-4 rounded-lg border bg-card p-4">
+                            <h3 className="text-sm font-semibold">Manage</h3>
 
                             <div className="space-y-1.5">
-                                <Label className="text-xs text-muted-foreground">Status</Label>
+                                <Label className="text-xs text-muted-foreground">
+                                    Status
+                                </Label>
                                 <select
                                     className="w-full rounded-md border bg-background px-3 py-2 text-sm"
                                     value={conversation.status}
-                                    onChange={(e) => handleStatusChange(e.target.value)}
+                                    onChange={(e) =>
+                                        handleStatusChange(e.target.value)
+                                    }
                                 >
                                     {statuses.map((s) => (
-                                        <option key={s.value} value={s.value}>{s.label}</option>
+                                        <option key={s.value} value={s.value}>
+                                            {s.label}
+                                        </option>
                                     ))}
                                 </select>
                             </div>
 
                             <div className="space-y-1.5">
-                                <Label className="text-xs text-muted-foreground">Assign to</Label>
+                                <Label className="text-xs text-muted-foreground">
+                                    Assign to
+                                </Label>
                                 <select
                                     className="w-full rounded-md border bg-background px-3 py-2 text-sm"
                                     value={conversation.assigned_to?.id ?? ''}
-                                    onChange={(e) => handleAssign(e.target.value)}
+                                    onChange={(e) =>
+                                        handleAssign(e.target.value)
+                                    }
                                 >
                                     <option value="">Unassigned</option>
                                     {agents.map((a) => (
-                                        <option key={a.id} value={a.id}>{a.name}</option>
+                                        <option key={a.id} value={a.id}>
+                                            {a.name}
+                                        </option>
                                     ))}
                                 </select>
                             </div>
 
                             <div className="border-t pt-3">
                                 <p className="text-xs text-muted-foreground">
-                                    Created: {new Date(conversation.created_at).toLocaleString()}
+                                    Created:{' '}
+                                    {new Date(
+                                        conversation.created_at,
+                                    ).toLocaleString()}
                                 </p>
                                 {conversation.last_reply_at && (
                                     <p className="text-xs text-muted-foreground">
-                                        Last reply: {new Date(conversation.last_reply_at).toLocaleString()}
+                                        Last reply:{' '}
+                                        {new Date(
+                                            conversation.last_reply_at,
+                                        ).toLocaleString()}
                                     </p>
                                 )}
                             </div>

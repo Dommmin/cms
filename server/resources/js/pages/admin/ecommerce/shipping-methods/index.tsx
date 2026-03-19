@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { Truck, PlusIcon, PencilIcon, TrashIcon } from 'lucide-react';
+import { PlusIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -8,8 +8,8 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 type ShippingMethod = {
@@ -92,7 +92,9 @@ export default function ShippingMethodsIndex({ methods, filters }: Props) {
                 <Badge
                     variant={row.original.is_active ? 'default' : 'secondary'}
                 >
-                    {row.original.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
+                    {row.original.is_active
+                        ? __('status.active', 'Active')
+                        : __('status.inactive', 'Inactive')}
                 </Badge>
             ),
         },
@@ -102,7 +104,11 @@ export default function ShippingMethodsIndex({ methods, filters }: Props) {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/ecommerce/shipping-methods/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/ecommerce/shipping-methods/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>
@@ -110,7 +116,10 @@ export default function ShippingMethodsIndex({ methods, filters }: Props) {
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title={__('dialog.delete_title', 'Delete Shipping Method')}
+                        title={__(
+                            'dialog.delete_title',
+                            'Delete Shipping Method',
+                        )}
                         description={`Are you sure you want to delete "${row.original.name}"?`}
                         onConfirm={() => {
                             router.delete(
@@ -138,7 +147,10 @@ export default function ShippingMethodsIndex({ methods, filters }: Props) {
             <Wrapper>
                 <PageHeader
                     title={__('page.shipping_methods', 'Shipping Methods')}
-                    description={__('page.shipping_methods_desc', 'Manage shipping methods')}
+                    description={__(
+                        'page.shipping_methods_desc',
+                        'Manage shipping methods',
+                    )}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/ecommerce/shipping-methods/create">

@@ -5,13 +5,39 @@ import { type JSX } from 'react';
 import DropDown, { DropDownItem } from '../../ui/DropDown';
 
 const FONT_FAMILIES = [
-    'Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Trebuchet MS', 'Verdana',
-    'Inter', 'Roboto', 'Open Sans', 'Lato', 'Poppins',
+    'Arial',
+    'Courier New',
+    'Georgia',
+    'Times New Roman',
+    'Trebuchet MS',
+    'Verdana',
+    'Inter',
+    'Roboto',
+    'Open Sans',
+    'Lato',
+    'Poppins',
 ];
 
 const FONT_SIZES = [
-    '10px', '11px', '12px', '13px', '14px', '15px', '16px', '17px', '18px',
-    '19px', '20px', '22px', '24px', '26px', '28px', '30px', '36px', '42px', '48px',
+    '10px',
+    '11px',
+    '12px',
+    '13px',
+    '14px',
+    '15px',
+    '16px',
+    '17px',
+    '18px',
+    '19px',
+    '20px',
+    '22px',
+    '24px',
+    '26px',
+    '28px',
+    '30px',
+    '36px',
+    '42px',
+    '48px',
 ];
 
 interface FontFamilyProps {
@@ -20,7 +46,11 @@ interface FontFamilyProps {
     onChange: (value: string) => void;
 }
 
-export function FontFamilyDropdown({ value, disabled, onChange }: FontFamilyProps): JSX.Element {
+export function FontFamilyDropdown({
+    value,
+    disabled,
+    onChange,
+}: FontFamilyProps): JSX.Element {
     const [editor] = useLexicalComposerContext();
 
     const handleChange = (font: string) => {
@@ -36,7 +66,9 @@ export function FontFamilyDropdown({ value, disabled, onChange }: FontFamilyProp
     return (
         <DropDown
             disabled={disabled}
-            label={<span className="text-sm min-w-[100px] truncate">{value}</span>}
+            label={
+                <span className="min-w-[100px] truncate text-sm">{value}</span>
+            }
             buttonAriaLabel="Formatting options for font family"
             tooltip="Font family"
         >
@@ -46,7 +78,9 @@ export function FontFamilyDropdown({ value, disabled, onChange }: FontFamilyProp
                     onClick={() => handleChange(font)}
                     active={value === font}
                 >
-                    <span style={{ fontFamily: font }} className="text-sm">{font}</span>
+                    <span style={{ fontFamily: font }} className="text-sm">
+                        {font}
+                    </span>
                 </DropDownItem>
             ))}
         </DropDown>
@@ -59,7 +93,11 @@ interface FontSizeProps {
     onChange: (value: string) => void;
 }
 
-export function FontSizeDropdown({ value, disabled, onChange }: FontSizeProps): JSX.Element {
+export function FontSizeDropdown({
+    value,
+    disabled,
+    onChange,
+}: FontSizeProps): JSX.Element {
     const [editor] = useLexicalComposerContext();
 
     const handleChange = (size: string) => {
@@ -75,7 +113,7 @@ export function FontSizeDropdown({ value, disabled, onChange }: FontSizeProps): 
     return (
         <DropDown
             disabled={disabled}
-            label={<span className="text-sm w-12 text-center">{value}</span>}
+            label={<span className="w-12 text-center text-sm">{value}</span>}
             buttonAriaLabel="Formatting options for font size"
             tooltip="Font size"
         >

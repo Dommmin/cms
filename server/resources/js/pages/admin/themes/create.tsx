@@ -1,4 +1,4 @@
-import { Link, Form, Head, router } from '@inertiajs/react';
+import { Link, Form, Head } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -55,12 +55,11 @@ export default function Create() {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/themes' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Themes
-                        
-                </Link>
-            </Button>
+                            <Link href="/admin/themes" prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                Back to Themes
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -115,7 +114,9 @@ export default function Create() {
                                             key={token.key}
                                             className="grid gap-2"
                                         >
-                                            <Label htmlFor={`token-${token.key}`}>
+                                            <Label
+                                                htmlFor={`token-${token.key}`}
+                                            >
                                                 {token.label}
                                             </Label>
                                             <Input

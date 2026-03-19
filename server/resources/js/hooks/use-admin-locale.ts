@@ -24,7 +24,9 @@ function subscribe(callback: () => void) {
     };
 }
 
-export function useAdminLocale(defaultLocale?: string): [string, (locale: string) => void] {
+export function useAdminLocale(
+    defaultLocale?: string,
+): [string, (locale: string) => void] {
     const locale = useSyncExternalStore(
         subscribe,
         () => getStoredLocale() ?? defaultLocale ?? 'en',

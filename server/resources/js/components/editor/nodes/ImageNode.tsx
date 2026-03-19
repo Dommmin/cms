@@ -121,8 +121,15 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     }
 
     static importJSON(serializedNode: SerializedImageNode): ImageNode {
-        const { altText, height, width, maxWidth, src, showCaption, caption } = serializedNode;
-        const node = $createImageNode({ src, altText, maxWidth, width, height });
+        const { altText, height, width, maxWidth, src, showCaption, caption } =
+            serializedNode;
+        const node = $createImageNode({
+            src,
+            altText,
+            maxWidth,
+            width,
+            height,
+        });
         const nestedEditor = node.__caption;
         const editorState = nestedEditor.parseEditorState(caption.editorState);
         if (!editorState.isEmpty()) nestedEditor.setEditorState(editorState);
@@ -144,7 +151,10 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
         };
     }
 
-    setWidthAndHeight(width: 'inherit' | number, height: 'inherit' | number): void {
+    setWidthAndHeight(
+        width: 'inherit' | number,
+        height: 'inherit' | number,
+    ): void {
         const writable = this.getWritable();
         writable.__width = width;
         writable.__height = height;
@@ -203,7 +213,19 @@ export function $createImageNode({
     captionsEnabled,
     key,
 }: ImagePayload): ImageNode {
-    return $applyNodeReplacement(new ImageNode(src, altText, maxWidth, width, height, false, undefined, captionsEnabled, key));
+    return $applyNodeReplacement(
+        new ImageNode(
+            src,
+            altText,
+            maxWidth,
+            width,
+            height,
+            false,
+            undefined,
+            captionsEnabled,
+            key,
+        ),
+    );
 }
 
 export function $isImageNode(node: unknown): node is ImageNode {

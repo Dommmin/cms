@@ -78,13 +78,13 @@ export function MediaPickerModal({
     onRemove,
     onSetThumbnail,
     selectedImages = [],
-    multiple = false,
+    multiple: _multiple = false,
 }: MediaPickerModalProps) {
     const [media, setMedia] = useState<MediaData | null>(null);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [extension, setExtension] = useState('');
-    const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
+    const [_selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [uploading, setUploading] = useState(false);
@@ -157,7 +157,7 @@ export function MediaPickerModal({
         onClose();
     };
 
-    const handleItemClick = (item: MediaItem) => {
+    const _handleItemClick = (item: MediaItem) => {
         setSelectedItem(item);
     };
 
@@ -207,7 +207,9 @@ export function MediaPickerModal({
         }
     };
 
-    const handleUploadInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleUploadInputChange = (
+        e: React.ChangeEvent<HTMLInputElement>,
+    ) => {
         if (e.target.files) {
             uploadFiles(e.target.files);
             e.target.value = '';

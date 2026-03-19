@@ -1,11 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import {
-    PlusIcon,
-    PencilIcon,
-    TrashIcon,
-    CopyIcon
-} from 'lucide-react';
+import { PlusIcon, PencilIcon, TrashIcon, CopyIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -13,9 +8,9 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { useTranslation } from '@/hooks/use-translation';
 
 type Menu = {
     id: number;
@@ -80,7 +75,9 @@ export default function MenusIndex({ menus, filters }: Props) {
                 <Badge
                     variant={row.original.is_active ? 'default' : 'secondary'}
                 >
-                    {row.original.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
+                    {row.original.is_active
+                        ? __('status.active', 'Active')
+                        : __('status.inactive', 'Inactive')}
                 </Badge>
             ),
         },
@@ -90,7 +87,11 @@ export default function MenusIndex({ menus, filters }: Props) {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/menus/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/menus/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>
@@ -133,10 +134,16 @@ export default function MenusIndex({ menus, filters }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Menus" />
             <Wrapper>
-                <PageHeader title={__('page.menus', 'Menus')} description={__('page.menus_desc', 'Manage navigation menus')}>
+                <PageHeader
+                    title={__('page.menus', 'Menus')}
+                    description={__(
+                        'page.menus_desc',
+                        'Manage navigation menus',
+                    )}
+                >
                     <PageHeaderActions>
                         <Link href="/admin/menus/create">
-                            <Button>
+                            <Button variant="outline">
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.create', 'Create Menu')}
                             </Button>
@@ -156,7 +163,10 @@ export default function MenusIndex({ menus, filters }: Props) {
                         next_page_url: menus.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search', 'Search menus...')}
+                    searchPlaceholder={__(
+                        'placeholder.search',
+                        'Search menus...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/menus"
                 />

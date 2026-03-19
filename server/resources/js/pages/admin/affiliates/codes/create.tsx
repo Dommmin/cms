@@ -1,4 +1,4 @@
-import { Link, Head, router, useForm } from '@inertiajs/react';
+import { Link, Head, useForm } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -55,12 +55,15 @@ export default function CreateCode({ users }: Props) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/affiliates/codes' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back
-                        
-                </Link>
-            </Button>
+                            <Link
+                                href="/admin/affiliates/codes"
+                                prefetch
+                                cacheFor={30}
+                            >
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                Back
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -76,7 +79,10 @@ export default function CreateCode({ users }: Props) {
                             </SelectTrigger>
                             <SelectContent>
                                 {users.map((user) => (
-                                    <SelectItem key={user.id} value={String(user.id)}>
+                                    <SelectItem
+                                        key={user.id}
+                                        value={String(user.id)}
+                                    >
                                         {user.name} ({user.email})
                                     </SelectItem>
                                 ))}
@@ -90,12 +96,15 @@ export default function CreateCode({ users }: Props) {
                         <Input
                             id="code"
                             value={data.code}
-                            onChange={(e) => setData('code', e.target.value.toUpperCase())}
+                            onChange={(e) =>
+                                setData('code', e.target.value.toUpperCase())
+                            }
                             placeholder="e.g. JOHN20"
                             className="font-mono"
                         />
                         <p className="text-xs text-muted-foreground">
-                            Only uppercase letters, numbers, hyphens and underscores.
+                            Only uppercase letters, numbers, hyphens and
+                            underscores.
                         </p>
                         <InputError message={errors.code} />
                     </div>
@@ -106,16 +115,25 @@ export default function CreateCode({ users }: Props) {
                             <Select
                                 value={data.discount_type}
                                 onValueChange={(v) =>
-                                    setData('discount_type', v as typeof data.discount_type)
+                                    setData(
+                                        'discount_type',
+                                        v as typeof data.discount_type,
+                                    )
                                 }
                             >
                                 <SelectTrigger>
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="none">No discount</SelectItem>
-                                    <SelectItem value="percentage">Percentage</SelectItem>
-                                    <SelectItem value="fixed">Fixed amount</SelectItem>
+                                    <SelectItem value="none">
+                                        No discount
+                                    </SelectItem>
+                                    <SelectItem value="percentage">
+                                        Percentage
+                                    </SelectItem>
+                                    <SelectItem value="fixed">
+                                        Fixed amount
+                                    </SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -131,10 +149,17 @@ export default function CreateCode({ users }: Props) {
                                     id="discount_value"
                                     type="number"
                                     min={0}
-                                    max={data.discount_type === 'percentage' ? 100 : undefined}
+                                    max={
+                                        data.discount_type === 'percentage'
+                                            ? 100
+                                            : undefined
+                                    }
                                     value={data.discount_value}
                                     onChange={(e) =>
-                                        setData('discount_value', Number(e.target.value))
+                                        setData(
+                                            'discount_value',
+                                            Number(e.target.value),
+                                        )
                                     }
                                 />
                                 <InputError message={errors.discount_value} />
@@ -144,7 +169,9 @@ export default function CreateCode({ users }: Props) {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="commission_rate">Commission Rate (%)</Label>
+                            <Label htmlFor="commission_rate">
+                                Commission Rate (%)
+                            </Label>
                             <Input
                                 id="commission_rate"
                                 type="number"
@@ -153,7 +180,10 @@ export default function CreateCode({ users }: Props) {
                                 step={0.1}
                                 value={data.commission_rate}
                                 onChange={(e) =>
-                                    setData('commission_rate', Number(e.target.value))
+                                    setData(
+                                        'commission_rate',
+                                        Number(e.target.value),
+                                    )
                                 }
                             />
                             <InputError message={errors.commission_rate} />
@@ -166,7 +196,9 @@ export default function CreateCode({ users }: Props) {
                                 type="number"
                                 min={1}
                                 value={data.max_uses}
-                                onChange={(e) => setData('max_uses', e.target.value)}
+                                onChange={(e) =>
+                                    setData('max_uses', e.target.value)
+                                }
                                 placeholder="Unlimited"
                             />
                             <InputError message={errors.max_uses} />
@@ -179,7 +211,9 @@ export default function CreateCode({ users }: Props) {
                             id="expires_at"
                             type="date"
                             value={data.expires_at}
-                            onChange={(e) => setData('expires_at', e.target.value)}
+                            onChange={(e) =>
+                                setData('expires_at', e.target.value)
+                            }
                         />
                         <InputError message={errors.expires_at} />
                     </div>
@@ -201,7 +235,9 @@ export default function CreateCode({ users }: Props) {
                             type="checkbox"
                             id="is_active"
                             checked={data.is_active}
-                            onChange={(e) => setData('is_active', e.target.checked)}
+                            onChange={(e) =>
+                                setData('is_active', e.target.checked)
+                            }
                             className="h-4 w-4 rounded border-gray-300"
                         />
                         <Label htmlFor="is_active" className="font-normal">

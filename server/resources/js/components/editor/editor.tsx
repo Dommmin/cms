@@ -1,11 +1,10 @@
-import { type JSX } from 'react';
 import './styles/editor.css';
 
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import type { EditorState } from 'lexical';
-import { useEffect } from 'react';
+import { useEffect, type JSX } from 'react';
 import { cn } from '@/lib/utils';
 import { SharedHistoryContext } from './context/SharedHistoryContext';
 import EditorShell from './EditorShell';
@@ -42,7 +41,13 @@ export interface EditorProps {
 
 // ─── Editor Component ──────────────────────────────────────────────────────────
 
-export default function Editor({ value, onChange, placeholder, className, showTreeView }: EditorProps): JSX.Element {
+export default function Editor({
+    value,
+    onChange,
+    placeholder,
+    className,
+    showTreeView,
+}: EditorProps): JSX.Element {
     const initialConfig = {
         namespace: 'lexical-editor',
         theme,
@@ -61,7 +66,10 @@ export default function Editor({ value, onChange, placeholder, className, showTr
         <div className={cn('w-full', className)}>
             <LexicalComposer initialConfig={initialConfig}>
                 <SharedHistoryContext>
-                    <EditorShell placeholder={placeholder} showTreeView={showTreeView} />
+                    <EditorShell
+                        placeholder={placeholder}
+                        showTreeView={showTreeView}
+                    />
                     {onChange && (
                         <OnChangePlugin
                             onChange={handleChange}

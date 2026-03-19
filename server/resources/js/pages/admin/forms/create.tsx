@@ -1,4 +1,4 @@
-import { Link, Form, Head, router } from '@inertiajs/react';
+import { Link, Form, Head } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -7,8 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -24,10 +24,13 @@ export default function Create() {
             <Head title="Create Form" />
 
             <Wrapper>
-                <PageHeader title={__('page.create_form', 'Create Form')} description={__('page.create_form_desc', 'Add a new form')}>
+                <PageHeader
+                    title={__('page.create_form', 'Create Form')}
+                    description={__('page.create_form_desc', 'Add a new form')}
+                >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href='/admin/forms' prefetch cacheFor={30}>
+                            <Link href="/admin/forms" prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>
@@ -43,7 +46,9 @@ export default function Create() {
                     {({ errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="name">{__('label.name', 'Name')}</Label>
+                                <Label htmlFor="name">
+                                    {__('label.name', 'Name')}
+                                </Label>
                                 <Input
                                     id="name"
                                     name="name"
@@ -55,7 +60,9 @@ export default function Create() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="slug">{__('label.slug', 'Slug')}</Label>
+                                <Label htmlFor="slug">
+                                    {__('label.slug', 'Slug')}
+                                </Label>
                                 <Input
                                     id="slug"
                                     name="slug"
@@ -66,7 +73,9 @@ export default function Create() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="description">{__('label.description', 'Description')}</Label>
+                                <Label htmlFor="description">
+                                    {__('label.description', 'Description')}
+                                </Label>
                                 <Textarea
                                     id="description"
                                     name="description"
@@ -77,7 +86,10 @@ export default function Create() {
 
                             <div className="grid gap-2">
                                 <Label htmlFor="notify_emails">
-                                    {__('label.notify_emails', 'Notify Emails (one per line)')}
+                                    {__(
+                                        'label.notify_emails',
+                                        'Notify Emails (one per line)',
+                                    )}
                                 </Label>
                                 <Textarea
                                     id="notify_emails"
@@ -106,7 +118,9 @@ export default function Create() {
                             </div>
 
                             <div className="flex items-center gap-4">
-                                <Button type="submit">{__('action.create_form', 'Create Form')}</Button>
+                                <Button variant="outline" type="submit">
+                                    {__('action.create_form', 'Create Form')}
+                                </Button>
                             </div>
                         </>
                     )}

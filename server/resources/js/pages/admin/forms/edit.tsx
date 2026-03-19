@@ -22,8 +22,8 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 const FIELD_TYPES = [
@@ -85,7 +85,14 @@ function toFieldName(str: string) {
 }
 
 function emptyField(): FieldData {
-    return { label: '', name: '', type: 'text', placeholder: '', is_required: false, options: [] };
+    return {
+        label: '',
+        name: '',
+        type: 'text',
+        placeholder: '',
+        is_required: false,
+        options: [],
+    };
 }
 
 function FieldEditor({
@@ -108,7 +115,8 @@ function FieldEditor({
         const opts = field.options.map((o, idx) => (idx === i ? val : o));
         onChange({ options: opts });
     };
-    const removeOption = (i: number) => onChange({ options: field.options.filter((_, idx) => idx !== i) });
+    const removeOption = (i: number) =>
+        onChange({ options: field.options.filter((_, idx) => idx !== i) });
 
     return (
         <div className="rounded-lg border bg-card p-4">
@@ -119,7 +127,9 @@ function FieldEditor({
                     {/* Row 1: label + type */}
                     <div className="grid grid-cols-2 gap-3">
                         <div className="grid gap-1">
-                            <Label className="text-xs text-muted-foreground">Label *</Label>
+                            <Label className="text-xs text-muted-foreground">
+                                Label *
+                            </Label>
                             <Input
                                 value={field.label}
                                 onChange={(e) => {
@@ -130,20 +140,34 @@ function FieldEditor({
                                 }}
                                 placeholder="e.g., Full Name"
                             />
-                            <InputError message={errors[`fields.${index}.label`]} />
+                            <InputError
+                                message={errors[`fields.${index}.label`]}
+                            />
                         </div>
                         <div className="grid gap-1">
-                            <Label className="text-xs text-muted-foreground">Type *</Label>
+                            <Label className="text-xs text-muted-foreground">
+                                Type *
+                            </Label>
                             <Select
                                 value={field.type}
-                                onValueChange={(v) => onChange({ type: v, options: HAS_OPTIONS.includes(v) ? field.options : [] })}
+                                onValueChange={(v) =>
+                                    onChange({
+                                        type: v,
+                                        options: HAS_OPTIONS.includes(v)
+                                            ? field.options
+                                            : [],
+                                    })
+                                }
                             >
                                 <SelectTrigger>
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {FIELD_TYPES.map((t) => (
-                                        <SelectItem key={t.value} value={t.value}>
+                                        <SelectItem
+                                            key={t.value}
+                                            value={t.value}
+                                        >
                                             {t.label}
                                         </SelectItem>
                                     ))}
@@ -155,36 +179,56 @@ function FieldEditor({
                     {/* Row 2: field name + placeholder */}
                     <div className="grid grid-cols-2 gap-3">
                         <div className="grid gap-1">
-                            <Label className="text-xs text-muted-foreground">Field name (slug) *</Label>
+                            <Label className="text-xs text-muted-foreground">
+                                Field name (slug) *
+                            </Label>
                             <Input
                                 value={field.name}
-                                onChange={(e) => onChange({ name: toFieldName(e.target.value) })}
+                                onChange={(e) =>
+                                    onChange({
+                                        name: toFieldName(e.target.value),
+                                    })
+                                }
                                 placeholder="e.g., full_name"
                             />
-                            <InputError message={errors[`fields.${index}.name`]} />
+                            <InputError
+                                message={errors[`fields.${index}.name`]}
+                            />
                         </div>
-                        {field.type !== 'checkbox' && field.type !== 'file' && !showOptions && (
-                            <div className="grid gap-1">
-                                <Label className="text-xs text-muted-foreground">Placeholder</Label>
-                                <Input
-                                    value={field.placeholder}
-                                    onChange={(e) => onChange({ placeholder: e.target.value })}
-                                    placeholder="e.g., Enter your name"
-                                />
-                            </div>
-                        )}
+                        {field.type !== 'checkbox' &&
+                            field.type !== 'file' &&
+                            !showOptions && (
+                                <div className="grid gap-1">
+                                    <Label className="text-xs text-muted-foreground">
+                                        Placeholder
+                                    </Label>
+                                    <Input
+                                        value={field.placeholder}
+                                        onChange={(e) =>
+                                            onChange({
+                                                placeholder: e.target.value,
+                                            })
+                                        }
+                                        placeholder="e.g., Enter your name"
+                                    />
+                                </div>
+                            )}
                     </div>
 
                     {/* Options for select/radio */}
                     {showOptions && (
                         <div className="grid gap-2">
-                            <Label className="text-xs text-muted-foreground">Options</Label>
+                            <Label className="text-xs text-muted-foreground">
+                                Options
+                            </Label>
                             <div className="space-y-2">
                                 {field.options.map((opt, i) => (
                                     <div key={i} className="flex gap-2">
                                         <Input
                                             value={opt}
-                                            onChange={(e) => updateOption(i, e.target.value)}
+                                            onChange={(e) =>
+                                                updateOption(i, e.target.value)
+                                            }
                                             placeholder={`Option ${i + 1}`}
                                         />
                                         <Button
@@ -217,10 +261,15 @@ function FieldEditor({
                             type="checkbox"
                             id={`req-${index}`}
                             checked={field.is_required}
-                            onChange={(e) => onChange({ is_required: e.target.checked })}
+                            onChange={(e) =>
+                                onChange({ is_required: e.target.checked })
+                            }
                             className="h-4 w-4 rounded border-gray-300"
                         />
-                        <Label htmlFor={`req-${index}`} className="text-sm font-normal">
+                        <Label
+                            htmlFor={`req-${index}`}
+                            className="text-sm font-normal"
+                        >
                             Required field
                         </Label>
                     </div>
@@ -246,7 +295,9 @@ export default function Edit({ form }: { form: FormData }) {
     const [name, setName] = useState(form.name);
     const [slug, setSlug] = useState(form.slug);
     const [description, setDescription] = useState(form.description ?? '');
-    const [notifyEmails, setNotifyEmails] = useState((form.notify_emails ?? []).join('\n'));
+    const [notifyEmails, setNotifyEmails] = useState(
+        (form.notify_emails ?? []).join('\n'),
+    );
     const [isActive, setIsActive] = useState(form.is_active);
     const [fields, setFields] = useState<FieldData[]>(
         (form.fields ?? []).map((f) => ({
@@ -265,7 +316,9 @@ export default function Edit({ form }: { form: FormData }) {
     const addField = () => setFields((prev) => [...prev, emptyField()]);
 
     const updateField = (index: number, patch: Partial<FieldData>) => {
-        setFields((prev) => prev.map((f, i) => (i === index ? { ...f, ...patch } : f)));
+        setFields((prev) =>
+            prev.map((f, i) => (i === index ? { ...f, ...patch } : f)),
+        );
     };
 
     const deleteField = (index: number) => {
@@ -291,7 +344,9 @@ export default function Edit({ form }: { form: FormData }) {
                     type: f.type,
                     placeholder: f.placeholder || null,
                     is_required: f.is_required,
-                    options: HAS_OPTIONS.includes(f.type) ? f.options.filter(Boolean) : [],
+                    options: HAS_OPTIONS.includes(f.type)
+                        ? f.options.filter(Boolean)
+                        : [],
                 })),
             },
             {
@@ -314,10 +369,16 @@ export default function Edit({ form }: { form: FormData }) {
             <Head title={`Edit: ${form.name}`} />
 
             <Wrapper>
-                <PageHeader title={form.name} description={__('page.edit_form_desc', 'Edit form settings and fields')}>
+                <PageHeader
+                    title={form.name}
+                    description={__(
+                        'page.edit_form_desc',
+                        'Edit form settings and fields',
+                    )}
+                >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href='/admin/forms' prefetch cacheFor={30}>
+                            <Link href="/admin/forms" prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>
@@ -328,10 +389,14 @@ export default function Edit({ form }: { form: FormData }) {
                 <div className="space-y-6">
                     {/* Settings */}
                     <div className="rounded-lg border bg-card p-6">
-                        <h3 className="mb-4 font-medium">{__('misc.form_settings', 'Form Settings')}</h3>
+                        <h3 className="mb-4 font-medium">
+                            {__('misc.form_settings', 'Form Settings')}
+                        </h3>
                         <div className="grid max-w-2xl gap-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="name">{__('label.name', 'Name')} *</Label>
+                                <Label htmlFor="name">
+                                    {__('label.name', 'Name')} *
+                                </Label>
                                 <Input
                                     id="name"
                                     value={name}
@@ -341,7 +406,9 @@ export default function Edit({ form }: { form: FormData }) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="slug">{__('label.slug', 'Slug')} *</Label>
+                                <Label htmlFor="slug">
+                                    {__('label.slug', 'Slug')} *
+                                </Label>
                                 <Input
                                     id="slug"
                                     value={slug}
@@ -351,11 +418,15 @@ export default function Edit({ form }: { form: FormData }) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="description">{__('label.description', 'Description')}</Label>
+                                <Label htmlFor="description">
+                                    {__('label.description', 'Description')}
+                                </Label>
                                 <Textarea
                                     id="description"
                                     value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
+                                    onChange={(e) =>
+                                        setDescription(e.target.value)
+                                    }
                                     placeholder="Form description..."
                                 />
                             </div>
@@ -363,13 +434,19 @@ export default function Edit({ form }: { form: FormData }) {
                             <div className="grid gap-2">
                                 <Label htmlFor="notify_emails">
                                     {__('label.notify_emails', 'Notify Emails')}{' '}
-                                    <span className="font-normal text-muted-foreground">(one per line)</span>
+                                    <span className="font-normal text-muted-foreground">
+                                        (one per line)
+                                    </span>
                                 </Label>
                                 <Textarea
                                     id="notify_emails"
                                     value={notifyEmails}
-                                    onChange={(e) => setNotifyEmails(e.target.value)}
-                                    placeholder={'admin@example.com\nsupport@example.com'}
+                                    onChange={(e) =>
+                                        setNotifyEmails(e.target.value)
+                                    }
+                                    placeholder={
+                                        'admin@example.com\nsupport@example.com'
+                                    }
                                     rows={3}
                                 />
                                 <InputError message={errors.notify_emails} />
@@ -380,10 +457,17 @@ export default function Edit({ form }: { form: FormData }) {
                                     type="checkbox"
                                     id="is_active"
                                     checked={isActive}
-                                    onChange={(e) => setIsActive(e.target.checked)}
+                                    onChange={(e) =>
+                                        setIsActive(e.target.checked)
+                                    }
                                     className="h-4 w-4 rounded border-gray-300"
                                 />
-                                <Label htmlFor="is_active" className="font-normal">{__('label.is_active', 'Active')}</Label>
+                                <Label
+                                    htmlFor="is_active"
+                                    className="font-normal"
+                                >
+                                    {__('label.is_active', 'Active')}
+                                </Label>
                             </div>
                         </div>
                     </div>
@@ -392,12 +476,22 @@ export default function Edit({ form }: { form: FormData }) {
                     <div className="rounded-lg border bg-card p-6">
                         <div className="mb-4 flex items-center justify-between">
                             <div>
-                                <h3 className="font-medium">{__('misc.form_fields', 'Form Fields')}</h3>
+                                <h3 className="font-medium">
+                                    {__('misc.form_fields', 'Form Fields')}
+                                </h3>
                                 <p className="mt-0.5 text-xs text-muted-foreground">
-                                    {__('misc.form_fields_desc', 'Define the fields users will fill in.')}
+                                    {__(
+                                        'misc.form_fields_desc',
+                                        'Define the fields users will fill in.',
+                                    )}
                                 </p>
                             </div>
-                            <Button type="button" variant="outline" size="sm" onClick={addField}>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={addField}
+                            >
                                 <PlusIcon className="mr-1 h-4 w-4" />
                                 {__('action.add_field', 'Add Field')}
                             </Button>
@@ -410,7 +504,9 @@ export default function Edit({ form }: { form: FormData }) {
                                     field={field}
                                     index={index}
                                     errors={errors}
-                                    onChange={(patch) => updateField(index, patch)}
+                                    onChange={(patch) =>
+                                        updateField(index, patch)
+                                    }
                                     onDelete={() => deleteField(index)}
                                 />
                             ))}
@@ -418,7 +514,10 @@ export default function Edit({ form }: { form: FormData }) {
                             {fields.length === 0 && (
                                 <div className="rounded-lg border border-dashed p-8 text-center">
                                     <p className="text-sm text-muted-foreground">
-                                        {__('empty.no_fields', 'No fields yet. Click "Add Field" to start building your form.')}
+                                        {__(
+                                            'empty.no_fields',
+                                            'No fields yet. Click "Add Field" to start building your form.',
+                                        )}
                                     </p>
                                 </div>
                             )}
@@ -427,7 +526,9 @@ export default function Edit({ form }: { form: FormData }) {
 
                     <div className="flex items-center gap-4">
                         <Button onClick={handleSave} disabled={processing}>
-                            {processing ? __('misc.saving', 'Saving...') : __('action.save_form', 'Save Form')}
+                            {processing
+                                ? __('misc.saving', 'Saving...')
+                                : __('action.save_form', 'Save Form')}
                         </Button>
                     </div>
                 </div>

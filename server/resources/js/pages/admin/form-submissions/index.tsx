@@ -1,7 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon, TrashIcon } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -9,6 +8,7 @@ import { PageHeader } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -53,13 +53,18 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 function payloadPreview(payload: Record<string, unknown>): string {
-    return Object.entries(payload)
-        .slice(0, 2)
-        .map(([k, v]) => `${k}: ${String(v).slice(0, 30)}`)
-        .join(', ') || 'No data';
+    return (
+        Object.entries(payload)
+            .slice(0, 2)
+            .map(([k, v]) => `${k}: ${String(v).slice(0, 30)}`)
+            .join(', ') || 'No data'
+    );
 }
 
-export default function FormSubmissionsIndex({ submissions, filters }: IndexProps) {
+export default function FormSubmissionsIndex({
+    submissions,
+    filters,
+}: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<Submission>[] = [
         {
@@ -73,7 +78,9 @@ export default function FormSubmissionsIndex({ submissions, filters }: IndexProp
             accessorKey: 'form',
             header: __('column.form', 'Form'),
             cell: ({ row }) => (
-                <span className="font-medium">{row.original.form?.name ?? `#${row.original.form_id}`}</span>
+                <span className="font-medium">
+                    {row.original.form?.name ?? `#${row.original.form_id}`}
+                </span>
             ),
         },
         {
@@ -107,7 +114,8 @@ export default function FormSubmissionsIndex({ submissions, filters }: IndexProp
         {
             accessorKey: 'created_at',
             header: __('column.date', 'Date'),
-            cell: ({ row }) => new Date(row.original.created_at).toLocaleString(),
+            cell: ({ row }) =>
+                new Date(row.original.created_at).toLocaleString(),
         },
         {
             id: 'actions',
@@ -115,7 +123,11 @@ export default function FormSubmissionsIndex({ submissions, filters }: IndexProp
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/forms/${row.original.form_id}/submissions/${row.original.id}`} prefetch cacheFor={60}>
+                        <Link
+                            href={`/admin/forms/${row.original.form_id}/submissions/${row.original.id}`}
+                            prefetch
+                            cacheFor={60}
+                        >
                             <EyeIcon className="mr-1 h-3 w-3" />
                             {__('action.show', 'View')}
                         </Link>
@@ -124,12 +136,16 @@ export default function FormSubmissionsIndex({ submissions, filters }: IndexProp
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Submission')}
-                        description={__('dialog.cannot_be_undone', 'Are you sure you want to delete this submission?')}
+                        description={__(
+                            'dialog.cannot_be_undone',
+                            'Are you sure you want to delete this submission?',
+                        )}
                         onConfirm={() => {
                             router.delete(
                                 `/admin/forms/${row.original.form_id}/submissions/${row.original.id}`,
                                 {
-                                    onSuccess: () => toast.success('Submission deleted'),
+                                    onSuccess: () =>
+                                        toast.success('Submission deleted'),
                                 },
                             );
                         }}
@@ -163,7 +179,10 @@ export default function FormSubmissionsIndex({ submissions, filters }: IndexProp
                         next_page_url: submissions.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search', 'Search submissions...')}
+                    searchPlaceholder={__(
+                        'placeholder.search',
+                        'Search submissions...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/form-submissions"
                 />

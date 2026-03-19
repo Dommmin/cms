@@ -1,4 +1,4 @@
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import {
     ArrowLeft,
     CheckCircle2,
@@ -6,7 +6,6 @@ import {
     Package,
     PackageCheck,
     Truck,
-    XCircle,
     Ban,
     RefreshCcw,
 } from 'lucide-react';
@@ -14,8 +13,8 @@ import { useState } from 'react';
 
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 
@@ -154,7 +153,8 @@ function StatusModal({
 }) {
     const __ = useTranslation();
     const label =
-        statusOptions.find((s) => s.value === targetStatus)?.label ?? targetStatus;
+        statusOptions.find((s) => s.value === targetStatus)?.label ??
+        targetStatus;
     const { data, setData, patch, processing, errors } = useForm({
         status: targetStatus,
         notes: '',
@@ -171,7 +171,9 @@ function StatusModal({
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
             <div className="w-full max-w-md rounded-xl border border-border bg-background p-6 shadow-xl">
-                <h2 className="mb-1 text-lg font-semibold">{__('dialog.change_order_status', 'Change Order Status')}</h2>
+                <h2 className="mb-1 text-lg font-semibold">
+                    {__('dialog.change_order_status', 'Change Order Status')}
+                </h2>
                 <p className="mb-4 text-sm text-muted-foreground">
                     {__('misc.order', 'Order')} #{order.reference_number} →{' '}
                     <strong>{label}</strong>
@@ -181,7 +183,10 @@ function StatusModal({
                     {targetStatus === 'shipped' && (
                         <div>
                             <label className="mb-1 block text-sm font-medium">
-                                {__('label.tracking_number_optional', 'Tracking Number (optional)')}
+                                {__(
+                                    'label.tracking_number_optional',
+                                    'Tracking Number (optional)',
+                                )}
                             </label>
                             <input
                                 type="text"
@@ -190,7 +195,7 @@ function StatusModal({
                                     setData('tracking_number', e.target.value)
                                 }
                                 placeholder="np. 1234567890"
-                                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
                             />
                         </div>
                     )}
@@ -203,7 +208,7 @@ function StatusModal({
                             onChange={(e) => setData('notes', e.target.value)}
                             rows={2}
                             maxLength={500}
-                            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
                         />
                         {errors.notes && (
                             <p className="mt-1 text-xs text-destructive">
@@ -225,7 +230,9 @@ function StatusModal({
                             disabled={processing}
                             className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
                         >
-                            {processing ? __('misc.saving', 'Saving...') : __('action.confirm', 'Confirm')}
+                            {processing
+                                ? __('misc.saving', 'Saving...')
+                                : __('action.confirm', 'Confirm')}
                         </button>
                     </div>
                 </form>
@@ -278,7 +285,7 @@ export default function OrderShow({
     const customerName =
         order.customer?.user?.name ??
         (`${order.customer?.first_name ?? ''} ${order.customer?.last_name ?? ''}`.trim() ||
-        __('misc.guest', 'Guest'));
+            __('misc.guest', 'Guest'));
     const customerEmail =
         order.customer?.user?.email ?? order.customer?.email ?? '';
 
@@ -289,7 +296,9 @@ export default function OrderShow({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`${__('misc.order', 'Order')} #${order.reference_number}`} />
+            <Head
+                title={`${__('misc.order', 'Order')} #${order.reference_number}`}
+            />
 
             {modalStatus && (
                 <StatusModal
@@ -321,7 +330,6 @@ export default function OrderShow({
                 <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
                     {/* ── Left (2/3): main info ── */}
                     <div className="space-y-6 lg:col-span-2">
-
                         {/* Status + transitions */}
                         <div className="rounded-xl border border-border p-5">
                             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -363,7 +371,8 @@ export default function OrderShow({
                         <div className="rounded-xl border border-border">
                             <div className="border-b border-border px-5 py-3">
                                 <h2 className="font-semibold">
-                                    {__('misc.products', 'Products')} ({order.items?.length ?? 0})
+                                    {__('misc.products', 'Products')} (
+                                    {order.items?.length ?? 0})
                                 </h2>
                             </div>
                             <table className="w-full text-sm">
@@ -393,9 +402,7 @@ export default function OrderShow({
                                             ? Object.entries(
                                                   item.variant.attributes,
                                               )
-                                                  .map(
-                                                      ([k, v]) => `${k}: ${v}`,
-                                                  )
+                                                  .map(([k, v]) => `${k}: ${v}`)
                                                   .join(', ')
                                             : null;
                                         return (
@@ -438,19 +445,28 @@ export default function OrderShow({
                             <div className="border-t border-border px-5 py-4">
                                 <div className="ml-auto max-w-xs space-y-1.5 text-sm">
                                     <div className="flex justify-between text-muted-foreground">
-                                        <span>{__('misc.products', 'Products')}</span>
+                                        <span>
+                                            {__('misc.products', 'Products')}
+                                        </span>
                                         <span>{fmt(order.subtotal)}</span>
                                     </div>
                                     {order.discount_amount > 0 && (
                                         <div className="flex justify-between text-green-600">
-                                            <span>{__('misc.discount', 'Discount')}</span>
+                                            <span>
+                                                {__(
+                                                    'misc.discount',
+                                                    'Discount',
+                                                )}
+                                            </span>
                                             <span>
                                                 -{fmt(order.discount_amount)}
                                             </span>
                                         </div>
                                     )}
                                     <div className="flex justify-between text-muted-foreground">
-                                        <span>{__('misc.shipping', 'Shipping')}</span>
+                                        <span>
+                                            {__('misc.shipping', 'Shipping')}
+                                        </span>
                                         <span>{fmt(order.shipping_cost)}</span>
                                     </div>
                                     {order.tax_amount > 0 && (
@@ -472,7 +488,10 @@ export default function OrderShow({
                             order.status_history.length > 0 && (
                                 <div className="rounded-xl border border-border p-5">
                                     <h2 className="mb-4 font-semibold">
-                                        {__('misc.status_history', 'Status History')}
+                                        {__(
+                                            'misc.status_history',
+                                            'Status History',
+                                        )}
                                     </h2>
                                     <ol className="relative border-l border-border pl-4">
                                         {order.status_history.map((h) => (
@@ -513,10 +532,9 @@ export default function OrderShow({
 
                     {/* ── Right (1/3): customer, addresses, shipment ── */}
                     <div className="space-y-4">
-
                         {/* Customer */}
                         <div className="rounded-xl border border-border p-5">
-                            <h2 className="mb-3 font-semibold text-sm">
+                            <h2 className="mb-3 text-sm font-semibold">
                                 {__('misc.customer', 'Customer')}
                             </h2>
                             <p className="font-medium">{customerName}</p>
@@ -532,18 +550,18 @@ export default function OrderShow({
 
                         {/* Addresses */}
                         <div className="rounded-xl border border-border p-5">
-                            <h2 className="mb-3 font-semibold text-sm">
+                            <h2 className="mb-3 text-sm font-semibold">
                                 {__('misc.addresses', 'Addresses')}
                             </h2>
                             <div className="space-y-3 text-sm">
                                 <div>
-                                    <p className="mb-0.5 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                    <p className="mb-0.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
                                         {__('misc.delivery', 'Delivery')}
                                     </p>
                                     <p>{fmtAddress(order.shipping_address)}</p>
                                 </div>
                                 <div>
-                                    <p className="mb-0.5 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                    <p className="mb-0.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
                                         {__('misc.billing', 'Billing')}
                                     </p>
                                     <p>{fmtAddress(order.billing_address)}</p>
@@ -554,7 +572,7 @@ export default function OrderShow({
                         {/* Payment */}
                         {order.payment && (
                             <div className="rounded-xl border border-border p-5">
-                                <h2 className="mb-3 font-semibold text-sm">
+                                <h2 className="mb-3 text-sm font-semibold">
                                     {__('misc.payment', 'Payment')}
                                 </h2>
                                 <div className="space-y-1 text-sm">
@@ -603,7 +621,7 @@ export default function OrderShow({
                         {/* Shipment */}
                         {order.shipment && (
                             <div className="rounded-xl border border-border p-5">
-                                <h2 className="mb-3 font-semibold text-sm">
+                                <h2 className="mb-3 text-sm font-semibold">
                                     {__('misc.shipment', 'Shipment')}
                                 </h2>
                                 <div className="space-y-1 text-sm">
@@ -628,13 +646,13 @@ export default function OrderShow({
                                     {order.shipment.tracking_number && (
                                         <div className="flex justify-between">
                                             <span className="text-muted-foreground">
-                                                {__('label.tracking_number', 'Tracking No.')}
+                                                {__(
+                                                    'label.tracking_number',
+                                                    'Tracking No.',
+                                                )}
                                             </span>
                                             <span className="font-mono text-xs">
-                                                {
-                                                    order.shipment
-                                                        .tracking_number
-                                                }
+                                                {order.shipment.tracking_number}
                                             </span>
                                         </div>
                                     )}
@@ -645,7 +663,7 @@ export default function OrderShow({
                         {/* Notes */}
                         {order.notes && (
                             <div className="rounded-xl border border-border p-5">
-                                <h2 className="mb-2 font-semibold text-sm">
+                                <h2 className="mb-2 text-sm font-semibold">
                                     {__('misc.notes', 'Notes')}
                                 </h2>
                                 <p className="text-sm text-muted-foreground">

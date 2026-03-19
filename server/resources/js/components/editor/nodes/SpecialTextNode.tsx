@@ -28,7 +28,11 @@ export class SpecialTextNode extends TextNode {
         return dom;
     }
 
-    updateDOM(prevNode: SpecialTextNode, dom: HTMLElement, config: EditorConfig): boolean {
+    updateDOM(
+        prevNode: SpecialTextNode,
+        dom: HTMLElement,
+        config: EditorConfig,
+    ): boolean {
         // @ts-expect-error - Lexical TextNode prevNode typing
         return super.updateDOM(prevNode, dom, config);
     }

@@ -3,7 +3,11 @@ import { $patchStyleText } from '@lexical/selection';
 import { $getSelection, $isRangeSelection } from 'lexical';
 import { Minus, Plus } from 'lucide-react';
 import { type JSX } from 'react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 const MIN_FONT_SIZE = 8;
 const MAX_FONT_SIZE = 72;
@@ -18,12 +22,19 @@ function parseFontSize(value: string): number {
     return parseInt(value.replace('px', ''), 10) || 15;
 }
 
-export default function FontSizeInput({ value, disabled, onChange }: Props): JSX.Element {
+export default function FontSizeInput({
+    value,
+    disabled,
+    onChange,
+}: Props): JSX.Element {
     const [editor] = useLexicalComposerContext();
     const currentSize = parseFontSize(value);
 
     const updateFontSize = (newSize: number) => {
-        const clamped = Math.min(Math.max(newSize, MIN_FONT_SIZE), MAX_FONT_SIZE);
+        const clamped = Math.min(
+            Math.max(newSize, MIN_FONT_SIZE),
+            MAX_FONT_SIZE,
+        );
         const sizeStr = `${clamped}px`;
         editor.update(() => {
             const selection = $getSelection();
@@ -47,7 +58,9 @@ export default function FontSizeInput({ value, disabled, onChange }: Props): JSX
                         <Minus className="h-3 w-3" />
                     </button>
                 </TooltipTrigger>
-                <TooltipContent side="bottom"><p>Decrease font size</p></TooltipContent>
+                <TooltipContent side="bottom">
+                    <p>Decrease font size</p>
+                </TooltipContent>
             </Tooltip>
             <Tooltip>
                 <TooltipTrigger asChild>
@@ -57,11 +70,17 @@ export default function FontSizeInput({ value, disabled, onChange }: Props): JSX
                         disabled={disabled}
                         min={MIN_FONT_SIZE}
                         max={MAX_FONT_SIZE}
-                        onChange={(e) => updateFontSize(parseInt(e.target.value, 10) || currentSize)}
-                        className="h-8 w-12 border-y border-input text-center text-sm outline-none focus:ring-0 bg-transparent"
+                        onChange={(e) =>
+                            updateFontSize(
+                                parseInt(e.target.value, 10) || currentSize,
+                            )
+                        }
+                        className="h-8 w-12 border-y border-input bg-transparent text-center text-sm outline-none focus:ring-0"
                     />
                 </TooltipTrigger>
-                <TooltipContent side="bottom"><p>Font size</p></TooltipContent>
+                <TooltipContent side="bottom">
+                    <p>Font size</p>
+                </TooltipContent>
             </Tooltip>
             <Tooltip>
                 <TooltipTrigger asChild>
@@ -74,7 +93,9 @@ export default function FontSizeInput({ value, disabled, onChange }: Props): JSX
                         <Plus className="h-3 w-3" />
                     </button>
                 </TooltipTrigger>
-                <TooltipContent side="bottom"><p>Increase font size</p></TooltipContent>
+                <TooltipContent side="bottom">
+                    <p>Increase font size</p>
+                </TooltipContent>
             </Tooltip>
         </div>
     );

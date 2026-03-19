@@ -14,7 +14,6 @@ import {
     SaveIcon,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -25,8 +24,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
-import { formatFileSize } from '@/lib/utils';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
+import { formatFileSize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 
 type MediaCustomProperties = {
@@ -69,7 +69,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Media', href: '/admin/media' },
 ];
 
-
 function getFileIcon(mimeType: string) {
     if (mimeType.startsWith('image/')) return ImageIcon;
     if (mimeType === 'application/pdf') return FileTextIcon;
@@ -99,6 +98,7 @@ export default function Index({
     const [isSavingMeta, setIsSavingMeta] = useState(false);
 
     // Sync metadata form when a new item is selected
+
     useEffect(() => {
         if (selectedItem) {
             setMetaForm({
@@ -150,7 +150,12 @@ export default function Index({
 
         router.post('/admin/media', formData, {
             onSuccess: () => {
-                toast.success(__('misc.files_uploaded', `${files.length} file(s) uploaded`));
+                toast.success(
+                    __(
+                        'misc.files_uploaded',
+                        `${files.length} file(s) uploaded`,
+                    ),
+                );
                 setUploadingFiles([]);
                 setIsUploading(false);
             },
@@ -180,7 +185,10 @@ export default function Index({
                     custom_properties: { ...metaForm },
                 });
             },
-            onError: () => toast.error(__('misc.failed_save_metadata', 'Failed to save metadata')),
+            onError: () =>
+                toast.error(
+                    __('misc.failed_save_metadata', 'Failed to save metadata'),
+                ),
             onFinish: () => setIsSavingMeta(false),
         });
     };
@@ -204,7 +212,10 @@ export default function Index({
             <Wrapper>
                 <PageHeader
                     title={__('page.media', 'Media Library')}
-                    description={__('page.media_desc', 'Manage files and images')}
+                    description={__(
+                        'page.media_desc',
+                        'Manage files and images',
+                    )}
                 >
                     <PageHeaderActions>
                         <Button
@@ -275,7 +286,10 @@ export default function Index({
                     <div className="relative max-w-md flex-1">
                         <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
-                            placeholder={__('placeholder.search_files', 'Search files...')}
+                            placeholder={__(
+                                'placeholder.search_files',
+                                'Search files...',
+                            )}
                             value={search}
                             onChange={(e) => handleSearch(e.target.value)}
                             className="pl-9"
@@ -330,8 +344,14 @@ export default function Index({
                                                 'image/',
                                             ) ? (
                                                 <img
-                                                    src={item.thumbnail_url ?? item.url}
-                                                    alt={item.custom_properties?.alt || item.name}
+                                                    src={
+                                                        item.thumbnail_url ??
+                                                        item.url
+                                                    }
+                                                    alt={
+                                                        item.custom_properties
+                                                            ?.alt || item.name
+                                                    }
                                                     className="h-full w-full object-cover"
                                                     loading="lazy"
                                                 />
@@ -400,7 +420,9 @@ export default function Index({
                     {selectedItem && (
                         <div className="w-80 shrink-0 overflow-y-auto border-l bg-muted/30">
                             <div className="flex items-center justify-between border-b px-4 py-3">
-                                <h3 className="font-semibold">{__('misc.details', 'Details')}</h3>
+                                <h3 className="font-semibold">
+                                    {__('misc.details', 'Details')}
+                                </h3>
                                 <Button
                                     variant="outline"
                                     size="icon"
@@ -417,7 +439,10 @@ export default function Index({
                                     ) ? (
                                         <img
                                             src={selectedItem.url}
-                                            alt={selectedItem.custom_properties?.alt || selectedItem.name}
+                                            alt={
+                                                selectedItem.custom_properties
+                                                    ?.alt || selectedItem.name
+                                            }
                                             className="h-full w-full object-contain"
                                         />
                                     ) : (
@@ -469,7 +494,9 @@ export default function Index({
                                                 {__('column.size', 'Size')}
                                             </Label>
                                             <p className="text-sm">
-                                                {formatFileSize(selectedItem.size)}
+                                                {formatFileSize(
+                                                    selectedItem.size,
+                                                )}
                                             </p>
                                         </div>
                                     </div>
@@ -487,15 +514,23 @@ export default function Index({
 
                                 {/* Editable metadata — available for all file types */}
                                 <div className="space-y-3 border-t pt-3">
-                                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                    <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                                         {__('misc.metadata', 'Metadata')}
                                     </p>
                                     {/* Alt text + caption only make sense for images */}
-                                    {selectedItem.mime_type.startsWith('image/') && (
+                                    {selectedItem.mime_type.startsWith(
+                                        'image/',
+                                    ) && (
                                         <>
                                             <div className="space-y-1">
-                                                <Label htmlFor="meta-alt" className="text-xs">
-                                                    {__('label.alt_text', 'Alt text')}
+                                                <Label
+                                                    htmlFor="meta-alt"
+                                                    className="text-xs"
+                                                >
+                                                    {__(
+                                                        'label.alt_text',
+                                                        'Alt text',
+                                                    )}
                                                 </Label>
                                                 <Input
                                                     id="meta-alt"
@@ -511,8 +546,14 @@ export default function Index({
                                                 />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label htmlFor="meta-caption" className="text-xs">
-                                                    {__('label.caption', 'Caption')}
+                                                <Label
+                                                    htmlFor="meta-caption"
+                                                    className="text-xs"
+                                                >
+                                                    {__(
+                                                        'label.caption',
+                                                        'Caption',
+                                                    )}
                                                 </Label>
                                                 <Input
                                                     id="meta-caption"
@@ -520,7 +561,8 @@ export default function Index({
                                                     onChange={(e) =>
                                                         setMetaForm((f) => ({
                                                             ...f,
-                                                            caption: e.target.value,
+                                                            caption:
+                                                                e.target.value,
                                                         }))
                                                     }
                                                     placeholder="Visible caption on page"
@@ -530,8 +572,14 @@ export default function Index({
                                         </>
                                     )}
                                     <div className="space-y-1">
-                                        <Label htmlFor="meta-description" className="text-xs">
-                                            {__('label.description', 'Description')}
+                                        <Label
+                                            htmlFor="meta-description"
+                                            className="text-xs"
+                                        >
+                                            {__(
+                                                'label.description',
+                                                'Description',
+                                            )}
                                         </Label>
                                         <Textarea
                                             id="meta-description"
@@ -548,8 +596,14 @@ export default function Index({
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <Label htmlFor="meta-author" className="text-xs">
-                                            {__('label.author_copyright', 'Author / Copyright')}
+                                        <Label
+                                            htmlFor="meta-author"
+                                            className="text-xs"
+                                        >
+                                            {__(
+                                                'label.author_copyright',
+                                                'Author / Copyright',
+                                            )}
                                         </Label>
                                         <Input
                                             id="meta-author"
@@ -571,7 +625,9 @@ export default function Index({
                                         disabled={isSavingMeta}
                                     >
                                         <SaveIcon className="mr-2 h-3.5 w-3.5" />
-                                        {isSavingMeta ? 'Saving…' : 'Save metadata'}
+                                        {isSavingMeta
+                                            ? 'Saving…'
+                                            : 'Save metadata'}
                                     </Button>
                                 </div>
 
@@ -588,12 +644,18 @@ export default function Index({
                                         }
                                     >
                                         <EyeIcon className="mr-2 h-4 w-4" />
-                                        {__('action.view_full_size', 'View Full Size')}
+                                        {__(
+                                            'action.view_full_size',
+                                            'View Full Size',
+                                        )}
                                     </Button>
                                     <ConfirmButton
                                         variant="outline"
                                         className="w-full"
-                                        title={__('dialog.delete_file', 'Delete File')}
+                                        title={__(
+                                            'dialog.delete_file',
+                                            'Delete File',
+                                        )}
                                         description={`Are you sure you want to delete "${selectedItem.name}"? This action cannot be undone.`}
                                         onConfirm={() => {
                                             router.delete(
@@ -601,7 +663,10 @@ export default function Index({
                                                 {
                                                     onSuccess: () => {
                                                         toast.success(
-                                                            __('misc.file_deleted', 'File deleted'),
+                                                            __(
+                                                                'misc.file_deleted',
+                                                                'File deleted',
+                                                            ),
                                                         );
                                                         setSelectedItem(null);
                                                     },

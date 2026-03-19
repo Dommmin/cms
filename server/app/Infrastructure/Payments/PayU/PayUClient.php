@@ -71,7 +71,7 @@ class PayUClient
             ->withoutRedirecting()
             ->acceptJson();
 
-        return match (strtoupper($method)) {
+        return match (mb_strtoupper($method)) {
             'POST' => $client->post($baseUrl.$path, $data),
             'GET' => $client->get($baseUrl.$path),
             default => throw new RuntimeException("Unsupported HTTP method: {$method}"),

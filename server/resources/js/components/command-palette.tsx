@@ -36,19 +36,66 @@ interface NavShortcut {
 // ── Static nav shortcuts ───────────────────────────────────────────────────
 
 const NAV_SHORTCUTS: NavShortcut[] = [
-    { group: 'Navigate', label: 'Dashboard', url: '/admin', icon: <LayoutDashboard className="h-4 w-4" /> },
-    { group: 'Navigate', label: 'Products', url: '/admin/ecommerce/products', icon: <Package className="h-4 w-4" /> },
-    { group: 'Navigate', label: 'Orders', url: '/admin/ecommerce/orders', icon: <ShoppingCart className="h-4 w-4" /> },
-    { group: 'Navigate', label: 'Blog Posts', url: '/admin/blog/posts', icon: <FileText className="h-4 w-4" /> },
-    { group: 'Navigate', label: 'Pages', url: '/admin/cms/pages', icon: <Folders className="h-4 w-4" /> },
-    { group: 'Navigate', label: 'Users', url: '/admin/users', icon: <Users className="h-4 w-4" /> },
-    { group: 'Navigate', label: 'Newsletter', url: '/admin/newsletter/campaigns', icon: <BarChart3 className="h-4 w-4" /> },
-    { group: 'Navigate', label: 'Settings', url: '/settings', icon: <Settings className="h-4 w-4" /> },
+    {
+        group: 'Navigate',
+        label: 'Dashboard',
+        url: '/admin',
+        icon: <LayoutDashboard className="h-4 w-4" />,
+    },
+    {
+        group: 'Navigate',
+        label: 'Products',
+        url: '/admin/ecommerce/products',
+        icon: <Package className="h-4 w-4" />,
+    },
+    {
+        group: 'Navigate',
+        label: 'Orders',
+        url: '/admin/ecommerce/orders',
+        icon: <ShoppingCart className="h-4 w-4" />,
+    },
+    {
+        group: 'Navigate',
+        label: 'Blog Posts',
+        url: '/admin/blog/posts',
+        icon: <FileText className="h-4 w-4" />,
+    },
+    {
+        group: 'Navigate',
+        label: 'Pages',
+        url: '/admin/cms/pages',
+        icon: <Folders className="h-4 w-4" />,
+    },
+    {
+        group: 'Navigate',
+        label: 'Users',
+        url: '/admin/users',
+        icon: <Users className="h-4 w-4" />,
+    },
+    {
+        group: 'Navigate',
+        label: 'Newsletter',
+        url: '/admin/newsletter/campaigns',
+        icon: <BarChart3 className="h-4 w-4" />,
+    },
+    {
+        group: 'Navigate',
+        label: 'Settings',
+        url: '/settings',
+        icon: <Settings className="h-4 w-4" />,
+    },
 ];
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-const GROUP_ORDER = ['Navigate', 'Products', 'Blog Posts', 'Pages', 'Orders', 'Users'];
+const GROUP_ORDER = [
+    'Navigate',
+    'Products',
+    'Blog Posts',
+    'Pages',
+    'Orders',
+    'Users',
+];
 
 function groupResults(items: SearchResult[]): Record<string, SearchResult[]> {
     const grouped: Record<string, SearchResult[]> = {};
@@ -121,10 +168,13 @@ export function CommandPalette() {
         }
         setLoading(true);
         try {
-            const res = await fetch(`/admin/search?q=${encodeURIComponent(q)}`, {
-                headers: { Accept: 'application/json' },
-                credentials: 'same-origin',
-            });
+            const res = await fetch(
+                `/admin/search?q=${encodeURIComponent(q)}`,
+                {
+                    headers: { Accept: 'application/json' },
+                    credentials: 'same-origin',
+                },
+            );
             const data: SearchResult[] = await res.json();
             setResults(data);
             setActiveIndex(0);
@@ -145,9 +195,8 @@ export function CommandPalette() {
 
     // ── Flat list of all visible items ─────────────────────────────────────
 
-    const displayItems: SearchResult[] = query.trim().length < 2
-        ? NAV_SHORTCUTS
-        : results;
+    const displayItems: SearchResult[] =
+        query.trim().length < 2 ? NAV_SHORTCUTS : results;
 
     // ── Keyboard navigation ────────────────────────────────────────────────
 
@@ -172,7 +221,9 @@ export function CommandPalette() {
     // ── Scroll active item into view ───────────────────────────────────────
 
     useEffect(() => {
-        const el = listRef.current?.querySelector(`[data-active="true"]`) as HTMLElement | null;
+        const el = listRef.current?.querySelector(
+            `[data-active="true"]`,
+        ) as HTMLElement | null;
         el?.scrollIntoView({ block: 'nearest' });
     }, [activeIndex]);
 
@@ -186,7 +237,7 @@ export function CommandPalette() {
             {/* Trigger button shown in the header */}
             <DialogPrimitive.Trigger asChild>
                 <button
-                    className="flex h-9 items-center gap-2 rounded-md border border-input bg-muted/40 px-3 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="flex h-9 items-center gap-2 rounded-md border border-input bg-muted/40 px-3 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
                     aria-label="Search"
                 >
                     <Search className="h-4 w-4 shrink-0" />
@@ -204,14 +255,17 @@ export function CommandPalette() {
                     className="fixed top-[12%] left-1/2 z-50 w-full max-w-xl -translate-x-1/2 rounded-xl border border-border bg-background shadow-2xl focus:outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
                     onKeyDown={handleKeyDown}
                 >
-                    <DialogPrimitive.Title className="sr-only">Command palette</DialogPrimitive.Title>
+                    <DialogPrimitive.Title className="sr-only">
+                        Command palette
+                    </DialogPrimitive.Title>
 
                     {/* Search input */}
                     <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-                        {loading
-                            ? <Loader2 className="h-4 w-4 shrink-0 animate-spin text-muted-foreground" />
-                            : <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
-                        }
+                        {loading ? (
+                            <Loader2 className="h-4 w-4 shrink-0 animate-spin text-muted-foreground" />
+                        ) : (
+                            <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+                        )}
                         <input
                             ref={inputRef}
                             value={query}
@@ -223,7 +277,11 @@ export function CommandPalette() {
                         />
                         {query && (
                             <button
-                                onClick={() => { setQuery(''); setResults([]); inputRef.current?.focus(); }}
+                                onClick={() => {
+                                    setQuery('');
+                                    setResults([]);
+                                    inputRef.current?.focus();
+                                }}
                                 className="text-xs text-muted-foreground hover:text-foreground"
                             >
                                 Clear
@@ -232,30 +290,40 @@ export function CommandPalette() {
                     </div>
 
                     {/* Results */}
-                    <div ref={listRef} className="max-h-[400px] overflow-y-auto py-2">
-                        {displayItems.length === 0 && query.trim().length >= 2 && !loading && (
-                            <p className="px-4 py-8 text-center text-sm text-muted-foreground">
-                                No results for &ldquo;{query}&rdquo;
-                            </p>
-                        )}
+                    <div
+                        ref={listRef}
+                        className="max-h-[400px] overflow-y-auto py-2"
+                    >
+                        {displayItems.length === 0 &&
+                            query.trim().length >= 2 &&
+                            !loading && (
+                                <p className="px-4 py-8 text-center text-sm text-muted-foreground">
+                                    No results for &ldquo;{query}&rdquo;
+                                </p>
+                            )}
 
                         {groups.map((group) => (
                             <div key={group}>
-                                <p className="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                <p className="px-4 pt-3 pb-1 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                                     {group}
                                 </p>
                                 {grouped[group].map((item) => {
-                                    const flatIndex = displayItems.indexOf(item);
+                                    const flatIndex =
+                                        displayItems.indexOf(item);
                                     const isActive = flatIndex === activeIndex;
                                     return (
                                         <button
                                             key={`${item.group}-${item.url}`}
                                             data-active={isActive}
                                             onClick={() => navigate(item)}
-                                            onMouseEnter={() => setActiveIndex(flatIndex)}
+                                            onMouseEnter={() =>
+                                                setActiveIndex(flatIndex)
+                                            }
                                             className={cn(
                                                 'flex w-full items-center gap-3 px-4 py-2 text-left text-sm transition-colors',
-                                                isActive ? 'bg-accent text-accent-foreground' : 'text-foreground hover:bg-accent/50',
+                                                isActive
+                                                    ? 'bg-accent text-accent-foreground'
+                                                    : 'text-foreground hover:bg-accent/50',
                                             )}
                                         >
                                             {'icon' in item && (
@@ -263,7 +331,9 @@ export function CommandPalette() {
                                                     {(item as NavShortcut).icon}
                                                 </span>
                                             )}
-                                            <span className="flex-1 truncate font-medium">{item.label}</span>
+                                            <span className="flex-1 truncate font-medium">
+                                                {item.label}
+                                            </span>
                                             {item.meta && (
                                                 <span className="shrink-0 truncate text-xs text-muted-foreground">
                                                     {item.meta}
@@ -278,9 +348,24 @@ export function CommandPalette() {
 
                     {/* Footer hint */}
                     <div className="flex items-center gap-4 border-t border-border px-4 py-2 text-xs text-muted-foreground">
-                        <span><kbd className="rounded border border-border px-1">↑↓</kbd> navigate</span>
-                        <span><kbd className="rounded border border-border px-1">↵</kbd> open</span>
-                        <span><kbd className="rounded border border-border px-1">Esc</kbd> close</span>
+                        <span>
+                            <kbd className="rounded border border-border px-1">
+                                ↑↓
+                            </kbd>{' '}
+                            navigate
+                        </span>
+                        <span>
+                            <kbd className="rounded border border-border px-1">
+                                ↵
+                            </kbd>{' '}
+                            open
+                        </span>
+                        <span>
+                            <kbd className="rounded border border-border px-1">
+                                Esc
+                            </kbd>{' '}
+                            close
+                        </span>
                     </div>
                 </DialogPrimitive.Content>
             </DialogPrimitive.Portal>

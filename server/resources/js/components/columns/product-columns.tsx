@@ -4,8 +4,8 @@ import { PencilIcon, TrashIcon, Package } from 'lucide-react';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { resolveLocalizedText } from '@/lib/localized-text';
 import { useTranslation } from '@/hooks/use-translation';
+import { resolveLocalizedText } from '@/lib/localized-text';
 
 export type ProductRow = {
     id: number;
@@ -40,7 +40,9 @@ export function useProductColumns(): ColumnDef<ProductRow>[] {
                         )}
                     </div>
                     <div>
-                        <div className="font-medium">{resolveLocalizedText(row.original.name)}</div>
+                        <div className="font-medium">
+                            {resolveLocalizedText(row.original.name)}
+                        </div>
                         <div className="text-xs text-muted-foreground">
                             /{row.original.slug}
                         </div>
@@ -53,7 +55,9 @@ export function useProductColumns(): ColumnDef<ProductRow>[] {
             header: __('column.category', 'Category'),
             cell: ({ row }) =>
                 row.original.category ? (
-                    <span className="text-sm">{resolveLocalizedText(row.original.category.name)}</span>
+                    <span className="text-sm">
+                        {resolveLocalizedText(row.original.category.name)}
+                    </span>
                 ) : (
                     <span className="text-muted-foreground">—</span>
                 ),
@@ -86,8 +90,12 @@ export function useProductColumns(): ColumnDef<ProductRow>[] {
             accessorKey: 'is_active',
             header: __('column.status', 'Status'),
             cell: ({ row }) => (
-                <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
-                    {row.original.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
+                <Badge
+                    variant={row.original.is_active ? 'default' : 'secondary'}
+                >
+                    {row.original.is_active
+                        ? __('status.active', 'Active')
+                        : __('status.inactive', 'Inactive')}
                 </Badge>
             ),
         },
@@ -97,7 +105,11 @@ export function useProductColumns(): ColumnDef<ProductRow>[] {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/ecommerce/products/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/ecommerce/products/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>

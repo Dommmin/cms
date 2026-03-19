@@ -1,11 +1,11 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 type SubmissionData = {
@@ -52,9 +52,16 @@ export default function SubmissionShow({
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href={`/admin/forms/${form.id}/submissions`} prefetch cacheFor={30}>
+                            <Link
+                                href={`/admin/forms/${form.id}/submissions`}
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                {__('action.back_to_submissions', 'Back to Submissions')}
+                                {__(
+                                    'action.back_to_submissions',
+                                    'Back to Submissions',
+                                )}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -102,7 +109,9 @@ export default function SubmissionShow({
 
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-lg">{__('misc.metadata', 'Metadata')}</CardTitle>
+                            <CardTitle className="text-lg">
+                                {__('misc.metadata', 'Metadata')}
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <dl className="space-y-4">
@@ -140,7 +149,10 @@ export default function SubmissionShow({
                                 </div>
                                 <div>
                                     <dt className="text-sm font-medium text-muted-foreground">
-                                        {__('label.submitted_at', 'Submitted At')}
+                                        {__(
+                                            'label.submitted_at',
+                                            'Submitted At',
+                                        )}
                                     </dt>
                                     <dd className="mt-1 text-sm">
                                         {new Date(

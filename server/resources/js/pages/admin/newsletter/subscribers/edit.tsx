@@ -1,4 +1,4 @@
-import { Link, Form, Head, router } from '@inertiajs/react';
+import { Link, Form, Head } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -33,12 +33,15 @@ export default function Edit({ subscriber }: { subscriber: Subscriber }) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/newsletter/subscribers' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back
-                        
-                </Link>
-            </Button>
+                            <Link
+                                href="/admin/newsletter/subscribers"
+                                prefetch
+                                cacheFor={30}
+                            >
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                Back
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -82,7 +85,10 @@ export default function Edit({ subscriber }: { subscriber: Subscriber }) {
                                     defaultChecked={subscriber.is_active}
                                     className="h-4 w-4 rounded border-gray-300"
                                 />
-                                <Label htmlFor="is_active" className="font-normal">
+                                <Label
+                                    htmlFor="is_active"
+                                    className="font-normal"
+                                >
                                     Active
                                 </Label>
                             </div>

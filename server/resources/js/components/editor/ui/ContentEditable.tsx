@@ -7,11 +7,14 @@ interface Props {
     placeholder?: string;
 }
 
-export default function LexicalContentEditable({ className, placeholder: _placeholder }: Props): JSX.Element {
+export default function LexicalContentEditable({
+    className,
+    placeholder: _placeholder,
+}: Props): JSX.Element {
     return (
         <ContentEditable
             className={cn(
-                'ContentEditable__root min-h-[400px] p-4 outline-none text-foreground leading-relaxed',
+                'ContentEditable__root min-h-[400px] p-4 leading-relaxed text-foreground outline-none',
                 className,
             )}
         />

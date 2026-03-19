@@ -7,8 +7,8 @@ import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 type Submission = {
@@ -95,7 +95,11 @@ export default function SubmissionsIndex({
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/forms/${form.id}/submissions/${row.original.id}`} prefetch cacheFor={60}>
+                        <Link
+                            href={`/admin/forms/${form.id}/submissions/${row.original.id}`}
+                            prefetch
+                            cacheFor={60}
+                        >
                             <EyeIcon className="mr-1 h-3 w-3" />
                             {__('action.view', 'View')}
                         </Link>
@@ -104,7 +108,10 @@ export default function SubmissionsIndex({
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Submission')}
-                        description={__('dialog.are_you_sure', 'Are you sure you want to delete this submission?')}
+                        description={__(
+                            'dialog.are_you_sure',
+                            'Are you sure you want to delete this submission?',
+                        )}
                         onConfirm={() => {
                             router.delete(
                                 `/admin/forms/${form.id}/submissions/${row.original.id}`,
@@ -133,7 +140,11 @@ export default function SubmissionsIndex({
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href={`/admin/forms/${form.id}/edit`} prefetch cacheFor={30}>
+                            <Link
+                                href={`/admin/forms/${form.id}/edit`}
+                                prefetch
+                                cacheFor={30}
+                            >
                                 {__('action.edit_form', 'Edit Form')}
                             </Link>
                         </Button>

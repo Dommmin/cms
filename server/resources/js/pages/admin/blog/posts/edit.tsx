@@ -1,14 +1,11 @@
-import { useAdminLocale } from '@/hooks/use-admin-locale';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowLeftIcon, ExternalLink, EyeIcon } from 'lucide-react';
-import { SeoPanel } from '@/components/seo-panel';
-import { VersionHistory } from '@/components/version-history';
 import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import toast from 'react-hot-toast';
 import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
+import { SeoPanel } from '@/components/seo-panel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,10 +18,13 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { VersionHistory } from '@/components/version-history';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
+import { useAdminLocale } from '@/hooks/use-admin-locale';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
@@ -167,10 +167,15 @@ export default function EditBlogPost({ post, categories }: Props) {
         };
 
         router.post(`/admin/blog/posts/${post.id}`, payload, {
-            onSuccess: () => toast.success(__('misc.post_updated', 'Post updated successfully')),
+            onSuccess: () =>
+                toast.success(
+                    __('misc.post_updated', 'Post updated successfully'),
+                ),
             onError: (errs) => {
                 setErrors(errs);
-                toast.error(__('misc.fix_errors', 'Please fix the errors below'));
+                toast.error(
+                    __('misc.fix_errors', 'Please fix the errors below'),
+                );
             },
             onFinish: () => setProcessing(false),
         });
@@ -208,7 +213,11 @@ export default function EditBlogPost({ post, categories }: Props) {
                             </a>
                         </Button>
                         <Button asChild variant="outline">
-                            <Link href="/admin/blog/posts" prefetch cacheFor={30}>
+                            <Link
+                                href="/admin/blog/posts"
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>
@@ -222,11 +231,18 @@ export default function EditBlogPost({ post, categories }: Props) {
                         <div className="lg:col-span-2">
                             <Tabs defaultValue="general" className="space-y-6">
                                 <TabsList>
-                                    <TabsTrigger value="general">{__('tab.general', 'General')}</TabsTrigger>
-                                    <TabsTrigger value="seo">{__('tab.seo', 'SEO')}</TabsTrigger>
+                                    <TabsTrigger value="general">
+                                        {__('tab.general', 'General')}
+                                    </TabsTrigger>
+                                    <TabsTrigger value="seo">
+                                        {__('tab.seo', 'SEO')}
+                                    </TabsTrigger>
                                 </TabsList>
 
-                                <TabsContent value="general" className="space-y-6">
+                                <TabsContent
+                                    value="general"
+                                    className="space-y-6"
+                                >
                                     {/* Locale switcher */}
                                     {locales.length > 1 && (
                                         <div className="flex items-center gap-2 rounded-lg border p-3">
@@ -242,12 +258,19 @@ export default function EditBlogPost({ post, categories }: Props) {
                                     )}
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="title">{__('label.title', 'Title')} *</Label>
+                                        <Label htmlFor="title">
+                                            {__('label.title', 'Title')} *
+                                        </Label>
                                         <Input
                                             id="title"
-                                            value={data.title[activeLocale] ?? ''}
+                                            value={
+                                                data.title[activeLocale] ?? ''
+                                            }
                                             onChange={(e) =>
-                                                handleTitleChange(activeLocale, e.target.value)
+                                                handleTitleChange(
+                                                    activeLocale,
+                                                    e.target.value,
+                                                )
                                             }
                                             placeholder="Post title"
                                         />
@@ -255,13 +278,20 @@ export default function EditBlogPost({ post, categories }: Props) {
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="slug">{__('label.slug', 'Slug')}</Label>
+                                        <Label htmlFor="slug">
+                                            {__('label.slug', 'Slug')}
+                                        </Label>
                                         <Input
                                             id="slug"
                                             value={data.slug}
                                             readOnly={!isSlugManual}
                                             onChange={(e) =>
-                                                setData((prev) => ({ ...prev, slug: slugify(e.target.value) }))
+                                                setData((prev) => ({
+                                                    ...prev,
+                                                    slug: slugify(
+                                                        e.target.value,
+                                                    ),
+                                                }))
                                             }
                                             placeholder="post-slug"
                                         />
@@ -271,32 +301,45 @@ export default function EditBlogPost({ post, categories }: Props) {
                                                 type="checkbox"
                                                 checked={isSlugManual}
                                                 onChange={(e) => {
-                                                    const manual = e.target.checked;
+                                                    const manual =
+                                                        e.target.checked;
                                                     setIsSlugManual(manual);
                                                     if (!manual) {
                                                         setData((prev) => ({
                                                             ...prev,
-                                                            slug: slugify(prev.title[defaultLocale] ?? ''),
+                                                            slug: slugify(
+                                                                prev.title[
+                                                                    defaultLocale
+                                                                ] ?? '',
+                                                            ),
                                                         }));
                                                     }
                                                 }}
                                                 className="h-4 w-4 rounded border-input"
                                             />
-                                            {__('misc.set_slug_manually', 'Set slug manually')}
+                                            {__(
+                                                'misc.set_slug_manually',
+                                                'Set slug manually',
+                                            )}
                                         </label>
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="excerpt">{__('label.excerpt', 'Excerpt')}</Label>
+                                        <Label htmlFor="excerpt">
+                                            {__('label.excerpt', 'Excerpt')}
+                                        </Label>
                                         <Textarea
                                             id="excerpt"
-                                            value={data.excerpt[activeLocale] ?? ''}
+                                            value={
+                                                data.excerpt[activeLocale] ?? ''
+                                            }
                                             onChange={(e) =>
                                                 setData((prev) => ({
                                                     ...prev,
                                                     excerpt: {
                                                         ...prev.excerpt,
-                                                        [activeLocale]: e.target.value,
+                                                        [activeLocale]:
+                                                            e.target.value,
                                                     },
                                                 }))
                                             }
@@ -308,26 +351,47 @@ export default function EditBlogPost({ post, categories }: Props) {
 
                                     <div className="grid gap-2">
                                         <div className="flex items-center justify-between">
-                                            <Label>{__('label.content', 'Content')} *</Label>
+                                            <Label>
+                                                {__('label.content', 'Content')}{' '}
+                                                *
+                                            </Label>
                                             <Select
                                                 value={data.content_type}
                                                 onValueChange={(val) =>
-                                                    handleContentTypeChange(val as 'richtext' | 'markdown')
+                                                    handleContentTypeChange(
+                                                        val as
+                                                            | 'richtext'
+                                                            | 'markdown',
+                                                    )
                                                 }
                                             >
                                                 <SelectTrigger className="w-40">
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="richtext">{__('type.rich_text', 'Rich Text')}</SelectItem>
-                                                    <SelectItem value="markdown">{__('type.markdown', 'Markdown')}</SelectItem>
+                                                    <SelectItem value="richtext">
+                                                        {__(
+                                                            'type.rich_text',
+                                                            'Rich Text',
+                                                        )}
+                                                    </SelectItem>
+                                                    <SelectItem value="markdown">
+                                                        {__(
+                                                            'type.markdown',
+                                                            'Markdown',
+                                                        )}
+                                                    </SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
                                         {data.content_type === 'richtext' ? (
                                             <RichTextEditor
                                                 key={`richtext-${activeLocale}`}
-                                                value={data.content[activeLocale] ?? ''}
+                                                value={
+                                                    data.content[
+                                                        activeLocale
+                                                    ] ?? ''
+                                                }
                                                 onChange={(val) =>
                                                     setData((prev) => ({
                                                         ...prev,
@@ -342,7 +406,11 @@ export default function EditBlogPost({ post, categories }: Props) {
                                         ) : (
                                             <MarkdownEditor
                                                 key={`markdown-${activeLocale}`}
-                                                value={data.content[activeLocale] ?? ''}
+                                                value={
+                                                    data.content[
+                                                        activeLocale
+                                                    ] ?? ''
+                                                }
                                                 onChange={(val) =>
                                                     setData((prev) => ({
                                                         ...prev,
@@ -362,13 +430,18 @@ export default function EditBlogPost({ post, categories }: Props) {
                                     <SeoPanel
                                         data={{
                                             seo_title: data.seo_title,
-                                            seo_description: data.seo_description,
+                                            seo_description:
+                                                data.seo_description,
                                             meta_robots: data.meta_robots,
                                             og_image: data.og_image,
-                                            sitemap_exclude: data.sitemap_exclude,
+                                            sitemap_exclude:
+                                                data.sitemap_exclude,
                                         }}
                                         onChange={(field, value) =>
-                                            setData((prev) => ({ ...prev, [field]: value }))
+                                            setData((prev) => ({
+                                                ...prev,
+                                                [field]: value,
+                                            }))
                                         }
                                         errors={errors}
                                         urlPath={`blog/${data.slug ?? post.slug}`}
@@ -390,7 +463,9 @@ export default function EditBlogPost({ post, categories }: Props) {
                                 </h3>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="status">{__('column.status', 'Status')}</Label>
+                                    <Label htmlFor="status">
+                                        {__('column.status', 'Status')}
+                                    </Label>
                                     <Select
                                         value={data.status}
                                         onValueChange={(val) =>
@@ -408,13 +483,22 @@ export default function EditBlogPost({ post, categories }: Props) {
                                                 {__('status.draft', 'Draft')}
                                             </SelectItem>
                                             <SelectItem value="scheduled">
-                                                {__('status.scheduled', 'Scheduled')}
+                                                {__(
+                                                    'status.scheduled',
+                                                    'Scheduled',
+                                                )}
                                             </SelectItem>
                                             <SelectItem value="published">
-                                                {__('status.published', 'Published')}
+                                                {__(
+                                                    'status.published',
+                                                    'Published',
+                                                )}
                                             </SelectItem>
                                             <SelectItem value="archived">
-                                                {__('status.archived', 'Archived')}
+                                                {__(
+                                                    'status.archived',
+                                                    'Archived',
+                                                )}
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
@@ -424,7 +508,11 @@ export default function EditBlogPost({ post, categories }: Props) {
                                 {data.status === 'scheduled' && (
                                     <div className="grid gap-2">
                                         <Label htmlFor="published_at">
-                                            {__('label.publish_at', 'Publish At')} *
+                                            {__(
+                                                'label.publish_at',
+                                                'Publish At',
+                                            )}{' '}
+                                            *
                                         </Label>
                                         <Input
                                             id="published_at"
@@ -433,7 +521,8 @@ export default function EditBlogPost({ post, categories }: Props) {
                                             onChange={(e) =>
                                                 setData((prev) => ({
                                                     ...prev,
-                                                    published_at: e.target.value,
+                                                    published_at:
+                                                        e.target.value,
                                                 }))
                                             }
                                         />
@@ -460,33 +549,63 @@ export default function EditBlogPost({ post, categories }: Props) {
                                         htmlFor="is_featured"
                                         className="font-normal"
                                     >
-                                        {__('label.featured_post', 'Featured post')}
+                                        {__(
+                                            'label.featured_post',
+                                            'Featured post',
+                                        )}
                                     </Label>
                                 </div>
 
                                 {locales.length > 1 && (
                                     <div className="space-y-2 border-t pt-3">
-                                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                                            {__('misc.visible_in_locales', 'Visible in locales')}
+                                        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                                            {__(
+                                                'misc.visible_in_locales',
+                                                'Visible in locales',
+                                            )}
                                         </p>
                                         <p className="text-xs text-muted-foreground">
-                                            {__('misc.leave_all_unchecked', 'Leave all unchecked to show in all languages.')}
+                                            {__(
+                                                'misc.leave_all_unchecked',
+                                                'Leave all unchecked to show in all languages.',
+                                            )}
                                         </p>
                                         {locales.map((locale) => (
-                                            <div key={locale.code} className="flex items-center gap-2">
+                                            <div
+                                                key={locale.code}
+                                                className="flex items-center gap-2"
+                                            >
                                                 <input
                                                     type="checkbox"
                                                     id={`locale-${locale.code}`}
-                                                    checked={data.available_locales?.includes(locale.code) ?? false}
+                                                    checked={
+                                                        data.available_locales?.includes(
+                                                            locale.code,
+                                                        ) ?? false
+                                                    }
                                                     onChange={(e) =>
                                                         setData((prev) => {
-                                                            const current = prev.available_locales ?? [];
-                                                            const updated = e.target.checked
-                                                                ? [...current, locale.code]
-                                                                : current.filter((c) => c !== locale.code);
+                                                            const current =
+                                                                prev.available_locales ??
+                                                                [];
+                                                            const updated = e
+                                                                .target.checked
+                                                                ? [
+                                                                      ...current,
+                                                                      locale.code,
+                                                                  ]
+                                                                : current.filter(
+                                                                      (c) =>
+                                                                          c !==
+                                                                          locale.code,
+                                                                  );
                                                             return {
                                                                 ...prev,
-                                                                available_locales: updated.length > 0 ? updated : null,
+                                                                available_locales:
+                                                                    updated.length >
+                                                                    0
+                                                                        ? updated
+                                                                        : null,
                                                             };
                                                         })
                                                     }
@@ -496,7 +615,8 @@ export default function EditBlogPost({ post, categories }: Props) {
                                                     htmlFor={`locale-${locale.code}`}
                                                     className="font-normal"
                                                 >
-                                                    {locale.name} ({locale.code})
+                                                    {locale.name} ({locale.code}
+                                                    )
                                                 </Label>
                                             </div>
                                         ))}
@@ -523,7 +643,12 @@ export default function EditBlogPost({ post, categories }: Props) {
                                         }
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder={__('placeholder.select_category', 'Select a category')} />
+                                            <SelectValue
+                                                placeholder={__(
+                                                    'placeholder.select_category',
+                                                    'Select a category',
+                                                )}
+                                            />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {categories.map((cat) => (
@@ -542,7 +667,9 @@ export default function EditBlogPost({ post, categories }: Props) {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="tags">{__('label.tags', 'Tags')}</Label>
+                                    <Label htmlFor="tags">
+                                        {__('label.tags', 'Tags')}
+                                    </Label>
                                     <Input
                                         id="tags"
                                         value={data.tags}
@@ -555,7 +682,10 @@ export default function EditBlogPost({ post, categories }: Props) {
                                         placeholder="tag1, tag2, tag3"
                                     />
                                     <p className="text-xs text-muted-foreground">
-                                        {__('misc.tags_comma_separated', 'Separate tags with commas')}
+                                        {__(
+                                            'misc.tags_comma_separated',
+                                            'Separate tags with commas',
+                                        )}
                                     </p>
                                     <InputError message={errors.tags} />
                                 </div>
@@ -563,7 +693,10 @@ export default function EditBlogPost({ post, categories }: Props) {
 
                             <div className="space-y-4 rounded-lg border p-4">
                                 <h3 className="text-sm font-medium">
-                                    {__('misc.featured_image', 'Featured Image')}
+                                    {__(
+                                        'misc.featured_image',
+                                        'Featured Image',
+                                    )}
                                 </h3>
                                 <div className="grid gap-2">
                                     <Label htmlFor="featured_image">
@@ -587,14 +720,20 @@ export default function EditBlogPost({ post, categories }: Props) {
                             </div>
 
                             <Button
+                                variant="outline"
                                 type="submit"
                                 disabled={processing}
                                 className="w-full"
                             >
-                                {processing ? __('misc.saving', 'Saving...') : __('action.save_changes', 'Save Changes')}
+                                {processing
+                                    ? __('misc.saving', 'Saving...')
+                                    : __('action.save_changes', 'Save Changes')}
                             </Button>
 
-                            <VersionHistory modelType="blog-post" modelId={post.id} />
+                            <VersionHistory
+                                modelType="blog-post"
+                                modelId={post.id}
+                            />
                         </div>
                     </div>
                 </form>

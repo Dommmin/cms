@@ -23,8 +23,8 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 type MenuItemData = {
@@ -90,10 +90,14 @@ function MenuItemEditor({
                                 required
                             />
                             <div className="grid gap-1">
-                                <Label className="text-xs text-muted-foreground">URL</Label>
+                                <Label className="text-xs text-muted-foreground">
+                                    URL
+                                </Label>
                                 <Input
                                     value={item.url}
-                                    onChange={(e) => onChange({ url: e.target.value })}
+                                    onChange={(e) =>
+                                        onChange({ url: e.target.value })
+                                    }
                                     placeholder="/home or https://..."
                                 />
                             </div>
@@ -101,17 +105,25 @@ function MenuItemEditor({
 
                         <div className="grid grid-cols-2 gap-3">
                             <div className="grid gap-1">
-                                <Label className="text-xs text-muted-foreground">Target</Label>
+                                <Label className="text-xs text-muted-foreground">
+                                    Target
+                                </Label>
                                 <Select
                                     value={item.target}
-                                    onValueChange={(v) => onChange({ target: v })}
+                                    onValueChange={(v) =>
+                                        onChange({ target: v })
+                                    }
                                 >
                                     <SelectTrigger>
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="_self">Same window</SelectItem>
-                                        <SelectItem value="_blank">New window</SelectItem>
+                                        <SelectItem value="_self">
+                                            Same window
+                                        </SelectItem>
+                                        <SelectItem value="_blank">
+                                            New window
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -121,7 +133,9 @@ function MenuItemEditor({
                                 </Label>
                                 <Input
                                     value={item.icon}
-                                    onChange={(e) => onChange({ icon: e.target.value })}
+                                    onChange={(e) =>
+                                        onChange({ icon: e.target.value })
+                                    }
                                     placeholder="lucide icon name"
                                 />
                             </div>
@@ -183,7 +197,9 @@ function MenuItemEditor({
                             }}
                             onDelete={() => {
                                 onChange({
-                                    children: item.children.filter((_, i) => i !== idx),
+                                    children: item.children.filter(
+                                        (_, i) => i !== idx,
+                                    ),
                                 });
                             }}
                             onAddChild={() => {}}
@@ -203,7 +219,8 @@ export default function Edit({ menu, locations }: Props) {
     const [isActive, setIsActive] = useState(menu.is_active);
     const normalizeLabel = (label: unknown): Record<string, string> => {
         if (typeof label === 'string') return { en: label };
-        if (label && typeof label === 'object') return label as Record<string, string>;
+        if (label && typeof label === 'object')
+            return label as Record<string, string>;
         return {};
     };
 
@@ -226,7 +243,9 @@ export default function Edit({ menu, locations }: Props) {
     const addItem = () => setItems((prev) => [...prev, emptyItem()]);
 
     const updateItem = (index: number, patch: Partial<MenuItemData>) => {
-        setItems((prev) => prev.map((item, i) => (i === index ? { ...item, ...patch } : item)));
+        setItems((prev) =>
+            prev.map((item, i) => (i === index ? { ...item, ...patch } : item)),
+        );
     };
 
     const deleteItem = (index: number) => {
@@ -283,10 +302,16 @@ export default function Edit({ menu, locations }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit: ${menu.name}`} />
             <Wrapper>
-                <PageHeader title={__('page.edit_menu', 'Edit Menu')} description={__('page.edit_menu_desc', 'Manage menu items and settings')}>
+                <PageHeader
+                    title={__('page.edit_menu', 'Edit Menu')}
+                    description={__(
+                        'page.edit_menu_desc',
+                        'Manage menu items and settings',
+                    )}
+                >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href='/admin/menus' prefetch cacheFor={30}>
+                            <Link href="/admin/menus" prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>
@@ -297,10 +322,14 @@ export default function Edit({ menu, locations }: Props) {
                 <div className="space-y-6">
                     {/* Menu Settings */}
                     <div className="rounded-lg border bg-card p-6">
-                        <h3 className="mb-4 font-medium">{__('misc.menu_settings', 'Menu Settings')}</h3>
+                        <h3 className="mb-4 font-medium">
+                            {__('misc.menu_settings', 'Menu Settings')}
+                        </h3>
                         <div className="grid max-w-2xl gap-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="name">{__('label.name', 'Name')} *</Label>
+                                <Label htmlFor="name">
+                                    {__('label.name', 'Name')} *
+                                </Label>
                                 <Input
                                     id="name"
                                     value={name}
@@ -311,22 +340,43 @@ export default function Edit({ menu, locations }: Props) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="location">{__('label.location', 'Location')}</Label>
-                                <Select value={location} onValueChange={setLocation}>
+                                <Label htmlFor="location">
+                                    {__('label.location', 'Location')}
+                                </Label>
+                                <Select
+                                    value={location}
+                                    onValueChange={setLocation}
+                                >
                                     <SelectTrigger id="location">
-                                        <SelectValue placeholder={__('placeholder.select_location', 'Select location')} />
+                                        <SelectValue
+                                            placeholder={__(
+                                                'placeholder.select_location',
+                                                'Select location',
+                                            )}
+                                        />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="none">{__('misc.no_location', 'No location')}</SelectItem>
+                                        <SelectItem value="none">
+                                            {__(
+                                                'misc.no_location',
+                                                'No location',
+                                            )}
+                                        </SelectItem>
                                         {locations.map((loc) => (
-                                            <SelectItem key={loc.value} value={loc.value}>
+                                            <SelectItem
+                                                key={loc.value}
+                                                value={loc.value}
+                                            >
                                                 {loc.label}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
                                 <p className="text-xs text-muted-foreground">
-                                    {__('misc.location_hint', 'Where this menu appears on the public site.')}
+                                    {__(
+                                        'misc.location_hint',
+                                        'Where this menu appears on the public site.',
+                                    )}
                                 </p>
                                 <InputError message={errors.location} />
                             </div>
@@ -336,10 +386,15 @@ export default function Edit({ menu, locations }: Props) {
                                     type="checkbox"
                                     id="is_active"
                                     checked={isActive}
-                                    onChange={(e) => setIsActive(e.target.checked)}
+                                    onChange={(e) =>
+                                        setIsActive(e.target.checked)
+                                    }
                                     className="h-4 w-4 rounded border-gray-300"
                                 />
-                                <Label htmlFor="is_active" className="font-normal">
+                                <Label
+                                    htmlFor="is_active"
+                                    className="font-normal"
+                                >
                                     {__('label.is_active', 'Active')}
                                 </Label>
                             </div>
@@ -350,12 +405,27 @@ export default function Edit({ menu, locations }: Props) {
                     <div className="rounded-lg border bg-card p-6">
                         <div className="mb-4 flex items-center justify-between">
                             <div>
-                                <h3 className="font-medium">{__('misc.menu_items', 'Menu Items')}</h3>
+                                <h3 className="font-medium">
+                                    {__('misc.menu_items', 'Menu Items')}
+                                </h3>
                                 <p className="mt-0.5 text-xs text-muted-foreground">
-                                    {__('misc.menu_items_desc', 'Add links. Use the')} <PlusIcon className="inline h-3 w-3" /> {__('misc.menu_items_desc2', 'button on an item to add a sub-item (dropdown).')}
+                                    {__(
+                                        'misc.menu_items_desc',
+                                        'Add links. Use the',
+                                    )}{' '}
+                                    <PlusIcon className="inline h-3 w-3" />{' '}
+                                    {__(
+                                        'misc.menu_items_desc2',
+                                        'button on an item to add a sub-item (dropdown).',
+                                    )}
                                 </p>
                             </div>
-                            <Button type="button" variant="outline" size="sm" onClick={addItem}>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={addItem}
+                            >
                                 <PlusIcon className="mr-1 h-4 w-4" />
                                 {__('action.add_item', 'Add Item')}
                             </Button>
@@ -366,7 +436,9 @@ export default function Edit({ menu, locations }: Props) {
                                 <MenuItemEditor
                                     key={index}
                                     item={item}
-                                    onChange={(patch) => updateItem(index, patch)}
+                                    onChange={(patch) =>
+                                        updateItem(index, patch)
+                                    }
                                     onDelete={() => deleteItem(index)}
                                     onAddChild={() => addChildToItem(index)}
                                 />
@@ -375,7 +447,10 @@ export default function Edit({ menu, locations }: Props) {
                             {items.length === 0 && (
                                 <div className="rounded-lg border border-dashed p-8 text-center">
                                     <p className="text-sm text-muted-foreground">
-                                        {__('empty.no_items', 'No items yet. Click "Add Item" to start building your menu.')}
+                                        {__(
+                                            'empty.no_items',
+                                            'No items yet. Click "Add Item" to start building your menu.',
+                                        )}
                                     </p>
                                 </div>
                             )}
@@ -383,8 +458,14 @@ export default function Edit({ menu, locations }: Props) {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <Button onClick={handleSave} disabled={processing}>
-                            {processing ? __('misc.saving', 'Saving...') : __('action.save_menu', 'Save Menu')}
+                        <Button
+                            variant="outline"
+                            onClick={handleSave}
+                            disabled={processing}
+                        >
+                            {processing
+                                ? __('misc.saving', 'Saving...')
+                                : __('action.save_menu', 'Save Menu')}
                         </Button>
                     </div>
                 </div>

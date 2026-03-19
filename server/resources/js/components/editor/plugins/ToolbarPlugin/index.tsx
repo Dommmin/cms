@@ -1,10 +1,21 @@
-import { $isCodeNode, CODE_LANGUAGE_FRIENDLY_NAME_MAP, normalizeCodeLang } from '@lexical/code';
+import {
+    $isCodeNode,
+    CODE_LANGUAGE_FRIENDLY_NAME_MAP,
+    normalizeCodeLang,
+} from '@lexical/code';
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link';
 import { $isListNode, ListNode } from '@lexical/list';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $isHeadingNode, HeadingTagType } from '@lexical/rich-text';
-import { $getSelectionStyleValueForProperty, $isAtNodeEnd, $patchStyleText } from '@lexical/selection';
-import { $findMatchingParent, $getNearestNodeOfType, mergeRegister } from '@lexical/utils';
+import { $isHeadingNode } from '@lexical/rich-text';
+import {
+    $getSelectionStyleValueForProperty,
+    $patchStyleText,
+} from '@lexical/selection';
+import {
+    $findMatchingParent,
+    $getNearestNodeOfType,
+    mergeRegister,
+} from '@lexical/utils';
 import {
     $getNodeByKey,
     $getSelection,
@@ -14,21 +25,29 @@ import {
     CAN_REDO_COMMAND,
     CAN_UNDO_COMMAND,
     COMMAND_PRIORITY_CRITICAL,
-    COMMAND_PRIORITY_NORMAL,
-    FORMAT_ELEMENT_COMMAND,
-    FORMAT_TEXT_COMMAND,
     REDO_COMMAND,
     SELECTION_CHANGE_COMMAND,
     UNDO_COMMAND,
     type ElementFormatType,
-    type LexicalEditor,
     type NodeKey,
 } from 'lexical';
-import { Redo2, Undo2, Link, Unlink, Baseline, Highlighter } from 'lucide-react';
+import {
+    Redo2,
+    Undo2,
+    Link,
+    Unlink,
+    Baseline,
+    Highlighter,
+} from 'lucide-react';
 import { type JSX } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Toggle } from '@/components/ui/toggle';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useSharedHistoryContext } from '../../context/SharedHistoryContext';
 import type { BlockType } from '../../context/ToolbarContext';
 import DropDown, { DropDownItem } from '../../ui/DropDown';
@@ -37,7 +56,7 @@ import { getSelectedNode } from '../../utils/getSelectedNode';
 import { sanitizeUrl } from '../../utils/url';
 import AlignDropdown from './AlignDropdown';
 import BlockFormatDropdown from './BlockFormatDropdown';
-import { FontFamilyDropdown, FontSizeDropdown } from './FontDropdown';
+import { FontFamilyDropdown } from './FontDropdown';
 import FontSizeInput from './FontSizeInput';
 import InsertDropdown from './InsertDropdown';
 import TextFormatButtons from './TextFormatButtons';
@@ -46,7 +65,9 @@ import TextFormatButtons from './TextFormatButtons';
 const EXTRA_LANGUAGES: [string, string][] = [['php', 'PHP']];
 
 const CODE_LANGUAGE_OPTIONS: [string, string][] = [];
-for (const [lang, friendlyName] of Object.entries(CODE_LANGUAGE_FRIENDLY_NAME_MAP)) {
+for (const [lang, friendlyName] of Object.entries(
+    CODE_LANGUAGE_FRIENDLY_NAME_MAP,
+)) {
     CODE_LANGUAGE_OPTIONS.push([lang, friendlyName]);
 }
 // Add extra languages not in the default map
@@ -57,17 +78,22 @@ for (const entry of EXTRA_LANGUAGES) {
 }
 CODE_LANGUAGE_OPTIONS.sort((a, b) => a[1].localeCompare(b[1]));
 
-export default function ToolbarPlugin({ setIsLinkEditMode }: { setIsLinkEditMode?: (v: boolean) => void }): JSX.Element {
+export default function ToolbarPlugin({
+    setIsLinkEditMode,
+}: {
+    setIsLinkEditMode?: (v: boolean) => void;
+}): JSX.Element {
     const [editor] = useLexicalComposerContext();
-    const { historyState } = useSharedHistoryContext();
+    const { historyState: _historyState } = useSharedHistoryContext();
     const toolbarRef = useRef<HTMLDivElement>(null);
 
     const [canUndo, setCanUndo] = useState(false);
     const [canRedo, setCanRedo] = useState(false);
     const [blockType, setBlockType] = useState<BlockType>('paragraph');
-    const [selectedElementKey, setSelectedElementKey] = useState<NodeKey | null>(null);
+    const [selectedElementKey, setSelectedElementKey] =
+        useState<NodeKey | null>(null);
     const [codeLanguage, setCodeLanguage] = useState<string>('');
-    const [isRTL, setIsRTL] = useState(false);
+    const [_isRTL, setIsRTL] = useState(false);
     const [isLink, setIsLink] = useState(false);
     const [isBold, setIsBold] = useState(false);
     const [isItalic, setIsItalic] = useState(false);
@@ -81,7 +107,8 @@ export default function ToolbarPlugin({ setIsLinkEditMode }: { setIsLinkEditMode
     const [bgColor, setBgColor] = useState('#ffffff');
     const [fontFamily, setFontFamily] = useState('Arial');
     const [fontSize, setFontSize] = useState('15px');
-    const [elementFormat, setElementFormat] = useState<ElementFormatType>('left');
+    const [elementFormat, setElementFormat] =
+        useState<ElementFormatType>('left');
 
     const $updateToolbar = useCallback(() => {
         const selection = $getSelection();
@@ -95,7 +122,8 @@ export default function ToolbarPlugin({ setIsLinkEditMode }: { setIsLinkEditMode
                           return parent !== null && $isRootOrShadowRoot(parent);
                       });
 
-            if (element === null) element = anchorNode.getTopLevelElementOrThrow();
+            if (element === null)
+                element = anchorNode.getTopLevelElementOrThrow();
 
             const elementKey = element.getKey();
             const elementDOM = editor.getElementByKey(elementKey);
@@ -116,83 +144,173 @@ export default function ToolbarPlugin({ setIsLinkEditMode }: { setIsLinkEditMode
             if (elementDOM !== null) {
                 setSelectedElementKey(elementKey);
                 if ($isListNode(element)) {
-                    const parentList = $getNearestNodeOfType<ListNode>(anchorNode, ListNode);
-                    const type = parentList ? parentList.getListType() : element.getListType();
-                    setBlockType(type === 'bullet' ? 'bullet' : type === 'number' ? 'number' : 'check');
+                    const parentList = $getNearestNodeOfType<ListNode>(
+                        anchorNode,
+                        ListNode,
+                    );
+                    const type = parentList
+                        ? parentList.getListType()
+                        : element.getListType();
+                    setBlockType(
+                        type === 'bullet'
+                            ? 'bullet'
+                            : type === 'number'
+                              ? 'number'
+                              : 'check',
+                    );
                 } else {
-                    const type = $isHeadingNode(element) ? element.getTag() : element.getType();
-                    if (type in { paragraph: 1, quote: 1, code: 1, h1: 1, h2: 1, h3: 1, h4: 1, h5: 1, h6: 1 }) {
+                    const type = $isHeadingNode(element)
+                        ? element.getTag()
+                        : element.getType();
+                    if (
+                        type in
+                        {
+                            paragraph: 1,
+                            quote: 1,
+                            code: 1,
+                            h1: 1,
+                            h2: 1,
+                            h3: 1,
+                            h4: 1,
+                            h5: 1,
+                            h6: 1,
+                        }
+                    ) {
                         setBlockType(type as BlockType);
                     }
-                    if ($isCodeNode(element)) setCodeLanguage(element.getLanguage() ?? '');
+                    if ($isCodeNode(element))
+                        setCodeLanguage(element.getLanguage() ?? '');
                 }
             }
 
-            setFontColor($getSelectionStyleValueForProperty(selection, 'color', '#000000'));
-            setBgColor($getSelectionStyleValueForProperty(selection, 'background-color', '#ffffff'));
-            setFontFamily($getSelectionStyleValueForProperty(selection, 'font-family', 'Arial'));
-            setFontSize($getSelectionStyleValueForProperty(selection, 'font-size', '15px'));
-            setElementFormat(($isElementNode(element) ? element.getFormatType() : 'left') || 'left');
+            setFontColor(
+                $getSelectionStyleValueForProperty(
+                    selection,
+                    'color',
+                    '#000000',
+                ),
+            );
+            setBgColor(
+                $getSelectionStyleValueForProperty(
+                    selection,
+                    'background-color',
+                    '#ffffff',
+                ),
+            );
+            setFontFamily(
+                $getSelectionStyleValueForProperty(
+                    selection,
+                    'font-family',
+                    'Arial',
+                ),
+            );
+            setFontSize(
+                $getSelectionStyleValueForProperty(
+                    selection,
+                    'font-size',
+                    '15px',
+                ),
+            );
+            setElementFormat(
+                ($isElementNode(element) ? element.getFormatType() : 'left') ||
+                    'left',
+            );
         }
     }, [editor]);
 
     useEffect(() => {
         return mergeRegister(
-            editor.registerEditableListener((editable) => setIsEditable(editable)),
+            editor.registerEditableListener((editable) =>
+                setIsEditable(editable),
+            ),
             editor.registerUpdateListener(({ editorState }) => {
                 editorState.read(() => $updateToolbar());
             }),
-            editor.registerCommand(SELECTION_CHANGE_COMMAND, (_payload, _newEditor) => {
-                $updateToolbar();
-                return false;
-            }, COMMAND_PRIORITY_CRITICAL),
-            editor.registerCommand(CAN_UNDO_COMMAND, (payload) => { setCanUndo(payload); return false; }, COMMAND_PRIORITY_CRITICAL),
-            editor.registerCommand(CAN_REDO_COMMAND, (payload) => { setCanRedo(payload); return false; }, COMMAND_PRIORITY_CRITICAL),
+            editor.registerCommand(
+                SELECTION_CHANGE_COMMAND,
+                (_payload, _newEditor) => {
+                    $updateToolbar();
+                    return false;
+                },
+                COMMAND_PRIORITY_CRITICAL,
+            ),
+            editor.registerCommand(
+                CAN_UNDO_COMMAND,
+                (payload) => {
+                    setCanUndo(payload);
+                    return false;
+                },
+                COMMAND_PRIORITY_CRITICAL,
+            ),
+            editor.registerCommand(
+                CAN_REDO_COMMAND,
+                (payload) => {
+                    setCanRedo(payload);
+                    return false;
+                },
+                COMMAND_PRIORITY_CRITICAL,
+            ),
         );
     }, [editor, $updateToolbar]);
 
     const applyStyleText = useCallback(
         (styles: Record<string, string>, skipHistoryStack?: boolean) => {
-            editor.update(() => {
-                const selection = $getSelection();
-                if ($isRangeSelection(selection)) $patchStyleText(selection, styles);
-            }, skipHistoryStack ? { tag: 'historic' } : {});
+            editor.update(
+                () => {
+                    const selection = $getSelection();
+                    if ($isRangeSelection(selection))
+                        $patchStyleText(selection, styles);
+                },
+                skipHistoryStack ? { tag: 'historic' } : {},
+            );
         },
         [editor],
     );
 
-    const onFontColorSelect = useCallback((value: string, _skipHistoryStack?: boolean) => {
-        applyStyleText({ color: value });
-    }, [applyStyleText]);
+    const onFontColorSelect = useCallback(
+        (value: string, _skipHistoryStack?: boolean) => {
+            applyStyleText({ color: value });
+        },
+        [applyStyleText],
+    );
 
-    const onBgColorSelect = useCallback((value: string, _skipHistoryStack?: boolean) => {
-        applyStyleText({ 'background-color': value });
-    }, [applyStyleText]);
+    const onBgColorSelect = useCallback(
+        (value: string, _skipHistoryStack?: boolean) => {
+            applyStyleText({ 'background-color': value });
+        },
+        [applyStyleText],
+    );
 
     const insertLink = useCallback(() => {
         if (!isLink) {
             setIsLinkEditMode?.(true);
-            editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizeUrl('https://'));
+            editor.dispatchCommand(
+                TOGGLE_LINK_COMMAND,
+                sanitizeUrl('https://'),
+            );
         } else {
             setIsLinkEditMode?.(false);
             editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
         }
     }, [editor, isLink, setIsLinkEditMode]);
 
-    const onCodeLanguageSelect = useCallback((value: string) => {
-        editor.update(() => {
-            if (selectedElementKey !== null) {
-                const node = $getNodeByKey(selectedElementKey);
-                if ($isCodeNode(node)) node.setLanguage(value);
-            }
-        });
-    }, [editor, selectedElementKey]);
+    const onCodeLanguageSelect = useCallback(
+        (value: string) => {
+            editor.update(() => {
+                if (selectedElementKey !== null) {
+                    const node = $getNodeByKey(selectedElementKey);
+                    if ($isCodeNode(node)) node.setLanguage(value);
+                }
+            });
+        },
+        [editor, selectedElementKey],
+    );
 
     return (
         <TooltipProvider>
             <div
                 ref={toolbarRef}
-                className="flex items-center flex-wrap gap-0.5 p-1.5 border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10 min-h-12"
+                className="sticky top-0 z-10 flex min-h-12 flex-wrap items-center gap-0.5 border-b bg-card/80 p-1.5 backdrop-blur-sm"
             >
                 {/* Undo / Redo */}
                 <Tooltip>
@@ -200,39 +318,61 @@ export default function ToolbarPlugin({ setIsLinkEditMode }: { setIsLinkEditMode
                         <button
                             type="button"
                             disabled={!canUndo || !isEditable}
-                            onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
+                            onClick={() =>
+                                editor.dispatchCommand(UNDO_COMMAND, undefined)
+                            }
                             className="flex h-8 w-8 items-center justify-center rounded hover:bg-accent disabled:opacity-50"
                         >
                             <Undo2 className="h-4 w-4" />
                         </button>
                     </TooltipTrigger>
-                    <TooltipContent><p>Undo (Ctrl+Z)</p></TooltipContent>
+                    <TooltipContent>
+                        <p>Undo (Ctrl+Z)</p>
+                    </TooltipContent>
                 </Tooltip>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <button
                             type="button"
                             disabled={!canRedo || !isEditable}
-                            onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
+                            onClick={() =>
+                                editor.dispatchCommand(REDO_COMMAND, undefined)
+                            }
                             className="flex h-8 w-8 items-center justify-center rounded hover:bg-accent disabled:opacity-50"
                         >
                             <Redo2 className="h-4 w-4" />
                         </button>
                     </TooltipTrigger>
-                    <TooltipContent><p>Redo (Ctrl+Y)</p></TooltipContent>
+                    <TooltipContent>
+                        <p>Redo (Ctrl+Y)</p>
+                    </TooltipContent>
                 </Tooltip>
 
                 <div className="toolbar-divider" />
 
                 {/* Block Format */}
-                <BlockFormatDropdown blockType={blockType} disabled={!isEditable} />
+                <BlockFormatDropdown
+                    blockType={blockType}
+                    disabled={!isEditable}
+                />
 
                 {blockType === 'code' ? (
                     <>
                         <div className="toolbar-divider" />
                         <DropDown
                             disabled={!isEditable}
-                            label={<span className="text-sm min-w-[120px]">{CODE_LANGUAGE_FRIENDLY_NAME_MAP[normalizeCodeLang(codeLanguage)] || Object.fromEntries(EXTRA_LANGUAGES)[normalizeCodeLang(codeLanguage)] || codeLanguage || 'Plain text'}</span>}
+                            label={
+                                <span className="min-w-[120px] text-sm">
+                                    {CODE_LANGUAGE_FRIENDLY_NAME_MAP[
+                                        normalizeCodeLang(codeLanguage)
+                                    ] ||
+                                        Object.fromEntries(EXTRA_LANGUAGES)[
+                                            normalizeCodeLang(codeLanguage)
+                                        ] ||
+                                        codeLanguage ||
+                                        'Plain text'}
+                                </span>
+                            }
                             buttonAriaLabel="Select language"
                         >
                             {CODE_LANGUAGE_OPTIONS.map(([lang, name]) => (
@@ -241,7 +381,9 @@ export default function ToolbarPlugin({ setIsLinkEditMode }: { setIsLinkEditMode
                                     onClick={() => onCodeLanguageSelect(lang)}
                                     active={lang === codeLanguage}
                                 >
-                                    <span className="text-sm font-mono">{name}</span>
+                                    <span className="font-mono text-sm">
+                                        {name}
+                                    </span>
                                 </DropDownItem>
                             ))}
                         </DropDown>
@@ -251,12 +393,20 @@ export default function ToolbarPlugin({ setIsLinkEditMode }: { setIsLinkEditMode
                         <div className="toolbar-divider" />
 
                         {/* Font Family */}
-                        <FontFamilyDropdown value={fontFamily} disabled={!isEditable} onChange={setFontFamily} />
+                        <FontFamilyDropdown
+                            value={fontFamily}
+                            disabled={!isEditable}
+                            onChange={setFontFamily}
+                        />
 
                         <div className="toolbar-divider" />
 
                         {/* Font Size */}
-                        <FontSizeInput value={fontSize} disabled={!isEditable} onChange={setFontSize} />
+                        <FontSizeInput
+                            value={fontSize}
+                            disabled={!isEditable}
+                            onChange={setFontSize}
+                        />
 
                         <div className="toolbar-divider" />
 
@@ -304,16 +454,25 @@ export default function ToolbarPlugin({ setIsLinkEditMode }: { setIsLinkEditMode
                                     onPressedChange={insertLink}
                                     className="h-8 w-8 p-0"
                                 >
-                                    {isLink ? <Unlink className="h-4 w-4" /> : <Link className="h-4 w-4" />}
+                                    {isLink ? (
+                                        <Unlink className="h-4 w-4" />
+                                    ) : (
+                                        <Link className="h-4 w-4" />
+                                    )}
                                 </Toggle>
                             </TooltipTrigger>
-                            <TooltipContent><p>{isLink ? 'Remove Link' : 'Insert Link'}</p></TooltipContent>
+                            <TooltipContent>
+                                <p>{isLink ? 'Remove Link' : 'Insert Link'}</p>
+                            </TooltipContent>
                         </Tooltip>
 
                         <div className="toolbar-divider" />
 
                         {/* Alignment */}
-                        <AlignDropdown elementFormat={elementFormat} disabled={!isEditable} />
+                        <AlignDropdown
+                            elementFormat={elementFormat}
+                            disabled={!isEditable}
+                        />
 
                         <div className="toolbar-divider" />
 

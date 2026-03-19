@@ -44,7 +44,7 @@ class PageController extends Controller
 
         return inertia('admin/cms/pages/create', [
             'modules' => config('cms.modules'),
-            'pages'   => $pages,
+            'pages' => $pages,
         ]);
     }
 

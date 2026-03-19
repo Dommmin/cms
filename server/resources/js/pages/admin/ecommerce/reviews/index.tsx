@@ -6,8 +6,8 @@ import {
 import DataTable from '@/components/data-table';
 import { PageHeader } from '@/components/page-header';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 type Props = {

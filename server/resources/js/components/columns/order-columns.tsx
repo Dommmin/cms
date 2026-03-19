@@ -63,7 +63,9 @@ export function useOrderColumns(): ColumnDef<OrderRow>[] {
                         </div>
                     </div>
                 ) : (
-                    <span className="text-muted-foreground">{__('misc.guest', 'Guest')}</span>
+                    <span className="text-muted-foreground">
+                        {__('misc.guest', 'Guest')}
+                    </span>
                 ),
         },
         {
@@ -112,11 +114,14 @@ export function useOrderColumns(): ColumnDef<OrderRow>[] {
             header: __('column.created_at', 'Date'),
             cell: ({ row }) => (
                 <span className="text-sm">
-                    {new Date(row.original.created_at).toLocaleDateString('pl-PL', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                    })}
+                    {new Date(row.original.created_at).toLocaleDateString(
+                        'pl-PL',
+                        {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                        },
+                    )}
                 </span>
             ),
         },
@@ -126,7 +131,11 @@ export function useOrderColumns(): ColumnDef<OrderRow>[] {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/ecommerce/orders/${row.original.id}`} prefetch cacheFor={60}>
+                        <Link
+                            href={`/admin/ecommerce/orders/${row.original.id}`}
+                            prefetch
+                            cacheFor={60}
+                        >
                             <EyeIcon className="mr-1 h-3 w-3" />
                             View
                         </Link>

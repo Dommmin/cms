@@ -1,7 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -9,6 +8,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -49,7 +49,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 function formatDiscount(code: AffiliateCode): string {
     if (code.discount_type === 'percentage') return `${code.discount_value}%`;
-    if (code.discount_type === 'fixed') return `${(code.discount_value / 100).toFixed(2)}`;
+    if (code.discount_type === 'fixed')
+        return `${(code.discount_value / 100).toFixed(2)}`;
     return '—';
 }
 
@@ -61,20 +62,28 @@ export default function CodesIndex({ codes, filters }: Props) {
             header: __('column.code', 'Code'),
             cell: ({ row }) => (
                 <div>
-                    <p className="font-mono font-semibold">{row.original.code}</p>
-                    <p className="text-xs text-muted-foreground">{row.original.user.name}</p>
+                    <p className="font-mono font-semibold">
+                        {row.original.code}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                        {row.original.user.name}
+                    </p>
                 </div>
             ),
         },
         {
             accessorKey: 'discount_type',
             header: __('column.discount', 'Discount'),
-            cell: ({ row }) => <span className="text-sm">{formatDiscount(row.original)}</span>,
+            cell: ({ row }) => (
+                <span className="text-sm">{formatDiscount(row.original)}</span>
+            ),
         },
         {
             accessorKey: 'commission_rate',
             header: __('column.commission', 'Commission'),
-            cell: ({ row }) => <span className="text-sm">{row.original.commission_rate}%</span>,
+            cell: ({ row }) => (
+                <span className="text-sm">{row.original.commission_rate}%</span>
+            ),
         },
         {
             accessorKey: 'uses_count',
@@ -91,7 +100,10 @@ export default function CodesIndex({ codes, filters }: Props) {
             header: __('column.total', 'Total Commission'),
             cell: ({ row }) => (
                 <span className="text-sm font-medium">
-                    {((row.original.referrals_sum_commission_amount ?? 0) / 100).toFixed(2)}
+                    {(
+                        (row.original.referrals_sum_commission_amount ?? 0) /
+                        100
+                    ).toFixed(2)}
                 </span>
             ),
         },
@@ -99,8 +111,12 @@ export default function CodesIndex({ codes, filters }: Props) {
             accessorKey: 'is_active',
             header: __('column.status', 'Status'),
             cell: ({ row }) => (
-                <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
-                    {row.original.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
+                <Badge
+                    variant={row.original.is_active ? 'default' : 'secondary'}
+                >
+                    {row.original.is_active
+                        ? __('status.active', 'Active')
+                        : __('status.inactive', 'Inactive')}
                 </Badge>
             ),
         },
@@ -110,7 +126,11 @@ export default function CodesIndex({ codes, filters }: Props) {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/affiliates/codes/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/affiliates/codes/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>
@@ -119,11 +139,18 @@ export default function CodesIndex({ codes, filters }: Props) {
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Code')}
-                        description={__('dialog.cannot_be_undone', 'Delete this affiliate code? This cannot be undone.')}
+                        description={__(
+                            'dialog.cannot_be_undone',
+                            'Delete this affiliate code? This cannot be undone.',
+                        )}
                         onConfirm={() =>
-                            router.delete(`/admin/affiliates/codes/${row.original.id}`, {
-                                onSuccess: () => toast.success('Code deleted'),
-                            })
+                            router.delete(
+                                `/admin/affiliates/codes/${row.original.id}`,
+                                {
+                                    onSuccess: () =>
+                                        toast.success('Code deleted'),
+                                },
+                            )
                         }
                     >
                         <TrashIcon className="mr-1 h-3 w-3" />
@@ -140,11 +167,16 @@ export default function CodesIndex({ codes, filters }: Props) {
             <Wrapper>
                 <PageHeader
                     title={__('page.affiliates', 'Affiliate Codes')}
-                    description={__('page.affiliates_desc', 'Manage referral codes and track affiliate performance')}
+                    description={__(
+                        'page.affiliates_desc',
+                        'Manage referral codes and track affiliate performance',
+                    )}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/affiliates/referrals">
-                            <Button variant="outline">{__('action.show', 'View Referrals')}</Button>
+                            <Button variant="outline">
+                                {__('action.show', 'View Referrals')}
+                            </Button>
                         </Link>
                         <Link href="/admin/affiliates/codes/create">
                             <Button>
@@ -167,7 +199,10 @@ export default function CodesIndex({ codes, filters }: Props) {
                         next_page_url: codes.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search', 'Search codes or affiliates...')}
+                    searchPlaceholder={__(
+                        'placeholder.search',
+                        'Search codes or affiliates...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/affiliates/codes"
                 />

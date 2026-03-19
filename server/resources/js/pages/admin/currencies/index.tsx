@@ -1,13 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import {
-    DollarSign,
-    PlusIcon,
-    PencilIcon,
-    TrashIcon,
-    StarIcon,
-} from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
+import { PlusIcon, PencilIcon, TrashIcon, StarIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -15,6 +8,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -110,7 +104,9 @@ export default function CurrenciesIndex({ currencies, filters }: Props) {
                 <Badge
                     variant={row.original.is_active ? 'default' : 'secondary'}
                 >
-                    {row.original.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
+                    {row.original.is_active
+                        ? __('status.active', 'Active')
+                        : __('status.inactive', 'Inactive')}
                 </Badge>
             ),
         },
@@ -120,7 +116,11 @@ export default function CurrenciesIndex({ currencies, filters }: Props) {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/currencies/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/currencies/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>
@@ -154,7 +154,10 @@ export default function CurrenciesIndex({ currencies, filters }: Props) {
             <Wrapper>
                 <PageHeader
                     title={__('page.currencies', 'Currencies')}
-                    description={__('page.currencies_desc', 'Manage currencies and exchange rates')}
+                    description={__(
+                        'page.currencies_desc',
+                        'Manage currencies and exchange rates',
+                    )}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/currencies/create">
@@ -178,7 +181,10 @@ export default function CurrenciesIndex({ currencies, filters }: Props) {
                         next_page_url: currencies.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search', 'Search currencies...')}
+                    searchPlaceholder={__(
+                        'placeholder.search',
+                        'Search currencies...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/currencies"
                 />

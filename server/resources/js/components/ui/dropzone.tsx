@@ -1,5 +1,5 @@
 import { Upload, X, Image, FileText, Film, Music } from 'lucide-react';
-import { useCallback } from 'react';
+import { createElement, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from '@/hooks/use-translation';
 import { cn, formatFileSize } from '@/lib/utils';
@@ -135,7 +135,7 @@ export function FilePreview({ file, onRemove, className }: FilePreviewProps) {
                         className="h-full w-full object-cover"
                     />
                 ) : (
-                    <Icon className="h-6 w-6 text-gray-400" />
+                    createElement(Icon, { className: 'h-6 w-6 text-gray-400' })
                 )}
             </div>
             <div className="flex-1 min-w-0">

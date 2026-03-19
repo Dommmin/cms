@@ -1,7 +1,6 @@
 import { Head, Link, router, usePoll } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon, MessageCircleIcon, TrashIcon } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -9,6 +8,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -54,8 +54,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const statusColors: Record<string, string> = {
     open: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-    pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-    resolved: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+    pending:
+        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+    resolved:
+        'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
     closed: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400',
 };
 
@@ -70,7 +72,13 @@ function formatRelativeTime(dateStr: string | null): string {
     return `${Math.floor(hrs / 24)}d ago`;
 }
 
-export default function SupportIndex({ conversations, filters, agents, open_count, statuses }: Props) {
+export default function SupportIndex({
+    conversations,
+    filters,
+    agents: _agents,
+    open_count,
+    statuses,
+}: Props) {
     const __ = useTranslation();
     // Refresh unread counts and new conversations every 30 seconds
     usePoll(30000);
@@ -85,7 +93,9 @@ export default function SupportIndex({ conversations, filters, agents, open_coun
                         <MessageCircleIcon className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div className="min-w-0">
-                        <p className="truncate font-medium">{row.original.subject}</p>
+                        <p className="truncate font-medium">
+                            {row.original.subject}
+                        </p>
                         <p className="truncate text-xs text-muted-foreground">
                             {row.original.name ?? row.original.email ?? '—'}
                         </p>
@@ -103,7 +113,8 @@ export default function SupportIndex({ conversations, filters, agents, open_coun
             header: __('column.status', 'Status'),
             cell: ({ row }) => (
                 <Badge className={statusColors[row.original.status] ?? ''}>
-                    {statuses.find((s) => s.value === row.original.status)?.label ?? row.original.status}
+                    {statuses.find((s) => s.value === row.original.status)
+                        ?.label ?? row.original.status}
                 </Badge>
             ),
         },
@@ -112,16 +123,22 @@ export default function SupportIndex({ conversations, filters, agents, open_coun
             header: __('column.assigned_to', 'Assigned to'),
             cell: ({ row }) =>
                 row.original.assigned_to ? (
-                    <span className="text-sm">{row.original.assigned_to.name}</span>
+                    <span className="text-sm">
+                        {row.original.assigned_to.name}
+                    </span>
                 ) : (
-                    <span className="text-muted-foreground">{__('misc.unassigned', 'Unassigned')}</span>
+                    <span className="text-muted-foreground">
+                        {__('misc.unassigned', 'Unassigned')}
+                    </span>
                 ),
         },
         {
             accessorKey: 'messages_count',
             header: __('column.messages', 'Messages'),
             cell: ({ row }) => (
-                <span className="text-sm text-muted-foreground">{row.original.messages_count}</span>
+                <span className="text-sm text-muted-foreground">
+                    {row.original.messages_count}
+                </span>
             ),
         },
         {
@@ -139,7 +156,11 @@ export default function SupportIndex({ conversations, filters, agents, open_coun
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/support/${row.original.id}`} prefetch cacheFor={60}>
+                        <Link
+                            href={`/admin/support/${row.original.id}`}
+                            prefetch
+                            cacheFor={60}
+                        >
                             <EyeIcon className="mr-1 h-3 w-3" />
                             {__('action.show', 'View')}
                         </Link>
@@ -148,10 +169,14 @@ export default function SupportIndex({ conversations, filters, agents, open_coun
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Conversation')}
-                        description={__('dialog.cannot_be_undone', 'This will permanently delete the conversation and all its messages.')}
+                        description={__(
+                            'dialog.cannot_be_undone',
+                            'This will permanently delete the conversation and all its messages.',
+                        )}
                         onConfirm={() => {
                             router.delete(`/admin/support/${row.original.id}`, {
-                                onSuccess: () => toast.success('Conversation deleted'),
+                                onSuccess: () =>
+                                    toast.success('Conversation deleted'),
                             });
                         }}
                     >
@@ -168,11 +193,18 @@ export default function SupportIndex({ conversations, filters, agents, open_coun
             <Wrapper>
                 <PageHeader
                     title={`Support${open_count > 0 ? ` (${open_count} open)` : ''}`}
-                    description={__('page.support_desc', 'Manage customer support conversations')}
+                    description={__(
+                        'page.support_desc',
+                        'Manage customer support conversations',
+                    )}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/support/canned-responses" prefetch cacheFor={30}>
+                            <Link
+                                href="/admin/support/canned-responses"
+                                prefetch
+                                cacheFor={30}
+                            >
                                 {__('nav.canned_responses', 'Canned Responses')}
                             </Link>
                         </Button>
@@ -191,7 +223,10 @@ export default function SupportIndex({ conversations, filters, agents, open_coun
                         next_page_url: conversations.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search', 'Search by subject, email or name...')}
+                    searchPlaceholder={__(
+                        'placeholder.search',
+                        'Search by subject, email or name...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/support"
                 />

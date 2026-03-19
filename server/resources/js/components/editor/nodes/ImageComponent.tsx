@@ -48,10 +48,11 @@ export default function ImageComponent({
 }: Props): JSX.Element {
     const imageRef = useRef<HTMLImageElement | null>(null);
     const buttonRef = useRef<HTMLButtonElement | null>(null);
-    const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey);
+    const [isSelected, setSelected, clearSelection] =
+        useLexicalNodeSelection(nodeKey);
     const [isResizing, setIsResizing] = useState(false);
     const [editor] = useLexicalComposerContext();
-    const [selection, setSelection] = useState<BaseSelection | null>(null);
+    const [_selection, setSelection] = useState<BaseSelection | null>(null);
     const activeEditorRef = useRef<LexicalEditor | null>(null);
 
     const onDelete = useCallback(
@@ -89,7 +90,10 @@ export default function ImageComponent({
 
     const onEscape = useCallback(
         (event: KeyboardEvent) => {
-            if (activeEditorRef.current === caption || buttonRef.current === event.target) {
+            if (
+                activeEditorRef.current === caption ||
+                buttonRef.current === event.target
+            ) {
                 clearSelection();
                 editor.update(() => {
                     setSelected(true);
@@ -104,7 +108,8 @@ export default function ImageComponent({
         let isMounted = true;
         const unregister = mergeRegister(
             editor.registerUpdateListener(({ editorState }) => {
-                if (isMounted) setSelection(editorState.read(() => $getSelection()));
+                if (isMounted)
+                    setSelection(editorState.read(() => $getSelection()));
             }),
             editor.registerCommand(
                 SELECTION_CHANGE_COMMAND,
@@ -143,24 +148,54 @@ export default function ImageComponent({
                 },
                 COMMAND_PRIORITY_LOW,
             ),
-            editor.registerCommand(KEY_DELETE_COMMAND, onDelete, COMMAND_PRIORITY_LOW),
-            editor.registerCommand(KEY_BACKSPACE_COMMAND, onDelete, COMMAND_PRIORITY_LOW),
-            editor.registerCommand(KEY_ENTER_COMMAND, onEnter, COMMAND_PRIORITY_LOW),
-            editor.registerCommand(KEY_ESCAPE_COMMAND, onEscape, COMMAND_PRIORITY_LOW),
+            editor.registerCommand(
+                KEY_DELETE_COMMAND,
+                onDelete,
+                COMMAND_PRIORITY_LOW,
+            ),
+            editor.registerCommand(
+                KEY_BACKSPACE_COMMAND,
+                onDelete,
+                COMMAND_PRIORITY_LOW,
+            ),
+            editor.registerCommand(
+                KEY_ENTER_COMMAND,
+                onEnter,
+                COMMAND_PRIORITY_LOW,
+            ),
+            editor.registerCommand(
+                KEY_ESCAPE_COMMAND,
+                onEscape,
+                COMMAND_PRIORITY_LOW,
+            ),
         );
         return () => {
             isMounted = false;
             unregister();
         };
-    }, [clearSelection, editor, isResizing, isSelected, nodeKey, onDelete, onEnter, onEscape, setSelected]);
+    }, [
+        clearSelection,
+        editor,
+        isResizing,
+        isSelected,
+        nodeKey,
+        onDelete,
+        onEnter,
+        onEscape,
+        setSelected,
+    ]);
 
-    const onResizeEnd = (nextWidth: 'inherit' | number, nextHeight: 'inherit' | number) => {
+    const onResizeEnd = (
+        nextWidth: 'inherit' | number,
+        nextHeight: 'inherit' | number,
+    ) => {
         setTimeout(() => {
             setIsResizing(false);
         }, 200);
         editor.update(() => {
             const node = $getNodeByKey(nodeKey);
-            if ($isImageNode(node)) node.setWidthAndHeight(nextWidth, nextHeight);
+            if ($isImageNode(node))
+                node.setWidthAndHeight(nextWidth, nextHeight);
         });
     };
 
@@ -177,7 +212,8 @@ export default function ImageComponent({
                     ref={imageRef}
                     className={cn(
                         'max-w-full cursor-default rounded',
-                        isFocused && 'outline outline-2 outline-primary outline-offset-1',
+                        isFocused &&
+                            'outline outline-2 outline-offset-1 outline-primary',
                     )}
                     src={src}
                     alt={altText}
@@ -202,7 +238,9 @@ export default function ImageComponent({
             </div>
             {showCaption && (
                 <div className="block w-full px-2 py-1 text-center text-sm text-muted-foreground">
-                    <Suspense fallback={null}>{/* caption editor would go here */}</Suspense>
+                    <Suspense fallback={null}>
+                        {/* caption editor would go here */}
+                    </Suspense>
                 </div>
             )}
         </Suspense>

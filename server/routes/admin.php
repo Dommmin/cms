@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\AdminSearchController;
-use App\Http\Controllers\Admin\PreviewController;
 use App\Http\Controllers\Admin\AffiliateCodeController;
 use App\Http\Controllers\Admin\AppNotificationController;
 use App\Http\Controllers\Admin\BlockRelationController;
@@ -27,6 +26,7 @@ use App\Http\Controllers\Admin\NewsletterCampaignController;
 use App\Http\Controllers\Admin\NewsletterSegmentController;
 use App\Http\Controllers\Admin\NewsletterSubscriberController;
 use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\PreviewController;
 use App\Http\Controllers\Admin\ReferralController;
 use App\Http\Controllers\Admin\SectionTemplateController;
 use App\Http\Controllers\Admin\SettingsController;

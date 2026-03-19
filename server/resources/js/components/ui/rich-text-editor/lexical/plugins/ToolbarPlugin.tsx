@@ -1,4 +1,5 @@
 import { $isCodeNode, CODE_LANGUAGE_FRIENDLY_NAME_MAP, CODE_LANGUAGE_MAP, getDefaultCodeLanguage } from '@lexical/code';
+import { $createCodeNode } from '@lexical/code';
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link';
 import {
     $isListNode,
@@ -7,12 +8,14 @@ import {
     INSERT_UNORDERED_LIST_COMMAND,
     ListNode,
 } from '@lexical/list';
-import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode';
 import { $createHeadingNode, $createQuoteNode, $isHeadingNode, $isQuoteNode, type HeadingTagType } from '@lexical/rich-text';
 import { $getSelectionStyleValueForProperty, $patchStyleText, $setBlocksType } from '@lexical/selection';
-import { $getNearestNodeOfType, mergeRegister } from '@lexical/utils';
 import { INSERT_TABLE_COMMAND } from '@lexical/table';
+import { $getNearestNodeOfType, mergeRegister } from '@lexical/utils';
+import type {
+    ElementNode} from 'lexical';
 import {
     $createParagraphNode,
     $getSelection,
@@ -30,7 +33,6 @@ import {
     UNDO_COMMAND,
     type ElementFormatType,
 } from 'lexical';
-import { $createCodeNode } from '@lexical/code';
 import {
     AlignCenter,
     AlignJustify,
@@ -69,6 +71,7 @@ import {
     ChevronRight,
 } from 'lucide-react';
 import { Fragment, useCallback, useEffect, useRef, useState, type JSX } from 'react';
+import { MediaPickerModal } from '@/components/media-picker-modal';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -79,10 +82,9 @@ import { Separator } from '@/components/ui/separator';
 import { Toggle } from '@/components/ui/toggle';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { $createImageNode } from '../../image-node';
-import { $createLayoutContainerNode, $createLayoutItemNode } from '../layout-nodes';
-import { $createCollapsibleContainerNode, $createCollapsibleTitleNode, $createCollapsibleContentNode } from '../collapsible-nodes';
 import { $createYouTubeNode, extractYouTubeId } from '../../youtube-node';
-import { MediaPickerModal } from '@/components/media-picker-modal';
+import { $createCollapsibleContainerNode, $createCollapsibleTitleNode, $createCollapsibleContentNode } from '../collapsible-nodes';
+import { $createLayoutContainerNode, $createLayoutItemNode } from '../layout-nodes';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -605,7 +607,7 @@ export default function ToolbarPlugin(): JSX.Element {
                 container.append(item);
             }
             $insertNodes([container]);
-            container.getFirstChild()?.getFirstChild()?.select();
+            ((container.getFirstChild() as ElementNode | null)?.getFirstChild() as ElementNode | null)?.select();
         });
     }, [editor]);
 

@@ -1,13 +1,13 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { RotateCcw, EyeIcon } from 'lucide-react';
+import { EyeIcon } from 'lucide-react';
 import DataTable from '@/components/data-table';
 import { PageHeader } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 type Customer = {
@@ -84,11 +84,20 @@ export default function ReturnsIndex({ returns, filters }: Props) {
             header: __('column.customer', 'Customer'),
             cell: ({ row }) => {
                 const customer = row.original.order.customer;
-                if (!customer) return <span className="text-muted-foreground">{__('misc.guest', 'Guest')}</span>;
+                if (!customer)
+                    return (
+                        <span className="text-muted-foreground">
+                            {__('misc.guest', 'Guest')}
+                        </span>
+                    );
                 return (
                     <div>
-                        <p className="font-medium">{customer.first_name} {customer.last_name}</p>
-                        <p className="text-xs text-muted-foreground">{customer.email}</p>
+                        <p className="font-medium">
+                            {customer.first_name} {customer.last_name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                            {customer.email}
+                        </p>
                     </div>
                 );
             },
@@ -131,7 +140,11 @@ export default function ReturnsIndex({ returns, filters }: Props) {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/ecommerce/returns/${row.original.id}`} prefetch cacheFor={60}>
+                        <Link
+                            href={`/admin/ecommerce/returns/${row.original.id}`}
+                            prefetch
+                            cacheFor={60}
+                        >
                             <EyeIcon className="mr-1 h-3 w-3" />
                             {__('action.show', 'View')}
                         </Link>
@@ -147,7 +160,10 @@ export default function ReturnsIndex({ returns, filters }: Props) {
             <Wrapper>
                 <PageHeader
                     title={__('page.returns', 'Returns')}
-                    description={__('page.returns_desc', 'Manage return requests')}
+                    description={__(
+                        'page.returns_desc',
+                        'Manage return requests',
+                    )}
                 />
 
                 <DataTable
@@ -162,7 +178,10 @@ export default function ReturnsIndex({ returns, filters }: Props) {
                         next_page_url: returns.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search', 'Search returns...')}
+                    searchPlaceholder={__(
+                        'placeholder.search',
+                        'Search returns...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/ecommerce/returns"
                 />

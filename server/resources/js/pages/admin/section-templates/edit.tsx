@@ -1,4 +1,4 @@
-import { Link, Form, Head, router } from '@inertiajs/react';
+import { Link, Form, Head } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 
 import InputError from '@/components/input-error';
@@ -50,12 +50,15 @@ export default function EditSectionTemplate({ template, categories }: Props) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/section-templates' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back
-                        
-                </Link>
-            </Button>
+                            <Link
+                                href="/admin/section-templates"
+                                prefetch
+                                cacheFor={30}
+                            >
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                Back
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -78,7 +81,9 @@ export default function EditSectionTemplate({ template, categories }: Props) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="section_type">Section Type *</Label>
+                                <Label htmlFor="section_type">
+                                    Section Type *
+                                </Label>
                                 <Input
                                     id="section_type"
                                     name="section_type"
@@ -98,7 +103,13 @@ export default function EditSectionTemplate({ template, categories }: Props) {
                                         <SelectValue placeholder="Select variant" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {['light', 'dark', 'muted', 'brand', 'hero'].map((v) => (
+                                        {[
+                                            'light',
+                                            'dark',
+                                            'muted',
+                                            'brand',
+                                            'hero',
+                                        ].map((v) => (
                                             <SelectItem key={v} value={v}>
                                                 {v}
                                             </SelectItem>
@@ -125,13 +136,19 @@ export default function EditSectionTemplate({ template, categories }: Props) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="preset_data">Preset Data (JSON) *</Label>
+                                <Label htmlFor="preset_data">
+                                    Preset Data (JSON) *
+                                </Label>
                                 <Textarea
                                     id="preset_data"
                                     name="preset_data"
                                     required
                                     rows={12}
-                                    defaultValue={JSON.stringify(template.preset_data, null, 2)}
+                                    defaultValue={JSON.stringify(
+                                        template.preset_data,
+                                        null,
+                                        2,
+                                    )}
                                     className="font-mono text-xs"
                                 />
                                 <InputError message={errors.preset_data} />
@@ -146,7 +163,10 @@ export default function EditSectionTemplate({ template, categories }: Props) {
                                     defaultChecked={template.is_global}
                                     className="h-4 w-4 rounded border-gray-300"
                                 />
-                                <Label htmlFor="is_global" className="font-normal">
+                                <Label
+                                    htmlFor="is_global"
+                                    className="font-normal"
+                                >
                                     Global (available in all pages)
                                 </Label>
                             </div>

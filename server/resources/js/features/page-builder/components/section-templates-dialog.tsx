@@ -40,7 +40,8 @@ export const SECTION_TEMPLATES: SectionTemplate[] = [
                         type: 'hero_banner',
                         configuration: {
                             title: 'Welcome to our Store',
-                            subtitle: 'Discover amazing products at great prices.',
+                            subtitle:
+                                'Discover amazing products at great prices.',
                             cta_text: 'Shop Now',
                             cta_url: '/products',
                             cta_style: 'primary',
@@ -149,8 +150,10 @@ export const SECTION_TEMPLATES: SectionTemplate[] = [
                     {
                         type: 'two_columns',
                         configuration: {
-                            left_content: '<h2>Our Story</h2><p>We started with a simple idea...</p>',
-                            right_content: '<p>Our team is passionate about quality and service.</p>',
+                            left_content:
+                                '<h2>Our Story</h2><p>We started with a simple idea...</p>',
+                            right_content:
+                                '<p>Our team is passionate about quality and service.</p>',
                             ratio: '50-50',
                             vertical_alignment: 'top',
                             reverse_on_mobile: false,
@@ -175,8 +178,18 @@ export const SECTION_TEMPLATES: SectionTemplate[] = [
                             display_mode: 'grid',
                             show_rating: true,
                             items: [
-                                { author: 'Jane Smith', role: 'Happy Customer', content: 'Absolutely love this store!', rating: 5 },
-                                { author: 'John Doe', role: 'Loyal Buyer', content: 'Fast shipping, great quality.', rating: 5 },
+                                {
+                                    author: 'Jane Smith',
+                                    role: 'Happy Customer',
+                                    content: 'Absolutely love this store!',
+                                    rating: 5,
+                                },
+                                {
+                                    author: 'John Doe',
+                                    role: 'Loyal Buyer',
+                                    content: 'Fast shipping, great quality.',
+                                    rating: 5,
+                                },
                             ],
                         },
                         position: 0,
@@ -203,7 +216,8 @@ export const SECTION_TEMPLATES: SectionTemplate[] = [
                     {
                         type: 'rich_text',
                         configuration: {
-                            content: '<h1>Frequently Asked Questions</h1><p>Find answers to the most common questions below.</p>',
+                            content:
+                                '<h1>Frequently Asked Questions</h1><p>Find answers to the most common questions below.</p>',
                             max_width: 'medium',
                         },
                         position: 0,
@@ -216,9 +230,21 @@ export const SECTION_TEMPLATES: SectionTemplate[] = [
                             title: '',
                             allow_multiple_open: false,
                             items: [
-                                { title: 'How do I place an order?', content: 'Simply browse our store, add items to your cart and checkout.' },
-                                { title: 'What is your return policy?', content: 'We accept returns within 30 days of purchase.' },
-                                { title: 'How long does shipping take?', content: 'Standard shipping takes 3-5 business days.' },
+                                {
+                                    title: 'How do I place an order?',
+                                    content:
+                                        'Simply browse our store, add items to your cart and checkout.',
+                                },
+                                {
+                                    title: 'What is your return policy?',
+                                    content:
+                                        'We accept returns within 30 days of purchase.',
+                                },
+                                {
+                                    title: 'How long does shipping take?',
+                                    content:
+                                        'Standard shipping takes 3-5 business days.',
+                                },
                             ],
                         },
                         position: 1,
@@ -249,7 +275,12 @@ export const SECTION_TEMPLATES: SectionTemplate[] = [
                             display_mode: 'carousel',
                             show_rating: true,
                             items: [
-                                { author: 'Alice', role: 'Customer', content: 'Best purchase ever!', rating: 5 },
+                                {
+                                    author: 'Alice',
+                                    role: 'Customer',
+                                    content: 'Best purchase ever!',
+                                    rating: 5,
+                                },
                             ],
                         },
                         position: 0,
@@ -269,7 +300,8 @@ export const SECTION_TEMPLATES: SectionTemplate[] = [
                         type: 'newsletter_signup',
                         configuration: {
                             title: 'Stay in the Loop',
-                            description: 'Get exclusive offers and updates delivered to your inbox.',
+                            description:
+                                'Get exclusive offers and updates delivered to your inbox.',
                             button_text: 'Subscribe',
                             placeholder_text: 'Enter your email address',
                             success_message: 'Thanks for subscribing!',
@@ -334,12 +366,36 @@ function LandingHeroThumb() {
     return (
         <svg viewBox="0 0 120 72" className="h-full w-full" fill="none">
             <rect width="120" height="40" fill="#1e293b" />
-            <rect x="30" y="10" width="60" height="6" rx="2" fill="white" fillOpacity="0.7" />
-            <rect x="40" y="20" width="40" height="4" rx="1.5" fill="white" fillOpacity="0.4" />
+            <rect
+                x="30"
+                y="10"
+                width="60"
+                height="6"
+                rx="2"
+                fill="white"
+                fillOpacity="0.7"
+            />
+            <rect
+                x="40"
+                y="20"
+                width="40"
+                height="4"
+                rx="1.5"
+                fill="white"
+                fillOpacity="0.4"
+            />
             <rect x="45" y="28" width="30" height="8" rx="2" fill="#6366f1" />
             <rect width="120" height="32" y="40" fill="#f8fafc" />
             <rect x="10" y="48" width="100" height="16" rx="2" fill="#0f172a" />
-            <rect x="16" y="52" width="50" height="4" rx="1" fill="white" fillOpacity="0.7" />
+            <rect
+                x="16"
+                y="52"
+                width="50"
+                height="4"
+                rx="1"
+                fill="white"
+                fillOpacity="0.7"
+            />
             <rect x="16" y="58" width="24" height="4" rx="1.5" fill="#6366f1" />
         </svg>
     );
@@ -365,15 +421,69 @@ function AboutUsThumb() {
     return (
         <svg viewBox="0 0 120 72" className="h-full w-full" fill="none">
             <rect width="120" height="72" fill="#f8fafc" />
-            <rect x="6" y="6" width="52" height="32" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
-            <rect x="62" y="6" width="52" height="32" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+            <rect
+                x="6"
+                y="6"
+                width="52"
+                height="32"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
+            <rect
+                x="62"
+                y="6"
+                width="52"
+                height="32"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
             <rect x="10" y="12" width="30" height="4" rx="1.5" fill="#94a3b8" />
             <rect x="10" y="20" width="44" height="3" rx="1" fill="#e2e8f0" />
             <rect x="10" y="26" width="36" height="3" rx="1" fill="#e2e8f0" />
-            <rect x="6" y="44" width="26" height="22" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
-            <rect x="36" y="44" width="26" height="22" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
-            <rect x="66" y="44" width="26" height="22" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
-            <rect x="96" y="44" width="26" height="22" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+            <rect
+                x="6"
+                y="44"
+                width="26"
+                height="22"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
+            <rect
+                x="36"
+                y="44"
+                width="26"
+                height="22"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
+            <rect
+                x="66"
+                y="44"
+                width="26"
+                height="22"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
+            <rect
+                x="96"
+                y="44"
+                width="26"
+                height="22"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
         </svg>
     );
 }
@@ -384,11 +494,38 @@ function FaqPageThumb() {
             <rect width="120" height="72" fill="#f8fafc" />
             <rect x="20" y="8" width="80" height="8" rx="2" fill="#94a3b8" />
             <rect x="20" y="20" width="60" height="4" rx="1" fill="#cbd5e1" />
-            <rect x="6" y="30" width="108" height="10" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+            <rect
+                x="6"
+                y="30"
+                width="108"
+                height="10"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
             <rect x="10" y="34" width="50" height="3" rx="1" fill="#94a3b8" />
-            <rect x="6" y="44" width="108" height="10" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+            <rect
+                x="6"
+                y="44"
+                width="108"
+                height="10"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
             <rect x="10" y="48" width="50" height="3" rx="1" fill="#94a3b8" />
-            <rect x="6" y="58" width="108" height="10" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+            <rect
+                x="6"
+                y="58"
+                width="108"
+                height="10"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
             <rect x="10" y="62" width="50" height="3" rx="1" fill="#94a3b8" />
         </svg>
     );
@@ -398,12 +535,56 @@ function NewsletterCtaThumb() {
     return (
         <svg viewBox="0 0 120 72" className="h-full w-full" fill="none">
             <rect width="120" height="72" fill="#f8fafc" />
-            <rect x="6" y="6" width="52" height="28" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
-            <rect x="62" y="6" width="52" height="28" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+            <rect
+                x="6"
+                y="6"
+                width="52"
+                height="28"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
+            <rect
+                x="62"
+                y="6"
+                width="52"
+                height="28"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
             <rect x="0" y="38" width="120" height="34" fill="#1e293b" />
-            <rect x="30" y="44" width="60" height="5" rx="1.5" fill="white" fillOpacity="0.8" />
-            <rect x="30" y="53" width="40" height="4" rx="1" fill="white" fillOpacity="0.4" />
-            <rect x="16" y="62" width="56" height="6" rx="1.5" fill="white" fillOpacity="0.15" stroke="white" strokeWidth="0.5" />
+            <rect
+                x="30"
+                y="44"
+                width="60"
+                height="5"
+                rx="1.5"
+                fill="white"
+                fillOpacity="0.8"
+            />
+            <rect
+                x="30"
+                y="53"
+                width="40"
+                height="4"
+                rx="1"
+                fill="white"
+                fillOpacity="0.4"
+            />
+            <rect
+                x="16"
+                y="62"
+                width="56"
+                height="6"
+                rx="1.5"
+                fill="white"
+                fillOpacity="0.15"
+                stroke="white"
+                strokeWidth="0.5"
+            />
             <rect x="76" y="62" width="28" height="6" rx="1.5" fill="#6366f1" />
         </svg>
     );
@@ -418,7 +599,11 @@ function MediaGalleryThumb() {
             <rect x="80" y="4" width="36" height="28" rx="2" fill="#e2e8f0" />
             <rect x="4" y="36" width="112" height="30" rx="2" fill="#0f172a" />
             <circle cx="60" cy="51" r="10" fill="white" fillOpacity="0.15" />
-            <polygon points="57,45 57,57 69,51" fill="white" fillOpacity="0.9" />
+            <polygon
+                points="57,45 57,57 69,51"
+                fill="white"
+                fillOpacity="0.9"
+            />
         </svg>
     );
 }
@@ -440,7 +625,11 @@ type SectionTemplatesDialogProps = {
     onInsert: (template: SectionTemplate) => void;
 };
 
-export function SectionTemplatesDialog({ open, onClose, onInsert }: SectionTemplatesDialogProps) {
+export function SectionTemplatesDialog({
+    open,
+    onClose,
+    onInsert,
+}: SectionTemplatesDialogProps) {
     return (
         <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
             <DialogContent className="flex max-h-[80vh] max-w-3xl flex-col gap-0 p-0">
@@ -450,7 +639,8 @@ export function SectionTemplatesDialog({ open, onClose, onInsert }: SectionTempl
                         Section Templates
                     </DialogTitle>
                     <DialogDescription>
-                        Insert a pre-built section combo to get started quickly. You can edit all content after inserting.
+                        Insert a pre-built section combo to get started quickly.
+                        You can edit all content after inserting.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -478,8 +668,12 @@ export function SectionTemplatesDialog({ open, onClose, onInsert }: SectionTempl
                                         )}
                                     </div>
                                     <div className="p-3">
-                                        <p className="text-sm font-semibold">{tpl.name}</p>
-                                        <p className="mt-0.5 text-xs text-muted-foreground">{tpl.description}</p>
+                                        <p className="text-sm font-semibold">
+                                            {tpl.name}
+                                        </p>
+                                        <p className="mt-0.5 text-xs text-muted-foreground">
+                                            {tpl.description}
+                                        </p>
                                         <div className="mt-2 flex flex-wrap gap-1">
                                             {tpl.tags.map((tag) => (
                                                 <span

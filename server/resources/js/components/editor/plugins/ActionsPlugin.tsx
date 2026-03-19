@@ -1,10 +1,9 @@
-import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
+import { $generateHtmlFromNodes } from '@lexical/html';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { CLEAR_EDITOR_COMMAND } from 'lexical';
-import { $getRoot, $insertNodes } from 'lexical';
-import { Download, FileJson, FileText, Trash2, Upload } from 'lucide-react';
+import { FileJson, FileText, Trash2, Upload } from 'lucide-react';
 import { type JSX } from 'react';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import {
     Tooltip,
     TooltipContent,
@@ -17,9 +16,10 @@ interface Props {
     isRichText?: boolean;
 }
 
-export default function ActionsPlugin({ isRichText = true }: Props): JSX.Element {
+export default function ActionsPlugin({
+    isRichText: _isRichText = true,
+}: Props): JSX.Element {
     const [editor] = useLexicalComposerContext();
-    const [isEditable, setIsEditable] = useState(() => editor.isEditable());
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const exportJSON = () => {
@@ -35,7 +35,9 @@ export default function ActionsPlugin({ isRichText = true }: Props): JSX.Element
 
     const exportHTML = () => {
         let html = '';
-        editor.read(() => { html = $generateHtmlFromNodes(editor); });
+        editor.read(() => {
+            html = $generateHtmlFromNodes(editor);
+        });
         const blob = new Blob([html], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -71,15 +73,32 @@ export default function ActionsPlugin({ isRichText = true }: Props): JSX.Element
     const actions = [
         { icon: FileJson, label: 'Export JSON', onClick: exportJSON },
         { icon: FileText, label: 'Export HTML', onClick: exportHTML },
-        { icon: Upload, label: 'Import JSON', onClick: () => fileInputRef.current?.click() },
-        { icon: Trash2, label: 'Clear Editor', onClick: clearEditor, className: 'text-destructive hover:text-destructive' },
+        {
+            icon: Upload,
+            label: 'Import JSON',
+            onClick: () => fileInputRef.current?.click(),
+        },
+        {
+            icon: Trash2,
+            label: 'Clear Editor',
+            onClick: clearEditor,
+            className: 'text-destructive hover:text-destructive',
+        },
     ];
 
     return (
         <TooltipProvider>
             <div className="flex items-center gap-1 border-t bg-muted/30 px-3 py-1.5">
-                <input ref={fileInputRef} type="file" accept=".json" onChange={importJSON} className="hidden" />
-                <span className="mr-2 text-xs text-muted-foreground">Actions:</span>
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".json"
+                    onChange={importJSON}
+                    className="hidden"
+                />
+                <span className="mr-2 text-xs text-muted-foreground">
+                    Actions:
+                </span>
                 {actions.map(({ icon: Icon, label, onClick, className }) => (
                     <Tooltip key={label}>
                         <TooltipTrigger asChild>
@@ -94,7 +113,9 @@ export default function ActionsPlugin({ isRichText = true }: Props): JSX.Element
                                 <Icon className="h-3.5 w-3.5" />
                             </button>
                         </TooltipTrigger>
-                        <TooltipContent side="top"><p>{label}</p></TooltipContent>
+                        <TooltipContent side="top">
+                            <p>{label}</p>
+                        </TooltipContent>
                     </Tooltip>
                 ))}
             </div>

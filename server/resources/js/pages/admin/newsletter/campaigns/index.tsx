@@ -1,16 +1,13 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
-    Megaphone,
     PlusIcon,
     EyeIcon,
     PencilIcon,
     TrashIcon,
     CopyIcon,
     SendIcon,
-    ClockIcon,
 } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -18,6 +15,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -141,7 +139,11 @@ export default function CampaignsIndex({ campaigns, filters }: Props) {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/newsletter/campaigns/${row.original.id}`} prefetch cacheFor={60}>
+                        <Link
+                            href={`/admin/newsletter/campaigns/${row.original.id}`}
+                            prefetch
+                            cacheFor={60}
+                        >
                             <EyeIcon className="mr-1 h-3 w-3" />
                             {__('action.show', 'View')}
                         </Link>
@@ -149,7 +151,11 @@ export default function CampaignsIndex({ campaigns, filters }: Props) {
                     {row.original.status === 'draft' && (
                         <>
                             <Button asChild variant="outline" size="sm">
-                                <Link href={`/admin/newsletter/campaigns/${row.original.id}/edit`} prefetch cacheFor={30}>
+                                <Link
+                                    href={`/admin/newsletter/campaigns/${row.original.id}/edit`}
+                                    prefetch
+                                    cacheFor={30}
+                                >
                                     <PencilIcon className="mr-1 h-3 w-3" />
                                     {__('action.edit', 'Edit')}
                                 </Link>
@@ -218,7 +224,10 @@ export default function CampaignsIndex({ campaigns, filters }: Props) {
             <Wrapper>
                 <PageHeader
                     title={__('page.campaigns', 'Campaigns')}
-                    description={__('page.campaigns_desc', 'Manage email campaigns')}
+                    description={__(
+                        'page.campaigns_desc',
+                        'Manage email campaigns',
+                    )}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/newsletter/campaigns/create">
@@ -242,7 +251,10 @@ export default function CampaignsIndex({ campaigns, filters }: Props) {
                         next_page_url: campaigns.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search', 'Search campaigns...')}
+                    searchPlaceholder={__(
+                        'placeholder.search',
+                        'Search campaigns...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/newsletter/campaigns"
                 />

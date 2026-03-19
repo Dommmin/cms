@@ -1,4 +1,4 @@
-import { $isCodeNode, getCodeLanguages, getLanguageFriendlyName, normalizeCodeLang } from '@lexical/code';
+import { $isCodeNode, getLanguageFriendlyName } from '@lexical/code';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getNearestNodeFromDOMNode } from 'lexical';
 import { Check, Copy } from 'lucide-react';
@@ -12,22 +12,36 @@ interface Props {
     anchorElem?: HTMLElement;
 }
 
-function CodeActionMenuContainer({ anchorElem }: { anchorElem: HTMLElement }): JSX.Element {
+function CodeActionMenuContainer({
+    anchorElem,
+}: {
+    anchorElem: HTMLElement;
+}): JSX.Element {
     const [editor] = useLexicalComposerContext();
     const [lang, setLang] = useState('');
     const [isShown, setShown] = useState<boolean>(false);
-    const [shouldListenMouseMove, setShouldListenMouseMove] = useState<boolean>(false);
-    const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-    const codeSetRef = useRef<Set<string>>(new Set());
+    const [shouldListenMouseMove, setShouldListenMouseMove] =
+        useState<boolean>(false);
+    const [position, setPosition] = useState<{ x: number; y: number }>({
+        x: 0,
+        y: 0,
+    });
+    const _codeSetRef = useRef<Set<string>>(new Set());
     const codeDOMNodeRef = useRef<HTMLElement | null>(null);
     const [isCopyCompleted, setCopyCompleted] = useState<boolean>(false);
 
-    function getMouseInfo(event: MouseEvent): { codeDOMNode: HTMLElement | null; isOutside: boolean } {
+    function getMouseInfo(event: MouseEvent): {
+        codeDOMNode: HTMLElement | null;
+        isOutside: boolean;
+    } {
         const target = event.target as Node;
         if (target && target.nodeType === Node.ELEMENT_NODE) {
             const elem = target as Element;
             const codeDOMNode = elem.closest<HTMLElement>('code.editor-code');
-            const isOutside = !(codeDOMNode || elem.closest<HTMLElement>('div.code-action-menu-container'));
+            const isOutside = !(
+                codeDOMNode ||
+                elem.closest<HTMLElement>('div.code-action-menu-container')
+            );
             return { codeDOMNode, isOutside };
         }
         return { codeDOMNode: null, isOutside: true };
@@ -45,10 +59,13 @@ function CodeActionMenuContainer({ anchorElem }: { anchorElem: HTMLElement }): J
             if (codeDOMNode && codeDOMNode !== codeDOMNodeRef.current) {
                 codeDOMNodeRef.current = codeDOMNode;
                 editor.getEditorState().read(() => {
-                    const maybeCodeNode = $getNearestNodeFromDOMNode(codeDOMNode);
+                    const maybeCodeNode =
+                        $getNearestNodeFromDOMNode(codeDOMNode);
                     if ($isCodeNode(maybeCodeNode)) {
                         const language = maybeCodeNode.getLanguage() as string;
-                        setLang(language ? getLanguageFriendlyName(language) : '');
+                        setLang(
+                            language ? getLanguageFriendlyName(language) : '',
+                        );
                     }
                 });
             }
@@ -73,9 +90,15 @@ function CodeActionMenuContainer({ anchorElem }: { anchorElem: HTMLElement }): J
             setShouldListenMouseMove(true);
         }
 
-        const codeBlocks = anchorElem.querySelectorAll<HTMLElement>('code.editor-code');
-        codeBlocks.forEach((block) => block.addEventListener('mouseenter', handleMouseEnter));
-        return () => codeBlocks.forEach((block) => block.removeEventListener('mouseenter', handleMouseEnter));
+        const codeBlocks =
+            anchorElem.querySelectorAll<HTMLElement>('code.editor-code');
+        codeBlocks.forEach((block) =>
+            block.addEventListener('mouseenter', handleMouseEnter),
+        );
+        return () =>
+            codeBlocks.forEach((block) =>
+                block.removeEventListener('mouseenter', handleMouseEnter),
+            );
     }, [anchorElem]);
 
     const handleCopy = useCallback(() => {
@@ -96,19 +119,32 @@ function CodeActionMenuContainer({ anchorElem }: { anchorElem: HTMLElement }): J
             className="code-action-menu-container absolute z-10 flex items-center gap-1"
             style={{ top: position.y + CODE_PADDING, right: CODE_PADDING }}
         >
-            {lang && <span className="text-xs text-muted-foreground bg-muted/80 px-1.5 py-0.5 rounded font-mono">{lang}</span>}
+            {lang && (
+                <span className="rounded bg-muted/80 px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
+                    {lang}
+                </span>
+            )}
             <button
                 type="button"
                 onClick={handleCopy}
                 className="flex h-7 w-7 items-center justify-center rounded border border-border bg-background text-muted-foreground shadow-sm hover:bg-muted"
                 title="Copy code"
             >
-                {isCopyCompleted ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+                {isCopyCompleted ? (
+                    <Check className="h-3.5 w-3.5 text-green-500" />
+                ) : (
+                    <Copy className="h-3.5 w-3.5" />
+                )}
             </button>
         </div>
     );
 }
 
-export default function CodeActionMenuPlugin({ anchorElem = document.body }: Props): JSX.Element {
-    return createPortal(<CodeActionMenuContainer anchorElem={anchorElem} />, anchorElem);
+export default function CodeActionMenuPlugin({
+    anchorElem = document.body,
+}: Props): JSX.Element {
+    return createPortal(
+        <CodeActionMenuContainer anchorElem={anchorElem} />,
+        anchorElem,
+    );
 }

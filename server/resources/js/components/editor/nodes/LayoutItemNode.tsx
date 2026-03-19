@@ -1,4 +1,9 @@
-import type { DOMConversionMap, EditorConfig, NodeKey, SerializedElementNode } from 'lexical';
+import type {
+    DOMConversionMap,
+    EditorConfig,
+    NodeKey,
+    SerializedElementNode,
+} from 'lexical';
 import { $applyNodeReplacement, ElementNode } from 'lexical';
 
 export class LayoutItemNode extends ElementNode {

@@ -1,13 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import {
-    HelpCircle,
-    PlusIcon,
-    EyeIcon,
-    PencilIcon,
-    TrashIcon,
-} from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
+import { PlusIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -15,6 +8,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -48,7 +42,11 @@ type Props = {
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'FAQ', href: '/admin/faqs' }];
 
-export default function FaqsIndex({ faqs, filters, categories }: Props) {
+export default function FaqsIndex({
+    faqs,
+    filters,
+    categories: _categories,
+}: Props) {
     const __ = useTranslation();
     const columns: ColumnDef<Faq>[] = [
         {
@@ -74,7 +72,9 @@ export default function FaqsIndex({ faqs, filters, categories }: Props) {
                 <Badge
                     variant={row.original.is_active ? 'default' : 'secondary'}
                 >
-                    {row.original.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
+                    {row.original.is_active
+                        ? __('status.active', 'Active')
+                        : __('status.inactive', 'Inactive')}
                 </Badge>
             ),
         },
@@ -105,7 +105,11 @@ export default function FaqsIndex({ faqs, filters, categories }: Props) {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/faqs/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/faqs/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>
@@ -114,7 +118,10 @@ export default function FaqsIndex({ faqs, filters, categories }: Props) {
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete FAQ')}
-                        description={__('dialog.cannot_be_undone', 'Are you sure you want to delete this FAQ? This action cannot be undone.')}
+                        description={__(
+                            'dialog.cannot_be_undone',
+                            'Are you sure you want to delete this FAQ? This action cannot be undone.',
+                        )}
                         onConfirm={() => {
                             router.delete(`/admin/faqs/${row.original.id}`, {
                                 onSuccess: () => toast.success('FAQ deleted'),
@@ -135,7 +142,10 @@ export default function FaqsIndex({ faqs, filters, categories }: Props) {
             <Wrapper>
                 <PageHeader
                     title={__('page.faqs', 'FAQ')}
-                    description={__('page.faqs_desc', 'Manage frequently asked questions')}
+                    description={__(
+                        'page.faqs_desc',
+                        'Manage frequently asked questions',
+                    )}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/faqs/create">
@@ -159,7 +169,10 @@ export default function FaqsIndex({ faqs, filters, categories }: Props) {
                         next_page_url: faqs.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search', 'Search questions...')}
+                    searchPlaceholder={__(
+                        'placeholder.search',
+                        'Search questions...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/faqs"
                 />

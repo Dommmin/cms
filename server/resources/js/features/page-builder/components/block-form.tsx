@@ -92,7 +92,7 @@ export function BlockForm({
                     <SelectContent>
                         {Object.entries(grouped).map(([category, entries]) => (
                             <div key={category}>
-                                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                                <div className="px-2 py-1.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
                                     {category.replace(/-/g, ' ')}
                                 </div>
                                 {entries.map(([key, config]) => (
@@ -121,7 +121,9 @@ export function BlockForm({
                 </div>
                 <Switch
                     checked={block.is_active}
-                    onCheckedChange={(checked) => onUpdate({ is_active: checked })}
+                    onCheckedChange={(checked) =>
+                        onUpdate({ is_active: checked })
+                    }
                 />
             </div>
 
@@ -130,7 +132,9 @@ export function BlockForm({
                 <DynamicBlockForm
                     block={block}
                     blockTypeConfig={currentBlockConfig}
-                    onUpdateConfig={(config) => onUpdate({ configuration: config })}
+                    onUpdateConfig={(config) =>
+                        onUpdate({ configuration: config })
+                    }
                     onUpdateRelations={(relations) => onUpdate({ relations })}
                 />
             )}

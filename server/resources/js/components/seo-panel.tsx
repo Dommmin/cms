@@ -1,5 +1,6 @@
-import { useMemo } from 'react';
 import { AlertCircle, CheckCircle } from 'lucide-react';
+import { useMemo } from 'react';
+import InputError from '@/components/input-error';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,7 +12,6 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import InputError from '@/components/input-error';
 
 export type SeoData = {
     seo_title: string;
@@ -32,7 +32,15 @@ type Props = {
     descriptionFallback?: string;
 };
 
-function CharCounter({ value, max, warn }: { value: number; max: number; warn: number }) {
+function CharCounter({
+    value,
+    max,
+    warn,
+}: {
+    value: number;
+    max: number;
+    warn: number;
+}) {
     const isGood = value >= warn && value <= max;
     const isOver = value > max;
     return (
@@ -47,9 +55,21 @@ function CharCounter({ value, max, warn }: { value: number; max: number; warn: n
 }
 
 const ROBOTS_OPTIONS = [
-    { value: 'index, follow', label: 'Index & Follow (Recommended)', color: 'bg-green-500' },
-    { value: 'noindex, follow', label: 'No Index, Follow', color: 'bg-amber-500' },
-    { value: 'index, nofollow', label: 'Index, No Follow', color: 'bg-amber-500' },
+    {
+        value: 'index, follow',
+        label: 'Index & Follow (Recommended)',
+        color: 'bg-green-500',
+    },
+    {
+        value: 'noindex, follow',
+        label: 'No Index, Follow',
+        color: 'bg-amber-500',
+    },
+    {
+        value: 'index, nofollow',
+        label: 'Index, No Follow',
+        color: 'bg-amber-500',
+    },
     {
         value: 'noindex, nofollow',
         label: 'No Index, No Follow (Strongest block)',
@@ -67,7 +87,9 @@ export function SeoPanel({
     descriptionFallback = 'No description provided.',
 }: Props) {
     const robotsColor = useMemo(
-        () => ROBOTS_OPTIONS.find((o) => o.value === data.meta_robots)?.color ?? 'bg-green-500',
+        () =>
+            ROBOTS_OPTIONS.find((o) => o.value === data.meta_robots)?.color ??
+            'bg-green-500',
         [data.meta_robots],
     );
 
@@ -80,7 +102,11 @@ export function SeoPanel({
             <div className="grid gap-2">
                 <div className="flex items-center justify-between">
                     <Label htmlFor="seo_title">SEO Title</Label>
-                    <CharCounter value={data.seo_title.length} max={60} warn={40} />
+                    <CharCounter
+                        value={data.seo_title.length}
+                        max={60}
+                        warn={40}
+                    />
                 </div>
                 <Input
                     id="seo_title"
@@ -95,12 +121,18 @@ export function SeoPanel({
             <div className="grid gap-2">
                 <div className="flex items-center justify-between">
                     <Label htmlFor="seo_description">Meta Description</Label>
-                    <CharCounter value={data.seo_description.length} max={160} warn={120} />
+                    <CharCounter
+                        value={data.seo_description.length}
+                        max={160}
+                        warn={120}
+                    />
                 </div>
                 <Textarea
                     id="seo_description"
                     value={data.seo_description}
-                    onChange={(e) => onChange('seo_description', e.target.value)}
+                    onChange={(e) =>
+                        onChange('seo_description', e.target.value)
+                    }
                     placeholder="Meta description for search engines (120-160 chars)"
                     rows={3}
                 />
@@ -109,10 +141,12 @@ export function SeoPanel({
 
             {/* SERP Preview */}
             <div className="rounded-lg border bg-muted/30 p-4">
-                <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                <p className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
                     Search Preview
                 </p>
-                <p className="text-xs text-muted-foreground">example.com › {urlPath}</p>
+                <p className="text-xs text-muted-foreground">
+                    example.com › {urlPath}
+                </p>
                 <p className="mt-0.5 truncate text-sm font-medium text-blue-600 dark:text-blue-400">
                     {displayTitle}
                 </p>
@@ -128,7 +162,9 @@ export function SeoPanel({
                     <Input
                         id="canonical_url"
                         value={data.canonical_url ?? ''}
-                        onChange={(e) => onChange('canonical_url', e.target.value || null)}
+                        onChange={(e) =>
+                            onChange('canonical_url', e.target.value || null)
+                        }
                         placeholder="https://example.com/canonical-url"
                     />
                     <InputError message={errors.canonical_url} />
@@ -140,7 +176,10 @@ export function SeoPanel({
                 <Label>Meta Robots</Label>
                 <div className="flex items-center gap-2">
                     <span className={`h-2 w-2 rounded-full ${robotsColor}`} />
-                    <Select value={data.meta_robots} onValueChange={(v) => onChange('meta_robots', v)}>
+                    <Select
+                        value={data.meta_robots}
+                        onValueChange={(v) => onChange('meta_robots', v)}
+                    >
                         <SelectTrigger className="flex-1">
                             <SelectValue />
                         </SelectTrigger>
@@ -161,7 +200,9 @@ export function SeoPanel({
                 <Input
                     id="og_image"
                     value={data.og_image ?? ''}
-                    onChange={(e) => onChange('og_image', e.target.value || null)}
+                    onChange={(e) =>
+                        onChange('og_image', e.target.value || null)
+                    }
                     placeholder="https://example.com/og-image.jpg"
                 />
                 {data.og_image && (
@@ -179,7 +220,9 @@ export function SeoPanel({
                 <Checkbox
                     id="sitemap_exclude"
                     checked={data.sitemap_exclude}
-                    onCheckedChange={(checked) => onChange('sitemap_exclude', checked === true)}
+                    onCheckedChange={(checked) =>
+                        onChange('sitemap_exclude', checked === true)
+                    }
                 />
                 <div>
                     <Label htmlFor="sitemap_exclude" className="cursor-pointer">

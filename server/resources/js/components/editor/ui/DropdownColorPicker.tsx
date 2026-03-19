@@ -1,6 +1,14 @@
 import { type JSX } from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import ColorPicker from './ColorPicker';
 
@@ -13,7 +21,14 @@ interface Props {
     tooltip?: string;
 }
 
-export default function DropdownColorPicker({ color, onChange, children, disabled, className, tooltip }: Props): JSX.Element {
+export default function DropdownColorPicker({
+    color,
+    onChange,
+    children,
+    disabled,
+    className,
+    tooltip,
+}: Props): JSX.Element {
     return (
         <Popover>
             {tooltip ? (
@@ -29,11 +44,16 @@ export default function DropdownColorPicker({ color, onChange, children, disable
                                 )}
                             >
                                 {children}
-                                <div className="mt-0.5 h-1 w-4 rounded-sm" style={{ background: color }} />
+                                <div
+                                    className="mt-0.5 h-1 w-4 rounded-sm"
+                                    style={{ background: color }}
+                                />
                             </button>
                         </PopoverTrigger>
                     </TooltipTrigger>
-                    <TooltipContent side="bottom"><p>{tooltip}</p></TooltipContent>
+                    <TooltipContent side="bottom">
+                        <p>{tooltip}</p>
+                    </TooltipContent>
                 </Tooltip>
             ) : (
                 <PopoverTrigger asChild disabled={disabled}>
@@ -46,7 +66,10 @@ export default function DropdownColorPicker({ color, onChange, children, disable
                         )}
                     >
                         {children}
-                        <div className="mt-0.5 h-1 w-4 rounded-sm" style={{ background: color }} />
+                        <div
+                            className="mt-0.5 h-1 w-4 rounded-sm"
+                            style={{ background: color }}
+                        />
                     </button>
                 </PopoverTrigger>
             )}

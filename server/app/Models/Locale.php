@@ -24,6 +24,19 @@ class Locale extends Model
         'is_active',
     ];
 
+    /**
+     * @return Collection<Locale>
+     */
+    public static function getLocales(): Collection
+    {
+        return self::query()
+            ->select(['code', 'name', 'native_name', 'flag_emoji', 'is_default'])
+            ->active()
+            ->orderByDesc('is_default')
+            ->orderBy('name')
+            ->get();
+    }
+
     public function translations(): HasMany
     {
         return $this->hasMany(Translation::class, 'locale_code', 'code');
@@ -45,18 +58,5 @@ class Locale extends Model
             'is_default' => 'boolean',
             'is_active' => 'boolean',
         ];
-    }
-
-    /**
-     * @return Collection<Locale>
-     */
-    public static function getLocales(): Collection
-    {
-        return self::query()
-            ->select(['code', 'name', 'native_name', 'flag_emoji', 'is_default'])
-            ->active()
-            ->orderByDesc('is_default')
-            ->orderBy('name')
-            ->get();
     }
 }

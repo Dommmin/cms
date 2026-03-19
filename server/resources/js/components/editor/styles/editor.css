@@ -11,7 +11,7 @@
 }
 
 .editor-scroller {
-    @apply min-h-[300px] border-0 outline-none resize-none overflow-auto;
+    @apply min-h-[300px] resize-none overflow-auto border-0 outline-none;
 }
 
 .editor-inner {
@@ -21,57 +21,57 @@
 /* ─── Content Editable ────────────────────────────────────────────────────── */
 
 .ContentEditable__root {
-    @apply min-h-[300px] p-4 outline-none text-foreground;
+    @apply min-h-[300px] p-4 text-foreground outline-none;
 }
 
 /* ─── Placeholder ─────────────────────────────────────────────────────────── */
 
 .Placeholder__root {
-    @apply absolute top-4 left-4 pointer-events-none text-muted-foreground select-none;
+    @apply pointer-events-none absolute top-4 left-4 text-muted-foreground select-none;
 }
 
 /* ─── Block Types ─────────────────────────────────────────────────────────── */
 
 .editor-paragraph {
-    @apply mb-2 last:mb-0 min-h-[1.5em] relative;
+    @apply relative mb-2 min-h-[1.5em] last:mb-0;
 }
 
 .editor-h1 {
-    @apply text-3xl font-bold mb-3 mt-5 first:mt-0;
+    @apply mt-5 mb-3 text-3xl font-bold first:mt-0;
 }
 
 .editor-h2 {
-    @apply text-2xl font-semibold mb-2 mt-4 first:mt-0;
+    @apply mt-4 mb-2 text-2xl font-semibold first:mt-0;
 }
 
 .editor-h3 {
-    @apply text-xl font-semibold mb-2 mt-3 first:mt-0;
+    @apply mt-3 mb-2 text-xl font-semibold first:mt-0;
 }
 
 .editor-h4 {
-    @apply text-lg font-semibold mb-1 mt-3 first:mt-0;
+    @apply mt-3 mb-1 text-lg font-semibold first:mt-0;
 }
 
 .editor-h5 {
-    @apply text-base font-semibold mb-1 mt-2 first:mt-0;
+    @apply mt-2 mb-1 text-base font-semibold first:mt-0;
 }
 
 .editor-h6 {
-    @apply text-sm font-semibold mb-1 mt-2 first:mt-0 text-muted-foreground;
+    @apply mt-2 mb-1 text-sm font-semibold text-muted-foreground first:mt-0;
 }
 
 .editor-quote {
-    @apply border-l-4 border-border pl-4 italic text-muted-foreground my-3;
+    @apply my-3 border-l-4 border-border pl-4 text-muted-foreground italic;
 }
 
 .editor-hr {
-    @apply border-0 border-t border-border h-0 my-4;
+    @apply my-4 h-0 border-0 border-t border-border;
 }
 
 /* ─── Text Formatting ─────────────────────────────────────────────────────── */
 
 .editor-text-code {
-    @apply bg-muted text-destructive rounded px-1.5 py-0.5 font-mono text-sm;
+    @apply rounded bg-muted px-1.5 py-0.5 font-mono text-sm text-destructive;
 }
 
 .editor-text-subscript {
@@ -87,13 +87,13 @@
 /* ─── Code Block ──────────────────────────────────────────────────────────── */
 
 .editor-code {
-    @apply block bg-muted rounded-lg pr-4 pt-4 pb-4 pl-14 font-mono text-sm my-3 overflow-x-auto whitespace-pre relative;
+    @apply relative my-3 block overflow-x-auto rounded-lg bg-muted pt-4 pr-4 pb-4 pl-14 font-mono text-sm whitespace-pre;
     tab-size: 2;
 }
 
 .editor-code:before {
     content: attr(data-gutter);
-    @apply absolute left-0 top-0 bottom-0 bg-muted-foreground/10 text-muted-foreground px-2 py-4 text-right min-w-[3rem] select-none font-mono text-xs;
+    @apply absolute top-0 bottom-0 left-0 min-w-[3rem] bg-muted-foreground/10 px-2 py-4 text-right font-mono text-xs text-muted-foreground select-none;
     white-space: pre-wrap;
     border-right: 1px solid var(--border);
 }
@@ -135,11 +135,11 @@
 /* ─── Lists ───────────────────────────────────────────────────────────────── */
 
 .editor-list-ul {
-    @apply list-disc ml-6 my-2;
+    @apply my-2 ml-6 list-disc;
 }
 
 .editor-list-ol {
-    @apply list-decimal ml-6 my-2;
+    @apply my-2 ml-6 list-decimal;
 }
 
 .editor-list-item {
@@ -153,37 +153,37 @@
 /* ─── Checklist ───────────────────────────────────────────────────────────── */
 
 .editor-checklist {
-    @apply ml-0 list-none my-2;
+    @apply my-2 ml-0 list-none;
 }
 
 .editor-list-item-unchecked,
 .editor-list-item-checked {
-    @apply relative pl-7 outline-none mb-0.5;
+    @apply relative mb-0.5 pl-7 outline-none;
 }
 
 .editor-list-item-unchecked:before,
 .editor-list-item-checked:before {
     content: '';
-    @apply absolute left-0 top-0.5 w-4 h-4 rounded border border-border cursor-pointer;
+    @apply absolute top-0.5 left-0 h-4 w-4 cursor-pointer rounded border border-border;
 }
 
 .editor-list-item-checked:before {
-    @apply bg-primary border-primary;
+    @apply border-primary bg-primary;
 }
 
 .editor-list-item-checked:after {
     content: '';
-    @apply absolute top-[5px] left-[3px] w-[10px] h-[6px] rotate-[-45deg] border-b-2 border-l-2 border-primary-foreground;
+    @apply absolute top-[5px] left-[3px] h-[6px] w-[10px] rotate-[-45deg] border-b-2 border-l-2 border-primary-foreground;
 }
 
 .editor-list-item-checked > span {
-    @apply line-through text-muted-foreground;
+    @apply text-muted-foreground line-through;
 }
 
 /* ─── Table ───────────────────────────────────────────────────────────────── */
 
 .editor-table-scrollable-wrapper {
-    @apply overflow-x-auto my-4;
+    @apply my-4 overflow-x-auto;
 }
 
 .editor-table {
@@ -191,7 +191,7 @@
 }
 
 .editor-table-cell {
-    @apply border border-border px-3 py-2 min-w-[50px] text-left align-top relative outline-none;
+    @apply relative min-w-[50px] border border-border px-3 py-2 text-left align-top outline-none;
 }
 
 .editor-table-cell-header {
@@ -212,11 +212,11 @@
 }
 
 .editor-table-cell-resizer {
-    @apply absolute right-0 top-0 bottom-0 w-1 cursor-col-resize z-10;
+    @apply absolute top-0 right-0 bottom-0 z-10 w-1 cursor-col-resize;
 }
 
 .editor-table-resize-ruler {
-    @apply absolute top-0 bottom-0 w-0.5 bg-primary pointer-events-none;
+    @apply pointer-events-none absolute top-0 bottom-0 w-0.5 bg-primary;
 }
 
 .editor-table-selected {
@@ -229,7 +229,7 @@
 
 .editor-table-add-rows,
 .editor-table-add-columns {
-    @apply absolute cursor-pointer flex items-center justify-center;
+    @apply absolute flex cursor-pointer items-center justify-center;
 }
 
 .editor-table-cell-action-button-container {
@@ -237,7 +237,7 @@
 }
 
 .editor-table-cell-action-button {
-    @apply w-5 h-5 rounded flex items-center justify-center bg-background border border-border cursor-pointer text-xs hover:bg-muted;
+    @apply flex h-5 w-5 cursor-pointer items-center justify-center rounded border border-border bg-background text-xs hover:bg-muted;
 }
 
 .editor-table-row-striping tr:nth-child(even) .editor-table-cell {
@@ -245,13 +245,13 @@
 }
 
 .editor-table-cell-sorted-indicator {
-    @apply inline-block ml-1 text-xs text-muted-foreground;
+    @apply ml-1 inline-block text-xs text-muted-foreground;
 }
 
 /* ─── Links ───────────────────────────────────────────────────────────────── */
 
 .editor-link {
-    @apply text-primary underline cursor-pointer;
+    @apply cursor-pointer text-primary underline;
 }
 
 .editor-link:hover {
@@ -261,13 +261,13 @@
 /* ─── Hashtag ─────────────────────────────────────────────────────────────── */
 
 .editor-hashtag {
-    @apply text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 rounded px-0.5;
+    @apply rounded bg-blue-50 px-0.5 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400;
 }
 
 /* ─── Mark / Highlight ────────────────────────────────────────────────────── */
 
 .editor-mark {
-    @apply bg-yellow-200 dark:bg-yellow-800/50 rounded-sm;
+    @apply rounded-sm bg-yellow-200 dark:bg-yellow-800/50;
 }
 
 .editor-mark-overlap {
@@ -277,7 +277,7 @@
 /* ─── Image ───────────────────────────────────────────────────────────────── */
 
 .editor-image {
-    @apply cursor-default inline-block relative select-none;
+    @apply relative inline-block cursor-default select-none;
 }
 
 .editor-image img {
@@ -360,11 +360,11 @@
 /* ─── Layout ──────────────────────────────────────────────────────────────── */
 
 .editor-layout-container {
-    @apply grid gap-4 my-4;
+    @apply my-4 grid gap-4;
 }
 
 .editor-layout-item {
-    @apply border border-dashed border-border rounded p-2 min-h-[50px];
+    @apply min-h-[50px] rounded border border-dashed border-border p-2;
 }
 
 .editor-layout-item:focus {
@@ -384,12 +384,12 @@
 /* ─── Block Cursor ────────────────────────────────────────────────────────── */
 
 .editor-block-cursor {
-    @apply absolute pointer-events-none;
+    @apply pointer-events-none absolute;
 }
 
 .editor-block-cursor::after {
     content: '';
-    @apply absolute top-0 left-0 right-0 bottom-0 border-2 border-primary rounded-sm;
+    @apply absolute top-0 right-0 bottom-0 left-0 rounded-sm border-2 border-primary;
     animation: CursorBlink 1s ease-in-out infinite;
 }
 
@@ -418,30 +418,30 @@
 /* ─── Floating Link Toolbar ───────────────────────────────────────────────── */
 
 .link-editor {
-    @apply absolute z-50 top-full left-0 mt-1 rounded-lg border bg-popover shadow-md p-2 flex items-center gap-2;
+    @apply absolute top-full left-0 z-50 mt-1 flex items-center gap-2 rounded-lg border bg-popover p-2 shadow-md;
 }
 
 .link-editor input {
-    @apply flex-1 bg-transparent outline-none text-sm text-foreground;
+    @apply flex-1 bg-transparent text-sm text-foreground outline-none;
 }
 
 /* ─── Floating Text Format Toolbar ───────────────────────────────────────── */
 
 .floating-text-format-popup {
-    @apply absolute z-50 bg-popover rounded-lg border shadow-md flex items-center gap-0.5 p-1;
+    @apply absolute z-50 flex items-center gap-0.5 rounded-lg border bg-popover p-1 shadow-md;
 }
 
 /* ─── Draggable Block ─────────────────────────────────────────────────────── */
 
 .draggable-block-menu {
-    @apply absolute flex items-center cursor-grab rounded p-0.5 z-10 will-change-transform hover:bg-muted/50 active:cursor-grabbing;
+    @apply absolute z-10 flex cursor-grab items-center rounded p-0.5 will-change-transform hover:bg-muted/50 active:cursor-grabbing;
     top: 0;
     left: 0;
     opacity: 0;
 }
 
 .draggable-block-target-line {
-    @apply pointer-events-none h-0.5 bg-primary absolute left-0 z-20 will-change-transform rounded-full;
+    @apply pointer-events-none absolute left-0 z-20 h-0.5 rounded-full bg-primary will-change-transform;
     top: 0;
     opacity: 0;
 }
@@ -449,7 +449,7 @@
 /* ─── Mentions ────────────────────────────────────────────────────────────── */
 
 .mention {
-    @apply text-primary font-semibold;
+    @apply font-semibold text-primary;
 }
 
 /* ─── Emoji ───────────────────────────────────────────────────────────────── */
@@ -461,7 +461,7 @@
 /* ─── Keyword ─────────────────────────────────────────────────────────────── */
 
 .editor-keyword {
-    @apply bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 rounded px-0.5;
+    @apply rounded bg-yellow-100 px-0.5 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200;
 }
 
 /* ─── Page Break ──────────────────────────────────────────────────────────── */
@@ -473,17 +473,17 @@
 /* ─── Sticky Note ─────────────────────────────────────────────────────────── */
 
 .sticky-note {
-    @apply absolute w-48 min-h-[80px] rounded-lg shadow-lg p-3 cursor-grab select-none;
+    @apply absolute min-h-[80px] w-48 cursor-grab rounded-lg p-3 shadow-lg select-none;
 }
 
 /* ─── Component Picker ────────────────────────────────────────────────────── */
 
 .component-picker-menu {
-    @apply absolute z-50 bg-popover rounded-lg border shadow-lg w-64 max-h-64 overflow-y-auto;
+    @apply absolute z-50 max-h-64 w-64 overflow-y-auto rounded-lg border bg-popover shadow-lg;
 }
 
 .component-picker-item {
-    @apply flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-accent;
+    @apply flex cursor-pointer items-center gap-3 px-3 py-2 text-sm hover:bg-accent;
 }
 
 .component-picker-item.selected {
@@ -493,11 +493,11 @@
 /* ─── Collapsible ─────────────────────────────────────────────────────────── */
 
 .collapsible-container {
-    @apply border border-border rounded-lg my-2 overflow-hidden;
+    @apply my-2 overflow-hidden rounded-lg border border-border;
 }
 
 .collapsible-title {
-    @apply flex items-center gap-2 p-3 font-medium cursor-pointer select-none hover:bg-muted/50;
+    @apply flex cursor-pointer items-center gap-2 p-3 font-medium select-none hover:bg-muted/50;
     list-style: none;
 }
 
@@ -523,7 +523,7 @@ details[open] > .collapsible-title::before {
 }
 
 .collapsible-content {
-    @apply p-3 border-t border-border;
+    @apply border-t border-border p-3;
 }
 
 /* ─── YouTube / Twitter / Figma Embeds ───────────────────────────────────── */
@@ -549,13 +549,13 @@ details[open] > .collapsible-title::before {
 /* ─── Toolbar ─────────────────────────────────────────────────────────────── */
 
 .toolbar-divider {
-    @apply w-px h-5 bg-border mx-0.5 self-center;
+    @apply mx-0.5 h-5 w-px self-center bg-border;
 }
 
 /* ─── Code Action Menu ────────────────────────────────────────────────────── */
 
 .code-action-menu-container {
-    @apply absolute top-2 right-2 flex items-center gap-1 z-10;
+    @apply absolute top-2 right-2 z-10 flex items-center gap-1;
 }
 
 /* ─── Selection ───────────────────────────────────────────────────────────── */

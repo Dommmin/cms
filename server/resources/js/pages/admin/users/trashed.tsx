@@ -1,8 +1,11 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
 import { ArrowLeftIcon, RotateCcwIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
+import {
+    forceDelete,
+    restore,
+} from '@/actions/App/Http/Controllers/Admin/UserController';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
-import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -13,11 +16,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
-import {
-    forceDelete,
-    restore,
-} from '@/actions/App/Http/Controllers/Admin/UserController';
 
 import type { BreadcrumbItem } from '@/types';
 
@@ -55,7 +55,10 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
             <Wrapper>
                 <PageHeader
                     title={__('page.users_trashed', 'Deleted Users')}
-                    description={__('page.users_trashed_desc', 'Soft-deleted accounts — restore or permanently remove')}
+                    description={__(
+                        'page.users_trashed_desc',
+                        'Soft-deleted accounts — restore or permanently remove',
+                    )}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
@@ -68,7 +71,7 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
                 </PageHeader>
 
                 {users.data.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                         {__('empty.no_users', 'No deleted users found.')}
                     </p>
                 ) : (
@@ -110,7 +113,10 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
                                         <td className="px-4 py-3">
                                             <div className="flex justify-end gap-2">
                                                 <Form
-                                                    {...restore.form(user.id)}
+                                                    action={restore.url(
+                                                        user.id,
+                                                    )}
+                                                    method="post"
                                                 >
                                                     {({ processing }) => (
                                                         <Button
@@ -122,7 +128,10 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
                                                             }
                                                         >
                                                             <RotateCcwIcon className="mr-1 h-3 w-3" />
-                                                            {__('action.restore', 'Restore')}
+                                                            {__(
+                                                                'action.restore',
+                                                                'Restore',
+                                                            )}
                                                         </Button>
                                                     )}
                                                 </Form>
@@ -137,7 +146,10 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
                                                     }
                                                 >
                                                     <Trash2Icon className="mr-1 h-3 w-3" />
-                                                    {__('action.delete', 'Delete Permanently')}
+                                                    {__(
+                                                        'action.delete',
+                                                        'Delete Permanently',
+                                                    )}
                                                 </Button>
                                             </div>
                                         </td>
@@ -161,7 +173,7 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
                                 Previous
                             </Button>
                         )}
-                        <span className="text-muted-foreground text-sm">
+                        <span className="text-sm text-muted-foreground">
                             Page {users.current_page} of {users.last_page}
                         </span>
                         {users.next_page_url && (
@@ -185,11 +197,19 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
             >
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{__('dialog.delete_title', 'Permanently Delete User')}</DialogTitle>
+                        <DialogTitle>
+                            {__(
+                                'dialog.delete_title',
+                                'Permanently Delete User',
+                            )}
+                        </DialogTitle>
                         <DialogDescription>
-                            {__('dialog.cannot_be_undone', 'This action cannot be undone.')} The user{' '}
-                            <strong>{confirmUser?.name}</strong> will be
-                            permanently removed from the database.
+                            {__(
+                                'dialog.cannot_be_undone',
+                                'This action cannot be undone.',
+                            )}{' '}
+                            The user <strong>{confirmUser?.name}</strong> will
+                            be permanently removed from the database.
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
@@ -199,7 +219,10 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
                         >
                             {__('action.cancel', 'Cancel')}
                         </Button>
-                        <Form {...forceDelete.form(confirmUserId ?? 0)}>
+                        <Form
+                            action={forceDelete.url(confirmUserId ?? 0)}
+                            method="delete"
+                        >
                             {({ processing }) => (
                                 <Button
                                     type="submit"

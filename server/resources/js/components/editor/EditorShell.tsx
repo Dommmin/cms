@@ -13,7 +13,7 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { type JSX } from 'react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useSharedHistoryContext } from './context/SharedHistoryContext';
 import ActionsPlugin from './plugins/ActionsPlugin';
@@ -22,11 +22,11 @@ import CodeActionMenuPlugin from './plugins/CodeActionMenuPlugin';
 import CodeHighlightPlugin from './plugins/CodeHighlightPlugin';
 import CollapsiblePlugin from './plugins/CollapsiblePlugin';
 import ComponentPickerPlugin from './plugins/ComponentPickerPlugin';
+import DatePlugin from './plugins/DatePlugin';
 import DraggableBlockPlugin from './plugins/DraggableBlockPlugin';
 import FigmaPlugin from './plugins/FigmaPlugin';
 import FloatingLinkEditorPlugin from './plugins/FloatingLinkEditorPlugin';
 import FloatingTextFormatPlugin from './plugins/FloatingTextFormatPlugin';
-import DatePlugin from './plugins/DatePlugin';
 import ImagesPlugin from './plugins/ImagesPlugin';
 import LayoutPlugin from './plugins/LayoutPlugin/LayoutPlugin';
 import PageBreakPlugin from './plugins/PageBreakPlugin';
@@ -35,7 +35,6 @@ import TwitterPlugin from './plugins/TwitterPlugin';
 import YouTubePlugin from './plugins/YouTubePlugin';
 import ContentEditable from './ui/ContentEditable';
 import Placeholder from './ui/Placeholder';
-import { validateUrl } from './utils/url';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -45,9 +44,14 @@ interface Props {
     className?: string;
 }
 
-export default function EditorShell({ showTreeView = false, placeholder = 'Enter some rich text…', className }: Props): JSX.Element {
+export default function EditorShell({
+    showTreeView = false,
+    placeholder = 'Enter some rich text…',
+    className,
+}: Props): JSX.Element {
     const { historyState } = useSharedHistoryContext();
-    const [floatingAnchorElem, setFloatingAnchorElem] = useState<HTMLDivElement | null>(null);
+    const [floatingAnchorElem, setFloatingAnchorElem] =
+        useState<HTMLDivElement | null>(null);
     const [isLinkEditMode, setIsLinkEditMode] = useState(false);
 
     const onRef = (_floatingAnchorElem: HTMLDivElement) => {
@@ -57,7 +61,12 @@ export default function EditorShell({ showTreeView = false, placeholder = 'Enter
     };
 
     return (
-        <div className={cn('editor-shell relative rounded-lg border bg-card shadow-sm', className)}>
+        <div
+            className={cn(
+                'editor-shell relative rounded-lg border bg-card shadow-sm',
+                className,
+            )}
+        >
             {/* Toolbar */}
             <ToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
 
@@ -80,13 +89,24 @@ export default function EditorShell({ showTreeView = false, placeholder = 'Enter
                     <HorizontalRulePlugin />
                     <TabIndentationPlugin />
                     <HashtagPlugin />
-                    <LinkPlugin validateUrl={(url: string) => {
-                        try {
-                            return ['http:', 'https:', 'mailto:', 'tel:'].includes(new URL(url).protocol);
-                        } catch {
-                            return /^https?:\/\//.test(url) || /^mailto:/.test(url) || /^tel:/.test(url);
-                        }
-                    }} />
+                    <LinkPlugin
+                        validateUrl={(url: string) => {
+                            try {
+                                return [
+                                    'http:',
+                                    'https:',
+                                    'mailto:',
+                                    'tel:',
+                                ].includes(new URL(url).protocol);
+                            } catch {
+                                return (
+                                    /^https?:\/\//.test(url) ||
+                                    /^mailto:/.test(url) ||
+                                    /^tel:/.test(url)
+                                );
+                            }
+                        }}
+                    />
                     <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
 
                     {/* Custom Plugins */}
@@ -105,8 +125,12 @@ export default function EditorShell({ showTreeView = false, placeholder = 'Enter
                     {/* Floating plugins need anchor elem */}
                     {floatingAnchorElem && (
                         <>
-                            <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
-                            <CodeActionMenuPlugin anchorElem={floatingAnchorElem} />
+                            <DraggableBlockPlugin
+                                anchorElem={floatingAnchorElem}
+                            />
+                            <CodeActionMenuPlugin
+                                anchorElem={floatingAnchorElem}
+                            />
                             <FloatingLinkEditorPlugin
                                 anchorElem={floatingAnchorElem}
                                 isLinkEditMode={isLinkEditMode}

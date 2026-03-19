@@ -15,7 +15,11 @@ export class CollapsibleContentNode extends ElementNode {
     }
 
     exportJSON(): SerializedElementNode {
-        return { ...super.exportJSON(), type: 'collapsible-content', version: 1 };
+        return {
+            ...super.exportJSON(),
+            type: 'collapsible-content',
+            version: 1,
+        };
     }
 
     createDOM(_config: EditorConfig): HTMLElement {

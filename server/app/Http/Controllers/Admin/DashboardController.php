@@ -26,31 +26,31 @@ class DashboardController extends Controller
         $widgets = DashboardWidget::ordered()->get();
 
         $shells = $widgets->map(fn ($w) => [
-            'id'        => $w->id,
-            'title'     => $w->title,
-            'type'      => $w->type->value,
-            'size'      => $w->size->value,
-            'icon'      => $w->icon,
-            'color'     => $w->color,
+            'id' => $w->id,
+            'title' => $w->title,
+            'type' => $w->type->value,
+            'size' => $w->size->value,
+            'icon' => $w->icon,
+            'color' => $w->color,
             'is_active' => $w->is_active,
-            'order'     => $w->order,
-            'config'    => $w->config,
+            'order' => $w->order,
+            'config' => $w->config,
         ]);
 
         return Inertia::render('admin/dashboard', [
             'widgetShells' => $shells,
-            'widgets'      => Inertia::defer(function () use ($widgets) {
+            'widgets' => Inertia::defer(function () use ($widgets) {
                 return $widgets->map(fn ($w) => [
-                    'id'        => $w->id,
-                    'title'     => $w->title,
-                    'type'      => $w->type->value,
-                    'size'      => $w->size->value,
-                    'icon'      => $w->icon,
-                    'color'     => $w->color,
+                    'id' => $w->id,
+                    'title' => $w->title,
+                    'type' => $w->type->value,
+                    'size' => $w->size->value,
+                    'icon' => $w->icon,
+                    'color' => $w->color,
                     'is_active' => $w->is_active,
-                    'order'     => $w->order,
-                    'config'    => $w->config,
-                    'data'      => $w->is_active ? $this->getWidgetData($w) : null,
+                    'order' => $w->order,
+                    'config' => $w->config,
+                    'data' => $w->is_active ? $this->getWidgetData($w) : null,
                 ]);
             }),
         ]);

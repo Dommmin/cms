@@ -14,6 +14,10 @@ export interface Widget {
     size: WidgetSize;
     icon?: string;
     color?: string;
+    is_active: boolean;
+    order: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     config?: any;
 }

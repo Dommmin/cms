@@ -95,9 +95,9 @@ return [
 
     'bank_transfer' => [
         'account_name' => env('BANK_TRANSFER_ACCOUNT_NAME', ''),
-        'iban'         => env('BANK_TRANSFER_IBAN', ''),
-        'swift'        => env('BANK_TRANSFER_SWIFT', ''),
-        'bank_name'    => env('BANK_TRANSFER_BANK_NAME', ''),
+        'iban' => env('BANK_TRANSFER_IBAN', ''),
+        'swift' => env('BANK_TRANSFER_SWIFT', ''),
+        'bank_name' => env('BANK_TRANSFER_BANK_NAME', ''),
     ],
 
 ];

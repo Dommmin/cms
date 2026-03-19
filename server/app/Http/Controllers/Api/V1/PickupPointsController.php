@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Infrastructure\Shipping\Furgonetka\FurgonetkaClient;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Throwable;
 
 class PickupPointsController extends Controller
 {
@@ -38,8 +39,8 @@ class PickupPointsController extends Controller
         // Guard: Furgonetka credentials must be set in server/.env
         if (empty(config('services.furgonetka.client_id')) || empty(config('services.furgonetka.client_secret'))) {
             return response()->json([
-                'data'        => [],
-                'configured'  => false,
+                'data' => [],
+                'configured' => false,
                 'missing_env' => ['FURGONETKA_CLIENT_ID', 'FURGONETKA_CLIENT_SECRET'],
             ]);
         }
@@ -56,11 +57,11 @@ class PickupPointsController extends Controller
         try {
             $raw = $this->client->getPickupPoints(
                 serviceCode: $serviceCode,
-                postalCode:  $postalCode ?: null,
-                lat:         $lat,
-                lng:         $lng,
+                postalCode: $postalCode ?: null,
+                lat: $lat,
+                lng: $lng,
             );
-        } catch (\Throwable) {
+        } catch (Throwable) {
             return response()->json(['data' => []]);
         }
 
@@ -89,17 +90,17 @@ class PickupPointsController extends Controller
                 }
 
                 $street = $p['address']['street'] ?? $p['street'] ?? '';
-                $city   = $p['address']['city']   ?? $p['city']   ?? '';
-                $zip    = $p['address']['zip']     ?? $p['zip']    ?? '';
-                $address = trim(implode(', ', array_filter([$street, $zip ? "{$zip} {$city}" : $city])));
+                $city = $p['address']['city'] ?? $p['city'] ?? '';
+                $zip = $p['address']['zip'] ?? $p['zip'] ?? '';
+                $address = mb_trim(implode(', ', array_filter([$street, $zip ? "{$zip} {$city}" : $city])));
 
                 return [
-                    'id'      => (string) ($p['code']   ?? $p['id']   ?? ''),
-                    'name'    => (string) ($p['name']   ?? $p['code'] ?? ''),
+                    'id' => (string) ($p['code'] ?? $p['id'] ?? ''),
+                    'name' => (string) ($p['name'] ?? $p['code'] ?? ''),
                     'address' => $address,
-                    'hours'   => $p['opening_hours'] ?? $p['hours'] ?? null,
-                    'lat'     => (float) ($p['location']['latitude']  ?? $p['latitude']  ?? 0),
-                    'lng'     => (float) ($p['location']['longitude'] ?? $p['longitude'] ?? 0),
+                    'hours' => $p['opening_hours'] ?? $p['hours'] ?? null,
+                    'lat' => (float) ($p['location']['latitude'] ?? $p['latitude'] ?? 0),
+                    'lng' => (float) ($p['location']['longitude'] ?? $p['longitude'] ?? 0),
                 ];
             })
             ->filter(fn (array $p) => $p['id'] !== '' && ($p['lat'] !== 0.0 || $p['lng'] !== 0.0))

@@ -1,4 +1,4 @@
-import { Link, Form, Head, router } from '@inertiajs/react';
+import { Link, Form, Head } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -37,12 +37,11 @@ export default function Create({ categories }: Props) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/faqs' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back
-                        
-                </Link>
-            </Button>
+                            <Link href="/admin/faqs" prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                Back
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -141,7 +140,11 @@ export default function Create({ categories }: Props) {
                             </div>
 
                             <div className="flex items-center gap-4">
-                                <Button type="submit" disabled={processing}>
+                                <Button
+                                    variant="outline"
+                                    type="submit"
+                                    disabled={processing}
+                                >
                                     {processing ? 'Creating...' : 'Create FAQ'}
                                 </Button>
                             </div>

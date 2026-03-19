@@ -1,12 +1,20 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { AlertTriangle, Eye, EyeOff, LayoutDashboard, RotateCcw, Star, Trash2 } from 'lucide-react';
+import {
+    AlertTriangle,
+    Eye,
+    EyeOff,
+    LayoutDashboard,
+    RotateCcw,
+    Star,
+    Trash2,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ChartWidget } from '@/components/widgets/chart-widget';
-import { StatCard } from '@/components/widgets/stat-card';
 import { CreateWidgetDialog } from '@/components/widgets/create-widget-dialog';
+import { StatCard } from '@/components/widgets/stat-card';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes/admin';
 import type { BreadcrumbItem } from '@/types';
@@ -42,7 +50,10 @@ const STATUS_COLORS: Record<string, string> = {
     cancelled: 'bg-red-100 text-red-800',
 };
 
-export default function Dashboard({ widgetShells, widgets: deferredWidgets }: DashboardProps) {
+export default function Dashboard({
+    widgetShells,
+    widgets: deferredWidgets,
+}: DashboardProps) {
     const __ = useTranslation();
     // Use deferred widgets once loaded; mutations update local state optimistically
     const [widgets, setWidgets] = useState<Widget[]>([]);
@@ -79,7 +90,9 @@ export default function Dashboard({ widgetShells, widgets: deferredWidgets }: Da
                 onSuccess: () => {
                     setWidgets((prev) =>
                         prev.map((w) =>
-                            w.id === widgetId ? { ...w, is_active: !currentActive } : w,
+                            w.id === widgetId
+                                ? { ...w, is_active: !currentActive }
+                                : w,
                         ),
                     );
                 },
@@ -88,15 +101,12 @@ export default function Dashboard({ widgetShells, widgets: deferredWidgets }: Da
     }
 
     function deleteWidget(widgetId: number) {
-        router.delete(
-            `/admin/dashboard/widgets/${widgetId}`,
-            {
-                preserveScroll: true,
-                onSuccess: () => {
-                    setWidgets((prev) => prev.filter((w) => w.id !== widgetId));
-                },
+        router.delete(`/admin/dashboard/widgets/${widgetId}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setWidgets((prev) => prev.filter((w) => w.id !== widgetId));
             },
-        );
+        });
     }
 
     function restoreDefaults() {
@@ -140,25 +150,43 @@ export default function Dashboard({ widgetShells, widgets: deferredWidgets }: Da
                 if (widget.config?.data_source === 'top_products') {
                     return (
                         <Card className="p-6">
-                            <h3 className="mb-4 font-semibold">{widget.title}</h3>
+                            <h3 className="mb-4 font-semibold">
+                                {widget.title}
+                            </h3>
                             {widget.data.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">{__('empty.no_data', 'No data available.')}</p>
+                                <p className="text-sm text-muted-foreground">
+                                    {__('empty.no_data', 'No data available.')}
+                                </p>
                             ) : (
                                 <div className="space-y-2">
-                                    {widget.data.map((row: any, index: number) => (
-                                        <div
-                                            key={index}
-                                            className="flex items-center justify-between rounded-lg border p-3"
-                                        >
-                                            <div className="min-w-0 flex-1">
-                                                <p className="truncate text-sm font-medium">{row.name}</p>
-                                                <p className="text-xs text-muted-foreground">{row.total_qty} {__('dashboard.units_sold', 'units sold')}</p>
+                                    {widget.data.map(
+                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                        (row: any, index: number) => (
+                                            <div
+                                                key={index}
+                                                className="flex items-center justify-between rounded-lg border p-3"
+                                            >
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="truncate text-sm font-medium">
+                                                        {row.name}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {row.total_qty}{' '}
+                                                        {__(
+                                                            'dashboard.units_sold',
+                                                            'units sold',
+                                                        )}
+                                                    </p>
+                                                </div>
+                                                <span className="ml-3 shrink-0 text-sm font-semibold">
+                                                    $
+                                                    {(
+                                                        row.total_revenue / 100
+                                                    ).toFixed(2)}
+                                                </span>
                                             </div>
-                                            <span className="ml-3 shrink-0 text-sm font-semibold">
-                                                ${(row.total_revenue / 100).toFixed(2)}
-                                            </span>
-                                        </div>
-                                    ))}
+                                        ),
+                                    )}
                                 </div>
                             )}
                         </Card>
@@ -173,29 +201,47 @@ export default function Dashboard({ widgetShells, widgets: deferredWidgets }: Da
                                 {widget.title}
                             </h3>
                             {widget.data.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">{__('dashboard.all_stocked', 'All variants are well-stocked.')}</p>
+                                <p className="text-sm text-muted-foreground">
+                                    {__(
+                                        'dashboard.all_stocked',
+                                        'All variants are well-stocked.',
+                                    )}
+                                </p>
                             ) : (
                                 <div className="space-y-2">
-                                    {widget.data.map((row: any) => (
-                                        <div
-                                            key={row.id}
-                                            className="flex items-center justify-between rounded-lg border p-3"
-                                        >
-                                            <div>
-                                                <p className="text-sm font-medium">{row.name}</p>
-                                                {row.sku && <p className="text-xs text-muted-foreground">SKU: {row.sku}</p>}
-                                            </div>
-                                            <span
-                                                className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                                                    row.stock <= 2
-                                                        ? 'bg-red-100 text-red-700'
-                                                        : 'bg-yellow-100 text-yellow-700'
-                                                }`}
+                                    {widget.data.map(
+                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                        (row: any) => (
+                                            <div
+                                                key={row.id}
+                                                className="flex items-center justify-between rounded-lg border p-3"
                                             >
-                                                {row.stock} {__('dashboard.left', 'left')}
-                                            </span>
-                                        </div>
-                                    ))}
+                                                <div>
+                                                    <p className="text-sm font-medium">
+                                                        {row.name}
+                                                    </p>
+                                                    {row.sku && (
+                                                        <p className="text-xs text-muted-foreground">
+                                                            SKU: {row.sku}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                                <span
+                                                    className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                                                        row.stock <= 2
+                                                            ? 'bg-red-100 text-red-700'
+                                                            : 'bg-yellow-100 text-yellow-700'
+                                                    }`}
+                                                >
+                                                    {row.stock}{' '}
+                                                    {__(
+                                                        'dashboard.left',
+                                                        'left',
+                                                    )}
+                                                </span>
+                                            </div>
+                                        ),
+                                    )}
                                 </div>
                             )}
                         </Card>
@@ -205,34 +251,51 @@ export default function Dashboard({ widgetShells, widgets: deferredWidgets }: Da
                 if (widget.config?.data_source === 'reviews') {
                     return (
                         <Card className="p-6">
-                            <h3 className="mb-4 font-semibold">{widget.title}</h3>
+                            <h3 className="mb-4 font-semibold">
+                                {widget.title}
+                            </h3>
                             {widget.data.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">{__('empty.no_reviews', 'No reviews yet.')}</p>
+                                <p className="text-sm text-muted-foreground">
+                                    {__('empty.no_reviews', 'No reviews yet.')}
+                                </p>
                             ) : (
                                 <div className="space-y-3">
-                                    {widget.data.map((row: any) => (
-                                        <div key={row.id} className="rounded-lg border p-3">
-                                            <div className="flex items-start justify-between gap-2">
-                                                <div className="min-w-0">
-                                                    <p className="truncate text-sm font-medium">{row.name}</p>
-                                                    <p className="text-xs text-muted-foreground">{row.author} · {row.created_at}</p>
+                                    {widget.data.map(
+                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                        (row: any) => (
+                                            <div
+                                                key={row.id}
+                                                className="rounded-lg border p-3"
+                                            >
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <div className="min-w-0">
+                                                        <p className="truncate text-sm font-medium">
+                                                            {row.name}
+                                                        </p>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {row.author} ·{' '}
+                                                            {row.created_at}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex shrink-0 items-center gap-0.5">
+                                                        {Array.from({
+                                                            length: 5,
+                                                        }).map((_, i) => (
+                                                            <Star
+                                                                key={i}
+                                                                className={`h-3 w-3 ${i < row.rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`}
+                                                            />
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                                <div className="flex shrink-0 items-center gap-0.5">
-                                                    {Array.from({ length: 5 }).map((_, i) => (
-                                                        <Star
-                                                            key={i}
-                                                            className={`h-3 w-3 ${i < row.rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`}
-                                                        />
-                                                    ))}
-                                                </div>
+                                                {row.status !== 'approved' && (
+                                                    <span className="mt-1 inline-block rounded-full bg-yellow-100 px-2 py-0.5 text-xs text-yellow-700">
+                                                        {row.status}
+                                                    </span>
+                                                )}
                                             </div>
-                                            {row.status !== 'approved' && (
-                                                <span className="mt-1 inline-block rounded-full bg-yellow-100 px-2 py-0.5 text-xs text-yellow-700">
-                                                    {row.status}
-                                                </span>
-                                            )}
-                                        </div>
-                                    ))}
+                                        ),
+                                    )}
                                 </div>
                             )}
                         </Card>
@@ -244,8 +307,11 @@ export default function Dashboard({ widgetShells, widgets: deferredWidgets }: Da
                         <h3 className="mb-4 font-semibold">{widget.title}</h3>
                         <div className="space-y-2">
                             {widget.data.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">{__('empty.no_data', 'No data available.')}</p>
+                                <p className="text-sm text-muted-foreground">
+                                    {__('empty.no_data', 'No data available.')}
+                                </p>
                             ) : (
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 widget.data.map((row: any, index: number) => (
                                     <div
                                         key={index}
@@ -253,24 +319,36 @@ export default function Dashboard({ widgetShells, widgets: deferredWidgets }: Da
                                     >
                                         <div className="flex min-w-0 flex-col">
                                             <span className="truncate text-sm font-medium">
-                                                {row.name || row.customer || `#${row.id}`}
+                                                {row.name ||
+                                                    row.customer ||
+                                                    `#${row.id}`}
                                             </span>
                                             {row.created_at && (
-                                                <span className="text-xs text-muted-foreground">{row.created_at}</span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {row.created_at}
+                                                </span>
                                             )}
                                         </div>
                                         <div className="flex shrink-0 items-center gap-2">
                                             {row.status && (
                                                 <span
                                                     className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${
-                                                        STATUS_COLORS[row.status] ?? 'bg-muted text-muted-foreground'
+                                                        STATUS_COLORS[
+                                                            row.status
+                                                        ] ??
+                                                        'bg-muted text-muted-foreground'
                                                     }`}
                                                 >
                                                     {row.status}
                                                 </span>
                                             )}
                                             {row.total != null && (
-                                                <span className="text-sm font-semibold">${(row.total / 100).toFixed(2)}</span>
+                                                <span className="text-sm font-semibold">
+                                                    $
+                                                    {(row.total / 100).toFixed(
+                                                        2,
+                                                    )}
+                                                </span>
                                             )}
                                         </div>
                                     </div>
@@ -286,15 +364,20 @@ export default function Dashboard({ widgetShells, widgets: deferredWidgets }: Da
                     <Card className="p-6">
                         <h3 className="mb-4 font-semibold">{widget.title}</h3>
                         <div className="grid gap-2">
-                            {widget.data.map((action: any, index: number) => (
-                                <Link
-                                    key={index}
-                                    href={action.url ?? action.route ?? '#'}
-                                    className="flex items-center gap-2 rounded-lg border p-3 transition-colors hover:bg-accent"
-                                >
-                                    <span className="text-sm">{action.label}</span>
-                                </Link>
-                            ))}
+                            {widget.data.map(
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                (action: any, index: number) => (
+                                    <Link
+                                        key={index}
+                                        href={action.url ?? action.route ?? '#'}
+                                        className="flex items-center gap-2 rounded-lg border p-3 transition-colors hover:bg-accent"
+                                    >
+                                        <span className="text-sm">
+                                            {action.label}
+                                        </span>
+                                    </Link>
+                                ),
+                            )}
                         </div>
                     </Card>
                 );
@@ -314,18 +397,27 @@ export default function Dashboard({ widgetShells, widgets: deferredWidgets }: Da
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={__('page.dashboard', 'Dashboard')} />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-
                 {/* Toolbar */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <LayoutDashboard className="h-4 w-4" />
-                        <span>{activeCount} {__('dashboard.active_widgets', 'active widgets')}</span>
+                        <span>
+                            {activeCount}{' '}
+                            {__('dashboard.active_widgets', 'active widgets')}
+                        </span>
                         {hiddenCount > 0 && (
-                            <span className="text-xs">· {hiddenCount} {__('dashboard.hidden', 'hidden')}</span>
+                            <span className="text-xs">
+                                · {hiddenCount}{' '}
+                                {__('dashboard.hidden', 'hidden')}
+                            </span>
                         )}
                     </div>
                     <div className="flex items-center gap-2">
-                        <CreateWidgetDialog onCreated={() => router.reload({ only: ['widgets'] })} />
+                        <CreateWidgetDialog
+                            onCreated={() =>
+                                router.reload({ only: ['widgets'] })
+                            }
+                        />
                         <Button
                             variant="outline"
                             size="sm"
@@ -333,8 +425,13 @@ export default function Dashboard({ widgetShells, widgets: deferredWidgets }: Da
                             disabled={resetting}
                             className="gap-2"
                         >
-                            <RotateCcw className={`h-3.5 w-3.5 ${resetting ? 'animate-spin' : ''}`} />
-                            {__('dashboard.restore_defaults', 'Restore defaults')}
+                            <RotateCcw
+                                className={`h-3.5 w-3.5 ${resetting ? 'animate-spin' : ''}`}
+                            />
+                            {__(
+                                'dashboard.restore_defaults',
+                                'Restore defaults',
+                            )}
                         </Button>
                     </div>
                 </div>
@@ -342,13 +439,15 @@ export default function Dashboard({ widgetShells, widgets: deferredWidgets }: Da
                 {/* Skeleton while deferred widgets load */}
                 {!loaded && (
                     <div className="grid auto-rows-min grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        {widgetShells.filter((s) => s.is_active).map((shell) => (
-                            <div
-                                key={shell.id}
-                                className={`${getSizeClass(shell.size)} animate-pulse rounded-xl border border-border bg-muted/40`}
-                                style={{ minHeight: 120 }}
-                            />
-                        ))}
+                        {widgetShells
+                            .filter((s) => s.is_active)
+                            .map((shell) => (
+                                <div
+                                    key={shell.id}
+                                    className={`${getSizeClass(shell.size)} animate-pulse rounded-xl border border-border bg-muted/40`}
+                                    style={{ minHeight: 120 }}
+                                />
+                            ))}
                     </div>
                 )}
 
@@ -356,12 +455,17 @@ export default function Dashboard({ widgetShells, widgets: deferredWidgets }: Da
                 {loaded && activeWidgets.length > 0 && (
                     <div className="grid auto-rows-min grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         {activeWidgets.map((widget) => (
-                            <div key={widget.id} className={`group relative ${getSizeClass(widget.size)}`}>
+                            <div
+                                key={widget.id}
+                                className={`group relative ${getSizeClass(widget.size)}`}
+                            >
                                 {renderWidget(widget)}
                                 {/* Widget controls */}
-                                <div className="absolute right-2 top-2 hidden items-center gap-0.5 opacity-0 transition-opacity group-hover:flex group-hover:opacity-100">
+                                <div className="absolute top-2 right-2 hidden items-center gap-0.5 opacity-0 transition-opacity group-hover:flex group-hover:opacity-100">
                                     <button
-                                        onClick={() => toggleWidget(widget.id, true)}
+                                        onClick={() =>
+                                            toggleWidget(widget.id, true)
+                                        }
                                         className="rounded-md p-1 text-muted-foreground hover:bg-accent"
                                         title={__('action.hide', 'Hide widget')}
                                     >
@@ -370,7 +474,10 @@ export default function Dashboard({ widgetShells, widgets: deferredWidgets }: Da
                                     <button
                                         onClick={() => deleteWidget(widget.id)}
                                         className="rounded-md p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                                        title={__('action.delete', 'Delete widget')}
+                                        title={__(
+                                            'action.delete',
+                                            'Delete widget',
+                                        )}
                                     >
                                         <Trash2 className="h-3.5 w-3.5" />
                                     </button>
@@ -383,14 +490,19 @@ export default function Dashboard({ widgetShells, widgets: deferredWidgets }: Da
                 {/* Hidden widgets */}
                 {hiddenWidgets.length > 0 && (
                     <div>
-                        <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        <p className="mb-2 text-xs font-medium tracking-wider text-muted-foreground uppercase">
                             {__('dashboard.hidden_widgets', 'Hidden widgets')}
                         </p>
                         <div className="flex flex-wrap gap-2">
                             {hiddenWidgets.map((widget) => (
-                                <div key={widget.id} className="group flex items-center gap-0.5 rounded-lg border border-dashed pr-1 hover:border-border">
+                                <div
+                                    key={widget.id}
+                                    className="group flex items-center gap-0.5 rounded-lg border border-dashed pr-1 hover:border-border"
+                                >
                                     <button
-                                        onClick={() => toggleWidget(widget.id, false)}
+                                        onClick={() =>
+                                            toggleWidget(widget.id, false)
+                                        }
                                         className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground"
                                         title={__('action.show', 'Show widget')}
                                     >
@@ -399,8 +511,11 @@ export default function Dashboard({ widgetShells, widgets: deferredWidgets }: Da
                                     </button>
                                     <button
                                         onClick={() => deleteWidget(widget.id)}
-                                        className="rounded-md p-1 text-muted-foreground opacity-0 hover:text-destructive group-hover:opacity-100"
-                                        title={__('action.delete', 'Delete widget')}
+                                        className="rounded-md p-1 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-destructive"
+                                        title={__(
+                                            'action.delete',
+                                            'Delete widget',
+                                        )}
                                     >
                                         <Trash2 className="h-3 w-3" />
                                     </button>
@@ -415,13 +530,31 @@ export default function Dashboard({ widgetShells, widgets: deferredWidgets }: Da
                     <div className="flex h-[400px] items-center justify-center rounded-xl border border-dashed">
                         <div className="text-center">
                             <LayoutDashboard className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
-                            <h3 className="text-lg font-semibold">{__('empty.no_widgets', 'No widgets configured.')}</h3>
+                            <h3 className="text-lg font-semibold">
+                                {__(
+                                    'empty.no_widgets',
+                                    'No widgets configured.',
+                                )}
+                            </h3>
                             <p className="mt-2 text-sm text-muted-foreground">
-                                {__('dashboard.restore_hint', 'Click "Restore defaults" to populate the dashboard.')}
+                                {__(
+                                    'dashboard.restore_hint',
+                                    'Click "Restore defaults" to populate the dashboard.',
+                                )}
                             </p>
-                            <Button className="mt-4 gap-2" onClick={restoreDefaults} disabled={resetting}>
-                                <RotateCcw className={`h-4 w-4 ${resetting ? 'animate-spin' : ''}`} />
-                                {__('dashboard.restore_defaults', 'Restore defaults')}
+                            <Button
+                                variant="outline"
+                                className="mt-4 gap-2"
+                                onClick={restoreDefaults}
+                                disabled={resetting}
+                            >
+                                <RotateCcw
+                                    className={`h-4 w-4 ${resetting ? 'animate-spin' : ''}`}
+                                />
+                                {__(
+                                    'dashboard.restore_defaults',
+                                    'Restore defaults',
+                                )}
                             </Button>
                         </div>
                     </div>

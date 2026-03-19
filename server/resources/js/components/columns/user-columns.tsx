@@ -74,7 +74,11 @@ export function useUserColumns(): ColumnDef<User>[] {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/users/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/users/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>

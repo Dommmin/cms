@@ -11,7 +11,16 @@ import {
     FORMAT_TEXT_COMMAND,
     SELECTION_CHANGE_COMMAND,
 } from 'lexical';
-import { Bold, Code, Italic, Link, Strikethrough, Subscript, Superscript, Underline as UnderlineIcon } from 'lucide-react';
+import {
+    Bold,
+    Code,
+    Italic,
+    Link,
+    Strikethrough,
+    Subscript,
+    Superscript,
+    Underline as UnderlineIcon,
+} from 'lucide-react';
 import { type JSX } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -61,7 +70,11 @@ function TextFormatFloatingToolbar({
 
     const updatePosition = useCallback(() => {
         const nativeSelection = window.getSelection();
-        if (!nativeSelection || nativeSelection.isCollapsed || nativeSelection.rangeCount === 0) {
+        if (
+            !nativeSelection ||
+            nativeSelection.isCollapsed ||
+            nativeSelection.rangeCount === 0
+        ) {
             setPosition(null);
             return;
         }
@@ -130,36 +143,71 @@ function TextFormatFloatingToolbar({
     }, [editor, updatePosition]);
 
     const style: React.CSSProperties = position
-        ? { position: 'fixed', top: position.top, left: position.left, zIndex: 9999 }
-        : { position: 'fixed', top: -9999, left: -9999, zIndex: 9999, opacity: 0 };
+        ? {
+              position: 'fixed',
+              top: position.top,
+              left: position.left,
+              zIndex: 9999,
+          }
+        : {
+              position: 'fixed',
+              top: -9999,
+              left: -9999,
+              zIndex: 9999,
+              opacity: 0,
+          };
 
     return (
         <div
             ref={toolbarRef}
             style={style}
-            className="bg-popover rounded-lg border shadow-md flex items-center gap-0.5 p-1"
+            className="flex items-center gap-0.5 rounded-lg border bg-popover p-1 shadow-md"
             onMouseDown={(e) => e.preventDefault()}
         >
-            {([
-                { format: 'bold', icon: Bold, pressed: isBold },
-                { format: 'italic', icon: Italic, pressed: isItalic },
-                { format: 'underline', icon: UnderlineIcon, pressed: isUnderline },
-                { format: 'strikethrough', icon: Strikethrough, pressed: isStrikethrough },
-                { format: 'subscript', icon: Subscript, pressed: isSubscript },
-                { format: 'superscript', icon: Superscript, pressed: isSuperscript },
-                { format: 'code', icon: Code, pressed: isCode },
-            ] as const).map(({ format, icon: Icon, pressed }) => (
+            {(
+                [
+                    { format: 'bold', icon: Bold, pressed: isBold },
+                    { format: 'italic', icon: Italic, pressed: isItalic },
+                    {
+                        format: 'underline',
+                        icon: UnderlineIcon,
+                        pressed: isUnderline,
+                    },
+                    {
+                        format: 'strikethrough',
+                        icon: Strikethrough,
+                        pressed: isStrikethrough,
+                    },
+                    {
+                        format: 'subscript',
+                        icon: Subscript,
+                        pressed: isSubscript,
+                    },
+                    {
+                        format: 'superscript',
+                        icon: Superscript,
+                        pressed: isSuperscript,
+                    },
+                    { format: 'code', icon: Code, pressed: isCode },
+                ] as const
+            ).map(({ format, icon: Icon, pressed }) => (
                 <Toggle
                     key={format}
                     size="sm"
                     pressed={pressed}
-                    onPressedChange={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, format as any)}
+                    onPressedChange={() =>
+                        editor.dispatchCommand(
+                            FORMAT_TEXT_COMMAND,
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            format as any,
+                        )
+                    }
                     className="h-7 w-7 p-0"
                 >
                     <Icon className="h-3.5 w-3.5" />
                 </Toggle>
             ))}
-            <div className="w-px h-4 bg-border mx-0.5" />
+            <div className="mx-0.5 h-4 w-px bg-border" />
             <Toggle
                 size="sm"
                 pressed={isLink}
@@ -231,7 +279,8 @@ function useFloatingTextFormatToolbar(
 
     useEffect(() => {
         document.addEventListener('selectionchange', updatePopup);
-        return () => document.removeEventListener('selectionchange', updatePopup);
+        return () =>
+            document.removeEventListener('selectionchange', updatePopup);
     }, [updatePopup]);
 
     useEffect(() => {

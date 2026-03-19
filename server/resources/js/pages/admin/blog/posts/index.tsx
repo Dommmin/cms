@@ -1,12 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import {
-    BookOpen,
-    PencilIcon,
-    PlusIcon,
-    StarIcon,
-    TrashIcon,
-} from 'lucide-react';
+import { PencilIcon, PlusIcon, StarIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -14,9 +8,9 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
-import { useTranslation } from '@/hooks/use-translation';
 import type { BreadcrumbItem } from '@/types';
 
 type Category = { id: number; name: string | Record<string, string> };
@@ -63,13 +57,21 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Blog Posts', href: '/admin/blog/posts' },
 ];
 
-const STATUS_BADGE: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+const STATUS_BADGE: Record<
+    string,
+    'default' | 'secondary' | 'destructive' | 'outline'
+> = {
     published: 'default',
     draft: 'secondary',
     archived: 'destructive',
 };
 
-export default function BlogPostsIndex({ posts, filters, statuses, categories }: Props) {
+export default function BlogPostsIndex({
+    posts,
+    filters,
+    statuses: _statuses,
+    categories: _categories,
+}: Props) {
     const __ = useTranslation();
     const columns: ColumnDef<BlogPost>[] = [
         {
@@ -79,9 +81,11 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
                 <div className="max-w-sm">
                     <div className="flex items-center gap-1">
                         {row.original.is_featured && (
-                            <StarIcon className="h-3 w-3 text-yellow-500 shrink-0" />
+                            <StarIcon className="h-3 w-3 shrink-0 text-yellow-500" />
                         )}
-                        <p className="line-clamp-1 font-medium">{resolveLocalizedText(row.original.title)}</p>
+                        <p className="line-clamp-1 font-medium">
+                            {resolveLocalizedText(row.original.title)}
+                        </p>
                     </div>
                     {row.original.category && (
                         <Badge variant="outline" className="mt-1 text-xs">
@@ -95,7 +99,9 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
             accessorKey: 'status',
             header: __('column.status', 'Status'),
             cell: ({ row }) => (
-                <Badge variant={STATUS_BADGE[row.original.status] ?? 'secondary'}>
+                <Badge
+                    variant={STATUS_BADGE[row.original.status] ?? 'secondary'}
+                >
                     {row.original.status}
                 </Badge>
             ),
@@ -124,7 +130,9 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
             cell: ({ row }) => (
                 <span className="text-sm text-muted-foreground">
                     {row.original.published_at
-                        ? new Date(row.original.published_at).toLocaleDateString()
+                        ? new Date(
+                              row.original.published_at,
+                          ).toLocaleDateString()
                         : '—'}
                 </span>
             ),
@@ -142,7 +150,11 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/blog/posts/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/blog/posts/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>
@@ -155,7 +167,10 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
                                 router.post(
                                     `/admin/blog/posts/${row.original.id}/publish`,
                                     {},
-                                    { onSuccess: () => toast.success('Post published') },
+                                    {
+                                        onSuccess: () =>
+                                            toast.success('Post published'),
+                                    },
                                 );
                             }}
                         >
@@ -169,7 +184,10 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
                                 router.post(
                                     `/admin/blog/posts/${row.original.id}/unpublish`,
                                     {},
-                                    { onSuccess: () => toast.success('Post unpublished') },
+                                    {
+                                        onSuccess: () =>
+                                            toast.success('Post unpublished'),
+                                    },
                                 );
                             }}
                         >
@@ -182,9 +200,13 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
                         title={__('dialog.delete_title', 'Delete Post')}
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
-                            router.delete(`/admin/blog/posts/${row.original.id}`, {
-                                onSuccess: () => toast.success('Post deleted'),
-                            });
+                            router.delete(
+                                `/admin/blog/posts/${row.original.id}`,
+                                {
+                                    onSuccess: () =>
+                                        toast.success('Post deleted'),
+                                },
+                            );
                         }}
                     >
                         <TrashIcon className="mr-1 h-3 w-3" />
@@ -201,7 +223,10 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
             <Wrapper>
                 <PageHeader
                     title={__('page.blog_posts', 'Blog Posts')}
-                    description={__('page.blog_posts_desc', 'Manage your blog content')}
+                    description={__(
+                        'page.blog_posts_desc',
+                        'Manage your blog content',
+                    )}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/blog/posts/create">
@@ -225,7 +250,10 @@ export default function BlogPostsIndex({ posts, filters, statuses, categories }:
                         next_page_url: posts.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search_posts', 'Search posts...')}
+                    searchPlaceholder={__(
+                        'placeholder.search_posts',
+                        'Search posts...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/blog/posts"
                 />

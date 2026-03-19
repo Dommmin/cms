@@ -39,8 +39,9 @@ export function SectionCard({
     children,
 }: SectionCardProps) {
     const sectionLabel =
-        (availableSections?.[section.section_type]?.label ?? section.section_type)
-        || 'Untitled Section';
+        (availableSections?.[section.section_type]?.label ??
+            section.section_type) ||
+        'Untitled Section';
     const {
         attributes,
         listeners,

@@ -1,5 +1,3 @@
-import { useAdminLocale } from '@/hooks/use-admin-locale';
-import { useTranslation } from '@/hooks/use-translation';
 import { Link, Head, router, usePage } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -11,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
+import { useAdminLocale } from '@/hooks/use-admin-locale';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
@@ -37,8 +37,12 @@ export default function Create({
 
     const __ = useTranslation();
     const [activeLocale, setActiveLocale] = useAdminLocale(defaultLocale);
-    const [nameValues, setNameValues] = useState<Record<string, string>>({ [defaultLocale]: '' });
-    const [descValues, setDescValues] = useState<Record<string, string>>({ [defaultLocale]: '' });
+    const [nameValues, setNameValues] = useState<Record<string, string>>({
+        [defaultLocale]: '',
+    });
+    const [descValues, setDescValues] = useState<Record<string, string>>({
+        [defaultLocale]: '',
+    });
     const [slug, setSlug] = useState('');
     const [isSlugManual, setIsSlugManual] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -58,8 +62,12 @@ export default function Create({
         setErrors({});
 
         const form = e.currentTarget;
-        const parentId = (form.elements.namedItem('parent_id') as HTMLSelectElement)?.value || null;
-        const isActive = (form.elements.namedItem('is_active') as HTMLInputElement)?.checked;
+        const parentId =
+            (form.elements.namedItem('parent_id') as HTMLSelectElement)
+                ?.value || null;
+        const isActive = (
+            form.elements.namedItem('is_active') as HTMLInputElement
+        )?.checked;
 
         router.post(
             '/admin/ecommerce/categories',
@@ -86,15 +94,24 @@ export default function Create({
             <Head title="Create Category" />
 
             <Wrapper>
-                <PageHeader title={__('page.create_page', 'Create Category')} description={__('page.create_page_desc', 'Create a new category')}>
+                <PageHeader
+                    title={__('page.create_page', 'Create Category')}
+                    description={__(
+                        'page.create_page_desc',
+                        'Create a new category',
+                    )}
+                >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/ecommerce/categories' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            {__('action.back', 'Back')}
-
-                </Link>
-            </Button>
+                            <Link
+                                href="/admin/ecommerce/categories"
+                                prefetch
+                                cacheFor={30}
+                            >
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                {__('action.back', 'Back')}
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -117,15 +134,24 @@ export default function Create({
                             locales.map((locale) => (
                                 <div
                                     key={locale.code}
-                                    className={locale.code !== activeLocale ? 'hidden' : undefined}
+                                    className={
+                                        locale.code !== activeLocale
+                                            ? 'hidden'
+                                            : undefined
+                                    }
                                 >
                                     <Input
                                         required={locale.code === defaultLocale}
-                                        autoFocus={locale.code === defaultLocale}
+                                        autoFocus={
+                                            locale.code === defaultLocale
+                                        }
                                         placeholder="Category name"
                                         value={nameValues[locale.code] ?? ''}
                                         onChange={(e) =>
-                                            handleNameChange(locale.code, e.target.value)
+                                            handleNameChange(
+                                                locale.code,
+                                                e.target.value,
+                                            )
                                         }
                                     />
                                 </div>
@@ -136,7 +162,12 @@ export default function Create({
                                 autoFocus
                                 placeholder="Category name"
                                 value={nameValues[defaultLocale] ?? ''}
-                                onChange={(e) => handleNameChange(defaultLocale, e.target.value)}
+                                onChange={(e) =>
+                                    handleNameChange(
+                                        defaultLocale,
+                                        e.target.value,
+                                    )
+                                }
                             />
                         )}
                         <InputError message={errors.name} />
@@ -160,7 +191,11 @@ export default function Create({
                                     const manual = e.target.checked;
                                     setIsSlugManual(manual);
                                     if (!manual) {
-                                        setSlug(slugify(nameValues[defaultLocale] ?? ''));
+                                        setSlug(
+                                            slugify(
+                                                nameValues[defaultLocale] ?? '',
+                                            ),
+                                        );
                                     }
                                 }}
                                 className="h-4 w-4 rounded border-input"
@@ -171,7 +206,9 @@ export default function Create({
 
                     {/* Parent Category */}
                     <div className="grid gap-2">
-                        <Label htmlFor="parent_id">{__('label.category', 'Parent Category')}</Label>
+                        <Label htmlFor="parent_id">
+                            {__('label.category', 'Parent Category')}
+                        </Label>
                         <select
                             id="parent_id"
                             name="parent_id"
@@ -191,7 +228,9 @@ export default function Create({
                     {/* Description with locale tabs */}
                     <div className="grid gap-2">
                         <div className="flex items-center justify-between">
-                            <Label>{__('label.description', 'Description')}</Label>
+                            <Label>
+                                {__('label.description', 'Description')}
+                            </Label>
                             <LocaleTabSwitcher
                                 locales={locales}
                                 activeLocale={activeLocale}
@@ -202,7 +241,11 @@ export default function Create({
                             locales.map((locale) => (
                                 <div
                                     key={locale.code}
-                                    className={locale.code !== activeLocale ? 'hidden' : undefined}
+                                    className={
+                                        locale.code !== activeLocale
+                                            ? 'hidden'
+                                            : undefined
+                                    }
                                 >
                                     <textarea
                                         rows={3}

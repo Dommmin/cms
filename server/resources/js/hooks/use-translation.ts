@@ -9,12 +9,16 @@ type AdminTranslations = Record<string, Record<string, string>>;
  * and shared via Inertia props (`adminTranslations`).
  */
 export function useTranslation(): (key: string, fallback?: string) => string {
-    const { adminTranslations = {} } = usePage<{ adminTranslations: AdminTranslations }>().props;
+    const { adminTranslations = {} } = usePage<{
+        adminTranslations: AdminTranslations;
+    }>().props;
     const [locale] = useAdminLocale();
 
     return (key: string, fallback: string = key): string => {
-        return adminTranslations[locale]?.[key]
-            ?? adminTranslations['en']?.[key]
-            ?? fallback;
+        return (
+            adminTranslations[locale]?.[key] ??
+            adminTranslations['en']?.[key] ??
+            fallback
+        );
     };
 }

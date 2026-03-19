@@ -17,8 +17,8 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 type LocaleOption = { code: string; name: string; flag_emoji: string | null };
@@ -53,10 +53,17 @@ type Props = {
     };
 };
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Translations', href: '/admin/translations' }];
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Translations', href: '/admin/translations' },
+];
 const ALL_GROUPS_VALUE = 'all-groups';
 
-export default function TranslationsIndex({ translations, locales, groups, filters }: Props) {
+export default function TranslationsIndex({
+    translations,
+    locales,
+    groups,
+    filters,
+}: Props) {
     const __ = useTranslation();
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editValue, setEditValue] = useState('');
@@ -144,14 +151,23 @@ export default function TranslationsIndex({ translations, locales, groups, filte
                                 className="h-8 min-w-[200px]"
                                 autoFocus
                                 onKeyDown={(e) => {
-                                    if (e.key === 'Enter') saveEdit(row.original);
+                                    if (e.key === 'Enter')
+                                        saveEdit(row.original);
                                     if (e.key === 'Escape') setEditingId(null);
                                 }}
                             />
-                            <Button variant="outline" size="sm" onClick={() => saveEdit(row.original)}>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => saveEdit(row.original)}
+                            >
                                 <CheckIcon className="h-4 w-4 text-green-600" />
                             </Button>
-                            <Button variant="outline" size="sm" onClick={() => setEditingId(null)}>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setEditingId(null)}
+                            >
                                 <XIcon className="h-4 w-4 text-muted-foreground" />
                             </Button>
                         </div>
@@ -159,7 +175,7 @@ export default function TranslationsIndex({ translations, locales, groups, filte
                 }
                 return (
                     <span
-                        className={`cursor-pointer text-sm hover:underline ${!row.original.value ? 'italic text-muted-foreground' : ''}`}
+                        className={`cursor-pointer text-sm hover:underline ${!row.original.value ? 'text-muted-foreground italic' : ''}`}
                         onClick={() => startEdit(row.original)}
                     >
                         {row.original.value || '— missing —'}
@@ -172,7 +188,11 @@ export default function TranslationsIndex({ translations, locales, groups, filte
             header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => startEdit(row.original)}>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => startEdit(row.original)}
+                    >
                         {__('action.edit', 'Edit')}
                     </Button>
                     <ConfirmButton
@@ -181,10 +201,14 @@ export default function TranslationsIndex({ translations, locales, groups, filte
                         title={__('dialog.delete_title', 'Delete Translation')}
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
-                            router.delete(`/admin/translations/${row.original.id}`, {
-                                onSuccess: () => toast.success('Translation deleted'),
-                                preserveScroll: true,
-                            });
+                            router.delete(
+                                `/admin/translations/${row.original.id}`,
+                                {
+                                    onSuccess: () =>
+                                        toast.success('Translation deleted'),
+                                    preserveScroll: true,
+                                },
+                            );
                         }}
                     >
                         {__('action.delete', 'Delete')}
@@ -198,18 +222,38 @@ export default function TranslationsIndex({ translations, locales, groups, filte
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Translations" />
             <Wrapper>
-                <PageHeader title={__('page.translations', 'Translations')} description={__('page.translations_desc', 'Translations are discovered automatically from frontend ()) calls.')}>
+                <PageHeader
+                    title={__('page.translations', 'Translations')}
+                    description={__(
+                        'page.translations_desc',
+                        'Translations are discovered automatically from frontend ()) calls.',
+                    )}
+                >
                     <PageHeaderActions>
-                        <Button variant="outline" onClick={handleSync} disabled={syncing}>
-                            <RefreshCwIcon className={`mr-2 h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
-                            {syncing ? __('misc.syncing', 'Syncing…') : __('misc.sync_from_source', 'Sync from source')}
+                        <Button
+                            variant="outline"
+                            onClick={handleSync}
+                            disabled={syncing}
+                        >
+                            <RefreshCwIcon
+                                className={`mr-2 h-4 w-4 ${syncing ? 'animate-spin' : ''}`}
+                            />
+                            {syncing
+                                ? __('misc.syncing', 'Syncing…')
+                                : __(
+                                      'misc.sync_from_source',
+                                      'Sync from source',
+                                  )}
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
                 {/* Filters */}
                 <div className="mb-4 flex flex-wrap items-center gap-3">
-                    <Select value={filters.locale ?? 'en'} onValueChange={(v) => handleFilterChange('locale', v)}>
+                    <Select
+                        value={filters.locale ?? 'en'}
+                        onValueChange={(v) => handleFilterChange('locale', v)}
+                    >
                         <SelectTrigger className="w-40">
                             <SelectValue placeholder="Locale" />
                         </SelectTrigger>
@@ -222,12 +266,17 @@ export default function TranslationsIndex({ translations, locales, groups, filte
                         </SelectContent>
                     </Select>
 
-                    <Select value={filters.group ?? ALL_GROUPS_VALUE} onValueChange={handleGroupFilterChange}>
+                    <Select
+                        value={filters.group ?? ALL_GROUPS_VALUE}
+                        onValueChange={handleGroupFilterChange}
+                    >
                         <SelectTrigger className="w-40">
                             <SelectValue placeholder="All groups" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value={ALL_GROUPS_VALUE}>All groups</SelectItem>
+                            <SelectItem value={ALL_GROUPS_VALUE}>
+                                All groups
+                            </SelectItem>
                             {groups.map((g) => (
                                 <SelectItem key={g} value={g}>
                                     {g}
@@ -239,7 +288,9 @@ export default function TranslationsIndex({ translations, locales, groups, filte
                     <Button
                         variant={isMissing ? 'default' : 'outline'}
                         size="sm"
-                        onClick={() => handleFilterChange('missing', isMissing ? '' : '1')}
+                        onClick={() =>
+                            handleFilterChange('missing', isMissing ? '' : '1')
+                        }
                     >
                         {__('misc.missing_only', 'Missing only')}
                         {isMissing && ' ✓'}
@@ -258,7 +309,10 @@ export default function TranslationsIndex({ translations, locales, groups, filte
                         next_page_url: translations.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search_translations', 'Search by key or value...')}
+                    searchPlaceholder={__(
+                        'placeholder.search_translations',
+                        'Search by key or value...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/translations"
                 />

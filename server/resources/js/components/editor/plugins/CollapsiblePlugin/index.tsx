@@ -1,6 +1,11 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $insertNodeToNearestRoot, mergeRegister } from '@lexical/utils';
-import { $createParagraphNode, COMMAND_PRIORITY_EDITOR, createCommand, type LexicalCommand } from 'lexical';
+import {
+    $createParagraphNode,
+    COMMAND_PRIORITY_EDITOR,
+    createCommand,
+    type LexicalCommand,
+} from 'lexical';
 import { type JSX } from 'react';
 import { useEffect } from 'react';
 import {
@@ -16,13 +21,20 @@ import {
     CollapsibleTitleNode,
 } from '../../nodes/CollapsibleTitleNode';
 
-export const INSERT_COLLAPSIBLE_COMMAND: LexicalCommand<undefined> = createCommand('INSERT_COLLAPSIBLE_COMMAND');
+export const INSERT_COLLAPSIBLE_COMMAND: LexicalCommand<undefined> =
+    createCommand('INSERT_COLLAPSIBLE_COMMAND');
 
 export default function CollapsiblePlugin(): JSX.Element | null {
     const [editor] = useLexicalComposerContext();
 
     useEffect(() => {
-        if (!editor.hasNodes([CollapsibleContainerNode, CollapsibleContentNode, CollapsibleTitleNode])) {
+        if (
+            !editor.hasNodes([
+                CollapsibleContainerNode,
+                CollapsibleContentNode,
+                CollapsibleTitleNode,
+            ])
+        ) {
             throw new Error('CollapsiblePlugin: Required nodes not registered');
         }
         return mergeRegister(

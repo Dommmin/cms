@@ -5,7 +5,6 @@ import {
     $getSelection,
     $isRangeSelection,
     CLICK_COMMAND,
-    COMMAND_PRIORITY_CRITICAL,
     COMMAND_PRIORITY_HIGH,
     COMMAND_PRIORITY_LOW,
     KEY_ESCAPE_COMMAND,
@@ -154,6 +153,7 @@ export default function FloatingLinkEditorPlugin({ anchorElem }: { anchorElem?: 
     const [editor] = useLexicalComposerContext();
     const [container, setContainer] = useState<HTMLElement | null>(null);
 
+     
     useEffect(() => {
         setContainer(anchorElem ?? editor.getRootElement()?.parentElement ?? document.body);
     }, [editor, anchorElem]);

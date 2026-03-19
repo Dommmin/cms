@@ -32,7 +32,7 @@ class InPostLockerCarrier implements ShippingCarrierInterface
 
         $payload = [
             'receiver' => [
-                'name' => trim(($address?->first_name ?? '').' '.($address?->last_name ?? '')),
+                'name' => mb_trim(($address?->first_name ?? '').' '.($address?->last_name ?? '')),
                 'company_name' => $address?->company_name,
                 'email' => $customer?->email ?? '',
                 'phone' => $address?->phone ?? '',
@@ -147,7 +147,7 @@ class InPostLockerCarrier implements ShippingCarrierInterface
 
     private function mapStatus(string $inpostStatus): ?ShipmentStatusEnum
     {
-        return match (strtolower($inpostStatus)) {
+        return match (mb_strtolower($inpostStatus)) {
             'created', 'offers_prepared', 'offer_selected', 'confirmed',
             'prepared', 'dispatched_by_sender' => ShipmentStatusEnum::LABEL_CREATED,
             'collected_from_sender' => ShipmentStatusEnum::PICKED_UP,

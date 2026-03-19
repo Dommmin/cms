@@ -9,22 +9,6 @@ use RuntimeException;
 
 class InPostClient
 {
-    private function baseUrl(): string
-    {
-        return rtrim((string) config('services.inpost_shipx.base_url'), '/');
-    }
-
-    private function client(): \Illuminate\Http\Client\PendingRequest
-    {
-        return Http::withToken((string) config('services.inpost_shipx.token'))
-            ->acceptJson();
-    }
-
-    private function organizationId(): string
-    {
-        return (string) config('services.inpost_shipx.organization_id');
-    }
-
     /**
      * Create a paczkomat shipment.
      *
@@ -80,5 +64,21 @@ class InPostClient
         }
 
         return $response->json() ?? [];
+    }
+
+    private function baseUrl(): string
+    {
+        return mb_rtrim((string) config('services.inpost_shipx.base_url'), '/');
+    }
+
+    private function client(): \Illuminate\Http\Client\PendingRequest
+    {
+        return Http::withToken((string) config('services.inpost_shipx.token'))
+            ->acceptJson();
+    }
+
+    private function organizationId(): string
+    {
+        return (string) config('services.inpost_shipx.organization_id');
     }
 }

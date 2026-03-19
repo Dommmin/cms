@@ -1,12 +1,10 @@
-import { Head, Link, router } from '@inertiajs/react';
-import { Plus, Percent, PencilIcon, TrashIcon } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
-import { ConfirmButton } from '@/components/confirm-dialog';
+import { Head, Link } from '@inertiajs/react';
+import { Plus, Percent } from 'lucide-react';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -65,7 +63,11 @@ export default function DiscountsIndex({ discounts, filters }: IndexProps) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/ecommerce/discounts/create" prefetch cacheFor={30}>
+                            <Link
+                                href="/admin/ecommerce/discounts/create"
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <Plus className="mr-2 h-4 w-4" />
                                 {__('action.add', 'Add Discount')}
                             </Link>
@@ -138,7 +140,10 @@ export default function DiscountsIndex({ discounts, filters }: IndexProps) {
                         next_page_url: discounts.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search', 'Search discounts...')}
+                    searchPlaceholder={__(
+                        'placeholder.search',
+                        'Search discounts...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/ecommerce/discounts"
                 />

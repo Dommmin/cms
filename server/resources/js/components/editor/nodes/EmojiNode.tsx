@@ -1,8 +1,11 @@
-import type { EditorConfig, NodeKey, SerializedLexicalNode, Spread } from 'lexical';
+import type { NodeKey, SerializedLexicalNode, Spread } from 'lexical';
 import { $applyNodeReplacement, DecoratorNode } from 'lexical';
 import { type JSX } from 'react';
 
-export type SerializedEmojiNode = Spread<{ emoji: string }, SerializedLexicalNode>;
+export type SerializedEmojiNode = Spread<
+    { emoji: string },
+    SerializedLexicalNode
+>;
 
 export class EmojiNode extends DecoratorNode<JSX.Element> {
     __emoji: string;

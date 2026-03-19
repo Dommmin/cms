@@ -1,12 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import {
-    PlusIcon,
-    EyeIcon,
-    TrashIcon,
-    RefreshCwIcon,
-} from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
+import { PlusIcon, EyeIcon, TrashIcon, RefreshCwIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -14,6 +8,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -153,7 +148,11 @@ export default function NotificationsIndex({ notifications, filters }: Props) {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/notifications/${row.original.id}`} prefetch cacheFor={60}>
+                        <Link
+                            href={`/admin/notifications/${row.original.id}`}
+                            prefetch
+                            cacheFor={60}
+                        >
                             <EyeIcon className="mr-1 h-3 w-3" />
                             {__('action.show', 'View')}
                         </Link>
@@ -183,7 +182,10 @@ export default function NotificationsIndex({ notifications, filters }: Props) {
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Notification')}
-                        description={__('dialog.cannot_be_undone', 'Are you sure you want to delete this notification?')}
+                        description={__(
+                            'dialog.cannot_be_undone',
+                            'Are you sure you want to delete this notification?',
+                        )}
                         onConfirm={() => {
                             router.delete(
                                 `/admin/notifications/${row.original.id}`,
@@ -207,11 +209,18 @@ export default function NotificationsIndex({ notifications, filters }: Props) {
             <Wrapper>
                 <PageHeader
                     title={__('page.notifications', 'Notifications')}
-                    description={__('page.notifications_desc', 'Manage system notifications')}
+                    description={__(
+                        'page.notifications_desc',
+                        'Manage system notifications',
+                    )}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/notifications/create" prefetch cacheFor={30}>
+                            <Link
+                                href="/admin/notifications/create"
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.create', 'Create Notification')}
                             </Link>
@@ -231,7 +240,10 @@ export default function NotificationsIndex({ notifications, filters }: Props) {
                         next_page_url: notifications.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search', 'Search notifications...')}
+                    searchPlaceholder={__(
+                        'placeholder.search',
+                        'Search notifications...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/notifications"
                 />

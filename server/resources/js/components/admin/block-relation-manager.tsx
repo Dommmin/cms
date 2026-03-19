@@ -10,7 +10,7 @@ import {
     LoaderIcon,
     CheckIcon,
 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
     MediaPickerModal,
     type MediaItem,
@@ -94,6 +94,34 @@ function ModelPickerModal({
     const abortRef = useRef<AbortController | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
+    const doSearch = useCallback(
+        function doSearch(q: string) {
+            if (abortRef.current) {
+                abortRef.current.abort();
+            }
+            const controller = new AbortController();
+            abortRef.current = controller;
+
+            setLoading(true);
+
+            fetch(
+                `/admin/block-relations/search?type=${encodeURIComponent(relationType)}&q=${encodeURIComponent(q)}`,
+                { signal: controller.signal },
+            )
+                .then((r) => r.json())
+                .then((data: SearchResult[]) => {
+                    setResults(data);
+                    setLoading(false);
+                })
+                .catch((err) => {
+                    if (err.name !== 'AbortError') {
+                        setLoading(false);
+                    }
+                });
+        },
+        [relationType],
+    );
+
     useEffect(() => {
         if (!open) {
             setQuery('');
@@ -103,37 +131,12 @@ function ModelPickerModal({
         // Autofocus + load initial results
         setTimeout(() => inputRef.current?.focus(), 100);
         doSearch('');
-    }, [open]);
+    }, [open, doSearch]);
 
     useEffect(() => {
         const timer = setTimeout(() => doSearch(query), 250);
         return () => clearTimeout(timer);
-    }, [query]);
-
-    function doSearch(q: string) {
-        if (abortRef.current) {
-            abortRef.current.abort();
-        }
-        const controller = new AbortController();
-        abortRef.current = controller;
-
-        setLoading(true);
-
-        fetch(
-            `/admin/block-relations/search?type=${encodeURIComponent(relationType)}&q=${encodeURIComponent(q)}`,
-            { signal: controller.signal },
-        )
-            .then((r) => r.json())
-            .then((data: SearchResult[]) => {
-                setResults(data);
-                setLoading(false);
-            })
-            .catch((err) => {
-                if (err.name !== 'AbortError') {
-                    setLoading(false);
-                }
-            });
-    }
+    }, [query, doSearch]);
 
     const label = MODEL_TYPE_LABELS[relationType] ?? relationType;
 
@@ -143,7 +146,8 @@ function ModelPickerModal({
                 <DialogHeader>
                     <DialogTitle>Select {label}</DialogTitle>
                     <DialogDescription>
-                        Search and select {multiple ? 'one or more' : 'a'} {label.toLowerCase()}.
+                        Search and select {multiple ? 'one or more' : 'a'}{' '}
+                        {label.toLowerCase()}.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -189,7 +193,9 @@ function ModelPickerModal({
                                     disabled={isSelected && multiple}
                                     className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm hover:bg-accent disabled:opacity-50"
                                 >
-                                    <span className="font-medium">{item.name}</span>
+                                    <span className="font-medium">
+                                        {item.name}
+                                    </span>
                                     <span className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
                                         #{item.id}
                                         {isSelected && (
@@ -214,7 +220,7 @@ function ModelPickerModal({
 }
 
 export function BlockRelationManager({
-    blockType,
+    blockType: _blockType,
     allowedRelations,
     value,
     onChange,
@@ -281,8 +287,9 @@ export function BlockRelationManager({
 
         const config = allowedRelations[pickerKey];
         const type =
-            (config.types.find((t) => t.startsWith('media.')) as RelationType) ||
-            'media.image';
+            (config.types.find((t) =>
+                t.startsWith('media.'),
+            ) as RelationType) || 'media.image';
 
         media.forEach((item) => {
             handleAddRelation(pickerKey, {
@@ -411,8 +418,7 @@ export function BlockRelationManager({
 
                             if (
                                 !current ||
-                                (Array.isArray(current) &&
-                                    current.length === 0)
+                                (Array.isArray(current) && current.length === 0)
                             ) {
                                 return (
                                     <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
@@ -535,7 +541,11 @@ export function BlockRelationManager({
                 onClose={() => setModelPickerOpen(false)}
                 onSelect={handleModelSelect}
                 relationType={activeRelationType as RelationType}
-                multiple={pickerKey ? (allowedRelations[pickerKey]?.multiple ?? false) : false}
+                multiple={
+                    pickerKey
+                        ? (allowedRelations[pickerKey]?.multiple ?? false)
+                        : false
+                }
                 selectedIds={(() => {
                     if (!pickerKey) return [];
                     const current = value[pickerKey];

@@ -1,11 +1,11 @@
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { UserCircle, DownloadIcon } from 'lucide-react';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 interface Customer {
@@ -120,7 +120,10 @@ export default function CustomersIndex({ customers, filters }: IndexProps) {
                         next_page_url: customers.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search', 'Search customers...')}
+                    searchPlaceholder={__(
+                        'placeholder.search',
+                        'Search customers...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/ecommerce/customers"
                 />

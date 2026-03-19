@@ -9,7 +9,11 @@ function isOnMenu(element: HTMLElement): boolean {
     return !!element.closest(`.${DRAGGABLE_BLOCK_MENU_CLASSNAME}`);
 }
 
-export default function DraggableBlockPlugin({ anchorElem = document.body }: { anchorElem?: HTMLElement }): JSX.Element {
+export default function DraggableBlockPlugin({
+    anchorElem = document.body,
+}: {
+    anchorElem?: HTMLElement;
+}): JSX.Element {
     const menuRef = useRef<HTMLDivElement>(null);
     const targetLineRef = useRef<HTMLDivElement>(null);
 
@@ -24,7 +28,10 @@ export default function DraggableBlockPlugin({ anchorElem = document.body }: { a
                 </div>
             }
             targetLineComponent={
-                <div ref={targetLineRef} className="draggable-block-target-line" />
+                <div
+                    ref={targetLineRef}
+                    className="draggable-block-target-line"
+                />
             }
             isOnMenu={isOnMenu}
         />

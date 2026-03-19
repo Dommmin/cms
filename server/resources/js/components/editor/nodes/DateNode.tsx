@@ -1,10 +1,20 @@
-import type { DOMConversionMap, DOMExportOutput, EditorConfig, NodeKey, SerializedLexicalNode, Spread } from 'lexical';
+import type {
+    DOMConversionMap,
+    DOMExportOutput,
+    EditorConfig,
+    NodeKey,
+    SerializedLexicalNode,
+    Spread,
+} from 'lexical';
 import { $applyNodeReplacement, DecoratorNode } from 'lexical';
 import { lazy, Suspense, type JSX } from 'react';
 
 const DateComponent = lazy(() => import('./DateComponent'));
 
-export type SerializedDateNode = Spread<{ isoDate: string }, SerializedLexicalNode>;
+export type SerializedDateNode = Spread<
+    { isoDate: string },
+    SerializedLexicalNode
+>;
 
 export class DateNode extends DecoratorNode<JSX.Element> {
     __isoDate: string;
@@ -39,7 +49,9 @@ export class DateNode extends DecoratorNode<JSX.Element> {
     exportDOM(): DOMExportOutput {
         const span = document.createElement('span');
         span.setAttribute('data-lexical-date', this.__isoDate);
-        span.textContent = new Date(this.__isoDate + 'T00:00:00').toLocaleDateString(undefined, {
+        span.textContent = new Date(
+            this.__isoDate + 'T00:00:00',
+        ).toLocaleDateString(undefined, {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -53,7 +65,10 @@ export class DateNode extends DecoratorNode<JSX.Element> {
                 if (!domNode.hasAttribute('data-lexical-date')) return null;
                 return {
                     conversion: (node: HTMLElement) => ({
-                        node: $createDateNode(node.getAttribute('data-lexical-date') ?? new Date().toISOString().slice(0, 10)),
+                        node: $createDateNode(
+                            node.getAttribute('data-lexical-date') ??
+                                new Date().toISOString().slice(0, 10),
+                        ),
                     }),
                     priority: 1 as const,
                 };
@@ -85,7 +100,10 @@ export class DateNode extends DecoratorNode<JSX.Element> {
     decorate(): JSX.Element {
         return (
             <Suspense fallback={null}>
-                <DateComponent isoDate={this.__isoDate} nodeKey={this.getKey()} />
+                <DateComponent
+                    isoDate={this.__isoDate}
+                    nodeKey={this.getKey()}
+                />
             </Suspense>
         );
     }

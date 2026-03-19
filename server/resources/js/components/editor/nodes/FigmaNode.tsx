@@ -1,16 +1,11 @@
-import type {
-    DOMConversionMap,
-    DOMExportOutput,
-    EditorConfig,
-    LexicalEditor,
-    NodeKey,
-    SerializedLexicalNode,
-    Spread,
-} from 'lexical';
+import type { NodeKey, SerializedLexicalNode, Spread } from 'lexical';
 import { $applyNodeReplacement, DecoratorNode } from 'lexical';
 import { type JSX } from 'react';
 
-export type SerializedFigmaNode = Spread<{ documentID: string }, SerializedLexicalNode>;
+export type SerializedFigmaNode = Spread<
+    { documentID: string },
+    SerializedLexicalNode
+>;
 
 export class FigmaNode extends DecoratorNode<JSX.Element> {
     __id: string;

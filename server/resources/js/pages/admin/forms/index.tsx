@@ -13,8 +13,8 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { FormsData } from '@/types/forms';
 
@@ -86,13 +86,21 @@ export default function Index({
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/forms/${row.original.id}/submissions`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/forms/${row.original.id}/submissions`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <EyeIcon className="mr-1 h-3 w-3" />
                             Submissions
                         </Link>
                     </Button>
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/forms/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/forms/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>
@@ -123,11 +131,18 @@ export default function Index({
             <Wrapper>
                 <PageHeader
                     title={__('page.forms', 'Forms')}
-                    description={__('page.forms_desc', 'Manage contact forms and surveys')}
+                    description={__(
+                        'page.forms_desc',
+                        'Manage contact forms and surveys',
+                    )}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/forms/create" prefetch cacheFor={30}>
+                            <Link
+                                href="/admin/forms/create"
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <ClipboardListIcon className="mr-2 h-4 w-4" />
                                 {__('action.create', 'Create Form')}
                             </Link>

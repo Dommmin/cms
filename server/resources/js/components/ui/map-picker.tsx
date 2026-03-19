@@ -1,4 +1,5 @@
 import 'leaflet/dist/leaflet.css';
+import type { Map, Marker } from 'leaflet';
 import { useEffect, useRef } from 'react';
 
 interface MapPickerProps {
@@ -9,8 +10,8 @@ interface MapPickerProps {
 
 export function MapPicker({ lat, lng, onChange }: MapPickerProps) {
     const containerRef = useRef<HTMLDivElement>(null);
-    const mapRef = useRef<import('leaflet').Map | null>(null);
-    const markerRef = useRef<import('leaflet').Marker | null>(null);
+    const mapRef = useRef<Map | null>(null);
+    const markerRef = useRef<Marker | null>(null);
 
     useEffect(() => {
         if (typeof window === 'undefined' || !containerRef.current) return;

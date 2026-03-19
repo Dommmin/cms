@@ -3,6 +3,7 @@
  * CollapsibleContainerNode wraps CollapsibleTitleNode + CollapsibleContentNode.
  */
 
+import { ElementNode } from 'lexical';
 import type {
     DOMConversionMap,
     DOMConversionOutput,
@@ -12,7 +13,6 @@ import type {
     NodeKey,
     SerializedElementNode,
 } from 'lexical';
-import { ElementNode } from 'lexical';
 import type { Spread } from 'lexical';
 
 // ─── CollapsibleContainerNode ─────────────────────────────────────────────────

@@ -78,8 +78,24 @@ function PromotionalBannerThumb() {
     return (
         <svg viewBox="0 0 80 48" className="h-full w-full" fill="none">
             <rect width="80" height="48" rx="3" fill="#1e293b" />
-            <rect x="10" y="12" width="40" height="5" rx="1.5" fill="#f8fafc" opacity="0.9" />
-            <rect x="10" y="21" width="28" height="4" rx="1" fill="#f8fafc" opacity="0.5" />
+            <rect
+                x="10"
+                y="12"
+                width="40"
+                height="5"
+                rx="1.5"
+                fill="#f8fafc"
+                opacity="0.9"
+            />
+            <rect
+                x="10"
+                y="21"
+                width="28"
+                height="4"
+                rx="1"
+                fill="#f8fafc"
+                opacity="0.5"
+            />
             <rect x="10" y="31" width="18" height="7" rx="2" fill="#6366f1" />
         </svg>
     );
@@ -91,7 +107,16 @@ function NewsletterThumb() {
             <rect width="80" height="48" rx="3" fill="#f8fafc" />
             <rect x="16" y="10" width="48" height="4" rx="1.5" fill="#64748b" />
             <rect x="16" y="18" width="48" height="3" rx="1" fill="#cbd5e1" />
-            <rect x="8" y="28" width="42" height="10" rx="2" fill="white" stroke="#cbd5e1" strokeWidth="1" />
+            <rect
+                x="8"
+                y="28"
+                width="42"
+                height="10"
+                rx="2"
+                fill="white"
+                stroke="#cbd5e1"
+                strokeWidth="1"
+            />
             <rect x="52" y="28" width="20" height="10" rx="2" fill="#6366f1" />
         </svg>
     );
@@ -101,8 +126,26 @@ function TestimonialsThumb() {
     return (
         <svg viewBox="0 0 80 48" className="h-full w-full" fill="none">
             <rect width="80" height="48" rx="3" fill="#f8fafc" />
-            <rect x="4" y="8" width="34" height="32" rx="3" fill="white" stroke="#e2e8f0" strokeWidth="1" />
-            <rect x="42" y="8" width="34" height="32" rx="3" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+            <rect
+                x="4"
+                y="8"
+                width="34"
+                height="32"
+                rx="3"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
+            <rect
+                x="42"
+                y="8"
+                width="34"
+                height="32"
+                rx="3"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
             <circle cx="14" cy="20" r="6" fill="#e2e8f0" />
             <rect x="22" y="17" width="12" height="3" rx="1" fill="#94a3b8" />
             <rect x="22" y="23" width="8" height="2" rx="1" fill="#cbd5e1" />
@@ -134,7 +177,11 @@ function VideoEmbedThumb() {
         <svg viewBox="0 0 80 48" className="h-full w-full" fill="none">
             <rect width="80" height="48" rx="3" fill="#0f172a" />
             <circle cx="40" cy="24" r="12" fill="white" fillOpacity="0.15" />
-            <polygon points="36,18 36,30 50,24" fill="white" fillOpacity="0.9" />
+            <polygon
+                points="36,18 36,30 50,24"
+                fill="white"
+                fillOpacity="0.9"
+            />
         </svg>
     );
 }
@@ -143,9 +190,33 @@ function CustomHtmlThumb() {
     return (
         <svg viewBox="0 0 80 48" className="h-full w-full" fill="none">
             <rect width="80" height="48" rx="3" fill="#0f172a" />
-            <text x="8" y="22" fontSize="9" fill="#22d3ee" fontFamily="monospace">{'<div>'}</text>
-            <text x="16" y="32" fontSize="9" fill="#94a3b8" fontFamily="monospace">{'...'}</text>
-            <text x="8" y="42" fontSize="9" fill="#22d3ee" fontFamily="monospace">{'</div>'}</text>
+            <text
+                x="8"
+                y="22"
+                fontSize="9"
+                fill="#22d3ee"
+                fontFamily="monospace"
+            >
+                {'<div>'}
+            </text>
+            <text
+                x="16"
+                y="32"
+                fontSize="9"
+                fill="#94a3b8"
+                fontFamily="monospace"
+            >
+                {'...'}
+            </text>
+            <text
+                x="8"
+                y="42"
+                fontSize="9"
+                fill="#22d3ee"
+                fontFamily="monospace"
+            >
+                {'</div>'}
+            </text>
         </svg>
     );
 }
@@ -154,8 +225,26 @@ function TwoColumnsThumb() {
     return (
         <svg viewBox="0 0 80 48" className="h-full w-full" fill="none">
             <rect width="80" height="48" rx="3" fill="#f8fafc" />
-            <rect x="4" y="4" width="34" height="40" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
-            <rect x="42" y="4" width="34" height="40" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+            <rect
+                x="4"
+                y="4"
+                width="34"
+                height="40"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
+            <rect
+                x="42"
+                y="4"
+                width="34"
+                height="40"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
             <rect x="8" y="8" width="26" height="4" rx="1.5" fill="#cbd5e1" />
             <rect x="8" y="16" width="26" height="3" rx="1" fill="#e2e8f0" />
             <rect x="8" y="22" width="22" height="3" rx="1" fill="#e2e8f0" />
@@ -170,9 +259,36 @@ function ThreeColumnsThumb() {
     return (
         <svg viewBox="0 0 80 48" className="h-full w-full" fill="none">
             <rect width="80" height="48" rx="3" fill="#f8fafc" />
-            <rect x="2" y="4" width="22" height="40" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
-            <rect x="29" y="4" width="22" height="40" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
-            <rect x="56" y="4" width="22" height="40" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+            <rect
+                x="2"
+                y="4"
+                width="22"
+                height="40"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
+            <rect
+                x="29"
+                y="4"
+                width="22"
+                height="40"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
+            <rect
+                x="56"
+                y="4"
+                width="22"
+                height="40"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
             <rect x="5" y="8" width="16" height="3" rx="1" fill="#cbd5e1" />
             <rect x="32" y="8" width="16" height="3" rx="1" fill="#cbd5e1" />
             <rect x="59" y="8" width="16" height="3" rx="1" fill="#cbd5e1" />
@@ -184,13 +300,40 @@ function AccordionThumb() {
     return (
         <svg viewBox="0 0 80 48" className="h-full w-full" fill="none">
             <rect width="80" height="48" rx="3" fill="#f8fafc" />
-            <rect x="6" y="6" width="68" height="10" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+            <rect
+                x="6"
+                y="6"
+                width="68"
+                height="10"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
             <rect x="10" y="10" width="30" height="3" rx="1" fill="#94a3b8" />
             <rect x="66" y="9" width="6" height="5" rx="1" fill="#cbd5e1" />
-            <rect x="6" y="20" width="68" height="10" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+            <rect
+                x="6"
+                y="20"
+                width="68"
+                height="10"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
             <rect x="10" y="24" width="30" height="3" rx="1" fill="#94a3b8" />
             <rect x="66" y="23" width="6" height="5" rx="1" fill="#cbd5e1" />
-            <rect x="6" y="34" width="68" height="10" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+            <rect
+                x="6"
+                y="34"
+                width="68"
+                height="10"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
             <rect x="10" y="38" width="30" height="3" rx="1" fill="#94a3b8" />
             <rect x="66" y="37" width="6" height="5" rx="1" fill="#cbd5e1" />
         </svg>
@@ -202,9 +345,36 @@ function TabsThumb() {
         <svg viewBox="0 0 80 48" className="h-full w-full" fill="none">
             <rect width="80" height="48" rx="3" fill="#f8fafc" />
             <rect x="4" y="6" width="20" height="8" rx="2" fill="#6366f1" />
-            <rect x="26" y="6" width="20" height="8" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
-            <rect x="48" y="6" width="20" height="8" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
-            <rect x="4" y="18" width="72" height="26" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+            <rect
+                x="26"
+                y="6"
+                width="20"
+                height="8"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
+            <rect
+                x="48"
+                y="6"
+                width="20"
+                height="8"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
+            <rect
+                x="4"
+                y="18"
+                width="72"
+                height="26"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
             <rect x="8" y="22" width="40" height="3" rx="1" fill="#cbd5e1" />
             <rect x="8" y="28" width="56" height="3" rx="1" fill="#e2e8f0" />
             <rect x="8" y="34" width="48" height="3" rx="1" fill="#e2e8f0" />
@@ -217,8 +387,22 @@ function MapThumb() {
         <svg viewBox="0 0 80 48" className="h-full w-full" fill="none">
             <rect width="80" height="48" rx="3" fill="#dbeafe" />
             <rect x="4" y="4" width="72" height="40" rx="2" fill="#bfdbfe" />
-            <line x1="0" y1="20" x2="80" y2="28" stroke="#93c5fd" strokeWidth="1.5" />
-            <line x1="20" y1="0" x2="28" y2="48" stroke="#93c5fd" strokeWidth="1.5" />
+            <line
+                x1="0"
+                y1="20"
+                x2="80"
+                y2="28"
+                stroke="#93c5fd"
+                strokeWidth="1.5"
+            />
+            <line
+                x1="20"
+                y1="0"
+                x2="28"
+                y2="48"
+                stroke="#93c5fd"
+                strokeWidth="1.5"
+            />
             <circle cx="40" cy="22" r="6" fill="#3b82f6" />
             <circle cx="40" cy="22" r="3" fill="white" />
         </svg>
@@ -229,8 +413,26 @@ function FormEmbedThumb() {
     return (
         <svg viewBox="0 0 80 48" className="h-full w-full" fill="none">
             <rect width="80" height="48" rx="3" fill="#f8fafc" />
-            <rect x="8" y="8" width="64" height="8" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
-            <rect x="8" y="20" width="64" height="8" rx="2" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+            <rect
+                x="8"
+                y="8"
+                width="64"
+                height="8"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
+            <rect
+                x="8"
+                y="20"
+                width="64"
+                height="8"
+                rx="2"
+                fill="white"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+            />
             <rect x="8" y="32" width="32" height="8" rx="2" fill="#6366f1" />
         </svg>
     );
@@ -255,7 +457,16 @@ const BLOCK_THUMBNAILS: Record<string, React.FC> = {
     form_embed: FormEmbedThumb,
 };
 
-const CATEGORY_ORDER = ['layout', 'content', 'ecommerce', 'marketing', 'social-proof', 'media', 'conversion', 'advanced'];
+const CATEGORY_ORDER = [
+    'layout',
+    'content',
+    'ecommerce',
+    'marketing',
+    'social-proof',
+    'media',
+    'conversion',
+    'advanced',
+];
 const CATEGORY_LABELS: Record<string, string> = {
     layout: 'Layout',
     content: 'Content',
@@ -276,14 +487,23 @@ type BlockTypePickerProps = {
     onClose: () => void;
 };
 
-export function BlockTypePicker({ open, availableBlockTypes, onSelect, onClose }: BlockTypePickerProps) {
+export function BlockTypePicker({
+    open,
+    availableBlockTypes,
+    onSelect,
+    onClose,
+}: BlockTypePickerProps) {
     const [query, setQuery] = useState('');
     const inputRef = useRef<HTMLInputElement>(null);
 
     const grouped = useMemo(() => {
         const q = query.toLowerCase();
-        const entries = Object.entries(availableBlockTypes).filter(([type, cfg]) =>
-            q === '' || cfg.name.toLowerCase().includes(q) || type.includes(q) || (cfg.description ?? '').toLowerCase().includes(q),
+        const entries = Object.entries(availableBlockTypes).filter(
+            ([type, cfg]) =>
+                q === '' ||
+                cfg.name.toLowerCase().includes(q) ||
+                type.includes(q) ||
+                (cfg.description ?? '').toLowerCase().includes(q),
         );
 
         const byCategory: Record<string, Array<[string, BlockTypeConfig]>> = {};
@@ -323,7 +543,9 @@ export function BlockTypePicker({ open, availableBlockTypes, onSelect, onClose }
 
                 <div className="flex-1 overflow-y-auto p-6">
                     {grouped.length === 0 && (
-                        <p className="py-8 text-center text-sm text-muted-foreground">No blocks match your search.</p>
+                        <p className="py-8 text-center text-sm text-muted-foreground">
+                            No blocks match your search.
+                        </p>
                     )}
                     {grouped.map(({ category, label, items }) => (
                         <div key={category} className="mb-6 last:mb-0">
@@ -352,7 +574,9 @@ export function BlockTypePicker({ open, availableBlockTypes, onSelect, onClose }
                                                     </div>
                                                 )}
                                             </div>
-                                            <span className="text-xs font-medium leading-tight">{cfg.name}</span>
+                                            <span className="text-xs leading-tight font-medium">
+                                                {cfg.name}
+                                            </span>
                                             {cfg.description && (
                                                 <span className="mt-0.5 line-clamp-2 text-[10px] leading-tight text-muted-foreground">
                                                     {cfg.description}

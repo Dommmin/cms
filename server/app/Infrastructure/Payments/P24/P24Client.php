@@ -9,19 +9,6 @@ use RuntimeException;
 
 class P24Client
 {
-    private function baseUrl(): string
-    {
-        return (string) config('services.p24.base_url');
-    }
-
-    private function client(): \Illuminate\Http\Client\PendingRequest
-    {
-        return Http::withBasicAuth(
-            (string) config('services.p24.pos_id'),
-            (string) config('services.p24.api_key'),
-        )->acceptJson();
-    }
-
     /**
      * @param  array<string, mixed>  $data
      * @return array<string, mixed>
@@ -65,5 +52,18 @@ class P24Client
         }
 
         return $response->json() ?? [];
+    }
+
+    private function baseUrl(): string
+    {
+        return (string) config('services.p24.base_url');
+    }
+
+    private function client(): \Illuminate\Http\Client\PendingRequest
+    {
+        return Http::withBasicAuth(
+            (string) config('services.p24.pos_id'),
+            (string) config('services.p24.api_key'),
+        )->acceptJson();
     }
 }

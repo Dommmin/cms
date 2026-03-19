@@ -1,10 +1,16 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $insertNodeToNearestRoot, mergeRegister } from '@lexical/utils';
-import { COMMAND_PRIORITY_EDITOR, createCommand, type LexicalCommand } from 'lexical';
+import {
+    COMMAND_PRIORITY_EDITOR,
+    createCommand,
+    type LexicalCommand,
+} from 'lexical';
 import { useEffect } from 'react';
 import { $createDateNode, DateNode } from '../nodes/DateNode';
 
-export const INSERT_DATE_COMMAND: LexicalCommand<string> = createCommand('INSERT_DATE_COMMAND');
+export const INSERT_DATE_COMMAND: LexicalCommand<string> = createCommand(
+    'INSERT_DATE_COMMAND',
+);
 
 export default function DatePlugin(): null {
     const [editor] = useLexicalComposerContext();

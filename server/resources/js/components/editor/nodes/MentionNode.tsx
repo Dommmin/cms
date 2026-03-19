@@ -1,7 +1,9 @@
 import type { EditorConfig, NodeKey, SerializedTextNode } from 'lexical';
 import { $applyNodeReplacement, TextNode } from 'lexical';
 
-export type SerializedMentionNode = SerializedTextNode & { mentionName: string };
+export type SerializedMentionNode = SerializedTextNode & {
+    mentionName: string;
+};
 
 export class MentionNode extends TextNode {
     __mention: string;
@@ -44,7 +46,11 @@ export class MentionNode extends TextNode {
         return dom;
     }
 
-    updateDOM(prevNode: MentionNode, dom: HTMLElement, config: EditorConfig): boolean {
+    updateDOM(
+        prevNode: MentionNode,
+        dom: HTMLElement,
+        config: EditorConfig,
+    ): boolean {
         // @ts-expect-error - Lexical TextNode prevNode typing
         return super.updateDOM(prevNode, dom, config);
     }

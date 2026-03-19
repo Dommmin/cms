@@ -1,4 +1,4 @@
-import { Link, Form, Head, router } from '@inertiajs/react';
+import { Link, Form, Head } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { User } from '@/types/auth';
 
@@ -43,12 +43,11 @@ export default function Edit({
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/users' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            {__('action.back', 'Back')}
-
-                </Link>
-            </Button>
+                            <Link href="/admin/users" prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                {__('action.back', 'Back')}
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -62,7 +61,9 @@ export default function Edit({
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="name">{__('label.name', 'Name')}</Label>
+                                <Label htmlFor="name">
+                                    {__('label.name', 'Name')}
+                                </Label>
                                 <Input
                                     id="name"
                                     name="name"
@@ -73,7 +74,9 @@ export default function Edit({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="email">{__('label.email', 'Email')}</Label>
+                                <Label htmlFor="email">
+                                    {__('label.email', 'Email')}
+                                </Label>
                                 <Input
                                     id="email"
                                     name="email"
@@ -114,7 +117,9 @@ export default function Edit({
 
                             {roles.length > 0 && (
                                 <div className="grid gap-2">
-                                    <Label htmlFor="roles">{__('label.roles', 'Roles')}</Label>
+                                    <Label htmlFor="roles">
+                                        {__('label.roles', 'Roles')}
+                                    </Label>
                                     <div className="space-y-2">
                                         {roles.map((role) => (
                                             <div
@@ -149,7 +154,10 @@ export default function Edit({
                             <StickyFormActions
                                 formId={formId}
                                 processing={processing}
-                                submitLabel={__('action.save_changes', 'Save Changes')}
+                                submitLabel={__(
+                                    'action.save_changes',
+                                    'Save Changes',
+                                )}
                             />
                         </>
                     )}

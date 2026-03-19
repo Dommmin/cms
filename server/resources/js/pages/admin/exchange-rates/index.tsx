@@ -1,7 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { RefreshCw, PlusIcon, PencilIcon, TrashIcon } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
+import { PlusIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -9,6 +8,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -49,8 +49,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function ExchangeRatesIndex({
     rates,
-    currencies,
-    filters,
+    currencies: _currencies,
+    filters: _filters,
 }: Props) {
     const __ = useTranslation();
     const columns: ColumnDef<ExchangeRate>[] = [
@@ -99,7 +99,11 @@ export default function ExchangeRatesIndex({
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/exchange-rates/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/exchange-rates/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>
@@ -132,7 +136,10 @@ export default function ExchangeRatesIndex({
             <Wrapper>
                 <PageHeader
                     title={__('page.exchange_rates', 'Exchange Rates')}
-                    description={__('page.exchange_rates_desc', 'Manage currency exchange rates')}
+                    description={__(
+                        'page.exchange_rates_desc',
+                        'Manage currency exchange rates',
+                    )}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/exchange-rates/create">

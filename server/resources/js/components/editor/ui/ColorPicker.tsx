@@ -12,9 +12,21 @@ const WIDTH = 214;
 const HEIGHT = 150;
 
 const basicColors = [
-    '#d0021b', '#f5a623', '#f8e71c', '#8b572a', '#7ed321',
-    '#417505', '#bd10e0', '#9013fe', '#4a90e2', '#50e3c2',
-    '#b8e986', '#000000', '#4a4a4a', '#9b9b9b', '#ffffff',
+    '#d0021b',
+    '#f5a623',
+    '#f8e71c',
+    '#8b572a',
+    '#7ed321',
+    '#417505',
+    '#bd10e0',
+    '#9013fe',
+    '#4a90e2',
+    '#50e3c2',
+    '#b8e986',
+    '#000000',
+    '#4a4a4a',
+    '#9b9b9b',
+    '#ffffff',
 ];
 
 function toHex(value: string): string {
@@ -34,13 +46,19 @@ interface MoveWrapperProps {
     children: React.ReactNode;
 }
 
-function MoveWrapper({ className, style, onChange, children }: MoveWrapperProps) {
+function MoveWrapper({
+    className,
+    style,
+    onChange,
+    children,
+}: MoveWrapperProps) {
     const divRef = useRef<HTMLDivElement>(null);
     const move = useCallback(
         (e: React.MouseEvent | MouseEvent): void => {
             if (divRef.current) {
                 const { current: div } = divRef;
-                const { width, height, left, top } = div.getBoundingClientRect();
+                const { width, height, left, top } =
+                    div.getBoundingClientRect();
                 const x = clamp(e.clientX - left, width, 0);
                 const y = clamp(e.clientY - top, height, 0);
                 onChange({ x, y });
@@ -65,7 +83,12 @@ function MoveWrapper({ className, style, onChange, children }: MoveWrapperProps)
     );
 
     return (
-        <div ref={divRef} className={className} style={style} onMouseDown={onMouseDown}>
+        <div
+            ref={divRef}
+            className={className}
+            style={style}
+            onMouseDown={onMouseDown}
+        >
             {children}
         </div>
     );
@@ -81,12 +104,17 @@ interface HSV {
     v: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function transformColor<M extends keyof HSV, O extends Exclude<keyof HSV, M>>(
     format: M,
     from: HSV[M],
     to: O,
 ): HSV[O] {
-    const { h, s, v } = { h: 0, s: 0, v: 0, ...{ [format]: from } } as HSV;
+    const {
+        h: _h,
+        s: _s,
+        v: _v,
+    } = { h: 0, s: 0, v: 0, ...{ [format]: from } } as HSV;
     switch (`${format}-${to}`) {
         case 'h-h':
             return from as HSV[O];
@@ -135,19 +163,52 @@ function hsvToHex(h: number, s: number, v: number): string {
     const q = vs * (1 - f * hs);
     const t = vs * (1 - (1 - f) * hs);
 
-    let r = 0, g = 0, b = 0;
+    let r = 0,
+        g = 0,
+        b = 0;
     switch (i) {
-        case 0: r = vs; g = t; b = p; break;
-        case 1: r = q; g = vs; b = p; break;
-        case 2: r = p; g = vs; b = t; break;
-        case 3: r = p; g = q; b = vs; break;
-        case 4: r = t; g = p; b = vs; break;
-        case 5: r = vs; g = p; b = q; break;
+        case 0:
+            r = vs;
+            g = t;
+            b = p;
+            break;
+        case 1:
+            r = q;
+            g = vs;
+            b = p;
+            break;
+        case 2:
+            r = p;
+            g = vs;
+            b = t;
+            break;
+        case 3:
+            r = p;
+            g = q;
+            b = vs;
+            break;
+        case 4:
+            r = t;
+            g = p;
+            b = vs;
+            break;
+        case 5:
+            r = vs;
+            g = p;
+            b = q;
+            break;
     }
 
-    return '#' + [r, g, b]
-        .map((x) => Math.round(x * 255).toString(16).padStart(2, '0'))
-        .join('');
+    return (
+        '#' +
+        [r, g, b]
+            .map((x) =>
+                Math.round(x * 255)
+                    .toString(16)
+                    .padStart(2, '0'),
+            )
+            .join('')
+    );
 }
 
 interface Props {
@@ -158,29 +219,36 @@ interface Props {
 export default function ColorPicker({ color, onChange }: Props): JSX.Element {
     const [selfColor, setSelfColor] = useState(() => hexToHsv(toHex(color)));
     const [inputColor, setInputColor] = useState(color);
-    const innerDivRef = useRef<HTMLDivElement>(null);
+    const _innerDivRef = useRef<HTMLDivElement>(null);
 
     const saturationPosition = useMemo(
-        () => ({ x: (selfColor.s / 100) * WIDTH, y: ((100 - selfColor.v) / 100) * HEIGHT }),
+        () => ({
+            x: (selfColor.s / 100) * WIDTH,
+            y: ((100 - selfColor.v) / 100) * HEIGHT,
+        }),
         [selfColor.s, selfColor.v],
     );
 
-    const huePosition = useMemo(() => ({ x: (selfColor.h / 360) * WIDTH }), [selfColor.h]);
-
-    const onSetHex = useCallback(
-        (hex: string) => {
-            setInputColor(hex);
-            if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
-                const hsv = hexToHsv(hex);
-                setSelfColor(hsv);
-            }
-        },
-        [],
+    const huePosition = useMemo(
+        () => ({ x: (selfColor.h / 360) * WIDTH }),
+        [selfColor.h],
     );
+
+    const onSetHex = useCallback((hex: string) => {
+        setInputColor(hex);
+        if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+            const hsv = hexToHsv(hex);
+            setSelfColor(hsv);
+        }
+    }, []);
 
     const onMoveSaturation = useCallback(
         ({ x, y }: Position) => {
-            const newHsv = { ...selfColor, s: (x / WIDTH) * 100, v: 100 - (y / HEIGHT) * 100 };
+            const newHsv = {
+                ...selfColor,
+                s: (x / WIDTH) * 100,
+                v: 100 - (y / HEIGHT) * 100,
+            };
             setSelfColor(newHsv);
             setInputColor(hsvToHex(newHsv.h, newHsv.s, newHsv.v));
         },
@@ -201,10 +269,10 @@ export default function ColorPicker({ color, onChange }: Props): JSX.Element {
     }, [inputColor, onChange]);
 
     return (
-        <div className="w-[230px] select-none p-2">
+        <div className="w-[230px] p-2 select-none">
             {/* Saturation */}
             <MoveWrapper
-                className="relative rounded-sm overflow-hidden cursor-crosshair"
+                className="relative cursor-crosshair overflow-hidden rounded-sm"
                 style={{
                     width: WIDTH,
                     height: HEIGHT,
@@ -214,25 +282,35 @@ export default function ColorPicker({ color, onChange }: Props): JSX.Element {
             >
                 <div
                     className="absolute inset-0"
-                    style={{ background: 'linear-gradient(to right, #fff, transparent)' }}
+                    style={{
+                        background:
+                            'linear-gradient(to right, #fff, transparent)',
+                    }}
                 />
                 <div
                     className="absolute inset-0"
-                    style={{ background: 'linear-gradient(to bottom, transparent, #000)' }}
+                    style={{
+                        background:
+                            'linear-gradient(to bottom, transparent, #000)',
+                    }}
                 />
                 <div
-                    className="absolute w-3 h-3 rounded-full border-2 border-white shadow -translate-x-1/2 -translate-y-1/2"
+                    className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow"
                     style={{
                         left: saturationPosition.x,
                         top: saturationPosition.y,
-                        background: hsvToHex(selfColor.h, selfColor.s, selfColor.v),
+                        background: hsvToHex(
+                            selfColor.h,
+                            selfColor.s,
+                            selfColor.v,
+                        ),
                     }}
                 />
             </MoveWrapper>
 
             {/* Hue */}
             <MoveWrapper
-                className="relative mt-2 h-3 rounded-full cursor-pointer"
+                className="relative mt-2 h-3 cursor-pointer rounded-full"
                 style={{
                     width: WIDTH,
                     background:
@@ -241,7 +319,7 @@ export default function ColorPicker({ color, onChange }: Props): JSX.Element {
                 onChange={onMoveHue}
             >
                 <div
-                    className="absolute top-1/2 w-3 h-3 rounded-full border-2 border-white shadow -translate-x-1/2 -translate-y-1/2"
+                    className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow"
                     style={{
                         left: huePosition.x,
                         background: `hsl(${selfColor.h}deg, 100%, 50%)`,
@@ -250,29 +328,33 @@ export default function ColorPicker({ color, onChange }: Props): JSX.Element {
             </MoveWrapper>
 
             {/* Input */}
-            <div className="flex items-center gap-2 mt-2">
+            <div className="mt-2 flex items-center gap-2">
                 <div
-                    className="w-8 h-8 rounded border border-border flex-shrink-0"
+                    className="h-8 w-8 flex-shrink-0 rounded border border-border"
                     style={{ background: inputColor }}
                 />
                 <input
-                    className="flex-1 h-8 px-2 text-sm border border-input rounded bg-transparent outline-none focus:ring-1 focus:ring-ring font-mono uppercase"
+                    className="h-8 flex-1 rounded border border-input bg-transparent px-2 font-mono text-sm uppercase outline-none focus:ring-1 focus:ring-ring"
                     value={inputColor}
                     onChange={(e) => onSetHex(e.target.value)}
                 />
             </div>
 
             {/* Basic Colors */}
-            <div className="flex flex-wrap gap-1 mt-2">
+            <div className="mt-2 flex flex-wrap gap-1">
                 {basicColors.map((basicColor) => (
                     <button
                         key={basicColor}
                         className={cn(
-                            'w-5 h-5 rounded-sm border border-border cursor-pointer',
-                            basicColor === inputColor && 'ring-1 ring-primary ring-offset-1',
+                            'h-5 w-5 cursor-pointer rounded-sm border border-border',
+                            basicColor === inputColor &&
+                                'ring-1 ring-primary ring-offset-1',
                         )}
                         style={{ background: basicColor }}
-                        onClick={() => { onSetHex(basicColor); onChange?.(basicColor); }}
+                        onClick={() => {
+                            onSetHex(basicColor);
+                            onChange?.(basicColor);
+                        }}
                     />
                 ))}
             </div>

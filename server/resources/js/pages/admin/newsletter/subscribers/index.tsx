@@ -1,7 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { Mail, PlusIcon, PencilIcon, TrashIcon, EyeIcon } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
+import { PlusIcon, PencilIcon, TrashIcon, EyeIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -9,6 +8,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -89,7 +89,9 @@ export default function SubscribersIndex({ subscribers, filters }: Props) {
                 <Badge
                     variant={row.original.is_active ? 'default' : 'secondary'}
                 >
-                    {row.original.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
+                    {row.original.is_active
+                        ? __('status.active', 'Active')
+                        : __('status.inactive', 'Inactive')}
                 </Badge>
             ),
         },
@@ -105,13 +107,21 @@ export default function SubscribersIndex({ subscribers, filters }: Props) {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/newsletter/subscribers/${row.original.id}`} prefetch cacheFor={60}>
+                        <Link
+                            href={`/admin/newsletter/subscribers/${row.original.id}`}
+                            prefetch
+                            cacheFor={60}
+                        >
                             <EyeIcon className="mr-1 h-3 w-3" />
                             {__('action.show', 'View')}
                         </Link>
                     </Button>
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/newsletter/subscribers/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/newsletter/subscribers/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>
@@ -144,7 +154,10 @@ export default function SubscribersIndex({ subscribers, filters }: Props) {
             <Wrapper>
                 <PageHeader
                     title={__('page.subscribers', 'Subscribers')}
-                    description={__('page.subscribers_desc', 'Manage newsletter subscribers')}
+                    description={__(
+                        'page.subscribers_desc',
+                        'Manage newsletter subscribers',
+                    )}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/newsletter/subscribers/create">
@@ -168,7 +181,10 @@ export default function SubscribersIndex({ subscribers, filters }: Props) {
                         next_page_url: subscribers.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search', 'Search subscribers...')}
+                    searchPlaceholder={__(
+                        'placeholder.search',
+                        'Search subscribers...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/newsletter/subscribers"
                 />

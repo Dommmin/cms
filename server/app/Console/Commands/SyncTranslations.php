@@ -58,16 +58,16 @@ class SyncTranslations extends Command
 
                 $exists = Translation::query()->where([
                     'locale_code' => $locale,
-                    'group'       => $entry['group'],
-                    'key'         => $entry['key'],
+                    'group' => $entry['group'],
+                    'key' => $entry['key'],
                 ])->exists();
 
                 if (! $exists) {
                     Translation::create([
                         'locale_code' => $locale,
-                        'group'       => $entry['group'],
-                        'key'         => $entry['key'],
-                        'value'       => $value,
+                        'group' => $entry['group'],
+                        'key' => $entry['key'],
+                        'value' => $value,
                     ]);
                     $created++;
                 }
@@ -92,7 +92,7 @@ class SyncTranslations extends Command
             new RecursiveDirectoryIterator($basePath, FilesystemIterator::SKIP_DOTS),
         );
 
-        $seen  = [];
+        $seen = [];
         $found = [];
 
         foreach ($files as $file) {
@@ -116,19 +116,19 @@ class SyncTranslations extends Command
             );
 
             foreach ($matches as $match) {
-                $fullKey  = $match[1];
+                $fullKey = $match[1];
                 $fallback = $match[2];
 
                 if (isset($seen[$fullKey])) {
                     continue;
                 }
 
-                $dotPos = strpos($fullKey, '.');
-                $group  = substr($fullKey, 0, $dotPos);
-                $key    = substr($fullKey, $dotPos + 1);
+                $dotPos = mb_strpos($fullKey, '.');
+                $group = mb_substr($fullKey, 0, $dotPos);
+                $key = mb_substr($fullKey, $dotPos + 1);
 
                 $seen[$fullKey] = true;
-                $found[]        = ['group' => $group, 'key' => $key, 'fallback' => $fallback];
+                $found[] = ['group' => $group, 'key' => $key, 'fallback' => $fallback];
             }
         }
 

@@ -28,7 +28,9 @@ export class LayoutContainerNode extends ElementNode {
         this.__templateColumns = templateColumns;
     }
 
-    static importJSON(node: SerializedLayoutContainerNode): LayoutContainerNode {
+    static importJSON(
+        node: SerializedLayoutContainerNode,
+    ): LayoutContainerNode {
         return $createLayoutContainerNode(node.templateColumns);
     }
 
@@ -78,10 +80,14 @@ export class LayoutContainerNode extends ElementNode {
     }
 }
 
-export function $createLayoutContainerNode(templateColumns: string): LayoutContainerNode {
+export function $createLayoutContainerNode(
+    templateColumns: string,
+): LayoutContainerNode {
     return $applyNodeReplacement(new LayoutContainerNode(templateColumns));
 }
 
-export function $isLayoutContainerNode(node: unknown): node is LayoutContainerNode {
+export function $isLayoutContainerNode(
+    node: unknown,
+): node is LayoutContainerNode {
     return node instanceof LayoutContainerNode;
 }

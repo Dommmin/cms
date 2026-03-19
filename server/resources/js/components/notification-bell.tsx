@@ -1,5 +1,15 @@
 import { Link } from '@inertiajs/react';
-import { Bell, BellOff, BellRing, Circle, Package, Star, AlertTriangle, MessageCircle, CheckCheck } from 'lucide-react';
+import {
+    Bell,
+    BellOff,
+    BellRing,
+    Circle,
+    Package,
+    Star,
+    AlertTriangle,
+    MessageCircle,
+    CheckCheck,
+} from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -45,46 +55,58 @@ export function NotificationBell() {
     const [unreadCount, setUnreadCount] = useState(0);
     const [open, setOpen] = useState(false);
     const [seenIds, setSeenIds] = useState<Set<string>>(new Set());
-    const [browserPermission, setBrowserPermission] = useState<NotificationPermission | 'unsupported'>(
-        getBrowserPermission,
-    );
+    const [browserPermission, setBrowserPermission] = useState<
+        NotificationPermission | 'unsupported'
+    >(getBrowserPermission);
     const panelRef = useRef<HTMLDivElement>(null);
     const seenIdsRef = useRef(seenIds);
     const browserNotifiedIds = useRef<Set<string>>(new Set());
+    // eslint-disable-next-line react-hooks/refs
     seenIdsRef.current = seenIds;
 
-    const fireBrowserNotifications = useCallback((incoming: AdminNotification[]) => {
-        if (browserPermission !== 'granted') return;
-        if (document.hasFocus()) return;
+    const fireBrowserNotifications = useCallback(
+        (incoming: AdminNotification[]) => {
+            if (browserPermission !== 'granted') return;
+            if (document.hasFocus()) return;
 
-        for (const n of incoming) {
-            if (browserNotifiedIds.current.has(n.id)) continue;
-            browserNotifiedIds.current.add(n.id);
+            for (const n of incoming) {
+                if (browserNotifiedIds.current.has(n.id)) continue;
+                browserNotifiedIds.current.add(n.id);
 
-            const notif = new Notification(n.title, {
-                body: n.message,
-                icon: TYPE_BROWSER_ICON[n.type],
-                tag: n.id,
-            });
-            notif.onclick = () => {
-                window.focus();
-                notif.close();
-            };
-        }
-    }, [browserPermission]);
+                const notif = new Notification(n.title, {
+                    body: n.message,
+                    icon: TYPE_BROWSER_ICON[n.type],
+                    tag: n.id,
+                });
+                notif.onclick = () => {
+                    window.focus();
+                    notif.close();
+                };
+            }
+        },
+        [browserPermission],
+    );
 
-    const applyUpdate = useCallback((data: { data: AdminNotification[]; unread_count: number }) => {
-        const incoming = data.data;
-        setNotifications(incoming);
-        const newOnes = incoming.filter((n) => !seenIdsRef.current.has(n.id));
-        setUnreadCount(newOnes.length);
-        fireBrowserNotifications(newOnes);
-    }, [fireBrowserNotifications]);
+    const applyUpdate = useCallback(
+        (data: { data: AdminNotification[]; unread_count: number }) => {
+            const incoming = data.data;
+            setNotifications(incoming);
+            const newOnes = incoming.filter(
+                (n) => !seenIdsRef.current.has(n.id),
+            );
+            setUnreadCount(newOnes.length);
+            fireBrowserNotifications(newOnes);
+        },
+        [fireBrowserNotifications],
+    );
 
     const fetchNotifications = useCallback(async () => {
         try {
             const res = await fetch('/admin/notifications', {
-                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
             });
             if (!res.ok) return;
             applyUpdate(await res.json());
@@ -102,7 +124,10 @@ export function NotificationBell() {
     // Close panel on outside click
     useEffect(() => {
         function handler(e: MouseEvent) {
-            if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+            if (
+                panelRef.current &&
+                !panelRef.current.contains(e.target as Node)
+            ) {
                 setOpen(false);
             }
         }
@@ -138,14 +163,14 @@ export function NotificationBell() {
             >
                 <Bell className="h-5 w-5" />
                 {unreadCount > 0 && (
-                    <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white">
+                    <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white">
                         {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                 )}
             </button>
 
             {open && (
-                <div className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-xl border border-border bg-popover shadow-lg">
+                <div className="absolute top-full right-0 z-50 mt-2 w-80 overflow-hidden rounded-xl border border-border bg-popover shadow-lg">
                     <div className="flex items-center justify-between border-b border-border px-4 py-3">
                         <h3 className="text-sm font-semibold">Notifications</h3>
 
@@ -213,7 +238,7 @@ export function NotificationBell() {
                                                 <Icon className="h-3.5 w-3.5" />
                                             </span>
                                             <div className="min-w-0 flex-1">
-                                                <p className="font-medium leading-tight">
+                                                <p className="leading-tight font-medium">
                                                     {n.title}
                                                 </p>
                                                 <p className="mt-0.5 truncate text-xs text-muted-foreground">

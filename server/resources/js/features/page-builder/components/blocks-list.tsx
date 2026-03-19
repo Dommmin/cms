@@ -11,7 +11,6 @@ import {
 } from '@dnd-kit/sortable';
 import axios from 'axios';
 import { BookOpen, ClipboardPaste, Plus, SearchIcon } from 'lucide-react';
-import { BlockTypePicker } from './block-type-picker';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
@@ -26,6 +25,7 @@ import { Input } from '@/components/ui/input';
 import type { Block, BlockTypeConfig, ReusableBlock } from '../types';
 import { BlockCard } from './block-card';
 import { BlockForm } from './block-form';
+import { BlockTypePicker } from './block-type-picker';
 
 type BlocksListProps = {
     blocks: Block[];
@@ -67,7 +67,10 @@ function LibraryModal({
         axios
             .get<ReusableBlock[]>('/admin/cms/reusable-blocks/library')
             .then(({ data }) => {
-                const items = Array.isArray(data) ? data : (data as any).data ?? [];
+                const items = Array.isArray(data)
+                    ? data
+                    : ((data as unknown as { data: ReusableBlock[] }).data ??
+                      []);
                 setBlocks(items);
                 setFiltered(items);
             })
@@ -77,7 +80,13 @@ function LibraryModal({
 
     useEffect(() => {
         const q = query.toLowerCase();
-        setFiltered(blocks.filter((b) => b.name.toLowerCase().includes(q) || (b.description ?? '').toLowerCase().includes(q)));
+        setFiltered(
+            blocks.filter(
+                (b) =>
+                    b.name.toLowerCase().includes(q) ||
+                    (b.description ?? '').toLowerCase().includes(q),
+            ),
+        );
     }, [query, blocks]);
 
     return (
@@ -86,7 +95,8 @@ function LibraryModal({
                 <DialogHeader>
                     <DialogTitle>Global Block Library</DialogTitle>
                     <DialogDescription>
-                        Insert a previously saved reusable block into this section.
+                        Insert a previously saved reusable block into this
+                        section.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -103,7 +113,9 @@ function LibraryModal({
 
                 <div className="max-h-64 overflow-y-auto rounded-md border">
                     {loading && (
-                        <p className="py-8 text-center text-sm text-muted-foreground">Loading...</p>
+                        <p className="py-8 text-center text-sm text-muted-foreground">
+                            Loading...
+                        </p>
                     )}
                     {!loading && filtered.length === 0 && (
                         <p className="py-8 text-center text-sm text-muted-foreground">
@@ -121,11 +133,17 @@ function LibraryModal({
                                 }}
                                 className="flex w-full flex-col px-4 py-2.5 text-left hover:bg-accent"
                             >
-                                <span className="text-sm font-medium">{block.name}</span>
+                                <span className="text-sm font-medium">
+                                    {block.name}
+                                </span>
                                 {block.description && (
-                                    <span className="text-xs text-muted-foreground">{block.description}</span>
+                                    <span className="text-xs text-muted-foreground">
+                                        {block.description}
+                                    </span>
                                 )}
-                                <span className="mt-0.5 text-xs text-muted-foreground/70">{block.type}</span>
+                                <span className="mt-0.5 text-xs text-muted-foreground/70">
+                                    {block.type}
+                                </span>
                             </button>
                         ))}
                 </div>
@@ -155,7 +173,8 @@ export function BlocksList({
 
     // Check clipboard on mount and when storage changes
     useEffect(() => {
-        const check = () => setHasClipboard(!!localStorage.getItem(CLIPBOARD_KEY));
+        const check = () =>
+            setHasClipboard(!!localStorage.getItem(CLIPBOARD_KEY));
         check();
         window.addEventListener('storage', check);
         return () => window.removeEventListener('storage', check);
@@ -246,16 +265,28 @@ export function BlocksList({
                 <h4 className="text-sm font-medium">Blocks</h4>
                 <div className="flex items-center gap-2">
                     {hasClipboard && (
-                        <Button onClick={handlePasteBlock} size="sm" variant="outline">
+                        <Button
+                            onClick={handlePasteBlock}
+                            size="sm"
+                            variant="outline"
+                        >
                             <ClipboardPaste className="mr-2 h-4 w-4" />
                             Paste Block
                         </Button>
                     )}
-                    <Button onClick={() => setLibraryOpen(true)} size="sm" variant="outline">
+                    <Button
+                        onClick={() => setLibraryOpen(true)}
+                        size="sm"
+                        variant="outline"
+                    >
                         <BookOpen className="mr-2 h-4 w-4" />
                         From Library
                     </Button>
-                    <Button onClick={() => setPickerOpen(true)} size="sm" variant="outline">
+                    <Button
+                        onClick={() => setPickerOpen(true)}
+                        size="sm"
+                        variant="outline"
+                    >
                         <Plus className="mr-2 h-4 w-4" />
                         Add Block
                     </Button>
@@ -292,16 +323,28 @@ export function BlocksList({
                                         sectionIndex={sectionIndex}
                                         isExpanded={isExpanded}
                                         blockTypeName={blockTypeName}
-                                        onToggle={() => onToggleBlock(blockIndex)}
-                                        onDelete={() => onDeleteBlock(blockIndex)}
-                                        onCopy={() => handleCopyBlock(blockIndex)}
+                                        onToggle={() =>
+                                            onToggleBlock(blockIndex)
+                                        }
+                                        onDelete={() =>
+                                            onDeleteBlock(blockIndex)
+                                        }
+                                        onCopy={() =>
+                                            handleCopyBlock(blockIndex)
+                                        }
                                         onSaveAsGlobal={(name, desc) =>
-                                            handleSaveAsGlobal(blockIndex, name, desc)
+                                            handleSaveAsGlobal(
+                                                blockIndex,
+                                                name,
+                                                desc,
+                                            )
                                         }
                                     >
                                         <BlockForm
                                             block={block}
-                                            availableBlockTypes={availableBlockTypes}
+                                            availableBlockTypes={
+                                                availableBlockTypes
+                                            }
                                             onUpdate={(patch) =>
                                                 onUpdateBlock(blockIndex, patch)
                                             }

@@ -82,7 +82,7 @@ test: setup-test-db
 # Run quality tools
 quality:
 	docker compose exec php composer larastan
-	docker compose exec php composer pint
+	docker compose exec php vendor/bin/pint
 	docker compose exec php npm run format
 	docker compose exec php npm run types
 	docker compose exec php npm run lint

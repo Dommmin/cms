@@ -1,6 +1,5 @@
-import { Link, Form, Head, router } from '@inertiajs/react';
+import { Link, Form, Head } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import StickyFormActions from '@/components/sticky-form-actions';
@@ -8,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -56,7 +56,11 @@ export default function Edit({
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href='/admin/ecommerce/discounts' prefetch cacheFor={30}>
+                            <Link
+                                href="/admin/ecommerce/discounts"
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>
@@ -73,7 +77,9 @@ export default function Edit({
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="name">{__('label.name', 'Name')}</Label>
+                                <Label htmlFor="name">
+                                    {__('label.name', 'Name')}
+                                </Label>
                                 <Input
                                     id="name"
                                     name="name"
@@ -86,7 +92,9 @@ export default function Edit({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="code">{__('label.code', 'Code')}</Label>
+                                <Label htmlFor="code">
+                                    {__('label.code', 'Code')}
+                                </Label>
                                 <Input
                                     id="code"
                                     name="code"
@@ -99,7 +107,9 @@ export default function Edit({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="type">{__('label.type', 'Discount Type')}</Label>
+                                <Label htmlFor="type">
+                                    {__('label.type', 'Discount Type')}
+                                </Label>
                                 <select
                                     id="type"
                                     name="type"
@@ -119,7 +129,9 @@ export default function Edit({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="value">{__('label.value', 'Value')}</Label>
+                                <Label htmlFor="value">
+                                    {__('label.value', 'Value')}
+                                </Label>
                                 <Input
                                     id="value"
                                     name="value"
@@ -184,7 +196,10 @@ export default function Edit({
                             <StickyFormActions
                                 formId={formId}
                                 processing={processing}
-                                submitLabel={__('action.save_changes', 'Save Changes')}
+                                submitLabel={__(
+                                    'action.save_changes',
+                                    'Save Changes',
+                                )}
                             />
                         </>
                     )}

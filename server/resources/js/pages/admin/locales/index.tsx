@@ -1,7 +1,12 @@
 import { Head, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { PlusIcon, StarIcon, TrashIcon, ToggleLeftIcon, ToggleRightIcon } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
+import {
+    PlusIcon,
+    StarIcon,
+    TrashIcon,
+    ToggleLeftIcon,
+    ToggleRightIcon,
+} from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
@@ -26,6 +31,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -62,7 +68,9 @@ type Props = {
     currencies: CurrencyOption[];
 };
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Locales', href: '/admin/locales' }];
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Locales', href: '/admin/locales' },
+];
 
 type LocaleForm = {
     code: string;
@@ -116,13 +124,19 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
         const payload = { ...form };
         if (editLocale) {
             router.put(`/admin/locales/${editLocale.id}`, payload, {
-                onSuccess: () => { setOpen(false); toast.success('Locale updated'); },
+                onSuccess: () => {
+                    setOpen(false);
+                    toast.success('Locale updated');
+                },
                 onError: () => toast.error('Failed to update locale'),
                 onFinish: () => setProcessing(false),
             });
         } else {
             router.post('/admin/locales', payload, {
-                onSuccess: () => { setOpen(false); toast.success('Locale created'); },
+                onSuccess: () => {
+                    setOpen(false);
+                    toast.success('Locale created');
+                },
                 onError: () => toast.error('Failed to create locale'),
                 onFinish: () => setProcessing(false),
             });
@@ -135,7 +149,9 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
             header: __('label.code', 'Code'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
-                    <span className="text-lg">{row.original.flag_emoji ?? ''}</span>
+                    <span className="text-lg">
+                        {row.original.flag_emoji ?? ''}
+                    </span>
                     <Badge variant="outline" className="font-mono uppercase">
                         {row.original.code}
                     </Badge>
@@ -148,7 +164,9 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
             cell: ({ row }) => (
                 <div>
                     <p className="font-medium">{row.original.name}</p>
-                    <p className="text-sm text-muted-foreground">{row.original.native_name}</p>
+                    <p className="text-sm text-muted-foreground">
+                        {row.original.native_name}
+                    </p>
                 </div>
             ),
         },
@@ -170,7 +188,8 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
             cell: ({ row }) =>
                 row.original.is_default ? (
                     <Badge variant="default" className="gap-1">
-                        <StarIcon className="h-3 w-3" /> {__('misc.default', 'Default')}
+                        <StarIcon className="h-3 w-3" />{' '}
+                        {__('misc.default', 'Default')}
                     </Badge>
                 ) : (
                     <Button
@@ -180,7 +199,10 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                             router.post(
                                 `/admin/locales/${row.original.id}/set-default`,
                                 {},
-                                { onSuccess: () => toast.success('Default locale updated') },
+                                {
+                                    onSuccess: () =>
+                                        toast.success('Default locale updated'),
+                                },
                             );
                         }}
                     >
@@ -193,9 +215,13 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
             header: __('label.is_active', 'Active'),
             cell: ({ row }) =>
                 row.original.is_active ? (
-                    <Badge variant="default">{__('status.active', 'Active')}</Badge>
+                    <Badge variant="default">
+                        {__('status.active', 'Active')}
+                    </Badge>
                 ) : (
-                    <Badge variant="secondary">{__('status.inactive', 'Inactive')}</Badge>
+                    <Badge variant="secondary">
+                        {__('status.inactive', 'Inactive')}
+                    </Badge>
                 ),
         },
         {
@@ -203,18 +229,27 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
             header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => openEdit(row.original)}>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openEdit(row.original)}
+                    >
                         {__('action.edit', 'Edit')}
                     </Button>
                     <ConfirmButton
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Locale')}
-                        description={__('dialog.cannot_be_undone', 'This will delete the locale and all its translations. This action cannot be undone.')}
+                        description={__(
+                            'dialog.cannot_be_undone',
+                            'This will delete the locale and all its translations. This action cannot be undone.',
+                        )}
                         onConfirm={() => {
                             router.delete(`/admin/locales/${row.original.id}`, {
-                                onSuccess: () => toast.success('Locale deleted'),
-                                onError: () => toast.error('Cannot delete default locale'),
+                                onSuccess: () =>
+                                    toast.success('Locale deleted'),
+                                onError: () =>
+                                    toast.error('Cannot delete default locale'),
                             });
                         }}
                         disabled={row.original.is_default}
@@ -231,7 +266,13 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Locales" />
             <Wrapper>
-                <PageHeader title={__('page.locales', 'Locales')} description={__('page.locales_desc', 'Manage supported languages')}>
+                <PageHeader
+                    title={__('page.locales', 'Locales')}
+                    description={__(
+                        'page.locales_desc',
+                        'Manage supported languages',
+                    )}
+                >
                     <PageHeaderActions>
                         <Button onClick={openCreate}>
                             <PlusIcon className="mr-2 h-4 w-4" />
@@ -252,7 +293,10 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                         next_page_url: locales.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search', 'Search locales...')}
+                    searchPlaceholder={__(
+                        'placeholder.search',
+                        'Search locales...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/locales"
                 />
@@ -261,7 +305,11 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{editLocale ? __('action.edit', 'Edit Locale') : __('action.add', 'Add Locale')}</DialogTitle>
+                        <DialogTitle>
+                            {editLocale
+                                ? __('action.edit', 'Edit Locale')
+                                : __('action.add', 'Add Locale')}
+                        </DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-2">
                         <div className="grid grid-cols-2 gap-4">
@@ -269,17 +317,29 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                                 <Label>{__('label.code', 'Code')}</Label>
                                 <Input
                                     value={form.code}
-                                    onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
+                                    onChange={(e) =>
+                                        setForm((f) => ({
+                                            ...f,
+                                            code: e.target.value,
+                                        }))
+                                    }
                                     placeholder="en"
                                     maxLength={10}
                                     disabled={!!editLocale}
                                 />
                             </div>
                             <div className="space-y-1">
-                                <Label>{__('label.flag_emoji', 'Flag Emoji')}</Label>
+                                <Label>
+                                    {__('label.flag_emoji', 'Flag Emoji')}
+                                </Label>
                                 <Input
                                     value={form.flag_emoji}
-                                    onChange={(e) => setForm((f) => ({ ...f, flag_emoji: e.target.value }))}
+                                    onChange={(e) =>
+                                        setForm((f) => ({
+                                            ...f,
+                                            flag_emoji: e.target.value,
+                                        }))
+                                    }
                                     placeholder="🇬🇧"
                                 />
                             </div>
@@ -288,15 +348,27 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                             <Label>{__('label.name', 'Name')}</Label>
                             <Input
                                 value={form.name}
-                                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                                onChange={(e) =>
+                                    setForm((f) => ({
+                                        ...f,
+                                        name: e.target.value,
+                                    }))
+                                }
                                 placeholder="English"
                             />
                         </div>
                         <div className="space-y-1">
-                            <Label>{__('label.native_name', 'Native Name')}</Label>
+                            <Label>
+                                {__('label.native_name', 'Native Name')}
+                            </Label>
                             <Input
                                 value={form.native_name}
-                                onChange={(e) => setForm((f) => ({ ...f, native_name: e.target.value }))}
+                                onChange={(e) =>
+                                    setForm((f) => ({
+                                        ...f,
+                                        native_name: e.target.value,
+                                    }))
+                                }
                                 placeholder="English"
                             />
                         </div>
@@ -304,13 +376,20 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                             <Label>{__('label.currency', 'Currency')}</Label>
                             <Select
                                 value={form.currency_code || '_none'}
-                                onValueChange={(v) => setForm((f) => ({ ...f, currency_code: v === '_none' ? '' : v }))}
+                                onValueChange={(v) =>
+                                    setForm((f) => ({
+                                        ...f,
+                                        currency_code: v === '_none' ? '' : v,
+                                    }))
+                                }
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select currency..." />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="_none">— None —</SelectItem>
+                                    <SelectItem value="_none">
+                                        — None —
+                                    </SelectItem>
                                     {currencies.map((c) => (
                                         <SelectItem key={c.code} value={c.code}>
                                             {c.code} — {c.name} ({c.symbol})
@@ -330,9 +409,16 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                                     type="checkbox"
                                     className="sr-only"
                                     checked={form.is_active}
-                                    onChange={(e) => setForm((f) => ({ ...f, is_active: e.target.checked }))}
+                                    onChange={(e) =>
+                                        setForm((f) => ({
+                                            ...f,
+                                            is_active: e.target.checked,
+                                        }))
+                                    }
                                 />
-                                <span className="text-sm">{__('status.active', 'Active')}</span>
+                                <span className="text-sm">
+                                    {__('status.active', 'Active')}
+                                </span>
                             </label>
                             <label className="flex cursor-pointer items-center gap-2">
                                 {form.is_default ? (
@@ -344,18 +430,30 @@ export default function LocalesIndex({ locales, filters, currencies }: Props) {
                                     type="checkbox"
                                     className="sr-only"
                                     checked={form.is_default}
-                                    onChange={(e) => setForm((f) => ({ ...f, is_default: e.target.checked }))}
+                                    onChange={(e) =>
+                                        setForm((f) => ({
+                                            ...f,
+                                            is_default: e.target.checked,
+                                        }))
+                                    }
                                 />
-                                <span className="text-sm">{__('misc.default', 'Default')}</span>
+                                <span className="text-sm">
+                                    {__('misc.default', 'Default')}
+                                </span>
                             </label>
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setOpen(false)}>
+                        <Button
+                            variant="outline"
+                            onClick={() => setOpen(false)}
+                        >
                             {__('action.cancel', 'Cancel')}
                         </Button>
                         <Button onClick={handleSubmit} disabled={processing}>
-                            {processing ? __('misc.processing', 'Saving...') : __('action.save', 'Save')}
+                            {processing
+                                ? __('misc.processing', 'Saving...')
+                                : __('action.save', 'Save')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

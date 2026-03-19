@@ -1,8 +1,12 @@
-import { useAdminLocale } from '@/hooks/use-admin-locale';
 import { Form, Head, Link, router, usePage } from '@inertiajs/react';
-import { ArrowLeftIcon, EyeIcon, GlobeIcon, LayoutIcon, PencilIcon } from 'lucide-react';
+import {
+    ArrowLeftIcon,
+    EyeIcon,
+    GlobeIcon,
+    LayoutIcon,
+    PencilIcon,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { slugify } from '@/lib/slug';
 import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -20,8 +24,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
+import { useAdminLocale } from '@/hooks/use-admin-locale';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
+import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
 
@@ -63,7 +69,10 @@ type Props = {
 };
 
 export default function Edit({ page, modules, pages }: Props) {
-    const { locales, frontendUrl } = usePage().props as { locales: SharedLocale[]; frontendUrl: string };
+    const { locales, frontendUrl } = usePage().props as {
+        locales: SharedLocale[];
+        frontendUrl: string;
+    };
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
     const [activeLocale, setActiveLocale] = useAdminLocale(defaultLocale);
 
@@ -86,9 +95,9 @@ export default function Edit({ page, modules, pages }: Props) {
     const [excerptValues, setExcerptValues] = useState<Record<string, string>>(
         page.excerpt ?? { [defaultLocale]: '' },
     );
-    const [slugTranslations, setSlugTranslations] = useState<Record<string, string>>(
-        page.slug_translations ?? {},
-    );
+    const [slugTranslations, setSlugTranslations] = useState<
+        Record<string, string>
+    >(page.slug_translations ?? {});
     const [parentId, setParentId] = useState<string>(
         page.parent_id ? String(page.parent_id) : 'none',
     );
@@ -100,7 +109,8 @@ export default function Edit({ page, modules, pages }: Props) {
     // Non-default locales that can have translated slugs
     const translatableLocales = locales.filter((l) => !l.is_default);
 
-    const displayTitle = titleValues[defaultLocale] ?? Object.values(titleValues)[0] ?? '';
+    const displayTitle =
+        titleValues[defaultLocale] ?? Object.values(titleValues)[0] ?? '';
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Pages', href: '/admin/cms/pages' },
@@ -115,7 +125,9 @@ export default function Edit({ page, modules, pages }: Props) {
                     <PageHeader
                         title={displayTitle}
                         description={
-                            page.is_published ? __('status.published_page', '{__('action.publish', 'Publish')}ed page') : __('status.draft', 'Draft')
+                            page.is_published
+                                ? __('status.published_page', 'Published page')
+                                : __('status.draft', 'Draft')
                         }
                     >
                         <PageHeaderActions>
@@ -130,16 +142,27 @@ export default function Edit({ page, modules, pages }: Props) {
                                 </a>
                             </Button>
                             <Button asChild variant="outline">
-                                <Link href="/admin/cms/pages" prefetch cacheFor={30}>
+                                <Link
+                                    href="/admin/cms/pages"
+                                    prefetch
+                                    cacheFor={30}
+                                >
                                     <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                     {__('action.back', 'Back')}
                                 </Link>
                             </Button>
                             {pageType === 'blocks' && (
                                 <Button asChild variant="outline">
-                                    <Link href={`/admin/cms/pages/${page.id}/builder`} prefetch cacheFor={30}>
+                                    <Link
+                                        href={`/admin/cms/pages/${page.id}/builder`}
+                                        prefetch
+                                        cacheFor={30}
+                                    >
                                         <PencilIcon className="mr-2 h-4 w-4" />
-                                        {__('action.open_builder', 'Open Builder')}
+                                        {__(
+                                            'action.open_builder',
+                                            'Open Builder',
+                                        )}
                                     </Link>
                                 </Button>
                             )}
@@ -187,7 +210,9 @@ export default function Edit({ page, modules, pages }: Props) {
                                 page.is_published ? 'default' : 'secondary'
                             }
                         >
-                            {page.is_published ? '{__('action.publish', 'Publish')}ed' : 'Draft'}
+                            {page.is_published
+                                ? __('status.published', 'Published')
+                                : __('status.draft', 'Draft')}
                         </Badge>
                         <Badge variant="outline">
                             <LayoutIcon className="mr-1 h-3 w-3" />
@@ -246,337 +271,604 @@ export default function Edit({ page, modules, pages }: Props) {
                                         key={`slug_translations-${locale.code}`}
                                         type="hidden"
                                         name={`slug_translations[${locale.code}]`}
-                                        value={slugTranslations[locale.code] ?? ''}
+                                        value={
+                                            slugTranslations[locale.code] ?? ''
+                                        }
                                     />
                                 ))}
 
-                                <Tabs defaultValue="general" className="space-y-6">
+                                <Tabs
+                                    defaultValue="general"
+                                    className="space-y-6"
+                                >
                                     <TabsList>
-                                        <TabsTrigger value="general">{__('tab.general', 'General')}</TabsTrigger>
-                                        <TabsTrigger value="seo">{__('tab.seo', 'SEO')}</TabsTrigger>
+                                        <TabsTrigger value="general">
+                                            {__('tab.general', 'General')}
+                                        </TabsTrigger>
+                                        <TabsTrigger value="seo">
+                                            {__('tab.seo', 'SEO')}
+                                        </TabsTrigger>
                                     </TabsList>
 
-                                    <TabsContent value="general" className="space-y-6">
+                                    <TabsContent
+                                        value="general"
+                                        className="space-y-6"
+                                    >
                                         {pages.length > 0 && (
                                             <div className="grid gap-2">
-                                                <Label>{__('label.parent_page', 'Parent page')}</Label>
-                                                <Select value={parentId} onValueChange={setParentId}>
+                                                <Label>
+                                                    {__(
+                                                        'label.parent_page',
+                                                        'Parent page',
+                                                    )}
+                                                </Label>
+                                                <Select
+                                                    value={parentId}
+                                                    onValueChange={setParentId}
+                                                >
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder={__('placeholder.no_parent', 'No parent (top-level)')} />
+                                                        <SelectValue
+                                                            placeholder={__(
+                                                                'placeholder.no_parent',
+                                                                'No parent (top-level)',
+                                                            )}
+                                                        />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="none">{__('misc.no_parent', '— No parent (top-level) —')}</SelectItem>
+                                                        <SelectItem value="none">
+                                                            {__(
+                                                                'misc.no_parent',
+                                                                '— No parent (top-level) —',
+                                                            )}
+                                                        </SelectItem>
                                                         {pages.map((p) => (
-                                                            <SelectItem key={p.id} value={String(p.id)}>
-                                                                /{typeof p.title === 'string' ? p.title : Object.values(p.title)[0]}
+                                                            <SelectItem
+                                                                key={p.id}
+                                                                value={String(
+                                                                    p.id,
+                                                                )}
+                                                            >
+                                                                /
+                                                                {typeof p.title ===
+                                                                'string'
+                                                                    ? p.title
+                                                                    : Object.values(
+                                                                          p.title,
+                                                                      )[0]}
                                                             </SelectItem>
                                                         ))}
                                                     </SelectContent>
                                                 </Select>
-                                                <InputError message={(errors as any).parent_id} />
+                                                <InputError
+                                                    message={
+                                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                        (errors as any)
+                                                            .parent_id
+                                                    }
+                                                />
                                             </div>
                                         )}
-                                <div className="grid gap-2">
-                                    <div className="flex items-center justify-between">
-                                        <Label>{__('label.title', 'Title')}</Label>
-                                        <LocaleTabSwitcher
-                                            locales={locales}
-                                            activeLocale={activeLocale}
-                                            onLocaleChange={setActiveLocale}
-                                        />
-                                    </div>
-                                    <Input
-                                        required
-                                        value={titleValues[activeLocale] ?? ''}
-                                        onChange={(e) => {
-                                            const value = e.target.value;
-                                            setTitleValues((prev) => ({
-                                                ...prev,
-                                                [activeLocale]: value,
-                                            }));
-                                            if (!isSlugManual && activeLocale === defaultLocale) {
-                                                setSlug(slugify(value));
-                                            }
-                                        }}
-                                    />
-                                    <InputError message={errors.title} />
-                                </div>
-
-                                <div className="grid gap-2">
-                                    <Label htmlFor="slug">{__('label.slug_default', 'Slug (default)')}</Label>
-                                    <Input
-                                        id="slug"
-                                        name="slug"
-                                        required
-                                        value={slug}
-                                        readOnly={!isSlugManual}
-                                        onChange={(e) => setSlug(slugify(e.target.value))}
-                                    />
-                                    <InputError message={errors.slug} />
-                                    <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                                        <input
-                                            type="checkbox"
-                                            checked={isSlugManual}
-                                            onChange={(e) => {
-                                                const manual = e.target.checked;
-                                                setIsSlugManual(manual);
-                                                if (!manual) {
-                                                    setSlug(slugify(titleValues[defaultLocale] ?? ''));
-                                                }
-                                            }}
-                                            className="h-4 w-4 rounded border-input"
-                                        />
-                                        {__('misc.set_slug_manually', 'Set slug manually')}
-                                    </label>
-                                </div>
-
-                                {translatableLocales.length > 0 && (
-                                    <div className="grid gap-3 rounded-lg border p-4">
-                                        <div>
-                                            <Label className="text-sm font-medium">{__('label.slug_translations', 'Slug Translations')}</Label>
-                                            <p className="mt-0.5 text-xs text-muted-foreground">
-                                                {__('misc.slug_translations_desc', 'Define locale-specific slugs. Leave blank to use the default slug.')}
-                                            </p>
-                                        </div>
-                                        {translatableLocales.map((locale) => (
-                                            <div key={locale.code} className="grid gap-1">
-                                                <Label htmlFor={`slug_translation_${locale.code}`} className="text-xs text-muted-foreground">
-                                                    {locale.name} ({locale.code})
-                                                </Label>
-                                                <Input
-                                                    id={`slug_translation_${locale.code}`}
-                                                    placeholder={page.slug}
-                                                    value={slugTranslations[locale.code] ?? ''}
-                                                    onChange={(e) => {
-                                                        const val = e.target.value
-                                                            .toLowerCase()
-                                                            .replace(/[^a-z0-9-]/g, '-')
-                                                            .replace(/-+/g, '-')
-                                                            .replace(/^-|-$/g, '');
-                                                        setSlugTranslations((prev) => ({
-                                                            ...prev,
-                                                            [locale.code]: val,
-                                                        }));
-                                                    }}
-                                                />
-                                                <InputError message={(errors as Record<string, string>)[`slug_translations.${locale.code}`]} />
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-
-                                <div className="grid gap-2">
-                                    <div className="flex items-center justify-between">
-                                        <Label>{__('label.excerpt', 'Excerpt')}</Label>
-                                        <LocaleTabSwitcher
-                                            locales={locales}
-                                            activeLocale={activeLocale}
-                                            onLocaleChange={setActiveLocale}
-                                        />
-                                    </div>
-                                    <Textarea
-                                        value={excerptValues[activeLocale] ?? ''}
-                                        onChange={(e) =>
-                                            setExcerptValues((prev) => ({
-                                                ...prev,
-                                                [activeLocale]: e.target.value,
-                                            }))
-                                        }
-                                        placeholder="Short description..."
-                                    />
-                                    <InputError message={errors.excerpt} />
-                                </div>
-
-                                <div className="grid gap-2">
-                                    <Label>{__('label.layout', 'Layout')}</Label>
-                                    <Select
-                                        value={layout}
-                                        onValueChange={setLayout}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder={__('placeholder.select_layout', 'Select layout')} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="default">
-                                                {__('layout.standard', 'Standard')}
-                                            </SelectItem>
-                                            <SelectItem value="full_width">
-                                                {__('layout.full_width', 'Full width')}
-                                            </SelectItem>
-                                            <SelectItem value="sidebar">
-                                                {__('layout.sidebar', 'Sidebar')}
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <InputError message={errors.layout} />
-                                </div>
-
-                                <div className="grid gap-2">
-                                    <Label>{__('label.page_type', 'Page type')}</Label>
-                                    <Select
-                                        value={pageType}
-                                        onValueChange={(value) => {
-                                            setPageType(value);
-                                            if (value !== 'module') {
-                                                setModuleName(null);
-                                            }
-                                        }}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder={__('placeholder.select_page_type', 'Select page type')} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="blocks">
-                                                {__('type.blocks', 'Blocks')}
-                                            </SelectItem>
-                                            <SelectItem value="module">
-                                                {__('type.module', 'Module')}
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <InputError message={errors.page_type} />
-                                </div>
-
-                                {pageType === 'module' && (
-                                    <div className="grid gap-2">
-                                        <Label>{__('label.module', 'Module')}</Label>
-                                        <Select
-                                            value={moduleName ?? ''}
-                                            onValueChange={(value) =>
-                                                setModuleName(
-                                                    value === '' ? null : value,
-                                                )
-                                            }
-                                        >
-                                            <SelectTrigger>
-                                                <SelectValue placeholder={__('placeholder.select_module', 'Select module')} />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {moduleOptions.map(
-                                                    ([key, mod]) => (
-                                                        <SelectItem
-                                                            key={key}
-                                                            value={key}
-                                                        >
-                                                            {mod.label}
-                                                        </SelectItem>
-                                                    ),
-                                                )}
-                                            </SelectContent>
-                                        </Select>
-                                        <InputError
-                                            message={errors.module_name}
-                                        />
-                                    </div>
-                                )}
-
-                                {pageType === 'module' &&
-                                    moduleName === 'content' && (
                                         <div className="grid gap-2">
-                                            <Label htmlFor="content_id">
-                                                {__('label.content_entry_id', 'Content entry ID')}
-                                            </Label>
+                                            <div className="flex items-center justify-between">
+                                                <Label>
+                                                    {__('label.title', 'Title')}
+                                                </Label>
+                                                <LocaleTabSwitcher
+                                                    locales={locales}
+                                                    activeLocale={activeLocale}
+                                                    onLocaleChange={
+                                                        setActiveLocale
+                                                    }
+                                                />
+                                            </div>
                                             <Input
-                                                id="content_id"
-                                                name="module_config[content_id]"
-                                                type="number"
-                                                defaultValue={
-                                                    (page.module_config
-                                                        ?.content_id as any) ??
+                                                required
+                                                value={
+                                                    titleValues[activeLocale] ??
                                                     ''
                                                 }
+                                                onChange={(e) => {
+                                                    const value =
+                                                        e.target.value;
+                                                    setTitleValues((prev) => ({
+                                                        ...prev,
+                                                        [activeLocale]: value,
+                                                    }));
+                                                    if (
+                                                        !isSlugManual &&
+                                                        activeLocale ===
+                                                            defaultLocale
+                                                    ) {
+                                                        setSlug(slugify(value));
+                                                    }
+                                                }}
                                             />
                                             <InputError
-                                                message={
-                                                    (errors as any)[
-                                                        'module_config.content_id'
-                                                    ]
-                                                }
+                                                message={errors.title}
                                             />
                                         </div>
-                                    )}
 
-                                {pageType === 'module' &&
-                                    moduleName === 'faq' && (
                                         <div className="grid gap-2">
-                                            <Label htmlFor="category">
-                                                {__('label.faq_category_optional', 'FAQ category (optional)')}
+                                            <Label htmlFor="slug">
+                                                {__(
+                                                    'label.slug_default',
+                                                    'Slug (default)',
+                                                )}
                                             </Label>
                                             <Input
-                                                id="category"
-                                                name="module_config[category]"
-                                                defaultValue={
-                                                    (page.module_config
-                                                        ?.category as any) ?? ''
+                                                id="slug"
+                                                name="slug"
+                                                required
+                                                value={slug}
+                                                readOnly={!isSlugManual}
+                                                onChange={(e) =>
+                                                    setSlug(
+                                                        slugify(e.target.value),
+                                                    )
                                                 }
+                                            />
+                                            <InputError message={errors.slug} />
+                                            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isSlugManual}
+                                                    onChange={(e) => {
+                                                        const manual =
+                                                            e.target.checked;
+                                                        setIsSlugManual(manual);
+                                                        if (!manual) {
+                                                            setSlug(
+                                                                slugify(
+                                                                    titleValues[
+                                                                        defaultLocale
+                                                                    ] ?? '',
+                                                                ),
+                                                            );
+                                                        }
+                                                    }}
+                                                    className="h-4 w-4 rounded border-input"
+                                                />
+                                                {__(
+                                                    'misc.set_slug_manually',
+                                                    'Set slug manually',
+                                                )}
+                                            </label>
+                                        </div>
+
+                                        {translatableLocales.length > 0 && (
+                                            <div className="grid gap-3 rounded-lg border p-4">
+                                                <div>
+                                                    <Label className="text-sm font-medium">
+                                                        {__(
+                                                            'label.slug_translations',
+                                                            'Slug Translations',
+                                                        )}
+                                                    </Label>
+                                                    <p className="mt-0.5 text-xs text-muted-foreground">
+                                                        {__(
+                                                            'misc.slug_translations_desc',
+                                                            'Define locale-specific slugs. Leave blank to use the default slug.',
+                                                        )}
+                                                    </p>
+                                                </div>
+                                                {translatableLocales.map(
+                                                    (locale) => (
+                                                        <div
+                                                            key={locale.code}
+                                                            className="grid gap-1"
+                                                        >
+                                                            <Label
+                                                                htmlFor={`slug_translation_${locale.code}`}
+                                                                className="text-xs text-muted-foreground"
+                                                            >
+                                                                {locale.name} (
+                                                                {locale.code})
+                                                            </Label>
+                                                            <Input
+                                                                id={`slug_translation_${locale.code}`}
+                                                                placeholder={
+                                                                    page.slug
+                                                                }
+                                                                value={
+                                                                    slugTranslations[
+                                                                        locale
+                                                                            .code
+                                                                    ] ?? ''
+                                                                }
+                                                                onChange={(
+                                                                    e,
+                                                                ) => {
+                                                                    const val =
+                                                                        e.target.value
+                                                                            .toLowerCase()
+                                                                            .replace(
+                                                                                /[^a-z0-9-]/g,
+                                                                                '-',
+                                                                            )
+                                                                            .replace(
+                                                                                /-+/g,
+                                                                                '-',
+                                                                            )
+                                                                            .replace(
+                                                                                /^-|-$/g,
+                                                                                '',
+                                                                            );
+                                                                    setSlugTranslations(
+                                                                        (
+                                                                            prev,
+                                                                        ) => ({
+                                                                            ...prev,
+                                                                            [locale.code]:
+                                                                                val,
+                                                                        }),
+                                                                    );
+                                                                }}
+                                                            />
+                                                            <InputError
+                                                                message={
+                                                                    (
+                                                                        errors as Record<
+                                                                            string,
+                                                                            string
+                                                                        >
+                                                                    )[
+                                                                        `slug_translations.${locale.code}`
+                                                                    ]
+                                                                }
+                                                            />
+                                                        </div>
+                                                    ),
+                                                )}
+                                            </div>
+                                        )}
+
+                                        <div className="grid gap-2">
+                                            <div className="flex items-center justify-between">
+                                                <Label>
+                                                    {__(
+                                                        'label.excerpt',
+                                                        'Excerpt',
+                                                    )}
+                                                </Label>
+                                                <LocaleTabSwitcher
+                                                    locales={locales}
+                                                    activeLocale={activeLocale}
+                                                    onLocaleChange={
+                                                        setActiveLocale
+                                                    }
+                                                />
+                                            </div>
+                                            <Textarea
+                                                value={
+                                                    excerptValues[
+                                                        activeLocale
+                                                    ] ?? ''
+                                                }
+                                                onChange={(e) =>
+                                                    setExcerptValues(
+                                                        (prev) => ({
+                                                            ...prev,
+                                                            [activeLocale]:
+                                                                e.target.value,
+                                                        }),
+                                                    )
+                                                }
+                                                placeholder="Short description..."
                                             />
                                             <InputError
-                                                message={
-                                                    (errors as any)[
-                                                        'module_config.category'
-                                                    ]
-                                                }
+                                                message={errors.excerpt}
                                             />
                                         </div>
-                                    )}
+
+                                        <div className="grid gap-2">
+                                            <Label>
+                                                {__('label.layout', 'Layout')}
+                                            </Label>
+                                            <Select
+                                                value={layout}
+                                                onValueChange={setLayout}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue
+                                                        placeholder={__(
+                                                            'placeholder.select_layout',
+                                                            'Select layout',
+                                                        )}
+                                                    />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="default">
+                                                        {__(
+                                                            'layout.standard',
+                                                            'Standard',
+                                                        )}
+                                                    </SelectItem>
+                                                    <SelectItem value="full_width">
+                                                        {__(
+                                                            'layout.full_width',
+                                                            'Full width',
+                                                        )}
+                                                    </SelectItem>
+                                                    <SelectItem value="sidebar">
+                                                        {__(
+                                                            'layout.sidebar',
+                                                            'Sidebar',
+                                                        )}
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <InputError
+                                                message={errors.layout}
+                                            />
+                                        </div>
+
+                                        <div className="grid gap-2">
+                                            <Label>
+                                                {__(
+                                                    'label.page_type',
+                                                    'Page type',
+                                                )}
+                                            </Label>
+                                            <Select
+                                                value={pageType}
+                                                onValueChange={(value) => {
+                                                    setPageType(value);
+                                                    if (value !== 'module') {
+                                                        setModuleName(null);
+                                                    }
+                                                }}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue
+                                                        placeholder={__(
+                                                            'placeholder.select_page_type',
+                                                            'Select page type',
+                                                        )}
+                                                    />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="blocks">
+                                                        {__(
+                                                            'type.blocks',
+                                                            'Blocks',
+                                                        )}
+                                                    </SelectItem>
+                                                    <SelectItem value="module">
+                                                        {__(
+                                                            'type.module',
+                                                            'Module',
+                                                        )}
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <InputError
+                                                message={errors.page_type}
+                                            />
+                                        </div>
+
+                                        {pageType === 'module' && (
+                                            <div className="grid gap-2">
+                                                <Label>
+                                                    {__(
+                                                        'label.module',
+                                                        'Module',
+                                                    )}
+                                                </Label>
+                                                <Select
+                                                    value={moduleName ?? ''}
+                                                    onValueChange={(value) =>
+                                                        setModuleName(
+                                                            value === ''
+                                                                ? null
+                                                                : value,
+                                                        )
+                                                    }
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue
+                                                            placeholder={__(
+                                                                'placeholder.select_module',
+                                                                'Select module',
+                                                            )}
+                                                        />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {moduleOptions.map(
+                                                            ([key, mod]) => (
+                                                                <SelectItem
+                                                                    key={key}
+                                                                    value={key}
+                                                                >
+                                                                    {mod.label}
+                                                                </SelectItem>
+                                                            ),
+                                                        )}
+                                                    </SelectContent>
+                                                </Select>
+                                                <InputError
+                                                    message={errors.module_name}
+                                                />
+                                            </div>
+                                        )}
+
+                                        {pageType === 'module' &&
+                                            moduleName === 'content' && (
+                                                <div className="grid gap-2">
+                                                    <Label htmlFor="content_id">
+                                                        {__(
+                                                            'label.content_entry_id',
+                                                            'Content entry ID',
+                                                        )}
+                                                    </Label>
+                                                    <Input
+                                                        id="content_id"
+                                                        name="module_config[content_id]"
+                                                        type="number"
+                                                        defaultValue={
+                                                            /* eslint-disable @typescript-eslint/no-explicit-any */
+                                                            (page.module_config
+                                                                ?.content_id as any) ??
+                                                            /* eslint-enable @typescript-eslint/no-explicit-any */
+                                                            ''
+                                                        }
+                                                    />
+                                                    <InputError
+                                                        message={
+                                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                            (errors as any)[
+                                                                'module_config.content_id'
+                                                            ]
+                                                        }
+                                                    />
+                                                </div>
+                                            )}
+
+                                        {pageType === 'module' &&
+                                            moduleName === 'faq' && (
+                                                <div className="grid gap-2">
+                                                    <Label htmlFor="category">
+                                                        {__(
+                                                            'label.faq_category_optional',
+                                                            'FAQ category (optional)',
+                                                        )}
+                                                    </Label>
+                                                    <Input
+                                                        id="category"
+                                                        name="module_config[category]"
+                                                        defaultValue={
+                                                            /* eslint-disable @typescript-eslint/no-explicit-any */
+                                                            (page.module_config
+                                                                ?.category as any) ??
+                                                            /* eslint-enable @typescript-eslint/no-explicit-any */
+                                                            ''
+                                                        }
+                                                    />
+                                                    <InputError
+                                                        message={
+                                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                            (errors as any)[
+                                                                'module_config.category'
+                                                            ]
+                                                        }
+                                                    />
+                                                </div>
+                                            )}
                                     </TabsContent>
 
-                                    <TabsContent value="seo" className="space-y-6">
+                                    <TabsContent
+                                        value="seo"
+                                        className="space-y-6"
+                                    >
                                         <div className="grid gap-2">
-                                            <Label htmlFor="seo_title">{__('label.seo_title', 'SEO title')}</Label>
+                                            <Label htmlFor="seo_title">
+                                                {__(
+                                                    'label.seo_title',
+                                                    'SEO title',
+                                                )}
+                                            </Label>
                                             <Input
                                                 id="seo_title"
                                                 name="seo_title"
-                                                defaultValue={page.seo_title ?? ''}
+                                                defaultValue={
+                                                    page.seo_title ?? ''
+                                                }
                                             />
-                                            <InputError message={errors.seo_title} />
+                                            <InputError
+                                                message={errors.seo_title}
+                                            />
                                         </div>
 
                                         <div className="grid gap-2">
-                                            <Label htmlFor="seo_description">{__('label.seo_description', 'SEO description')}</Label>
+                                            <Label htmlFor="seo_description">
+                                                {__(
+                                                    'label.seo_description',
+                                                    'SEO description',
+                                                )}
+                                            </Label>
                                             <Textarea
                                                 id="seo_description"
                                                 name="seo_description"
-                                                defaultValue={page.seo_description ?? ''}
+                                                defaultValue={
+                                                    page.seo_description ?? ''
+                                                }
                                             />
-                                            <InputError message={errors.seo_description} />
+                                            <InputError
+                                                message={errors.seo_description}
+                                            />
                                         </div>
 
                                         <div className="grid gap-2">
-                                            <Label htmlFor="seo_canonical">{__('label.canonical_url', 'Canonical URL')}</Label>
+                                            <Label htmlFor="seo_canonical">
+                                                {__(
+                                                    'label.canonical_url',
+                                                    'Canonical URL',
+                                                )}
+                                            </Label>
                                             <Input
                                                 id="seo_canonical"
                                                 name="seo_canonical"
-                                                defaultValue={page.seo_canonical ?? ''}
+                                                defaultValue={
+                                                    page.seo_canonical ?? ''
+                                                }
                                             />
-                                            <InputError message={errors.seo_canonical} />
+                                            <InputError
+                                                message={errors.seo_canonical}
+                                            />
                                         </div>
 
                                         <div className="grid gap-2">
-                                            <Label htmlFor="meta_robots">{__('label.meta_robots', 'Meta Robots')}</Label>
+                                            <Label htmlFor="meta_robots">
+                                                {__(
+                                                    'label.meta_robots',
+                                                    'Meta Robots',
+                                                )}
+                                            </Label>
                                             <select
                                                 id="meta_robots"
                                                 name="meta_robots"
-                                                defaultValue={page.meta_robots ?? 'index, follow'}
+                                                defaultValue={
+                                                    page.meta_robots ??
+                                                    'index, follow'
+                                                }
                                                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                                             >
-                                                <option value="index, follow">Index &amp; Follow (Recommended)</option>
-                                                <option value="noindex, follow">No Index, Follow</option>
-                                                <option value="index, nofollow">Index, No Follow</option>
-                                                <option value="noindex, nofollow">No Index, No Follow</option>
+                                                <option value="index, follow">
+                                                    Index &amp; Follow
+                                                    (Recommended)
+                                                </option>
+                                                <option value="noindex, follow">
+                                                    No Index, Follow
+                                                </option>
+                                                <option value="index, nofollow">
+                                                    Index, No Follow
+                                                </option>
+                                                <option value="noindex, nofollow">
+                                                    No Index, No Follow
+                                                </option>
                                             </select>
-                                            <InputError message={errors.meta_robots} />
+                                            <InputError
+                                                message={errors.meta_robots}
+                                            />
                                         </div>
 
                                         <div className="grid gap-2">
-                                            <Label htmlFor="og_image">{__('label.og_image_url', 'OG Image URL')}</Label>
+                                            <Label htmlFor="og_image">
+                                                {__(
+                                                    'label.og_image_url',
+                                                    'OG Image URL',
+                                                )}
+                                            </Label>
                                             <Input
                                                 id="og_image"
                                                 name="og_image"
-                                                defaultValue={page.og_image ?? ''}
+                                                defaultValue={
+                                                    page.og_image ?? ''
+                                                }
                                                 placeholder="https://example.com/og-image.jpg"
                                             />
-                                            <InputError message={errors.og_image} />
+                                            <InputError
+                                                message={errors.og_image}
+                                            />
                                         </div>
 
                                         <div className="flex items-center gap-3">
@@ -585,16 +877,33 @@ export default function Edit({ page, modules, pages }: Props) {
                                                 id="sitemap_exclude"
                                                 name="sitemap_exclude"
                                                 value="1"
-                                                defaultChecked={page.sitemap_exclude ?? false}
+                                                defaultChecked={
+                                                    page.sitemap_exclude ??
+                                                    false
+                                                }
                                                 className="h-4 w-4 rounded border-input"
                                             />
-                                            <Label htmlFor="sitemap_exclude">{__('label.exclude_sitemap', 'Exclude from XML sitemap')}</Label>
+                                            <Label htmlFor="sitemap_exclude">
+                                                {__(
+                                                    'label.exclude_sitemap',
+                                                    'Exclude from XML sitemap',
+                                                )}
+                                            </Label>
                                         </div>
                                     </TabsContent>
 
                                     <div className="flex items-center gap-4 pt-2">
-                                        <Button type="submit" disabled={processing}>
-                                            {processing ? __('misc.saving', 'Saving...') : __('action.save_changes', 'Save Changes')}
+                                        <Button
+                                            variant="outline"
+                                            type="submit"
+                                            disabled={processing}
+                                        >
+                                            {processing
+                                                ? __('misc.saving', 'Saving...')
+                                                : __(
+                                                      'action.save_changes',
+                                                      'Save Changes',
+                                                  )}
                                         </Button>
                                     </div>
                                 </Tabs>

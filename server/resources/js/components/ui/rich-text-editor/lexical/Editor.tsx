@@ -1,10 +1,10 @@
 import { registerCodeHighlighting } from '@lexical/code';
+import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
 import type { InitialConfigType } from '@lexical/react/LexicalComposer';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
-import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
@@ -14,14 +14,14 @@ import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { useEffect, useRef, type JSX } from 'react';
 import { nodes } from './nodes';
 import AutoLinkPlugin from './plugins/AutoLinkPlugin';
+import CopyCodePlugin from './plugins/CopyCodePlugin';
+import DraggableBlockPlugin from './plugins/DraggableBlockPlugin';
 import FloatingLinkEditorPlugin from './plugins/FloatingLinkEditorPlugin';
 import FloatingTextFormatPlugin from './plugins/FloatingTextFormatPlugin';
-import CopyCodePlugin from './plugins/CopyCodePlugin';
-import TableActionMenuPlugin from './plugins/TableActionMenuPlugin';
-import SlashCommandPlugin from './plugins/SlashCommandPlugin';
-import DraggableBlockPlugin from './plugins/DraggableBlockPlugin';
 import HtmlPlugin from './plugins/HtmlPlugin';
 import MarkdownPlugin from './plugins/MarkdownPlugin';
+import SlashCommandPlugin from './plugins/SlashCommandPlugin';
+import TableActionMenuPlugin from './plugins/TableActionMenuPlugin';
 import ToolbarPlugin from './plugins/ToolbarPlugin';
 import WordCountPlugin from './plugins/WordCountPlugin';
 import { theme } from './theme';
@@ -70,6 +70,7 @@ export default function Editor({ value, onChange, placeholder = 'Start writing..
 
     return (
         <div ref={containerRef} className={`editor-container ${className ?? ''}`.trim()}>
+            {/* eslint-disable-next-line react-hooks/refs */}
             <LexicalComposer initialConfig={config.current}>
                 {editable && <ToolbarPlugin />}
                 <div className="editor-input group" style={{ position: 'relative', ...contentStyle }}>
@@ -78,7 +79,9 @@ export default function Editor({ value, onChange, placeholder = 'Start writing..
                         placeholder={<div className="editor-placeholder">{placeholder}</div>}
                         ErrorBoundary={LexicalErrorBoundary}
                     />
+                    {/* eslint-disable-next-line react-hooks/refs */}
                     {editable && <FloatingTextFormatPlugin anchorElem={containerRef.current ?? undefined} />}
+                    {/* eslint-disable-next-line react-hooks/refs */}
                     {editable && <FloatingLinkEditorPlugin anchorElem={containerRef.current ?? undefined} />}
                 </div>
                 <HistoryPlugin />
@@ -92,6 +95,7 @@ export default function Editor({ value, onChange, placeholder = 'Start writing..
                 <HorizontalRulePlugin />
                 {editable && <MarkdownPlugin />}
                 {editable && <SlashCommandPlugin />}
+                {/* eslint-disable-next-line react-hooks/refs */}
                 {editable && <DraggableBlockPlugin anchorElem={containerRef.current ?? undefined} />}
                 <HtmlPlugin value={value} onChange={onChange} />
                 <EditablePlugin editable={editable} />

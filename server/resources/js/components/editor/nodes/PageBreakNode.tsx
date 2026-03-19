@@ -1,9 +1,19 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 import { mergeRegister } from '@lexical/utils';
-import type { DOMConversionMap, DOMExportOutput, EditorConfig, SerializedLexicalNode } from 'lexical';
+import type {
+    DOMConversionMap,
+    EditorConfig,
+    SerializedLexicalNode,
+} from 'lexical';
 import { $applyNodeReplacement, DecoratorNode } from 'lexical';
-import { $getNodeByKey, CLICK_COMMAND, COMMAND_PRIORITY_LOW, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND } from 'lexical';
+import {
+    $getNodeByKey,
+    CLICK_COMMAND,
+    COMMAND_PRIORITY_LOW,
+    KEY_BACKSPACE_COMMAND,
+    KEY_DELETE_COMMAND,
+} from 'lexical';
 import { type JSX } from 'react';
 import { useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -11,7 +21,8 @@ import { cn } from '@/lib/utils';
 
 function PageBreakComponent({ nodeKey }: { nodeKey: string }) {
     const [editor] = useLexicalComposerContext();
-    const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey);
+    const [isSelected, setSelected, clearSelection] =
+        useLexicalNodeSelection(nodeKey);
 
     const onDelete = useCallback(
         (event: KeyboardEvent) => {
@@ -43,8 +54,16 @@ function PageBreakComponent({ nodeKey }: { nodeKey: string }) {
                 },
                 COMMAND_PRIORITY_LOW,
             ),
-            editor.registerCommand(KEY_DELETE_COMMAND, onDelete, COMMAND_PRIORITY_LOW),
-            editor.registerCommand(KEY_BACKSPACE_COMMAND, onDelete, COMMAND_PRIORITY_LOW),
+            editor.registerCommand(
+                KEY_DELETE_COMMAND,
+                onDelete,
+                COMMAND_PRIORITY_LOW,
+            ),
+            editor.registerCommand(
+                KEY_BACKSPACE_COMMAND,
+                onDelete,
+                COMMAND_PRIORITY_LOW,
+            ),
         );
     }, [clearSelection, editor, isSelected, nodeKey, onDelete, setSelected]);
 
@@ -52,7 +71,8 @@ function PageBreakComponent({ nodeKey }: { nodeKey: string }) {
         <div
             className={cn(
                 'editor-page-break my-4 flex items-center gap-3',
-                isSelected && 'rounded outline outline-2 outline-primary outline-offset-2',
+                isSelected &&
+                    'rounded outline outline-2 outline-offset-2 outline-primary',
             )}
         >
             <div className="flex-1 border-t-2 border-dashed border-border" />
@@ -95,7 +115,10 @@ export class PageBreakNode extends DecoratorNode<JSX.Element> {
         return {
             figure: (node: HTMLElement) =>
                 node.className === 'editor-page-break'
-                    ? { conversion: () => ({ node: $createPageBreakNode() }), priority: 1 }
+                    ? {
+                          conversion: () => ({ node: $createPageBreakNode() }),
+                          priority: 1,
+                      }
                     : null,
         };
     }

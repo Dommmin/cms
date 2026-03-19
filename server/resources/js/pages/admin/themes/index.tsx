@@ -7,7 +7,6 @@ import {
     CopyIcon,
     CheckIcon,
 } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -15,6 +14,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -86,7 +86,9 @@ export default function ThemesIndex({ themes, filters }: Props) {
                         {__('status.active', 'Active')}
                     </Badge>
                 ) : (
-                    <Badge variant="secondary">{__('status.inactive', 'Inactive')}</Badge>
+                    <Badge variant="secondary">
+                        {__('status.inactive', 'Inactive')}
+                    </Badge>
                 ),
         },
         {
@@ -117,7 +119,11 @@ export default function ThemesIndex({ themes, filters }: Props) {
                         </Button>
                     )}
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/themes/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/themes/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>
@@ -162,7 +168,10 @@ export default function ThemesIndex({ themes, filters }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Themes" />
             <Wrapper>
-                <PageHeader title={__('page.themes', 'Themes')} description={__('page.themes_desc', 'Manage site themes')}>
+                <PageHeader
+                    title={__('page.themes', 'Themes')}
+                    description={__('page.themes_desc', 'Manage site themes')}
+                >
                     <PageHeaderActions>
                         <Button
                             variant="outline"
@@ -183,7 +192,11 @@ export default function ThemesIndex({ themes, filters }: Props) {
                             {__('action.disable', 'Disable Theme')}
                         </Button>
                         <Button asChild variant="outline">
-                            <Link href="/admin/themes/create" prefetch cacheFor={30}>
+                            <Link
+                                href="/admin/themes/create"
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.create', 'Create Theme')}
                             </Link>
@@ -203,7 +216,10 @@ export default function ThemesIndex({ themes, filters }: Props) {
                         next_page_url: themes.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search', 'Search themes...')}
+                    searchPlaceholder={__(
+                        'placeholder.search',
+                        'Search themes...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/themes"
                 />

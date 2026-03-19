@@ -31,7 +31,8 @@ export default function BuilderPage({
 }: BuilderPageProps) {
     const [isSaving, setIsSaving] = useState(false);
     const [isSplitView, setIsSplitView] = useState(false);
-    const [previewDevice, setPreviewDevice] = useState<PreviewDevice>('desktop');
+    const [previewDevice, setPreviewDevice] =
+        useState<PreviewDevice>('desktop');
     const [isAutoSaving, setIsAutoSaving] = useState(false);
     const [localSections, setLocalSections] = useState<Section[]>(sections);
     const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -51,11 +52,21 @@ export default function BuilderPage({
         if (!blockId) return;
 
         const tryScroll = () => {
-            const el = document.querySelector<HTMLElement>(`[data-block-id="${blockId}"]`);
+            const el = document.querySelector<HTMLElement>(
+                `[data-block-id="${blockId}"]`,
+            );
             if (!el) return false;
             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             el.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2');
-            setTimeout(() => el.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2'), 2500);
+            setTimeout(
+                () =>
+                    el.classList.remove(
+                        'ring-2',
+                        'ring-indigo-500',
+                        'ring-offset-2',
+                    ),
+                2500,
+            );
             return true;
         };
 
@@ -68,6 +79,7 @@ export default function BuilderPage({
     }, []);
 
     // Auto-save with debounce when in split view
+
     useEffect(() => {
         if (!isSplitView) return;
 
@@ -158,9 +170,19 @@ export default function BuilderPage({
              * view. The container CSS changes but the component stays mounted,
              * preserving all unsaved state (sections, expanded panels, etc.).
              */}
-            <div className={isSplitView ? 'flex h-[calc(100vh-4rem)] overflow-hidden' : ''}>
+            <div
+                className={
+                    isSplitView
+                        ? 'flex h-[calc(100vh-4rem)] overflow-hidden'
+                        : ''
+                }
+            >
                 {/* Builder panel */}
-                <div className={isSplitView ? 'w-[45%] overflow-y-auto border-r' : ''}>
+                <div
+                    className={
+                        isSplitView ? 'w-[45%] overflow-y-auto border-r' : ''
+                    }
+                >
                     <PageBuilder
                         data={builderData}
                         onSave={handleSave}
@@ -178,7 +200,7 @@ export default function BuilderPage({
                 {isSplitView && (
                     <div className="relative flex w-[55%] flex-col items-center overflow-y-auto bg-muted/30">
                         {isAutoSaving && (
-                            <div className="absolute right-3 top-3 z-10 rounded-md bg-background/80 px-2 py-1 text-xs text-muted-foreground shadow backdrop-blur">
+                            <div className="absolute top-3 right-3 z-10 rounded-md bg-background/80 px-2 py-1 text-xs text-muted-foreground shadow backdrop-blur">
                                 Auto-saving...
                             </div>
                         )}

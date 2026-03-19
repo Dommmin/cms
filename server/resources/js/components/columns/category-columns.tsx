@@ -4,8 +4,8 @@ import { PencilIcon, TrashIcon, Folder } from 'lucide-react';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { resolveLocalizedText } from '@/lib/localized-text';
 import { useTranslation } from '@/hooks/use-translation';
+import { resolveLocalizedText } from '@/lib/localized-text';
 
 export type CategoryRow = {
     id: number;
@@ -30,7 +30,9 @@ export function useCategoryColumns(): ColumnDef<CategoryRow>[] {
             cell: ({ row }) => {
                 const depth = row.original.depth ?? 0;
                 const categoryName = resolveLocalizedText(row.original.name);
-                const categoryDescription = resolveLocalizedText(row.original.description);
+                const categoryDescription = resolveLocalizedText(
+                    row.original.description,
+                );
                 return (
                     <div className="flex items-center gap-3">
                         <div
@@ -76,15 +78,21 @@ export function useCategoryColumns(): ColumnDef<CategoryRow>[] {
             accessorKey: 'products_count',
             header: __('column.products', 'Products'),
             cell: ({ row }) => (
-                <span className="text-sm">{row.original.products_count ?? 0}</span>
+                <span className="text-sm">
+                    {row.original.products_count ?? 0}
+                </span>
             ),
         },
         {
             accessorKey: 'is_active',
             header: __('column.status', 'Status'),
             cell: ({ row }) => (
-                <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
-                    {row.original.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
+                <Badge
+                    variant={row.original.is_active ? 'default' : 'secondary'}
+                >
+                    {row.original.is_active
+                        ? __('status.active', 'Active')
+                        : __('status.inactive', 'Inactive')}
                 </Badge>
             ),
         },
@@ -94,7 +102,11 @@ export function useCategoryColumns(): ColumnDef<CategoryRow>[] {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/ecommerce/categories/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/ecommerce/categories/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>

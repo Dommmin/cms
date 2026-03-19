@@ -5,7 +5,13 @@ import { useState } from 'react';
 import Editor from '@/components/editor/editor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 
@@ -37,9 +43,12 @@ export default function EditorPage(): JSX.Element {
                             <FileText className="h-5 w-5 text-primary" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-semibold">Rich Text Editor</h1>
+                            <h1 className="text-xl font-semibold">
+                                Rich Text Editor
+                            </h1>
                             <p className="text-sm text-muted-foreground">
-                                Full-featured Lexical editor with playground.lexical.dev features
+                                Full-featured Lexical editor with
+                                playground.lexical.dev features
                             </p>
                         </div>
                     </div>
@@ -69,27 +78,60 @@ export default function EditorPage(): JSX.Element {
                 {/* Features Overview */}
                 <Card>
                     <CardHeader className="pb-3">
-                        <CardTitle className="text-sm">Editor Features</CardTitle>
-                        <CardDescription>Available features in this editor</CardDescription>
+                        <CardTitle className="text-sm">
+                            Editor Features
+                        </CardTitle>
+                        <CardDescription>
+                            Available features in this editor
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="flex flex-wrap gap-1.5">
                             {[
-                                'Rich Text', 'Headings H1–H5', 'Bold/Italic/Underline',
-                                'Strikethrough', 'Subscript/Superscript', 'Inline Code',
-                                'Code Blocks', 'Syntax Highlight', 'Bullet Lists',
-                                'Numbered Lists', 'Check Lists', 'Block Quote',
-                                'Tables', 'Images', 'YouTube Embeds',
-                                'Twitter/X Embeds', 'Figma Embeds', 'Horizontal Rule',
-                                'Page Break', 'Multi-column Layout', 'Collapsible Sections',
-                                'Auto-link', 'Link Editor', 'Font Family',
-                                'Font Size', 'Text Color', 'Highlight Color',
-                                'Text Alignment', 'Indent/Outdent', 'Undo/Redo',
-                                'Markdown Shortcuts', 'Slash Commands', 'Drag & Drop Blocks',
-                                'Floating Format Toolbar', 'Export JSON', 'Export HTML',
-                                'Hashtags', 'Keyboard Shortcuts',
+                                'Rich Text',
+                                'Headings H1–H5',
+                                'Bold/Italic/Underline',
+                                'Strikethrough',
+                                'Subscript/Superscript',
+                                'Inline Code',
+                                'Code Blocks',
+                                'Syntax Highlight',
+                                'Bullet Lists',
+                                'Numbered Lists',
+                                'Check Lists',
+                                'Block Quote',
+                                'Tables',
+                                'Images',
+                                'YouTube Embeds',
+                                'Twitter/X Embeds',
+                                'Figma Embeds',
+                                'Horizontal Rule',
+                                'Page Break',
+                                'Multi-column Layout',
+                                'Collapsible Sections',
+                                'Auto-link',
+                                'Link Editor',
+                                'Font Family',
+                                'Font Size',
+                                'Text Color',
+                                'Highlight Color',
+                                'Text Alignment',
+                                'Indent/Outdent',
+                                'Undo/Redo',
+                                'Markdown Shortcuts',
+                                'Slash Commands',
+                                'Drag & Drop Blocks',
+                                'Floating Format Toolbar',
+                                'Export JSON',
+                                'Export HTML',
+                                'Hashtags',
+                                'Keyboard Shortcuts',
                             ].map((feature) => (
-                                <Badge key={feature} variant="secondary" className="text-xs">
+                                <Badge
+                                    key={feature}
+                                    variant="secondary"
+                                    className="text-xs"
+                                >
                                     {feature}
                                 </Badge>
                             ))}

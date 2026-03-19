@@ -8,7 +8,6 @@ import {
     Package,
 } from 'lucide-react';
 import { useState } from 'react';
-import { useTranslation } from '@/hooks/use-translation';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -20,6 +19,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
@@ -59,7 +59,10 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Review Details', href: '#' },
 ];
 
-const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+const statusVariant: Record<
+    string,
+    'default' | 'secondary' | 'destructive' | 'outline'
+> = {
     approved: 'default',
     pending: 'secondary',
     rejected: 'destructive',
@@ -117,7 +120,11 @@ export default function ReviewShow({ review }: Props) {
                 >
                     <PageHeaderActions>
                         <Button variant="outline" asChild>
-                            <Link href="/admin/ecommerce/reviews" prefetch cacheFor={30}>
+                            <Link
+                                href="/admin/ecommerce/reviews"
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>
@@ -128,7 +135,6 @@ export default function ReviewShow({ review }: Props) {
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     {/* Left column — review content */}
                     <div className="space-y-6 lg:col-span-2">
-
                         {/* Product */}
                         <div className="rounded-lg border bg-card">
                             <div className="border-b bg-muted/40 px-6 py-4">
@@ -151,7 +157,9 @@ export default function ReviewShow({ review }: Props) {
                                         )}
                                     </div>
                                     <div>
-                                        <div className="font-medium">{productName}</div>
+                                        <div className="font-medium">
+                                            {productName}
+                                        </div>
                                         <div className="text-sm text-muted-foreground">
                                             /{review.product.slug}
                                         </div>
@@ -173,7 +181,10 @@ export default function ReviewShow({ review }: Props) {
                             <div className="border-b bg-muted/40 px-6 py-4">
                                 <h2 className="flex items-center gap-2 text-sm font-semibold">
                                     <MessageSquare className="h-4 w-4" />
-                                    {__('misc.review_content', 'Review Content')}
+                                    {__(
+                                        'misc.review_content',
+                                        'Review Content',
+                                    )}
                                 </h2>
                             </div>
                             <div className="space-y-4 px-6 py-6">
@@ -185,7 +196,9 @@ export default function ReviewShow({ review }: Props) {
                                 </div>
 
                                 {review.title && (
-                                    <h3 className="text-lg font-semibold">{review.title}</h3>
+                                    <h3 className="text-lg font-semibold">
+                                        {review.title}
+                                    </h3>
                                 )}
 
                                 <p className="whitespace-pre-wrap text-muted-foreground">
@@ -216,7 +229,11 @@ export default function ReviewShow({ review }: Props) {
 
                                 <div className="flex items-center gap-2 border-t pt-4 text-sm text-muted-foreground">
                                     <ThumbsUp className="h-4 w-4" />
-                                    {review.helpful_count} {__('misc.helpful_count', 'people found this helpful')}
+                                    {review.helpful_count}{' '}
+                                    {__(
+                                        'misc.helpful_count',
+                                        'people found this helpful',
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -224,43 +241,72 @@ export default function ReviewShow({ review }: Props) {
 
                     {/* Right column — sidebar */}
                     <div className="space-y-6">
-
                         {/* Moderation */}
                         <div className="rounded-lg border bg-card">
                             <div className="border-b bg-muted/40 px-6 py-4">
-                                <h2 className="text-sm font-semibold">{__('misc.moderation', 'Moderation')}</h2>
+                                <h2 className="text-sm font-semibold">
+                                    {__('misc.moderation', 'Moderation')}
+                                </h2>
                             </div>
                             <div className="space-y-4 px-6 py-4">
                                 <div className="space-y-1.5">
                                     <label className="text-sm font-medium">
-                                        {__('misc.current_status', 'Current status')}
+                                        {__(
+                                            'misc.current_status',
+                                            'Current status',
+                                        )}
                                     </label>
-                                    <Badge variant={statusVariant[review.status] ?? 'outline'}>
+                                    <Badge
+                                        variant={
+                                            statusVariant[review.status] ??
+                                            'outline'
+                                        }
+                                    >
                                         {review.status}
                                     </Badge>
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="text-sm font-medium">
-                                        {__('misc.change_status', 'Change status')}
+                                        {__(
+                                            'misc.change_status',
+                                            'Change status',
+                                        )}
                                     </label>
-                                    <Select value={status} onValueChange={setStatus}>
+                                    <Select
+                                        value={status}
+                                        onValueChange={setStatus}
+                                    >
                                         <SelectTrigger>
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="pending">Pending</SelectItem>
-                                            <SelectItem value="approved">Approved</SelectItem>
-                                            <SelectItem value="rejected">Rejected</SelectItem>
+                                            <SelectItem value="pending">
+                                                Pending
+                                            </SelectItem>
+                                            <SelectItem value="approved">
+                                                Approved
+                                            </SelectItem>
+                                            <SelectItem value="rejected">
+                                                Rejected
+                                            </SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
                                 <Button
+                                    variant="outline"
                                     className="w-full"
                                     onClick={handleStatusUpdate}
-                                    disabled={updating || status === review.status}
+                                    disabled={
+                                        updating || status === review.status
+                                    }
                                 >
                                     <Save className="mr-2 h-4 w-4" />
-                                    {updating ? __('misc.saving', 'Saving...') : __('action.save_status', 'Save Status')}
+                                    {updating
+                                        ? __('misc.saving', 'Saving...')
+                                        : __(
+                                              'action.save_status',
+                                              'Save Status',
+                                          )}
                                 </Button>
                             </div>
                         </div>
@@ -268,7 +314,9 @@ export default function ReviewShow({ review }: Props) {
                         {/* Customer */}
                         <div className="rounded-lg border bg-card">
                             <div className="border-b bg-muted/40 px-6 py-4">
-                                <h2 className="text-sm font-semibold">{__('misc.customer', 'Customer')}</h2>
+                                <h2 className="text-sm font-semibold">
+                                    {__('misc.customer', 'Customer')}
+                                </h2>
                             </div>
                             <div className="px-6 py-4">
                                 {review.customer ? (
@@ -290,7 +338,10 @@ export default function ReviewShow({ review }: Props) {
                                     </div>
                                 ) : (
                                     <p className="text-sm text-muted-foreground">
-                                        {__('misc.guest_review', 'Guest review')}
+                                        {__(
+                                            'misc.guest_review',
+                                            'Guest review',
+                                        )}
                                     </p>
                                 )}
                             </div>
@@ -299,20 +350,34 @@ export default function ReviewShow({ review }: Props) {
                         {/* Metadata */}
                         <div className="rounded-lg border bg-card">
                             <div className="border-b bg-muted/40 px-6 py-4">
-                                <h2 className="text-sm font-semibold">{__('misc.metadata', 'Metadata')}</h2>
+                                <h2 className="text-sm font-semibold">
+                                    {__('misc.metadata', 'Metadata')}
+                                </h2>
                             </div>
                             <div className="space-y-3 px-6 py-4">
                                 <div>
-                                    <div className="text-xs text-muted-foreground">Review ID</div>
-                                    <div className="font-mono font-medium">#{review.id}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                        Review ID
+                                    </div>
+                                    <div className="font-mono font-medium">
+                                        #{review.id}
+                                    </div>
                                 </div>
                                 <div>
-                                    <div className="text-xs text-muted-foreground">Submitted</div>
-                                    <div className="text-sm">{formatDate(review.created_at)}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                        Submitted
+                                    </div>
+                                    <div className="text-sm">
+                                        {formatDate(review.created_at)}
+                                    </div>
                                 </div>
                                 <div>
-                                    <div className="text-xs text-muted-foreground">Last updated</div>
-                                    <div className="text-sm">{formatDate(review.updated_at)}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                        Last updated
+                                    </div>
+                                    <div className="text-sm">
+                                        {formatDate(review.updated_at)}
+                                    </div>
                                 </div>
                             </div>
                         </div>

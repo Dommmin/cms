@@ -65,7 +65,25 @@ export default [
         },
     },
     {
-        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js', 'vite.config.ts'],
+        // Allow _-prefixed unused variables (common in interface implementations, e.g. Lexical nodes)
+        rules: {
+            '@typescript-eslint/no-unused-vars': [
+                'error',
+                {
+                    argsIgnorePattern: '^_',
+                    varsIgnorePattern: '^_',
+                    caughtErrorsIgnorePattern: '^_',
+                },
+            ],
+            // React compiler rules — downgrade to warn to allow established patterns
+            // (e.g. setState in useEffect for syncing external/deferred props, dynamic icon rendering)
+            'react-hooks/set-state-in-effect': 'warn',
+            'react-hooks/refs': 'warn',
+            'react-hooks/static-components': 'warn',
+        },
+    },
+    {
+        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js', 'vite.config.ts', 'resources/js/actions/**', 'resources/js/routes/**'],
     },
     prettier, // Turn off all rules that might conflict with Prettier
 ];

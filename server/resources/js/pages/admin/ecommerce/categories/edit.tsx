@@ -1,19 +1,19 @@
-import { useAdminLocale } from '@/hooks/use-admin-locale';
-import { useTranslation } from '@/hooks/use-translation';
 import { Link, Head, router, usePage } from '@inertiajs/react';
 import { ArrowLeftIcon, EyeIcon } from 'lucide-react';
-import { SeoPanel } from '@/components/seo-panel';
-import { VersionHistory } from '@/components/version-history';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
+import { SeoPanel } from '@/components/seo-panel';
 import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { VersionHistory } from '@/components/version-history';
 import Wrapper from '@/components/wrapper';
+import { useAdminLocale } from '@/hooks/use-admin-locale';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
@@ -42,7 +42,10 @@ export default function Edit({
     category: CategoryEditProps;
     categories?: Category[];
 }) {
-    const { locales, frontendUrl } = usePage().props as { locales: SharedLocale[]; frontendUrl: string };
+    const { locales, frontendUrl } = usePage().props as {
+        locales: SharedLocale[];
+        frontendUrl: string;
+    };
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
 
     const normalizedCategories: Category[] = Array.isArray(categories)
@@ -89,8 +92,12 @@ export default function Edit({
         setErrors({});
 
         const form = e.currentTarget;
-        const parentId = (form.elements.namedItem('parent_id') as HTMLSelectElement)?.value || null;
-        const isActive = (form.elements.namedItem('is_active') as HTMLInputElement)?.checked;
+        const parentId =
+            (form.elements.namedItem('parent_id') as HTMLSelectElement)
+                ?.value || null;
+        const isActive = (
+            form.elements.namedItem('is_active') as HTMLInputElement
+        )?.checked;
 
         router.put(
             `/admin/ecommerce/categories/${category.id}`,
@@ -142,7 +149,11 @@ export default function Edit({
                             </a>
                         </Button>
                         <Button asChild variant="outline">
-                            <Link href='/admin/ecommerce/categories' prefetch cacheFor={30}>
+                            <Link
+                                href="/admin/ecommerce/categories"
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>
@@ -157,177 +168,214 @@ export default function Edit({
                 >
                     <Tabs defaultValue="general" className="space-y-6">
                         <TabsList>
-                            <TabsTrigger value="general">{__('tab.general', 'General')}</TabsTrigger>
-                            <TabsTrigger value="seo">{__('tab.seo', 'SEO')}</TabsTrigger>
+                            <TabsTrigger value="general">
+                                {__('tab.general', 'General')}
+                            </TabsTrigger>
+                            <TabsTrigger value="seo">
+                                {__('tab.seo', 'SEO')}
+                            </TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="general" className="space-y-6">
-                    <div className="grid gap-2">
-                        <div className="flex items-center justify-between">
-                            <Label>{__('label.name', 'Name')}</Label>
-                            <LocaleTabSwitcher
-                                locales={locales}
-                                activeLocale={activeLocale}
-                                onLocaleChange={setActiveLocale}
-                            />
-                        </div>
-                        {locales.length > 0 ? (
-                            locales.map((locale) => (
-                                <div
-                                    key={locale.code}
-                                    className={
-                                        locale.code !== activeLocale
-                                            ? 'hidden'
-                                            : undefined
-                                    }
-                                >
+                            <div className="grid gap-2">
+                                <div className="flex items-center justify-between">
+                                    <Label>{__('label.name', 'Name')}</Label>
+                                    <LocaleTabSwitcher
+                                        locales={locales}
+                                        activeLocale={activeLocale}
+                                        onLocaleChange={setActiveLocale}
+                                    />
+                                </div>
+                                {locales.length > 0 ? (
+                                    locales.map((locale) => (
+                                        <div
+                                            key={locale.code}
+                                            className={
+                                                locale.code !== activeLocale
+                                                    ? 'hidden'
+                                                    : undefined
+                                            }
+                                        >
+                                            <Input
+                                                required={
+                                                    locale.code ===
+                                                    defaultLocale
+                                                }
+                                                autoFocus={
+                                                    locale.code ===
+                                                    defaultLocale
+                                                }
+                                                placeholder="Category name"
+                                                value={
+                                                    nameValues[locale.code] ??
+                                                    ''
+                                                }
+                                                onChange={(e) =>
+                                                    handleNameChange(
+                                                        locale.code,
+                                                        e.target.value,
+                                                    )
+                                                }
+                                            />
+                                        </div>
+                                    ))
+                                ) : (
                                     <Input
-                                        required={locale.code === defaultLocale}
-                                        autoFocus={
-                                            locale.code === defaultLocale
-                                        }
+                                        required
+                                        autoFocus
                                         placeholder="Category name"
-                                        value={nameValues[locale.code] ?? ''}
+                                        value={nameValues[defaultLocale] ?? ''}
                                         onChange={(e) =>
                                             handleNameChange(
-                                                locale.code,
+                                                defaultLocale,
                                                 e.target.value,
                                             )
                                         }
                                     />
-                                </div>
-                            ))
-                        ) : (
-                            <Input
-                                required
-                                autoFocus
-                                placeholder="Category name"
-                                value={nameValues[defaultLocale] ?? ''}
-                                onChange={(e) =>
-                                    handleNameChange(defaultLocale, e.target.value)
-                                }
-                            />
-                        )}
-                        <InputError message={errors.name} />
-                    </div>
+                                )}
+                                <InputError message={errors.name} />
+                            </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="slug">{__('label.slug', 'Slug')}</Label>
-                        <Input
-                            id="slug"
-                            value={slug}
-                            readOnly={!isSlugManual}
-                            onChange={(e) => setSlug(slugify(e.target.value))}
-                        />
-                        <InputError message={errors.slug} />
-                        <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <input
-                                type="checkbox"
-                                checked={isSlugManual}
-                                onChange={(e) => {
-                                    const manual = e.target.checked;
-                                    setIsSlugManual(manual);
-                                    if (!manual) {
-                                        setSlug(
-                                            slugify(
-                                                nameValues[defaultLocale] ?? '',
-                                            ),
-                                        );
+                            <div className="grid gap-2">
+                                <Label htmlFor="slug">
+                                    {__('label.slug', 'Slug')}
+                                </Label>
+                                <Input
+                                    id="slug"
+                                    value={slug}
+                                    readOnly={!isSlugManual}
+                                    onChange={(e) =>
+                                        setSlug(slugify(e.target.value))
                                     }
-                                }}
-                                className="h-4 w-4 rounded border-input"
-                            />
-                            {__('misc.slug_auto_hint', 'Set slug manually')}
-                        </label>
-                    </div>
+                                />
+                                <InputError message={errors.slug} />
+                                <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <input
+                                        type="checkbox"
+                                        checked={isSlugManual}
+                                        onChange={(e) => {
+                                            const manual = e.target.checked;
+                                            setIsSlugManual(manual);
+                                            if (!manual) {
+                                                setSlug(
+                                                    slugify(
+                                                        nameValues[
+                                                            defaultLocale
+                                                        ] ?? '',
+                                                    ),
+                                                );
+                                            }
+                                        }}
+                                        className="h-4 w-4 rounded border-input"
+                                    />
+                                    {__(
+                                        'misc.slug_auto_hint',
+                                        'Set slug manually',
+                                    )}
+                                </label>
+                            </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="parent_id">{__('label.category', 'Parent Category')}</Label>
-                        <select
-                            id="parent_id"
-                            name="parent_id"
-                            defaultValue={category.parent_id ?? ''}
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            <option value="">None (Top level)</option>
-                            {parentCategories.map((cat) => (
-                                <option key={cat.id} value={cat.id}>
-                                    {cat.name}
-                                </option>
-                            ))}
-                        </select>
-                        <InputError message={errors.parent_id} />
-                    </div>
-
-                    <div className="grid gap-2">
-                        <div className="flex items-center justify-between">
-                            <Label>{__('label.description', 'Description')}</Label>
-                            <LocaleTabSwitcher
-                                locales={locales}
-                                activeLocale={activeLocale}
-                                onLocaleChange={setActiveLocale}
-                            />
-                        </div>
-                        {locales.length > 0 ? (
-                            locales.map((locale) => (
-                                <div
-                                    key={locale.code}
-                                    className={
-                                        locale.code !== activeLocale
-                                            ? 'hidden'
-                                            : undefined
-                                    }
+                            <div className="grid gap-2">
+                                <Label htmlFor="parent_id">
+                                    {__('label.category', 'Parent Category')}
+                                </Label>
+                                <select
+                                    id="parent_id"
+                                    name="parent_id"
+                                    defaultValue={category.parent_id ?? ''}
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                 >
+                                    <option value="">None (Top level)</option>
+                                    {parentCategories.map((cat) => (
+                                        <option key={cat.id} value={cat.id}>
+                                            {cat.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <InputError message={errors.parent_id} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <div className="flex items-center justify-between">
+                                    <Label>
+                                        {__('label.description', 'Description')}
+                                    </Label>
+                                    <LocaleTabSwitcher
+                                        locales={locales}
+                                        activeLocale={activeLocale}
+                                        onLocaleChange={setActiveLocale}
+                                    />
+                                </div>
+                                {locales.length > 0 ? (
+                                    locales.map((locale) => (
+                                        <div
+                                            key={locale.code}
+                                            className={
+                                                locale.code !== activeLocale
+                                                    ? 'hidden'
+                                                    : undefined
+                                            }
+                                        >
+                                            <textarea
+                                                rows={3}
+                                                placeholder="Category description (optional)"
+                                                value={
+                                                    descValues[locale.code] ??
+                                                    ''
+                                                }
+                                                onChange={(e) =>
+                                                    setDescValues((prev) => ({
+                                                        ...prev,
+                                                        [locale.code]:
+                                                            e.target.value,
+                                                    }))
+                                                }
+                                                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                                            />
+                                        </div>
+                                    ))
+                                ) : (
                                     <textarea
                                         rows={3}
                                         placeholder="Category description (optional)"
-                                        value={descValues[locale.code] ?? ''}
+                                        value={descValues[defaultLocale] ?? ''}
                                         onChange={(e) =>
                                             setDescValues((prev) => ({
                                                 ...prev,
-                                                [locale.code]: e.target.value,
+                                                [defaultLocale]: e.target.value,
                                             }))
                                         }
                                         className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                     />
-                                </div>
-                            ))
-                        ) : (
-                            <textarea
-                                rows={3}
-                                placeholder="Category description (optional)"
-                                value={descValues[defaultLocale] ?? ''}
-                                onChange={(e) =>
-                                    setDescValues((prev) => ({
-                                        ...prev,
-                                        [defaultLocale]: e.target.value,
-                                    }))
-                                }
-                                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                            />
-                        )}
-                        <InputError message={errors.description} />
-                    </div>
+                                )}
+                                <InputError message={errors.description} />
+                            </div>
 
-                    <div className="flex items-center gap-2">
-                        <input
-                            type="checkbox"
-                            id="is_active"
-                            name="is_active"
-                            defaultChecked={category.is_active}
-                            className="h-4 w-4 rounded border-input"
-                        />
-                        <Label htmlFor="is_active" className="font-normal">
-                            {__('label.is_active', 'Active')}
-                        </Label>
-                    </div>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    id="is_active"
+                                    name="is_active"
+                                    defaultChecked={category.is_active}
+                                    className="h-4 w-4 rounded border-input"
+                                />
+                                <Label
+                                    htmlFor="is_active"
+                                    className="font-normal"
+                                >
+                                    {__('label.is_active', 'Active')}
+                                </Label>
+                            </div>
                         </TabsContent>
 
                         <TabsContent value="seo" className="space-y-6">
                             <SeoPanel
                                 data={seoData}
                                 onChange={(field, value) =>
-                                    setSeoData((prev) => ({ ...prev, [field]: value }))
+                                    setSeoData((prev) => ({
+                                        ...prev,
+                                        [field]: value,
+                                    }))
                                 }
                                 errors={errors}
                                 urlPath={`products?category=${slug}`}
@@ -342,7 +390,10 @@ export default function Edit({
                         submitLabel={__('action.save_changes', 'Save Changes')}
                     />
 
-                    <VersionHistory modelType="category" modelId={category.id} />
+                    <VersionHistory
+                        modelType="category"
+                        modelId={category.id}
+                    />
                 </form>
             </Wrapper>
         </AppLayout>

@@ -141,11 +141,12 @@ export function BlockCard({
                         )}
 
                         {/* Icon (expanded only) */}
-                        {isExpanded && (block.reusable_block_id ? (
-                            <Globe2 className="h-3.5 w-3.5 text-blue-500" />
-                        ) : (
-                            <Box className="h-3.5 w-3.5 text-muted-foreground" />
-                        ))}
+                        {isExpanded &&
+                            (block.reusable_block_id ? (
+                                <Globe2 className="h-3.5 w-3.5 text-blue-500" />
+                            ) : (
+                                <Box className="h-3.5 w-3.5 text-muted-foreground" />
+                            ))}
 
                         {/* Block label */}
                         <div
@@ -192,21 +193,23 @@ export function BlockCard({
                         )}
 
                         {/* Save to library */}
-                        {onSaveAsGlobal && !block.reusable_block_id && block.type && (
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setGlobalName(displayName);
-                                    setSaveDialogOpen(true);
-                                }}
-                                className="h-6 w-6 p-0 text-muted-foreground hover:text-primary"
-                                title="Save as Global Block"
-                            >
-                                <LibraryBig className="h-3.5 w-3.5" />
-                            </Button>
-                        )}
+                        {onSaveAsGlobal &&
+                            !block.reusable_block_id &&
+                            block.type && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setGlobalName(displayName);
+                                        setSaveDialogOpen(true);
+                                    }}
+                                    className="h-6 w-6 p-0 text-muted-foreground hover:text-primary"
+                                    title="Save as Global Block"
+                                >
+                                    <LibraryBig className="h-3.5 w-3.5" />
+                                </Button>
+                            )}
 
                         {/* Delete */}
                         <Button
@@ -238,8 +241,9 @@ export function BlockCard({
                     </DialogHeader>
                     <div className="space-y-3 py-2">
                         <p className="text-sm text-muted-foreground">
-                            This block will be saved to the Global Block Library and linked
-                            here. Any future edits will propagate to all pages that use it.
+                            This block will be saved to the Global Block Library
+                            and linked here. Any future edits will propagate to
+                            all pages that use it.
                         </p>
                         <div className="space-y-1.5">
                             <Label htmlFor="global-name">Name</Label>
@@ -254,7 +258,9 @@ export function BlockCard({
                         <div className="space-y-1.5">
                             <Label htmlFor="global-desc">
                                 Description{' '}
-                                <span className="text-muted-foreground">(optional)</span>
+                                <span className="text-muted-foreground">
+                                    (optional)
+                                </span>
                             </Label>
                             <Input
                                 id="global-desc"

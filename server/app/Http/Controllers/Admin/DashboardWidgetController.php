@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\WidgetSize;
-use App\Enums\WidgetType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreDashboardWidgetRequest;
 use App\Models\DashboardWidget;

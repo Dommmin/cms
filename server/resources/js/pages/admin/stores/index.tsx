@@ -1,7 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { MapPin, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -9,6 +8,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -53,7 +53,7 @@ export default function StoresIndex({ stores, filters }: Props) {
             cell: ({ row }) => (
                 <div>
                     <p className="font-medium">{row.original.name}</p>
-                    <p className="text-muted-foreground text-xs">
+                    <p className="text-xs text-muted-foreground">
                         {row.original.slug}
                     </p>
                 </div>
@@ -65,7 +65,7 @@ export default function StoresIndex({ stores, filters }: Props) {
             cell: ({ row }) => (
                 <div>
                     <p className="text-sm">{row.original.address}</p>
-                    <p className="text-muted-foreground text-xs">
+                    <p className="text-xs text-muted-foreground">
                         {row.original.city}, {row.original.country}
                     </p>
                 </div>
@@ -98,7 +98,9 @@ export default function StoresIndex({ stores, filters }: Props) {
                         );
                     }}
                 >
-                    {row.original.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
+                    {row.original.is_active
+                        ? __('status.active', 'Active')
+                        : __('status.inactive', 'Inactive')}
                 </Badge>
             ),
         },
@@ -108,7 +110,11 @@ export default function StoresIndex({ stores, filters }: Props) {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/stores/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/stores/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>
@@ -117,7 +123,10 @@ export default function StoresIndex({ stores, filters }: Props) {
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Store')}
-                        description={__('dialog.cannot_be_undone', 'Are you sure you want to delete this store? This action cannot be undone.')}
+                        description={__(
+                            'dialog.cannot_be_undone',
+                            'Are you sure you want to delete this store? This action cannot be undone.',
+                        )}
                         onConfirm={() => {
                             router.delete(`/admin/stores/${row.original.id}`, {
                                 onSuccess: () => toast.success('Store deleted'),
@@ -138,7 +147,10 @@ export default function StoresIndex({ stores, filters }: Props) {
             <Wrapper>
                 <PageHeader
                     title={__('page.stores', 'Stores')}
-                    description={__('page.stores_desc', 'Manage physical store locations')}
+                    description={__(
+                        'page.stores_desc',
+                        'Manage physical store locations',
+                    )}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/stores/create">
@@ -152,12 +164,15 @@ export default function StoresIndex({ stores, filters }: Props) {
 
                 {stores.data.length === 0 && !filters.search ? (
                     <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
-                        <MapPin className="text-muted-foreground mb-4 h-12 w-12" />
+                        <MapPin className="mb-4 h-12 w-12 text-muted-foreground" />
                         <h3 className="text-lg font-semibold">
                             {__('empty.no_stores', 'No stores yet')}
                         </h3>
-                        <p className="text-muted-foreground mt-1 text-sm">
-                            {__('empty.no_stores_desc', 'Add your first store location to get started.')}
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            {__(
+                                'empty.no_stores_desc',
+                                'Add your first store location to get started.',
+                            )}
                         </p>
                         <Link href="/admin/stores/create" className="mt-4">
                             <Button>
@@ -179,7 +194,10 @@ export default function StoresIndex({ stores, filters }: Props) {
                             next_page_url: stores.next_page_url ?? null,
                         }}
                         searchable
-                        searchPlaceholder={__('placeholder.search', 'Search stores...')}
+                        searchPlaceholder={__(
+                            'placeholder.search',
+                            'Search stores...',
+                        )}
                         searchValue={filters.search ?? ''}
                         baseUrl="/admin/stores"
                     />

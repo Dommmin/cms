@@ -1,16 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Search, Plus, Edit, Trash2, Power, PowerOff } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -21,6 +13,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -47,7 +40,9 @@ interface Promotion {
 
 interface PaginatedPromotions {
     data: Promotion[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     links: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     meta: any;
 }
 
@@ -364,8 +359,16 @@ export default function Index({
                                                             <Power className="h-4 w-4" />
                                                         )}
                                                     </Button>
-                                                    <Button asChild variant="outline" size="sm">
-                                                        <Link href={`/admin/ecommerce/promotions/${promotion.id}/edit`} prefetch cacheFor={30}>
+                                                    <Button
+                                                        asChild
+                                                        variant="outline"
+                                                        size="sm"
+                                                    >
+                                                        <Link
+                                                            href={`/admin/ecommerce/promotions/${promotion.id}/edit`}
+                                                            prefetch
+                                                            cacheFor={30}
+                                                        >
                                                             <Edit className="h-4 w-4" />
                                                         </Link>
                                                     </Button>
@@ -399,6 +402,7 @@ export default function Index({
                         </div>
                         <div className="flex gap-2">
                             {promotions.links.map(
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 (link: any, index: number) => (
                                     <Link
                                         key={index}

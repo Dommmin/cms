@@ -79,14 +79,17 @@ function aggregateWeekly(data: DataPoint[]): DataPoint[] {
         } else {
             map.set(key, {
                 total: pt.value,
-                label: monday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                label: monday.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                }),
             });
         }
     }
     return Array.from(map.entries())
         .sort(([a], [b]) => a.localeCompare(b))
         .slice(-13)
-        .map(([date, { total, label }]) => ({ date: label, value: total }));
+        .map(([_date, { total, label }]) => ({ date: label, value: total }));
 }
 
 function aggregateMonthly(data: DataPoint[]): DataPoint[] {
@@ -102,13 +105,21 @@ function aggregateMonthly(data: DataPoint[]): DataPoint[] {
             const [year, month] = key.split('-');
             const d = new Date(Number(year), Number(month) - 1, 1);
             return {
-                date: d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+                date: d.toLocaleDateString('en-US', {
+                    month: 'short',
+                    year: 'numeric',
+                }),
                 value,
             };
         });
 }
 
-export function ChartWidget({ title, data, chartType = 'line', color = 'blue' }: ChartWidgetProps) {
+export function ChartWidget({
+    title,
+    data,
+    chartType = 'line',
+    color = 'blue',
+}: ChartWidgetProps) {
     const [granularity, setGranularity] = useState<Granularity>('daily');
     const stroke = colorMap[color] ?? colorMap.blue;
 
@@ -120,12 +131,10 @@ export function ChartWidget({ title, data, chartType = 'line', color = 'blue' }:
             return aggregateMonthly(data);
         }
         // Daily: last 30 data points, format ISO dates to "Jan 1"
-        return data
-            .slice(-30)
-            .map((pt) => ({
-                ...pt,
-                date: pt.date.includes('-') ? formatDate(pt.date) : pt.date,
-            }));
+        return data.slice(-30).map((pt) => ({
+            ...pt,
+            date: pt.date.includes('-') ? formatDate(pt.date) : pt.date,
+        }));
     }, [data, granularity]);
 
     if (chartType === 'donut') {
@@ -152,17 +161,29 @@ export function ChartWidget({ title, data, chartType = 'line', color = 'blue' }:
                             ))}
                         </Pie>
                         <Tooltip
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            formatter={((value: number, name: string) => [value, name]) as any}
+                            formatter={
+                                /* eslint-disable @typescript-eslint/no-explicit-any */
+                                ((value: number, name: string) => [
+                                    value,
+                                    name,
+                                ]) as any
+                                /* eslint-enable @typescript-eslint/no-explicit-any */
+                            }
                         />
                     </PieChart>
                 </ResponsiveContainer>
                 <div className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1">
                     {data.map((item, i) => (
-                        <div key={i} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <div
+                            key={i}
+                            className="flex items-center gap-1.5 text-xs text-muted-foreground"
+                        >
                             <span
                                 className="h-2.5 w-2.5 rounded-full"
-                                style={{ background: DONUT_COLORS[i % DONUT_COLORS.length] }}
+                                style={{
+                                    background:
+                                        DONUT_COLORS[i % DONUT_COLORS.length],
+                                }}
                             />
                             {item.label ?? item.date}: {item.value}
                         </div>
@@ -172,7 +193,12 @@ export function ChartWidget({ title, data, chartType = 'line', color = 'blue' }:
         );
     }
 
-    const maxTicks = granularity === 'daily' ? 6 : granularity === 'weekly' ? 7 : chartData.length;
+    const maxTicks =
+        granularity === 'daily'
+            ? 6
+            : granularity === 'weekly'
+              ? 7
+              : chartData.length;
     const step = Math.max(1, Math.ceil(chartData.length / maxTicks));
 
     return (
@@ -196,23 +222,50 @@ export function ChartWidget({ title, data, chartType = 'line', color = 'blue' }:
                 </div>
             </div>
             <ResponsiveContainer width="100%" height={200}>
-                <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
+                <AreaChart
+                    data={chartData}
+                    margin={{ top: 4, right: 4, bottom: 0, left: 0 }}
+                >
                     <defs>
-                        <linearGradient id={`grad-${color}`} x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor={stroke} stopOpacity={0.2} />
-                            <stop offset="95%" stopColor={stroke} stopOpacity={0} />
+                        <linearGradient
+                            id={`grad-${color}`}
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                        >
+                            <stop
+                                offset="5%"
+                                stopColor={stroke}
+                                stopOpacity={0.2}
+                            />
+                            <stop
+                                offset="95%"
+                                stopColor={stroke}
+                                stopOpacity={0}
+                            />
                         </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="hsl(var(--border))"
+                        vertical={false}
+                    />
                     <XAxis
                         dataKey="date"
-                        tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                        tick={{
+                            fontSize: 11,
+                            fill: 'hsl(var(--muted-foreground))',
+                        }}
                         tickLine={false}
                         axisLine={false}
                         interval={step - 1}
                     />
                     <YAxis
-                        tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                        tick={{
+                            fontSize: 11,
+                            fill: 'hsl(var(--muted-foreground))',
+                        }}
                         tickLine={false}
                         axisLine={false}
                         tickFormatter={formatCurrency}
@@ -225,8 +278,14 @@ export function ChartWidget({ title, data, chartType = 'line', color = 'blue' }:
                             borderRadius: '8px',
                             fontSize: 12,
                         }}
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        formatter={((v: number) => [formatCurrency(v), 'Revenue']) as any}
+                        formatter={
+                            /* eslint-disable @typescript-eslint/no-explicit-any */
+                            ((v: number) => [
+                                formatCurrency(v),
+                                'Revenue',
+                            ]) as any
+                            /* eslint-enable @typescript-eslint/no-explicit-any */
+                        }
                     />
                     <Area
                         type="monotone"

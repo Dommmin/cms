@@ -14,9 +14,9 @@ class ShippingMethod extends Model
 {
     use HasFactory, HasTranslations;
 
-    protected $table = 'shipping_methods';
-
     public array $translatable = ['name', 'description'];
+
+    protected $table = 'shipping_methods';
 
     protected $fillable = [
         'carrier', 'name', 'description', 'is_active', 'min_weight', 'max_weight',

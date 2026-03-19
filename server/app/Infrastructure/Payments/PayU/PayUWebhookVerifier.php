@@ -27,8 +27,8 @@ class PayUWebhookVerifier
         // Header format: "sender=checkout;signature=abc123;algorithm=MD5;..."
         foreach (explode(';', $header) as $part) {
             [$key, $value] = array_pad(explode('=', $part, 2), 2, '');
-            if (trim($key) === 'signature') {
-                return trim($value) ?: null;
+            if (mb_trim($key) === 'signature') {
+                return mb_trim($value) ?: null;
             }
         }
 

@@ -2,7 +2,6 @@ import { Link, Head, router } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { useTranslation } from '@/hooks/use-translation';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -17,6 +16,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
@@ -38,10 +38,16 @@ type Props = {
     parentCategories: Category[];
 };
 
-export default function EditBlogCategory({ category, parentCategories }: Props) {
+export default function EditBlogCategory({
+    category,
+    parentCategories,
+}: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Blog Categories', href: '/admin/blog/categories' },
-        { title: category.name, href: `/admin/blog/categories/${category.id}/edit` },
+        {
+            title: category.name,
+            href: `/admin/blog/categories/${category.id}/edit`,
+        },
     ];
 
     const __ = useTranslation();
@@ -82,10 +88,18 @@ export default function EditBlogCategory({ category, parentCategories }: Props) 
                 parent_id: data.parent_id || null,
             },
             {
-                onSuccess: () => toast.success(__('misc.category_updated', 'Category updated successfully')),
+                onSuccess: () =>
+                    toast.success(
+                        __(
+                            'misc.category_updated',
+                            'Category updated successfully',
+                        ),
+                    ),
                 onError: (errs) => {
                     setErrors(errs);
-                    toast.error(__('misc.fix_errors', 'Please fix the errors below'));
+                    toast.error(
+                        __('misc.fix_errors', 'Please fix the errors below'),
+                    );
                 },
                 onFinish: () => setProcessing(false),
             },
@@ -102,18 +116,23 @@ export default function EditBlogCategory({ category, parentCategories }: Props) 
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/blog/categories' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            {__('action.back', 'Back')}
-                        
-                </Link>
-            </Button>
+                            <Link
+                                href="/admin/blog/categories"
+                                prefetch
+                                cacheFor={30}
+                            >
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                {__('action.back', 'Back')}
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
                 <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
                     <div className="grid gap-2">
-                        <Label htmlFor="name">{__('label.name', 'Name')} *</Label>
+                        <Label htmlFor="name">
+                            {__('label.name', 'Name')} *
+                        </Label>
                         <Input
                             id="name"
                             value={data.name}
@@ -136,12 +155,17 @@ export default function EditBlogCategory({ category, parentCategories }: Props) 
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="description">{__('label.description', 'Description')}</Label>
+                        <Label htmlFor="description">
+                            {__('label.description', 'Description')}
+                        </Label>
                         <Textarea
                             id="description"
                             value={data.description}
                             onChange={(e) =>
-                                setData((prev) => ({ ...prev, description: e.target.value }))
+                                setData((prev) => ({
+                                    ...prev,
+                                    description: e.target.value,
+                                }))
                             }
                             placeholder="Brief description of the category"
                             rows={3}
@@ -151,21 +175,34 @@ export default function EditBlogCategory({ category, parentCategories }: Props) 
 
                     {parentCategories.length > 0 && (
                         <div className="grid gap-2">
-                            <Label htmlFor="parent_id">{__('label.parent_category', 'Parent Category')}</Label>
+                            <Label htmlFor="parent_id">
+                                {__('label.parent_category', 'Parent Category')}
+                            </Label>
                             <Select
                                 value={data.parent_id}
                                 onValueChange={(val) =>
-                                    setData((prev) => ({ ...prev, parent_id: val }))
+                                    setData((prev) => ({
+                                        ...prev,
+                                        parent_id: val,
+                                    }))
                                 }
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder={__('placeholder.none_root', 'None (root category)')} />
+                                    <SelectValue
+                                        placeholder={__(
+                                            'placeholder.none_root',
+                                            'None (root category)',
+                                        )}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {parentCategories
                                         .filter((cat) => cat.id !== category.id)
                                         .map((cat) => (
-                                            <SelectItem key={cat.id} value={String(cat.id)}>
+                                            <SelectItem
+                                                key={cat.id}
+                                                value={String(cat.id)}
+                                            >
                                                 {cat.name}
                                             </SelectItem>
                                         ))}
@@ -176,7 +213,9 @@ export default function EditBlogCategory({ category, parentCategories }: Props) 
                     )}
 
                     <div className="grid gap-2">
-                        <Label htmlFor="position">{__('label.position', 'Position')}</Label>
+                        <Label htmlFor="position">
+                            {__('label.position', 'Position')}
+                        </Label>
                         <Input
                             id="position"
                             type="number"
@@ -198,18 +237,30 @@ export default function EditBlogCategory({ category, parentCategories }: Props) 
                             id="is_active"
                             checked={data.is_active}
                             onChange={(e) =>
-                                setData((prev) => ({ ...prev, is_active: e.target.checked }))
+                                setData((prev) => ({
+                                    ...prev,
+                                    is_active: e.target.checked,
+                                }))
                             }
                             className="h-4 w-4 rounded border-gray-300"
                         />
                         <Label htmlFor="is_active" className="font-normal">
-                            {__('label.active_visible', 'Active (visible on site)')}
+                            {__(
+                                'label.active_visible',
+                                'Active (visible on site)',
+                            )}
                         </Label>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <Button type="submit" disabled={processing}>
-                            {processing ? __('misc.saving', 'Saving...') : __('action.save_changes', 'Save Changes')}
+                        <Button
+                            variant="outline"
+                            type="submit"
+                            disabled={processing}
+                        >
+                            {processing
+                                ? __('misc.saving', 'Saving...')
+                                : __('action.save_changes', 'Save Changes')}
                         </Button>
                     </div>
                 </form>

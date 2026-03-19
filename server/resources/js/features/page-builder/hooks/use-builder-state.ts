@@ -21,7 +21,10 @@ type HistoryAction =
     | { type: 'UNDO' }
     | { type: 'REDO' };
 
-function historyReducer(state: HistoryState, action: HistoryAction): HistoryState {
+function historyReducer(
+    state: HistoryState,
+    action: HistoryAction,
+): HistoryState {
     switch (action.type) {
         case 'SET':
             return {
@@ -159,7 +162,10 @@ export function useBuilderState(initialSections: Section[]) {
                         relations: [],
                         ...defaults,
                     };
-                    return { ...section, blocks: [...section.blocks, newBlock] };
+                    return {
+                        ...section,
+                        blocks: [...section.blocks, newBlock],
+                    };
                 }),
             });
         },
@@ -192,7 +198,9 @@ export function useBuilderState(initialSections: Section[]) {
                     if (si !== sectionIndex) return section;
                     return {
                         ...section,
-                        blocks: section.blocks.filter((_, bi) => bi !== blockIndex),
+                        blocks: section.blocks.filter(
+                            (_, bi) => bi !== blockIndex,
+                        ),
                     };
                 }),
             });

@@ -6,6 +6,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 /**
  * Scans admin Inertia/React TSX files for t('key', 'fallback') calls
@@ -18,16 +20,16 @@ use Illuminate\Support\Arr;
  */
 class SyncAdminTranslations extends Command
 {
+    /** Regex patterns to extract __('key', 'fallback') calls from TSX. */
+    private const PATTERNS = [
+        '/__\([\'"]([a-z][a-z0-9._-]+)[\'"](?:,\s*[\'"]([^\'"]*)[\'"]\s*)?\)/u',
+    ];
+
     protected $signature = 'admin:sync-translations
         {--dry-run : Show what would change without writing files}
         {--locale= : Only process a specific locale}';
 
     protected $description = 'Sync translation keys from admin TSX files into lang/*/admin.php';
-
-    /** Regex patterns to extract __('key', 'fallback') calls from TSX. */
-    private const PATTERNS = [
-        '/__\([\'"]([a-z][a-z0-9._-]+)[\'"](?:,\s*[\'"]([^\'"]*)[\'"]\s*)?\)/u',
-    ];
 
     public function handle(): int
     {
@@ -45,7 +47,7 @@ class SyncAdminTranslations extends Command
 
         $files = [];
         foreach ($scanDirs as $scanDir) {
-            $this->info('Scanning: ' . $scanDir);
+            $this->info('Scanning: '.$scanDir);
             $files = array_merge($files, $this->getTsxFiles($scanDir));
         }
         foreach ($files as $file) {
@@ -73,7 +75,7 @@ class SyncAdminTranslations extends Command
 
         // --- 2. Load existing lang files and merge ---
         $langDir = lang_path();
-        $localeDirs = glob($langDir . '/*', GLOB_ONLYDIR) ?: [];
+        $localeDirs = glob($langDir.'/*', GLOB_ONLYDIR) ?: [];
 
         foreach ($localeDirs as $localeDir) {
             $locale = basename($localeDir);
@@ -82,7 +84,7 @@ class SyncAdminTranslations extends Command
                 continue;
             }
 
-            $langFile = $localeDir . '/admin.php';
+            $langFile = $localeDir.'/admin.php';
             $existing = file_exists($langFile) ? (require $langFile) : [];
             $flat = Arr::dot($existing);
 
@@ -97,11 +99,13 @@ class SyncAdminTranslations extends Command
 
             if ($added === 0) {
                 $this->line("  <comment>{$locale}</comment>: already up-to-date.");
+
                 continue;
             }
 
             if ($isDryRun) {
                 $this->line("  <comment>{$locale}</comment>: would add {$added} keys.");
+
                 continue;
             }
 
@@ -123,7 +127,7 @@ class SyncAdminTranslations extends Command
     private function getTsxFiles(string $dir): array
     {
         $files = [];
-        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
         foreach ($iterator as $file) {
             if ($file->isFile() && in_array($file->getExtension(), ['tsx', 'ts'], true)) {
                 $files[] = $file->getPathname();
@@ -168,7 +172,7 @@ class SyncAdminTranslations extends Command
         return
         PHP;
 
-        $content = $header . "\n" . $this->arrayToPhp($data, 0) . ";\n";
+        $content = $header."\n".$this->arrayToPhp($data, 0).";\n";
         file_put_contents($path, $content);
     }
 
@@ -181,19 +185,19 @@ class SyncAdminTranslations extends Command
     {
         $pad = str_repeat('    ', $indent);
         $innerPad = str_repeat('    ', $indent + 1);
-        $lines = ["["];
+        $lines = ['['];
 
         foreach ($array as $key => $value) {
-            $escapedKey = "'" . addslashes((string) $key) . "'";
+            $escapedKey = "'".addslashes((string) $key)."'";
             if (is_array($value)) {
-                $lines[] = $innerPad . $escapedKey . ' => ' . $this->arrayToPhp($value, $indent + 1) . ',';
+                $lines[] = $innerPad.$escapedKey.' => '.$this->arrayToPhp($value, $indent + 1).',';
             } else {
-                $escapedValue = "'" . addslashes((string) $value) . "'";
-                $lines[] = $innerPad . $escapedKey . ' => ' . $escapedValue . ',';
+                $escapedValue = "'".addslashes((string) $value)."'";
+                $lines[] = $innerPad.$escapedKey.' => '.$escapedValue.',';
             }
         }
 
-        $lines[] = $pad . ']';
+        $lines[] = $pad.']';
 
         return implode("\n", $lines);
     }

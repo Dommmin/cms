@@ -1,4 +1,4 @@
-import { Link, Form, Head, router } from '@inertiajs/react';
+import { Link, Form, Head } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -32,7 +32,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Create', href: '/admin/notifications/create' },
 ];
 
-export default function CreateNotification({ customers, types, channels }: Props) {
+export default function CreateNotification({
+    customers,
+    types,
+    channels,
+}: Props) {
     const formId = 'notification-create-form';
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -44,16 +48,24 @@ export default function CreateNotification({ customers, types, channels }: Props
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/notifications' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back to Notifications
-                        
-                </Link>
-            </Button>
+                            <Link
+                                href="/admin/notifications"
+                                prefetch
+                                cacheFor={30}
+                            >
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                Back to Notifications
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
-                <Form action="/admin/notifications" method="post" id={formId} className="max-w-2xl space-y-6">
+                <Form
+                    action="/admin/notifications"
+                    method="post"
+                    id={formId}
+                    className="max-w-2xl space-y-6"
+                >
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
@@ -69,10 +81,17 @@ export default function CreateNotification({ customers, types, channels }: Props
                                         Select customer
                                     </option>
                                     {customers.map((customer) => (
-                                        <option key={customer.id} value={customer.id}>
-                                            {[customer.first_name, customer.last_name]
+                                        <option
+                                            key={customer.id}
+                                            value={customer.id}
+                                        >
+                                            {[
+                                                customer.first_name,
+                                                customer.last_name,
+                                            ]
                                                 .filter(Boolean)
-                                                .join(' ') || customer.email}{' '}
+                                                .join(' ') ||
+                                                customer.email}{' '}
                                             ({customer.email})
                                         </option>
                                     ))}
@@ -93,7 +112,10 @@ export default function CreateNotification({ customers, types, channels }: Props
                                         Select type
                                     </option>
                                     {types.map((type) => (
-                                        <option key={type.value} value={type.value}>
+                                        <option
+                                            key={type.value}
+                                            value={type.value}
+                                        >
                                             {type.label}
                                         </option>
                                     ))}
@@ -114,7 +136,10 @@ export default function CreateNotification({ customers, types, channels }: Props
                                         Select channel
                                     </option>
                                     {channels.map((channel) => (
-                                        <option key={channel.value} value={channel.value}>
+                                        <option
+                                            key={channel.value}
+                                            value={channel.value}
+                                        >
                                             {channel.label}
                                         </option>
                                     ))}

@@ -1,4 +1,4 @@
-import { Link, Form, Head, router } from '@inertiajs/react';
+import { Link, Form, Head } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -24,15 +24,21 @@ export default function CreateCannedResponse() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Canned Response" />
             <Wrapper>
-                <PageHeader title="Create Canned Response" description="Add a predefined reply for agents">
+                <PageHeader
+                    title="Create Canned Response"
+                    description="Add a predefined reply for agents"
+                >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/support/canned-responses' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back
-                        
-                </Link>
-            </Button>
+                            <Link
+                                href="/admin/support/canned-responses"
+                                prefetch
+                                cacheFor={30}
+                            >
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                Back
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -46,14 +52,21 @@ export default function CreateCannedResponse() {
                         <>
                             <div className="grid gap-2">
                                 <Label htmlFor="title">Title *</Label>
-                                <Input id="title" name="title" placeholder="e.g. Shipping information" required />
+                                <Input
+                                    id="title"
+                                    name="title"
+                                    placeholder="e.g. Shipping information"
+                                    required
+                                />
                                 <InputError message={errors.title} />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="shortcut">
                                     Shortcut *{' '}
-                                    <span className="text-xs text-muted-foreground">(used as #shortcut in chat)</span>
+                                    <span className="text-xs text-muted-foreground">
+                                        (used as #shortcut in chat)
+                                    </span>
                                 </Label>
                                 <div className="flex items-center">
                                     <span className="flex h-9 items-center rounded-l-md border border-r-0 bg-muted px-3 text-sm text-muted-foreground">

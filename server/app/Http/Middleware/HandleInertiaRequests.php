@@ -25,21 +25,6 @@ class HandleInertiaRequests extends Middleware
      */
     protected $rootView = 'app';
 
-    private function loadAdminTranslations(): array
-    {
-        return Cache::remember('admin_translations_v2', 3600, function (): array {
-            $result = [];
-
-            foreach (glob(lang_path('*/admin.php')) ?: [] as $file) {
-                $locale = basename(dirname($file));
-                $translations = require $file;
-                $result[$locale] = Arr::dot($translations);
-            }
-
-            return $result;
-        });
-    }
-
     /**
      * Determines the current asset version.
      *
@@ -89,5 +74,20 @@ class HandleInertiaRequests extends Middleware
             'locales' => Locale::getLocales(),
             'adminTranslations' => $this->loadAdminTranslations(),
         ];
+    }
+
+    private function loadAdminTranslations(): array
+    {
+        return Cache::remember('admin_translations_v2', 3600, function (): array {
+            $result = [];
+
+            foreach (glob(lang_path('*/admin.php')) ?: [] as $file) {
+                $locale = basename(dirname($file));
+                $translations = require $file;
+                $result[$locale] = Arr::dot($translations);
+            }
+
+            return $result;
+        });
     }
 }

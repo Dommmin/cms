@@ -1,4 +1,4 @@
-import { Link, Form, Head, router } from '@inertiajs/react';
+import { Link, Form, Head } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 export default function Edit({
@@ -47,7 +47,11 @@ export default function Edit({
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href='/admin/ecommerce/brands' prefetch cacheFor={30}>
+                            <Link
+                                href="/admin/ecommerce/brands"
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>
@@ -64,7 +68,9 @@ export default function Edit({
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="name">{__('label.name', 'Name')}</Label>
+                                <Label htmlFor="name">
+                                    {__('label.name', 'Name')}
+                                </Label>
                                 <Input
                                     id="name"
                                     name="name"
@@ -77,7 +83,9 @@ export default function Edit({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="slug">{__('label.slug', 'Slug')}</Label>
+                                <Label htmlFor="slug">
+                                    {__('label.slug', 'Slug')}
+                                </Label>
                                 <Input
                                     id="slug"
                                     name="slug"
@@ -89,7 +97,9 @@ export default function Edit({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="description">{__('label.description', 'Description')}</Label>
+                                <Label htmlFor="description">
+                                    {__('label.description', 'Description')}
+                                </Label>
                                 <textarea
                                     id="description"
                                     name="description"
@@ -121,7 +131,10 @@ export default function Edit({
                             <StickyFormActions
                                 formId={formId}
                                 processing={processing}
-                                submitLabel={__('action.save_changes', 'Save Changes')}
+                                submitLabel={__(
+                                    'action.save_changes',
+                                    'Save Changes',
+                                )}
                             />
                         </>
                     )}

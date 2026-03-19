@@ -29,7 +29,9 @@ export class CollapsibleContainerNode extends ElementNode {
         this.__open = open;
     }
 
-    static importJSON(node: SerializedCollapsibleContainerNode): CollapsibleContainerNode {
+    static importJSON(
+        node: SerializedCollapsibleContainerNode,
+    ): CollapsibleContainerNode {
         return $createCollapsibleContainerNode(node.open);
     }
 
@@ -58,7 +60,10 @@ export class CollapsibleContainerNode extends ElementNode {
         return details;
     }
 
-    updateDOM(prevNode: CollapsibleContainerNode, dom: HTMLDetailsElement): boolean {
+    updateDOM(
+        prevNode: CollapsibleContainerNode,
+        dom: HTMLDetailsElement,
+    ): boolean {
         if (prevNode.__open !== this.__open) dom.open = this.__open;
         return false;
     }
@@ -80,7 +85,9 @@ export class CollapsibleContainerNode extends ElementNode {
     }
 }
 
-export function $createCollapsibleContainerNode(open: boolean): CollapsibleContainerNode {
+export function $createCollapsibleContainerNode(
+    open: boolean,
+): CollapsibleContainerNode {
     return $applyNodeReplacement(new CollapsibleContainerNode(open));
 }
 

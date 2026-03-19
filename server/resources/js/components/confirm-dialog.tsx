@@ -23,7 +23,7 @@ interface ConfirmDialogProps {
     confirmMethod?: 'delete' | 'post' | 'put' | 'patch';
     confirmLabel?: string;
     cancelLabel?: string;
-    variant?: 'default' | 'destructive';
+    variant?: 'default' | 'destructive' | 'outline';
 }
 
 export function ConfirmDialog({

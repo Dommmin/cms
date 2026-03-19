@@ -1,5 +1,5 @@
-import { Head, router } from '@inertiajs/react';
-import { ShoppingCart, EyeIcon, DownloadIcon } from 'lucide-react';
+import { Head } from '@inertiajs/react';
+import { DownloadIcon } from 'lucide-react';
 import {
     useOrderColumns,
     type OrderRow,
@@ -8,8 +8,8 @@ import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 type OrderData = {
@@ -42,7 +42,10 @@ export default function OrdersIndex({
             <Wrapper>
                 <PageHeader
                     title={__('page.orders', 'Orders')}
-                    description={__('page.orders_desc', 'Manage customer orders')}
+                    description={__(
+                        'page.orders_desc',
+                        'Manage customer orders',
+                    )}
                 >
                     <PageHeaderActions>
                         <Button variant="outline" asChild>
@@ -66,7 +69,10 @@ export default function OrdersIndex({
                         next_page_url: orders.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search_orders', 'Search orders...')}
+                    searchPlaceholder={__(
+                        'placeholder.search_orders',
+                        'Search orders...',
+                    )}
                     searchValue={filters?.search ?? ''}
                     baseUrl="/admin/ecommerce/orders"
                 />

@@ -6,7 +6,6 @@ import {
     flexRender,
 } from '@tanstack/react-table';
 import { useCallback, useState } from 'react';
-import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
 import {
     Select,
@@ -15,6 +14,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
 import type { PaginationInfo } from '@/types';
 
@@ -48,15 +48,18 @@ export default function DataTable<T>({
     const __ = useTranslation();
     const [search, setSearch] = useState(searchValue);
     const perPageOptions = pagination
-        ? Array.from(
-              new Set([10, 25, 50, 100, pagination.per_page]),
-          ).sort((a, b) => a - b)
+        ? Array.from(new Set([10, 25, 50, 100, pagination.per_page])).sort(
+              (a, b) => a - b,
+          )
         : [10, 25, 50, 100];
 
     const handleSearch = useCallback(() => {
-        const currentParams = typeof window !== 'undefined'
-            ? Object.fromEntries(new URLSearchParams(window.location.search).entries())
-            : {};
+        const currentParams =
+            typeof window !== 'undefined'
+                ? Object.fromEntries(
+                      new URLSearchParams(window.location.search).entries(),
+                  )
+                : {};
 
         if (onSearch) {
             onSearch(search);
@@ -83,7 +86,10 @@ export default function DataTable<T>({
                 <div className="flex items-center gap-2">
                     <input
                         type="text"
-                        placeholder={searchPlaceholder ?? __('placeholder.search', 'Search...')}
+                        placeholder={
+                            searchPlaceholder ??
+                            __('placeholder.search', 'Search...')
+                        }
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         onKeyDown={(e) => {
@@ -179,12 +185,21 @@ export default function DataTable<T>({
                                 if (onPerPageChange) {
                                     onPerPageChange(parseInt(value));
                                 } else if (baseUrl) {
-                                    const currentParams = typeof window !== 'undefined'
-                                        ? Object.fromEntries(new URLSearchParams(window.location.search).entries())
-                                        : {};
+                                    const currentParams =
+                                        typeof window !== 'undefined'
+                                            ? Object.fromEntries(
+                                                  new URLSearchParams(
+                                                      window.location.search,
+                                                  ).entries(),
+                                              )
+                                            : {};
                                     router.get(
                                         baseUrl,
-                                        { ...currentParams, per_page: parseInt(value), page: 1 },
+                                        {
+                                            ...currentParams,
+                                            per_page: parseInt(value),
+                                            page: 1,
+                                        },
                                         { replace: true, preserveState: true },
                                     );
                                 }

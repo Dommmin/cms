@@ -27,11 +27,47 @@ function ThumbnailSvg({ children }: { children: React.ReactNode }) {
 }
 
 // Reusable primitives
-const Line = ({ y, x1 = 4, x2 = 60 }: { y: number; x1?: number; x2?: number }) => (
-    <rect x={x1} y={y} width={x2 - x1} height={1.5} rx={0.75} fill="currentColor" opacity={0.3} />
+const Line = ({
+    y,
+    x1 = 4,
+    x2 = 60,
+}: {
+    y: number;
+    x1?: number;
+    x2?: number;
+}) => (
+    <rect
+        x={x1}
+        y={y}
+        width={x2 - x1}
+        height={1.5}
+        rx={0.75}
+        fill="currentColor"
+        opacity={0.3}
+    />
 );
-const Rect = ({ x, y, w, h, opacity = 0.2 }: { x: number; y: number; w: number; h: number; opacity?: number }) => (
-    <rect x={x} y={y} width={w} height={h} rx={1} fill="currentColor" opacity={opacity} />
+const Rect = ({
+    x,
+    y,
+    w,
+    h,
+    opacity = 0.2,
+}: {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    opacity?: number;
+}) => (
+    <rect
+        x={x}
+        y={y}
+        width={w}
+        height={h}
+        rx={1}
+        fill="currentColor"
+        opacity={opacity}
+    />
 );
 const Circle = ({ cx, cy, r }: { cx: number; cy: number; r: number }) => (
     <circle cx={cx} cy={cy} r={r} fill="currentColor" opacity={0.2} />
@@ -90,7 +126,13 @@ function CategoriesGridThumb() {
             <Line y={4} x1={20} x2={44} />
             {[0, 1, 2, 3].map((i) => (
                 <g key={i}>
-                    <Rect x={4 + (i % 2) * 31} y={10 + Math.floor(i / 2) * 13} w={27} h={10} opacity={0.2} />
+                    <Rect
+                        x={4 + (i % 2) * 31}
+                        y={10 + Math.floor(i / 2) * 13}
+                        w={27}
+                        h={10}
+                        opacity={0.2}
+                    />
                 </g>
             ))}
         </ThumbnailSvg>
@@ -129,7 +171,9 @@ function TestimonialsThumb() {
     return (
         <ThumbnailSvg>
             {/* Quote mark */}
-            <text x={4} y={12} fontSize={10} fill="currentColor" opacity={0.3}>&ldquo;</text>
+            <text x={4} y={12} fontSize={10} fill="currentColor" opacity={0.3}>
+                &ldquo;
+            </text>
             <Line y={13} x1={12} x2={58} />
             <Line y={18} x1={12} x2={52} />
             <Line y={23} x1={12} x2={40} />
@@ -159,7 +203,11 @@ function VideoEmbedThumb() {
             <Rect x={4} y={4} w={56} h={28} opacity={0.15} />
             {/* Play icon */}
             <circle cx={32} cy={18} r={8} fill="currentColor" opacity={0.2} />
-            <polygon points="29,14 29,22 37,18" fill="currentColor" opacity={0.5} />
+            <polygon
+                points="29,14 29,22 37,18"
+                fill="currentColor"
+                opacity={0.5}
+            />
         </ThumbnailSvg>
     );
 }
@@ -201,7 +249,13 @@ function AccordionThumb() {
         <ThumbnailSvg>
             {[0, 1, 2, 3].map((i) => (
                 <g key={i}>
-                    <Rect x={4} y={4 + i * 8} w={56} h={6} opacity={i === 0 ? 0.25 : 0.12} />
+                    <Rect
+                        x={4}
+                        y={4 + i * 8}
+                        w={56}
+                        h={6}
+                        opacity={i === 0 ? 0.25 : 0.12}
+                    />
                     <Line y={7 + i * 8} x1={8} x2={48} />
                 </g>
             ))}
@@ -214,7 +268,14 @@ function TabsThumb() {
         <ThumbnailSvg>
             {/* Tab headers */}
             {[0, 1, 2].map((i) => (
-                <Rect key={i} x={4 + i * 21} y={3} w={18} h={6} opacity={i === 0 ? 0.4 : 0.15} />
+                <Rect
+                    key={i}
+                    x={4 + i * 21}
+                    y={3}
+                    w={18}
+                    h={6}
+                    opacity={i === 0 ? 0.4 : 0.15}
+                />
             ))}
             {/* Tab content area */}
             <Rect x={4} y={11} w={56} h={22} opacity={0.1} />
@@ -231,10 +292,25 @@ function MapThumb() {
             <Rect x={4} y={4} w={56} h={28} opacity={0.12} />
             {/* Map grid lines */}
             <Line y={14} x1={4} x2={60} />
-            <rect x={28} y={4} width={1.5} height={28} fill="currentColor" opacity={0.15} />
+            <rect
+                x={28}
+                y={4}
+                width={1.5}
+                height={28}
+                fill="currentColor"
+                opacity={0.15}
+            />
             {/* Pin */}
             <circle cx={32} cy={14} r={4} fill="currentColor" opacity={0.35} />
-            <line x1={32} y1={18} x2={32} y2={24} stroke="currentColor" strokeWidth={1.5} opacity={0.35} />
+            <line
+                x1={32}
+                y1={18}
+                x2={32}
+                y2={24}
+                stroke="currentColor"
+                strokeWidth={1.5}
+                opacity={0.35}
+            />
         </ThumbnailSvg>
     );
 }
@@ -254,13 +330,34 @@ function FormEmbedThumb() {
 function CustomHtmlThumb() {
     return (
         <ThumbnailSvg>
-            <text x={4} y={16} fontSize={9} fill="currentColor" opacity={0.5} fontFamily="monospace">
+            <text
+                x={4}
+                y={16}
+                fontSize={9}
+                fill="currentColor"
+                opacity={0.5}
+                fontFamily="monospace"
+            >
                 {'<div>'}
             </text>
-            <text x={10} y={23} fontSize={9} fill="currentColor" opacity={0.35} fontFamily="monospace">
+            <text
+                x={10}
+                y={23}
+                fontSize={9}
+                fill="currentColor"
+                opacity={0.35}
+                fontFamily="monospace"
+            >
                 {'...'}
             </text>
-            <text x={4} y={30} fontSize={9} fill="currentColor" opacity={0.5} fontFamily="monospace">
+            <text
+                x={4}
+                y={30}
+                fontSize={9}
+                fill="currentColor"
+                opacity={0.5}
+                fontFamily="monospace"
+            >
                 {'</div>'}
             </text>
         </ThumbnailSvg>
@@ -269,7 +366,12 @@ function CustomHtmlThumb() {
 
 function GenericThumb({ icon }: { icon?: string }) {
     const label = icon
-        ? icon.replace(/-/g, ' ').split(' ').map((w) => w[0]?.toUpperCase() ?? '').join('').slice(0, 2)
+        ? icon
+              .replace(/-/g, ' ')
+              .split(' ')
+              .map((w) => w[0]?.toUpperCase() ?? '')
+              .join('')
+              .slice(0, 2)
         : '?';
     return (
         <ThumbnailSvg>

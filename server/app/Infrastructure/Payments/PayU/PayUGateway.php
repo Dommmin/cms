@@ -49,7 +49,7 @@ class PayUGateway implements PaymentGatewayInterface
             'customerIp' => $customerIp,
             'merchantPosId' => (string) config('services.payu.pos_id'),
             'description' => 'Zamówienie #'.($order->reference_number ?? $order->id),
-            'currencyCode' => strtoupper($payment->currency_code),
+            'currencyCode' => mb_strtoupper($payment->currency_code),
             'totalAmount' => (string) $payment->amount,
             'extOrderId' => (string) $payment->id,
             'buyer' => $this->buildBuyer($order),

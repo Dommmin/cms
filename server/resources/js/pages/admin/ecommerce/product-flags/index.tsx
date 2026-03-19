@@ -6,8 +6,8 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 interface ProductFlag {
@@ -56,7 +56,11 @@ export default function ProductFlagsIndex({ flags, filters }: IndexProps) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/ecommerce/product-flags/create" prefetch cacheFor={30}>
+                            <Link
+                                href="/admin/ecommerce/product-flags/create"
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <Plus className="mr-2 h-4 w-4" />
                                 {__('action.add_flag', 'Add Flag')}
                             </Link>
@@ -73,15 +77,21 @@ export default function ProductFlagsIndex({ flags, filters }: IndexProps) {
                                 <div className="flex items-center gap-2">
                                     <div
                                         className="flex h-8 w-8 items-center justify-center rounded"
-                                        style={{ backgroundColor: `${row.original.color}20` }}
+                                        style={{
+                                            backgroundColor: `${row.original.color}20`,
+                                        }}
                                     >
                                         <Flag
                                             className="h-4 w-4"
-                                            style={{ color: row.original.color }}
+                                            style={{
+                                                color: row.original.color,
+                                            }}
                                         />
                                     </div>
                                     <div>
-                                        <span className="font-medium">{row.original.name}</span>
+                                        <span className="font-medium">
+                                            {row.original.name}
+                                        </span>
                                         {row.original.description && (
                                             <p className="text-xs text-muted-foreground">
                                                 {row.original.description}
@@ -107,7 +117,9 @@ export default function ProductFlagsIndex({ flags, filters }: IndexProps) {
                                 <div className="flex items-center gap-2">
                                     <span
                                         className="inline-block h-4 w-4 rounded-sm border"
-                                        style={{ backgroundColor: row.original.color }}
+                                        style={{
+                                            backgroundColor: row.original.color,
+                                        }}
                                     />
                                     <code className="text-xs text-muted-foreground">
                                         {row.original.color}
@@ -119,8 +131,16 @@ export default function ProductFlagsIndex({ flags, filters }: IndexProps) {
                             accessorKey: 'is_active',
                             header: __('column.status', 'Status'),
                             cell: ({ row }) => (
-                                <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
-                                    {row.original.is_active ? __('status.active', 'Active') : __('status.inactive', 'Inactive')}
+                                <Badge
+                                    variant={
+                                        row.original.is_active
+                                            ? 'default'
+                                            : 'secondary'
+                                    }
+                                >
+                                    {row.original.is_active
+                                        ? __('status.active', 'Active')
+                                        : __('status.inactive', 'Inactive')}
                                 </Badge>
                             ),
                         },
@@ -130,7 +150,11 @@ export default function ProductFlagsIndex({ flags, filters }: IndexProps) {
                             cell: ({ row }) => (
                                 <div className="flex items-center gap-2">
                                     <Button asChild variant="outline" size="sm">
-                                        <Link href={`/admin/ecommerce/product-flags/${row.original.id}/edit`} prefetch cacheFor={30}>
+                                        <Link
+                                            href={`/admin/ecommerce/product-flags/${row.original.id}/edit`}
+                                            prefetch
+                                            cacheFor={30}
+                                        >
                                             <PencilIcon className="mr-1 h-3 w-3" />
                                             {__('action.edit', 'Edit')}
                                         </Link>
@@ -138,7 +162,10 @@ export default function ProductFlagsIndex({ flags, filters }: IndexProps) {
                                     <ConfirmButton
                                         variant="outline"
                                         size="sm"
-                                        title={__('dialog.delete_title', 'Delete Flag')}
+                                        title={__(
+                                            'dialog.delete_title',
+                                            'Delete Flag',
+                                        )}
                                         description={`Are you sure you want to delete "${row.original.name}"?`}
                                         onConfirm={() => {
                                             router.delete(
@@ -162,7 +189,10 @@ export default function ProductFlagsIndex({ flags, filters }: IndexProps) {
                         next_page_url: flags.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search_flags', 'Search flags...')}
+                    searchPlaceholder={__(
+                        'placeholder.search_flags',
+                        'Search flags...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/ecommerce/product-flags"
                 />

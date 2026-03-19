@@ -1,8 +1,16 @@
 import { $createCodeNode } from '@lexical/code';
-import { INSERT_CHECK_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND } from '@lexical/list';
+import {
+    INSERT_CHECK_LIST_COMMAND,
+    INSERT_ORDERED_LIST_COMMAND,
+    INSERT_UNORDERED_LIST_COMMAND,
+} from '@lexical/list';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode';
-import { LexicalTypeaheadMenuPlugin, MenuOption, useBasicTypeaheadTriggerMatch } from '@lexical/react/LexicalTypeaheadMenuPlugin';
+import {
+    LexicalTypeaheadMenuPlugin,
+    MenuOption,
+    useBasicTypeaheadTriggerMatch,
+} from '@lexical/react/LexicalTypeaheadMenuPlugin';
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
 import { $setBlocksType } from '@lexical/selection';
 import { INSERT_TABLE_COMMAND } from '@lexical/table';
@@ -14,15 +22,28 @@ import {
     type LexicalEditor,
 } from 'lexical';
 import {
-    Calendar, Columns, Code2, ChevronRight, FileText,
-    Figma, Heading1, Heading2, Heading3,
-    List, ListChecks, ListOrdered, Minus,
-    Quote, Table, Twitter, Type, Youtube,
+    Calendar,
+    Columns,
+    Code2,
+    ChevronRight,
+    FileText,
+    Figma,
+    Heading1,
+    Heading2,
+    Heading3,
+    List,
+    ListChecks,
+    ListOrdered,
+    Minus,
+    Quote,
+    Table,
+    Twitter,
+    Type,
+    Youtube,
 } from 'lucide-react';
 import { type JSX } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { $createImageNode } from '../nodes/ImageNode';
 import { $createYouTubeNode } from '../nodes/YouTubeNode';
 import { INSERT_COLLAPSIBLE_COMMAND } from './CollapsiblePlugin';
 import { INSERT_DATE_COMMAND } from './DatePlugin';
@@ -96,7 +117,9 @@ function promptUrl(label: string): string | null {
 }
 
 function extractYouTubeId(url: string): string | null {
-    const m = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/.exec(url);
+    const m = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/.exec(
+        url,
+    );
     return m ? m[1] : null;
 }
 
@@ -113,35 +136,52 @@ function getBaseOptions(editor: LexicalEditor): ComponentPickerOption[] {
             onSelect: () =>
                 editor.update(() => {
                     const selection = $getSelection();
-                    if ($isRangeSelection(selection)) $setBlocksType(selection, () => $createParagraphNode());
+                    if ($isRangeSelection(selection))
+                        $setBlocksType(selection, () => $createParagraphNode());
                 }),
         }),
         ...(['h1', 'h2', 'h3'] as const).map(
             (tag, i) =>
                 new ComponentPickerOption(`Heading ${i + 1}`, {
-                    icon: i === 0 ? <Heading1 className="h-4 w-4" /> : i === 1 ? <Heading2 className="h-4 w-4" /> : <Heading3 className="h-4 w-4" />,
+                    icon:
+                        i === 0 ? (
+                            <Heading1 className="h-4 w-4" />
+                        ) : i === 1 ? (
+                            <Heading2 className="h-4 w-4" />
+                        ) : (
+                            <Heading3 className="h-4 w-4" />
+                        ),
                     keywords: ['heading', 'header', `h${i + 1}`],
                     onSelect: () =>
                         editor.update(() => {
                             const selection = $getSelection();
-                            if ($isRangeSelection(selection)) $setBlocksType(selection, () => $createHeadingNode(tag));
+                            if ($isRangeSelection(selection))
+                                $setBlocksType(selection, () =>
+                                    $createHeadingNode(tag),
+                                );
                         }),
                 }),
         ),
         new ComponentPickerOption('Bulleted List', {
             icon: <List className="h-4 w-4" />,
             keywords: ['bulleted list', 'unordered list', 'ul'],
-            onSelect: () => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined),
+            onSelect: () =>
+                editor.dispatchCommand(
+                    INSERT_UNORDERED_LIST_COMMAND,
+                    undefined,
+                ),
         }),
         new ComponentPickerOption('Numbered List', {
             icon: <ListOrdered className="h-4 w-4" />,
             keywords: ['numbered list', 'ordered list', 'ol'],
-            onSelect: () => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined),
+            onSelect: () =>
+                editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined),
         }),
         new ComponentPickerOption('Check List', {
             icon: <ListChecks className="h-4 w-4" />,
             keywords: ['check list', 'todo list', 'checklist'],
-            onSelect: () => editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined),
+            onSelect: () =>
+                editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined),
         }),
         new ComponentPickerOption('Quote', {
             icon: <Quote className="h-4 w-4" />,
@@ -149,7 +189,8 @@ function getBaseOptions(editor: LexicalEditor): ComponentPickerOption[] {
             onSelect: () =>
                 editor.update(() => {
                     const selection = $getSelection();
-                    if ($isRangeSelection(selection)) $setBlocksType(selection, () => $createQuoteNode());
+                    if ($isRangeSelection(selection))
+                        $setBlocksType(selection, () => $createQuoteNode());
                 }),
         }),
         new ComponentPickerOption('Code Block', {
@@ -158,38 +199,54 @@ function getBaseOptions(editor: LexicalEditor): ComponentPickerOption[] {
             onSelect: () =>
                 editor.update(() => {
                     const selection = $getSelection();
-                    if ($isRangeSelection(selection)) $setBlocksType(selection, () => $createCodeNode());
+                    if ($isRangeSelection(selection))
+                        $setBlocksType(selection, () => $createCodeNode());
                 }),
         }),
         new ComponentPickerOption('Divider', {
             icon: <Minus className="h-4 w-4" />,
             keywords: ['horizontal rule', 'divider', 'hr', 'line'],
-            onSelect: () => editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined),
+            onSelect: () =>
+                editor.dispatchCommand(
+                    INSERT_HORIZONTAL_RULE_COMMAND,
+                    undefined,
+                ),
         }),
         new ComponentPickerOption('Page Break', {
             icon: <FileText className="h-4 w-4" />,
             keywords: ['page break', 'pagebreak', 'break'],
-            onSelect: () => editor.dispatchCommand(INSERT_PAGE_BREAK_COMMAND, undefined),
+            onSelect: () =>
+                editor.dispatchCommand(INSERT_PAGE_BREAK_COMMAND, undefined),
         }),
         new ComponentPickerOption('Table', {
             icon: <Table className="h-4 w-4" />,
             keywords: ['grid', 'spreadsheet', 'rows', 'columns', 'table'],
-            onSelect: () => editor.dispatchCommand(INSERT_TABLE_COMMAND, { rows: '3', columns: '3' }),
+            onSelect: () =>
+                editor.dispatchCommand(INSERT_TABLE_COMMAND, {
+                    rows: '3',
+                    columns: '3',
+                }),
         }),
         new ComponentPickerOption('Columns Layout', {
             icon: <Columns className="h-4 w-4" />,
             keywords: ['columns', 'layout', 'grid', 'two columns'],
-            onSelect: () => editor.dispatchCommand(INSERT_LAYOUT_COMMAND, '1fr 1fr'),
+            onSelect: () =>
+                editor.dispatchCommand(INSERT_LAYOUT_COMMAND, '1fr 1fr'),
         }),
         new ComponentPickerOption('Collapsible', {
             icon: <ChevronRight className="h-4 w-4" />,
             keywords: ['collapsible', 'accordion', 'toggle', 'details'],
-            onSelect: () => editor.dispatchCommand(INSERT_COLLAPSIBLE_COMMAND, undefined),
+            onSelect: () =>
+                editor.dispatchCommand(INSERT_COLLAPSIBLE_COMMAND, undefined),
         }),
         new ComponentPickerOption('Date', {
             icon: <Calendar className="h-4 w-4" />,
             keywords: ['date', 'today', 'time', 'calendar'],
-            onSelect: () => editor.dispatchCommand(INSERT_DATE_COMMAND, new Date().toISOString().slice(0, 10)),
+            onSelect: () =>
+                editor.dispatchCommand(
+                    INSERT_DATE_COMMAND,
+                    new Date().toISOString().slice(0, 10),
+                ),
         }),
         new ComponentPickerOption('YouTube Video', {
             icon: <Youtube className="h-4 w-4" />,
@@ -198,7 +255,10 @@ function getBaseOptions(editor: LexicalEditor): ComponentPickerOption[] {
                 const url = promptUrl('YouTube');
                 if (!url) return;
                 const id = extractYouTubeId(url);
-                if (id) editor.update(() => { $insertNodeToNearestRoot($createYouTubeNode(id)); });
+                if (id)
+                    editor.update(() => {
+                        $insertNodeToNearestRoot($createYouTubeNode(id));
+                    });
             },
         }),
         new ComponentPickerOption('X (Tweet)', {
@@ -226,19 +286,29 @@ export default function ComponentPickerPlugin(): JSX.Element {
     const [editor] = useLexicalComposerContext();
     const [queryString, setQueryString] = useState<string | null>(null);
 
-    const checkForTriggerMatch = useBasicTypeaheadTriggerMatch('/', { minLength: 0 });
+    const checkForTriggerMatch = useBasicTypeaheadTriggerMatch('/', {
+        minLength: 0,
+    });
 
     const options = useMemo(() => {
         const baseOptions = getBaseOptions(editor);
         if (!queryString) return baseOptions;
         const regex = new RegExp(queryString, 'i');
-        return baseOptions.filter((option) =>
-            regex.test(option.title) || option.keywords.some((keyword) => regex.test(keyword)),
+        return baseOptions.filter(
+            (option) =>
+                regex.test(option.title) ||
+                option.keywords.some((keyword) => regex.test(keyword)),
         );
     }, [editor, queryString]);
 
     const onSelectOption = useCallback(
-        (selectedOption: ComponentPickerOption, nodeToRemove: any | null, closeMenu: () => void, matchingString: string) => {
+        (
+            selectedOption: ComponentPickerOption,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            nodeToRemove: any | null,
+            closeMenu: () => void,
+            matchingString: string,
+        ) => {
             editor.update(() => {
                 nodeToRemove?.remove();
                 selectedOption.onSelect(matchingString);
@@ -254,17 +324,25 @@ export default function ComponentPickerPlugin(): JSX.Element {
             onSelectOption={onSelectOption}
             triggerFn={checkForTriggerMatch}
             options={options}
-            menuRenderFn={(anchorElementRef, { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex }) =>
+            menuRenderFn={(
+                anchorElementRef,
+                { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
+            ) =>
                 anchorElementRef.current && options.length
                     ? createPortal(
-                          <div className="component-picker-menu z-50 min-w-[200px] max-h-[300px] overflow-y-auto rounded-lg border bg-popover p-1 shadow-lg">
+                          <div className="component-picker-menu z-50 max-h-[300px] min-w-[200px] overflow-y-auto rounded-lg border bg-popover p-1 shadow-lg">
                               <ul>
                                   {options.map((option, i) => (
                                       <ComponentPickerMenuItem
                                           index={i}
                                           isSelected={selectedIndex === i}
-                                          onClick={() => { setHighlightedIndex(i); selectOptionAndCleanUp(option); }}
-                                          onMouseEnter={() => setHighlightedIndex(i)}
+                                          onClick={() => {
+                                              setHighlightedIndex(i);
+                                              selectOptionAndCleanUp(option);
+                                          }}
+                                          onMouseEnter={() =>
+                                              setHighlightedIndex(i)
+                                          }
                                           key={option.key}
                                           option={option}
                                       />

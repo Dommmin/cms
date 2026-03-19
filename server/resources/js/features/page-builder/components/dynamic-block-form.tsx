@@ -27,7 +27,6 @@ import type {
     ArraySchemaProperty,
     Block,
     BlockTypeConfig,
-    RelationConfig,
     SchemaProperty,
     StringSchemaProperty,
 } from '../types';
@@ -51,11 +50,15 @@ function StringField({ fieldKey, schema, value, onChange }: FieldProps) {
             <div className="space-y-1.5">
                 <Label htmlFor={fieldKey}>{label}</Label>
                 {s.description && (
-                    <p className="text-xs text-muted-foreground">{s.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                        {s.description}
+                    </p>
                 )}
                 <Select value={str} onValueChange={onChange}>
                     <SelectTrigger id={fieldKey}>
-                        <SelectValue placeholder={`Select ${label.toLowerCase()}…`} />
+                        <SelectValue
+                            placeholder={`Select ${label.toLowerCase()}…`}
+                        />
                     </SelectTrigger>
                     <SelectContent>
                         {s.enum.map((opt) => (
@@ -74,7 +77,9 @@ function StringField({ fieldKey, schema, value, onChange }: FieldProps) {
             <div className="space-y-1.5">
                 <Label>{label}</Label>
                 {s.description && (
-                    <p className="text-xs text-muted-foreground">{s.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                        {s.description}
+                    </p>
                 )}
                 <RichTextEditor value={str} onChange={onChange} />
             </div>
@@ -86,7 +91,9 @@ function StringField({ fieldKey, schema, value, onChange }: FieldProps) {
             <div className="space-y-1.5">
                 <Label htmlFor={fieldKey}>{label}</Label>
                 {s.description && (
-                    <p className="text-xs text-muted-foreground">{s.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                        {s.description}
+                    </p>
                 )}
                 <Textarea
                     id={fieldKey}
@@ -104,7 +111,9 @@ function StringField({ fieldKey, schema, value, onChange }: FieldProps) {
             <div className="space-y-1.5">
                 <Label htmlFor={fieldKey}>{label}</Label>
                 {s.description && (
-                    <p className="text-xs text-muted-foreground">{s.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                        {s.description}
+                    </p>
                 )}
                 <div className="flex items-center gap-2">
                     <input
@@ -131,7 +140,9 @@ function StringField({ fieldKey, schema, value, onChange }: FieldProps) {
             <div className="space-y-1.5">
                 <Label htmlFor={fieldKey}>{label}</Label>
                 {s.description && (
-                    <p className="text-xs text-muted-foreground">{s.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                        {s.description}
+                    </p>
                 )}
                 <Textarea
                     id={fieldKey}
@@ -193,20 +204,22 @@ function NumberField({ fieldKey, schema, value, onChange }: FieldProps) {
 
 function BooleanField({ fieldKey, schema, value, onChange }: FieldProps) {
     const s = schema as Extract<SchemaProperty, { type: 'boolean' }>;
-    const bool = (value as boolean | undefined) ?? (s.default as boolean | undefined) ?? false;
+    const bool =
+        (value as boolean | undefined) ??
+        (s.default as boolean | undefined) ??
+        false;
 
     return (
         <div className="flex items-center justify-between rounded-lg border p-3">
             <div>
                 <p className="text-sm font-medium">{s.label ?? fieldKey}</p>
                 {s.description && (
-                    <p className="text-xs text-muted-foreground">{s.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                        {s.description}
+                    </p>
                 )}
             </div>
-            <Switch
-                checked={bool}
-                onCheckedChange={onChange}
-            />
+            <Switch checked={bool} onCheckedChange={onChange} />
         </div>
     );
 }
@@ -241,7 +254,12 @@ function RepeaterField({ fieldKey, schema, value, onChange }: FieldProps) {
         <div className="space-y-3">
             <div className="flex items-center justify-between">
                 <Label>{s.label ?? fieldKey}</Label>
-                <Button type="button" variant="outline" size="sm" onClick={addItem}>
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addItem}
+                >
                     <PlusIcon className="mr-1 h-3.5 w-3.5" />
                     Add item
                 </Button>
@@ -256,7 +274,7 @@ function RepeaterField({ fieldKey, schema, value, onChange }: FieldProps) {
             {items.map((item, idx) => (
                 <div key={idx} className="rounded-lg border bg-muted/20 p-4">
                     <div className="mb-3 flex items-center justify-between">
-                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                             Item {idx + 1}
                         </span>
                         <Button
@@ -270,15 +288,17 @@ function RepeaterField({ fieldKey, schema, value, onChange }: FieldProps) {
                         </Button>
                     </div>
                     <div className="space-y-3">
-                        {Object.entries(subProperties).map(([subKey, subSchema]) => (
-                            <SchemaField
-                                key={subKey}
-                                fieldKey={`${fieldKey}.${idx}.${subKey}`}
-                                schema={subSchema}
-                                value={item[subKey]}
-                                onChange={(v) => updateItem(idx, subKey, v)}
-                            />
-                        ))}
+                        {Object.entries(subProperties).map(
+                            ([subKey, subSchema]) => (
+                                <SchemaField
+                                    key={subKey}
+                                    fieldKey={`${fieldKey}.${idx}.${subKey}`}
+                                    schema={subSchema}
+                                    value={item[subKey]}
+                                    onChange={(v) => updateItem(idx, subKey, v)}
+                                />
+                            ),
+                        )}
                     </div>
                 </div>
             ))}
@@ -354,7 +374,8 @@ export function DynamicBlockForm({
         allowedRelations[key].types.some((t) => t.startsWith('media.')),
     );
     const nonMediaRelationKeys = Object.keys(allowedRelations).filter(
-        (key) => !allowedRelations[key].types.some((t) => t.startsWith('media.')),
+        (key) =>
+            !allowedRelations[key].types.some((t) => t.startsWith('media.')),
     );
 
     // Convert block.relations to BlockRelationManager format
@@ -431,10 +452,17 @@ export function DynamicBlockForm({
             {mediaRelationKeys.length > 0 && (
                 <div className="space-y-2">
                     <div className="border-t pt-4">
-                        <p className="mb-3 text-sm font-medium text-foreground">Media</p>
+                        <p className="mb-3 text-sm font-medium text-foreground">
+                            Media
+                        </p>
                         <BlockRelationManager
                             blockType={block.type}
-                            allowedRelations={mediaAllowedRelations as Record<string, BRMRelationConfig>}
+                            allowedRelations={
+                                mediaAllowedRelations as Record<
+                                    string,
+                                    BRMRelationConfig
+                                >
+                            }
                             value={relationsData}
                             onChange={handleRelationsChange}
                         />
@@ -451,7 +479,12 @@ export function DynamicBlockForm({
                         </p>
                         <BlockRelationManager
                             blockType={block.type}
-                            allowedRelations={nonMediaAllowedRelations as Record<string, BRMRelationConfig>}
+                            allowedRelations={
+                                nonMediaAllowedRelations as Record<
+                                    string,
+                                    BRMRelationConfig
+                                >
+                            }
                             value={relationsData}
                             onChange={handleRelationsChange}
                         />

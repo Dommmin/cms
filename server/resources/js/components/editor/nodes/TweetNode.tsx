@@ -1,8 +1,5 @@
 import type {
-    DOMConversionMap,
-    DOMExportOutput,
     EditorConfig,
-    LexicalEditor,
     NodeKey,
     SerializedLexicalNode,
     Spread,
@@ -49,7 +46,9 @@ export class TweetNode extends DecoratorNode<JSX.Element> {
     decorate(): JSX.Element {
         return (
             <div className="mx-auto my-4 max-w-md rounded-xl border border-border bg-card p-4">
-                <p className="text-sm text-muted-foreground">Tweet ID: {this.__id}</p>
+                <p className="text-sm text-muted-foreground">
+                    Tweet ID: {this.__id}
+                </p>
                 <a
                     href={`https://twitter.com/i/web/status/${this.__id}`}
                     target="_blank"

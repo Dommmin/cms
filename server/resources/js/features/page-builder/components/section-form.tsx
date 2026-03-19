@@ -63,8 +63,9 @@ export function SectionForm({
             <div className="flex items-start gap-2 rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
                 <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 <span>
-                    Section container settings — define how the public site wraps this
-                    section. Add <strong>blocks</strong> below to set the actual content.
+                    Section container settings — define how the public site
+                    wraps this section. Add <strong>blocks</strong> below to set
+                    the actual content.
                 </span>
             </div>
 
@@ -75,18 +76,24 @@ export function SectionForm({
                     <Select
                         value={section.section_type || undefined}
                         onValueChange={(value) =>
-                            onUpdate({ section_type: value, layout: 'contained', variant: null })
+                            onUpdate({
+                                section_type: value,
+                                layout: 'contained',
+                                variant: null,
+                            })
                         }
                     >
                         <SelectTrigger id="section-type">
                             <SelectValue placeholder="Select type..." />
                         </SelectTrigger>
                         <SelectContent>
-                            {Object.entries(availableSections).map(([key, config]) => (
-                                <SelectItem key={key} value={key}>
-                                    {config.label || key}
-                                </SelectItem>
-                            ))}
+                            {Object.entries(availableSections).map(
+                                ([key, config]) => (
+                                    <SelectItem key={key} value={key}>
+                                        {config.label || key}
+                                    </SelectItem>
+                                ),
+                            )}
                         </SelectContent>
                     </Select>
                     {currentSectionConfig?.description && (
@@ -110,7 +117,10 @@ export function SectionForm({
                         <SelectContent>
                             {layoutOptions.length > 0 ? (
                                 layoutOptions.map((option) => (
-                                    <SelectItem key={option.value} value={option.value}>
+                                    <SelectItem
+                                        key={option.value}
+                                        value={option.value}
+                                    >
                                         {option.label}
                                     </SelectItem>
                                 ))
@@ -124,11 +134,15 @@ export function SectionForm({
                 {/* Variant */}
                 {variantOptions.length > 0 && (
                     <div className="space-y-1.5">
-                        <Label htmlFor="section-variant">Background / Style</Label>
+                        <Label htmlFor="section-variant">
+                            Background / Style
+                        </Label>
                         <Select
                             value={section.variant ?? '_none_'}
                             onValueChange={(value) =>
-                                onUpdate({ variant: value === '_none_' ? null : value })
+                                onUpdate({
+                                    variant: value === '_none_' ? null : value,
+                                })
                             }
                         >
                             <SelectTrigger id="section-variant">
@@ -137,7 +151,10 @@ export function SectionForm({
                             <SelectContent>
                                 <SelectItem value="_none_">None</SelectItem>
                                 {variantOptions.map((option) => (
-                                    <SelectItem key={option.value} value={option.value}>
+                                    <SelectItem
+                                        key={option.value}
+                                        value={option.value}
+                                    >
                                         {option.label}
                                     </SelectItem>
                                 ))}

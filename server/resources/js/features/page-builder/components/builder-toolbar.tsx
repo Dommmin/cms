@@ -5,7 +5,19 @@
  */
 
 import { Link } from '@inertiajs/react';
-import { ArrowLeft, Columns2, Eye, LayoutTemplate, Monitor, Plus, Redo2, Save, Smartphone, Tablet, Undo2 } from 'lucide-react';
+import {
+    ArrowLeft,
+    Columns2,
+    Eye,
+    LayoutTemplate,
+    Monitor,
+    Plus,
+    Redo2,
+    Save,
+    Smartphone,
+    Tablet,
+    Undo2,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export type PreviewDevice = 'desktop' | 'tablet' | 'mobile';
@@ -30,9 +42,9 @@ type BuilderToolbarProps = {
 };
 
 export function BuilderToolbar({
-    pageId,
+    pageId: _pageId,
     pageTitle,
-    isPublished,
+    isPublished: _isPublished,
     isSaving,
     isSplitView,
     canUndo,
@@ -100,7 +112,11 @@ export function BuilderToolbar({
                             <div className="flex items-center rounded-md border">
                                 <Button
                                     onClick={() => onChangeDevice('desktop')}
-                                    variant={previewDevice === 'desktop' ? 'secondary' : 'ghost'}
+                                    variant={
+                                        previewDevice === 'desktop'
+                                            ? 'secondary'
+                                            : 'ghost'
+                                    }
                                     size="sm"
                                     title="Desktop preview"
                                     className="h-8 w-8 rounded-r-none border-0 p-0"
@@ -109,7 +125,11 @@ export function BuilderToolbar({
                                 </Button>
                                 <Button
                                     onClick={() => onChangeDevice('tablet')}
-                                    variant={previewDevice === 'tablet' ? 'secondary' : 'ghost'}
+                                    variant={
+                                        previewDevice === 'tablet'
+                                            ? 'secondary'
+                                            : 'ghost'
+                                    }
                                     size="sm"
                                     title="Tablet preview"
                                     className="h-8 w-8 rounded-none border-x p-0"
@@ -118,7 +138,11 @@ export function BuilderToolbar({
                                 </Button>
                                 <Button
                                     onClick={() => onChangeDevice('mobile')}
-                                    variant={previewDevice === 'mobile' ? 'secondary' : 'ghost'}
+                                    variant={
+                                        previewDevice === 'mobile'
+                                            ? 'secondary'
+                                            : 'ghost'
+                                    }
                                     size="sm"
                                     title="Mobile preview"
                                     className="h-8 w-8 rounded-l-none border-0 p-0"
@@ -130,7 +154,11 @@ export function BuilderToolbar({
                         </>
                     )}
 
-                    <Button onClick={onOpenTemplates} variant="outline" size="sm">
+                    <Button
+                        onClick={onOpenTemplates}
+                        variant="outline"
+                        size="sm"
+                    >
                         <LayoutTemplate className="mr-2 h-4 w-4" />
                         Templates
                     </Button>

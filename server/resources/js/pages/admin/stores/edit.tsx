@@ -81,19 +81,15 @@ export default function EditStore({ store }: Props) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                <Link href='/admin/stores' prefetch cacheFor={30}>
-                            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                            Back
-                        
-                </Link>
-            </Button>
+                            <Link href="/admin/stores" prefetch cacheFor={30}>
+                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                Back
+                            </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
-                <form
-                    onSubmit={handleSubmit}
-                    className="max-w-2xl space-y-6"
-                >
+                <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
                     <div className="grid gap-2">
                         <Label htmlFor="name">Name *</Label>
                         <Input

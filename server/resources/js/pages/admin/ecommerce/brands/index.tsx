@@ -6,8 +6,8 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 interface Brand {
@@ -58,7 +58,11 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/ecommerce/brands/create" prefetch cacheFor={30}>
+                            <Link
+                                href="/admin/ecommerce/brands/create"
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <Plus className="mr-2 h-4 w-4" />
                                 {__('action.add_brand', 'Add Brand')}
                             </Link>
@@ -125,7 +129,11 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                             cell: ({ row }) => (
                                 <div className="flex items-center gap-2">
                                     <Button asChild variant="outline" size="sm">
-                                        <Link href={`/admin/ecommerce/brands/${row.original.id}/edit`} prefetch cacheFor={30}>
+                                        <Link
+                                            href={`/admin/ecommerce/brands/${row.original.id}/edit`}
+                                            prefetch
+                                            cacheFor={30}
+                                        >
                                             <PencilIcon className="mr-1 h-3 w-3" />
                                             {__('action.edit', 'Edit')}
                                         </Link>
@@ -133,7 +141,10 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                                     <ConfirmButton
                                         variant="outline"
                                         size="sm"
-                                        title={__('dialog.delete_title', 'Delete Brand')}
+                                        title={__(
+                                            'dialog.delete_title',
+                                            'Delete Brand',
+                                        )}
                                         description={`${__('dialog.are_you_sure', 'Are you sure you want to delete')} "${row.original.name}"?`}
                                         onConfirm={() => {
                                             router.delete(
@@ -157,7 +168,10 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                         next_page_url: brands.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search_brands', 'Search brands...')}
+                    searchPlaceholder={__(
+                        'placeholder.search_brands',
+                        'Search brands...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/ecommerce/brands"
                 />

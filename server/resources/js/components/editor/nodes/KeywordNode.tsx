@@ -28,7 +28,11 @@ export class KeywordNode extends TextNode {
         return dom;
     }
 
-    updateDOM(prevNode: KeywordNode, dom: HTMLElement, config: EditorConfig): boolean {
+    updateDOM(
+        prevNode: KeywordNode,
+        dom: HTMLElement,
+        config: EditorConfig,
+    ): boolean {
         // @ts-expect-error - Lexical TextNode prevNode typing
         return super.updateDOM(prevNode, dom, config);
     }

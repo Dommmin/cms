@@ -5,14 +5,15 @@
  */
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import type {
+    TableCellNode} from '@lexical/table';
 import {
     $deleteTableColumn__EXPERIMENTAL as $deleteTableColumn,
     $deleteTableRow__EXPERIMENTAL as $deleteTableRow,
     $insertTableColumn__EXPERIMENTAL as $insertTableColumn,
     $insertTableRow__EXPERIMENTAL as $insertTableRow,
     $isTableCellNode,
-    $unmergeCell,
-    TableCellNode,
+    $unmergeCell
 } from '@lexical/table';
 import { $getSelection, $isRangeSelection } from 'lexical';
 import { useCallback, useEffect, useRef, useState, type JSX } from 'react';

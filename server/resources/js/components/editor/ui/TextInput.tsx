@@ -10,10 +10,19 @@ interface Props {
     className?: string;
 }
 
-export default function TextInput({ label, value, onChange, placeholder, type = 'text', className }: Props): JSX.Element {
+export default function TextInput({
+    label,
+    value,
+    onChange,
+    placeholder,
+    type = 'text',
+    className,
+}: Props): JSX.Element {
     return (
         <div className={cn('flex flex-col gap-1.5', className)}>
-            <label className="text-sm font-medium text-foreground">{label}</label>
+            <label className="text-sm font-medium text-foreground">
+                {label}
+            </label>
             <input
                 type={type}
                 value={value}

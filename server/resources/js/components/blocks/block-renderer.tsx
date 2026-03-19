@@ -3,6 +3,7 @@ import AccordionBlock from '@/components/blocks/accordion';
 
 type Block = {
     type: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data?: any;
 };
 

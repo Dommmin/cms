@@ -68,23 +68,22 @@ const EVENT_COLORS: Record<string, 'default' | 'secondary' | 'destructive'> = {
     deleted: 'destructive',
 };
 
-function subjectLabel(type: string | null): string {
-    if (!type) return '—';
-    return type.split('\\').pop() ?? type;
-}
-
 function ChangeDiff({ properties }: { properties: ActivityLog['properties'] }) {
     if (!properties?.old && !properties?.attributes) return null;
     const old = properties.old ?? {};
     const next = properties.attributes ?? {};
-    const keys = Array.from(new Set([...Object.keys(old), ...Object.keys(next)]));
+    const keys = Array.from(
+        new Set([...Object.keys(old), ...Object.keys(next)]),
+    );
     if (keys.length === 0) return null;
 
     return (
         <div className="space-y-0.5 text-xs">
             {keys.map((key) => (
                 <div key={key} className="flex items-center gap-1">
-                    <span className="font-mono text-muted-foreground">{key}:</span>
+                    <span className="font-mono text-muted-foreground">
+                        {key}:
+                    </span>
                     {old[key] !== undefined && (
                         <span className="rounded bg-red-50 px-1 text-red-700 line-through dark:bg-red-950/30 dark:text-red-400">
                             {String(old[key])}
@@ -101,19 +100,32 @@ function ChangeDiff({ properties }: { properties: ActivityLog['properties'] }) {
     );
 }
 
-export default function ActivityLogIndex({ activities, users, log_names, filters }: Props) {
+export default function ActivityLogIndex({
+    activities,
+    users,
+    log_names,
+    filters,
+}: Props) {
     const [localFilters, setLocalFilters] = useState(filters);
 
     const applyFilters = () => {
-        router.get('/admin/activity-log', localFilters as Record<string, string>, {
-            preserveState: true,
-            replace: true,
-        });
+        router.get(
+            '/admin/activity-log',
+            localFilters as Record<string, string>,
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
     };
 
     const resetFilters = () => {
         setLocalFilters({});
-        router.get('/admin/activity-log', {}, { preserveState: true, replace: true });
+        router.get(
+            '/admin/activity-log',
+            {},
+            { preserveState: true, replace: true },
+        );
     };
 
     const columns: ColumnDef<ActivityLog>[] = [
@@ -121,7 +133,7 @@ export default function ActivityLogIndex({ activities, users, log_names, filters
             accessorKey: 'created_at',
             header: 'Date',
             cell: ({ row }) => (
-                <span className="whitespace-nowrap text-xs text-muted-foreground">
+                <span className="text-xs whitespace-nowrap text-muted-foreground">
                     {new Date(row.original.created_at).toLocaleString()}
                 </span>
             ),
@@ -132,18 +144,28 @@ export default function ActivityLogIndex({ activities, users, log_names, filters
             cell: ({ row }) =>
                 row.original.causer ? (
                     <div>
-                        <p className="text-sm font-medium">{row.original.causer.name}</p>
-                        <p className="text-xs text-muted-foreground">{row.original.causer.email}</p>
+                        <p className="text-sm font-medium">
+                            {row.original.causer.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                            {row.original.causer.email}
+                        </p>
                     </div>
                 ) : (
-                    <span className="text-xs text-muted-foreground">System</span>
+                    <span className="text-xs text-muted-foreground">
+                        System
+                    </span>
                 ),
         },
         {
             accessorKey: 'event',
             header: 'Action',
             cell: ({ row }) => (
-                <Badge variant={EVENT_COLORS[row.original.event ?? ''] ?? 'secondary'}>
+                <Badge
+                    variant={
+                        EVENT_COLORS[row.original.event ?? ''] ?? 'secondary'
+                    }
+                >
                     {row.original.event ?? row.original.description}
                 </Badge>
             ),
@@ -167,7 +189,9 @@ export default function ActivityLogIndex({ activities, users, log_names, filters
         {
             id: 'changes',
             header: 'Changes',
-            cell: ({ row }) => <ChangeDiff properties={row.original.properties} />,
+            cell: ({ row }) => (
+                <ChangeDiff properties={row.original.properties} />
+            ),
         },
     ];
 
@@ -289,7 +313,11 @@ export default function ActivityLogIndex({ activities, users, log_names, filters
                         <Button size="sm" onClick={applyFilters}>
                             Apply Filters
                         </Button>
-                        <Button size="sm" variant="outline" onClick={resetFilters}>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={resetFilters}
+                        >
                             Reset
                         </Button>
                         <span className="ml-auto text-xs text-muted-foreground">

@@ -18,14 +18,14 @@ enum ShippingCarrierEnum: string
     public function getLabel(): string
     {
         return match ($this) {
-            self::INPOST          => 'InPost Kurier',
-            self::INPOST_LOCKER   => 'InPost Paczkomat',
-            self::DPD             => 'DPD Kurier',
-            self::DPD_PICKUP      => 'DPD Pickup',
-            self::DHL             => 'DHL Parcel',
+            self::INPOST => 'InPost Kurier',
+            self::INPOST_LOCKER => 'InPost Paczkomat',
+            self::DPD => 'DPD Kurier',
+            self::DPD_PICKUP => 'DPD Pickup',
+            self::DHL => 'DHL Parcel',
             self::DHL_SERVICEPOINT => 'DHL ServicePoint',
-            self::GLS             => 'GLS Parcel',
-            self::PICKUP          => 'Odbiór osobisty',
+            self::GLS => 'GLS Parcel',
+            self::PICKUP => 'Odbiór osobisty',
         };
     }
 
@@ -53,10 +53,10 @@ enum ShippingCarrierEnum: string
     public function checkoutEnvVars(): array
     {
         return match ($this) {
-            self::INPOST_LOCKER      => ['INPOST_GEOWIDGET_TOKEN'],
+            self::INPOST_LOCKER => ['INPOST_GEOWIDGET_TOKEN'],
             self::DPD_PICKUP,
-            self::DHL_SERVICEPOINT   => ['FURGONETKA_CLIENT_ID', 'FURGONETKA_CLIENT_SECRET'],
-            default                  => [],
+            self::DHL_SERVICEPOINT => ['FURGONETKA_CLIENT_ID', 'FURGONETKA_CLIENT_SECRET'],
+            default => [],
         };
     }
 
@@ -64,13 +64,13 @@ enum ShippingCarrierEnum: string
     public function furgonetkaServiceCode(): ?string
     {
         return match ($this) {
-            self::INPOST          => 'inpost_kurier',
-            self::DPD             => 'dpd_classic',
-            self::DPD_PICKUP      => 'dpd_pickup',
-            self::DHL             => 'dhl_parcel',
+            self::INPOST => 'inpost_kurier',
+            self::DPD => 'dpd_classic',
+            self::DPD_PICKUP => 'dpd_pickup',
+            self::DHL => 'dhl_parcel',
             self::DHL_SERVICEPOINT => 'dhl_servicepoint',
-            self::GLS             => 'gls_business',
-            default               => null,
+            self::GLS => 'gls_business',
+            default => null,
         };
     }
 }

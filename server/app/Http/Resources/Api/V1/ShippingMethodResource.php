@@ -16,9 +16,9 @@ class ShippingMethodResource extends JsonResource
 {
     /** Maps env variable name → Laravel config key used to check if it is set. */
     private const array ENV_TO_CONFIG = [
-        'INPOST_GEOWIDGET_TOKEN'       => 'services.inpost_shipx.geowidget_token',
-        'FURGONETKA_CLIENT_ID'         => 'services.furgonetka.client_id',
-        'FURGONETKA_CLIENT_SECRET'     => 'services.furgonetka.client_secret',
+        'INPOST_GEOWIDGET_TOKEN' => 'services.inpost_shipx.geowidget_token',
+        'FURGONETKA_CLIENT_ID' => 'services.furgonetka.client_id',
+        'FURGONETKA_CLIENT_SECRET' => 'services.furgonetka.client_secret',
     ];
 
     public function toArray(Request $request): array
@@ -47,9 +47,9 @@ class ShippingMethodResource extends JsonResource
             'estimated_days_min' => $method->estimated_days_min,
             'estimated_days_max' => $method->estimated_days_max,
             'requires_pickup_point' => $method->requiresPickupPoint(),
-            'uses_native_widget'    => $method->carrier instanceof \App\Enums\ShippingCarrierEnum && $method->carrier->usesNativeWidget(),
-            'configured'            => $missingConfig === [],
-            'missing_config'        => $missingConfig,
+            'uses_native_widget' => $method->carrier instanceof \App\Enums\ShippingCarrierEnum && $method->carrier->usesNativeWidget(),
+            'configured' => $missingConfig === [],
+            'missing_config' => $missingConfig,
         ];
     }
 }

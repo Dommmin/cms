@@ -10,13 +10,17 @@ import {
 import { ConfirmButton } from '@/components/confirm-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { resolveLocalizedText } from '@/lib/localized-text';
 import { useTranslation } from '@/hooks/use-translation';
+import { resolveLocalizedText } from '@/lib/localized-text';
 
 export type PageRow = {
     id: number;
     parent_id: number | null;
-    parent?: { id: number; title: string | Record<string, string>; slug: string } | null;
+    parent?: {
+        id: number;
+        title: string | Record<string, string>;
+        slug: string;
+    } | null;
     title: string | Record<string, string>;
     slug: string;
     page_type: string;
@@ -42,10 +46,15 @@ export function usePageColumns(): ColumnDef<PageRow>[] {
                         </div>
                     )}
                     <div>
-                        <span className="font-medium">{resolveLocalizedText(row.original.title)}</span>
+                        <span className="font-medium">
+                            {resolveLocalizedText(row.original.title)}
+                        </span>
                         {row.original.parent && (
                             <p className="text-xs text-muted-foreground">
-                                under /{resolveLocalizedText(row.original.parent.title)}
+                                under /
+                                {resolveLocalizedText(
+                                    row.original.parent.title,
+                                )}
                             </p>
                         )}
                     </div>
@@ -57,7 +66,10 @@ export function usePageColumns(): ColumnDef<PageRow>[] {
             header: __('column.path', 'Path'),
             cell: ({ row }) => (
                 <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
-                    {row.original.parent ? `/${row.original.parent.slug}/` : '/'}{row.original.slug}
+                    {row.original.parent
+                        ? `/${row.original.parent.slug}/`
+                        : '/'}
+                    {row.original.slug}
                 </code>
             ),
         },
@@ -66,7 +78,8 @@ export function usePageColumns(): ColumnDef<PageRow>[] {
             header: __('column.type', 'Type'),
             cell: ({ row }) => (
                 <Badge variant="outline" className="text-xs">
-                    {row.original.page_type === 'module' && row.original.module_name
+                    {row.original.page_type === 'module' &&
+                    row.original.module_name
                         ? `Module: ${row.original.module_name}`
                         : row.original.page_type}
                 </Badge>
@@ -93,7 +106,11 @@ export function usePageColumns(): ColumnDef<PageRow>[] {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/cms/pages/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/cms/pages/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>

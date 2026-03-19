@@ -1,7 +1,9 @@
 export function sanitizeUrl(url: string): string {
     try {
         const parsedUrl = new URL(url);
-        if (!['http:', 'https:', 'mailto:', 'tel:'].includes(parsedUrl.protocol)) {
+        if (
+            !['http:', 'https:', 'mailto:', 'tel:'].includes(parsedUrl.protocol)
+        ) {
             return 'about:blank';
         }
         return url;
@@ -10,7 +12,13 @@ export function sanitizeUrl(url: string): string {
     }
 }
 
-const SUPPORTED_URL_PROTOCOLS = new Set(['http:', 'https:', 'mailto:', 'tel:', 'sms:']);
+const SUPPORTED_URL_PROTOCOLS = new Set([
+    'http:',
+    'https:',
+    'mailto:',
+    'tel:',
+    'sms:',
+]);
 
 export function validateUrl(url: string): boolean {
     try {
@@ -22,7 +30,9 @@ export function validateUrl(url: string): boolean {
 }
 
 export const MATCHERS = [
-    (text: string): null | { index: number; length: number; text: string; url: string } => {
+    (
+        text: string,
+    ): null | { index: number; length: number; text: string; url: string } => {
         const URL_REGEX =
             /((https?:\/\/(www\.)?)|(www\.))[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
         const match = URL_REGEX.exec(text);
@@ -32,10 +42,14 @@ export const MATCHERS = [
             index: match.index,
             length: fullMatch.length,
             text: fullMatch,
-            url: fullMatch.startsWith('http') ? fullMatch : `https://${fullMatch}`,
+            url: fullMatch.startsWith('http')
+                ? fullMatch
+                : `https://${fullMatch}`,
         };
     },
-    (text: string): null | { index: number; length: number; text: string; url: string } => {
+    (
+        text: string,
+    ): null | { index: number; length: number; text: string; url: string } => {
         const EMAIL_REGEX =
             /(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
         const match = EMAIL_REGEX.exec(text);

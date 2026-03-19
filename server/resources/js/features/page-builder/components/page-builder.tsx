@@ -4,8 +4,7 @@
  * Follows SOLID principles - composed of specialized components
  */
 
-import type {
-    DragEndEvent} from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
 import {
     DndContext,
     closestCenter,
@@ -40,7 +39,17 @@ type PageBuilderProps = {
     onChangeDevice?: (device: PreviewDevice) => void;
 };
 
-export function PageBuilder({ data, onSave, onPreview, onChange, isSplitView = false, isSaving = false, previewDevice = 'desktop', onToggleSplitView, onChangeDevice }: PageBuilderProps) {
+export function PageBuilder({
+    data,
+    onSave,
+    onPreview,
+    onChange,
+    isSplitView = false,
+    isSaving = false,
+    previewDevice = 'desktop',
+    onToggleSplitView,
+    onChangeDevice,
+}: PageBuilderProps) {
     const {
         sections,
         expandedSections,
@@ -72,7 +81,12 @@ export function PageBuilder({ data, onSave, onPreview, onChange, isSplitView = f
     useEffect(() => {
         function handleKeyDown(e: KeyboardEvent) {
             const target = e.target as HTMLElement;
-            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
+            if (
+                target.tagName === 'INPUT' ||
+                target.tagName === 'TEXTAREA' ||
+                target.isContentEditable
+            )
+                return;
             if (e.ctrlKey || e.metaKey) {
                 if (e.key === 'z' && !e.shiftKey) {
                     e.preventDefault();
@@ -138,7 +152,11 @@ export function PageBuilder({ data, onSave, onPreview, onChange, isSplitView = f
                 onChangeDevice={onChangeDevice ?? (() => {})}
             />
 
-            <div className={isSplitView ? 'px-4 py-8' : 'container max-w-5xl py-8'}>
+            <div
+                className={
+                    isSplitView ? 'px-4 py-8' : 'container max-w-5xl py-8'
+                }
+            >
                 {sections.length === 0 ? (
                     <div className="rounded-lg border border-dashed bg-background p-16 text-center">
                         <h3 className="mb-2 text-lg font-semibold">
@@ -191,17 +209,24 @@ export function PageBuilder({ data, onSave, onPreview, onChange, isSplitView = f
                                         onUpdate={(patch) =>
                                             updateSection(index, patch)
                                         }
-                                        onAddBlock={(type) => addBlock(index, { type })}
+                                        onAddBlock={(type) =>
+                                            addBlock(index, { type })
+                                        }
                                         onAddReusableBlock={(block) =>
                                             addBlock(index, {
                                                 type: block.type,
-                                                configuration: block.configuration,
-                                                relations: block.relations_config ?? [],
+                                                configuration:
+                                                    block.configuration,
+                                                relations:
+                                                    block.relations_config ??
+                                                    [],
                                                 reusable_block_id: block.id,
                                                 reusable_block_name: block.name,
                                             })
                                         }
-                                        onPasteBlock={(patch) => addBlock(index, patch)}
+                                        onPasteBlock={(patch) =>
+                                            addBlock(index, patch)
+                                        }
                                         onUpdateBlock={(blockIndex, patch) =>
                                             updateBlock(
                                                 index,

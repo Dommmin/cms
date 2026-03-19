@@ -33,7 +33,11 @@ export class AutocompleteNode extends TextNode {
         return dom;
     }
 
-    updateDOM(prevNode: AutocompleteNode, dom: HTMLElement, config: EditorConfig): boolean {
+    updateDOM(
+        prevNode: AutocompleteNode,
+        dom: HTMLElement,
+        config: EditorConfig,
+    ): boolean {
         // @ts-expect-error - Lexical TextNode prevNode typing
         return super.updateDOM(prevNode, dom, config);
     }

@@ -1,7 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Copy, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
 import toast from 'react-hot-toast';
 
 import { ConfirmButton } from '@/components/confirm-dialog';
@@ -10,6 +9,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -53,9 +53,11 @@ export default function SectionTemplatesIndex({ templates, filters }: Props) {
             cell: ({ row }) => (
                 <div>
                     <p className="font-medium">{row.original.name}</p>
-                    <p className="text-muted-foreground text-xs">
+                    <p className="text-xs text-muted-foreground">
                         {row.original.section_type}
-                        {row.original.variant ? ` · ${row.original.variant}` : ''}
+                        {row.original.variant
+                            ? ` · ${row.original.variant}`
+                            : ''}
                     </p>
                 </div>
             ),
@@ -67,15 +69,19 @@ export default function SectionTemplatesIndex({ templates, filters }: Props) {
                 row.original.category ? (
                     <Badge variant="outline">{row.original.category}</Badge>
                 ) : (
-                    <span className="text-muted-foreground text-xs">—</span>
+                    <span className="text-xs text-muted-foreground">—</span>
                 ),
         },
         {
             accessorKey: 'is_global',
             header: __('column.scope', 'Scope'),
             cell: ({ row }) => (
-                <Badge variant={row.original.is_global ? 'default' : 'secondary'}>
-                    {row.original.is_global ? __('misc.global', 'Global') : __('misc.local', 'Local')}
+                <Badge
+                    variant={row.original.is_global ? 'default' : 'secondary'}
+                >
+                    {row.original.is_global
+                        ? __('misc.global', 'Global')
+                        : __('misc.local', 'Local')}
                 </Badge>
             ),
         },
@@ -91,7 +97,10 @@ export default function SectionTemplatesIndex({ templates, filters }: Props) {
                             router.post(
                                 `/admin/section-templates/${row.original.id}/duplicate`,
                                 {},
-                                { onSuccess: () => toast.success('Template duplicated') },
+                                {
+                                    onSuccess: () =>
+                                        toast.success('Template duplicated'),
+                                },
                             )
                         }
                     >
@@ -99,7 +108,11 @@ export default function SectionTemplatesIndex({ templates, filters }: Props) {
                         {__('action.duplicate', 'Duplicate')}
                     </Button>
                     <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/section-templates/${row.original.id}/edit`} prefetch cacheFor={30}>
+                        <Link
+                            href={`/admin/section-templates/${row.original.id}/edit`}
+                            prefetch
+                            cacheFor={30}
+                        >
                             <PencilIcon className="mr-1 h-3 w-3" />
                             {__('action.edit', 'Edit')}
                         </Link>
@@ -108,11 +121,17 @@ export default function SectionTemplatesIndex({ templates, filters }: Props) {
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Template')}
-                        description={__('dialog.cannot_be_undone', 'Are you sure you want to delete this template? This cannot be undone.')}
+                        description={__(
+                            'dialog.cannot_be_undone',
+                            'Are you sure you want to delete this template? This cannot be undone.',
+                        )}
                         onConfirm={() =>
                             router.delete(
                                 `/admin/section-templates/${row.original.id}`,
-                                { onSuccess: () => toast.success('Template deleted') },
+                                {
+                                    onSuccess: () =>
+                                        toast.success('Template deleted'),
+                                },
                             )
                         }
                     >
@@ -130,11 +149,14 @@ export default function SectionTemplatesIndex({ templates, filters }: Props) {
             <Wrapper>
                 <PageHeader
                     title={__('page.section_templates', 'Section Templates')}
-                    description={__('page.section_templates_desc', 'Reusable section presets for the page builder')}
+                    description={__(
+                        'page.section_templates_desc',
+                        'Reusable section presets for the page builder',
+                    )}
                 >
                     <PageHeaderActions>
                         <Link href="/admin/section-templates/create">
-                            <Button>
+                            <Button variant="outline">
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.create', 'New Template')}
                             </Button>
@@ -154,7 +176,10 @@ export default function SectionTemplatesIndex({ templates, filters }: Props) {
                         next_page_url: templates.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search', 'Search templates...')}
+                    searchPlaceholder={__(
+                        'placeholder.search',
+                        'Search templates...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/section-templates"
                 />

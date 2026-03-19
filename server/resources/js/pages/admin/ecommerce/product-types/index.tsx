@@ -6,8 +6,8 @@ import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
-import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 interface ProductType {
@@ -58,7 +58,11 @@ export default function ProductTypesIndex({ types, filters }: IndexProps) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/ecommerce/product-types/create" prefetch cacheFor={30}>
+                            <Link
+                                href="/admin/ecommerce/product-types/create"
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <Plus className="mr-2 h-4 w-4" />
                                 {__('action.add_type', 'Add Type')}
                             </Link>
@@ -115,7 +119,11 @@ export default function ProductTypesIndex({ types, filters }: IndexProps) {
                             cell: ({ row }) => (
                                 <div className="flex items-center gap-2">
                                     <Button asChild variant="outline" size="sm">
-                                        <Link href={`/admin/ecommerce/product-types/${row.original.id}/edit`} prefetch cacheFor={30}>
+                                        <Link
+                                            href={`/admin/ecommerce/product-types/${row.original.id}/edit`}
+                                            prefetch
+                                            cacheFor={30}
+                                        >
                                             <PencilIcon className="mr-1 h-3 w-3" />
                                             {__('action.edit', 'Edit')}
                                         </Link>
@@ -123,14 +131,19 @@ export default function ProductTypesIndex({ types, filters }: IndexProps) {
                                     <ConfirmButton
                                         variant="outline"
                                         size="sm"
-                                        title={__('dialog.delete_title', 'Delete Product Type')}
+                                        title={__(
+                                            'dialog.delete_title',
+                                            'Delete Product Type',
+                                        )}
                                         description={`Delete product type "${row.original.name}"?`}
                                         onConfirm={() => {
                                             router.delete(
                                                 `/admin/ecommerce/product-types/${row.original.id}`,
                                                 {
                                                     onSuccess: () =>
-                                                        toast.success('Product type deleted'),
+                                                        toast.success(
+                                                            'Product type deleted',
+                                                        ),
                                                 },
                                             );
                                         }}
@@ -154,7 +167,10 @@ export default function ProductTypesIndex({ types, filters }: IndexProps) {
                         next_page_url: types.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search_types', 'Search types...')}
+                    searchPlaceholder={__(
+                        'placeholder.search_types',
+                        'Search types...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/ecommerce/product-types"
                 />

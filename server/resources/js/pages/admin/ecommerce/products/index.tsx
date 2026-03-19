@@ -42,7 +42,10 @@ export default function ProductsIndex({
             <Wrapper>
                 <PageHeader
                     title={__('page.products', 'Products')}
-                    description={__('page.products_desc', 'Manage products catalog')}
+                    description={__(
+                        'page.products_desc',
+                        'Manage products catalog',
+                    )}
                 >
                     <PageHeaderActions>
                         <Button variant="outline" asChild>
@@ -52,7 +55,11 @@ export default function ProductsIndex({
                             </a>
                         </Button>
                         <Button asChild variant="outline">
-                            <Link href='/admin/ecommerce/products/create' prefetch cacheFor={30}>
+                            <Link
+                                href="/admin/ecommerce/products/create"
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.add', 'Add Product')}
                             </Link>
@@ -72,7 +79,10 @@ export default function ProductsIndex({
                         next_page_url: products.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('placeholder.search_products', 'Search products...')}
+                    searchPlaceholder={__(
+                        'placeholder.search_products',
+                        'Search products...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl="/admin/ecommerce/products"
                 />
