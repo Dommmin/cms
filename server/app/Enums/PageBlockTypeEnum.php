@@ -22,6 +22,7 @@ enum PageBlockTypeEnum: string
     case Tabs = 'tabs';
     case FormEmbed = 'form_embed';
     case Map = 'map';
+    case FeaturedPosts = 'featured_posts';
 
     public function label(): string
     {
@@ -42,6 +43,7 @@ enum PageBlockTypeEnum: string
             self::Tabs => 'Zakładki',
             self::FormEmbed => 'Formularz',
             self::Map => 'Mapa',
+            self::FeaturedPosts => 'Polecane artykuły',
         };
     }
 }

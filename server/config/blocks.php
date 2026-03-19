@@ -54,12 +54,20 @@ return [
             'model' => App\Models\Faq::class,
             'label' => 'FAQ',
         ],
+        'blog_post' => [
+            'model' => App\Models\BlogPost::class,
+            'label' => 'Blog Post',
+        ],
+        'blog_category' => [
+            'model' => App\Models\BlogCategory::class,
+            'label' => 'Blog Category',
+        ],
     ],
 
     'block_types' => [
         'hero_banner' => [
             'name' => 'Hero Banner',
-            'description' => 'Full-width hero section with title, subtitle and CTA button',
+            'description' => 'Full-width hero section with title, subtitle and up to two CTA buttons',
             'icon' => 'layout-template',
             'category' => 'layout',
             'enum' => PageBlockTypeEnum::HeroBanner,
@@ -85,20 +93,37 @@ return [
                     ],
                     'cta_text' => [
                         'type' => 'string',
-                        'label' => 'Button Label',
+                        'label' => 'Primary Button Label',
                         'placeholder' => 'e.g. Shop Now',
                     ],
                     'cta_url' => [
                         'type' => 'string',
-                        'label' => 'Button URL',
+                        'label' => 'Primary Button URL',
                         'format' => 'url',
                         'placeholder' => 'https://',
                     ],
                     'cta_style' => [
                         'type' => 'string',
-                        'label' => 'Button Style',
+                        'label' => 'Primary Button Style',
                         'enum' => ['primary', 'secondary', 'outline', 'ghost'],
                         'default' => 'primary',
+                    ],
+                    'cta2_text' => [
+                        'type' => 'string',
+                        'label' => 'Secondary Button Label',
+                        'placeholder' => 'e.g. Learn More',
+                    ],
+                    'cta2_url' => [
+                        'type' => 'string',
+                        'label' => 'Secondary Button URL',
+                        'format' => 'url',
+                        'placeholder' => 'https://',
+                    ],
+                    'cta2_style' => [
+                        'type' => 'string',
+                        'label' => 'Secondary Button Style',
+                        'enum' => ['primary', 'secondary', 'outline', 'ghost'],
+                        'default' => 'outline',
                     ],
                     'text_alignment' => [
                         'type' => 'string',
@@ -679,6 +704,97 @@ return [
                         'min' => 200,
                         'max' => 800,
                         'default' => 400,
+                    ],
+                ],
+            ],
+        ],
+
+        'featured_posts' => [
+            'name' => 'Featured Posts',
+            'description' => 'Display selected or latest blog posts in a grid or list',
+            'icon' => 'newspaper',
+            'category' => 'content',
+            'enum' => PageBlockTypeEnum::FeaturedPosts,
+            'allowed_relations' => [
+                'posts' => ['types' => ['blog_post'], 'multiple' => true],
+                'category_filter' => ['types' => ['blog_category'], 'multiple' => false],
+            ],
+            'schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'title' => [
+                        'type' => 'string',
+                        'label' => 'Section Title',
+                        'placeholder' => 'e.g. Latest Articles',
+                    ],
+                    'subtitle' => [
+                        'type' => 'string',
+                        'label' => 'Section Subtitle',
+                        'format' => 'textarea',
+                        'placeholder' => 'Short description below the heading',
+                    ],
+                    'source' => [
+                        'type' => 'string',
+                        'label' => 'Posts Source',
+                        'description' => 'Manual: pick posts via Linked Content. Latest: auto-fetch newest published.',
+                        'enum' => ['manual', 'latest', 'category'],
+                        'default' => 'latest',
+                    ],
+                    'max_items' => [
+                        'type' => 'integer',
+                        'label' => 'Max Posts to Show',
+                        'min' => 1,
+                        'max' => 24,
+                        'default' => 4,
+                    ],
+                    'columns' => [
+                        'type' => 'integer',
+                        'label' => 'Columns',
+                        'min' => 1,
+                        'max' => 4,
+                        'default' => 3,
+                    ],
+                    'display_mode' => [
+                        'type' => 'string',
+                        'label' => 'Display Mode',
+                        'enum' => ['grid', 'list', 'carousel'],
+                        'default' => 'grid',
+                    ],
+                    'show_excerpt' => [
+                        'type' => 'boolean',
+                        'label' => 'Show Excerpt',
+                        'default' => true,
+                    ],
+                    'show_author' => [
+                        'type' => 'boolean',
+                        'label' => 'Show Author',
+                        'default' => true,
+                    ],
+                    'show_date' => [
+                        'type' => 'boolean',
+                        'label' => 'Show Publication Date',
+                        'default' => true,
+                    ],
+                    'show_category' => [
+                        'type' => 'boolean',
+                        'label' => 'Show Category Badge',
+                        'default' => true,
+                    ],
+                    'show_read_time' => [
+                        'type' => 'boolean',
+                        'label' => 'Show Estimated Read Time',
+                        'default' => false,
+                    ],
+                    'cta_text' => [
+                        'type' => 'string',
+                        'label' => '"View All" Button Label',
+                        'placeholder' => 'e.g. Read the Blog',
+                    ],
+                    'cta_url' => [
+                        'type' => 'string',
+                        'label' => '"View All" Button URL',
+                        'format' => 'url',
+                        'placeholder' => '/blog',
                     ],
                 ],
             ],

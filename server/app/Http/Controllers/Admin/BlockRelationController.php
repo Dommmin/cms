@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BlogCategory;
+use App\Models\BlogPost;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Faq;
@@ -70,6 +72,19 @@ class BlockRelationController extends Controller
                 ->orderBy('question')
                 ->limit(20)
                 ->get(['id', 'question as name']),
+
+            'blog_post' => BlogPost::query()
+                ->when($query, fn ($q) => $q->where('title', 'like', "%{$query}%"))
+                ->orderByDesc('published_at')
+                ->limit(20)
+                ->get(['id', 'title'])
+                ->map(fn ($item) => ['id' => $item->id, 'name' => $item->getTranslation('title', 'en')]),
+
+            'blog_category' => BlogCategory::query()
+                ->when($query, fn ($q) => $q->where('name', 'like', "%{$query}%"))
+                ->orderBy('name')
+                ->limit(20)
+                ->get(['id', 'name']),
 
             default => collect(),
         };

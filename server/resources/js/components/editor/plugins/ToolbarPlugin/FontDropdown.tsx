@@ -35,9 +35,18 @@ const FONT_SIZES = [
     '26px',
     '28px',
     '30px',
+    '32px',
     '36px',
+    '40px',
     '42px',
     '48px',
+    '56px',
+    '64px',
+    '72px',
+    '80px',
+    '96px',
+    '112px',
+    '128px',
 ];
 
 interface FontFamilyProps {
