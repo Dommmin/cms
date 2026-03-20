@@ -548,7 +548,7 @@ All enums are in `app/Enums/` and use PHP 8.1+ backed enum syntax.
 | `NotificationStatusEnum`  | (notification states)                                                                                                                                                                                                                                  |
 | `NotificationTypeEnum`    | (notification content types)                                                                                                                                                                                                                           |
 | `OrderStatusEnum`         | `pending`, `awaiting_payment`, `paid`, `processing`, `shipped`, `delivered`, `cancelled`, `refunded` — used for labels, colors, and admin form validation. **Not** used as a model cast (see Order State Machine below).                               |
-| `PageBlockTypeEnum`       | `hero_banner`, `rich_text`, `featured_products`, `categories_grid`, `promotional_banner`, `newsletter_signup`, `testimonials`, `image_gallery`, `video_embed`, `custom_html`, `two_columns`, `three_columns`, `accordion`, `tabs`, `form_embed`, `map` |
+| `PageBlockTypeEnum`       | `hero_banner`, `rich_text`, `featured_products`, `categories_grid`, `promotional_banner`, `newsletter_signup`, `testimonials`, `image_gallery`, `video_embed`, `custom_html`, `two_columns`, `three_columns`, `accordion`, `tabs`, `form_embed`, `map`, `featured_posts`, `stats_counter`, `call_to_action`, `pricing_table`, `brands_slider`, `logo_cloud`, `countdown_timer`, `timeline`, `team_members` |
 | `PageTypeEnum`            | `blocks`, `module`                                                                                                                                                                                                                                     |
 | `PaymentProviderEnum`     | `p24`, `payu`, `stripe`, `cash_on_delivery`                                                                                                                                                                                                            |
 | `ReturnStatusEnum`        | `pending`, `approved`, `rejected`, `return_label_sent`, `awaiting_return`, `received`, `inspected`, `refunded`, `closed`                                                                                                                               |
@@ -974,30 +974,93 @@ Same pattern as payment gateways.
 // app/Enums/PageBlockTypeEnum.php
 case MyBlock = 'my_block';
 
-public function label(): string
-{
-    return match ($this) {
-        // ... existing ...
-        self::MyBlock => 'My Block',
-    };
+// In label():
+self::MyBlock => 'My Block Label',
+```
+
+**Step 2: Define the schema in `config/blocks.php`**
+
+```php
+'my_block' => [
+    'name'        => 'My Block',
+    'description' => 'Short description shown in the block picker.',
+    'icon'        => 'layout-template',     // lucide icon name
+    'category'    => 'content',             // groups blocks in the picker
+    'enum'        => PageBlockTypeEnum::MyBlock,
+
+    // Relations: which external models/media can be attached
+    'allowed_relations' => [
+        'background' => ['types' => ['media.image'], 'multiple' => false],
+        'products'   => ['types' => ['product'], 'multiple' => true],
+    ],
+
+    // Schema drives the auto-generated admin form — no frontend code needed
+    'schema' => [
+        'type'       => 'object',
+        'properties' => [
+            'title'   => ['type' => 'string', 'label' => 'Title', 'maxLength' => 120],
+            'columns' => ['type' => 'integer', 'label' => 'Columns', 'min' => 1, 'max' => 4, 'default' => 3],
+            'style'   => ['type' => 'string', 'label' => 'Style', 'enum' => ['card', 'flat'], 'default' => 'card'],
+            'body'    => ['type' => 'string', 'label' => 'Body', 'format' => 'richtext'],
+        ],
+    ],
+],
+```
+
+Available field formats: `textarea`, `richtext`, `url`, `color`, `code`. Use `enum` for Select dropdowns, `array` for repeaters.
+
+Available categories: `layout`, `content`, `ecommerce`, `marketing`, `media`, `forms`, `conversion`, `navigation`, `custom`.
+
+**Step 3: Create the frontend block component**
+
+```tsx
+// client/components/page-builder/blocks/my-block.tsx
+import type { PageBlock } from "@/types/api";
+
+interface MyBlockConfig {
+  title?: string;
+  // ... other fields from schema
+}
+
+interface Props { block: PageBlock; }
+
+export function MyBlock({ block }: Props) {
+  const cfg = block.configuration as MyBlockConfig;
+  // Use block.relations for media/model relations
+  // Use getRelationsByKey(block.relations, "products") for model relations
+  return <div>{cfg.title}</div>;
 }
 ```
 
-**Step 2: Add block config schema**
+**Step 4: Register in `block-renderer.tsx`**
 
-Define the block's configuration schema in `config/blocks.php` following the existing structure.
+```tsx
+// client/components/page-builder/block-renderer.tsx
+import { MyBlock } from "./blocks/my-block";
 
-**Step 3: Frontend block component (client)**
+case "my_block":
+  return <MyBlock block={block} />;
+```
 
-Create a React component in `client/components/page-builder/blocks/MyBlock.tsx`. The component receives the `configuration` object from the block record.
+**Step 5: Add to the `BlockType` union in `client/types/api.ts`**
 
-**Step 4: Admin editor component**
+```ts
+export type BlockType = ... | "my_block";
+```
 
-Create an editor form component in `resources/js/components/page-builder/blocks/my-block-editor.tsx` for configuring the block inside the admin page builder.
+#### DB-driven blocks
 
-**Step 5: Register in block renderer**
+For blocks that pull data from the database (products, brands, posts), use `allowed_relations` with model types. The backend's `BlockRelationService` resolves relations and embeds them in the API response as `block.relations[].data`. Use `getRelationsByKey(block.relations, "slot_name")` to extract them in the component.
 
-Add the block type to the block renderer switch/map in the page builder component so the editor knows which editor to show for this block type.
+For "all brands / all products" source mode, add a `source` enum field (`manual` / `all`) and handle the "all" case server-side by eager-loading and injecting all records into a synthetic relation array (or handle in the component via a separate API fetch).
+
+#### Custom / client-specific blocks
+
+Use `'category' => 'custom'` for blocks tailored to a specific client's design (e.g., a client's specific hero layout, a branded section). These appear in a "Custom" group in the block picker and signal to future developers that they may not be reusable across projects.
+
+#### Section scroll animations
+
+Animations are stored in `section.settings.animation` (one of: `fade-in`, `fade-up`, `fade-left`, `fade-right`, `zoom-in`). The `SectionRenderer` reads this value and wraps the section in a framer-motion `AnimatedSection` client component with `whileInView` and `viewport={{ once: true }}`. To add new animation presets, add an entry to `PRESETS` in `client/components/page-builder/animated-section.tsx`.
 
 ---
 

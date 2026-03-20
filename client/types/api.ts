@@ -492,7 +492,15 @@ export type BlockType =
   | "tabs"
   | "form_embed"
   | "map"
-  | "featured_posts";
+  | "featured_posts"
+  | "stats_counter"
+  | "call_to_action"
+  | "pricing_table"
+  | "brands_slider"
+  | "logo_cloud"
+  | "countdown_timer"
+  | "timeline"
+  | "team_members";
 
 export interface Page {
   id: number;

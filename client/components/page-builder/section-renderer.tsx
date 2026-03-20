@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import type { PageSection } from "@/types/api";
 import { AdminBlockOverlay } from "@/components/admin/admin-block-overlay";
 
+import { AnimatedSection } from "./animated-section";
 import { BlockRenderer } from "./block-renderer";
 
 interface Props {
@@ -42,6 +43,7 @@ export function SectionRenderer({ section, isPreview, pageId, adminBaseUrl }: Pr
 
   const settings = section.settings as Record<string, string> | null;
   const padding = settings?.padding ?? "lg";
+  const animation = settings?.animation ?? "none";
 
   const sectionBg = variantStyles[variant] ?? "";
   const sectionPadding =
@@ -51,31 +53,45 @@ export function SectionRenderer({ section, isPreview, pageId, adminBaseUrl }: Pr
 
   const activeBlocks = section.blocks.filter((b) => b.is_active);
 
+  const sectionClassName = cn(sectionBg, sectionPadding);
+  const sectionProps = {
+    "data-section-type": section.section_type,
+    "data-section-id": section.id,
+  };
+
+  const inner = (
+    <div className={containerClass}>
+      {activeBlocks.map((block) =>
+        isPreview && pageId && adminBaseUrl ? (
+          <AdminBlockOverlay
+            key={block.id}
+            blockId={block.id}
+            blockType={block.type}
+            pageId={pageId}
+            adminBaseUrl={adminBaseUrl}
+          >
+            <BlockRenderer block={block} />
+          </AdminBlockOverlay>
+        ) : (
+          <div key={block.id} className="w-full">
+            <BlockRenderer block={block} />
+          </div>
+        ),
+      )}
+    </div>
+  );
+
+  if (animation && animation !== "none") {
+    return (
+      <AnimatedSection animation={animation} className={sectionClassName} {...sectionProps}>
+        {inner}
+      </AnimatedSection>
+    );
+  }
+
   return (
-    <section
-      className={cn(sectionBg, sectionPadding)}
-      data-section-type={section.section_type}
-      data-section-id={section.id}
-    >
-      <div className={containerClass}>
-        {activeBlocks.map((block) => (
-          isPreview && pageId && adminBaseUrl ? (
-            <AdminBlockOverlay
-              key={block.id}
-              blockId={block.id}
-              blockType={block.type}
-              pageId={pageId}
-              adminBaseUrl={adminBaseUrl}
-            >
-              <BlockRenderer block={block} />
-            </AdminBlockOverlay>
-          ) : (
-            <div key={block.id} className="w-full">
-              <BlockRenderer block={block} />
-            </div>
-          )
-        ))}
-      </div>
+    <section className={sectionClassName} {...sectionProps}>
+      {inner}
     </section>
   );
 }

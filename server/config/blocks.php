@@ -800,6 +800,424 @@ return [
             ],
         ],
 
+        'stats_counter' => [
+            'name' => 'Stats / Counters',
+            'description' => 'Animated number counters — perfect for "5000+ customers", "98% satisfaction", etc.',
+            'icon' => 'bar-chart-2',
+            'category' => 'marketing',
+            'enum' => PageBlockTypeEnum::StatsCounter,
+            'allowed_relations' => [],
+            'schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'title' => [
+                        'type' => 'string',
+                        'label' => 'Section Title',
+                        'placeholder' => 'e.g. By the Numbers',
+                    ],
+                    'subtitle' => [
+                        'type' => 'string',
+                        'label' => 'Section Subtitle',
+                        'format' => 'textarea',
+                    ],
+                    'style' => [
+                        'type' => 'string',
+                        'label' => 'Card Style',
+                        'enum' => ['plain', 'card', 'bordered', 'icon'],
+                        'default' => 'plain',
+                    ],
+                    'columns' => [
+                        'type' => 'integer',
+                        'label' => 'Columns',
+                        'min' => 2,
+                        'max' => 5,
+                        'default' => 4,
+                    ],
+                    'animate_numbers' => [
+                        'type' => 'boolean',
+                        'label' => 'Animate Numbers on Scroll',
+                        'default' => true,
+                    ],
+                    'stats' => [
+                        'type' => 'array',
+                        'label' => 'Stats',
+                        'items' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'value' => [
+                                    'type' => 'string',
+                                    'label' => 'Value',
+                                    'placeholder' => 'e.g. 5000',
+                                ],
+                                'suffix' => [
+                                    'type' => 'string',
+                                    'label' => 'Suffix',
+                                    'placeholder' => 'e.g. + or %',
+                                ],
+                                'label' => [
+                                    'type' => 'string',
+                                    'label' => 'Label',
+                                    'placeholder' => 'e.g. Happy Customers',
+                                ],
+                                'icon' => [
+                                    'type' => 'string',
+                                    'label' => 'Icon (lucide name)',
+                                    'placeholder' => 'e.g. users',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+
+        'call_to_action' => [
+            'name' => 'Call to Action',
+            'description' => 'Full-width CTA section with heading, text, and up to two buttons',
+            'icon' => 'mouse-pointer-click',
+            'category' => 'marketing',
+            'enum' => PageBlockTypeEnum::CallToAction,
+            'allowed_relations' => [
+                'background' => ['types' => ['media.image'], 'multiple' => false],
+            ],
+            'schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'title' => [
+                        'type' => 'string',
+                        'label' => 'Heading',
+                        'placeholder' => 'Ready to get started?',
+                        'maxLength' => 120,
+                    ],
+                    'subtitle' => [
+                        'type' => 'string',
+                        'label' => 'Subheading',
+                        'format' => 'textarea',
+                        'placeholder' => 'Join thousands of customers...',
+                        'maxLength' => 300,
+                    ],
+                    'alignment' => [
+                        'type' => 'string',
+                        'label' => 'Alignment',
+                        'enum' => ['left', 'center', 'right'],
+                        'default' => 'center',
+                    ],
+                    'style' => [
+                        'type' => 'string',
+                        'label' => 'Style',
+                        'enum' => ['plain', 'gradient', 'dark', 'brand', 'image'],
+                        'default' => 'gradient',
+                    ],
+                    'primary_label' => [
+                        'type' => 'string',
+                        'label' => 'Primary Button Label',
+                        'placeholder' => 'Get Started',
+                    ],
+                    'primary_url' => [
+                        'type' => 'string',
+                        'label' => 'Primary Button URL',
+                        'format' => 'url',
+                    ],
+                    'secondary_label' => [
+                        'type' => 'string',
+                        'label' => 'Secondary Button Label',
+                        'placeholder' => 'Learn More',
+                    ],
+                    'secondary_url' => [
+                        'type' => 'string',
+                        'label' => 'Secondary Button URL',
+                        'format' => 'url',
+                    ],
+                    'badge_text' => [
+                        'type' => 'string',
+                        'label' => 'Badge Text (optional)',
+                        'placeholder' => 'e.g. New Feature',
+                    ],
+                ],
+            ],
+        ],
+
+        'pricing_table' => [
+            'name' => 'Pricing Table',
+            'description' => 'Pricing plans with feature lists — ideal for services, subscriptions, or tiers',
+            'icon' => 'credit-card',
+            'category' => 'marketing',
+            'enum' => PageBlockTypeEnum::PricingTable,
+            'allowed_relations' => [],
+            'schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'title' => [
+                        'type' => 'string',
+                        'label' => 'Section Title',
+                        'placeholder' => 'Simple, transparent pricing',
+                    ],
+                    'subtitle' => [
+                        'type' => 'string',
+                        'label' => 'Section Subtitle',
+                        'format' => 'textarea',
+                    ],
+                    'currency_symbol' => [
+                        'type' => 'string',
+                        'label' => 'Currency Symbol',
+                        'default' => 'zł',
+                    ],
+                    'billing_toggle' => [
+                        'type' => 'boolean',
+                        'label' => 'Show monthly/yearly toggle',
+                        'default' => false,
+                    ],
+                    'plans' => [
+                        'type' => 'array',
+                        'label' => 'Plans',
+                        'items' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'name' => ['type' => 'string', 'label' => 'Plan Name', 'placeholder' => 'Pro'],
+                                'badge' => ['type' => 'string', 'label' => 'Badge (e.g. Most Popular)', 'placeholder' => ''],
+                                'price_monthly' => ['type' => 'string', 'label' => 'Monthly Price', 'placeholder' => '49'],
+                                'price_yearly' => ['type' => 'string', 'label' => 'Yearly Price', 'placeholder' => '39'],
+                                'description' => ['type' => 'string', 'label' => 'Short Description', 'format' => 'textarea'],
+                                'features' => ['type' => 'string', 'label' => 'Features (one per line)', 'format' => 'textarea', 'placeholder' => "Unlimited products\nEmail support\nAnalytics"],
+                                'cta_label' => ['type' => 'string', 'label' => 'Button Label', 'placeholder' => 'Get Started'],
+                                'cta_url' => ['type' => 'string', 'label' => 'Button URL', 'format' => 'url'],
+                                'is_featured' => ['type' => 'boolean', 'label' => 'Highlight this plan', 'default' => false],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+
+        'brands_slider' => [
+            'name' => 'Brands Slider',
+            'description' => 'Auto-scrolling carousel of brand logos — pulls live data from the Brands catalogue',
+            'icon' => 'badge',
+            'category' => 'ecommerce',
+            'enum' => PageBlockTypeEnum::BrandsSlider,
+            'allowed_relations' => [
+                'brands' => ['types' => ['brand'], 'multiple' => true],
+            ],
+            'schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'title' => [
+                        'type' => 'string',
+                        'label' => 'Section Title',
+                        'placeholder' => 'e.g. Trusted Brands',
+                    ],
+                    'source' => [
+                        'type' => 'string',
+                        'label' => 'Source',
+                        'description' => 'All: shows every active brand. Manual: pick brands via Linked Content.',
+                        'enum' => ['all', 'manual'],
+                        'default' => 'all',
+                    ],
+                    'speed' => [
+                        'type' => 'string',
+                        'label' => 'Scroll Speed',
+                        'enum' => ['slow', 'normal', 'fast'],
+                        'default' => 'normal',
+                    ],
+                    'logo_height' => [
+                        'type' => 'integer',
+                        'label' => 'Logo Height (px)',
+                        'min' => 24,
+                        'max' => 120,
+                        'default' => 48,
+                    ],
+                    'grayscale' => [
+                        'type' => 'boolean',
+                        'label' => 'Grayscale logos (color on hover)',
+                        'default' => true,
+                    ],
+                ],
+            ],
+        ],
+
+        'logo_cloud' => [
+            'name' => 'Logo Cloud',
+            'description' => 'Grid of client / partner logos (media uploads)',
+            'icon' => 'layout-grid',
+            'category' => 'marketing',
+            'enum' => PageBlockTypeEnum::LogoCloud,
+            'allowed_relations' => [
+                'logos' => ['types' => ['media.image'], 'multiple' => true],
+            ],
+            'schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'title' => [
+                        'type' => 'string',
+                        'label' => 'Section Title',
+                        'placeholder' => 'e.g. Trusted by',
+                    ],
+                    'columns' => [
+                        'type' => 'integer',
+                        'label' => 'Columns',
+                        'min' => 2,
+                        'max' => 8,
+                        'default' => 5,
+                    ],
+                    'logo_height' => [
+                        'type' => 'integer',
+                        'label' => 'Logo Height (px)',
+                        'min' => 24,
+                        'max' => 120,
+                        'default' => 40,
+                    ],
+                    'grayscale' => [
+                        'type' => 'boolean',
+                        'label' => 'Grayscale logos (color on hover)',
+                        'default' => true,
+                    ],
+                ],
+            ],
+        ],
+
+        'countdown_timer' => [
+            'name' => 'Countdown Timer',
+            'description' => 'Live countdown to a target date — great for flash sales and event launches',
+            'icon' => 'timer',
+            'category' => 'marketing',
+            'enum' => PageBlockTypeEnum::CountdownTimer,
+            'allowed_relations' => [],
+            'schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'title' => [
+                        'type' => 'string',
+                        'label' => 'Heading',
+                        'placeholder' => 'Flash Sale Ends In',
+                    ],
+                    'subtitle' => [
+                        'type' => 'string',
+                        'label' => 'Subheading',
+                        'format' => 'textarea',
+                    ],
+                    'target_date' => [
+                        'type' => 'string',
+                        'label' => 'Target Date & Time (ISO 8601)',
+                        'placeholder' => '2026-12-31T23:59:00',
+                        'description' => 'Format: YYYY-MM-DDTHH:MM:SS',
+                    ],
+                    'show_labels' => [
+                        'type' => 'boolean',
+                        'label' => 'Show Days / Hours / Minutes / Seconds labels',
+                        'default' => true,
+                    ],
+                    'expired_message' => [
+                        'type' => 'string',
+                        'label' => 'Message when expired',
+                        'placeholder' => 'This offer has ended.',
+                    ],
+                    'cta_label' => [
+                        'type' => 'string',
+                        'label' => 'CTA Button Label',
+                    ],
+                    'cta_url' => [
+                        'type' => 'string',
+                        'label' => 'CTA Button URL',
+                        'format' => 'url',
+                    ],
+                    'style' => [
+                        'type' => 'string',
+                        'label' => 'Style',
+                        'enum' => ['light', 'dark', 'brand'],
+                        'default' => 'dark',
+                    ],
+                ],
+            ],
+        ],
+
+        'timeline' => [
+            'name' => 'Timeline',
+            'description' => 'Vertical timeline — company history, process steps, milestones',
+            'icon' => 'milestone',
+            'category' => 'content',
+            'enum' => PageBlockTypeEnum::Timeline,
+            'allowed_relations' => [],
+            'schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'title' => [
+                        'type' => 'string',
+                        'label' => 'Section Title',
+                    ],
+                    'subtitle' => [
+                        'type' => 'string',
+                        'label' => 'Section Subtitle',
+                        'format' => 'textarea',
+                    ],
+                    'layout' => [
+                        'type' => 'string',
+                        'label' => 'Layout',
+                        'enum' => ['left', 'center', 'right'],
+                        'default' => 'left',
+                    ],
+                    'items' => [
+                        'type' => 'array',
+                        'label' => 'Timeline Items',
+                        'items' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'date' => ['type' => 'string', 'label' => 'Date / Year', 'placeholder' => '2020'],
+                                'title' => ['type' => 'string', 'label' => 'Title', 'placeholder' => 'Company founded'],
+                                'description' => ['type' => 'string', 'label' => 'Description', 'format' => 'textarea'],
+                                'icon' => ['type' => 'string', 'label' => 'Icon (lucide name)', 'placeholder' => 'star'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+
+        'team_members' => [
+            'name' => 'Team Members',
+            'description' => 'Grid of team member cards with photo, name, role and social links',
+            'icon' => 'users',
+            'category' => 'content',
+            'enum' => PageBlockTypeEnum::TeamMembers,
+            'allowed_relations' => [],
+            'schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'title' => [
+                        'type' => 'string',
+                        'label' => 'Section Title',
+                        'placeholder' => 'Meet the Team',
+                    ],
+                    'subtitle' => [
+                        'type' => 'string',
+                        'label' => 'Section Subtitle',
+                        'format' => 'textarea',
+                    ],
+                    'columns' => [
+                        'type' => 'integer',
+                        'label' => 'Columns',
+                        'min' => 2,
+                        'max' => 5,
+                        'default' => 4,
+                    ],
+                    'members' => [
+                        'type' => 'array',
+                        'label' => 'Team Members',
+                        'items' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'name' => ['type' => 'string', 'label' => 'Name', 'placeholder' => 'John Smith'],
+                                'role' => ['type' => 'string', 'label' => 'Role', 'placeholder' => 'CEO & Founder'],
+                                'bio' => ['type' => 'string', 'label' => 'Short Bio', 'format' => 'textarea'],
+                                'photo_url' => ['type' => 'string', 'label' => 'Photo URL', 'format' => 'url'],
+                                'linkedin_url' => ['type' => 'string', 'label' => 'LinkedIn URL', 'format' => 'url'],
+                                'twitter_url' => ['type' => 'string', 'label' => 'Twitter/X URL', 'format' => 'url'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+
         'form_embed' => [
             'name' => 'Form Embed',
             'description' => 'Embed a contact form or other custom form',

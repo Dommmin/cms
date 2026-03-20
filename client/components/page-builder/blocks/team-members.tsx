@@ -1,0 +1,93 @@
+import Image from "next/image";
+import Link from "next/link";
+
+import { Linkedin, Twitter } from "lucide-react";
+
+import type { PageBlock } from "@/types/api";
+
+interface TeamMember {
+  name?: string;
+  role?: string;
+  bio?: string;
+  photo_url?: string;
+  linkedin_url?: string;
+  twitter_url?: string;
+}
+
+interface TeamMembersConfig {
+  title?: string;
+  subtitle?: string;
+  columns?: number;
+  members?: TeamMember[];
+}
+
+interface Props {
+  block: PageBlock;
+}
+
+export function TeamMembersBlock({ block }: Props) {
+  const cfg = block.configuration as TeamMembersConfig;
+  const members = cfg.members ?? [];
+  const columns = cfg.columns ?? 4;
+
+  const colClass = {
+    2: "grid-cols-1 sm:grid-cols-2",
+    3: "grid-cols-1 sm:grid-cols-3",
+    4: "grid-cols-2 sm:grid-cols-4",
+    5: "grid-cols-2 sm:grid-cols-5",
+  }[columns as 2 | 3 | 4 | 5] ?? "grid-cols-2 sm:grid-cols-4";
+
+  if (members.length === 0) return null;
+
+  return (
+    <div className="flex flex-col gap-10">
+      {(cfg.title || cfg.subtitle) && (
+        <div className="text-center">
+          {cfg.title && <h2 className="text-2xl font-bold md:text-3xl">{cfg.title}</h2>}
+          {cfg.subtitle && <p className="mt-2 text-muted-foreground">{cfg.subtitle}</p>}
+        </div>
+      )}
+
+      <div className={`grid gap-8 ${colClass}`}>
+        {members.map((member, i) => (
+          <div key={i} className="flex flex-col items-center gap-3 text-center">
+            {member.photo_url ? (
+              <Image
+                src={member.photo_url}
+                alt={member.name ?? ""}
+                width={96}
+                height={96}
+                className="h-24 w-24 rounded-full object-cover ring-2 ring-border"
+              />
+            ) : (
+              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-muted text-2xl font-bold text-muted-foreground">
+                {member.name?.charAt(0) ?? "?"}
+              </div>
+            )}
+            <div>
+              {member.name && <p className="font-semibold">{member.name}</p>}
+              {member.role && (
+                <p className="text-sm text-muted-foreground">{member.role}</p>
+              )}
+            </div>
+            {member.bio && (
+              <p className="text-sm text-muted-foreground">{member.bio}</p>
+            )}
+            <div className="flex gap-3">
+              {member.linkedin_url && (
+                <Link href={member.linkedin_url} target="_blank" className="text-muted-foreground hover:text-foreground transition-colors">
+                  <Linkedin className="h-4 w-4" />
+                </Link>
+              )}
+              {member.twitter_url && (
+                <Link href={member.twitter_url} target="_blank" className="text-muted-foreground hover:text-foreground transition-colors">
+                  <Twitter className="h-4 w-4" />
+                </Link>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

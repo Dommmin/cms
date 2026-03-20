@@ -163,24 +163,33 @@ A page is made up of **sections**. Each section contains one or more **blocks**.
 
 **Available block types:**
 
-| Block              | Purpose                                              |
-|--------------------|------------------------------------------------------|
-| Hero Banner        | Full-width banner with heading, text, and CTA button |
-| Rich Text          | Formatted text content (headings, lists, links)      |
-| Featured Products  | Display a selection of products                      |
-| Categories Grid    | Show product categories as a visual grid             |
-| Promotional Banner | Marketing banner with image and text                 |
-| Newsletter Signup  | Email capture form                                   |
-| Testimonials       | Customer quotes                                      |
-| Image Gallery      | Photo gallery                                        |
-| Video Embed        | Embedded video                                       |
-| Custom HTML        | Raw HTML for advanced users                          |
-| Two Columns        | Side-by-side layout                                  |
-| Three Columns      | Three-column layout                                  |
-| Accordion          | Expandable FAQ-style items                           |
-| Tabs               | Tabbed content                                       |
-| Form Embed         | Embed a contact/custom form                          |
-| Map                | Location map                                         |
+| Block              | Category   | Purpose                                                                   |
+|--------------------|------------|---------------------------------------------------------------------------|
+| Hero Banner        | Layout     | Full-width banner with heading, text, and up to two CTA buttons           |
+| Rich Text          | Content    | Formatted text content (headings, lists, links, tables)                   |
+| Two Columns        | Layout     | Side-by-side two-column layout                                            |
+| Three Columns      | Layout     | Three-column layout                                                       |
+| Accordion          | Content    | Expandable FAQ-style items                                                |
+| Tabs               | Content    | Tabbed content areas                                                      |
+| Timeline           | Content    | Vertical timeline — company history, process steps, milestones            |
+| Team Members       | Content    | Grid of team member cards with photo, name, role and social links         |
+| Featured Products  | Ecommerce  | Display a curated selection of products (pulled from database)            |
+| Categories Grid    | Ecommerce  | Show product categories as a visual grid (pulled from database)           |
+| Brands Slider      | Ecommerce  | Auto-scrolling carousel of brand logos (pulled from database)             |
+| Featured Posts     | Content    | Display latest or selected blog posts (pulled from database)              |
+| Stats / Counters   | Marketing  | Animated number counters — "5000+ customers", "98% satisfaction"          |
+| Call to Action     | Marketing  | Full-width CTA section with heading, subtitle, and up to two buttons      |
+| Pricing Table      | Marketing  | Pricing plans with feature lists and optional monthly/yearly toggle       |
+| Logo Cloud         | Marketing  | Grid of client/partner logos (upload via Media)                           |
+| Countdown Timer    | Marketing  | Live countdown to a target date — for flash sales or event launches       |
+| Promotional Banner | Marketing  | Marketing banner with image and text overlay                              |
+| Newsletter Signup  | Conversion | Email capture form                                                        |
+| Form Embed         | Conversion | Embed a contact form or any custom form                                   |
+| Testimonials       | Marketing  | Customer quotes with star rating                                          |
+| Image Gallery      | Media      | Photo gallery with lightbox                                               |
+| Video Embed        | Media      | Embedded YouTube or Vimeo video                                           |
+| Map                | Content    | Location map                                                              |
+| Custom HTML        | Advanced   | Raw HTML for advanced users / developers                                  |
 
 **Useful features:**
 
@@ -188,6 +197,8 @@ A page is made up of **sections**. Each section contains one or more **blocks**.
 - **Copy / Paste blocks** — click the copy icon on any block to copy it to your clipboard, then paste it anywhere on the same or a different page
 - **Mobile preview** — switch to mobile preview mode in the toolbar to see how the page looks on a phone screen
 - **Split view** — view the editor and the page preview side by side
+- **Scroll animations** — each section has a **Scroll Animation** setting: choose Fade In, Fade Up, Slide from Left/Right, or Zoom In to add an entrance animation when the visitor scrolls to that section. Set to **None** to disable.
+- **Section spacing** — the **Spacing** dropdown on each section controls padding (No padding / Small / Medium / Large / Extra large)
 
 **To add a block:**
 

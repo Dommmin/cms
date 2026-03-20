@@ -69,7 +69,7 @@ export function SectionForm({
                 </span>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
                 {/* Section Type */}
                 <div className="space-y-1.5">
                     <Label htmlFor="section-type">Container Type</Label>
@@ -127,6 +127,72 @@ export function SectionForm({
                             ) : (
                                 <SelectItem value="default">Default</SelectItem>
                             )}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Padding */}
+                <div className="space-y-1.5">
+                    <Label htmlFor="section-padding">Spacing</Label>
+                    <Select
+                        value={
+                            (section.settings?.padding as string | undefined) ??
+                            'lg'
+                        }
+                        onValueChange={(value) =>
+                            onUpdate({
+                                settings: {
+                                    ...section.settings,
+                                    padding: value,
+                                },
+                            })
+                        }
+                    >
+                        <SelectTrigger id="section-padding">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="none">No padding</SelectItem>
+                            <SelectItem value="sm">Small</SelectItem>
+                            <SelectItem value="md">Medium</SelectItem>
+                            <SelectItem value="lg">Large (default)</SelectItem>
+                            <SelectItem value="xl">Extra large</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Scroll animation */}
+                <div className="space-y-1.5">
+                    <Label htmlFor="section-animation">Scroll Animation</Label>
+                    <Select
+                        value={
+                            (section.settings?.animation as string | undefined) ??
+                            'none'
+                        }
+                        onValueChange={(value) =>
+                            onUpdate({
+                                settings: {
+                                    ...section.settings,
+                                    animation:
+                                        value === 'none' ? undefined : value,
+                                },
+                            })
+                        }
+                    >
+                        <SelectTrigger id="section-animation">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="none">None</SelectItem>
+                            <SelectItem value="fade-in">Fade In</SelectItem>
+                            <SelectItem value="fade-up">Fade Up</SelectItem>
+                            <SelectItem value="fade-left">
+                                Slide from Left
+                            </SelectItem>
+                            <SelectItem value="fade-right">
+                                Slide from Right
+                            </SelectItem>
+                            <SelectItem value="zoom-in">Zoom In</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>

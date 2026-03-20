@@ -19,6 +19,8 @@
 
 Navigate to **CMS → Pages**, then click the **Builder** button next to any page.
 
+> **Quick tip:** Set a **Scroll Animation** on any section to make it animate in when the visitor scrolls to it. Choose from Fade In, Fade Up, Slide from Left/Right, or Zoom In in the section container settings.
+
 ---
 
 ### Sections
@@ -91,6 +93,7 @@ Click **Save** in the top-right toolbar. A toast notification confirms success.
 Page Builder (feature)
 ├── config/blocks.php              — Block type definitions (schema, relations)
 ├── config/cms/sections.php        — Section type definitions (layouts, variants)
+│                                    (animation + padding stored in section.settings JSON)
 │
 ├── Backend
 │   ├── app/Models/Page.php
@@ -110,11 +113,17 @@ Page Builder (feature)
         ├── builder-toolbar.tsx     — Top action bar
         ├── sortable-section.tsx    — Section wrapper (DnD)
         ├── section-card.tsx        — Section header UI
-        ├── section-form.tsx        — Section type/layout/variant selectors
+        ├── section-form.tsx        — Section type / layout / variant / padding / animation selectors
         ├── blocks-list.tsx         — Block list with DnD
         ├── block-card.tsx          — Block header UI + save-to-global
         ├── block-form.tsx          — Block type selector + active toggle
         └── dynamic-block-form.tsx  — Schema-driven field renderer
+
+Public frontend (client/components/page-builder/)
+    ├── section-renderer.tsx        — Renders a section + applies animation wrapper
+    ├── animated-section.tsx        — "use client" framer-motion wrapper (5 presets)
+    ├── block-renderer.tsx          — Switch on block.type → component
+    └── blocks/                     — One file per block type
 ```
 
 ### Database Schema

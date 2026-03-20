@@ -23,6 +23,14 @@ enum PageBlockTypeEnum: string
     case FormEmbed = 'form_embed';
     case Map = 'map';
     case FeaturedPosts = 'featured_posts';
+    case StatsCounter = 'stats_counter';
+    case CallToAction = 'call_to_action';
+    case PricingTable = 'pricing_table';
+    case BrandsSlider = 'brands_slider';
+    case LogoCloud = 'logo_cloud';
+    case CountdownTimer = 'countdown_timer';
+    case Timeline = 'timeline';
+    case TeamMembers = 'team_members';
 
     public function label(): string
     {
@@ -44,6 +52,14 @@ enum PageBlockTypeEnum: string
             self::FormEmbed => 'Formularz',
             self::Map => 'Mapa',
             self::FeaturedPosts => 'Polecane artykuły',
+            self::StatsCounter => 'Liczniki / Statystyki',
+            self::CallToAction => 'Call to Action',
+            self::PricingTable => 'Tabela cenowa',
+            self::BrandsSlider => 'Slider marek',
+            self::LogoCloud => 'Loga partnerów',
+            self::CountdownTimer => 'Odliczanie',
+            self::Timeline => 'Oś czasu',
+            self::TeamMembers => 'Zespół',
         };
     }
 }

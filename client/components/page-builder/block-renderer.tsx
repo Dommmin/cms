@@ -1,18 +1,26 @@
 import { AccordionBlock } from "./blocks/accordion-block";
-import { MapBlock } from "./blocks/map-block";
+import { BrandsSliderBlock } from "./blocks/brands-slider";
+import { CallToActionBlock } from "./blocks/call-to-action";
 import { CategoriesGridBlock } from "./blocks/categories-grid";
+import { CountdownTimerBlock } from "./blocks/countdown-timer";
 import { CustomHtmlBlock } from "./blocks/custom-html";
 import { FeaturedPostsBlock } from "./blocks/featured-posts";
 import { FeaturedProductsBlock } from "./blocks/featured-products";
 import { FormEmbedBlock } from "./blocks/form-embed";
 import { HeroBannerBlock } from "./blocks/hero-banner";
 import { ImageGalleryBlock } from "./blocks/image-gallery";
+import { LogoCloudBlock } from "./blocks/logo-cloud";
+import { MapBlock } from "./blocks/map-block";
 import { NewsletterSignupBlock } from "./blocks/newsletter-signup";
+import { PricingTableBlock } from "./blocks/pricing-table";
 import { PromotionalBannerBlock } from "./blocks/promotional-banner";
 import { RichTextBlock } from "./blocks/rich-text";
+import { StatsCounterBlock } from "./blocks/stats-counter";
 import { TabsBlock } from "./blocks/tabs-block";
+import { TeamMembersBlock } from "./blocks/team-members";
 import { TestimonialsBlock } from "./blocks/testimonials";
 import { ThreeColumnsBlock } from "./blocks/three-columns";
+import { TimelineBlock } from "./blocks/timeline";
 import { TwoColumnsBlock } from "./blocks/two-columns";
 import { VideoEmbedBlock } from "./blocks/video-embed";
 import type { PageBlock } from "@/types/api";
@@ -57,6 +65,22 @@ export function BlockRenderer({ block }: Props) {
       return <MapBlock block={block} />;
     case "featured_posts":
       return <FeaturedPostsBlock block={block} />;
+    case "stats_counter":
+      return <StatsCounterBlock block={block} />;
+    case "call_to_action":
+      return <CallToActionBlock block={block} />;
+    case "pricing_table":
+      return <PricingTableBlock block={block} />;
+    case "brands_slider":
+      return <BrandsSliderBlock block={block} />;
+    case "logo_cloud":
+      return <LogoCloudBlock block={block} />;
+    case "countdown_timer":
+      return <CountdownTimerBlock block={block} />;
+    case "timeline":
+      return <TimelineBlock block={block} />;
+    case "team_members":
+      return <TeamMembersBlock block={block} />;
     default:
       // Unknown block type — silent fallback in production
       if (process.env.NODE_ENV === "development") {

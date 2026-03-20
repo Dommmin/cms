@@ -288,10 +288,47 @@
 - ✅ Copy/paste blocks between pages (localStorage key `pb_clipboard`, copy button in `BlockCard`, Paste in `BlocksList`)
 - ✅ Undo/redo (Ctrl+Z / Ctrl+Shift+Z) — `useReducer` with history stacks, max 20 steps (`use-builder-state.ts`)
 - ✅ Mobile preview mode (`PreviewDevice` type, device selector in toolbar, iframe max-width in `builder.tsx`)
+- ✅ **Section scroll animations** — framer-motion `AnimatedSection` wrapper; `animation` field in section `settings` JSON; options: `fade-in`, `fade-up`, `fade-left`, `fade-right`, `zoom-in`; configured per-section in admin SectionForm; `viewport={{ once: true }}` so each section animates once on scroll
+- ✅ **Section spacing control** — `padding` field in section `settings` JSON; options: none/sm/md/lg/xl; configured in admin SectionForm
 - ⚠️ Block templates library — `SectionTemplatesDialog` component exists with UI skeleton, but **no pre-built templates seeded**
+
+### Block Library (2026-03-20)
+
+| Block             | Category   | Data source | Status |
+|-------------------|------------|-------------|--------|
+| Hero Banner       | layout     | static      | ✅ |
+| Rich Text         | content    | static      | ✅ |
+| Two Columns       | layout     | static      | ✅ |
+| Three Columns     | layout     | static      | ✅ |
+| Accordion         | content    | static      | ✅ |
+| Tabs              | content    | static      | ✅ |
+| Timeline          | content    | static      | ✅ 2026-03-20 |
+| Team Members      | content    | static      | ✅ 2026-03-20 |
+| Featured Products | ecommerce  | DB (product relations) | ✅ |
+| Categories Grid   | ecommerce  | DB (category relations) | ✅ |
+| Brands Slider     | ecommerce  | DB (brand relations) | ✅ 2026-03-20 |
+| Featured Posts    | content    | DB (blog_post relations) | ✅ |
+| Stats / Counters  | marketing  | static (array) | ✅ 2026-03-20 |
+| Call to Action    | marketing  | static | ✅ 2026-03-20 |
+| Pricing Table     | marketing  | static (array) | ✅ 2026-03-20 |
+| Logo Cloud        | marketing  | media relations | ✅ 2026-03-20 |
+| Countdown Timer   | marketing  | static (target_date) | ✅ 2026-03-20 |
+| Promotional Banner| marketing  | static | ✅ |
+| Newsletter Signup | conversion | static | ✅ |
+| Form Embed        | conversion | DB (form relation) | ✅ |
+| Testimonials      | marketing  | static (array) | ✅ |
+| Image Gallery     | media      | media relations | ✅ |
+| Video Embed       | media      | static (url) | ✅ |
+| Map               | content    | static (lat/lng) or DB (store) | ✅ |
+| Custom HTML       | advanced   | static | ✅ |
 
 **Remaining:**
 - Seed pre-built section templates (`SectionTemplate` model → `section_templates` table)
+- **Before/After slider** (`custom` category) — image comparison widget; client-specific; consider `react-compare-slider`
+- **Product Slider** (ecommerce) — horizontal scrollable carousel of products (vs grid in FeaturedProducts)
+- **Parallax Banner** (`custom`) — background parallax scroll effect; client-specific
+- **Testimonials Slider** — carousel variant of Testimonials block (currently grid only)
+- **Gallery Grid with Lightbox** — upgrade ImageGallery to support Masonry layout + lightbox overlay (currently basic grid)
 
 ---
 
