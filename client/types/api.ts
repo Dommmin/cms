@@ -500,7 +500,10 @@ export type BlockType =
   | "logo_cloud"
   | "countdown_timer"
   | "timeline"
-  | "team_members";
+  | "team_members"
+  | "icon_list"
+  | "steps_process"
+  | "trust_badges";
 
 export interface Page {
   id: number;

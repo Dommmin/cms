@@ -1,5 +1,8 @@
 import { AccordionBlock } from "./blocks/accordion-block";
 import { BrandsSliderBlock } from "./blocks/brands-slider";
+import { IconListBlock } from "./blocks/icon-list";
+import { StepsProcessBlock } from "./blocks/steps-process";
+import { TrustBadgesBlock } from "./blocks/trust-badges";
 import { CallToActionBlock } from "./blocks/call-to-action";
 import { CategoriesGridBlock } from "./blocks/categories-grid";
 import { CountdownTimerBlock } from "./blocks/countdown-timer";
@@ -81,6 +84,12 @@ export function BlockRenderer({ block }: Props) {
       return <TimelineBlock block={block} />;
     case "team_members":
       return <TeamMembersBlock block={block} />;
+    case "icon_list":
+      return <IconListBlock block={block} />;
+    case "steps_process":
+      return <StepsProcessBlock block={block} />;
+    case "trust_badges":
+      return <TrustBadgesBlock block={block} />;
     default:
       // Unknown block type — silent fallback in production
       if (process.env.NODE_ENV === "development") {

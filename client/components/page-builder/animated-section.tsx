@@ -1,5 +1,6 @@
 "use client";
 
+import { useReducedMotion } from "framer-motion";
 import { motion } from "framer-motion";
 
 type AnimationPreset = {
@@ -39,7 +40,8 @@ interface Props {
 }
 
 export function AnimatedSection({ animation, className, children, ...rest }: Props) {
-  const preset = PRESETS[animation];
+  const reducedMotion = useReducedMotion();
+  const preset = !reducedMotion ? PRESETS[animation] : null;
 
   if (!preset) {
     return (

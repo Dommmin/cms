@@ -31,6 +31,9 @@ enum PageBlockTypeEnum: string
     case CountdownTimer = 'countdown_timer';
     case Timeline = 'timeline';
     case TeamMembers = 'team_members';
+    case IconList = 'icon_list';
+    case StepsProcess = 'steps_process';
+    case TrustBadges = 'trust_badges';
 
     public function label(): string
     {
@@ -60,6 +63,9 @@ enum PageBlockTypeEnum: string
             self::CountdownTimer => 'Odliczanie',
             self::Timeline => 'Oś czasu',
             self::TeamMembers => 'Zespół',
+            self::IconList => 'Lista ikon',
+            self::StepsProcess => 'Jak to działa',
+            self::TrustBadges => 'Znaki zaufania',
         };
     }
 }

@@ -1218,6 +1218,108 @@ return [
             ],
         ],
 
+        'icon_list' => [
+            'name' => 'Icon List / Features',
+            'description' => 'Repeater of icon + title + description — classic features or benefits block',
+            'icon' => 'list',
+            'category' => 'content',
+            'enum' => PageBlockTypeEnum::IconList,
+            'allowed_relations' => [],
+            'schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'title' => ['type' => 'string', 'label' => 'Section Title', 'placeholder' => 'Why Choose Us'],
+                    'subtitle' => ['type' => 'string', 'label' => 'Section Subtitle', 'format' => 'textarea'],
+                    'columns' => ['type' => 'integer', 'label' => 'Columns', 'min' => 1, 'max' => 4, 'default' => 2],
+                    'style' => [
+                        'type' => 'string',
+                        'label' => 'Item Style',
+                        'enum' => ['horizontal', 'centered', 'compact'],
+                        'default' => 'horizontal',
+                    ],
+                    'icon_color' => ['type' => 'string', 'label' => 'Icon Color', 'format' => 'color'],
+                    'items' => [
+                        'type' => 'array',
+                        'label' => 'Items',
+                        'items' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'icon' => ['type' => 'string', 'label' => 'Icon', 'placeholder' => 'check, star, shield, truck, lock…'],
+                                'title' => ['type' => 'string', 'label' => 'Title'],
+                                'description' => ['type' => 'string', 'label' => 'Description', 'format' => 'textarea'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+
+        'steps_process' => [
+            'name' => 'Steps / How It Works',
+            'description' => 'Numbered process steps — "How it works" section with connectors between steps',
+            'icon' => 'footprints',
+            'category' => 'content',
+            'enum' => PageBlockTypeEnum::StepsProcess,
+            'allowed_relations' => [],
+            'schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'title' => ['type' => 'string', 'label' => 'Section Title', 'placeholder' => 'How It Works'],
+                    'subtitle' => ['type' => 'string', 'label' => 'Section Subtitle', 'format' => 'textarea'],
+                    'layout' => [
+                        'type' => 'string',
+                        'label' => 'Layout',
+                        'enum' => ['horizontal', 'vertical', 'numbered'],
+                        'default' => 'horizontal',
+                    ],
+                    'steps' => [
+                        'type' => 'array',
+                        'label' => 'Steps',
+                        'items' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'title' => ['type' => 'string', 'label' => 'Step Title'],
+                                'description' => ['type' => 'string', 'label' => 'Description', 'format' => 'textarea'],
+                                'icon' => ['type' => 'string', 'label' => 'Icon (optional)', 'placeholder' => 'check, star…'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+
+        'trust_badges' => [
+            'name' => 'Trust Badges',
+            'description' => 'Row of trust signals: Free Shipping, Secure Payment, Returns, Authentic, etc.',
+            'icon' => 'shield-check',
+            'category' => 'marketing',
+            'enum' => PageBlockTypeEnum::TrustBadges,
+            'allowed_relations' => [],
+            'schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'style' => [
+                        'type' => 'string',
+                        'label' => 'Style',
+                        'enum' => ['row', 'card', 'minimal'],
+                        'default' => 'row',
+                    ],
+                    'badges' => [
+                        'type' => 'array',
+                        'label' => 'Badges',
+                        'items' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'icon' => ['type' => 'string', 'label' => 'Icon', 'placeholder' => 'truck, shield, return, lock, award…'],
+                                'label' => ['type' => 'string', 'label' => 'Label', 'placeholder' => 'Free Shipping'],
+                                'sublabel' => ['type' => 'string', 'label' => 'Sub-label', 'placeholder' => 'On orders over 200 zł'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+
         'form_embed' => [
             'name' => 'Form Embed',
             'description' => 'Embed a contact form or other custom form',
