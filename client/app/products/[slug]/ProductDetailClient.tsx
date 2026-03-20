@@ -182,6 +182,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                 src={activeImage.url}
                 alt={activeImage.alt ?? product.name}
                 fill
+                priority
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
@@ -190,6 +191,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                 src={product.thumbnail.url}
                 alt={product.thumbnail.alt ?? product.name}
                 fill
+                priority
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />

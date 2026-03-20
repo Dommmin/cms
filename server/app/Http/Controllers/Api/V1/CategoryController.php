@@ -19,9 +19,14 @@ class CategoryController extends Controller
             ->where('is_active', true)
             ->when($request->parent_id, fn ($q, $id) => $q->where('parent_id', $id))
             ->when(! $request->has('parent_id') && ! $request->boolean('all'), fn ($q) => $q->whereNull('parent_id'))
-            ->with('children')
+            ->withCount('products')
+            ->with(['children' => fn ($q) => $q->withCount('products')])
             ->orderBy('position')
-            ->get();
+            ->get()
+            // Exclude categories with no products (directly or through one level of children)
+            ->filter(fn (Category $cat) => $cat->products_count > 0
+                || $cat->children->sum('products_count') > 0)
+            ->values();
 
         return response()->json(new CategoryCollection($categories));
     }

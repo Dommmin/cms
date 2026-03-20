@@ -7,6 +7,7 @@ import { useLogin } from "@/hooks/use-auth";
 import { useTranslation } from "@/hooks/use-translation";
 import { useLocalePath } from "@/hooks/use-locale";
 import { SocialLoginButtons } from "@/components/social-login-buttons";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 
 export default function LoginPage() {
   const { mutate: login, isPending, error } = useLogin();
@@ -14,10 +15,11 @@ export default function LoginPage() {
   const lp = useLocalePath();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    login({ email, password });
+    login({ email, password, cf_turnstile_response: turnstileToken || undefined });
   }
 
   const errorMessage =
@@ -71,6 +73,12 @@ export default function LoginPage() {
             className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
+
+        <TurnstileWidget
+          onVerify={setTurnstileToken}
+          onExpire={() => setTurnstileToken("")}
+        />
+
         <button
           type="submit"
           disabled={isPending}

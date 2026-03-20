@@ -47,7 +47,7 @@ class ProductController extends Controller
             ->paginate(24)
             ->withQueryString();
 
-        return response()->json(new ProductCollection($products));
+        return (new ProductCollection($products))->response();
     }
 
     public function show(string $slug): JsonResponse
@@ -228,6 +228,6 @@ class ProductController extends Controller
             ->paginate(24)
             ->withQueryString();
 
-        return response()->json(new ProductCollection($products));
+        return (new ProductCollection($products))->response();
     }
 }

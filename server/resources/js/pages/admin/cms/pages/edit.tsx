@@ -39,6 +39,7 @@ type ModuleConfig = {
 type PageData = {
     id: number;
     parent_id: number | null;
+    locale: string | null;
     title: Record<string, string>;
     slug: string;
     slug_translations: Record<string, string> | null;
@@ -218,6 +219,13 @@ export default function Edit({ page, modules, pages }: Props) {
                             <LayoutIcon className="mr-1 h-3 w-3" />
                             {page.layout}
                         </Badge>
+                        {page.locale ? (
+                            <Badge variant="outline" className="font-mono uppercase">
+                                {page.locale}
+                            </Badge>
+                        ) : (
+                            <Badge variant="secondary">Global</Badge>
+                        )}
                     </div>
 
                     <Form
@@ -247,6 +255,11 @@ export default function Edit({ page, modules, pages }: Props) {
                                     type="hidden"
                                     name="parent_id"
                                     value={parentId === 'none' ? '' : parentId}
+                                />
+                                <input
+                                    type="hidden"
+                                    name="locale"
+                                    value={page.locale ?? ''}
                                 />
                                 {/* Hidden inputs for all locale title/excerpt values */}
                                 {locales.map((locale) => (

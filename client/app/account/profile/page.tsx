@@ -55,6 +55,7 @@ export default function ProfilePage() {
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [newAddress, setNewAddress] = useState<AddressForm>({ ...EMPTY_ADDRESS });
   const [addressErrors, setAddressErrors] = useState<Record<string, string[]>>({});
+  const [passwordErrors, setPasswordErrors] = useState<Record<string, string[]>>({});
   const [exportingData, setExportingData] = useState(false);
 
   async function handleExportData() {
@@ -90,9 +91,16 @@ export default function ProfilePage() {
 
   function handlePasswordSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setPasswordErrors({});
     updatePassword(passwordForm, {
-      onSuccess: () =>
-        setPasswordForm({ current_password: "", password: "", password_confirmation: "" }),
+      onSuccess: () => {
+        setPasswordForm({ current_password: "", password: "", password_confirmation: "" });
+        setPasswordErrors({});
+      },
+      onError: (err: any) => {
+        const errors = err?.response?.data?.errors;
+        if (errors) setPasswordErrors(errors);
+      },
     });
   }
 
@@ -159,7 +167,7 @@ export default function ProfilePage() {
         <h2 className="mb-4 text-base font-semibold">{t("account.change_password", "Change password")}</h2>
         <form onSubmit={handlePasswordSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium">{t("auth.password", "Password")}</label>
+            <label className="mb-1 block text-sm font-medium">{t("auth.current_password", "Current Password")}</label>
             <input
               type="password"
               required
@@ -167,12 +175,15 @@ export default function ProfilePage() {
               onChange={(e) =>
                 setPasswordForm((p) => ({ ...p, current_password: e.target.value }))
               }
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              className={`w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring ${passwordErrors.current_password ? "border-destructive" : "border-input"}`}
             />
+            {passwordErrors.current_password && (
+              <p className="mt-1 text-xs text-destructive">{passwordErrors.current_password[0]}</p>
+            )}
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium">{t("auth.password", "New password")}</label>
+              <label className="mb-1 block text-sm font-medium">{t("auth.new_password", "New password")}</label>
               <input
                 type="password"
                 required
@@ -181,8 +192,11 @@ export default function ProfilePage() {
                 onChange={(e) =>
                   setPasswordForm((p) => ({ ...p, password: e.target.value }))
                 }
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                className={`w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring ${passwordErrors.password ? "border-destructive" : "border-input"}`}
               />
+              {passwordErrors.password && (
+                <p className="mt-1 text-xs text-destructive">{passwordErrors.password[0]}</p>
+              )}
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium">{t("auth.confirm_password", "Confirm new password")}</label>

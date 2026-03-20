@@ -26,6 +26,7 @@ class UpdatePageRequest extends FormRequest
 
         return [
             'parent_id' => ['nullable', 'integer', 'exists:pages,id'],
+            'locale' => ['nullable', 'string', 'max:10', Rule::in(\App\Models\Locale::pluck('code')->toArray())],
             'title' => ['required'],
             'title.*' => ['nullable', 'string', 'max:255'],
             'slug' => [
@@ -33,7 +34,8 @@ class UpdatePageRequest extends FormRequest
                 'string',
                 'max:255',
                 Rule::unique('pages', 'slug')
-                    ->where('parent_id', $this->input('parent_id'))
+                    ->where('parent_id', $this->input('parent_id') ?: null)
+                    ->where('locale', $this->input('locale') ?: null)
                     ->ignore($page?->id),
             ],
             'excerpt' => ['nullable'],

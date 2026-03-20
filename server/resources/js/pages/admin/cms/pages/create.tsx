@@ -1,4 +1,4 @@
-import { Link, Form, Head } from '@inertiajs/react';
+import { Link, Form, Head, usePage } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import InputError from '@/components/input-error';
@@ -21,6 +21,7 @@ import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 
 import type { BreadcrumbItem } from '@/types';
+import type { SharedLocale } from '@/types/global';
 
 type ModuleConfig = {
     label: string;
@@ -46,6 +47,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Create({ modules, pages }: Props) {
     const __ = useTranslation();
+    const { locales } = usePage().props as { locales: SharedLocale[] };
 
     const moduleOptions = useMemo(
         () => Object.entries(modules ?? {}),
@@ -55,6 +57,7 @@ export default function Create({ modules, pages }: Props) {
     const [layout, setLayout] = useState<string>('default');
     const [pageType, setPageType] = useState<string>('blocks');
     const [moduleName, setModuleName] = useState<string | null>(null);
+    const [locale, setLocale] = useState<string>('global');
     const [parentId, setParentId] = useState<string>('none');
     const [title, setTitle] = useState('');
     const [slug, setSlug] = useState('');
@@ -111,6 +114,13 @@ export default function Create({ modules, pages }: Props) {
                                 name="module_name"
                                 value={moduleName ?? ''}
                             />
+                            {locale !== 'global' && (
+                                <input
+                                    type="hidden"
+                                    name="locale"
+                                    value={locale}
+                                />
+                            )}
                             {parentId !== 'none' && (
                                 <input
                                     type="hidden"
@@ -133,6 +143,41 @@ export default function Create({ modules, pages }: Props) {
                                     value="general"
                                     className="space-y-6"
                                 >
+                                    {locales.length > 0 && (
+                                        <div className="grid gap-2">
+                                            <Label>
+                                                {__('label.site', 'Site / Locale')}
+                                            </Label>
+                                            <Select
+                                                value={locale}
+                                                onValueChange={setLocale}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="global">
+                                                        — Global (no locale) —
+                                                    </SelectItem>
+                                                    {locales.map((l) => (
+                                                        <SelectItem
+                                                            key={l.code}
+                                                            value={l.code}
+                                                        >
+                                                            {l.name} ({l.code})
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <InputError
+                                                message={
+                                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                    (errors as any).locale
+                                                }
+                                            />
+                                        </div>
+                                    )}
+
                                     {pages.length > 0 && (
                                         <div className="grid gap-2">
                                             <Label>

@@ -27,6 +27,10 @@ class PageIndexQuery
             ->when($this->request->has('is_home'), function ($query) {
                 $query->where('is_home', $this->request->boolean('is_home'));
             })
+            ->when($this->request->filled('locale'), function ($query) {
+                $locale = $this->request->string('locale')->toString();
+                $query->forLocale($locale);
+            })
             ->orderByRaw('COALESCE(parent_id, id), parent_id IS NOT NULL, title')
             ->paginate(20)
             ->withQueryString();

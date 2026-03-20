@@ -14,6 +14,13 @@ class CategoryFilter implements Filter
 {
     public function __invoke(Builder $query, mixed $value, string $property): void
     {
-        $query->whereHas('category', fn (Builder $q) => $q->where('slug', $value)->where('is_active', true));
+        $query->whereHas('category', function (Builder $q) use ($value): void {
+            $q->where('is_active', true)
+                ->where(function (Builder $q) use ($value): void {
+                    // Match the category directly OR via its parent (one level up)
+                    $q->where('slug', $value)
+                        ->orWhereHas('parent', fn (Builder $q) => $q->where('slug', $value)->where('is_active', true));
+                });
+        });
     }
 }

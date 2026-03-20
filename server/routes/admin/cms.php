@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\Cms\PageController;
 use App\Http\Controllers\Admin\Cms\ReusableBlockController;
 
 Route::prefix('cms')->name('cms.')->group(function () {
+    Route::post('pages/clone-site', [PageController::class, 'cloneSite'])->name('pages.clone-site');
     Route::resource('pages', PageController::class)->except(['show'])
         ->names([
             'create' => 'pages.create',

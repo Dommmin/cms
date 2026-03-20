@@ -16,6 +16,7 @@ import { resolveLocalizedText } from '@/lib/localized-text';
 export type PageRow = {
     id: number;
     parent_id: number | null;
+    locale: string | null;
     parent?: {
         id: number;
         title: string | Record<string, string>;
@@ -72,6 +73,20 @@ export function usePageColumns(): ColumnDef<PageRow>[] {
                     {row.original.slug}
                 </code>
             ),
+        },
+        {
+            accessorKey: 'locale',
+            header: __('column.site', 'Site'),
+            cell: ({ row }) =>
+                row.original.locale ? (
+                    <Badge variant="outline" className="text-xs font-mono uppercase">
+                        {row.original.locale}
+                    </Badge>
+                ) : (
+                    <Badge variant="secondary" className="text-xs">
+                        Global
+                    </Badge>
+                ),
         },
         {
             accessorKey: 'page_type',

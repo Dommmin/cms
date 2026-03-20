@@ -43,8 +43,8 @@ export function HeroBannerBlock({ block }: Props) {
     secondary:
       "bg-secondary text-secondary-foreground hover:bg-secondary/80 px-8 py-3 rounded-lg font-semibold transition-colors",
     outline:
-      "border-2 border-white text-white hover:bg-white/10 px-8 py-3 rounded-lg font-semibold transition-colors",
-    ghost: "text-white hover:bg-white/10 px-8 py-3 rounded-lg font-semibold transition-colors",
+      "border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 px-8 py-3 rounded-lg font-semibold transition-colors",
+    ghost: "text-primary-foreground hover:bg-primary-foreground/10 px-8 py-3 rounded-lg font-semibold transition-colors",
   }[cfg.cta_style ?? "primary"];
 
   return (
@@ -68,18 +68,18 @@ export function HeroBannerBlock({ block }: Props) {
           />
         </>
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-primary/30 to-slate-800" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-primary/70" />
       )}
 
       {/* Content */}
       <div className={`relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-6 px-6 py-16 ${alignClass}`}>
         {cfg.title && (
-          <h1 className="text-4xl font-bold text-white drop-shadow-md md:text-6xl">
+          <h1 className="text-4xl font-bold text-primary-foreground drop-shadow-md md:text-6xl">
             {cfg.title}
           </h1>
         )}
         {cfg.subtitle && (
-          <p className="max-w-2xl text-lg text-white/90 drop-shadow md:text-xl">
+          <p className="max-w-2xl text-lg text-primary-foreground/90 drop-shadow md:text-xl">
             {cfg.subtitle}
           </p>
         )}
@@ -100,9 +100,9 @@ export function HeroBannerBlock({ block }: Props) {
                     secondary:
                       "bg-secondary text-secondary-foreground hover:bg-secondary/80 px-8 py-3 rounded-lg font-semibold transition-colors",
                     outline:
-                      "border-2 border-white text-white hover:bg-white/10 px-8 py-3 rounded-lg font-semibold transition-colors",
+                      "border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 px-8 py-3 rounded-lg font-semibold transition-colors",
                     ghost:
-                      "text-white hover:bg-white/10 px-8 py-3 rounded-lg font-semibold transition-colors",
+                      "text-primary-foreground hover:bg-primary-foreground/10 px-8 py-3 rounded-lg font-semibold transition-colors",
                   }[cfg.cta2_style ?? "outline"]
                 }
               >

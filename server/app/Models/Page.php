@@ -8,6 +8,7 @@ use App\Enums\PageLayoutEnum;
 use App\Enums\PageTypeEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -62,7 +63,7 @@ class Page extends Model
     protected $table = 'pages';
 
     protected $fillable = [
-        'parent_id', 'title', 'slug', 'slug_translations', 'content', 'rich_content', 'excerpt', 'layout',
+        'parent_id', 'locale', 'title', 'slug', 'slug_translations', 'content', 'rich_content', 'excerpt', 'layout',
         'builder_snapshot', 'page_type', 'module_name', 'module_config',
         'theme_id', 'is_published', 'published_at', 'published_version_id', 'draft_version_id', 'position',
         'seo_title', 'seo_description', 'seo_canonical', 'meta_robots', 'og_image', 'sitemap_exclude', 'available_locales',
@@ -96,6 +97,8 @@ class Page extends Model
 
     /**
      * Find a published page by locale-aware path segments.
+     *
+     * For each segment: first tries locale-specific page, then falls back to global (locale = null).
      * Each segment is matched against canonical slug OR slug_translations->{locale}.
      */
     public static function findByLocalizedPath(array $segments, string $locale = 'en'): ?self
@@ -106,26 +109,53 @@ class Page extends Model
 
         $page = null;
         foreach ($segments as $segment) {
-            $query = self::query()
-                ->where('is_published', true)
-                ->where(function ($q) use ($segment, $locale): void {
-                    $q->where('slug', $segment)
-                        ->orWhere("slug_translations->{$locale}", $segment);
-                });
-
-            if ($page === null) {
-                $query->whereNull('parent_id');
-            } else {
-                $query->where('parent_id', $page->id);
-            }
-
-            $page = $query->first();
+            $page = self::findSegmentWithLocaleFallback($segment, $locale, $page?->id);
             if (! $page) {
                 return null;
             }
         }
 
         return $page;
+    }
+
+    /**
+     * Find a single path segment, trying locale-specific first, then global fallback.
+     */
+    private static function findSegmentWithLocaleFallback(
+        string $segment,
+        string $locale,
+        ?int $parentId
+    ): ?self {
+        $baseQuery = fn () => self::query()
+            ->where('is_published', true)
+            ->where(function ($q) use ($segment, $locale): void {
+                $q->where('slug', $segment)
+                    ->orWhere("slug_translations->{$locale}", $segment);
+            })
+            ->when($parentId === null,
+                fn ($q) => $q->whereNull('parent_id'),
+                fn ($q) => $q->where('parent_id', $parentId),
+            );
+
+        // 1. Locale-specific page (highest priority)
+        $found = $baseQuery()->where('locale', $locale)->first();
+
+        // 2. Global page fallback (locale = null)
+        return $found ?? $baseQuery()->whereNull('locale')->first();
+    }
+
+    /**
+     * Scope to filter pages by site locale.
+     *
+     * @param  string|null  $locale  'global' = whereNull('locale'), code = where('locale', code), null = no filter
+     */
+    public function scopeForLocale(Builder $query, ?string $locale): void
+    {
+        if ($locale === 'global') {
+            $query->whereNull('locale');
+        } elseif ($locale !== null) {
+            $query->where('locale', $locale);
+        }
     }
 
     public function getActivitylogOptions(): LogOptions

@@ -20,15 +20,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  let page;
-  console.log("Fetching page...");
-  try {
-    page = await getPage("home");
-  } catch {
-    notFound();
-  }
+  const page = await getPage("home").catch(() => null);
+  return <HomeContent page={page} />;
+}
 
-  if (!page.is_published) {
+type PageData = Awaited<ReturnType<typeof getPage>>;
+
+function HomeContent({ page }: { page: PageData | null }) {
+  if (!page || !page.is_published) {
     notFound();
   }
 

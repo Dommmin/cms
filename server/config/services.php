@@ -100,4 +100,8 @@ return [
         'bank_name' => env('BANK_TRANSFER_BANK_NAME', ''),
     ],
 
+    'cloudflare' => [
+        'turnstile_secret' => env('CLOUDFLARE_TURNSTILE_SECRET_KEY'),
+    ],
+
 ];

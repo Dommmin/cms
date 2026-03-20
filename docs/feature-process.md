@@ -135,6 +135,80 @@ After every feature, update ALL of these:
 
 ---
 
+## Security Audit Checklist
+
+Run this audit before every production release and for any feature touching auth, forms, payments, or user data.
+
+### Authentication & Session
+- [ ] Login brute-force: Fortify throttle is `5 req/min` per `email|IP` — confirm still active
+- [ ] Admin login has no bypass (no `remember_me` with insecure tokens, no debug backdoors)
+- [ ] Session cookie: `secure`, `httponly`, `samesite=strict` set in `session.php`
+- [ ] Password reset tokens expire (default 60 min) — check `auth.passwords.users.expire`
+- [ ] 2FA enforced for admin users? (Fortify TOTP is available)
+
+### API Rate Limiting
+| Limiter | Limit | Applies to |
+|---|---|---|
+| `api.strict` | 10/min/IP | Auth routes (login, register, password reset) |
+| `api.public` | 60/min/IP | Browse endpoints (products, pages, blog) |
+| `api.auth` | 300/min/user | Authenticated user actions |
+
+- [ ] Verify limiters still cover all auth routes in `routes/api.php`
+- [ ] Consider adding `api.strict` to newsletter signup and form submission routes
+
+### Forms & User Input
+- [ ] All `POST`/`PUT`/`PATCH` routes go through `FormRequest` (no inline `$request->validate()`)
+- [ ] Form submissions rate-limited (currently no per-form limit — add if spam becomes an issue)
+- [ ] No bot protection (honeypot/CAPTCHA) on contact form — consider adding if spam occurs:
+  - Simple honeypot: hidden field that bots fill, humans don't
+  - reCAPTCHA v3: `josiasmontag/laravel-recaptchav3` package (invisible, score-based)
+  - Cloudflare Turnstile: drop-in CAPTCHA replacement, privacy-friendly
+- [ ] File uploads: validate MIME type server-side (not just client-side)
+
+### Payments
+- [ ] Webhook signatures verified (PayU MD5, P24 SHA256) in `ProcessPaymentWebhook`
+- [ ] Payment amounts validated server-side, never trust client-submitted price
+- [ ] No card data stored — PCI DSS scope is minimal
+
+### OWASP Top 10 Quick Check
+| Risk | Status | Notes |
+|---|---|---|
+| SQL Injection | ✅ Safe | Eloquent ORM, no raw queries |
+| XSS | ✅ Safe | React auto-escapes, Blade `{{ }}` escapes |
+| Broken Auth | ✅ Fortify + Sanctum | Throttled, token-based |
+| Insecure Direct Object Reference | ⚠️ Audit | Policies on all admin controllers? |
+| Security Misconfiguration | ⚠️ Check | `APP_DEBUG=false` in prod, no debug routes exposed |
+| Sensitive Data Exposure | ✅ | HTTPS enforced, no secrets in responses |
+| CSRF | ✅ | Sanctum SPA + `csrf-cookie`, all state-changing routes protected |
+| Using Known Vulnerable Components | ⚠️ Run | `composer audit` + `npm audit` before release |
+| Insufficient Logging | ⚠️ | Telescope for dev; ensure prod has log aggregation |
+
+### Pre-Release Security Checklist
+```bash
+# Check for known vulnerabilities in dependencies
+docker compose exec php composer audit
+docker compose exec node npm audit
+
+# Verify no debug config in production
+grep -r "APP_DEBUG" server/.env  # must be false
+
+# Confirm policies are enforced on new controllers
+php artisan route:list --path=admin | grep -v "policy\|auth"
+
+# Run static analysis
+docker compose exec php vendor/bin/phpstan analyse
+```
+
+### IP Blocking / Account Lockout
+Currently: **rate limiting only** (429 responses), no persistent IP banning or account lockout.
+
+If brute-force becomes a real concern, options:
+1. **Account lockout after N failures**: Add `LockAccount` listener on `Lockout` event from Fortify
+2. **Fail2ban on Nginx logs**: Parse 429s, block IPs at the server level
+3. **Cloudflare WAF**: Automatic bot scoring, IP reputation, DDoS mitigation — recommended for production
+
+---
+
 ## Quick Reference: File Naming
 
 | Type             | Pattern                                                    | Example                       |

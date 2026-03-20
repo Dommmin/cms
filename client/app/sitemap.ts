@@ -40,10 +40,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const products = await serverFetch<PaginatedResponse<Product>>('/products?per_page=500');
     for (const product of products.data.filter(p => !p.sitemap_exclude)) {
+      const d = product.created_at ? new Date(product.created_at) : null;
       entries.push(
         sitemapEntry(
           `/products/${product.slug}`,
-          new Date(product.created_at),
+          d && !isNaN(d.getTime()) ? d : new Date(),
           'weekly',
           0.8,
         ),

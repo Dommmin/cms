@@ -38,6 +38,7 @@ export interface LoginPayload {
   email: string;
   password: string;
   cart_token?: string | null;
+  cf_turnstile_response?: string;
 }
 
 export interface RegisterPayload {
@@ -46,6 +47,7 @@ export interface RegisterPayload {
   password: string;
   password_confirmation: string;
   cart_token?: string | null;
+  cf_turnstile_response?: string;
 }
 
 // ── Media ─────────────────────────────────────────────────────────────────────
@@ -347,6 +349,7 @@ export interface UpdatePasswordPayload {
 export interface NewsletterSubscribePayload {
   email: string;
   name?: string;
+  cf_turnstile_response?: string;
 }
 
 // ── Forms ─────────────────────────────────────────────────────────────────────

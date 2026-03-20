@@ -7,6 +7,7 @@ import { useRegister } from "@/hooks/use-auth";
 import { useTranslation } from "@/hooks/use-translation";
 import { useLocalePath } from "@/hooks/use-locale";
 import { SocialLoginButtons } from "@/components/social-login-buttons";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 
 export default function RegisterPage() {
   const { mutate: register, isPending, error } = useRegister();
@@ -18,6 +19,7 @@ export default function RegisterPage() {
     password: "",
     password_confirmation: "",
   });
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -25,7 +27,7 @@ export default function RegisterPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    register(form);
+    register({ ...form, cf_turnstile_response: turnstileToken || undefined });
   }
 
   const errorMessage =
@@ -106,6 +108,10 @@ export default function RegisterPage() {
             className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
+        <TurnstileWidget
+          onVerify={setTurnstileToken}
+          onExpire={() => setTurnstileToken("")}
+        />
         <button
           type="submit"
           disabled={isPending}

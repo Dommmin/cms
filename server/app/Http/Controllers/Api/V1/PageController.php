@@ -23,6 +23,7 @@ class PageController extends Controller
         $page->load([
             'sections' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
             'sections.blocks' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
+            'sections.blocks.relations',
         ]);
 
         return response()->json(['data' => new PageResource($page)]);

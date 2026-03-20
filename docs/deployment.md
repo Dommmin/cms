@@ -159,6 +159,111 @@ Before deploying to production:
 
 ---
 
+## Cloudflare Setup (Production)
+
+Cloudflare provides free DDoS protection, WAF, and bot protection. All features below are on the **Free plan**.
+
+### 1. DNS / Proxy Setup
+
+1. Add your domain to Cloudflare (free plan).
+2. In the **DNS** tab, set your A record to your server IP and **enable the orange cloud** (proxied). All traffic now flows through Cloudflare.
+3. In **SSL/TLS** → Overview: set mode to **Full (strict)** if your server has a valid cert, or **Full** otherwise.
+
+### 2. Cloudflare Turnstile (CAPTCHA)
+
+Turnstile is a free, privacy-preserving CAPTCHA that protects login, register, newsletter, and contact forms.
+
+**Setup:**
+
+1. Go to [dash.cloudflare.com](https://dash.cloudflare.com) → **Turnstile** (left sidebar).
+2. Click **Add site** → enter your domain → choose widget type: **Managed** (recommended).
+3. Copy the **Site Key** (public) and **Secret Key** (private).
+4. Set environment variables:
+
+```bash
+# server/.env
+CLOUDFLARE_TURNSTILE_SECRET_KEY=your_secret_key_here
+
+# client/.env.local (or production env)
+NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY=your_site_key_here
+```
+
+The widget renders automatically on login, register, newsletter, and contact forms. If the keys are not set, the widget is hidden and validation is skipped (dev mode).
+
+### 3. Real IP from Cloudflare (`CF-Connecting-IP`)
+
+The `TrustCloudflareProxies` middleware (registered in `bootstrap/app.php`) reads the real visitor IP from the `CF-Connecting-IP` header. This ensures:
+- Rate limiting applies to real IPs, not Cloudflare proxy IPs.
+- Form submission deduplication by IP works correctly.
+
+**Nginx hardening** — strip the header on direct (non-Cloudflare) connections to prevent spoofing:
+
+```nginx
+# In your server block, before proxy_pass to PHP-FPM:
+# Only allow CF-Connecting-IP from Cloudflare's IP ranges.
+# Cloudflare publishes ranges at https://www.cloudflare.com/ips/
+# For simplicity, clear it and let the middleware fall back to REMOTE_ADDR
+# if a request arrives without going through Cloudflare:
+real_ip_header CF-Connecting-IP;
+set_real_ip_from 103.21.244.0/22;
+set_real_ip_from 103.22.200.0/22;
+set_real_ip_from 103.31.4.0/22;
+set_real_ip_from 104.16.0.0/13;
+set_real_ip_from 104.24.0.0/14;
+set_real_ip_from 108.162.192.0/18;
+set_real_ip_from 131.0.72.0/22;
+set_real_ip_from 141.101.64.0/18;
+set_real_ip_from 162.158.0.0/15;
+set_real_ip_from 172.64.0.0/13;
+set_real_ip_from 173.245.48.0/20;
+set_real_ip_from 188.114.96.0/20;
+set_real_ip_from 190.93.240.0/20;
+set_real_ip_from 197.234.240.0/22;
+set_real_ip_from 198.41.128.0/17;
+set_real_ip_from 2400:cb00::/32;
+set_real_ip_from 2606:4700::/32;
+set_real_ip_from 2803:f800::/32;
+set_real_ip_from 2405:b500::/32;
+set_real_ip_from 2405:8100::/32;
+set_real_ip_from 2a06:98c0::/29;
+set_real_ip_from 2c0f:f248::/32;
+```
+
+### 4. WAF Custom Rules (5 Free Rules)
+
+In Cloudflare dashboard → **Security** → **WAF** → **Custom rules** → click **Create rule**:
+
+| # | Rule name | Expression | Action |
+|---|-----------|-----------|--------|
+| 1 | Block non-browser API abuse | `(http.request.uri.path contains "/api/" and not http.user_agent contains "Mozilla" and not http.user_agent contains "curl" and not http.user_agent contains "axios")` | **Block** |
+| 2 | Rate-limit login endpoint | `(http.request.uri.path eq "/api/v1/auth/login" and http.request.method eq "POST")` | **Rate limit** — 5 req/min per IP |
+| 3 | Rate-limit register endpoint | `(http.request.uri.path eq "/api/v1/auth/register" and http.request.method eq "POST")` | **Rate limit** — 3 req/min per IP |
+| 4 | Block known bad bots | `(cf.client.bot)` | **Block** |
+| 5 | Challenge suspicious countries | `(ip.geoip.country in {"XX" "YY"} and http.request.uri.path contains "/api/v1/auth/")` | **Managed Challenge** |
+
+> Replace `"XX" "YY"` in rule 5 with ISO country codes you want to challenge (e.g. countries you don't sell to).
+> Rules 2 and 3 use Cloudflare's built-in rate limiting on the Free plan (limited to 1 rule per zone on Free — upgrade to Pro for multiple rate limit rules).
+
+### 5. Bot Fight Mode
+
+In **Security** → **Bots** → enable **Bot Fight Mode** (free). Automatically challenges known bots.
+
+### 6. Security Level
+
+In **Security** → **Settings** → set **Security Level** to **Medium** or **High** (blocks known malicious IPs automatically).
+
+### Production Cloudflare Checklist
+
+- [ ] Domain proxied through Cloudflare (orange cloud in DNS)
+- [ ] SSL/TLS mode set to Full or Full (strict)
+- [ ] Turnstile keys set in both `server/.env` and client env
+- [ ] Bot Fight Mode enabled
+- [ ] WAF Custom Rules 1–4 created (rule 5 optional)
+- [ ] Security Level set to Medium or High
+- [ ] Nginx `real_ip_header CF-Connecting-IP` configured
+
+---
+
 ## Scheduled Commands
 
 Configured in `routes/console.php`:

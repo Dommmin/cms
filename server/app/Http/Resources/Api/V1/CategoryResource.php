@@ -16,6 +16,10 @@ class CategoryResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        return CategoryData::from($this->resource)->toArray();
+        $data = CategoryData::from($this->resource)->toArray();
+        $data['image_url'] = $data['image_path'] ?? null;
+        unset($data['image_path']);
+
+        return $data;
     }
 }

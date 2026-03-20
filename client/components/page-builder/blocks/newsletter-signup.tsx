@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 import { subscribe } from "@/api/newsletter";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 import type { PageBlock } from "@/types/api";
 
 interface NewsletterSignupConfig {
@@ -23,6 +24,7 @@ export function NewsletterSignupBlock({ block }: Props) {
   const cfg = block.configuration as NewsletterSignupConfig;
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
 
@@ -31,7 +33,11 @@ export function NewsletterSignupBlock({ block }: Props) {
     if (!email) return;
     setLoading(true);
     try {
-      await subscribe({ email, name: cfg.ask_name ? name : undefined });
+      await subscribe({
+        email,
+        name: cfg.ask_name ? name : undefined,
+        cf_turnstile_response: turnstileToken || undefined,
+      });
       setDone(true);
       toast.success(cfg.success_message ?? "Thanks for subscribing!");
     } catch {
@@ -87,6 +93,10 @@ export function NewsletterSignupBlock({ block }: Props) {
             {loading ? "..." : (cfg.button_text ?? "Subscribe")}
           </button>
         </div>
+        <TurnstileWidget
+          onVerify={setTurnstileToken}
+          onExpire={() => setTurnstileToken("")}
+        />
       </form>
     </div>
   );

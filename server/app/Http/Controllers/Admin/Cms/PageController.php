@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin\Cms;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Cms\CloneSiteRequest;
 use App\Http\Requests\Admin\Cms\StorePageRequest;
 use App\Http\Requests\Admin\Cms\UpdatePageRequest;
 use App\Models\Page;
 use App\Queries\Admin\PageIndexQuery;
+use App\Services\CloneSiteService;
 use App\Services\PageSlugService;
 use App\Services\PageVersionService;
 use Illuminate\Http\RedirectResponse;
@@ -30,7 +32,7 @@ class PageController extends Controller
 
         return inertia('admin/cms/pages/index', [
             'pages' => $pages,
-            'filters' => $request->only(['search', 'status', 'is_home']),
+            'filters' => $request->only(['search', 'status', 'is_home', 'locale']),
         ]);
     }
 
@@ -129,6 +131,20 @@ class PageController extends Controller
         $copy->save();
 
         return redirect()->route('admin.cms.pages.edit', $copy)->with('success', 'Page duplicated');
+    }
+
+    public function cloneSite(CloneSiteRequest $request, CloneSiteService $service): RedirectResponse
+    {
+        try {
+            $service->clone(
+                sourceLocale: $request->validated('source_locale'),
+                targetLocale: $request->validated('target_locale'),
+            );
+        } catch (\RuntimeException $e) {
+            return back()->withErrors(['target_locale' => $e->getMessage()]);
+        }
+
+        return back()->with('success', 'Site cloned successfully.');
     }
 
     public function publish(Page $page): RedirectResponse

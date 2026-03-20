@@ -41,6 +41,21 @@ export default async function DynamicPage({ params }: Props) {
   const locale = headersList.get("x-locale") ?? "en";
   const page = await getPage(slug.join("/"), locale).catch(() => null);
 
+  // Always return JSX so Turbopack can finish timing DynamicPage normally.
+  // notFound() is called inside the sync PageContent child to avoid the
+  // "cannot have a negative time stamp" Turbopack bug.
+  return <PageContent page={page} slug={slug} />;
+}
+
+type PageData = Awaited<ReturnType<typeof getPage>>;
+
+function PageContent({
+  page,
+  slug,
+}: {
+  page: PageData | null;
+  slug: string[];
+}) {
   if (!page || !page.is_published) {
     notFound();
   }

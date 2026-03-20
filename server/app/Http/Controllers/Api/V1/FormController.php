@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Form;
 use App\Models\FormSubmission;
 use App\Notifications\FormSubmissionNotification;
+use App\Rules\TurnstileRule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
@@ -30,6 +31,10 @@ class FormController extends Controller
                 ], 422);
             }
         }
+
+        $request->validate([
+            'cf_turnstile_response' => ['nullable', 'string', new TurnstileRule],
+        ]);
 
         $rules = [];
         foreach ($form->fields as $field) {

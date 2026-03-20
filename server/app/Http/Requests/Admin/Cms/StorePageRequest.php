@@ -25,13 +25,16 @@ class StorePageRequest extends FormRequest
 
         return [
             'parent_id' => ['nullable', 'integer', 'exists:pages,id'],
+            'locale' => ['nullable', 'string', 'max:10', Rule::in(\App\Models\Locale::pluck('code')->toArray())],
             'title' => ['required'],
             'title.*' => ['nullable', 'string', 'max:255'],
             'slug' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('pages', 'slug')->where('parent_id', $this->input('parent_id')),
+                Rule::unique('pages', 'slug')
+                    ->where('parent_id', $this->input('parent_id') ?: null)
+                    ->where('locale', $this->input('locale') ?: null),
             ],
             'excerpt' => ['nullable'],
             'excerpt.*' => ['nullable', 'string', 'max:1000'],

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 import { submitForm } from "@/api/forms";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 import type { Form, FormField, PageBlock } from "@/types/api";
 
 interface FormEmbedConfig {
@@ -92,6 +93,7 @@ function FieldInput({ field }: { field: FormField }) {
 export function FormEmbedBlock({ block }: Props) {
   const cfg = block.configuration as FormEmbedConfig;
   const form = cfg.form;
+  const [turnstileToken, setTurnstileToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
 
@@ -111,6 +113,9 @@ export function FormEmbedBlock({ block }: Props) {
     formData.forEach((value, key) => {
       payload[key] = value;
     });
+    if (turnstileToken) {
+      payload.cf_turnstile_response = turnstileToken;
+    }
     try {
       await submitForm(form!.id, payload);
       setDone(true);
@@ -157,6 +162,10 @@ export function FormEmbedBlock({ block }: Props) {
           </div>
         ))}
 
+        <TurnstileWidget
+          onVerify={setTurnstileToken}
+          onExpire={() => setTurnstileToken("")}
+        />
         <button
           type="submit"
           disabled={loading}

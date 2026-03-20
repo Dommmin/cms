@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
 import { useLocalePath } from "@/hooks/use-locale";
+import { useTranslation } from "@/hooks/use-translation";
 import type { Category, MenuItem } from "@/types/api";
 
 interface Props {
@@ -26,6 +27,7 @@ export function MegaMenu({ items, categories }: Props) {
   const [openKey, setOpenKey] = useState<OpenKey>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lp = useLocalePath();
+  const { t } = useTranslation();
 
   function open(key: OpenKey) {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -50,7 +52,7 @@ export function MegaMenu({ items, categories }: Props) {
           onMouseLeave={scheduleClose}
         >
           <button className="flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-accent hover:text-foreground">
-            Categories
+            {t("nav.categories", "Categories")}
             <ChevronDown
               className={`h-3.5 w-3.5 transition-transform ${openKey === "categories" ? "rotate-180" : ""}`}
             />
@@ -64,7 +66,7 @@ export function MegaMenu({ items, categories }: Props) {
             >
               <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Shop by category
+                  {t("nav.shop_by_category", "Shop by category")}
                 </p>
                 <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
                   {categories.map((cat) => (
@@ -103,7 +105,7 @@ export function MegaMenu({ items, categories }: Props) {
                     onClick={() => setOpenKey(null)}
                     className="text-sm font-medium text-primary hover:underline"
                   >
-                    View all products →
+                    {t("nav.view_all_products", "View all products →")}
                   </Link>
                 </div>
               </div>

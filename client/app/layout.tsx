@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ToastContainer } from "react-toastify";
@@ -6,9 +7,9 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { AdminBar } from "@/components/admin/admin-bar";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
+import { ChatWidgetLoader } from "@/components/chat/chat-widget-loader";
 import { GoogleTagManager } from "@/components/layout/google-tag-manager";
 import { CookieConsent, type CookieSettings } from "@/components/cookie-consent";
-import { ChatWidget } from "@/components/chat/chat-widget";
 import { ComparisonBar } from "@/components/comparison-bar";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
@@ -23,24 +24,44 @@ import "./globals.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
-export async function generateMetadata(): Promise<Metadata> {
-  const publicSettings = await serverFetch<{
-    settings: {
-      general?: { site_name?: string; site_description?: string };
-      seo?: {
-        google_site_verification?: string;
-        bing_site_verification?: string;
-        disable_indexing?: string | boolean;
-      };
+// Cached per-request: both generateMetadata and RootLayout share one fetch
+type PublicSettingsResponse = {
+  settings: {
+    general?: {
+      site_name?: string;
+      site_url?: string;
+      site_description?: string;
+      contact_email?: string;
+      contact_phone?: string;
     };
-  }>("/settings/public").catch(() => null);
+    seo?: {
+      google_tag_manager?: string;
+      google_site_verification?: string;
+      bing_site_verification?: string;
+      disable_indexing?: string | boolean;
+      og_image?: string;
+      twitter_handle?: string;
+    };
+    social?: Record<string, string>;
+    cookie?: CookieSettings;
+  };
+};
+
+const getPublicSettings = cache(async () =>
+  serverFetch<PublicSettingsResponse>("/settings/public", { revalidate: 300, tags: ["settings"] }).catch(() => null),
+);
+
+export async function generateMetadata(): Promise<Metadata> {
+  const publicSettings = await getPublicSettings();
 
   const siteName = publicSettings?.settings.general?.site_name ?? "Store";
   const siteDescription = publicSettings?.settings.general?.site_description;
@@ -73,24 +94,7 @@ export default async function RootLayout({
   const locale = cookieStore.get("locale")?.value ?? "en";
   const isAdminPreview = !!cookieStore.get("admin_preview")?.value;
 
-  type PublicSettingsResponse = {
-    settings: {
-      general?: {
-        site_name?: string;
-        site_url?: string;
-        site_description?: string;
-        contact_email?: string;
-        contact_phone?: string;
-      };
-      seo?: { google_tag_manager?: string };
-      social?: Record<string, string>;
-      cookie?: CookieSettings;
-    };
-  };
-
-  const publicSettings = await serverFetch<PublicSettingsResponse>("/settings/public").catch(
-    () => null,
-  );
+  const publicSettings = await getPublicSettings();
   const gtmId = publicSettings?.settings.seo?.google_tag_manager ?? null;
   const siteName = publicSettings?.settings.general?.site_name ?? "Store";
   const siteUrl = publicSettings?.settings.general?.site_url;
@@ -104,6 +108,17 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
+        {/* Preconnect to API origin for faster TTFB on client-side fetches */}
+        {process.env.NEXT_PUBLIC_API_URL && (
+          <link
+            rel="preconnect"
+            href={new URL(process.env.NEXT_PUBLIC_API_URL).origin}
+          />
+        )}
+        {/* Preconnect to Cloudflare Turnstile if key is configured */}
+        {process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY && (
+          <link rel="preconnect" href="https://challenges.cloudflare.com" />
+        )}
         {/* Theme: prevent flash */}
         <script
           dangerouslySetInnerHTML={{
@@ -138,9 +153,9 @@ export default async function RootLayout({
               <Footer />
             </div>
             <CookieConsent settings={cookieSettings} />
-            <ChatWidget />
+            <ChatWidgetLoader />
             <ComparisonBar />
-            <ToastContainer position="top-right" autoClose={4000} />
+            <ToastContainer position="bottom-right" autoClose={2000} />
             {gtmId && <GoogleTagManager gtmId={gtmId} />}
           </TranslationProvider>
         </QueryProvider>
