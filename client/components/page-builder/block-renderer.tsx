@@ -2,6 +2,7 @@ import { AccordionBlock } from "./blocks/accordion-block";
 import { MapBlock } from "./blocks/map-block";
 import { CategoriesGridBlock } from "./blocks/categories-grid";
 import { CustomHtmlBlock } from "./blocks/custom-html";
+import { FeaturedPostsBlock } from "./blocks/featured-posts";
 import { FeaturedProductsBlock } from "./blocks/featured-products";
 import { FormEmbedBlock } from "./blocks/form-embed";
 import { HeroBannerBlock } from "./blocks/hero-banner";
@@ -54,6 +55,8 @@ export function BlockRenderer({ block }: Props) {
       return <FormEmbedBlock block={block} />;
     case "map":
       return <MapBlock block={block} />;
+    case "featured_posts":
+      return <FeaturedPostsBlock block={block} />;
     default:
       // Unknown block type — silent fallback in production
       if (process.env.NODE_ENV === "development") {

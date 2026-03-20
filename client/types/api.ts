@@ -491,7 +491,8 @@ export type BlockType =
   | "accordion"
   | "tabs"
   | "form_embed"
-  | "map";
+  | "map"
+  | "featured_posts";
 
 export interface Page {
   id: number;

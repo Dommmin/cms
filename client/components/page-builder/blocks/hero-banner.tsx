@@ -10,8 +10,9 @@ interface HeroBannerConfig {
   cta_text?: string;
   cta_url?: string;
   cta_style?: "primary" | "secondary" | "outline" | "ghost";
-  cta_secondary_text?: string;
-  cta_secondary_url?: string;
+  cta2_text?: string;
+  cta2_url?: string;
+  cta2_style?: "primary" | "secondary" | "outline" | "ghost";
   text_alignment?: "left" | "center" | "right";
   overlay_opacity?: number;
   min_height?: number;
@@ -82,19 +83,30 @@ export function HeroBannerBlock({ block }: Props) {
             {cfg.subtitle}
           </p>
         )}
-        {(cfg.cta_text || cfg.cta_secondary_text) && (
+        {(cfg.cta_text || cfg.cta2_text) && (
           <div className="mt-2 flex flex-wrap gap-4">
             {cfg.cta_text && cfg.cta_url && (
               <Link href={cfg.cta_url} className={ctaClass}>
                 {cfg.cta_text}
               </Link>
             )}
-            {cfg.cta_secondary_text && cfg.cta_secondary_url && (
+            {cfg.cta2_text && cfg.cta2_url && (
               <Link
-                href={cfg.cta_secondary_url}
-                className="px-8 py-3 font-semibold text-white underline underline-offset-4 transition-opacity hover:opacity-80"
+                href={cfg.cta2_url}
+                className={
+                  {
+                    primary:
+                      "bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-3 rounded-lg font-semibold transition-colors",
+                    secondary:
+                      "bg-secondary text-secondary-foreground hover:bg-secondary/80 px-8 py-3 rounded-lg font-semibold transition-colors",
+                    outline:
+                      "border-2 border-white text-white hover:bg-white/10 px-8 py-3 rounded-lg font-semibold transition-colors",
+                    ghost:
+                      "text-white hover:bg-white/10 px-8 py-3 rounded-lg font-semibold transition-colors",
+                  }[cfg.cta2_style ?? "outline"]
+                }
               >
-                {cfg.cta_secondary_text}
+                {cfg.cta2_text}
               </Link>
             )}
           </div>
