@@ -1,4 +1,4 @@
-.PHONY: up stop down build install shell migrate fresh test setup-test-db logs pail seed fresh-seed clear sync-translations npm-build pint help
+.PHONY: up stop down build install shell migrate fresh test setup-test-db logs pail seed fresh-seed clear sync-translations npm-build pint e2e e2e-ui help
 
 # Set environment variables
 export UID = $(shell id -u)
@@ -132,3 +132,11 @@ node_shell:
 
 node_logs:
 	docker compose logs -f node
+
+# Run Playwright E2E tests (headless, inside Docker)
+e2e:
+	docker compose --profile testing run --rm playwright npx playwright test
+
+# Run Playwright with UI reporter (generates HTML report in client/playwright-report/)
+e2e-report:
+	docker compose --profile testing run --rm playwright npx playwright test --reporter=html

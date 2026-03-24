@@ -98,6 +98,22 @@ services:
     networks:
       - cms-network
 
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.52.0-noble
+    container_name: ${COMPOSE_PROJECT_NAME}_playwright
+    working_dir: /var/www/client
+    volumes:
+      - ./client:/var/www/client
+    environment:
+      TEST_BASE_URL: http://node:3000
+      CI: "true"
+    networks:
+      - cms-network
+    depends_on:
+      - node
+    profiles:
+      - testing
+
   gotenberg:
     image: gotenberg/gotenberg:8
     container_name: ${COMPOSE_PROJECT_NAME}_gotenberg
