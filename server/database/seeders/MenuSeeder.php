@@ -179,6 +179,13 @@ class MenuSeeder extends Seeder
                 'link_type' => MenuLinkTypeEnum::Page,
                 'position' => 5,
             ],
+            [
+                'label' => ['en' => 'Online Dispute Resolution (ODR)', 'pl' => 'Platforma ODR (spory konsumenckie)'],
+                'url' => 'https://ec.europa.eu/consumers/odr',
+                'link_type' => MenuLinkTypeEnum::Custom,
+                'target' => '_blank',
+                'position' => 6,
+            ],
         ];
 
         foreach ($items as $item) {
@@ -187,7 +194,7 @@ class MenuSeeder extends Seeder
                 'parent_id' => null,
                 'label' => $item['label'],
                 'url' => $item['url'] ?? null,
-                'target' => '_self',
+                'target' => $item['target'] ?? '_self',
                 'link_type' => $item['link_type'],
                 'linked_entity_id' => isset($item['page_slug']) ? $this->pageId($item['page_slug']) : null,
                 'is_active' => true,
