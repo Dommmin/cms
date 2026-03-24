@@ -207,11 +207,13 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                 <button
                   key={img.id}
                   onClick={() => setActiveImageIndex(i)}
+                  aria-label={img.alt ?? `${product.name} – image ${i + 1}`}
+                  aria-pressed={i === activeImageIndex}
                   className={`relative aspect-square overflow-hidden rounded-lg border-2 ${i === activeImageIndex ? "border-primary" : "border-transparent"}`}
                 >
                   <Image
                     src={img.url}
-                    alt={img.alt ?? ""}
+                    alt=""
                     fill
                     className="object-cover"
                     sizes="80px"
