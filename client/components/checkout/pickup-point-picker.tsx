@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 
 import { usePickupPoints } from "@/hooks/use-pickup-points";
 import type { PickupPoint } from "@/types/api";
+import type { PickupPointPickerProps } from './pickup-point-picker.types';
 
 // Leaflet cannot run on the server — dynamically imported with ssr:false
 const PickupPointMap = dynamic(
@@ -20,14 +21,7 @@ const PickupPointMap = dynamic(
   },
 );
 
-interface Props {
-  carrier: string;
-  postalCode?: string;
-  value: string | null;
-  onChange: (id: string, point: PickupPoint) => void;
-}
-
-export function PickupPointPicker({ carrier, postalCode = "", value, onChange }: Props) {
+export function PickupPointPicker({ carrier, postalCode = "", value, onChange }: PickupPointPickerProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState(postalCode);
   const [selected, setSelected] = useState<PickupPoint | null>(null);

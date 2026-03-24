@@ -2,18 +2,9 @@ import Image from "next/image";
 
 import { getRelationsByKey } from "@/lib/format";
 import type { PageBlock } from "@/types/api";
+import type { ImageGalleryConfig, ImageGalleryProps } from './image-gallery.types';
 
-interface ImageGalleryConfig {
-  title?: string;
-  columns?: 2 | 3 | 4;
-  aspect?: "square" | "video" | "portrait";
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function ImageGalleryBlock({ block }: Props) {
+export function ImageGalleryBlock({ block }: ImageGalleryProps) {
   const cfg = block.configuration as ImageGalleryConfig;
   const columns = cfg.columns ?? 3;
   const aspect = cfg.aspect ?? "square";

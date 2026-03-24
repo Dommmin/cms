@@ -35,16 +35,9 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
+import type { CommandItem } from './SlashCommandPlugin.types';
 
 // ─── Command definitions ──────────────────────────────────────────────────────
-
-type CommandItem = {
-    id: string;
-    label: string;
-    description: string;
-    keywords: string[];
-    icon: string;
-};
 
 const COMMANDS: CommandItem[] = [
     { id: 'p', label: 'Paragraph', description: 'Plain text', keywords: ['paragraph', 'text', 'p'], icon: 'P' },

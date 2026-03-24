@@ -16,28 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type User = { id: number; name: string; email: string };
-
-type AffiliateCode = {
-    id: number;
-    code: string;
-    user_id: number;
-    discount_type: 'percentage' | 'fixed' | 'none';
-    discount_value: number;
-    commission_rate: string;
-    max_uses: number | null;
-    uses_count: number;
-    is_active: boolean;
-    expires_at: string | null;
-    notes: string | null;
-    user: User;
-};
-
-type Props = {
-    code: AffiliateCode;
-    users: User[];
-};
+import type { User, AffiliateCode, EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Affiliates', href: '/admin/affiliates/codes' },
@@ -45,7 +24,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Edit', href: '' },
 ];
 
-export default function EditCode({ code, users }: Props) {
+export default function EditCode({ code, users }: EditProps) {
     const { data, setData, put, processing, errors } = useForm({
         user_id: String(code.user_id),
         code: code.code,

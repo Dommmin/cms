@@ -1,9 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { DownloadIcon } from 'lucide-react';
-import {
-    useOrderColumns,
-    type OrderRow,
-} from '@/components/columns/order-columns';
+import { useOrderColumns } from '@/components/columns/order-columns';
+import type { OrderRow } from '@/components/columns/order-columns.types';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -11,16 +9,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type OrderData = {
-    data: OrderRow[];
-    prev_page_url?: string;
-    next_page_url?: string;
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-};
+import type { OrderData } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Orders', href: '/admin/ecommerce/orders' },

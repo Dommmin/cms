@@ -28,56 +28,9 @@ import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
+import type { Category, BlogPost, EditProps, FormData } from './edit.types';
 
-type Category = { id: number; name: string };
-
-type BlogPost = {
-    id: number;
-    title: Record<string, string>;
-    slug: string;
-    excerpt: Record<string, string> | null;
-    content: Record<string, string>;
-    content_type: 'richtext' | 'markdown';
-    status: string;
-    blog_category_id: number | null;
-    tags: string[] | null;
-    available_locales: string[] | null;
-    is_featured: boolean;
-    featured_image: string | null;
-    published_at: string | null;
-    seo_title: string | null;
-    seo_description: string | null;
-    meta_robots: string | null;
-    og_image: string | null;
-    sitemap_exclude: boolean;
-};
-
-type Props = {
-    post: BlogPost;
-    categories: Category[];
-};
-
-type FormData = {
-    title: Record<string, string>;
-    slug: string;
-    excerpt: Record<string, string>;
-    content: Record<string, string>;
-    content_type: 'richtext' | 'markdown';
-    status: string;
-    published_at: string;
-    blog_category_id: string;
-    tags: string;
-    available_locales: string[] | null;
-    is_featured: boolean;
-    featured_image: string;
-    seo_title: string;
-    seo_description: string;
-    meta_robots: string;
-    og_image: string | null;
-    sitemap_exclude: boolean;
-};
-
-export default function EditBlogPost({ post, categories }: Props) {
+export default function EditBlogPost({ post, categories }: EditProps) {
     const { frontendUrl, locales } = usePage().props as {
         frontendUrl: string;
         locales: SharedLocale[];

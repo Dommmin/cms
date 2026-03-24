@@ -3,23 +3,9 @@
 import { useState } from "react";
 
 import type { PageBlock } from "@/types/api";
+import type { AccordionItem, AccordionConfig, AccordionBlockProps } from './accordion-block.types';
 
-interface AccordionItem {
-  question: string;
-  answer: string;
-}
-
-interface AccordionConfig {
-  title?: string;
-  items?: AccordionItem[];
-  allow_multiple?: boolean;
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function AccordionBlock({ block }: Props) {
+export function AccordionBlock({ block }: AccordionBlockProps) {
   const cfg = block.configuration as AccordionConfig;
   const items = cfg.items ?? [];
   const [openItems, setOpenItems] = useState<Set<number>>(new Set());

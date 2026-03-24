@@ -3,22 +3,7 @@ import { createElement, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from '@/hooks/use-translation';
 import { cn, formatFileSize } from '@/lib/utils';
-
-export interface DropzoneProps {
-    onFilesUploaded?: (files: File[]) => void;
-    accept?: Record<string, string[]>;
-    maxFiles?: number;
-    maxSize?: number;
-    disabled?: boolean;
-    className?: string;
-    uploading?: boolean;
-}
-
-export interface FilePreviewProps {
-    file: File;
-    onRemove?: () => void;
-    className?: string;
-}
+import type { DropzoneProps, FilePreviewProps } from './dropzone.types';
 
 function getFileIcon(mimeType: string) {
     if (mimeType.startsWith('image/')) return Image;

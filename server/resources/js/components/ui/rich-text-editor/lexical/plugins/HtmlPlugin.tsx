@@ -3,11 +3,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { $createParagraphNode, $getRoot, $isDecoratorNode, $isElementNode } from 'lexical';
 import { useEffect, useRef, type JSX } from 'react';
-
-interface HtmlPluginProps {
-    value?: string;
-    onChange?: (html: string) => void;
-}
+import type { HtmlPluginProps } from './HtmlPlugin.types';
 
 export default function HtmlPlugin({ value, onChange }: HtmlPluginProps): JSX.Element {
     const [editor] = useLexicalComposerContext();

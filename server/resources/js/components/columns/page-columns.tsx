@@ -12,23 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
 import { resolveLocalizedText } from '@/lib/localized-text';
-
-export type PageRow = {
-    id: number;
-    parent_id: number | null;
-    locale: string | null;
-    parent?: {
-        id: number;
-        title: string | Record<string, string>;
-        slug: string;
-    } | null;
-    title: string | Record<string, string>;
-    slug: string;
-    page_type: string;
-    module_name: string | null;
-    is_published: boolean;
-    updated_at: string;
-};
+import type { PageRow } from './page-columns.types';
 
 export function usePageColumns(): ColumnDef<PageRow>[] {
     const __ = useTranslation();

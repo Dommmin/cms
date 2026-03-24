@@ -15,11 +15,7 @@ import {
 } from 'lucide-react';
 import { type JSX } from 'react';
 import DropDown, { DropDownItem } from '../../ui/DropDown';
-
-interface Props {
-    elementFormat: string;
-    disabled?: boolean;
-}
+import type { AlignDropdownProps } from './AlignDropdown.types';
 
 const ALIGN_OPTIONS = [
     {
@@ -47,7 +43,7 @@ const ALIGN_OPTIONS = [
 export default function AlignDropdown({
     elementFormat,
     disabled,
-}: Props): JSX.Element {
+}: AlignDropdownProps): JSX.Element {
     const [editor] = useLexicalComposerContext();
     const current =
         ALIGN_OPTIONS.find((a) => a.format === elementFormat) ??

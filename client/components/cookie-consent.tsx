@@ -6,29 +6,7 @@ import { X, Cookie } from "lucide-react";
 
 import { updateConsent } from "@/lib/datalayer";
 import { COOKIE_CONSENT_OPEN_EVENT } from "@/providers/cookie-consent-provider";
-
-interface ConsentState {
-  analytics: boolean;
-  marketing: boolean;
-  functional: boolean;
-}
-
-interface StoredConsent {
-  analytics: boolean;
-  marketing: boolean;
-  functional: boolean;
-  version: string;
-}
-
-export interface CookieSettings {
-  banner_title?: string;
-  banner_description?: string;
-  privacy_policy_url?: string;
-  cookie_policy_url?: string;
-  analytics_description?: string;
-  marketing_description?: string;
-  consent_version?: string;
-}
+import type { ConsentState, StoredConsent, CookieSettings, CookieConsentProps } from './cookie-consent.types';
 
 const STORAGE_KEY = "cookie_consent";
 
@@ -85,13 +63,9 @@ function getOrCreateSessionId(): string {
   return id;
 }
 
-interface Props {
-  settings?: CookieSettings;
-}
-
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-export function CookieConsent({ settings = {} }: Props) {
+export function CookieConsent({ settings = {} }: CookieConsentProps) {
   const [visible, setVisible] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [prefs, setPrefs] = useState<ConsentState>({

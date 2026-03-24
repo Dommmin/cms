@@ -20,28 +20,12 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
-
-type Category = { id: number; name: string };
-
-type BlogCategory = {
-    id: number;
-    name: string;
-    slug: string;
-    description: string | null;
-    parent_id: number | null;
-    is_active: boolean;
-    position: number;
-};
-
-type Props = {
-    category: BlogCategory;
-    parentCategories: Category[];
-};
+import type { Category, BlogCategory, EditProps } from './edit.types';
 
 export default function EditBlogCategory({
     category,
     parentCategories,
-}: Props) {
+}: EditProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Blog Categories', href: '/admin/blog/categories' },
         {

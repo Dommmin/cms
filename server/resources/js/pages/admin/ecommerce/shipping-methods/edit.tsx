@@ -22,26 +22,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
-
-interface Carrier {
-    value: string;
-    label: string;
-}
-
-interface ShippingMethod {
-    id: number;
-    name: Record<string, string>;
-    description: Record<string, string> | null;
-    carrier: string;
-    is_active: boolean;
-    base_price: number;
-    price_per_kg: number;
-    min_weight: number | null;
-    max_weight: number | null;
-    min_order_value: number | null;
-    free_shipping_threshold: number | null;
-    shipments_count: number;
-}
+import type { Carrier, ShippingMethod } from './edit.types';
 
 const formId = 'shipping-method-edit-form';
 

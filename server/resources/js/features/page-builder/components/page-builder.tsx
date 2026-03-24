@@ -22,22 +22,11 @@ import { useEffect, useState } from 'react';
 import { useBuilderState } from '../hooks/use-builder-state';
 import type { BuilderData, Section } from '../types';
 import { BuilderToolbar } from './builder-toolbar';
-import type { PreviewDevice } from './builder-toolbar';
-import type { SectionTemplate } from './section-templates-dialog';
+import type { PreviewDevice } from './builder-toolbar.types';
+import type { SectionTemplate } from './section-templates-dialog.types';
 import { SectionTemplatesDialog } from './section-templates-dialog';
 import { SortableSection } from './sortable-section';
-
-type PageBuilderProps = {
-    data: BuilderData;
-    onSave: (sections: BuilderData['sections']) => Promise<void>;
-    onPreview: () => void;
-    onChange?: (sections: Section[]) => void;
-    isSplitView?: boolean;
-    isSaving?: boolean;
-    previewDevice?: PreviewDevice;
-    onToggleSplitView?: () => void;
-    onChangeDevice?: (device: PreviewDevice) => void;
-};
+import type { PageBuilderProps } from './page-builder.types';
 
 export function PageBuilder({
     data,

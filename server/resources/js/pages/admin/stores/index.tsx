@@ -11,40 +11,13 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Store = {
-    id: number;
-    name: string;
-    slug: string;
-    address: string;
-    city: string;
-    country: string;
-    lat: string;
-    lng: string;
-    is_active: boolean;
-    created_at: string;
-};
-
-type StoresData = {
-    data: Store[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = {
-    stores: StoresData;
-    filters: { search?: string };
-};
+import type { Store, StoresData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Stores', href: '/admin/stores' },
 ];
 
-export default function StoresIndex({ stores, filters }: Props) {
+export default function StoresIndex({ stores, filters }: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<Store>[] = [
         {

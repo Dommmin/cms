@@ -8,34 +8,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-interface Attribute {
-    id: number;
-    name: string;
-    slug: string;
-    type: string;
-    is_filterable: boolean;
-    is_variant_selection: boolean;
-    values_count: number;
-}
-
-interface PaginationData {
-    data: Attribute[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-}
-
-interface IndexProps {
-    attributes: PaginationData;
-    filters: {
-        search?: string;
-        type?: string;
-    };
-}
+import type { Attribute, PaginationData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

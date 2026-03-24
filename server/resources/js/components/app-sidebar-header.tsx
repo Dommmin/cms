@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useAdminLocale } from '@/hooks/use-admin-locale';
-import type { Appearance } from '@/hooks/use-appearance';
+import type { Appearance } from '@/hooks/use-appearance.types';
 import { useAppearance } from '@/hooks/use-appearance';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import type { SharedLocale } from '@/types/global';

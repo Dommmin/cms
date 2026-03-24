@@ -2,20 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Script from "next/script";
-
-interface InPostPoint {
-  name: string;
-  address: {
-    line1: string;
-    line2: string;
-  };
-}
-
-interface InpostPickerProps {
-  value: string | null;
-  onChange: (pointId: string, point: InPostPoint) => void;
-  language?: string;
-}
+import type { InPostPoint, InpostPickerProps } from './inpost-picker.types';
 
 // Inner component — only rendered when the token is present (hooks are always called).
 function InpostWidget({

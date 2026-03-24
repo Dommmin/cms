@@ -1,15 +1,5 @@
 import type { PageBlock } from "@/types/api";
-
-interface VideoEmbedConfig {
-  title?: string;
-  url?: string;
-  /** youtube | vimeo | custom */
-  provider?: string;
-  autoplay?: boolean;
-  loop?: boolean;
-  muted?: boolean;
-  aspect?: "video" | "square" | "portrait";
-}
+import type { VideoEmbedConfig, VideoEmbedProps } from './video-embed.types';
 
 function getEmbedUrl(url: string, autoplay: boolean, loop: boolean, muted: boolean): string {
   try {
@@ -45,11 +35,7 @@ function getEmbedUrl(url: string, autoplay: boolean, loop: boolean, muted: boole
   return url;
 }
 
-interface Props {
-  block: PageBlock;
-}
-
-export function VideoEmbedBlock({ block }: Props) {
+export function VideoEmbedBlock({ block }: VideoEmbedProps) {
   const cfg = block.configuration as VideoEmbedConfig;
   if (!cfg.url) return null;
 

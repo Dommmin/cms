@@ -19,6 +19,7 @@ import { $getSelection, $isRangeSelection } from 'lexical';
 import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
+import type { MenuPos } from './TableActionMenuPlugin.types';
 
 // Preset cell background colors
 const CELL_COLORS = [
@@ -32,8 +33,6 @@ const CELL_COLORS = [
     { color: '#f3f4f6', label: 'Gray' },
     { color: '#fff', label: 'White' },
 ];
-
-type MenuPos = { x: number; y: number } | null;
 
 function MenuItem({
     label,

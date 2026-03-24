@@ -3,22 +3,9 @@ import Link from "next/link";
 
 import { getRelationByKey } from "@/lib/format";
 import type { PageBlock } from "@/types/api";
+import type { PromotionalBannerConfig, PromotionalBannerProps } from './promotional-banner.types';
 
-interface PromotionalBannerConfig {
-  title?: string;
-  subtitle?: string;
-  badge_text?: string;
-  cta_text?: string;
-  cta_url?: string;
-  layout?: "left" | "right" | "center";
-  background_color?: string;
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function PromotionalBannerBlock({ block }: Props) {
+export function PromotionalBannerBlock({ block }: PromotionalBannerProps) {
   const cfg = block.configuration as PromotionalBannerConfig;
   const layout = cfg.layout ?? "left";
 

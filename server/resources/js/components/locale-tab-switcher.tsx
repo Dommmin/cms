@@ -1,19 +1,5 @@
 import { cn } from '@/lib/utils';
-
-interface Locale {
-    code: string;
-    name: string;
-    native_name?: string | null;
-    flag_emoji?: string | null;
-    is_default: boolean;
-}
-
-interface LocaleTabSwitcherProps {
-    locales: Locale[];
-    activeLocale: string;
-    onLocaleChange: (locale: string) => void;
-    className?: string;
-}
+import type { Locale, LocaleTabSwitcherProps } from './locale-tab-switcher.types';
 
 export function LocaleTabSwitcher({
     locales,

@@ -5,22 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
 import { resolveLocalizedText } from '@/lib/localized-text';
-
-export type ReviewRow = {
-    id: number;
-    product: {
-        id: number;
-        name: string | Record<string, string>;
-        slug: string;
-    };
-    customer?: { id: number; name: string; email: string };
-    rating: number;
-    title?: string;
-    body: string;
-    status: string;
-    helpful_count: number;
-    created_at: string;
-};
+import type { ReviewRow } from './review-columns.types';
 
 const statusVariant: Record<
     string,

@@ -15,23 +15,14 @@ import {
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Currency = {
-    id: number;
-    code: string;
-    name: string;
-};
-
-type Props = {
-    currencies: Currency[];
-};
+import type { Currency, CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Exchange Rates', href: '/admin/exchange-rates' },
     { title: 'Add', href: '/admin/exchange-rates/create' },
 ];
 
-export default function Create({ currencies }: Props) {
+export default function Create({ currencies }: CreateProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Add Exchange Rate" />

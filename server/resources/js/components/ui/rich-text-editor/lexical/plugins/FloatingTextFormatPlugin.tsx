@@ -13,15 +13,7 @@ import { Bold, Code2, Italic, Link2, Link2Off, Strikethrough, Underline } from '
 import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import { createPortal } from 'react-dom';
 import { Toggle } from '@/components/ui/toggle';
-
-interface FormatState {
-    isBold: boolean;
-    isItalic: boolean;
-    isUnderline: boolean;
-    isStrikethrough: boolean;
-    isCode: boolean;
-    isLink: boolean;
-}
+import type { FormatState } from './FloatingTextFormatPlugin.types';
 
 function FloatingToolbar({ editor, anchorElem }: { editor: ReturnType<typeof useLexicalComposerContext>[0]; anchorElem: HTMLElement }): JSX.Element {
     const ref = useRef<HTMLDivElement>(null);

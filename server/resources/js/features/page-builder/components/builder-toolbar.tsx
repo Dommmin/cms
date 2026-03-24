@@ -19,27 +19,7 @@ import {
     Undo2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-export type PreviewDevice = 'desktop' | 'tablet' | 'mobile';
-
-type BuilderToolbarProps = {
-    pageId: number;
-    pageTitle: string;
-    isPublished: boolean;
-    isSaving: boolean;
-    isSplitView: boolean;
-    canUndo: boolean;
-    canRedo: boolean;
-    previewDevice: PreviewDevice;
-    onAddSection: () => void;
-    onOpenTemplates: () => void;
-    onSave: () => void;
-    onPreview: () => void;
-    onToggleSplitView: () => void;
-    onUndo: () => void;
-    onRedo: () => void;
-    onChangeDevice: (device: PreviewDevice) => void;
-};
+import type { PreviewDevice, BuilderToolbarProps } from './builder-toolbar.types';
 
 export function BuilderToolbar({
     pageId: _pageId,

@@ -17,46 +17,7 @@ import {
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type ActivityLog = {
-    id: number;
-    log_name: string;
-    description: string;
-    event: string | null;
-    subject_type: string | null;
-    subject_id: number | null;
-    causer: { id: number; name: string; email: string } | null;
-    properties: {
-        attributes?: Record<string, unknown>;
-        old?: Record<string, unknown>;
-    } | null;
-    created_at: string;
-};
-
-type PaginatedActivities = {
-    data: ActivityLog[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type User = { id: number; name: string; email: string };
-
-type Props = {
-    activities: PaginatedActivities;
-    users: User[];
-    log_names: string[];
-    filters: {
-        causer_id?: string;
-        log_name?: string;
-        event?: string;
-        date_from?: string;
-        date_to?: string;
-    };
-};
+import type { ActivityLog, PaginatedActivities, User, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Activity Log', href: '/admin/activity-log' },
@@ -105,7 +66,7 @@ export default function ActivityLogIndex({
     users,
     log_names,
     filters,
-}: Props) {
+}: IndexProps) {
     const [localFilters, setLocalFilters] = useState(filters);
 
     const applyFilters = () => {

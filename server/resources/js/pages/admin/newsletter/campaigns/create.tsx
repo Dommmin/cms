@@ -9,15 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Segment = {
-    id: number;
-    name: string;
-};
-
-type Props = {
-    segments: Segment[];
-};
+import type { Segment, CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Newsletter', href: '/admin/newsletter' },
@@ -25,7 +17,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Create', href: '/admin/newsletter/campaigns/create' },
 ];
 
-export default function Create({ segments }: Props) {
+export default function Create({ segments }: CreateProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Campaign" />

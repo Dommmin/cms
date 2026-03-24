@@ -17,29 +17,14 @@ import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type SectionTemplate = {
-    id: number;
-    name: string;
-    section_type: string;
-    variant: string | null;
-    category: string | null;
-    preset_data: Record<string, unknown>;
-    thumbnail: string | null;
-    is_global: boolean;
-};
-
-type Props = {
-    template: SectionTemplate;
-    categories: string[];
-};
+import type { SectionTemplate, EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Section Templates', href: '/admin/section-templates' },
     { title: 'Edit', href: '#' },
 ];
 
-export default function EditSectionTemplate({ template, categories }: Props) {
+export default function EditSectionTemplate({ template, categories }: EditProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit Template: ${template.name}`} />

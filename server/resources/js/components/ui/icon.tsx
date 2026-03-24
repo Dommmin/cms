@@ -1,9 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-
-interface IconProps {
-    iconNode?: LucideIcon | null;
-    className?: string;
-}
+import type { IconProps } from './icon.types';
 
 export function Icon({ iconNode: IconComponent, className }: IconProps) {
     if (!IconComponent) {

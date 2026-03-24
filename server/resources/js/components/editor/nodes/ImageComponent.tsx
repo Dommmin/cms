@@ -20,19 +20,7 @@ import { useCallback, useEffect, useRef, useState, Suspense } from 'react';
 import { cn } from '@/lib/utils';
 import ImageResizer from '../ui/ImageResizer';
 import { $isImageNode } from './ImageNode';
-
-interface Props {
-    altText: string;
-    caption: LexicalEditor;
-    captionsEnabled: boolean;
-    height: 'inherit' | number;
-    maxWidth: number;
-    nodeKey: NodeKey;
-    resizable: boolean;
-    showCaption: boolean;
-    src: string;
-    width: 'inherit' | number;
-}
+import type { ImageComponentProps } from './ImageComponent.types';
 
 export default function ImageComponent({
     src,
@@ -45,7 +33,7 @@ export default function ImageComponent({
     showCaption,
     caption,
     captionsEnabled,
-}: Props): JSX.Element {
+}: ImageComponentProps): JSX.Element {
     const imageRef = useRef<HTMLImageElement | null>(null);
     const buttonRef = useRef<HTMLButtonElement | null>(null);
     const [isSelected, setSelected, clearSelection] =

@@ -7,35 +7,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-interface Discount {
-    id: number;
-    code: string;
-    name: string;
-    type: 'percentage' | 'fixed_amount' | 'free_shipping';
-    value: number;
-    is_active: boolean;
-    uses_count: number;
-    max_uses?: number;
-}
-
-interface PaginationData {
-    data: Discount[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-}
-
-interface IndexProps {
-    discounts: PaginationData;
-    filters: {
-        search?: string;
-        is_active?: boolean;
-    };
-}
+import type { Discount, PaginationData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

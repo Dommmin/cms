@@ -31,19 +31,7 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import type { Block } from '../types';
 import { BlockThumbnail } from './block-thumbnail';
-
-type BlockCardProps = {
-    block: Block;
-    blockIndex: number;
-    sectionIndex: number;
-    isExpanded: boolean;
-    blockTypeName?: string;
-    onToggle: () => void;
-    onDelete: () => void;
-    onCopy?: () => void;
-    onSaveAsGlobal?: (name: string, description: string) => void;
-    children?: React.ReactNode;
-};
+import type { BlockCardProps } from './block-card.types';
 
 export function BlockCard({
     block,

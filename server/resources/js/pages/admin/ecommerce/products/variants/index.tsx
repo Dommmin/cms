@@ -8,21 +8,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
-
-type Variant = {
-    id: number;
-    sku: string;
-    name: string;
-    price: number;
-    stock_quantity: number;
-    is_active: boolean;
-    is_default: boolean;
-};
-
-type Product = {
-    id: number;
-    name: string | Record<string, string>;
-};
+import type { Variant, Product } from './index.types';
 
 export default function ProductVariantsIndex({
     product,

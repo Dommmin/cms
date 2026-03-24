@@ -85,10 +85,9 @@ import { $createImageNode } from '../../image-node';
 import { $createYouTubeNode, extractYouTubeId } from '../../youtube-node';
 import { $createCollapsibleContainerNode, $createCollapsibleTitleNode, $createCollapsibleContentNode } from '../collapsible-nodes';
 import { $createLayoutContainerNode, $createLayoutItemNode } from '../layout-nodes';
+import type { BlockType, InsertDialog, ToolbarState } from './ToolbarPlugin.types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-
-type BlockType = 'paragraph' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'quote' | 'code' | 'bullet' | 'number' | 'check';
 
 const ELEMENT_FORMAT_NUM_TO_TYPE: Record<number, ElementFormatType> = {
     0: '',
@@ -99,27 +98,6 @@ const ELEMENT_FORMAT_NUM_TO_TYPE: Record<number, ElementFormatType> = {
     5: 'end',
     6: 'justify',
 } as const;
-type InsertDialog = 'image' | 'youtube' | 'table' | 'emoji' | 'special' | null;
-
-interface ToolbarState {
-    canUndo: boolean;
-    canRedo: boolean;
-    blockType: BlockType;
-    elementFormat: ElementFormatType;
-    isBold: boolean;
-    isItalic: boolean;
-    isUnderline: boolean;
-    isStrikethrough: boolean;
-    isCode: boolean;
-    isSubscript: boolean;
-    isSuperscript: boolean;
-    isHighlight: boolean;
-    isLink: boolean;
-    codeLanguage: string;
-    fontSize: string;
-    fontFamily: string;
-    fontColor: string;
-}
 
 // ─── Helper components ────────────────────────────────────────────────────────
 

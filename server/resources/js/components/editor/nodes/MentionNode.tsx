@@ -1,9 +1,6 @@
 import type { EditorConfig, NodeKey, SerializedTextNode } from 'lexical';
 import { $applyNodeReplacement, TextNode } from 'lexical';
-
-export type SerializedMentionNode = SerializedTextNode & {
-    mentionName: string;
-};
+import type { SerializedMentionNode } from './MentionNode.types';
 
 export class MentionNode extends TextNode {
     __mention: string;

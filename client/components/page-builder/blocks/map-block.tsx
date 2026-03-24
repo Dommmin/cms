@@ -4,21 +4,9 @@ import { useEffect, useState } from "react";
 
 import { StoreMap } from "@/components/store-map";
 import type { PageBlock, Store } from "@/types/api";
+import type { MapBlockConfig, MapBlockProps } from './map-block.types';
 
-interface MapBlockConfig {
-  store_id?: number;
-  lat?: number;
-  lng?: number;
-  title?: string;
-  zoom?: number;
-  height?: number;
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function MapBlock({ block }: Props) {
+export function MapBlock({ block }: MapBlockProps) {
   const cfg = block.configuration as MapBlockConfig;
   const height = cfg.height ?? 400;
   const zoom = cfg.zoom ?? 14;

@@ -23,36 +23,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
-
-type Customer = {
-    id: number;
-    name: string;
-    email: string;
-};
-
-type Product = {
-    id: number;
-    name: string | Record<string, string>;
-    slug: string;
-    thumbnail?: string;
-};
-
-type Review = {
-    id: number;
-    product: Product;
-    customer?: Customer;
-    rating: number;
-    title?: string;
-    body: string;
-    status: string;
-    helpful_count: number;
-    pros?: string;
-    cons?: string;
-    created_at: string;
-    updated_at: string;
-};
-
-type Props = { review: Review };
+import type { Customer, Product, Review, ShowProps } from './show.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Reviews', href: '/admin/ecommerce/reviews' },
@@ -85,7 +56,7 @@ function StarRating({ rating }: { rating: number }) {
     );
 }
 
-export default function ReviewShow({ review }: Props) {
+export default function ReviewShow({ review }: ShowProps) {
     const __ = useTranslation();
     const [status, setStatus] = useState(review.status);
     const [updating, setUpdating] = useState(false);

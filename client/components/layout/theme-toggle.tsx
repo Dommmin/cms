@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
-
-type Theme = "light" | "dark";
+import type { Theme } from './theme-toggle.types';
 
 function applyTheme(theme: Theme) {
   if (theme === "dark") {

@@ -27,36 +27,14 @@ import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
-
-type Category = { id: number; name: string };
-
-type Props = {
-    categories: Category[];
-};
+import type { Category, CreateProps, FormData } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Blog Posts', href: '/admin/blog/posts' },
     { title: 'Create Post', href: '/admin/blog/posts/create' },
 ];
 
-type FormData = {
-    title: Record<string, string>;
-    slug: string;
-    excerpt: Record<string, string>;
-    content: Record<string, string>;
-    content_type: 'richtext' | 'markdown';
-    status: string;
-    published_at: string;
-    blog_category_id: string;
-    tags: string;
-    available_locales: string[] | null;
-    is_featured: boolean;
-    featured_image: string;
-    seo_title: string;
-    seo_description: string;
-};
-
-export default function CreateBlogPost({ categories }: Props) {
+export default function CreateBlogPost({ categories }: CreateProps) {
     const { locales } = usePage<{ locales: SharedLocale[] }>().props;
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
     const __ = useTranslation();

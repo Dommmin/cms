@@ -10,12 +10,9 @@ import { JsonLd } from "@/components/json-ld";
 import { generateAlternates, generateCanonical } from "@/lib/seo";
 import { buildBlogPosting, buildBreadcrumbList } from "@/lib/schema";
 import { localePath } from "@/lib/i18n";
+import type { PageProps } from './page.types';
 
-interface Props {
-  params: Promise<{ slug: string }>;
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   try {
     const { slug } = await params;
     const cookieStore = await cookies();
@@ -43,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function BlogPostPage({ params }: Props) {
+export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params;
 
   const cookieStore = await cookies();

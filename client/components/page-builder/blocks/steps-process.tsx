@@ -1,23 +1,7 @@
 import type { PageBlock } from "@/types/api";
+import type { Step, StepsProcessConfig, StepsProcessProps } from './steps-process.types';
 
-interface Step {
-  title?: string;
-  description?: string;
-  icon?: string;
-}
-
-interface StepsProcessConfig {
-  title?: string;
-  subtitle?: string;
-  layout?: "horizontal" | "vertical" | "numbered";
-  steps?: Step[];
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function StepsProcessBlock({ block }: Props) {
+export function StepsProcessBlock({ block }: StepsProcessProps) {
   const cfg = block.configuration as StepsProcessConfig;
   const steps = cfg.steps ?? [];
   const layout = cfg.layout ?? "horizontal";

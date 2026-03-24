@@ -11,18 +11,13 @@ import {
 } from '@/components/ui/card';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
 import AlertError from './alert-error';
-
-type Props = {
-    recoveryCodesList: string[];
-    fetchRecoveryCodes: () => Promise<void>;
-    errors: string[];
-};
+import type { TwoFactorRecoveryCodesProps } from './two-factor-recovery-codes.types';
 
 export default function TwoFactorRecoveryCodes({
     recoveryCodesList,
     fetchRecoveryCodes,
     errors,
-}: Props) {
+}: TwoFactorRecoveryCodesProps) {
     const [codesAreVisible, setCodesAreVisible] = useState<boolean>(false);
     const codesSectionRef = useRef<HTMLDivElement | null>(null);
     const canRegenerateCodes = recoveryCodesList.length > 0 && codesAreVisible;

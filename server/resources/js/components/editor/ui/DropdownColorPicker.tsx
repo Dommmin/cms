@@ -11,15 +11,7 @@ import {
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import ColorPicker from './ColorPicker';
-
-interface Props {
-    color: string;
-    onChange?: (color: string) => void;
-    children: React.ReactNode;
-    disabled?: boolean;
-    className?: string;
-    tooltip?: string;
-}
+import type { DropdownColorPickerProps } from './DropdownColorPicker.types';
 
 export default function DropdownColorPicker({
     color,
@@ -28,7 +20,7 @@ export default function DropdownColorPicker({
     disabled,
     className,
     tooltip,
-}: Props): JSX.Element {
+}: DropdownColorPickerProps): JSX.Element {
     return (
         <Popover>
             {tooltip ? (

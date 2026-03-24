@@ -12,39 +12,13 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type SectionTemplate = {
-    id: number;
-    name: string;
-    section_type: string;
-    variant: string | null;
-    category: string | null;
-    is_global: boolean;
-    thumbnail: string | null;
-    created_at: string;
-};
-
-type TemplatesData = {
-    data: SectionTemplate[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = {
-    templates: TemplatesData;
-    categories: string[];
-    filters: { search?: string; category?: string };
-};
+import type { SectionTemplate, TemplatesData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Section Templates', href: '/admin/section-templates' },
 ];
 
-export default function SectionTemplatesIndex({ templates, filters }: Props) {
+export default function SectionTemplatesIndex({ templates, filters }: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<SectionTemplate>[] = [
         {

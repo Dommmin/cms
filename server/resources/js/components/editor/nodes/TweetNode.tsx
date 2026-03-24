@@ -6,8 +6,7 @@ import type {
 } from 'lexical';
 import { $applyNodeReplacement, DecoratorNode } from 'lexical';
 import { type JSX } from 'react';
-
-export type SerializedTweetNode = Spread<{ id: string }, SerializedLexicalNode>;
+import type { SerializedTweetNode } from './TweetNode.types';
 
 export class TweetNode extends DecoratorNode<JSX.Element> {
     __id: string;

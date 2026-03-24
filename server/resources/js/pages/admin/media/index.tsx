@@ -28,42 +28,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { formatFileSize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
-
-type MediaCustomProperties = {
-    alt?: string;
-    caption?: string;
-    description?: string;
-    author?: string;
-};
-
-type MediaItem = {
-    id: number;
-    name: string;
-    file_name: string;
-    mime_type: string;
-    size: number;
-    url: string;
-    thumbnail_url: string | null;
-    custom_properties: MediaCustomProperties | null;
-    created_at: string;
-};
-
-type MediaData = {
-    data: MediaItem[];
-    prev_page_url: string | null;
-    next_page_url: string | null;
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-};
-
-type MetaForm = {
-    alt: string;
-    caption: string;
-    description: string;
-    author: string;
-};
+import type { MediaCustomProperties, MediaItem, MediaData, MetaForm } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Media', href: '/admin/media' },

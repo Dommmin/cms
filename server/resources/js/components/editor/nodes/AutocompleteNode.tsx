@@ -1,7 +1,6 @@
 import type { EditorConfig, NodeKey, SerializedTextNode } from 'lexical';
 import { $applyNodeReplacement, TextNode } from 'lexical';
-
-export type UUID = ReturnType<typeof crypto.randomUUID>;
+import type { UUID } from './AutocompleteNode.types';
 
 export class AutocompleteNode extends TextNode {
     __uuid: UUID;

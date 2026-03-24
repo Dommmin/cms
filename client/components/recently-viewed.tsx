@@ -3,12 +3,9 @@
 import { useRecentlyViewedProducts } from "@/hooks/use-recently-viewed";
 import { ProductCard } from "@/components/product-card";
 import { useTranslation } from "@/hooks/use-translation";
+import type { RecentlyViewedProps } from './recently-viewed.types';
 
-interface Props {
-  excludeId?: number;
-}
-
-export function RecentlyViewed({ excludeId }: Props) {
+export function RecentlyViewed({ excludeId }: RecentlyViewedProps) {
   const { t } = useTranslation();
   const { data: products = [], isLoading } = useRecentlyViewedProducts(excludeId);
 

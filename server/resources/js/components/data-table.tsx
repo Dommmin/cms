@@ -17,21 +17,7 @@ import {
 import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
 import type { PaginationInfo } from '@/types';
-
-interface DataTableProps<T> {
-    columns: ColumnDef<T>[];
-    data: T[];
-    pagination?: PaginationInfo;
-    sortable?: boolean;
-    searchable?: boolean;
-    searchPlaceholder?: string;
-    searchValue?: string;
-    onSearch?: (value: string) => void;
-    onPerPageChange?: (perPage: number) => void;
-    onSortChange?: (sort: string) => void;
-    baseUrl?: string;
-    className?: string;
-}
+import type { DataTableProps } from './data-table.types';
 
 export default function DataTable<T>({
     columns,

@@ -2,21 +2,7 @@
 
 import { useState } from "react";
 import { Loader2Icon, SendIcon } from "lucide-react";
-
-export interface PreChatData {
-  name: string;
-  email: string;
-  subject: string;
-  body: string;
-}
-
-interface Props {
-  isAuthenticated: boolean;
-  userName?: string;
-  userEmail?: string;
-  onSubmit: (data: PreChatData) => void;
-  isLoading: boolean;
-}
+import type { PreChatData, PreChatFormProps } from './pre-chat-form.types';
 
 const SUBJECTS = [
   "Pytanie o zamówienie",
@@ -26,7 +12,7 @@ const SUBJECTS = [
   "Inne",
 ];
 
-export function PreChatForm({ isAuthenticated, userName, userEmail, onSubmit, isLoading }: Props) {
+export function PreChatForm({ isAuthenticated, userName, userEmail, onSubmit, isLoading }: PreChatFormProps) {
   const [name, setName] = useState(userName ?? "");
   const [email, setEmail] = useState(userEmail ?? "");
   const [subject, setSubject] = useState(SUBJECTS[0]);

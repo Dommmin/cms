@@ -8,24 +8,7 @@ import { MarkdownEditor } from '@/components/ui/markdown-editor';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { Textarea } from '@/components/ui/textarea';
 import type { SharedLocale } from '@/types/global';
-
-interface Props {
-    label: string;
-    value: Record<string, string>;
-    onChange: (value: Record<string, string>) => void;
-    /** Defaults to 'input'. */
-    type?: 'input' | 'textarea' | 'richtext' | 'markdown';
-    placeholder?: string;
-    required?: boolean;
-    /**
-     * Field name used to look up errors.
-     * Supports both `errors[name]` (top-level) and `errors["name.en"]` (per-locale).
-     */
-    name?: string;
-    errors?: Record<string, string>;
-    rows?: number;
-    id?: string;
-}
+import type { LocalizedFieldProps } from './localized-field.types';
 
 /**
  * A locale-aware field wrapper that adds a locale tab switcher alongside any
@@ -56,7 +39,7 @@ export function LocalizedField({
     errors,
     rows = 3,
     id,
-}: Props) {
+}: LocalizedFieldProps) {
     const { locales = [] } = usePage<{ locales: SharedLocale[] }>().props;
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
     const [activeLocale, setActiveLocale] = useState(defaultLocale);

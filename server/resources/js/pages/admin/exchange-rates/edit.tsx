@@ -15,32 +15,14 @@ import {
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Currency = {
-    id: number;
-    code: string;
-    name: string;
-};
-
-type ExchangeRate = {
-    id: number;
-    currency_id: number;
-    rate: number;
-    source: string | null;
-    fetched_at: string;
-};
-
-type Props = {
-    rate: ExchangeRate;
-    currencies: Currency[];
-};
+import type { Currency, ExchangeRate, EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Exchange Rates', href: '/admin/exchange-rates' },
     { title: 'Edit', href: '' },
 ];
 
-export default function Edit({ rate, currencies }: Props) {
+export default function Edit({ rate, currencies }: EditProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Exchange Rate" />

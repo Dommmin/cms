@@ -2,12 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@/lib/axios";
-
-interface ApplePayButtonProps {
-  amount: number;
-  currency: string;
-  onToken: (token: string) => void;
-}
+import type { ApplePayButtonProps, ApplePaySessionInstance } from './apple-pay-button.types';
 
 declare global {
   interface Window {
@@ -16,15 +11,6 @@ declare global {
       new (version: number, request: object): ApplePaySessionInstance;
     };
   }
-}
-
-interface ApplePaySessionInstance {
-  onvalidatemerchant: (event: { validationURL: string }) => void;
-  onpaymentauthorized: (event: { payment: { token: { paymentData: object } } }) => void;
-  oncancel: () => void;
-  completeMerchantValidation(session: object): void;
-  completePayment(status: number): void;
-  begin(): void;
 }
 
 export function ApplePayButton({ amount, currency, onToken }: ApplePayButtonProps) {

@@ -25,6 +25,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
+import type { FieldData, FormData } from './edit.types';
 
 const FIELD_TYPES = [
     { value: 'text', label: 'Text' },
@@ -41,35 +42,6 @@ const FIELD_TYPES = [
 ];
 
 const HAS_OPTIONS = ['select', 'radio'];
-
-type FieldData = {
-    id?: number;
-    label: string;
-    name: string;
-    type: string;
-    placeholder: string;
-    is_required: boolean;
-    options: string[];
-};
-
-type FormData = {
-    id: number;
-    name: string;
-    slug: string;
-    description: string | null;
-    notify_emails: string[];
-    is_active: boolean;
-    fields: Array<{
-        id: number;
-        label: string;
-        name: string;
-        type: string;
-        placeholder?: string | null;
-        is_required: boolean;
-        options: string[] | null;
-        settings: { placeholder?: string | null } | null;
-    }>;
-};
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Forms', href: '/admin/forms' },

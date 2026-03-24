@@ -16,10 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type User = { id: number; name: string; email: string };
-
-type Props = { users: User[] };
+import type { User, CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Affiliates', href: '/admin/affiliates/codes' },
@@ -27,7 +24,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Create', href: '' },
 ];
 
-export default function CreateCode({ users }: Props) {
+export default function CreateCode({ users }: CreateProps) {
     const { data, setData, post, processing, errors } = useForm({
         user_id: '',
         code: '',

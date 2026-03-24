@@ -2,11 +2,7 @@ import { type JSX } from 'react';
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
-
-interface Position {
-    x: number;
-    y: number;
-}
+import type { Position, MoveWrapperProps, HSV, ColorPickerProps } from './ColorPicker.types';
 
 const WIDTH = 214;
 const HEIGHT = 150;
@@ -37,13 +33,6 @@ function toHex(value: string): string {
         return ctx.fillStyle;
     }
     return value;
-}
-
-interface MoveWrapperProps {
-    className?: string;
-    style?: React.CSSProperties;
-    onChange: (position: Position) => void;
-    children: React.ReactNode;
 }
 
 function MoveWrapper({
@@ -96,12 +85,6 @@ function MoveWrapper({
 
 function clamp(value: number, max: number, min: number): number {
     return value > max ? max : value < min ? min : value;
-}
-
-interface HSV {
-    h: number;
-    s: number;
-    v: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -211,12 +194,7 @@ function hsvToHex(h: number, s: number, v: number): string {
     );
 }
 
-interface Props {
-    color: string;
-    onChange?: (color: string) => void;
-}
-
-export default function ColorPicker({ color, onChange }: Props): JSX.Element {
+export default function ColorPicker({ color, onChange }: ColorPickerProps): JSX.Element {
     const [selfColor, setSelfColor] = useState(() => hexToHsv(toHex(color)));
     const [inputColor, setInputColor] = useState(color);
     const _innerDivRef = useRef<HTMLDivElement>(null);

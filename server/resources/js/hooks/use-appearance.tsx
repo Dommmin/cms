@@ -1,13 +1,5 @@
 import { useCallback, useMemo, useSyncExternalStore } from 'react';
-
-export type ResolvedAppearance = 'light' | 'dark';
-export type Appearance = ResolvedAppearance | 'system';
-
-export type UseAppearanceReturn = {
-    readonly appearance: Appearance;
-    readonly resolvedAppearance: ResolvedAppearance;
-    readonly updateAppearance: (mode: Appearance) => void;
-};
+import type { ResolvedAppearance, Appearance, UseAppearanceReturn } from './use-appearance.types';
 
 const listeners = new Set<() => void>();
 let currentAppearance: Appearance = 'system';

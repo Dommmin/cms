@@ -3,6 +3,7 @@ import { $patchStyleText } from '@lexical/selection';
 import { $getSelection, $isRangeSelection } from 'lexical';
 import { type JSX } from 'react';
 import DropDown, { DropDownItem } from '../../ui/DropDown';
+import type { FontFamilyProps, FontSizeProps } from './FontDropdown.types';
 
 const FONT_FAMILIES = [
     'Arial',
@@ -49,12 +50,6 @@ const FONT_SIZES = [
     '128px',
 ];
 
-interface FontFamilyProps {
-    value: string;
-    disabled?: boolean;
-    onChange: (value: string) => void;
-}
-
 export function FontFamilyDropdown({
     value,
     disabled,
@@ -94,12 +89,6 @@ export function FontFamilyDropdown({
             ))}
         </DropDown>
     );
-}
-
-interface FontSizeProps {
-    value: string;
-    disabled?: boolean;
-    onChange: (value: string) => void;
 }
 
 export function FontSizeDropdown({

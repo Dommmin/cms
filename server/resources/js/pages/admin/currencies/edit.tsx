@@ -9,33 +9,14 @@ import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type ExchangeRate = {
-    rate: number;
-    fetched_at: string;
-};
-
-type Currency = {
-    id: number;
-    code: string;
-    name: string;
-    symbol: string;
-    decimal_places: number;
-    is_active: boolean;
-    is_base: boolean;
-    exchange_rates: ExchangeRate[];
-};
-
-type Props = {
-    currency: Currency;
-};
+import type { ExchangeRate, Currency, EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Currencies', href: '/admin/currencies' },
     { title: 'Edit', href: '' },
 ];
 
-export default function Edit({ currency }: Props) {
+export default function Edit({ currency }: EditProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit: ${currency.code}`} />

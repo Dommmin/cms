@@ -11,37 +11,13 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type ShippingMethod = {
-    id: number;
-    name: string;
-    carrier: string;
-    base_price: number;
-    price_per_kg: number;
-    is_active: boolean;
-    shipments_count: number;
-};
-
-type MethodsData = {
-    data: ShippingMethod[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = {
-    methods: MethodsData;
-    filters: { search?: string; is_active?: string; carrier?: string };
-};
+import type { ShippingMethod, MethodsData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Shipping Methods', href: '/admin/ecommerce/shipping-methods' },
 ];
 
-export default function ShippingMethodsIndex({ methods, filters }: Props) {
+export default function ShippingMethodsIndex({ methods, filters }: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<ShippingMethod>[] = [
         {

@@ -17,8 +17,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { useLocalePath } from "@/hooks/use-locale";
 import { api } from "@/lib/axios";
 import type { Address } from "@/types/api";
-
-type AddressForm = Omit<Address, "id" | "is_default">;
+import type { AddressForm } from './page.types';
 
 const EMPTY_ADDRESS: AddressForm = {
   type: "shipping",

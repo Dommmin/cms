@@ -1,22 +1,10 @@
 import type { LexicalEditor } from 'lexical';
 import { type JSX } from 'react';
 import { useRef } from 'react';
+import type { ImageResizerProps } from './ImageResizer.types';
 
 function clamp(value: number, min: number, max: number): number {
     return Math.min(Math.max(value, min), max);
-}
-
-interface Props {
-    editor: LexicalEditor;
-    buttonRef: React.RefObject<HTMLButtonElement | null>;
-    imageRef: React.RefObject<HTMLElement | null>;
-    maxWidth?: number;
-    onResizeStart: () => void;
-    onResizeEnd: (
-        width: 'inherit' | number,
-        height: 'inherit' | number,
-    ) => void;
-    captionsEnabled: boolean;
 }
 
 const Direction = {
@@ -33,7 +21,7 @@ export default function ImageResizer({
     imageRef,
     maxWidth,
     captionsEnabled: _captionsEnabled,
-}: Props): JSX.Element {
+}: ImageResizerProps): JSX.Element {
     const controlWrapperRef = useRef<HTMLDivElement>(null);
     const userSelect = useRef({ priority: '', value: 'default' });
     const positioningRef = useRef<{

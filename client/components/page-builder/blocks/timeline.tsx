@@ -1,24 +1,7 @@
 import type { PageBlock } from "@/types/api";
+import type { TimelineItem, TimelineConfig, TimelineProps } from './timeline.types';
 
-interface TimelineItem {
-  date?: string;
-  title?: string;
-  description?: string;
-  icon?: string;
-}
-
-interface TimelineConfig {
-  title?: string;
-  subtitle?: string;
-  layout?: "left" | "center" | "right";
-  items?: TimelineItem[];
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function TimelineBlock({ block }: Props) {
+export function TimelineBlock({ block }: TimelineProps) {
   const cfg = block.configuration as TimelineConfig;
   const items = cfg.items ?? [];
 

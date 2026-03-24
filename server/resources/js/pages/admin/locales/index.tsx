@@ -34,53 +34,11 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Locale = {
-    id: number;
-    code: string;
-    name: string;
-    native_name: string;
-    flag_emoji: string | null;
-    currency_code: string | null;
-    is_default: boolean;
-    is_active: boolean;
-};
-
-type CurrencyOption = {
-    code: string;
-    name: string;
-    symbol: string;
-};
-
-type LocalesData = {
-    data: Locale[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = {
-    locales: LocalesData;
-    filters: { search?: string };
-    currencies: CurrencyOption[];
-};
+import type { Locale, CurrencyOption, LocalesData, IndexProps, LocaleForm } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Locales', href: '/admin/locales' },
 ];
-
-type LocaleForm = {
-    code: string;
-    name: string;
-    native_name: string;
-    flag_emoji: string;
-    currency_code: string;
-    is_default: boolean;
-    is_active: boolean;
-};
 
 const defaultForm: LocaleForm = {
     code: '',
@@ -92,7 +50,7 @@ const defaultForm: LocaleForm = {
     is_active: true,
 };
 
-export default function LocalesIndex({ locales, filters, currencies }: Props) {
+export default function LocalesIndex({ locales, filters, currencies }: IndexProps) {
     const __ = useTranslation();
     const [open, setOpen] = useState(false);
     const [editLocale, setEditLocale] = useState<Locale | null>(null);

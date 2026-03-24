@@ -19,21 +19,7 @@ import type { BlockTypeConfig } from '@/features/page-builder';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type GlobalBlock = {
-    id: number;
-    name: string;
-    description: string | null;
-    type: string;
-    is_active: boolean;
-    page_blocks_count: number;
-    created_at: string;
-};
-
-type Props = {
-    blocks: GlobalBlock[];
-    available_block_types: Record<string, BlockTypeConfig>;
-};
+import type { GlobalBlock, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'CMS', href: '/admin/cms' },
@@ -43,7 +29,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function ReusableBlocksIndex({
     blocks,
     available_block_types,
-}: Props) {
+}: IndexProps) {
     const [editBlock, setEditBlock] = useState<GlobalBlock | null>(null);
     const [editName, setEditName] = useState('');
     const [editDesc, setEditDesc] = useState('');

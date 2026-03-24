@@ -11,37 +11,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Currency = {
-    id: number;
-    code: string;
-    name: string;
-};
-
-type ExchangeRate = {
-    id: number;
-    currency_id: number;
-    currency: Currency;
-    rate: number;
-    source: string | null;
-    fetched_at: string;
-};
-
-type RatesData = {
-    data: ExchangeRate[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = {
-    rates: RatesData;
-    currencies: Currency[];
-    filters: { currency_id?: string; source?: string };
-};
+import type { Currency, ExchangeRate, RatesData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Exchange Rates', href: '/admin/exchange-rates' },
@@ -51,7 +21,7 @@ export default function ExchangeRatesIndex({
     rates,
     currencies: _currencies,
     filters: _filters,
-}: Props) {
+}: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<ExchangeRate>[] = [
         {

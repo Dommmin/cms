@@ -26,11 +26,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Toggle } from '@/components/ui/toggle';
 import { getSelectedNode } from '../utils/getSelectedNode';
-
-interface Position {
-    top: number;
-    left: number;
-}
+import type { Position } from './FloatingTextFormatPlugin.types';
 
 function TextFormatFloatingToolbar({
     editor,

@@ -5,27 +5,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import type { PageBlock } from "@/types/api";
-
-interface CountdownTimerConfig {
-  title?: string;
-  subtitle?: string;
-  target_date?: string;
-  show_labels?: boolean;
-  expired_message?: string;
-  cta_label?: string;
-  cta_url?: string;
-  style?: "light" | "dark" | "brand";
-}
-
-interface Props {
-  block: PageBlock;
-}
+import type { CountdownTimerConfig, CountdownTimerProps } from './countdown-timer.types';
 
 function pad(n: number) {
   return String(n).padStart(2, "0");
 }
 
-export function CountdownTimerBlock({ block }: Props) {
+export function CountdownTimerBlock({ block }: CountdownTimerProps) {
   const cfg = block.configuration as CountdownTimerConfig;
   const targetDate = cfg.target_date ? new Date(cfg.target_date) : null;
 

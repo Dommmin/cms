@@ -2,25 +2,9 @@ import { usePage } from '@inertiajs/react';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import type { LocaleData, LocalizedInputProps } from './localized-input.types';
 
-type LocaleData = {
-    code: string;
-    name: string;
-    native_name: string;
-    flag_emoji: string;
-    is_default: boolean;
-};
-
-interface Props {
-    label: string;
-    value: Record<string, string>;
-    onChange: (value: Record<string, string>) => void;
-    placeholder?: string;
-    required?: boolean;
-    error?: string;
-}
-
-export function LocalizedInput({ label, value, onChange, placeholder, required, error }: Props) {
+export function LocalizedInput({ label, value, onChange, placeholder, required, error }: LocalizedInputProps) {
     const { locales = [] } = usePage<{ locales: LocaleData[] }>().props;
 
     return (

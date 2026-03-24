@@ -170,7 +170,7 @@ export default function ProductsClient() {
                 <button
                   key={page}
                   onClick={() => setParam("page", String(page))}
-                  aria-label={t("shop.go_to_page", `Go to page ${page}`, { page })}
+                  aria-label={t("shop.go_to_page", `Go to page ${page}`)}
                   aria-current={page === data.meta!.current_page ? "page" : undefined}
                   className={`h-9 w-9 rounded-md text-sm font-medium ${
                     page === data.meta!.current_page

@@ -11,44 +11,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Customer = {
-    id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-};
-
-type AppNotification = {
-    id: number;
-    type: string;
-    channel: string;
-    status: string;
-    customer?: Customer | null;
-    sent_at: string | null;
-    failed_at: string | null;
-    created_at: string;
-};
-
-type NotificationsData = {
-    data: AppNotification[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = {
-    notifications: NotificationsData;
-    filters: {
-        search?: string;
-        type?: string;
-        status?: string;
-        channel?: string;
-    };
-};
+import type { Customer, AppNotification, NotificationsData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Notifications', href: '/admin/notifications' },
@@ -67,7 +30,7 @@ const channelIcons: Record<string, string> = {
     in_app: '🔵',
 };
 
-export default function NotificationsIndex({ notifications, filters }: Props) {
+export default function NotificationsIndex({ notifications, filters }: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<AppNotification>[] = [
         {

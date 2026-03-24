@@ -1,29 +1,9 @@
 import { Head } from '@inertiajs/react';
 import type React from 'react';
 import { resolveLocalizedText } from '@/lib/localized-text';
+import type { Cfg, PreviewBlock, PreviewSection, PagePreviewProps } from './page-preview.types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Cfg = Record<string, any>;
-
-type PreviewBlock = {
-    id: number;
-    type: string;
-    configuration: Cfg;
-};
-
-type PreviewSection = {
-    id: number;
-    section_type: string;
-    layout: string;
-    variant: string | null;
-    settings: Cfg | null;
-    blocks: PreviewBlock[];
-};
-
-type PagePreviewProps = {
-    page: { id: number; title: string | Record<string, string>; slug: string };
-    sections: PreviewSection[];
-};
 
 // ─── Block preview components ─────────────────────────────────────────────────
 

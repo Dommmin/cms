@@ -3,10 +3,7 @@ import type { Page } from "@/types/api";
 
 import { ModuleRenderer } from "./module-renderer";
 import { SectionRenderer } from "./section-renderer";
-
-interface Props {
-  page: Page;
-}
+import type { PageRendererProps } from './page-renderer.types';
 
 /**
  * Top-level renderer for CMS pages.
@@ -18,7 +15,7 @@ interface Props {
  * This component is a Server Component — it has no interactivity of its own.
  * Interactive child blocks (newsletter, forms, accordion, tabs) are 'use client'.
  */
-export async function PageRenderer({ page }: Props) {
+export async function PageRenderer({ page }: PageRendererProps) {
   if (!page.is_published) {
     return null;
   }

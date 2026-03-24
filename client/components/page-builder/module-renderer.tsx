@@ -1,14 +1,11 @@
 import type { Faq, Page } from "@/types/api";
+import type { ModuleRendererProps } from './module-renderer.types';
 
 /**
  * Renders the content for module-type pages.
  * The API embeds module-specific data inside page.module_config
  * (e.g. rich-text HTML for 'content', FAQ items for 'faq').
  */
-
-interface Props {
-  page: Page;
-}
 
 function ContentModule({ page }: { page: Page }) {
   const html = page.content ?? (page.module_config?.html as string | undefined);
@@ -57,7 +54,7 @@ function FaqModule({ page }: { page: Page }) {
   );
 }
 
-export function ModuleRenderer({ page }: Props) {
+export function ModuleRenderer({ page }: ModuleRendererProps) {
   switch (page.module_name) {
     case "content":
       return <ContentModule page={page} />;

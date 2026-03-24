@@ -5,12 +5,9 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 import { trackPageView } from "@/lib/datalayer";
+import type { GoogleTagManagerProps } from './google-tag-manager.types';
 
-interface Props {
-  gtmId: string;
-}
-
-export function GoogleTagManager({ gtmId }: Props) {
+export function GoogleTagManager({ gtmId }: GoogleTagManagerProps) {
   const pathname = usePathname();
 
   // Track page views on route change

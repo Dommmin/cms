@@ -10,31 +10,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Submission = {
-    id: number;
-    form_id: number;
-    data: Record<string, unknown>;
-    ip_address: string | null;
-    user_agent: string | null;
-    created_at: string;
-};
-
-type SubmissionsData = {
-    data: Submission[];
-    prev_page_url: string | null;
-    next_page_url: string | null;
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-};
-
-type FormData = {
-    id: number;
-    name: string;
-    slug: string;
-};
+import type { Submission, SubmissionsData, FormData } from './submissions.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Forms', href: '/admin/forms' },

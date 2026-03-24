@@ -30,18 +30,7 @@ import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
-
-type Category = { id: number; name: string; slug: string };
-type ProductType = { id: number; name: string };
-type Brand = { id: number; name: string };
-type ProductFlag = {
-    id: number;
-    name: string;
-    color: string;
-    description?: string | null;
-};
-type FormErrors = Record<string, string>;
-type TabKey = 'general' | 'pricing' | 'media' | 'metadata';
+import type { Category, ProductType, Brand, ProductFlag, FormErrors, TabKey, FormData } from './create.types';
 
 const formId = 'product-create-form';
 
@@ -49,34 +38,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Products', href: '/admin/ecommerce/products' },
     { title: 'Create Product', href: '/admin/ecommerce/products/create' },
 ];
-
-type FormData = {
-    name: Record<string, string>;
-    slug: string;
-    description: Record<string, string>;
-    short_description: Record<string, string>;
-    sku_prefix: string;
-    category_id: string | number | null;
-    product_type_id: string | number | null;
-    brand_id: string | number | null;
-    is_active: boolean;
-    is_saleable: boolean;
-    seo_title: string;
-    seo_description: string;
-    flags: number[];
-    variant: {
-        sku: string;
-        name: string;
-        price: string;
-        cost_price: string;
-        compare_at_price: string;
-        weight: string;
-        stock_quantity: string;
-        stock_threshold: string;
-        is_active: boolean;
-    };
-    categories: number[];
-};
 
 const defaultFormData = (defaultLocale: string): FormData => ({
     name: { [defaultLocale]: '' },

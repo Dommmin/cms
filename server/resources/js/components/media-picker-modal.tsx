@@ -17,44 +17,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-
-type MediaItem = {
-    id: number;
-    name: string;
-    file_name: string;
-    mime_type: string;
-    size: number;
-    url: string;
-    created_at: string;
-};
-
-type SelectedImage = {
-    id: number;
-    url: string;
-    name: string;
-    is_thumbnail: boolean;
-};
-
-type MediaData = {
-    data: MediaItem[];
-    prev_page_url: string | null;
-    next_page_url: string | null;
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-};
-
-type MediaPickerModalProps = {
-    open: boolean;
-    onClose: () => void;
-    onSelect: (media: MediaItem) => void;
-    onReorder: (images: SelectedImage[]) => void;
-    onRemove: (id: number) => void;
-    onSetThumbnail: (id: number) => void;
-    selectedImages: SelectedImage[];
-    multiple?: boolean;
-};
+import type { MediaItem, SelectedImage, MediaData, MediaPickerModalProps } from './media-picker-modal.types';
 
 const MIME_TYPE_ICONS: Record<string, React.ElementType> = {
     'image/': ImageIcon,

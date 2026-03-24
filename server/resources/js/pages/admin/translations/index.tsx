@@ -20,38 +20,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type LocaleOption = { code: string; name: string; flag_emoji: string | null };
-
-type Translation = {
-    id: number;
-    locale_code: string;
-    group: string;
-    key: string;
-    value: string;
-};
-
-type TranslationsData = {
-    data: Translation[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = {
-    translations: TranslationsData;
-    locales: LocaleOption[];
-    groups: string[];
-    filters: {
-        locale?: string;
-        group?: string;
-        search?: string;
-        missing?: string;
-    };
-};
+import type { LocaleOption, Translation, TranslationsData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Translations', href: '/admin/translations' },
@@ -63,7 +32,7 @@ export default function TranslationsIndex({
     locales,
     groups,
     filters,
-}: Props) {
+}: IndexProps) {
     const __ = useTranslation();
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editValue, setEditValue] = useState('');

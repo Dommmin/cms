@@ -5,6 +5,7 @@ import { getPage } from "@/api/cms";
 import { PageRenderer } from "@/components/page-builder/page-renderer";
 import { RecentlyViewed } from "@/components/recently-viewed";
 import { generateAlternates } from "@/lib/seo";
+import type { PageData } from './page.types';
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
@@ -23,8 +24,6 @@ export default async function HomePage() {
   const page = await getPage("home").catch(() => null);
   return <HomeContent page={page} />;
 }
-
-type PageData = Awaited<ReturnType<typeof getPage>>;
 
 function HomeContent({ page }: { page: PageData | null }) {
   if (!page || !page.is_published) {

@@ -6,18 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
 import { resolveLocalizedText } from '@/lib/localized-text';
-
-export type ProductRow = {
-    id: number;
-    name: string | Record<string, string>;
-    slug: string;
-    price: number;
-    is_active: boolean;
-    is_saleable: boolean;
-    category?: { id: number; name: string | Record<string, string> };
-    product_type?: { id: number; name: string | Record<string, string> };
-    images?: Array<{ url: string }>;
-};
+import type { ProductRow } from './product-columns.types';
 
 export function useProductColumns(): ColumnDef<ProductRow>[] {
     const __ = useTranslation();

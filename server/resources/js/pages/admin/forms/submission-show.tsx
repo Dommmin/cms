@@ -7,22 +7,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type SubmissionData = {
-    id: number;
-    form_id: number;
-    data: Record<string, unknown>;
-    ip_address: string | null;
-    user_agent: string | null;
-    page_url: string | null;
-    created_at: string;
-};
-
-type FormData = {
-    id: number;
-    name: string;
-    slug: string;
-};
+import type { SubmissionData, FormData } from './submission-show.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Forms', href: '/admin/forms' },

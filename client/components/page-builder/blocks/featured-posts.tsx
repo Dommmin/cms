@@ -3,25 +3,9 @@ import Link from "next/link";
 
 import { getRelationsByKey } from "@/lib/format";
 import type { BlogPost, PageBlock } from "@/types/api";
+import type { FeaturedPostsConfig, FeaturedPostsProps } from './featured-posts.types';
 
-interface FeaturedPostsConfig {
-  title?: string;
-  subtitle?: string;
-  columns?: number;
-  cta_text?: string;
-  cta_url?: string;
-  show_excerpt?: boolean;
-  show_author?: boolean;
-  show_date?: boolean;
-  show_category?: boolean;
-  show_read_time?: boolean;
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function FeaturedPostsBlock({ block }: Props) {
+export function FeaturedPostsBlock({ block }: FeaturedPostsProps) {
   const cfg = block.configuration as FeaturedPostsConfig;
   const columns = cfg.columns ?? 3;
 

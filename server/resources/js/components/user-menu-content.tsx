@@ -8,12 +8,9 @@ import {
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import type { User } from '@/types';
+import type { UserMenuContentProps } from './user-menu-content.types';
 
-type Props = {
-    user: User;
-};
-
-export function UserMenuContent({ user }: Props) {
+export function UserMenuContent({ user }: UserMenuContentProps) {
     const cleanup = useMobileNavigation();
 
     const handleLogout = () => {

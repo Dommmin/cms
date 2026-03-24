@@ -22,30 +22,14 @@ import { slugify } from '@/lib/slug';
 
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
-
-type ModuleConfig = {
-    label: string;
-    description?: string;
-};
-
-type ParentPage = {
-    id: number;
-    title: string;
-    slug: string;
-    children?: { id: number; title: string }[];
-};
-
-type Props = {
-    modules: Record<string, ModuleConfig>;
-    pages: ParentPage[];
-};
+import type { ModuleConfig, ParentPage, CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Pages', href: '/admin/cms/pages' },
     { title: 'Create', href: '/admin/cms/pages/create' },
 ];
 
-export default function Create({ modules, pages }: Props) {
+export default function Create({ modules, pages }: CreateProps) {
     const __ = useTranslation();
     const { locales } = usePage().props as { locales: SharedLocale[] };
 

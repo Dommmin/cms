@@ -3,20 +3,9 @@ import Link from "next/link";
 import { ProductCard } from "@/components/product-card";
 import { getRelationsByKey } from "@/lib/format";
 import type { PageBlock, Product } from "@/types/api";
+import type { FeaturedProductsConfig, FeaturedProductsProps } from './featured-products.types';
 
-interface FeaturedProductsConfig {
-  title?: string;
-  subtitle?: string;
-  columns?: 2 | 3 | 4;
-  view_all_url?: string;
-  view_all_label?: string;
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function FeaturedProductsBlock({ block }: Props) {
+export function FeaturedProductsBlock({ block }: FeaturedProductsProps) {
   const cfg = block.configuration as FeaturedProductsConfig;
   const columns = cfg.columns ?? 4;
 

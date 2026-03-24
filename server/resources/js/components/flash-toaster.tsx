@@ -1,12 +1,7 @@
 import { usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
-
-export type FlashMessages = {
-    success?: string | null;
-    error?: string | null;
-    nonce?: string | null;
-};
+import type { FlashMessages } from './flash-toaster.types';
 
 export default function FlashToaster() {
     const { props } = usePage<{ flash?: FlashMessages }>();

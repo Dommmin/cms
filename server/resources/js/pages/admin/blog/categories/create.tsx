@@ -20,19 +20,14 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
-
-type Category = { id: number; name: string };
-
-type Props = {
-    parentCategories: Category[];
-};
+import type { Category, CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Blog Categories', href: '/admin/blog/categories' },
     { title: 'Create', href: '/admin/blog/categories/create' },
 ];
 
-export default function CreateBlogCategory({ parentCategories }: Props) {
+export default function CreateBlogCategory({ parentCategories }: CreateProps) {
     const __ = useTranslation();
     const [data, setData] = useState({
         name: '',

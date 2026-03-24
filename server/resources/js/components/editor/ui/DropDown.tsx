@@ -6,14 +6,7 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-
-interface DropDownItemProps {
-    className?: string;
-    onClick: () => void;
-    title?: string;
-    children: React.ReactNode;
-    active?: boolean;
-}
+import type { DropDownItemProps, DropDownProps } from './DropDown.types';
 
 export function DropDownItem({
     className,
@@ -36,16 +29,6 @@ export function DropDownItem({
             {children}
         </button>
     );
-}
-
-interface DropDownProps {
-    label: React.ReactNode;
-    children: React.ReactNode;
-    disabled?: boolean;
-    className?: string;
-    buttonClassName?: string;
-    buttonAriaLabel?: string;
-    tooltip?: string;
 }
 
 export default function DropDown({

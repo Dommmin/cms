@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getBlogCategories, getBlogPosts } from "@/api/cms";
 import { localePath } from "@/lib/i18n";
 import { generateAlternates } from "@/lib/seo";
+import type { PageProps } from './page.types';
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -13,11 +14,7 @@ export const metadata: Metadata = {
   alternates: generateAlternates("/blog"),
 };
 
-interface Props {
-  searchParams: Promise<{ page?: string; category?: string }>;
-}
-
-export default async function BlogPage({ searchParams }: Props) {
+export default async function BlogPage({ searchParams }: PageProps) {
   const { page = "1", category } = await searchParams;
 
   const cookieStore = await cookies();

@@ -22,11 +22,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import type { Category, MenuItem } from "@/types/api";
-
-interface Props {
-  items: MenuItem[];
-  categories: Category[];
-}
+import type { MobileMenuProps } from './mobile-menu.types';
 
 function localiseUrl(url: string | null | undefined, lp: (path: string) => string): string {
   if (!url || url === "#") return "#";
@@ -34,7 +30,7 @@ function localiseUrl(url: string | null | undefined, lp: (path: string) => strin
   return lp(url);
 }
 
-export function MobileMenu({ items, categories }: Props) {
+export function MobileMenu({ items, categories }: MobileMenuProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [mounted, setMounted] = useState(false);

@@ -1,14 +1,6 @@
 import { type JSX } from 'react';
 import { cn } from '@/lib/utils';
-
-interface Props {
-    label: string;
-    value: string;
-    onChange: (value: string) => void;
-    placeholder?: string;
-    type?: 'text' | 'url' | 'email' | 'number';
-    className?: string;
-}
+import type { TextInputProps } from './TextInput.types';
 
 export default function TextInput({
     label,
@@ -17,7 +9,7 @@ export default function TextInput({
     placeholder,
     type = 'text',
     className,
-}: Props): JSX.Element {
+}: TextInputProps): JSX.Element {
     return (
         <div className={cn('flex flex-col gap-1.5', className)}>
             <label className="text-sm font-medium text-foreground">

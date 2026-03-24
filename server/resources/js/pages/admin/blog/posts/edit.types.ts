@@ -1,0 +1,44 @@
+export type Category = { id: number; name: string };
+export type BlogPost = {
+    id: number;
+    title: Record<string, string>;
+    slug: string;
+    excerpt: Record<string, string> | null;
+    content: Record<string, string>;
+    content_type: 'richtext' | 'markdown';
+    status: string;
+    blog_category_id: number | null;
+    tags: string[] | null;
+    available_locales: string[] | null;
+    is_featured: boolean;
+    featured_image: string | null;
+    published_at: string | null;
+    seo_title: string | null;
+    seo_description: string | null;
+    meta_robots: string | null;
+    og_image: string | null;
+    sitemap_exclude: boolean;
+};
+export type EditProps = {
+    post: BlogPost;
+    categories: Category[];
+};
+export type FormData = {
+    title: Record<string, string>;
+    slug: string;
+    excerpt: Record<string, string>;
+    content: Record<string, string>;
+    content_type: 'richtext' | 'markdown';
+    status: string;
+    published_at: string;
+    blog_category_id: string;
+    tags: string;
+    available_locales: string[] | null;
+    is_featured: boolean;
+    featured_image: string;
+    seo_title: string;
+    seo_description: string;
+    meta_robots: string;
+    og_image: string | null;
+    sitemap_exclude: boolean;
+};

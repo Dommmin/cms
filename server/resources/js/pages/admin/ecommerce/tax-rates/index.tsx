@@ -9,33 +9,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-interface TaxRate {
-    id: number;
-    name: string;
-    rate: number;
-    country_code?: string;
-    is_active: boolean;
-    is_default: boolean;
-}
-
-interface PaginationData {
-    data: TaxRate[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-}
-
-interface IndexProps {
-    taxRates: PaginationData;
-    filters: {
-        search?: string;
-        is_active?: boolean;
-    };
-}
+import type { TaxRate, PaginationData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

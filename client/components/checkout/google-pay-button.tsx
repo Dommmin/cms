@@ -1,12 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
-interface GooglePayButtonProps {
-  amount: number;
-  currency: string;
-  onToken: (token: string) => void;
-}
+import type { GooglePayButtonProps, GooglePayClient } from './google-pay-button.types';
 
 declare global {
   interface Window {
@@ -18,12 +13,6 @@ declare global {
       };
     };
   }
-}
-
-interface GooglePayClient {
-  isReadyToPay(request: object): Promise<{ result: boolean }>;
-  loadPaymentData(request: object): Promise<{ paymentMethodData: { tokenizationData: { token: string } } }>;
-  createButton(config: object): HTMLElement;
 }
 
 export function GooglePayButton({ amount, currency, onToken }: GooglePayButtonProps) {

@@ -2,12 +2,9 @@ import Link from "next/link";
 import { CheckCircle, XCircle } from "lucide-react";
 
 import { serverFetch } from "@/lib/server-fetch";
+import type { PageProps } from './page.types';
 
-interface Props {
-  searchParams: Promise<{ token?: string }>;
-}
-
-export default async function NewsletterConfirmPage({ searchParams }: Props) {
+export default async function NewsletterConfirmPage({ searchParams }: PageProps) {
   const { token } = await searchParams;
 
   if (!token) {

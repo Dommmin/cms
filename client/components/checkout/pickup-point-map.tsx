@@ -5,6 +5,7 @@ import L from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { useEffect } from "react";
 import type { PickupPoint } from "@/types/api";
+import type { PickupPointMapProps } from './pickup-point-map.types';
 
 // ── Custom SVG pin icon ──────────────────────────────────────────────────────
 
@@ -40,14 +41,7 @@ function FitBounds({ points }: { points: PickupPoint[] }) {
 
 // ── Main map component ───────────────────────────────────────────────────────
 
-interface Props {
-  points: PickupPoint[];
-  hoveredId: string | null;
-  onSelect: (point: PickupPoint) => void;
-  onHover: (id: string | null) => void;
-}
-
-export function PickupPointMap({ points, hoveredId, onSelect, onHover }: Props) {
+export function PickupPointMap({ points, hoveredId, onSelect, onHover }: PickupPointMapProps) {
   const center: [number, number] = points.length > 0
     ? [points[0].lat, points[0].lng]
     : [52.069, 19.48]; // Polska

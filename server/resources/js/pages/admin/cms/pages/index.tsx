@@ -1,10 +1,8 @@
 import { Link, Head, router, usePage, useForm } from '@inertiajs/react';
 import { FileTextIcon, CopyIcon } from 'lucide-react';
 import { useState } from 'react';
-import {
-    usePageColumns,
-    type PageRow,
-} from '@/components/columns/page-columns';
+import { usePageColumns } from '@/components/columns/page-columns';
+import type { PageRow } from '@/components/columns/page-columns.types';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -32,16 +30,7 @@ import AppLayout from '@/layouts/app-layout';
 
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
-
-type PagesData = {
-    data: PageRow[];
-    prev_page_url?: string | null;
-    next_page_url?: string | null;
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-};
+import type { PagesData } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

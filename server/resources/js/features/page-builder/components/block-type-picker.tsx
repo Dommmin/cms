@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import type { BlockTypeConfig } from '../types';
+import type { BlockTypePickerProps } from './block-type-picker.types';
 
 // ---------- SVG Thumbnails ----------
 
@@ -479,13 +480,6 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 // ---------- Picker ----------
-
-type BlockTypePickerProps = {
-    open: boolean;
-    availableBlockTypes: Record<string, BlockTypeConfig>;
-    onSelect: (type: string) => void;
-    onClose: () => void;
-};
 
 export function BlockTypePicker({
     open,

@@ -2,19 +2,9 @@ import Image from "next/image";
 
 import { getRelationsByKey } from "@/lib/format";
 import type { PageBlock } from "@/types/api";
+import type { LogoCloudConfig, LogoCloudProps } from './logo-cloud.types';
 
-interface LogoCloudConfig {
-  title?: string;
-  columns?: number;
-  logo_height?: number;
-  grayscale?: boolean;
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function LogoCloudBlock({ block }: Props) {
+export function LogoCloudBlock({ block }: LogoCloudProps) {
   const cfg = block.configuration as LogoCloudConfig;
   const columns = cfg.columns ?? 5;
   const logoHeight = cfg.logo_height ?? 40;

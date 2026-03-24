@@ -12,25 +12,12 @@ import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
+import type { FormData } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Stores', href: '/admin/stores' },
     { title: 'Create', href: '/admin/stores/create' },
 ];
-
-type FormData = {
-    name: string;
-    slug: string;
-    address: string;
-    city: string;
-    country: string;
-    phone: string;
-    email: string;
-    opening_hours: string;
-    lat: number | null;
-    lng: number | null;
-    is_active: boolean;
-};
 
 export default function CreateStore() {
     const [data, setData] = useState<FormData>({

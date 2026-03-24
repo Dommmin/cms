@@ -7,29 +7,7 @@ import { ApplePayButton } from "@/components/checkout/apple-pay-button";
 import { BlikInput } from "@/components/checkout/blik-input";
 import { GooglePayButton } from "@/components/checkout/google-pay-button";
 import { useTranslation } from "@/hooks/use-translation";
-
-export type PaymentMethodValue =
-  | "blik"
-  | "apple_pay"
-  | "google_pay"
-  | "p24"
-  | "cash_on_delivery"
-  | "bank_transfer";
-
-export interface PaymentStepProps {
-  selected: PaymentMethodValue;
-  onSelect: (method: PaymentMethodValue) => void;
-  blikCode: string;
-  onBlikCode: (code: string) => void;
-  onApplePayToken: (token: string) => void;
-  onGooglePayToken: (token: string) => void;
-  cartTotal: number;
-  currency: string;
-  /** Provider config from GET /checkout/payment-methods — undefined = still loading */
-  providerConfig?: PaymentMethodConfig[];
-  /** True when the selected shipping method is personal pickup (carrier=pickup) */
-  isPickup?: boolean;
-}
+import type { PaymentMethodValue, PaymentStepProps } from './payment-step.types';
 
 const METHOD_DEFS: Array<{
   value: PaymentMethodValue;

@@ -4,15 +4,11 @@ import { GitCompare } from "lucide-react";
 
 import { useIsInComparison, useToggleComparison, useComparisonIds } from "@/hooks/use-comparison";
 import { useTranslation } from "@/hooks/use-translation";
+import type { CompareButtonProps } from './compare-button.types';
 
 const MAX_COMPARE = 4;
 
-interface Props {
-  productId: number;
-  className?: string;
-}
-
-export function CompareButton({ productId, className = "" }: Props) {
+export function CompareButton({ productId, className = "" }: CompareButtonProps) {
   const { t } = useTranslation();
   const inComparison = useIsInComparison(productId);
   const toggle = useToggleComparison(productId);

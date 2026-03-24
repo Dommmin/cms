@@ -19,27 +19,11 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes/admin';
 import type { BreadcrumbItem } from '@/types';
 import type { Widget, WidgetSize } from '@/types/widgets';
+import type { WidgetShell, DashboardProps } from './dashboard.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: dashboard().url },
 ];
-
-interface WidgetShell {
-    id: number;
-    title: string;
-    type: string;
-    size: WidgetSize;
-    icon: string | null;
-    color: string | null;
-    is_active: boolean;
-    order: number;
-    config: Record<string, unknown> | null;
-}
-
-interface DashboardProps {
-    widgetShells: WidgetShell[];
-    widgets: Widget[] | undefined; // deferred — undefined until loaded
-}
 
 const STATUS_COLORS: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-800',

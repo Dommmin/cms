@@ -1,15 +1,11 @@
 import { type JSX } from 'react';
 import { cn } from '@/lib/utils';
-
-interface Props {
-    children: React.ReactNode;
-    className?: string;
-}
+import type { PlaceholderProps } from './Placeholder.types';
 
 export default function Placeholder({
     children,
     className,
-}: Props): JSX.Element {
+}: PlaceholderProps): JSX.Element {
     return (
         <div
             className={cn(

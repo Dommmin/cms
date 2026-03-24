@@ -11,37 +11,13 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Menu = {
-    id: number;
-    name: string;
-    location: string | null;
-    is_active: boolean;
-    all_items_count: number;
-    created_at: string;
-};
-
-type MenusData = {
-    data: Menu[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = {
-    menus: MenusData;
-    filters: { search?: string; location?: string; is_active?: string };
-    locations: { value: string; label: string }[];
-};
+import type { Menu, MenusData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Menus', href: '/admin/menus' },
 ];
 
-export default function MenusIndex({ menus, filters }: Props) {
+export default function MenusIndex({ menus, filters }: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<Menu>[] = [
         {

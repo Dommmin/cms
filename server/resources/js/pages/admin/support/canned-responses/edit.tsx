@@ -10,15 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type CannedResponse = {
-    id: number;
-    title: string;
-    shortcut: string;
-    body: string;
-};
-
-type Props = { canned_response: CannedResponse };
+import type { CannedResponse, EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Support', href: '/admin/support' },
@@ -26,7 +18,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Edit', href: '#' },
 ];
 
-export default function EditCannedResponse({ canned_response }: Props) {
+export default function EditCannedResponse({ canned_response }: EditProps) {
     const formId = 'canned-response-edit-form';
 
     return (

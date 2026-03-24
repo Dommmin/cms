@@ -12,25 +12,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-
-export type SeoData = {
-    seo_title: string;
-    seo_description: string;
-    meta_robots: string;
-    og_image: string | null;
-    sitemap_exclude: boolean;
-    canonical_url?: string;
-};
-
-type Props = {
-    data: SeoData;
-    onChange: (field: string, value: string | boolean | null) => void;
-    errors?: Record<string, string>;
-    showCanonical?: boolean;
-    urlPath?: string;
-    titleFallback?: string;
-    descriptionFallback?: string;
-};
+import type { SeoData, SeoPanelProps } from './seo-panel.types';
 
 function CharCounter({
     value,
@@ -85,7 +67,7 @@ export function SeoPanel({
     urlPath = 'page-slug',
     titleFallback = 'Page Title',
     descriptionFallback = 'No description provided.',
-}: Props) {
+}: SeoPanelProps) {
     const robotsColor = useMemo(
         () =>
             ROBOTS_OPTIONS.find((o) => o.value === data.meta_robots)?.color ??

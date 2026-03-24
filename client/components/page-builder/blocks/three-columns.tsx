@@ -2,22 +2,9 @@ import Image from "next/image";
 
 import { getRelationByKey } from "@/lib/format";
 import type { PageBlock } from "@/types/api";
+import type { ThreeColumnsConfig, ThreeColumnsProps } from './three-columns.types';
 
-interface ThreeColumnsConfig {
-  column_1_title?: string;
-  column_1_content?: string;
-  column_2_title?: string;
-  column_2_content?: string;
-  column_3_title?: string;
-  column_3_content?: string;
-  vertical_alignment?: "top" | "middle" | "bottom";
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function ThreeColumnsBlock({ block }: Props) {
+export function ThreeColumnsBlock({ block }: ThreeColumnsProps) {
   const cfg = block.configuration as ThreeColumnsConfig;
 
   const columns = [

@@ -15,8 +15,7 @@ import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
-
-type Category = { id: number; name: string; slug: string };
+import type { Category } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Categories', href: '/admin/ecommerce/categories' },

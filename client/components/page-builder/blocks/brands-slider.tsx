@@ -5,18 +5,7 @@ import Image from "next/image";
 
 import { getRelationsByKey } from "@/lib/format";
 import type { Brand, PageBlock } from "@/types/api";
-
-interface BrandsSliderConfig {
-  title?: string;
-  source?: "all" | "manual";
-  speed?: "slow" | "normal" | "fast";
-  logo_height?: number;
-  grayscale?: boolean;
-}
-
-interface Props {
-  block: PageBlock;
-}
+import type { BrandsSliderConfig, BrandsSliderProps } from './brands-slider.types';
 
 const pxPerSecond: Record<string, number> = {
   slow: 50,
@@ -24,7 +13,7 @@ const pxPerSecond: Record<string, number> = {
   fast: 160,
 };
 
-export function BrandsSliderBlock({ block }: Props) {
+export function BrandsSliderBlock({ block }: BrandsSliderProps) {
   const cfg = block.configuration as BrandsSliderConfig;
   const logoHeight = cfg.logo_height ?? 48;
   const grayscale = cfg.grayscale !== false;

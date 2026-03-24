@@ -1,15 +1,7 @@
 import type { PageBlock } from "@/types/api";
+import type { CustomHtmlConfig, CustomHtmlProps } from './custom-html.types';
 
-interface CustomHtmlConfig {
-  html?: string;
-  css?: string;
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function CustomHtmlBlock({ block }: Props) {
+export function CustomHtmlBlock({ block }: CustomHtmlProps) {
   const cfg = block.configuration as CustomHtmlConfig;
   if (!cfg.html) return null;
 

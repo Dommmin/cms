@@ -11,14 +11,11 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-
-interface Props {
-    isRichText?: boolean;
-}
+import type { ActionsPluginProps } from './ActionsPlugin.types';
 
 export default function ActionsPlugin({
     isRichText: _isRichText = true,
-}: Props): JSX.Element {
+}: ActionsPluginProps): JSX.Element {
     const [editor] = useLexicalComposerContext();
     const fileInputRef = useRef<HTMLInputElement>(null);
 

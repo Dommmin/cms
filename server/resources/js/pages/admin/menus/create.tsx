@@ -16,17 +16,14 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Props = {
-    locations: { value: string; label: string }[];
-};
+import type { CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Menus', href: '/admin/menus' },
     { title: 'Create', href: '/admin/menus/create' },
 ];
 
-export default function Create({ locations }: Props) {
+export default function Create({ locations }: CreateProps) {
     const __ = useTranslation();
 
     return (

@@ -9,36 +9,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type CookieConsent = {
-    id: number;
-    session_id: string;
-    ip: string;
-    category: string;
-    granted: boolean;
-    created_at: string;
-};
-
-type ConsentsData = {
-    data: CookieConsent[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = {
-    consents: ConsentsData;
-    filters: { search?: string; category?: string; granted?: string };
-    categories: string[];
-    stats: {
-        total_consents: number;
-        granted_count: number;
-        denied_count: number;
-    };
-};
+import type { CookieConsent, ConsentsData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Cookie Consents', href: '/admin/cookie-consents' },
@@ -49,7 +20,7 @@ export default function CookieConsentsIndex({
     filters,
     categories: _categories,
     stats,
-}: Props) {
+}: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<CookieConsent>[] = [
         {

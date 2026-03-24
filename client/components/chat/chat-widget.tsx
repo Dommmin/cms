@@ -11,17 +11,13 @@ import {
 } from "@/api/chat";
 import { useConversation, useSendMessage, useStartConversation } from "@/hooks/use-chat";
 import { ChatPanel } from "./chat-panel";
-import { PreChatForm, type PreChatData } from "./pre-chat-form";
-
-interface Props {
-  isAuthenticated?: boolean;
-  userName?: string;
-  userEmail?: string;
-}
+import { PreChatForm } from "./pre-chat-form";
+import type { PreChatData } from "./pre-chat-form.types";
+import type { ChatWidgetProps } from './chat-widget.types';
 
 const OPEN_KEY = "support_open";
 
-export function ChatWidget({ isAuthenticated = false, userName, userEmail }: Props) {
+export function ChatWidget({ isAuthenticated = false, userName, userEmail }: ChatWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const prevMessageCount = useRef(0);

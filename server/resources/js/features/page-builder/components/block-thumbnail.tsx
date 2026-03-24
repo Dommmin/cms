@@ -1,13 +1,9 @@
+import type { BlockThumbnailProps } from './block-thumbnail.types';
 /**
  * Block Thumbnail
  * Small SVG wireframe preview shown in the collapsed block card header.
  * Each block type gets a schematic that hints at its visual layout.
  */
-
-type BlockThumbnailProps = {
-    blockType: string;
-    className?: string;
-};
 
 const W = 64;
 const H = 36;

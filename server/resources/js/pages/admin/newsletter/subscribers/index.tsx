@@ -11,38 +11,14 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Subscriber = {
-    id: number;
-    email: string;
-    first_name: string | null;
-    is_active: boolean;
-    is_bounced: boolean;
-    tags: string[];
-    created_at: string;
-};
-
-type SubscribersData = {
-    data: Subscriber[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = {
-    subscribers: SubscribersData;
-    filters: { search?: string; is_active?: string; is_bounced?: string };
-};
+import type { Subscriber, SubscribersData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Newsletter', href: '/admin/newsletter' },
     { title: 'Subscribers', href: '/admin/newsletter/subscribers' },
 ];
 
-export default function SubscribersIndex({ subscribers, filters }: Props) {
+export default function SubscribersIndex({ subscribers, filters }: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<Subscriber>[] = [
         {

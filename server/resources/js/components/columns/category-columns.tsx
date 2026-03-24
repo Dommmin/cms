@@ -6,19 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
 import { resolveLocalizedText } from '@/lib/localized-text';
-
-export type CategoryRow = {
-    id: number;
-    name: string | Record<string, string>;
-    slug: string;
-    description?: string | Record<string, string> | null;
-    is_active: boolean;
-    parent_id?: number | null;
-    parent?: { id: number; name: string | Record<string, string> } | null;
-    children?: CategoryRow[];
-    products_count?: number;
-    depth?: number;
-};
+import type { CategoryRow } from './category-columns.types';
 
 export function useCategoryColumns(): ColumnDef<CategoryRow>[] {
     const __ = useTranslation();

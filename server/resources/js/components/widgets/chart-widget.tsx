@@ -12,21 +12,7 @@ import {
     YAxis,
 } from 'recharts';
 import { Card } from '@/components/ui/card';
-
-interface DataPoint {
-    date: string;
-    value: number;
-    label?: string;
-}
-
-interface ChartWidgetProps {
-    title: string;
-    data: DataPoint[];
-    chartType?: 'line' | 'donut';
-    color?: string;
-}
-
-type Granularity = 'daily' | 'weekly' | 'monthly';
+import type { DataPoint, ChartWidgetProps, Granularity } from './chart-widget.types';
 
 const GRANULARITY_OPTIONS: { label: string; value: Granularity }[] = [
     { label: 'Daily', value: 'daily' },

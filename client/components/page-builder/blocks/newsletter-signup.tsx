@@ -6,21 +6,9 @@ import { toast } from "react-toastify";
 import { subscribe } from "@/api/newsletter";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import type { PageBlock } from "@/types/api";
+import type { NewsletterSignupConfig, NewsletterSignupProps } from './newsletter-signup.types';
 
-interface NewsletterSignupConfig {
-  title?: string;
-  subtitle?: string;
-  placeholder?: string;
-  button_text?: string;
-  success_message?: string;
-  ask_name?: boolean;
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function NewsletterSignupBlock({ block }: Props) {
+export function NewsletterSignupBlock({ block }: NewsletterSignupProps) {
   const cfg = block.configuration as NewsletterSignupConfig;
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");

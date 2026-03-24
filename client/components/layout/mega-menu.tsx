@@ -8,11 +8,7 @@ import { ChevronDown } from "lucide-react";
 import { useLocalePath } from "@/hooks/use-locale";
 import { useTranslation } from "@/hooks/use-translation";
 import type { Category, MenuItem } from "@/types/api";
-
-interface Props {
-  items: MenuItem[];
-  categories: Category[];
-}
+import type { MegaMenuProps, OpenKey } from './mega-menu.types';
 
 /** Apply locale prefix to internal paths; leave external URLs (http//) untouched. */
 function localiseUrl(url: string | null | undefined, lp: (path: string) => string): string {
@@ -21,9 +17,7 @@ function localiseUrl(url: string | null | undefined, lp: (path: string) => strin
   return lp(url);
 }
 
-type OpenKey = number | "categories" | null;
-
-export function MegaMenu({ items, categories }: Props) {
+export function MegaMenu({ items, categories }: MegaMenuProps) {
   const [openKey, setOpenKey] = useState<OpenKey>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lp = useLocalePath();

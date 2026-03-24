@@ -4,28 +4,9 @@ import Link from "next/link";
 import { Linkedin, Twitter } from "lucide-react";
 
 import type { PageBlock } from "@/types/api";
+import type { TeamMember, TeamMembersConfig, TeamMembersProps } from './team-members.types';
 
-interface TeamMember {
-  name?: string;
-  role?: string;
-  bio?: string;
-  photo_url?: string;
-  linkedin_url?: string;
-  twitter_url?: string;
-}
-
-interface TeamMembersConfig {
-  title?: string;
-  subtitle?: string;
-  columns?: number;
-  members?: TeamMember[];
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function TeamMembersBlock({ block }: Props) {
+export function TeamMembersBlock({ block }: TeamMembersProps) {
   const cfg = block.configuration as TeamMembersConfig;
   const members = cfg.members ?? [];
   const columns = cfg.columns ?? 4;

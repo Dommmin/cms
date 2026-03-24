@@ -1,19 +1,13 @@
 import { type JSX } from 'react';
 import { cn } from '@/lib/utils';
-
-interface Props {
-    label: string;
-    onChange: (files: FileList | null) => void;
-    accept?: string;
-    className?: string;
-}
+import type { FileInputProps } from './FileInput.types';
 
 export default function FileInput({
     label,
     onChange,
     accept,
     className,
-}: Props): JSX.Element {
+}: FileInputProps): JSX.Element {
     return (
         <div className={cn('flex flex-col gap-1.5', className)}>
             <label className="text-sm font-medium text-foreground">

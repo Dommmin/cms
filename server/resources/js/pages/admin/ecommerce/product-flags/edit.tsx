@@ -10,16 +10,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-interface ProductFlag {
-    id: number;
-    name: string;
-    slug: string;
-    color: string;
-    description: string | null;
-    is_active: boolean;
-    position: number;
-}
+import type { ProductFlag } from './edit.types';
 
 export default function Edit({ flag }: { flag: ProductFlag }) {
     const __ = useTranslation();

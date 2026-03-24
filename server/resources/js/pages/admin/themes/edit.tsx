@@ -11,20 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Theme = {
-    id: number;
-    name: string;
-    slug: string;
-    description: string | null;
-    tokens?: Record<string, string> | null;
-    is_active: boolean;
-    pages_count: number;
-};
-
-type Props = {
-    theme: Theme;
-};
+import type { Theme, EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Themes', href: '/admin/themes' },
@@ -58,7 +45,7 @@ const editableTokens = [
     { key: 'sidebar-ring', label: 'Sidebar Ring' },
 ] as const;
 
-export default function Edit({ theme }: Props) {
+export default function Edit({ theme }: EditProps) {
     const formId = 'theme-edit-form';
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

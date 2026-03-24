@@ -5,6 +5,7 @@ import L from "leaflet";
 import { useEffect } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import type { Store } from "@/types/api";
+import type { StoreMapInnerProps } from './store-map-inner.types';
 
 // Fix default marker icon paths for webpack/Next.js
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -18,12 +19,6 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
 });
 
-interface Props {
-  stores: Store[];
-  height?: number;
-  zoom?: number;
-}
-
 function MapInvalidateSize() {
   useEffect(() => {
     window.dispatchEvent(new Event("resize"));
@@ -31,7 +26,7 @@ function MapInvalidateSize() {
   return null;
 }
 
-export default function StoreMapInner({ stores, height = 400, zoom = 13 }: Props) {
+export default function StoreMapInner({ stores, height = 400, zoom = 13 }: StoreMapInnerProps) {
   const center: [number, number] =
     stores.length > 0
       ? [stores[0].lat, stores[0].lng]

@@ -11,33 +11,14 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type CannedResponse = {
-    id: number;
-    title: string;
-    shortcut: string;
-    body: string;
-    created_at: string;
-};
-
-type CannedResponsesData = {
-    data: CannedResponse[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = { canned_responses: CannedResponsesData };
+import type { CannedResponse, CannedResponsesData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Support', href: '/admin/support' },
     { title: 'Canned Responses', href: '/admin/support/canned-responses' },
 ];
 
-export default function CannedResponsesIndex({ canned_responses }: Props) {
+export default function CannedResponsesIndex({ canned_responses }: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<CannedResponse>[] = [
         {

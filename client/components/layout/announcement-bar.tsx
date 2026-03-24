@@ -6,15 +6,7 @@ import { X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import { api } from "@/lib/axios";
-
-interface BannerPromotion {
-  id: number;
-  name: string;
-  banner_text: string;
-  banner_color: string | null;
-  banner_url: string | null;
-  ends_at: string | null;
-}
+import type { BannerPromotion } from './announcement-bar.types';
 
 function useCountdown(endsAt: string | null) {
   const [timeLeft, setTimeLeft] = useState<{ h: number; m: number; s: number } | null>(null);

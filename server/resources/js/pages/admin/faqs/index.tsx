@@ -11,34 +11,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Faq = {
-    id: number;
-    question: string;
-    answer: string;
-    category: string | null;
-    is_active: boolean;
-    position: number;
-    views_count: number;
-    helpful_count: number;
-    created_at: string;
-};
-
-type FaqsData = {
-    data: Faq[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = {
-    faqs: FaqsData;
-    filters: { search?: string; category?: string; is_active?: string };
-    categories: string[];
-};
+import type { Faq, FaqsData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'FAQ', href: '/admin/faqs' }];
 
@@ -46,7 +19,7 @@ export default function FaqsIndex({
     faqs,
     filters,
     categories: _categories,
-}: Props) {
+}: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<Faq>[] = [
         {

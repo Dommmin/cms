@@ -26,28 +26,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type MenuItemData = {
-    id?: number;
-    label: Record<string, string>;
-    url: string;
-    target: string;
-    icon: string;
-    children: MenuItemData[];
-};
-
-type Menu = {
-    id: number;
-    name: string;
-    location: string | null;
-    is_active: boolean;
-    items: MenuItemData[];
-};
-
-type Props = {
-    menu: Menu;
-    locations: { value: string; label: string }[];
-};
+import type { MenuItemData, Menu, EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Menus', href: '/admin/menus' },
@@ -211,7 +190,7 @@ function MenuItemEditor({
     );
 }
 
-export default function Edit({ menu, locations }: Props) {
+export default function Edit({ menu, locations }: EditProps) {
     const __ = useTranslation();
 
     const [name, setName] = useState(menu.name);

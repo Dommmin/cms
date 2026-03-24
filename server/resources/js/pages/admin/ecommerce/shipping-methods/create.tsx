@@ -22,11 +22,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
-
-interface Carrier {
-    value: string;
-    label: string;
-}
+import type { Carrier } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Shipping Methods', href: '/admin/ecommerce/shipping-methods' },

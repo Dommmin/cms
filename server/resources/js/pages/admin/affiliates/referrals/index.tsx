@@ -12,50 +12,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Referral = {
-    id: number;
-    status: 'pending' | 'approved' | 'paid' | 'cancelled';
-    order_total: number;
-    commission_amount: number;
-    paid_at: string | null;
-    created_at: string;
-    affiliate_code: {
-        id: number;
-        code: string;
-        user: { id: number; name: string; email: string };
-    };
-    order: {
-        id: number;
-        reference_number: string;
-        total: number;
-        status: string;
-    } | null;
-    referred_user: { id: number; name: string; email: string } | null;
-};
-
-type ReferralsData = {
-    data: Referral[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Stats = {
-    total_referrals: number;
-    pending_commissions: number;
-    approved_commissions: number;
-    paid_commissions: number;
-};
-
-type Props = {
-    referrals: ReferralsData;
-    stats: Stats;
-    filters: { search?: string; status?: string };
-};
+import type { Referral, ReferralsData, Stats, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Affiliates', href: '/admin/affiliates/codes' },
@@ -76,7 +33,7 @@ function fmt(cents: number): string {
     return (cents / 100).toFixed(2);
 }
 
-export default function ReferralsIndex({ referrals, stats, filters }: Props) {
+export default function ReferralsIndex({ referrals, stats, filters }: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<Referral>[] = [
         {

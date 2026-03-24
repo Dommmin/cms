@@ -11,37 +11,14 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Segment = {
-    id: number;
-    name: string;
-    description: string | null;
-    is_active: boolean;
-    campaigns_count: number;
-    created_at: string;
-};
-
-type SegmentsData = {
-    data: Segment[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = {
-    segments: SegmentsData;
-    filters: { search?: string; is_active?: string };
-};
+import type { Segment, SegmentsData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Newsletter', href: '/admin/newsletter' },
     { title: 'Segments', href: '/admin/newsletter/segments' },
 ];
 
-export default function SegmentsIndex({ segments, filters }: Props) {
+export default function SegmentsIndex({ segments, filters }: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<Segment>[] = [
         {

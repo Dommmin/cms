@@ -18,38 +18,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Segment = {
-    id: number;
-    name: string;
-};
-
-type Campaign = {
-    id: number;
-    name: string;
-    subject: string;
-    status: string;
-    type: string;
-    segment?: Segment | null;
-    total_sent: number;
-    scheduled_at: string | null;
-    created_at: string;
-};
-
-type CampaignsData = {
-    data: Campaign[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = {
-    campaigns: CampaignsData;
-    filters: { search?: string; status?: string; type?: string };
-};
+import type { Segment, Campaign, CampaignsData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Newsletter', href: '/admin/newsletter' },
@@ -64,7 +33,7 @@ const statusColors: Record<string, string> = {
     cancelled: 'bg-red-100 text-red-800',
 };
 
-export default function CampaignsIndex({ campaigns, filters }: Props) {
+export default function CampaignsIndex({ campaigns, filters }: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<Campaign>[] = [
         {

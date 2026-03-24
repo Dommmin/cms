@@ -2,15 +2,7 @@ import { ArrowDown, ArrowUp, type LucideIcon } from 'lucide-react';
 import * as icons from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-
-interface StatCardProps {
-    title: string;
-    value: number | string;
-    trend?: number;
-    icon?: string;
-    color?: string;
-    format?: 'number' | 'currency';
-}
+import type { StatCardProps } from './stat-card.types';
 
 const colorClasses = {
     blue: 'text-blue-500 bg-blue-50 dark:bg-blue-950',

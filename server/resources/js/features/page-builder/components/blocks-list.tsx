@@ -26,20 +26,7 @@ import type { Block, BlockTypeConfig, ReusableBlock } from '../types';
 import { BlockCard } from './block-card';
 import { BlockForm } from './block-form';
 import { BlockTypePicker } from './block-type-picker';
-
-type BlocksListProps = {
-    blocks: Block[];
-    sectionIndex: number;
-    expandedBlocks: Set<string>;
-    availableBlockTypes: Record<string, BlockTypeConfig>;
-    onAddBlock: (type: string) => void;
-    onAddReusableBlock: (block: ReusableBlock) => void;
-    onPasteBlock: (patch: Partial<Block>) => void;
-    onUpdateBlock: (blockIndex: number, patch: Partial<Block>) => void;
-    onDeleteBlock: (blockIndex: number) => void;
-    onMoveBlock: (oldIndex: number, newIndex: number) => void;
-    onToggleBlock: (blockIndex: number) => void;
-};
+import type { BlocksListProps } from './blocks-list.types';
 
 /** Modal to browse and insert a saved global block */
 function LibraryModal({

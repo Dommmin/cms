@@ -27,12 +27,9 @@ import { TimelineBlock } from "./blocks/timeline";
 import { TwoColumnsBlock } from "./blocks/two-columns";
 import { VideoEmbedBlock } from "./blocks/video-embed";
 import type { PageBlock } from "@/types/api";
+import type { BlockRendererProps } from './block-renderer.types';
 
-interface Props {
-  block: PageBlock;
-}
-
-export function BlockRenderer({ block }: Props) {
+export function BlockRenderer({ block }: BlockRendererProps) {
   switch (block.type) {
     case "hero_banner":
       return <HeroBannerBlock block={block} />;

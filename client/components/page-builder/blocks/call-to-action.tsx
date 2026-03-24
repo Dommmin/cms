@@ -3,24 +3,9 @@ import Link from "next/link";
 
 import { getRelationsByKey } from "@/lib/format";
 import type { PageBlock } from "@/types/api";
+import type { CallToActionConfig, CallToActionProps } from './call-to-action.types';
 
-interface CallToActionConfig {
-  title?: string;
-  subtitle?: string;
-  alignment?: "left" | "center" | "right";
-  style?: "plain" | "gradient" | "dark" | "brand" | "image";
-  primary_label?: string;
-  primary_url?: string;
-  secondary_label?: string;
-  secondary_url?: string;
-  badge_text?: string;
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function CallToActionBlock({ block }: Props) {
+export function CallToActionBlock({ block }: CallToActionProps) {
   const cfg = block.configuration as CallToActionConfig;
   const alignment = cfg.alignment ?? "center";
   const style = cfg.style ?? "gradient";

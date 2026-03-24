@@ -1,12 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-
-interface BlikInputProps {
-  value: string;
-  onChange: (value: string) => void;
-  autoFocus?: boolean;
-}
+import type { BlikInputProps } from './blik-input.types';
 
 export function BlikInput({ value, onChange, autoFocus = true }: BlikInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);

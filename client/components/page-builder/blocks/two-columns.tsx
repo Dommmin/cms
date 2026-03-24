@@ -2,24 +2,9 @@ import Image from "next/image";
 
 import { getRelationByKey } from "@/lib/format";
 import type { PageBlock } from "@/types/api";
+import type { TwoColumnsConfig, TwoColumnsProps } from './two-columns.types';
 
-interface TwoColumnsConfig {
-  left_title?: string;
-  left_content?: string;
-  right_title?: string;
-  right_content?: string;
-  /** text-image | image-text | text-text */
-  layout?: string;
-  ratio?: "50-50" | "60-40" | "40-60";
-  vertical_align?: "top" | "center" | "bottom";
-  gap?: "sm" | "md" | "lg";
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function TwoColumnsBlock({ block }: Props) {
+export function TwoColumnsBlock({ block }: TwoColumnsProps) {
   const cfg = block.configuration as TwoColumnsConfig;
   const layout = cfg.layout ?? "text-text";
   const ratio = cfg.ratio ?? "50-50";

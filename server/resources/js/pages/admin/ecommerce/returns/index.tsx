@@ -9,42 +9,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Customer = {
-    first_name: string;
-    last_name: string;
-    email: string;
-} | null;
-
-type Order = {
-    id: number;
-    order_number: string;
-    customer: Customer;
-};
-
-type ReturnRequest = {
-    id: number;
-    reference_number: string;
-    status: string;
-    return_type: string;
-    order: Order;
-    created_at: string;
-};
-
-type ReturnsData = {
-    data: ReturnRequest[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = {
-    returns: ReturnsData;
-    filters: { search?: string; status?: string };
-};
+import type { Customer, Order, ReturnRequest, ReturnsData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Returns', href: '/admin/ecommerce/returns' },
@@ -58,7 +23,7 @@ const statusColors: Record<string, string> = {
     completed: 'bg-green-100 text-green-800',
 };
 
-export default function ReturnsIndex({ returns, filters }: Props) {
+export default function ReturnsIndex({ returns, filters }: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<ReturnRequest>[] = [
         {

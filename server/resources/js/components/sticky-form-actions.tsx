@@ -1,12 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
-
-type StickyFormActionsProps = {
-    formId: string;
-    processing?: boolean;
-    submitLabel?: string;
-    processingLabel?: string;
-};
+import type { StickyFormActionsProps } from './sticky-form-actions.types';
 
 export default function StickyFormActions({
     formId,

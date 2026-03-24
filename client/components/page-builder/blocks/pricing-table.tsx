@@ -6,32 +6,9 @@ import { Check } from "lucide-react";
 import Link from "next/link";
 
 import type { PageBlock } from "@/types/api";
+import type { Plan, PricingTableConfig, PricingTableProps } from './pricing-table.types';
 
-interface Plan {
-  name?: string;
-  badge?: string;
-  price_monthly?: string;
-  price_yearly?: string;
-  description?: string;
-  features?: string;
-  cta_label?: string;
-  cta_url?: string;
-  is_featured?: boolean;
-}
-
-interface PricingTableConfig {
-  title?: string;
-  subtitle?: string;
-  currency_symbol?: string;
-  billing_toggle?: boolean;
-  plans?: Plan[];
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function PricingTableBlock({ block }: Props) {
+export function PricingTableBlock({ block }: PricingTableProps) {
   const cfg = block.configuration as PricingTableConfig;
   const plans = cfg.plans ?? [];
   const currency = cfg.currency_symbol ?? "zł";

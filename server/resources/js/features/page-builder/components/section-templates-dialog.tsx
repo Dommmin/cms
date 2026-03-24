@@ -12,14 +12,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import type { Block, Section } from '../types';
-
-export type SectionTemplate = {
-    id: string;
-    name: string;
-    description: string;
-    tags: string[];
-    sections: Array<Omit<Section, 'id' | 'position'>>;
-};
+import type { SectionTemplate, SectionTemplatesDialogProps } from './section-templates-dialog.types';
 
 // Pre-built templates — each defines the full section + block structure to insert.
 export const SECTION_TEMPLATES: SectionTemplate[] = [
@@ -618,12 +611,6 @@ const TEMPLATE_THUMBS: Record<string, React.FC> = {
 };
 
 // ---------- Dialog ----------
-
-type SectionTemplatesDialogProps = {
-    open: boolean;
-    onClose: () => void;
-    onInsert: (template: SectionTemplate) => void;
-};
 
 export function SectionTemplatesDialog({
     open,

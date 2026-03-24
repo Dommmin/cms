@@ -18,22 +18,7 @@ import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
-
-type Category = { id: number; name: string; slug: string };
-
-type CategoryEditProps = {
-    id: number;
-    name: Record<string, string>;
-    slug: string;
-    description?: Record<string, string>;
-    parent_id?: number | null;
-    is_active: boolean;
-    seo_title?: string | null;
-    seo_description?: string | null;
-    meta_robots?: string | null;
-    og_image?: string | null;
-    sitemap_exclude?: boolean;
-};
+import type { Category, CategoryEditProps } from './edit.types';
 
 export default function Edit({
     category,

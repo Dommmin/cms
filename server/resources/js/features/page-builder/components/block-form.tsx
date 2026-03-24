@@ -16,13 +16,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import type { Block, BlockTypeConfig } from '../types';
 import { DynamicBlockForm } from './dynamic-block-form';
-
-type BlockFormProps = {
-    block: Block;
-    availableBlockTypes: Record<string, BlockTypeConfig>;
-    onUpdate: (patch: Partial<Block>) => void;
-    onUnlinkReusable?: () => void;
-};
+import type { BlockFormProps } from './block-form.types';
 
 export function BlockForm({
     block,

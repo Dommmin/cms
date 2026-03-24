@@ -9,33 +9,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-interface Brand {
-    id: number;
-    name: string;
-    slug: string;
-    description?: string;
-    is_active: boolean;
-    products_count: number;
-}
-
-interface PaginationData {
-    data: Brand[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-}
-
-interface IndexProps {
-    brands: PaginationData;
-    filters: {
-        search?: string;
-        is_active?: boolean;
-    };
-}
+import type { Brand, PaginationData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

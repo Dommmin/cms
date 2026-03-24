@@ -16,17 +16,14 @@ import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Props = {
-    categories: string[];
-};
+import type { CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'FAQ', href: '/admin/faqs' },
     { title: 'Create', href: '/admin/faqs/create' },
 ];
 
-export default function Create({ categories }: Props) {
+export default function Create({ categories }: CreateProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create FAQ" />

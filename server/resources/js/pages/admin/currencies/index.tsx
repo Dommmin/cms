@@ -11,43 +11,13 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type ExchangeRate = {
-    rate: number;
-    fetched_at: string;
-};
-
-type Currency = {
-    id: number;
-    code: string;
-    name: string;
-    symbol: string;
-    decimal_places: number;
-    is_active: boolean;
-    is_base: boolean;
-    exchange_rates: ExchangeRate[];
-};
-
-type CurrenciesData = {
-    data: Currency[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = {
-    currencies: CurrenciesData;
-    filters: { search?: string; is_active?: string };
-};
+import type { ExchangeRate, Currency, CurrenciesData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Currencies', href: '/admin/currencies' },
 ];
 
-export default function CurrenciesIndex({ currencies, filters }: Props) {
+export default function CurrenciesIndex({ currencies, filters }: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<Currency>[] = [
         {

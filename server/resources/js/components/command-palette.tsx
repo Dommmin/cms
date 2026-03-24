@@ -15,23 +15,9 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils';
+import type { SearchResult, NavShortcut } from './command-palette.types';
 
 // ── Types ──────────────────────────────────────────────────────────────────
-
-interface SearchResult {
-    group: string;
-    label: string;
-    meta?: string | null;
-    url: string;
-}
-
-interface NavShortcut {
-    group: 'Navigate';
-    label: string;
-    meta?: string;
-    url: string;
-    icon: React.ReactNode;
-}
 
 // ── Static nav shortcuts ───────────────────────────────────────────────────
 

@@ -35,10 +35,7 @@ import { dashboard } from '@/routes/admin';
 import type { BreadcrumbItem, NavItem } from '@/types';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
-
-type Props = {
-    breadcrumbs?: BreadcrumbItem[];
-};
+import type { AppHeaderProps } from './app-header.types';
 
 const mainNavItems: NavItem[] = [
     {
@@ -64,7 +61,7 @@ const rightNavItems: NavItem[] = [
 const activeItemStyles =
     'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
-export function AppHeader({ breadcrumbs = [] }: Props) {
+export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const page = usePage();
     const { auth } = page.props;
     const getInitials = useInitials();

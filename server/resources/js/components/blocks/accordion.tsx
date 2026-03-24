@@ -1,17 +1,8 @@
 import React from 'react';
-
-type AccordionItem = {
-    title: string;
-    content: string;
-};
-
-type Props = {
-    heading?: string;
-    items: AccordionItem[];
-};
+import type { AccordionItem, AccordionProps } from './accordion.types';
 
 // Simple accessible accordion block
-export default function AccordionBlock({ heading, items }: Props) {
+export default function AccordionBlock({ heading, items }: AccordionProps) {
     return (
         <section className="rounded-lg border bg-white p-4">
             {heading && (

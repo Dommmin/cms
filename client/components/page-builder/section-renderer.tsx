@@ -4,13 +4,7 @@ import { AdminBlockOverlay } from "@/components/admin/admin-block-overlay";
 
 import { AnimatedSection } from "./animated-section";
 import { BlockRenderer } from "./block-renderer";
-
-interface Props {
-  section: PageSection;
-  isPreview?: boolean;
-  pageId?: number;
-  adminBaseUrl?: string;
-}
+import type { SectionRendererProps } from './section-renderer.types';
 
 const variantStyles: Record<string, string> = {
   light: "bg-background text-foreground",
@@ -37,7 +31,7 @@ const sectionPaddingStyles: Record<string, string> = {
   xl: "py-28",
 };
 
-export function SectionRenderer({ section, isPreview, pageId, adminBaseUrl }: Props) {
+export function SectionRenderer({ section, isPreview, pageId, adminBaseUrl }: SectionRendererProps) {
   const variant = section.variant ?? "light";
   const layout = section.layout ?? "contained";
 

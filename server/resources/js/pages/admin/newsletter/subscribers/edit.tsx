@@ -8,13 +8,7 @@ import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Subscriber = {
-    id: number;
-    email: string;
-    first_name: string | null;
-    is_active: boolean;
-};
+import type { Subscriber } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Newsletter', href: '/admin/newsletter' },

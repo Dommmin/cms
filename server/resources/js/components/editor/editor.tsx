@@ -10,6 +10,7 @@ import { SharedHistoryContext } from './context/SharedHistoryContext';
 import EditorShell from './EditorShell';
 import { nodes } from './nodes';
 import { theme } from './theme';
+import type { EditorProps } from './editor.types';
 
 // ─── InitialState Plugin ───────────────────────────────────────────────────────
 
@@ -30,15 +31,7 @@ function InitialStatePlugin({ value }: { value?: string }): null {
     return null;
 }
 
-// ─── Props ────────────────────────────────────────────────────────────────────
-
-export interface EditorProps {
-    value?: string;
-    onChange?: (value: string) => void;
-    placeholder?: string;
-    className?: string;
-    showTreeView?: boolean;
-}
+// ─── EditorProps ────────────────────────────────────────────────────────────────────
 
 // ─── Editor Component ──────────────────────────────────────────────────────────
 

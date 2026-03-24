@@ -18,16 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { AvailableSection, Section } from '../types';
-
-type SectionCardProps = {
-    section: Section;
-    index: number;
-    isExpanded: boolean;
-    availableSections?: Record<string, AvailableSection>;
-    onToggle: () => void;
-    onDelete: () => void;
-    children?: React.ReactNode;
-};
+import type { SectionCardProps } from './section-card.types';
 
 export function SectionCard({
     section,

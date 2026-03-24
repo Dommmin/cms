@@ -25,16 +25,7 @@ import TableActionMenuPlugin from './plugins/TableActionMenuPlugin';
 import ToolbarPlugin from './plugins/ToolbarPlugin';
 import WordCountPlugin from './plugins/WordCountPlugin';
 import { theme } from './theme';
-
-export type Props = {
-    value?: string;
-    onChange?: (html: string) => void;
-    placeholder?: string;
-    className?: string;
-    maxHeight?: number | string;
-    editable?: boolean;
-    showWordCount?: boolean;
-};
+import type { EditorProps } from './Editor.types';
 
 function buildConfig(editable: boolean): InitialConfigType {
     return {
@@ -60,7 +51,7 @@ function EditablePlugin({ editable }: { editable: boolean }): null {
     return null;
 }
 
-export default function Editor({ value, onChange, placeholder = 'Start writing...', className, maxHeight, editable = true, showWordCount = true }: Props): JSX.Element {
+export default function Editor({ value, onChange, placeholder = 'Start writing...', className, maxHeight, editable = true, showWordCount = true }: EditorProps): JSX.Element {
     const containerRef = useRef<HTMLDivElement>(null);
     const config = useRef(buildConfig(editable));
 

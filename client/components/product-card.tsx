@@ -12,12 +12,9 @@ import { useAddToCart } from "@/hooks/use-cart";
 import { useMe } from "@/hooks/use-auth";
 import { PriceDisplay } from "@/components/price-display";
 import type { Product } from "@/types/api";
+import type { ProductCardProps } from './product-card.types';
 
-interface Props {
-  product: Product;
-}
-
-export function ProductCard({ product }: Props) {
+export function ProductCard({ product }: ProductCardProps) {
   const { t } = useTranslation();
   const lp = useLocalePath();
   const firstVariantId = product.variants?.[0]?.id ?? 0;

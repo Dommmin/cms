@@ -2,6 +2,7 @@
 
 import { X, ExternalLink, Settings } from "lucide-react";
 import { useAdminPreview, type AdminPreviewEntity } from "@/hooks/use-admin-preview";
+import type { AdminBarProps } from './admin-bar.types';
 
 const ENTITY_LABELS: Record<string, string> = {
   page: "Page",
@@ -13,15 +14,6 @@ const ENTITY_LABELS: Record<string, string> = {
 function exitPreview() {
   document.cookie = "admin_preview=; max-age=0; path=/";
   window.location.reload();
-}
-
-interface AdminBarProps {
-  entity?: {
-    type: AdminPreviewEntity["type"];
-    id: number | null;
-    name: string | null;
-    admin_url: string | null;
-  } | null;
 }
 
 export function AdminBar({ entity: entityOverride }: AdminBarProps = {}) {

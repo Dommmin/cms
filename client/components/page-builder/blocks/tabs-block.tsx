@@ -3,24 +3,9 @@
 import { useState } from "react";
 
 import type { PageBlock } from "@/types/api";
+import type { Tab, TabsConfig, TabsBlockProps } from './tabs-block.types';
 
-interface Tab {
-  label: string;
-  content?: string;
-  icon?: string;
-}
-
-interface TabsConfig {
-  title?: string;
-  tabs?: Tab[];
-  variant?: "underline" | "pills" | "boxed";
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function TabsBlock({ block }: Props) {
+export function TabsBlock({ block }: TabsBlockProps) {
   const cfg = block.configuration as TabsConfig;
   const tabs = cfg.tabs ?? [];
   const [activeTab, setActiveTab] = useState(0);

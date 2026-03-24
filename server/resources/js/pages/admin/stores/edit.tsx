@@ -12,32 +12,14 @@ import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Store = {
-    id: number;
-    name: string;
-    slug: string;
-    address: string;
-    city: string;
-    country: string;
-    phone: string | null;
-    email: string | null;
-    opening_hours: Record<string, string> | null;
-    lat: string;
-    lng: string;
-    is_active: boolean;
-};
-
-type Props = {
-    store: Store;
-};
+import type { Store, EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Stores', href: '/admin/stores' },
     { title: 'Edit', href: '' },
 ];
 
-export default function EditStore({ store }: Props) {
+export default function EditStore({ store }: EditProps) {
     const [data, setData] = useState({
         name: store.name,
         slug: store.slug,

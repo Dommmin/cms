@@ -1,24 +1,6 @@
 import { cn } from "@/lib/utils";
 import type { PageBlock } from "@/types/api";
-
-interface IconListItem {
-  icon?: string;
-  title?: string;
-  description?: string;
-}
-
-interface IconListConfig {
-  title?: string;
-  subtitle?: string;
-  columns?: number;
-  style?: "horizontal" | "centered" | "compact";
-  icon_color?: string;
-  items?: IconListItem[];
-}
-
-interface Props {
-  block: PageBlock;
-}
+import type { IconListItem, IconListConfig, IconListProps } from './icon-list.types';
 
 // Simple icon map — renders emoji or text fallback (full Lucide dynamic import avoided for bundle size)
 function BlockIcon({ name, color }: { name?: string; color?: string }) {
@@ -40,7 +22,7 @@ function BlockIcon({ name, color }: { name?: string; color?: string }) {
   );
 }
 
-export function IconListBlock({ block }: Props) {
+export function IconListBlock({ block }: IconListProps) {
   const cfg = block.configuration as IconListConfig;
   const items = cfg.items ?? [];
   const columns = cfg.columns ?? 2;

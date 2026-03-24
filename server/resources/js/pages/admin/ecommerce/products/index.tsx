@@ -1,9 +1,7 @@
 import { Link, Head } from '@inertiajs/react';
 import { PlusIcon, DownloadIcon } from 'lucide-react';
-import {
-    useProductColumns,
-    type ProductRow,
-} from '@/components/columns/product-columns';
+import { useProductColumns } from '@/components/columns/product-columns';
+import type { ProductRow } from '@/components/columns/product-columns.types';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -11,16 +9,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type ProductData = {
-    data: ProductRow[];
-    prev_page_url?: string;
-    next_page_url?: string;
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-};
+import type { ProductData } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Products', href: '/admin/ecommerce/products' },

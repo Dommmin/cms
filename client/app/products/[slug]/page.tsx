@@ -3,12 +3,9 @@ import { serverFetch } from "@/lib/server-fetch";
 import { generateCanonical, generateAlternates } from "@/lib/seo";
 import type { Product } from "@/types/api";
 import ProductDetailClient from "./ProductDetailClient";
+import type { PageProps } from './page.types';
 
-interface Props {
-  params: Promise<{ slug: string }>;
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   try {
     const { slug } = await params;
     const { data: product } = await serverFetch<{ data: Product }>(`/products/${slug}`);
@@ -34,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function ProductPage({ params }: Props) {
+export default async function ProductPage({ params }: PageProps) {
   const { slug } = await params;
   return <ProductDetailClient slug={slug} />;
 }

@@ -8,13 +8,9 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 import { $isDateNode } from './DateNode';
+import type { DateComponentProps } from './DateComponent.types';
 
-interface Props {
-    isoDate: string;
-    nodeKey: string;
-}
-
-export default function DateComponent({ isoDate, nodeKey }: Props) {
+export default function DateComponent({ isoDate, nodeKey }: DateComponentProps) {
     const [editor] = useLexicalComposerContext();
     const [open, setOpen] = useState(false);
 

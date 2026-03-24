@@ -9,7 +9,8 @@ import { AdminBar } from "@/components/admin/admin-bar";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { ChatWidgetLoader } from "@/components/chat/chat-widget-loader";
 import { GoogleTagManager } from "@/components/layout/google-tag-manager";
-import { CookieConsent, type CookieSettings } from "@/components/cookie-consent";
+import { CookieConsent } from "@/components/cookie-consent";
+import type { CookieSettings } from "@/components/cookie-consent.types";
 import { ComparisonBar } from "@/components/comparison-bar";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
@@ -20,6 +21,7 @@ import { serverFetch } from "@/lib/server-fetch";
 import { buildOrganization, buildWebSite } from "@/lib/schema";
 
 import "./globals.css";
+import type { PublicSettingsResponse } from './layout.types';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,27 +36,6 @@ const geistMono = Geist_Mono({
 });
 
 // Cached per-request: both generateMetadata and RootLayout share one fetch
-type PublicSettingsResponse = {
-  settings: {
-    general?: {
-      site_name?: string;
-      site_url?: string;
-      site_description?: string;
-      contact_email?: string;
-      contact_phone?: string;
-    };
-    seo?: {
-      google_tag_manager?: string;
-      google_site_verification?: string;
-      bing_site_verification?: string;
-      disable_indexing?: string | boolean;
-      og_image?: string;
-      twitter_handle?: string;
-    };
-    social?: Record<string, string>;
-    cookie?: CookieSettings;
-  };
-};
 
 const getPublicSettings = cache(async () =>
   serverFetch<PublicSettingsResponse>("/settings/public", { revalidate: 300, tags: ["settings"] }).catch(() => null),

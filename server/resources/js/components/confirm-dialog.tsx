@@ -12,19 +12,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-
-interface ConfirmDialogProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    title?: string;
-    description?: string;
-    onConfirm?: () => void;
-    confirmUrl?: string;
-    confirmMethod?: 'delete' | 'post' | 'put' | 'patch';
-    confirmLabel?: string;
-    cancelLabel?: string;
-    variant?: 'default' | 'destructive' | 'outline';
-}
+import type { ConfirmDialogProps, ConfirmButtonProps } from './confirm-dialog.types';
 
 export function ConfirmDialog({
     open,
@@ -96,19 +84,6 @@ export function ConfirmDialog({
             </AlertDialogContent>
         </AlertDialog>
     );
-}
-
-interface ConfirmButtonProps {
-    onConfirm: () => void;
-    title?: string;
-    description?: string;
-    confirmLabel?: string;
-    cancelLabel?: string;
-    variant?: 'default' | 'destructive' | 'outline';
-    size?: 'default' | 'sm' | 'lg' | 'icon';
-    disabled?: boolean;
-    className?: string;
-    children?: React.ReactNode;
 }
 
 export function ConfirmButton({

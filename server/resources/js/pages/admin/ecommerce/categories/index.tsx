@@ -1,9 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { PlusIcon } from 'lucide-react';
-import {
-    useCategoryColumns,
-    type CategoryRow,
-} from '@/components/columns/category-columns';
+import { useCategoryColumns } from '@/components/columns/category-columns';
+import type { CategoryRow } from '@/components/columns/category-columns.types';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -11,16 +9,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type CategoryData = {
-    data: CategoryRow[];
-    prev_page_url?: string;
-    next_page_url?: string;
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-};
+import type { CategoryData } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Categories', href: '/admin/ecommerce/categories' },

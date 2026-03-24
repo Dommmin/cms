@@ -1,15 +1,7 @@
 import type { PageBlock } from "@/types/api";
+import type { RichTextConfig, RichTextProps } from './rich-text.types';
 
-interface RichTextConfig {
-  content?: string;
-  text_size?: "sm" | "base" | "lg" | "xl";
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function RichTextBlock({ block }: Props) {
+export function RichTextBlock({ block }: RichTextProps) {
   const cfg = block.configuration as RichTextConfig;
 
   const proseSize = {

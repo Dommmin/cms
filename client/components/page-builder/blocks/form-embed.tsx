@@ -6,17 +6,7 @@ import { toast } from "react-toastify";
 import { submitForm } from "@/api/forms";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import type { Form, FormField, PageBlock } from "@/types/api";
-
-interface FormEmbedConfig {
-  title?: string;
-  subtitle?: string;
-  /** Pre-resolved form data embedded by the API */
-  form?: Form;
-}
-
-interface Props {
-  block: PageBlock;
-}
+import type { FormEmbedConfig, FormEmbedProps } from './form-embed.types';
 
 function FieldInput({ field }: { field: FormField }) {
   const base =
@@ -90,7 +80,7 @@ function FieldInput({ field }: { field: FormField }) {
   );
 }
 
-export function FormEmbedBlock({ block }: Props) {
+export function FormEmbedBlock({ block }: FormEmbedProps) {
   const cfg = block.configuration as FormEmbedConfig;
   const form = cfg.form;
   const [turnstileToken, setTurnstileToken] = useState("");

@@ -4,20 +4,7 @@ import { EyeIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
-
-export type OrderRow = {
-    id: number;
-    order_number: string;
-    status: string;
-    payment_status: string;
-    total: number;
-    customer?: {
-        first_name: string;
-        last_name: string;
-        email: string;
-    };
-    created_at: string;
-};
+import type { OrderRow } from './order-columns.types';
 
 const statusColors: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-800',

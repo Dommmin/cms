@@ -1,19 +1,5 @@
 import type { PageBlock } from "@/types/api";
-
-interface Badge {
-  icon?: string;
-  label?: string;
-  sublabel?: string;
-}
-
-interface TrustBadgesConfig {
-  style?: "row" | "card" | "minimal";
-  badges?: Badge[];
-}
-
-interface Props {
-  block: PageBlock;
-}
+import type { Badge, TrustBadgesConfig, TrustBadgesProps } from './trust-badges.types';
 
 const iconMap: Record<string, string> = {
   truck: "🚚", shield: "🛡", return: "↩", lock: "🔒", star: "★",
@@ -21,7 +7,7 @@ const iconMap: Record<string, string> = {
   heart: "♥", users: "👥", phone: "📞", mail: "✉", globe: "🌍",
 };
 
-export function TrustBadgesBlock({ block }: Props) {
+export function TrustBadgesBlock({ block }: TrustBadgesProps) {
   const cfg = block.configuration as TrustBadgesConfig;
   const badges = cfg.badges ?? [];
   const style = cfg.style ?? "row";

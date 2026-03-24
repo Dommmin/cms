@@ -11,42 +11,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Agent = { id: number; name: string };
-
-type Conversation = {
-    id: number;
-    subject: string;
-    status: string;
-    channel: string;
-    email: string | null;
-    name: string | null;
-    last_reply_at: string | null;
-    created_at: string;
-    messages_count: number;
-    unread_messages_count: number;
-    assigned_to: Agent | null;
-};
-
-type ConversationsData = {
-    data: Conversation[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type StatusOption = { value: string; label: string; color: string };
-
-type Props = {
-    conversations: ConversationsData;
-    filters: { search?: string; status?: string; assigned_to?: string };
-    agents: Agent[];
-    open_count: number;
-    statuses: StatusOption[];
-};
+import type { Agent, Conversation, ConversationsData, StatusOption, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Support', href: '/admin/support' },
@@ -78,7 +43,7 @@ export default function SupportIndex({
     agents: _agents,
     open_count,
     statuses,
-}: Props) {
+}: IndexProps) {
     const __ = useTranslation();
     // Refresh unread counts and new conversations every 30 seconds
     usePoll(30000);

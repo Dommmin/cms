@@ -10,18 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Segment = {
-    id: number;
-    name: string;
-    description: string | null;
-    is_active: boolean;
-    campaigns_count: number;
-};
-
-type Props = {
-    segment: Segment;
-};
+import type { Segment, EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Newsletter', href: '/admin/newsletter' },
@@ -29,7 +18,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Edit', href: '' },
 ];
 
-export default function Edit({ segment }: Props) {
+export default function Edit({ segment }: EditProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit: ${segment.name}`} />

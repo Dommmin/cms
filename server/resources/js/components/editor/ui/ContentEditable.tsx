@@ -1,16 +1,12 @@
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { type JSX } from 'react';
 import { cn } from '@/lib/utils';
-
-interface Props {
-    className?: string;
-    placeholder?: string;
-}
+import type { ContentEditableProps } from './ContentEditable.types';
 
 export default function LexicalContentEditable({
     className,
     placeholder: _placeholder,
-}: Props): JSX.Element {
+}: ContentEditableProps): JSX.Element {
     return (
         <ContentEditable
             className={cn(

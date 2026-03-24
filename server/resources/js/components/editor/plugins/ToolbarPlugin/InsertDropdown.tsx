@@ -30,17 +30,9 @@ import { INSERT_FIGMA_COMMAND } from '../FigmaPlugin';
 import { INSERT_LAYOUT_COMMAND } from '../LayoutPlugin/LayoutPlugin';
 import { INSERT_PAGE_BREAK_COMMAND } from '../PageBreakPlugin';
 import { INSERT_TWEET_COMMAND } from '../TwitterPlugin';
+import type { MediaItem, MediaResponse, ModalType, InsertDropdownProps } from './InsertDropdown.types';
 
 // ─── Media picker for image insertion ─────────────────────────────────────────
-
-type MediaItem = { id: number; name: string; mime_type: string; url: string };
-type MediaResponse = {
-    data: MediaItem[];
-    next_page_url: string | null;
-    prev_page_url: string | null;
-    current_page: number;
-    last_page: number;
-};
 
 function InsertImageFromMedia({
     onClose,
@@ -556,21 +548,7 @@ function InsertColumnsDialog({
     );
 }
 
-type ModalType =
-    | 'date'
-    | 'image'
-    | 'table'
-    | 'youtube'
-    | 'tweet'
-    | 'figma'
-    | 'columns'
-    | null;
-
-interface Props {
-    disabled?: boolean;
-}
-
-export default function InsertDropdown({ disabled }: Props): JSX.Element {
+export default function InsertDropdown({ disabled }: InsertDropdownProps): JSX.Element {
     const [editor] = useLexicalComposerContext();
     const [modal, setModal] = useState<ModalType>(null);
 

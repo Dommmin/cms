@@ -15,12 +15,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import type { AvailableSection, Section } from '../types';
-
-type SectionFormProps = {
-    section: Section;
-    availableSections: Record<string, AvailableSection>;
-    onUpdate: (patch: Partial<Section>) => void;
-};
+import type { SectionFormProps } from './section-form.types';
 
 export function SectionForm({
     section,

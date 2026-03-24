@@ -2,16 +2,7 @@
 
 import { useCurrency } from "@/hooks/use-currency";
 import { useTranslation } from "@/hooks/use-translation";
-
-interface Props {
-  price: number;
-  compareAtPrice?: number | null;
-  omnibusPrice?: number | null;
-  isOnSale?: boolean;
-  /** Tailwind text size class for the main price, e.g. "text-lg" (default) or "text-sm" */
-  size?: "sm" | "base" | "lg";
-  className?: string;
-}
+import type { PriceDisplayProps } from './price-display.types';
 
 const sizeClasses = {
   sm: "text-sm",
@@ -19,7 +10,7 @@ const sizeClasses = {
   lg: "text-lg",
 };
 
-export function PriceDisplay({ price, compareAtPrice, omnibusPrice, isOnSale, size = "lg", className }: Props) {
+export function PriceDisplay({ price, compareAtPrice, omnibusPrice, isOnSale, size = "lg", className }: PriceDisplayProps) {
   const { formatPrice } = useCurrency();
   const { t } = useTranslation();
   const onSale = isOnSale ?? (!!compareAtPrice && compareAtPrice > price);

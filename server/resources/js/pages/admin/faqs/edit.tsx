@@ -16,29 +16,14 @@ import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Faq = {
-    id: number;
-    question: string;
-    answer: string;
-    category: string | null;
-    is_active: boolean;
-    position: number;
-    views_count: number;
-    helpful_count: number;
-};
-
-type Props = {
-    faq: Faq;
-    categories: string[];
-};
+import type { Faq, EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'FAQ', href: '/admin/faqs' },
     { title: 'Edit', href: '' },
 ];
 
-export default function Edit({ faq, categories }: Props) {
+export default function Edit({ faq, categories }: EditProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit: ${faq.question.slice(0, 30)}...`} />

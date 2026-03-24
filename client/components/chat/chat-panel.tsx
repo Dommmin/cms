@@ -3,21 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Loader2Icon, SendIcon, Trash2Icon } from "lucide-react";
 import type { SupportMessage } from "@/types/api";
-
-interface Props {
-  messages: SupportMessage[];
-  isSending: boolean;
-  isLoadingMessages: boolean;
-  onSend: (body: string) => void;
-  onReset: () => void;
-  isClosed: boolean;
-}
+import type { ChatPanelProps } from './chat-panel.types';
 
 function formatTime(dateStr: string): string {
   return new Date(dateStr).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" });
 }
 
-export function ChatPanel({ messages, isSending, isLoadingMessages, onSend, onReset, isClosed }: Props) {
+export function ChatPanel({ messages, isSending, isLoadingMessages, onSend, onReset, isClosed }: ChatPanelProps) {
   const [text, setText] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 

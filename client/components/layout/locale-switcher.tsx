@@ -5,13 +5,7 @@ import { ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/axios";
 import { useTranslation } from "@/hooks/use-translation";
-
-type LocaleOption = {
-  code: string;
-  name: string;
-  native_name: string;
-  flag_emoji: string | null;
-};
+import type { LocaleOption } from './locale-switcher.types';
 
 async function fetchLocales(): Promise<LocaleOption[]> {
   const { data } = await api.get<LocaleOption[]>("/locales");

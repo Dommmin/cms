@@ -19,21 +19,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Setting = {
-    key: string;
-    label: string | null;
-    value: unknown;
-    type: string;
-    description: string | null;
-    is_public: boolean;
-};
-
-type Props = {
-    settings: { data: Setting[] };
-    groups: string[];
-    currentGroup: string;
-};
+import type { Setting, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Settings', href: '/admin/settings' },
@@ -139,7 +125,7 @@ function GroupIcon({
     return <Icon className={className} />;
 }
 
-export default function Index({ settings, groups, currentGroup }: Props) {
+export default function Index({ settings, groups, currentGroup }: IndexProps) {
     const __ = useTranslation();
     const initialValues = Object.fromEntries(
         settings.data.map((s) => [

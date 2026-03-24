@@ -11,25 +11,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
-
-type Product = {
-    id: number;
-    name: string | Record<string, string>;
-};
-
-type TaxRate = {
-    id: number;
-    name: string;
-    rate: number;
-};
-
-type VariantAttribute = {
-    id: number;
-    name: string;
-    slug: string;
-    is_required: boolean;
-    values: Array<{ id: number; value: string; slug: string }>;
-};
+import type { Product, TaxRate, VariantAttribute } from './create.types';
 
 export default function CreateVariant({
     product,

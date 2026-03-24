@@ -30,6 +30,7 @@ import {
 import { type JSX } from 'react';
 import type { BlockType } from '../../context/ToolbarContext';
 import DropDown, { DropDownItem } from '../../ui/DropDown';
+import type { BlockFormatDropdownProps } from './BlockFormatDropdown.types';
 
 const BLOCK_TYPES: { type: BlockType; label: string; icon: React.ReactNode }[] =
     [
@@ -149,15 +150,10 @@ function formatCode(editor: LexicalEditor): void {
     });
 }
 
-interface Props {
-    blockType: BlockType;
-    disabled?: boolean;
-}
-
 export default function BlockFormatDropdown({
     blockType,
     disabled,
-}: Props): JSX.Element {
+}: BlockFormatDropdownProps): JSX.Element {
     const [editor] = useLexicalComposerContext();
     const currentBlock =
         BLOCK_TYPES.find((b) => b.type === blockType) ?? BLOCK_TYPES[0];

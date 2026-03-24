@@ -1,14 +1,7 @@
 import MDEditor from '@uiw/react-md-editor';
 import { useAppearance } from '@/hooks/use-appearance';
 import { cn } from '@/lib/utils';
-
-interface MarkdownEditorProps {
-    value?: string;
-    onChange?: (value: string) => void;
-    disabled?: boolean;
-    className?: string;
-    minHeight?: number;
-}
+import type { MarkdownEditorProps } from './markdown-editor.types';
 
 export function MarkdownEditor({
     value = '',

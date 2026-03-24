@@ -1,25 +1,7 @@
 import type { PageBlock } from "@/types/api";
+import type { Testimonial, TestimonialsConfig, TestimonialsProps } from './testimonials.types';
 
-interface Testimonial {
-  author: string;
-  role?: string;
-  avatar_url?: string;
-  content: string;
-  rating?: number;
-}
-
-interface TestimonialsConfig {
-  title?: string;
-  subtitle?: string;
-  items?: Testimonial[];
-  columns?: 1 | 2 | 3;
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function TestimonialsBlock({ block }: Props) {
+export function TestimonialsBlock({ block }: TestimonialsProps) {
   const cfg = block.configuration as TestimonialsConfig;
   const columns = cfg.columns ?? 3;
   const items = cfg.items ?? [];

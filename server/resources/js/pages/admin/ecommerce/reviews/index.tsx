@@ -1,33 +1,19 @@
 import { Head } from '@inertiajs/react';
-import {
-    useReviewColumns,
-    type ReviewRow,
-} from '@/components/columns/review-columns';
+import { useReviewColumns } from '@/components/columns/review-columns';
+import type { ReviewRow } from '@/components/columns/review-columns.types';
 import DataTable from '@/components/data-table';
 import { PageHeader } from '@/components/page-header';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Props = {
-    reviews: {
-        data: ReviewRow[];
-        current_page: number;
-        last_page: number;
-        per_page: number;
-        total: number;
-        prev_page_url: string | null;
-        next_page_url: string | null;
-    };
-    filters?: { search?: string };
-};
+import type { IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Reviews', href: '/admin/ecommerce/reviews' },
 ];
 
-export default function ReviewsIndex({ reviews, filters }: Props) {
+export default function ReviewsIndex({ reviews, filters }: IndexProps) {
     const __ = useTranslation();
     const reviewColumns = useReviewColumns();
 

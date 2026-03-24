@@ -2,16 +2,9 @@
 
 import { PencilIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import type { AdminBlockOverlayProps } from './admin-block-overlay.types';
 
-interface Props {
-  blockId: number;
-  blockType: string;
-  pageId: number;
-  adminBaseUrl: string;
-  children: ReactNode;
-}
-
-export function AdminBlockOverlay({ blockId, blockType, pageId, adminBaseUrl, children }: Props) {
+export function AdminBlockOverlay({ blockId, blockType, pageId, adminBaseUrl, children }: AdminBlockOverlayProps) {
   const editUrl = `${adminBaseUrl}/admin/cms/pages/${pageId}/builder?block=${blockId}`;
 
   const label = blockType.replace(/_/g, " ");

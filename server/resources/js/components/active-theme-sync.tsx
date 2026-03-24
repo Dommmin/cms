@@ -1,11 +1,6 @@
 import { usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
-
-type ActiveTheme = {
-    id: number;
-    slug: string;
-    tokens?: Record<string, string> | null;
-};
+import type { ActiveTheme } from './active-theme-sync.types';
 
 const ALLOWED_THEME_TOKENS = [
     'background',

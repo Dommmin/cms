@@ -7,6 +7,7 @@ import { z } from "zod/v4";
 import type { AddressPayload } from "@/api/checkout";
 import type { Address } from "@/types/api";
 import { useTranslation } from "@/hooks/use-translation";
+import type { AddressErrors, NominatimResult, AddressFieldsetProps } from './address-fieldset.types';
 
 // ── Postal-code patterns per country ──────────────────────────────────────
 
@@ -68,8 +69,6 @@ const addressSchema = z.object({
   phone: z.string().min(7, "Numer telefonu jest wymagany"),
 });
 
-type AddressErrors = Partial<Record<keyof AddressPayload, string>>;
-
 function validateAddress(value: AddressPayload): AddressErrors {
   const result = addressSchema.safeParse(value);
   const errors: AddressErrors = {};
@@ -86,20 +85,6 @@ function validateAddress(value: AddressPayload): AddressErrors {
 }
 
 // ── Nominatim address autocomplete ─────────────────────────────────────────
-
-interface NominatimResult {
-  place_id: number;
-  display_name: string;
-  address: {
-    road?: string;
-    house_number?: string;
-    city?: string;
-    town?: string;
-    village?: string;
-    postcode?: string;
-    country_code?: string;
-  };
-}
 
 function useAddressSearch(query: string, country: string) {
   const [results, setResults] = useState<NominatimResult[]>([]);
@@ -235,17 +220,6 @@ const COUNTRIES = [
 
 // ── Main AddressFieldset ───────────────────────────────────────────────────
 
-interface Props {
-  title: string;
-  value: AddressPayload;
-  onChange: (v: AddressPayload) => void;
-  savedAddresses?: Address[];
-  /** Prefix for autocomplete attributes, e.g. "billing" or "shipping" */
-  autocompleteSection?: string;
-  /** If true, shows validation errors even for untouched fields (on submit) */
-  showAllErrors?: boolean;
-}
-
 export function AddressFieldset({
   title,
   value,
@@ -253,7 +227,7 @@ export function AddressFieldset({
   savedAddresses,
   autocompleteSection = "billing",
   showAllErrors = false,
-}: Props) {
+}: AddressFieldsetProps) {
   const { t } = useTranslation();
   const [touched, setTouched] = useState<Partial<Record<keyof AddressPayload, boolean>>>({});
   const [streetQuery, setStreetQuery] = useState("");

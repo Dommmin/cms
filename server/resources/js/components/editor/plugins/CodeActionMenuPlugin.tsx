@@ -5,12 +5,9 @@ import { Check, Copy } from 'lucide-react';
 import { type JSX } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import type { CodeActionMenuPluginProps } from './CodeActionMenuPlugin.types';
 
 const CODE_PADDING = 8;
-
-interface Props {
-    anchorElem?: HTMLElement;
-}
 
 function CodeActionMenuContainer({
     anchorElem,
@@ -142,7 +139,7 @@ function CodeActionMenuContainer({
 
 export default function CodeActionMenuPlugin({
     anchorElem = document.body,
-}: Props): JSX.Element {
+}: CodeActionMenuPluginProps): JSX.Element {
     return createPortal(
         <CodeActionMenuContainer anchorElem={anchorElem} />,
         anchorElem,

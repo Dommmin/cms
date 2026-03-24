@@ -5,26 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useInView } from "framer-motion";
 
 import type { PageBlock } from "@/types/api";
-
-interface StatItem {
-  value: string;
-  suffix?: string;
-  label?: string;
-  icon?: string;
-}
-
-interface StatsCounterConfig {
-  title?: string;
-  subtitle?: string;
-  style?: "plain" | "card" | "bordered" | "icon";
-  columns?: number;
-  animate_numbers?: boolean;
-  stats?: StatItem[];
-}
-
-interface Props {
-  block: PageBlock;
-}
+import type { StatItem, StatsCounterConfig, StatsCounterProps } from './stats-counter.types';
 
 function AnimatedNumber({ value, animate }: { value: string; animate: boolean }) {
   const numericValue = parseFloat(value.replace(/[^0-9.]/g, ""));
@@ -54,7 +35,7 @@ function AnimatedNumber({ value, animate }: { value: string; animate: boolean })
   );
 }
 
-export function StatsCounterBlock({ block }: Props) {
+export function StatsCounterBlock({ block }: StatsCounterProps) {
   const cfg = block.configuration as StatsCounterConfig;
   const stats = cfg.stats ?? [];
   const columns = cfg.columns ?? 4;

@@ -2,11 +2,7 @@
 
 import { useReducedMotion } from "framer-motion";
 import { motion } from "framer-motion";
-
-type AnimationPreset = {
-  initial: Record<string, number>;
-  animate: Record<string, number>;
-};
+import type { AnimationPreset, AnimatedSectionProps } from './animated-section.types';
 
 const PRESETS: Record<string, AnimationPreset> = {
   "fade-in": {
@@ -31,15 +27,7 @@ const PRESETS: Record<string, AnimationPreset> = {
   },
 };
 
-interface Props {
-  animation: string;
-  className?: string;
-  "data-section-type"?: string;
-  "data-section-id"?: number;
-  children: React.ReactNode;
-}
-
-export function AnimatedSection({ animation, className, children, ...rest }: Props) {
+export function AnimatedSection({ animation, className, children, ...rest }: AnimatedSectionProps) {
   const reducedMotion = useReducedMotion();
   const preset = !reducedMotion ? PRESETS[animation] : null;
 

@@ -17,37 +17,13 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Theme = {
-    id: number;
-    name: string;
-    slug: string;
-    description: string | null;
-    is_active: boolean;
-    pages_count: number;
-    created_at: string;
-};
-
-type ThemesData = {
-    data: Theme[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = {
-    themes: ThemesData;
-    filters: { search?: string; is_active?: string };
-};
+import type { Theme, ThemesData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Themes', href: '/admin/themes' },
 ];
 
-export default function ThemesIndex({ themes, filters }: Props) {
+export default function ThemesIndex({ themes, filters }: IndexProps) {
     const { props } = usePage<{
         activeTheme?: { id: number; slug: string } | null;
     }>();

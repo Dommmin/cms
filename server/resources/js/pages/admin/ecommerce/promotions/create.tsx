@@ -21,39 +21,7 @@ import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
-
-interface Category {
-    id: number;
-    name: string | Record<string, string>;
-}
-
-interface Product {
-    id: number;
-    name: string | Record<string, string>;
-    price: number;
-}
-
-interface FormData {
-    name: string;
-    slug: string;
-    description: string;
-    type: 'percentage' | 'fixed_amount' | 'buy_x_get_y' | 'free_shipping';
-    value: string;
-    min_value: string;
-    max_discount: string;
-    apply_to: 'all' | 'specific_products' | 'specific_categories';
-    is_active: boolean;
-    is_stackable: boolean;
-    priority: string;
-    starts_at: string;
-    ends_at: string;
-    products: Record<string, { discount_value: string; discount_type: string }>;
-    categories: Record<
-        string,
-        { discount_value: string; discount_type: string }
-    >;
-    metadata: Record<string, string>;
-}
+import type { Category, Product, FormData } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Promotions', href: '/admin/ecommerce/promotions' },

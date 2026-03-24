@@ -6,33 +6,9 @@ import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
+import type { Customer, AppNotification, ShowProps } from './show.types';
 
-type Customer = {
-    id: number;
-    first_name: string | null;
-    last_name: string | null;
-    email: string;
-};
-
-type AppNotification = {
-    id: number;
-    type: string;
-    channel: string;
-    status: string;
-    customer?: Customer | null;
-    sent_at: string | null;
-    failed_at: string | null;
-    error_message: string | null;
-    metadata?: Record<string, unknown> | null;
-    created_at: string;
-    updated_at: string;
-};
-
-type Props = {
-    notification: AppNotification;
-};
-
-export default function ShowNotification({ notification }: Props) {
+export default function ShowNotification({ notification }: ShowProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Notifications', href: '/admin/notifications' },
         {

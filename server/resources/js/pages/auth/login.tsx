@@ -10,18 +10,13 @@ import AuthLayout from '@/layouts/auth-layout';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-
-type Props = {
-    status?: string;
-    canResetPassword: boolean;
-    canRegister: boolean;
-};
+import type { LoginProps } from './login.types';
 
 export default function Login({
     status,
     canResetPassword,
     canRegister,
-}: Props) {
+}: LoginProps) {
     return (
         <AuthLayout
             title="Log in to your account"

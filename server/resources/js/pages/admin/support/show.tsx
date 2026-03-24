@@ -17,62 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Agent = { id: number; name: string };
-type StatusOption = { value: string; label: string; color: string };
-
-type Message = {
-    id: number;
-    sender_type: 'customer' | 'agent';
-    sender_name: string;
-    body: string;
-    is_internal: boolean;
-    read_at: string | null;
-    created_at: string;
-};
-
-type Order = {
-    id: number;
-    reference_number: string;
-    status: string;
-    total: number;
-};
-
-type Customer = {
-    id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-    orders?: Order[];
-};
-
-type Conversation = {
-    id: number;
-    subject: string;
-    status: string;
-    channel: string;
-    email: string | null;
-    name: string | null;
-    created_at: string;
-    last_reply_at: string | null;
-    messages: Message[];
-    assigned_to: Agent | null;
-    customer: Customer | null;
-};
-
-type CannedResponse = {
-    id: number;
-    title: string;
-    shortcut: string;
-    body: string;
-};
-
-type Props = {
-    conversation: Conversation;
-    agents: Agent[];
-    canned_responses: CannedResponse[];
-    statuses: StatusOption[];
-};
+import type { Agent, StatusOption, Message, Order, Customer, Conversation, CannedResponse, ShowProps } from './show.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Support', href: '/admin/support' },
@@ -91,7 +36,7 @@ export default function SupportShow({
     agents,
     canned_responses,
     statuses,
-}: Props) {
+}: ShowProps) {
     const [isInternal, setIsInternal] = useState(false);
 
     // Refresh conversation every 5 seconds to pick up new customer messages

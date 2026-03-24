@@ -2,14 +2,7 @@ import { Link } from '@inertiajs/react';
 import { ChevronRightIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
-
-interface PageHeaderProps {
-    title: string;
-    description?: string;
-    breadcrumbs?: BreadcrumbItem[];
-    children?: React.ReactNode;
-    className?: string;
-}
+import type { PageHeaderProps, PageHeaderActionsProps } from './page-header.types';
 
 export function PageHeader({
     title,
@@ -63,11 +56,6 @@ export function PageHeader({
             </div>
         </div>
     );
-}
-
-interface PageHeaderActionsProps {
-    children: React.ReactNode;
-    className?: string;
 }
 
 export function PageHeaderActions({

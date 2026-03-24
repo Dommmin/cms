@@ -3,19 +3,9 @@ import Link from "next/link";
 
 import { getRelationsByKey } from "@/lib/format";
 import type { Category, PageBlock } from "@/types/api";
+import type { CategoriesGridConfig, CategoriesGridProps } from './categories-grid.types';
 
-interface CategoriesGridConfig {
-  title?: string;
-  subtitle?: string;
-  columns?: 2 | 3 | 4 | 6;
-  show_description?: boolean;
-}
-
-interface Props {
-  block: PageBlock;
-}
-
-export function CategoriesGridBlock({ block }: Props) {
+export function CategoriesGridBlock({ block }: CategoriesGridProps) {
   const cfg = block.configuration as CategoriesGridConfig;
   const columns = cfg.columns ?? 3;
 

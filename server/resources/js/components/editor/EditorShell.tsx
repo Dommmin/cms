@@ -35,20 +35,15 @@ import TwitterPlugin from './plugins/TwitterPlugin';
 import YouTubePlugin from './plugins/YouTubePlugin';
 import ContentEditable from './ui/ContentEditable';
 import Placeholder from './ui/Placeholder';
+import type { EditorShellProps } from './EditorShell.types';
 
 const isDev = process.env.NODE_ENV === 'development';
-
-interface Props {
-    showTreeView?: boolean;
-    placeholder?: string;
-    className?: string;
-}
 
 export default function EditorShell({
     showTreeView = false,
     placeholder = 'Enter some rich text…',
     className,
-}: Props): JSX.Element {
+}: EditorShellProps): JSX.Element {
     const { historyState } = useSharedHistoryContext();
     const [floatingAnchorElem, setFloatingAnchorElem] =
         useState<HTMLDivElement | null>(null);

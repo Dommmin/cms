@@ -7,14 +7,9 @@ import { openCookiePreferences } from "@/providers/cookie-consent-provider";
 import type { MenuItem } from "@/types/api";
 
 import { NewsletterForm } from "./newsletter-form";
+import type { FooterContentProps } from './footer-content.types';
 
-interface Props {
-  mainItems: MenuItem[];
-  legalItems: MenuItem[];
-  currentYear: number;
-}
-
-export function FooterContent({ mainItems, legalItems, currentYear }: Props) {
+export function FooterContent({ mainItems, legalItems, currentYear }: FooterContentProps) {
   const { t } = useTranslation();
 
   return (

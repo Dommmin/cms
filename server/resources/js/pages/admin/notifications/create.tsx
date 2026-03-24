@@ -8,24 +8,7 @@ import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type Customer = {
-    id: number;
-    first_name: string | null;
-    last_name: string | null;
-    email: string;
-};
-
-type Option = {
-    value: string;
-    label: string;
-};
-
-type Props = {
-    customers: Customer[];
-    types: Option[];
-    channels: Option[];
-};
+import type { Customer, Option, CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Notifications', href: '/admin/notifications' },
@@ -36,7 +19,7 @@ export default function CreateNotification({
     customers,
     types,
     channels,
-}: Props) {
+}: CreateProps) {
     const formId = 'notification-create-form';
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

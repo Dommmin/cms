@@ -11,23 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-
-type VersionEntry = {
-    id: number;
-    version_number: number;
-    event: 'created' | 'updated' | 'deleted' | 'restored';
-    changes: Record<string, { old: unknown; new: unknown }> | null;
-    change_note: string | null;
-    created_at: string;
-    creator: { id: number; name: string } | null;
-};
-
-type DiffEntry = { old: unknown; new: unknown };
-
-type Props = {
-    modelType: string;
-    modelId: number;
-};
+import type { VersionEntry, DiffEntry, VersionHistoryProps } from './version-history.types';
 
 function formatValue(val: unknown): string {
     if (val === null || val === undefined) return '—';
@@ -88,7 +72,7 @@ function DiffTable({ diff }: { diff: Record<string, DiffEntry> }) {
     );
 }
 
-export function VersionHistory({ modelType, modelId }: Props) {
+export function VersionHistory({ modelType, modelId }: VersionHistoryProps) {
     const [open, setOpen] = useState(false);
     const [versions, setVersions] = useState<VersionEntry[]>([]);
     const [loading, setLoading] = useState(false);

@@ -7,12 +7,9 @@ import { JsonLd } from "@/components/json-ld";
 import { PageRenderer } from "@/components/page-builder/page-renderer";
 import { buildFaqPage, buildWebPage } from "@/lib/schema";
 import { generateCanonical } from "@/lib/seo";
+import type { PageProps, PageData } from './page.types';
 
-interface Props {
-  params: Promise<{ slug: string[] }>;
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   try {
     const [{ slug }, headersList] = await Promise.all([params, headers()]);
     const locale = headersList.get("x-locale") ?? "en";
@@ -36,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function DynamicPage({ params }: Props) {
+export default async function DynamicPage({ params }: PageProps) {
   const [{ slug }, headersList] = await Promise.all([params, headers()]);
   const locale = headersList.get("x-locale") ?? "en";
   const page = await getPage(slug.join("/"), locale).catch(() => null);
@@ -46,8 +43,6 @@ export default async function DynamicPage({ params }: Props) {
   // "cannot have a negative time stamp" Turbopack bug.
   return <PageContent page={page} slug={slug} />;
 }
-
-type PageData = Awaited<ReturnType<typeof getPage>>;
 
 function PageContent({
   page,

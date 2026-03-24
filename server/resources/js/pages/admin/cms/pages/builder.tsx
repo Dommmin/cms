@@ -10,18 +10,7 @@ import type {
 } from '@/features/page-builder';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type BuilderPageProps = {
-    page: {
-        id: number;
-        title: string;
-        slug: string;
-        is_published?: boolean;
-    };
-    sections: Section[];
-    available_sections: Record<string, AvailableSection>;
-    available_block_relations: Record<string, BlockTypeConfig>;
-};
+import type { BuilderPageProps } from './builder.types';
 
 export default function BuilderPage({
     page,

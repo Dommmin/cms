@@ -12,15 +12,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
-
-interface AdminNotification {
-    id: string;
-    type: 'new_order' | 'pending_review' | 'low_stock' | 'unread_support';
-    title: string;
-    message: string;
-    created_at: string;
-    url: string;
-}
+import type { AdminNotification } from './notification-bell.types';
 
 const TYPE_ICON: Record<AdminNotification['type'], React.ElementType> = {
     new_order: Package,

@@ -2,13 +2,7 @@ import * as React from 'react';
 import type { InputHTMLAttributes } from 'react';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-
-interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement> {
-    label: string;
-    error?: string;
-    hint?: string;
-    wrapperClassName?: string;
-}
+import type { FormFieldProps, SelectFieldProps, TextareaFieldProps, CheckboxFieldProps } from './form-field.types';
 
 export const InputField = React.forwardRef<HTMLInputElement, FormFieldProps>(
     (
@@ -41,15 +35,6 @@ export const InputField = React.forwardRef<HTMLInputElement, FormFieldProps>(
 );
 
 InputField.displayName = 'InputField';
-
-interface SelectFieldProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-    label: string;
-    error?: string;
-    hint?: string;
-    options: { value: string; label: string }[];
-    placeholder?: string;
-    wrapperClassName?: string;
-}
 
 export const SelectField = React.forwardRef<
     HTMLSelectElement,
@@ -107,13 +92,6 @@ export const SelectField = React.forwardRef<
 
 SelectField.displayName = 'SelectField';
 
-interface TextareaFieldProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-    label: string;
-    error?: string;
-    hint?: string;
-    wrapperClassName?: string;
-}
-
 export const TextareaField = React.forwardRef<
     HTMLTextAreaElement,
     TextareaFieldProps
@@ -143,15 +121,6 @@ export const TextareaField = React.forwardRef<
 });
 
 TextareaField.displayName = 'TextareaField';
-
-interface CheckboxFieldProps extends Omit<
-    InputHTMLAttributes<HTMLInputElement>,
-    'type'
-> {
-    label: string;
-    error?: string;
-    wrapperClassName?: string;
-}
 
 export const CheckboxField = React.forwardRef<
     HTMLInputElement,

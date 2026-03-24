@@ -22,6 +22,7 @@ import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { confirm } from '@/routes/two-factor';
 import AlertError from './alert-error';
 import { Spinner } from './ui/spinner';
+import type { TwoFactorSetupModalProps } from './two-factor-setup-modal.types';
 
 function GridScanIcon() {
     return (
@@ -229,18 +230,6 @@ function TwoFactorVerificationStep({
     );
 }
 
-type Props = {
-    isOpen: boolean;
-    onClose: () => void;
-    requiresConfirmation: boolean;
-    twoFactorEnabled: boolean;
-    qrCodeSvg: string | null;
-    manualSetupKey: string | null;
-    clearSetupData: () => void;
-    fetchSetupData: () => Promise<void>;
-    errors: string[];
-};
-
 export default function TwoFactorSetupModal({
     isOpen,
     onClose,
@@ -251,7 +240,7 @@ export default function TwoFactorSetupModal({
     clearSetupData,
     fetchSetupData,
     errors,
-}: Props) {
+}: TwoFactorSetupModalProps) {
     const [showVerificationStep, setShowVerificationStep] =
         useState<boolean>(false);
 

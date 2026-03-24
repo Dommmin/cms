@@ -11,36 +11,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-
-type AffiliateCode = {
-    id: number;
-    code: string;
-    discount_type: 'percentage' | 'fixed' | 'none';
-    discount_value: number;
-    commission_rate: string;
-    max_uses: number | null;
-    uses_count: number;
-    is_active: boolean;
-    expires_at: string | null;
-    referrals_count: number;
-    referrals_sum_commission_amount: number | null;
-    user: { id: number; name: string; email: string };
-};
-
-type CodesData = {
-    data: AffiliateCode[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type Props = {
-    codes: CodesData;
-    filters: { search?: string; status?: string };
-};
+import type { AffiliateCode, CodesData, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Affiliates', href: '/admin/affiliates/codes' },
@@ -54,7 +25,7 @@ function formatDiscount(code: AffiliateCode): string {
     return '—';
 }
 
-export default function CodesIndex({ codes, filters }: Props) {
+export default function CodesIndex({ codes, filters }: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<AffiliateCode>[] = [
         {

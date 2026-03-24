@@ -12,46 +12,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
-
-type Category = { id: number; name: string | Record<string, string> };
-
-type BlogPost = {
-    id: number;
-    title: string | Record<string, string>;
-    slug: string;
-    status: string;
-    content_type: string;
-    is_featured: boolean;
-    views_count: number;
-    published_at: string | null;
-    created_at: string;
-    category: Category | null;
-    author: { id: number; name: string } | null;
-};
-
-type PostsData = {
-    data: BlogPost[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-};
-
-type StatusOption = { value: string; label: string };
-
-type Props = {
-    posts: PostsData;
-    filters: {
-        search?: string;
-        category_id?: string;
-        status?: string;
-        content_type?: string;
-    };
-    statuses: StatusOption[];
-    categories: { id: number; name: string }[];
-};
+import type { Category, BlogPost, PostsData, StatusOption, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Blog Posts', href: '/admin/blog/posts' },
@@ -71,7 +32,7 @@ export default function BlogPostsIndex({
     filters,
     statuses: _statuses,
     categories: _categories,
-}: Props) {
+}: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<BlogPost>[] = [
         {

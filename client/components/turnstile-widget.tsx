@@ -2,14 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import Script from "next/script";
+import type { TurnstileWidgetProps } from './turnstile-widget.types';
 
 const SITE_KEY = process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY ?? "";
-
-interface Props {
-  onVerify: (token: string) => void;
-  onExpire?: () => void;
-  className?: string;
-}
 
 declare global {
   interface Window {
@@ -34,7 +29,7 @@ declare global {
  * Renders nothing when NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY is not set,
  * so local development works without Cloudflare credentials.
  */
-export function TurnstileWidget({ onVerify, onExpire, className }: Props) {
+export function TurnstileWidget({ onVerify, onExpire, className }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
 
