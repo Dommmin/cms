@@ -112,6 +112,7 @@ describe('Checkout – price integrity', function () {
             ->postJson('/api/v1/checkout', [
                 'shipping_method_id' => $shipping->id,
                 'payment_provider' => 'cash_on_delivery',
+                'terms_accepted' => true,
                 'billing_address' => secureCheckoutAddress(),
                 'shipping_address' => secureCheckoutAddress(),
             ]);
@@ -132,6 +133,7 @@ describe('Checkout – price integrity', function () {
             ->postJson('/api/v1/checkout', [
                 'shipping_method_id' => $shipping->id,
                 'payment_provider' => 'cash_on_delivery',
+                'terms_accepted' => true,
                 'billing_address' => secureCheckoutAddress(),
                 'shipping_address' => secureCheckoutAddress(),
             ]);
@@ -162,6 +164,7 @@ describe('Checkout – price integrity', function () {
             ->postJson('/api/v1/checkout', [
                 'shipping_method_id' => $shipping->id,
                 'payment_provider' => 'cash_on_delivery',
+                'terms_accepted' => true,
                 'billing_address' => secureCheckoutAddress(),
                 'shipping_address' => secureCheckoutAddress(),
             ]);
@@ -180,6 +183,7 @@ describe('Checkout – price integrity', function () {
             ->postJson('/api/v1/checkout', [
                 'shipping_method_id' => $shipping->id,
                 'payment_provider' => 'cash_on_delivery',
+                'terms_accepted' => true,
                 'billing_address' => secureCheckoutAddress(),
                 'shipping_address' => secureCheckoutAddress(),
             ])->assertStatus(201);
@@ -212,6 +216,7 @@ describe('Checkout – discount revalidation', function () {
             ->postJson('/api/v1/checkout', [
                 'shipping_method_id' => $shipping->id,
                 'payment_provider' => 'cash_on_delivery',
+                'terms_accepted' => true,
                 'billing_address' => secureCheckoutAddress(),
                 'shipping_address' => secureCheckoutAddress(),
             ])->assertStatus(201);
@@ -241,6 +246,7 @@ describe('Checkout – discount revalidation', function () {
             ->postJson('/api/v1/checkout', [
                 'shipping_method_id' => $shipping->id,
                 'payment_provider' => 'cash_on_delivery',
+                'terms_accepted' => true,
                 'billing_address' => secureCheckoutAddress(),
                 'shipping_address' => secureCheckoutAddress(),
             ])->assertStatus(201); // checkout still succeeds
@@ -267,6 +273,7 @@ describe('Checkout – discount revalidation', function () {
             ->postJson('/api/v1/checkout', [
                 'shipping_method_id' => $shipping->id,
                 'payment_provider' => 'cash_on_delivery',
+                'terms_accepted' => true,
                 'billing_address' => secureCheckoutAddress(),
                 'shipping_address' => secureCheckoutAddress(),
             ])->assertStatus(201);
@@ -292,6 +299,7 @@ describe('Checkout – discount revalidation', function () {
             ->postJson('/api/v1/checkout', [
                 'shipping_method_id' => $shipping->id,
                 'payment_provider' => 'cash_on_delivery',
+                'terms_accepted' => true,
                 'billing_address' => secureCheckoutAddress(),
                 'shipping_address' => secureCheckoutAddress(),
             ])->assertStatus(201);
@@ -308,6 +316,7 @@ describe('Checkout – discount revalidation', function () {
             ->postJson('/api/v1/checkout', [
                 'shipping_method_id' => $shipping->id,
                 'payment_provider' => 'cash_on_delivery',
+                'terms_accepted' => true,
                 'billing_address' => secureCheckoutAddress(),
                 'shipping_address' => secureCheckoutAddress(),
             ])->assertStatus(201);
@@ -341,6 +350,7 @@ describe('Checkout – affiliate codes', function () {
             ->postJson('/api/v1/checkout', [
                 'shipping_method_id' => $shipping->id,
                 'payment_provider' => 'cash_on_delivery',
+                'terms_accepted' => true,
                 'billing_address' => secureCheckoutAddress(),
                 'shipping_address' => secureCheckoutAddress(),
                 'referral_code' => 'PARTNER10',
@@ -366,6 +376,7 @@ describe('Checkout – affiliate codes', function () {
             ->postJson('/api/v1/checkout', [
                 'shipping_method_id' => $shipping->id,
                 'payment_provider' => 'cash_on_delivery',
+                'terms_accepted' => true,
                 'billing_address' => secureCheckoutAddress(),
                 'shipping_address' => secureCheckoutAddress(),
                 'referral_code' => 'NONEXISTENTCODE',
@@ -395,6 +406,7 @@ describe('Checkout – affiliate codes', function () {
             ->postJson('/api/v1/checkout', [
                 'shipping_method_id' => $shipping->id,
                 'payment_provider' => 'cash_on_delivery',
+                'terms_accepted' => true,
                 'billing_address' => secureCheckoutAddress(),
                 'shipping_address' => secureCheckoutAddress(),
                 'referral_code' => 'INACTIVE_AFF',
@@ -423,6 +435,7 @@ describe('Checkout – affiliate codes', function () {
             ->postJson('/api/v1/checkout', [
                 'shipping_method_id' => $shipping->id,
                 'payment_provider' => 'cash_on_delivery',
+                'terms_accepted' => true,
                 'billing_address' => secureCheckoutAddress(),
                 'shipping_address' => secureCheckoutAddress(),
                 'referral_code' => 'FIXED999',

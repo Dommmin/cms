@@ -80,6 +80,7 @@ export default function CheckoutPage() {
   const [blikCode, setBlikCode] = useState("");
   const [paymentToken, setPaymentToken] = useState("");
   const [notes, setNotes] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [submitAttempted, setSubmitAttempted] = useState(false);
 
   // Resolve auth token client-side only — avoids server/client hydration mismatch
@@ -184,6 +185,7 @@ export default function CheckoutPage() {
         billing_address: billing,
         shipping_address: shippingAddr,
         notes: notes || undefined,
+        terms_accepted: true,
       },
       {
         onSuccess: (response) => {
@@ -511,17 +513,40 @@ export default function CheckoutPage() {
                 </p>
               )}
 
+              <label className="mt-5 flex cursor-pointer items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-primary"
+                  required
+                />
+                <span className="text-xs text-muted-foreground">
+                  {t("checkout.terms_accept_prefix", "I have read and accept the")}{" "}
+                  <Link href={lp("/terms-of-service")} target="_blank" className="underline hover:text-foreground">
+                    {t("checkout.terms_link", "Terms of Service")}
+                  </Link>
+                  {" "}{t("checkout.and", "and")}{" "}
+                  <Link href={lp("/privacy-policy")} target="_blank" className="underline hover:text-foreground">
+                    {t("checkout.privacy_link", "Privacy Policy")}
+                  </Link>
+                  {". "}{t("checkout.withdrawal_note", "I am aware of my right to withdraw within 14 days.")}
+                </span>
+              </label>
+
+              {submitAttempted && !termsAccepted && (
+                <p className="mt-1 text-xs text-destructive">
+                  {t("checkout.terms_required", "You must accept the terms to place an order.")}
+                </p>
+              )}
+
               <button
                 type="submit"
-                disabled={isPending || !selectedMethod}
-                className="mt-5 w-full rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={isPending || !selectedMethod || !termsAccepted}
+                className="mt-4 w-full rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isPending ? t("checkout.placing_order", "Placing order...") : t("checkout.place_order", "Place Order")}
               </button>
-
-              <p className="mt-3 text-center text-xs text-muted-foreground">
-                {t("checkout.order_terms", 'By clicking "Place Order" you agree to the terms of sale.')}
-              </p>
             </div>
           </div>
         </div>

@@ -57,6 +57,8 @@ export interface CheckoutPayload {
   billing_address: AddressPayload;
   shipping_address: AddressPayload;
   notes?: string;
+  terms_accepted?: boolean;
+  referral_code?: string;
 }
 
 export interface PaymentResult {

@@ -45,6 +45,7 @@ class CheckoutRequest extends FormRequest
             'notes' => ['nullable', 'string', 'max:1000'],
             'pickup_point_id' => ['nullable', 'string'],
             'referral_code' => ['nullable', 'string', 'max:50'],
+            'terms_accepted' => ['required', 'accepted'],
             'billing_address' => ['required', 'array'],
             ...collect($addressRules)->mapWithKeys(fn ($rules, $key) => ["billing_address.{$key}" => $rules])->all(),
             'shipping_address' => ['required', 'array'],
