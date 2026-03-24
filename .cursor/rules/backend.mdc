@@ -1,0 +1,94 @@
+---
+description: Laravel 12 backend rules for server/ directory
+globs: ["server/**/*.php", "server/resources/js/**/*.tsx", "server/resources/js/**/*.ts"]
+alwaysApply: false
+---
+
+# Backend Rules (Laravel 12)
+
+## PHP Conventions
+
+```php
+<?php
+declare(strict_types=1);
+
+// Constructor property promotion
+public function __construct(
+    private readonly CartService $cartService,
+) {}
+
+// Explicit return types always
+public function show(Product $product): JsonResponse
+{
+    return response()->json(new ProductResource($product));
+}
+
+// casts() method — not $casts property (Laravel 12)
+protected function casts(): array
+{
+    return ['price' => 'integer', 'status' => OrderStatus::class];
+}
+```
+
+## Eloquent
+
+- `Model::query()` always — never `DB::` for standard queries
+- Eager-load relations (no N+1): `->with(['variants', 'category'])`
+- `->sole()` for must-exist single result, `->firstOrFail()` when appropriate
+- Translatable columns: `where('title->en', 'value')` or `whereJsonContainsLocale()`
+
+## Controllers
+
+- Thin controllers — business logic in `app/Services/`
+- Always use Form Request classes (never inline validation)
+- Always return API Resources, not raw models
+
+## Routes
+
+- API routes: `api.v1.` prefix under `/api/v1/`
+- Admin routes: `admin.` prefix under `/admin/`
+- New API endpoints need a rate limiter: `api.strict` (10/min) | `api.public` (60/min) | `api.auth` (300/min)
+
+## Testing (Pest)
+
+```php
+declare(strict_types=1);
+
+beforeEach(function () {
+    Role::firstOrCreate(['name' => 'admin']);
+});
+
+it('creates a product', function () {
+    $user = User::factory()->create()->assignRole('admin');
+    $this->actingAs($user, 'sanctum')
+        ->postJson('/api/v1/products', [...])
+        ->assertCreated();
+});
+```
+
+- `assertSoftDeleted()` — not `assertDatabaseMissing()` for soft-delete models
+- `assertOk()` / `assertCreated()` / `assertUnprocessable()` — not `assertStatus(200)`
+- Always use factories; create them if missing
+
+## Enums
+
+```php
+enum OrderStatus: string
+{
+    case AwaitingPayment = 'awaiting_payment';  // TitleCase keys
+    case Processing = 'processing';
+}
+```
+
+## After Changes
+
+Run: `docker compose exec php vendor/bin/pint --dirty`
+Run: `docker compose exec php php artisan test --compact`
+
+## Admin SPA (Inertia + React)
+
+- Pages in `resources/js/pages/admin/`
+- Use Wayfinder: `import { index } from '@/actions/Admin/ProductController'`
+- Forms: `<Form>` Inertia component
+- Navigation: `<Link>` Inertia component
+- Run after admin route changes: `docker compose exec php php artisan wayfinder:generate --no-interaction`

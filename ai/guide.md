@@ -52,6 +52,14 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - **Roles**: admin, editor (Spatie Permissions)
 - **GDPR**: soft-delete + PII anonymization (`AnonymizeUserData`), data export (Art. 15), user trash (admin)
 
+### Payments
+- **PayU** — BLIK native, Apple Pay, Google Pay, redirect; OAuth2 token caching; MD5 webhook verification; `POST /api/v1/webhooks/payu`
+- **P24** — Basic Auth, SHA256 signature; Apple/Google Pay on P24 page; `POST /api/v1/webhooks/p24`
+- **Payment status**: `GET /api/v1/payments/{payment}/status` (auth + policy)
+- Checkout response: `{ order, payment: { id, action, redirect_url } }`
+- Infrastructure: `app/Infrastructure/Payments/PayU/` + `app/Infrastructure/Payments/P24/`
+- Frontend: `PaymentStep`, `BlikInput`, `ApplePayButton`, `GooglePayButton`, `usePaymentStatus` hook (3s poll), `/checkout/pending` page
+
 ### System / Infrastructure
 - **Settings** — 6 groups (general, mail, etc.), DB-driven, cached 1h, admin UI
 - **Notifications** — SSE stream, channels, admin panel
@@ -73,6 +81,9 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - **Admin Bar (Preview Mode)** — `GET /admin/preview?url=&entity_type=&entity_id=&entity_name=&admin_url=` sets `admin_preview` cookie (2h, non-HttpOnly), redirects to frontend URL; "Preview" buttons on Page/BlogPost/Product/Category edit pages; `useAdminPreview()` hook + `<AdminBar />` component in Next.js root layout (fixed dark bar, z-9999, entity badge, "Edit in Admin" + "Exit Preview")
 - **Lexical RTE** — full-featured rich text editor at `resources/js/components/ui/rich-text-editor/`; block type dropdown (P/H1–H6/Quote/Code/Bullet/Number/Check), inline formatting (B/I/U/S/Code/Subscript/Superscript/Highlight/Eraser), alignment, floating link editor, floating bubble menu, insert (HR/Image/YouTube/Table/2-3 Columns/Collapsible/Emoji/Special chars), code language selector, copy-code button, word/character count footer, `maxHeight` + `editable` + `showWordCount` props; font size (10–36px), font family, text color picker (24 colors), spellcheck; `TableActionMenuPlugin` (right-click: row/col ops + cell bg color), `SlashCommandPlugin` (type `/`), `DraggableBlockPlugin`; custom nodes: `LayoutContainerNode`, `LayoutItemNode`, `CollapsibleContainerNode`, `CollapsibleTitleNode`, `CollapsibleContentNode`
 - **Admin Bar Level 2 (Block Overlays)** — `<AdminBlockOverlay>` wraps each block in `SectionRenderer` when `admin_preview` cookie is set; hover shows block type label + "Edit" button (links to `builder?block={id}`); page builder scrolls to + highlights the block on load when `?block={id}` in URL
+- **WCAG 2.1 AA** — skip nav link in root layout (`#main-content`), `aria-label` on icon-only buttons, `aria-live/atomic` on quantity steppers, `aria-current="page"` on active nav links, `aria-expanded/controls` on filter toggles, focus trap in cookie consent dialog (`role="dialog" aria-modal="true"`), labelled form inputs throughout
+- **EU/PL Legal Compliance** — checkout terms checkbox (required/accepted validation in `CheckoutRequest`), 14-day withdrawal notice in checkout, ODR platform link in footer legal menu (`https://ec.europa.eu/consumers/odr`), Omnibus price history (30-day low via `PriceHistory` + `ProductVariantPriceObserver`)
+- **Playwright E2E** — `client/tests/e2e/` (smoke, cart, i18n specs), Docker service under `testing` profile, `make e2e` / `make e2e-report` Makefile targets
 
 ---
 
@@ -179,7 +190,7 @@ docker compose exec php vendor/bin/pint --dirty
 
 **Backend**: Laravel 12, Fortify, Sanctum, Inertia v2, Wayfinder, Scout + Typesense, spatie/permission, spatie/medialibrary, spatie/translatable, spatie/model-states, spatie/query-builder, spatie/activitylog, spatie/health, spatie/pdf, maatwebsite/excel, Telescope, Boost (dev)
 
-**Frontend (client)**: Next.js 16, React 19, TanStack Query, Axios, Zod, react-hook-form, Tailwind v4, Leaflet, Recharts
+**Frontend (client)**: Next.js 16, React 19, TanStack Query, Axios, Zod, react-hook-form, Tailwind v4, Leaflet, Recharts, Playwright (E2E)
 
 **Frontend (admin)**: Inertia React v2, Radix UI, shadcn/ui, TanStack Table, Tiptap, DnD Kit, Wayfinder
 
@@ -187,4 +198,4 @@ docker compose exec php vendor/bin/pint --dirty
 
 ## Current Test Count
 
-291 passing, 1 skipped, 1 pre-existing fail (ThemeSeederTest — missing 3rd theme slug) (as of 2026-03-10)
+107 passing (as of 2026-03-24) — old broad tests removed; replaced with focused feature tests covering Cart, Checkout security, Orders API, Reviews, Webhooks (PayU/P24), Wishlists, Blog scheduling, PayU webhook verifier

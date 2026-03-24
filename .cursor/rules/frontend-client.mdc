@@ -1,0 +1,94 @@
+---
+description: Next.js 16 public frontend rules for client/ directory
+globs: ["client/**/*.tsx", "client/**/*.ts", "client/**/*.css"]
+alwaysApply: false
+---
+
+# Frontend Rules (Next.js 16 — client/)
+
+## Server vs Client Components
+
+```ts
+// Server component (default — SSR, no hooks)
+import { serverFetch } from "@/lib/server-fetch";
+const data = await serverFetch<ProductList>("/products", { revalidate: 60, tags: ["products"] });
+
+// Client component (needs interactivity/hooks)
+"use client";
+import { api } from "@/lib/axios";
+const { data } = useQuery({ queryKey: ['products'], queryFn: () => api.get('/products') });
+```
+
+Server components by default. Add `"use client"` only when you need hooks, event handlers, or browser APIs.
+
+## i18n — Locale-Prefixed URLs
+
+All public paths are prefixed: `/en/products`, `/pl/blog`.
+
+```ts
+// Client components
+const lp = useLocalePath();        // (path) => `/${locale}${path}`
+const locale = useLocale();        // extracts locale from pathname
+
+// Server components
+import { localePath } from "@/lib/i18n";
+import { cookies } from "next/headers";
+const locale = (await cookies()).get("locale")?.value ?? "en";
+
+// API calls — always pass locale
+serverFetch(`/products?locale=${locale}`)
+```
+
+**Never hardcode locale in hrefs.** Always use `lp(path)`.
+
+## API Types — Check Before Writing
+
+Open `client/types/api.ts` first. Key gotchas:
+
+| Type | Correct field | Wrong assumption |
+|------|--------------|-----------------|
+| `CartItem` | `product` (direct) | ~~`variant.product`~~ |
+| `ProductVariant` | `attributes: Record<string,string>` | ~~`attribute_values`~~ |
+| `ProductReview` | `author`, `body` | ~~`reviewer_name`~~ |
+| `Order` | `items?.length` | ~~`items_count`~~ |
+| `BlogPost` | `featured_image: string\|null` | ~~`cover_image_url`~~ |
+
+## SEO
+
+Every public page needs `generateMetadata()`:
+
+```ts
+export async function generateMetadata({ params }): Promise<Metadata> {
+  const product = await serverFetch<Product>(`/products/${params.slug}`);
+  return {
+    title: product.name,
+    openGraph: { images: [product.og_image ?? product.thumbnail?.url] },
+  };
+}
+```
+
+Add JSON-LD: `<JsonLd data={buildProduct(product)} />` from `components/json-ld.tsx`.
+
+## WCAG 2.1 AA — Required
+
+- Icon-only buttons: `aria-label="..."` + `aria-hidden="true"` on icon
+- Form inputs: `<label htmlFor="id">` or `aria-label`
+- Active nav links: `aria-current="page"`
+- Pagination nav: `<nav aria-label="Pagination">` + `aria-current="page"` on active
+- Quantity updates: `aria-live="polite" aria-atomic` on the number
+- Modal/dialog: focus trap (Tab/Shift+Tab inside), `role="dialog" aria-modal="true"`
+- Skip link in root layout: `<a href="#main-content">Skip to main content</a>`
+
+## Key Dependencies
+
+- TanStack Query for server state (client components)
+- react-hook-form + Zod for forms
+- Tailwind v4 with `dark:` prefix (`.dark` on `<html>`)
+- `toast.success()` / `toast.error()` from react-toastify
+
+## Commands
+
+```bash
+docker compose exec node npm run build
+docker compose exec node npx playwright test  # E2E
+```

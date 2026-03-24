@@ -1,77 +1,87 @@
 # CLAUDE.md
 
-Monorepo: **Laravel 12 backend + admin SPA** (`server/`) · **Next.js 16 public frontend** (`client/`)
+Monorepo: **Laravel 12 + admin SPA** (`server/`) · **Next.js 16 public frontend** (`client/`)
 
-> **Start every session by reading `ai/guide.md`** — it contains the full feature map, key paths, and conventions.
-
----
-
-## AI Context Files
-
-```
-ai/guide.md       ← PRIMARY — features, paths, conventions (read this first)
-ai/rules.md       ← Auto-update rules + quality gates
-ai/prompts.md     ← Reusable prompts for common tasks
-ai/context.md     ← Deep technical context (auth, cart, i18n, GDPR, etc.)
-```
-
-## Project Docs
-
-```
-docs/
-├── architecture.md       System overview (Docker stack, data flow)
-├── backend.md            Laravel structure, packages, patterns
-├── frontend.md           Inertia admin SPA + Next.js public frontend
-├── coding-standards.md   PHP / TypeScript / testing / git
-├── feature-process.md    Step-by-step workflow for new features
-├── deployment.md         Docker, Makefile, environment, production
-├── page-builder.md       Page builder architecture (deep-dive)
-├── features-backlog.md   Roadmap and planned features
-└── project-status.md     Module coverage + test status
-
-server/docs/
-├── USER_GUIDE.md         For content editors (non-technical)
-└── DEVELOPER_GUIDE.md    For developers extending the system
-```
-
-> `server/CLAUDE.md` is managed automatically by **laravel-boost** — do not edit manually.
-> It contains Laravel-specific rules, package versions, and skill activation.
+> Read **`ai/guide.md`** first — feature map, key paths, conventions.
+> Read **`ai/context.md`** for deep context (auth, cart, i18n, payments, page builder).
 
 ---
 
-## Docker — All Commands Run in Containers
+## All Commands Run in Docker
 
 ```bash
-# From repo root (Makefile shortcuts)
-make up             # Start all containers
-make down           # Stop
-make shell          # Enter PHP container (bash)
-make migrate        # php artisan migrate
-make fresh          # migrate:fresh --seed
-make test           # php artisan test --compact
-make quality        # Pint + PHPStan
+# Makefile shortcuts (from repo root)
+make up / make down / make shell / make migrate / make fresh / make test / make quality
 
-# Direct docker compose (when you need specific args)
+# Direct (when you need specific args)
 docker compose exec php php artisan <cmd>
 docker compose exec php php artisan test --compact tests/Feature/SomeTest.php
 docker compose exec php vendor/bin/pint --dirty
 docker compose exec node npm run build
 ```
 
-> **Never run `php artisan` or `vendor/bin/pint` directly** — local PHP has no Redis/MySQL access.
-> Always prefix with `docker compose exec php`.
+> **Never run `php artisan` or `vendor/bin/pint` directly** — host has no DB/Redis access.
+
+---
+
+## Structure
+
+| Part | Path | Stack |
+|------|------|-------|
+| Backend + Admin SPA | `server/` | Laravel 12, Inertia/React, Pest |
+| Public Frontend | `client/` | Next.js 16, React 19, TanStack Query |
+
+REST API: `/api/v1/*` · Admin: `/admin/*` (Inertia SPA)
+
+---
+
+## Non-Negotiable Rules
+
+**PHP (`server/`):**
+- `declare(strict_types=1)` on every file
+- `Model::query()` — never `DB::` for standard queries
+- Eager-load relations (no N+1 in loops)
+- Form Request classes for all validation — never inline
+- `env()` only inside `config/` files
+- After any PHP change: `docker compose exec php vendor/bin/pint --dirty`
+
+**TypeScript (`client/`):**
+- Check `client/types/api.ts` **before** using any API response field
+- Server components → `serverFetch()` from `lib/server-fetch.ts`
+- Client components → `api` from `lib/axios.ts`
+- All internal links must use `useLocalePath()` / `lp()` (locale-prefixed URLs)
+
+**Always:**
+- Write Pest tests for every feature — `php artisan make:test --pest Name`
+- All tests must pass before commit: `php artisan test --compact`
+- Update `ai/guide.md` when adding or changing features
+
+---
+
+## AI Context Files
+
+```
+ai/guide.md      ← feature map, key paths, conventions        (read first)
+ai/context.md    ← auth, cart, i18n, payments, page builder   (read for deep tasks)
+ai/rules.md      ← quality gates, auto-update rules, GDPR
+ai/prompts.md    ← copy-paste task templates
+ai/commit-rules.md ← commit message conventions
+ai/mcp/          ← MCP server configs
+
+server/CLAUDE.md ← Laravel rules — auto-managed by laravel-boost (do not edit)
+client/CLAUDE.md ← Next.js rules (loaded automatically when working in client/)
+```
 
 ---
 
 ## MCP Servers
 
-Configured in `server/.ai/mcp/mcp.json`. Two active servers:
+`server/.ai/mcp/mcp.json` — two active servers:
 
 | Server | Purpose |
 |--------|---------|
-| `laravel-boost` | Tinker, DB queries, browser logs, docs search, artisan, health checks |
+| `laravel-boost` | Tinker, DB queries, browser logs, artisan, docs search |
 | `shadcn` | shadcn/ui component docs + generation |
 
-> **laravel-boost runs on the HOST** (not inside Docker) — this is correct.
-> MCP servers are host processes; boost connects to DB/Redis via Docker-exposed ports (`localhost:3306`, `localhost:6379`).
-> The command points to `/Users/domin/admin/artisan` — a separate boost admin app, not this project.
+> laravel-boost runs on HOST, connects to Docker DB/Redis via `localhost:3306` / `localhost:6379`.
+> The command points to `/Users/domin/admin/artisan` — a separate boost admin app.

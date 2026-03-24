@@ -1,0 +1,45 @@
+---
+description: Global rules for the CMS monorepo (Laravel 12 + Next.js 16)
+alwaysApply: true
+---
+
+# CMS Monorepo — Global Rules
+
+**Project**: Headless CMS + e-commerce. `server/` = Laravel 12 backend + Inertia/React admin SPA. `client/` = Next.js 16 public storefront.
+
+Read `ai/guide.md` for the full feature map and key paths. Read `ai/context.md` for deep technical context (auth, cart, i18n, payments).
+
+## Docker — All Commands in Containers
+
+```bash
+docker compose exec php php artisan <cmd>
+docker compose exec php php artisan test --compact
+docker compose exec php vendor/bin/pint --dirty
+docker compose exec node npm run build
+make up / make down / make shell / make migrate / make test
+```
+
+**Never run `php artisan` or `pint` directly** — host has no DB/Redis.
+
+## Universal Rules
+
+- Write Pest tests for every feature; all must pass before committing
+- Update `ai/guide.md` when adding/changing any feature
+- Prices are **integer cents/grosze** — never floats
+- Soft-delete users via `AnonymizeUserData` action only — never hard-delete
+- `env()` only inside `config/` files — use `config('key')` everywhere else
+- New top-level directories require approval
+
+## File Naming
+
+| Type | Pattern |
+|------|---------|
+| Model | `app/Models/Name.php` |
+| API Controller | `app/Http/Controllers/Api/V1/NameController.php` |
+| Admin Controller | `app/Http/Controllers/Admin/NameController.php` |
+| Form Request | `app/Http/Requests/Admin/Store\|UpdateNameRequest.php` |
+| API Resource | `app/Http/Resources/Api/V1/NameResource.php` |
+| Service | `app/Services/NameService.php` |
+| Policy | `app/Policies/NamePolicy.php` |
+| Test (API) | `tests/Feature/Api/NameTest.php` |
+| Test (Admin) | `tests/Feature/Admin/NameControllerTest.php` |
