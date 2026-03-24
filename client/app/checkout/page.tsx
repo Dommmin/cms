@@ -262,18 +262,20 @@ export default function CheckoutPage() {
             {/* Guest email */}
             {!token && (
               <div className="rounded-xl border border-border p-5">
-                <h2 className="mb-3 text-sm font-semibold">
+                <label htmlFor="guest-email" className="mb-3 block text-sm font-semibold">
                   {t("checkout.guest_email_title", "Your Email Address")}
-                </h2>
-                <p className="mb-3 text-xs text-muted-foreground">
+                </label>
+                <p className="mb-3 text-xs text-muted-foreground" id="guest-email-hint">
                   {t("checkout.guest_email_hint", "We'll send your order confirmation here.")}
                 </p>
                 <input
+                  id="guest-email"
                   type="email"
                   value={guestEmail}
                   onChange={(e) => setGuestEmail(e.target.value)}
                   placeholder="you@example.com"
                   required
+                  aria-describedby="guest-email-hint"
                   className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 />
                 {submitAttempted && !guestEmail.trim() && (
@@ -447,10 +449,11 @@ export default function CheckoutPage() {
 
             {/* Notes */}
             <div>
-              <label className="mb-1 block text-sm font-medium">
+              <label htmlFor="order-notes" className="mb-1 block text-sm font-medium">
                 {t("checkout.optional_notes", "Order Notes (optional)")}
               </label>
               <textarea
+                id="order-notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}

@@ -100,22 +100,27 @@ export default function CartPage() {
                     <button
                       onClick={() => updateItem({ id: item.id, quantity: item.quantity - 1 })}
                       disabled={item.quantity <= 1}
+                      aria-label={t("cart.decrease_quantity", "Decrease quantity")}
                       className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-input hover:bg-accent disabled:opacity-40"
                     >
-                      <Minus className="h-3 w-3" />
+                      <Minus className="h-3 w-3" aria-hidden="true" />
                     </button>
-                    <span className="w-6 text-center text-sm">{item.quantity}</span>
+                    <span className="w-6 text-center text-sm" aria-live="polite" aria-atomic="true">
+                      {item.quantity}
+                    </span>
                     <button
                       onClick={() => updateItem({ id: item.id, quantity: item.quantity + 1 })}
+                      aria-label={t("cart.increase_quantity", "Increase quantity")}
                       className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-input hover:bg-accent"
                     >
-                      <Plus className="h-3 w-3" />
+                      <Plus className="h-3 w-3" aria-hidden="true" />
                     </button>
                     <button
                       onClick={() => removeItem(item.id)}
+                      aria-label={t("cart.remove_item", "Remove item")}
                       className="ml-2 text-muted-foreground hover:text-destructive"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4" aria-hidden="true" />
                     </button>
                   </div>
                 </div>

@@ -60,20 +60,24 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
               <p className="text-sm text-muted-foreground">{user.email}</p>
             </div>
             <nav className="space-y-1">
-              {NAV_LINKS.map(({ href, label, icon: Icon }) => (
-                <Link
-                  key={href}
-                  href={lp(href)}
-                  className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                    pathWithoutLocale.startsWith(href)
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  {label}
-                </Link>
-              ))}
+              {NAV_LINKS.map(({ href, label, icon: Icon }) => {
+                const isActive = pathWithoutLocale.startsWith(href);
+                return (
+                  <Link
+                    key={href}
+                    href={lp(href)}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                    {label}
+                  </Link>
+                );
+              })}
               <button
                 onClick={() => logout()}
                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"

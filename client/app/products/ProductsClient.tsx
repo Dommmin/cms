@@ -62,7 +62,11 @@ export default function ProductsClient() {
         </div>
         <div className="flex items-center gap-3">
           {/* Search */}
+          <label htmlFor="products-search" className="sr-only">
+            {t("shop.search_placeholder", "Search products…")}
+          </label>
           <input
+            id="products-search"
             type="search"
             placeholder={t("shop.search_placeholder", "Search products…")}
             defaultValue={filters.search ?? ""}
@@ -74,7 +78,11 @@ export default function ProductsClient() {
             className="rounded-md border border-input bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           />
           {/* Sort */}
+          <label htmlFor="products-sort" className="sr-only">
+            {t("shop.sort_label", "Sort products")}
+          </label>
           <select
+            id="products-sort"
             value={filters.sort ?? ""}
             onChange={(e) => setParam("sort", e.target.value)}
             className="rounded-md border border-input bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
@@ -87,9 +95,11 @@ export default function ProductsClient() {
           </select>
           <button
             onClick={() => setShowFilters(!showFilters)}
+            aria-expanded={showFilters}
+            aria-controls="products-filters-panel"
             className="inline-flex items-center gap-2 rounded-md border border-input bg-background px-3 py-1.5 text-sm hover:bg-accent"
           >
-            <SlidersHorizontal className="h-4 w-4" />
+            <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
             {t("shop.filters", "Filters")}
           </button>
         </div>
@@ -97,7 +107,7 @@ export default function ProductsClient() {
 
       {/* Filters panel */}
       {showFilters && (
-        <div className="mb-6 grid grid-cols-2 gap-4 rounded-xl border border-border bg-card p-4 sm:grid-cols-4">
+        <div id="products-filters-panel" className="mb-6 grid grid-cols-2 gap-4 rounded-xl border border-border bg-card p-4 sm:grid-cols-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">
               {t("shop.min_price", "Min Price")} (€)
@@ -155,11 +165,13 @@ export default function ProductsClient() {
 
           {/* Pagination */}
           {data?.meta && data.meta.last_page > 1 && (
-            <div className="mt-8 flex items-center justify-center gap-2">
+            <nav aria-label={t("shop.pagination", "Pagination")} className="mt-8 flex items-center justify-center gap-2">
               {Array.from({ length: data.meta.last_page }, (_, i) => i + 1).map((page) => (
                 <button
                   key={page}
                   onClick={() => setParam("page", String(page))}
+                  aria-label={t("shop.go_to_page", `Go to page ${page}`, { page })}
+                  aria-current={page === data.meta!.current_page ? "page" : undefined}
                   className={`h-9 w-9 rounded-md text-sm font-medium ${
                     page === data.meta!.current_page
                       ? "bg-primary text-primary-foreground"
@@ -169,7 +181,7 @@ export default function ProductsClient() {
                   {page}
                 </button>
               ))}
-            </div>
+            </nav>
           )}
         </>
       )}

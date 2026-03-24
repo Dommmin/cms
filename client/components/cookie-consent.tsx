@@ -89,6 +89,8 @@ interface Props {
   settings?: CookieSettings;
 }
 
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export function CookieConsent({ settings = {} }: Props) {
   const [visible, setVisible] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -97,6 +99,7 @@ export function CookieConsent({ settings = {} }: Props) {
     marketing: false,
     functional: true,
   });
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   const version = settings.consent_version ?? "1.0";
 
@@ -121,6 +124,29 @@ export function CookieConsent({ settings = {} }: Props) {
     window.addEventListener(COOKIE_CONSENT_OPEN_EVENT, handleOpen);
     return () => window.removeEventListener(COOKIE_CONSENT_OPEN_EVENT, handleOpen);
   }, []);
+
+  // Focus trap: auto-focus first element + keep Tab within dialog
+  useEffect(() => {
+    if (!visible || !dialogRef.current) return;
+    const el = dialogRef.current;
+    const focusables = () => Array.from(el.querySelectorAll<HTMLElement>(FOCUSABLE));
+    focusables()[0]?.focus();
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== "Tab") return;
+      const items = focusables();
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+    el.addEventListener("keydown", onKeyDown);
+    return () => el.removeEventListener("keydown", onKeyDown);
+  }, [visible, showDetails]);
 
   if (!visible) return null;
 
@@ -158,6 +184,7 @@ export function CookieConsent({ settings = {} }: Props) {
 
   return (
     <div
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-label={bannerTitle}
