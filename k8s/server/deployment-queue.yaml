@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cms-queue
+  namespace: cms-prod
+  labels:
+    app: cms-server
+    component: queue
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cms-server
+      component: queue
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: cms-server
+        component: queue
+    spec:
+      terminationGracePeriodSeconds: 120  # allow current job to finish
+      containers:
+        - name: queue
+          image: ghcr.io/OWNER/cms-server:latest  # replaced by CI
+          imagePullPolicy: Always
+          # --max-time restarts worker hourly to prevent memory leaks
+          command:
+            - php
+            - artisan
+            - queue:work
+            - --tries=3
+            - --sleep=3
+            - --max-time=3600
+            - --no-ansi
+          volumeMounts:
+            - name: env-file
+              mountPath: /var/www/html/.env
+              subPath: .env
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          livenessProbe:
+            exec:
+              command: ["pgrep", "-f", "queue:work"]
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+      volumes:
+        - name: env-file
+          secret:
+            secretName: cms-server-env
+      imagePullSecrets:
+        - name: ghcr-pull-secret

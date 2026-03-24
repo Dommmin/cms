@@ -5,6 +5,7 @@ const apiHostname = process.env.NEXT_PUBLIC_API_URL
   : "localhost";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   poweredByHeader: false,
   compress: true,
   images: {

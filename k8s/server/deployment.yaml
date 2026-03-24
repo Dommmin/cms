@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cms-server
+  namespace: cms-prod
+  labels:
+    app: cms-server
+    component: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cms-server
+      component: web
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0   # zero-downtime rolling deploy
+  template:
+    metadata:
+      labels:
+        app: cms-server
+        component: web
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: app
+          image: ghcr.io/OWNER/cms-server:latest  # replaced by CI
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              name: http
+          volumeMounts:
+            - name: env-file
+              mountPath: /var/www/html/.env
+              subPath: .env
+            - name: storage
+              mountPath: /var/www/html/storage/app
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+          # Liveness: nginx level — restart if process is dead
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          # Readiness: Laravel health endpoint — gate traffic until app is ready
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 5"]  # drain in-flight requests
+      volumes:
+        - name: env-file
+          secret:
+            secretName: cms-server-env
+        - name: storage
+          emptyDir: {}   # media on S3; only framework cache/views here
+      imagePullSecrets:
+        - name: ghcr-pull-secret

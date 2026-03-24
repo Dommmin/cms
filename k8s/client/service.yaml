@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cms-client
+  namespace: cms-prod
+  labels:
+    app: cms-client
+spec:
+  selector:
+    app: cms-client
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+  type: ClusterIP
