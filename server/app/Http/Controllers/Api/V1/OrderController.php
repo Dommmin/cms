@@ -41,7 +41,7 @@ class OrderController extends Controller
 
         $order = Order::query()
             ->where('reference_number', $reference)
-            ->when($customer, fn ($q) => $q->where('customer_id', $customer->id))
+            ->where('customer_id', $customer?->id)
             ->with(['items', 'billingAddress', 'shippingAddress', 'payment', 'shipment', 'statusHistory'])
             ->firstOrFail();
 

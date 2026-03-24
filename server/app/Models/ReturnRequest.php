@@ -47,7 +47,7 @@ class ReturnRequest extends Model
 
     public function items(): HasMany
     {
-        return $this->hasMany(ReturnItem::class);
+        return $this->hasMany(ReturnItem::class, 'return_id');
     }
 
     public function statusHistory(): HasMany

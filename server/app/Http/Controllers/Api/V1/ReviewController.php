@@ -79,7 +79,7 @@ class ReviewController extends Controller
         if ($alreadyVoted) {
             $review->helpfulVotes()->where('customer_id', $customer->id)->delete();
         } else {
-            $review->helpfulVotes()->create(['customer_id' => $customer->id]);
+            $review->helpfulVotes()->create(['customer_id' => $customer->id, 'is_helpful' => true]);
         }
 
         $review->recalculateHelpfulCount();
