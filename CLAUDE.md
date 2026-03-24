@@ -45,8 +45,12 @@ REST API: `/api/v1/*` · Admin: `/admin/*` (Inertia SPA)
 - `env()` only inside `config/` files
 - After any PHP change: `docker compose exec php vendor/bin/pint --dirty`
 
-**TypeScript (`client/`):**
-- Check `client/types/api.ts` **before** using any API response field
+**TypeScript (`client/` and `server/resources/js/`):**
+- `.tsx` files are clean — component logic + JSX only, **no type/interface definitions**
+- Types live in separate `.ts` files:
+  - Component-specific → `ComponentName.types.ts` (colocated)
+  - Directory-shared → `types.ts` in the same directory
+  - API response types → `client/types/api.ts` (check before writing any API call)
 - Server components → `serverFetch()` from `lib/server-fetch.ts`
 - Client components → `api` from `lib/axios.ts`
 - All internal links must use `useLocalePath()` / `lp()` (locale-prefixed URLs)

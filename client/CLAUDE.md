@@ -99,6 +99,34 @@ Always check `client/types/api.ts` first. Common gotchas:
 - Server components by default; add `"use client"` only when needed (interactivity, hooks)
 - Dark mode: `dark:` prefix (`.dark` class on `<html>`) — Tailwind v4
 
+## Types in Separate Files — Required
+
+`.tsx` files must be clean (component logic + JSX only). **Never define types or interfaces inside `.tsx` files.**
+
+```
+# Component-specific types — colocated
+ProductCard.tsx
+ProductCard.types.ts      ← Props, local interfaces
+
+# Directory-wide shared types
+components/cart/types.ts  ← shared within the directory
+
+# Global API response types
+types/api.ts              ← always check before writing API calls
+```
+
+```ts
+// ProductCard.types.ts
+export interface ProductCardProps {
+  product: Product;
+  showBadge?: boolean;
+}
+
+// ProductCard.tsx
+import type { ProductCardProps } from "./ProductCard.types";
+export function ProductCard({ product, showBadge }: ProductCardProps) { ... }
+```
+
 ## SEO / Metadata
 
 Every public page needs `generateMetadata()`:

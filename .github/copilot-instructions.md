@@ -44,9 +44,13 @@ make up / make down / make shell / make migrate / make fresh / make test
 
 ---
 
-## TypeScript Rules (client/)
+## TypeScript Rules (client/ and server/resources/js/)
 
-- Check `client/types/api.ts` **before** using any API response field
+- **`.tsx` files are clean** — no `interface` or `type` definitions inside `.tsx` files
+- Types live in separate `.ts` files:
+  - Component props → `ComponentName.types.ts` (colocated)
+  - Directory-shared → `types.ts` in that directory
+  - API response types → `client/types/api.ts` (check before writing any API call)
 - Server components → `serverFetch()` from `lib/server-fetch.ts`
 - Client components (`"use client"`) → `api` from `lib/axios.ts`
 - All links use `useLocalePath()` — URLs are locale-prefixed (`/en/`, `/pl/`)

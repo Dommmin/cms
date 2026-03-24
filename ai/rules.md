@@ -51,6 +51,8 @@ Rules that AI must follow automatically in this project.
 - Always use Wayfinder for backend route references
 - Check `client/types/api.ts` before using API response fields
 - Server components → `serverFetch()`, client components → `api` (axios)
+- `.tsx` files are clean — no type/interface definitions inside them
+- Types in separate `.ts` files: component-specific → `Name.types.ts` (colocated), shared → `types.ts`, API → `types/api.ts`
 
 ---
 

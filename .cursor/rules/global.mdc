@@ -30,6 +30,26 @@ make up / make down / make shell / make migrate / make test
 - `env()` only inside `config/` files — use `config('key')` everywhere else
 - New top-level directories require approval
 
+## TypeScript — Types in Separate Files
+
+`.tsx` files are clean (component logic + JSX only). **No type/interface definitions in `.tsx`.**
+
+| Scope | File |
+|-------|------|
+| Component props / local interfaces | `ComponentName.types.ts` (colocated) |
+| Shared within a directory | `types.ts` in that directory |
+| Global API response types | `client/types/api.ts` |
+
+```ts
+// Button.types.ts
+export interface ButtonProps { label: string; disabled?: boolean; }
+
+// Button.tsx
+import type { ButtonProps } from "./Button.types";
+```
+
+Applies to both `client/` (Next.js) and `server/resources/js/` (admin SPA).
+
 ## File Naming
 
 | Type | Pattern |

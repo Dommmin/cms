@@ -92,3 +92,25 @@ Run: `docker compose exec php php artisan test --compact`
 - Forms: `<Form>` Inertia component
 - Navigation: `<Link>` Inertia component
 - Run after admin route changes: `docker compose exec php php artisan wayfinder:generate --no-interaction`
+
+## TypeScript — Types in Separate Files
+
+`.tsx` files are clean — **no `interface` or `type` definitions inside `.tsx`**.
+
+```
+resources/js/pages/admin/products/
+  Index.tsx           ← page component only
+  Index.types.ts      ← PageProps, filters, local interfaces
+
+resources/js/components/ui/
+  DataTable.tsx
+  DataTable.types.ts  ← DataTableProps, ColumnDef overrides
+```
+
+```ts
+// ProductForm.types.ts
+export interface ProductFormProps { product?: Product; categories: Category[]; }
+
+// ProductForm.tsx
+import type { ProductFormProps } from "./ProductForm.types";
+```

@@ -74,8 +74,12 @@ client/          Next.js 16 public storefront
 - `casts()` method on models (not `$casts` property) — Laravel 12
 - After any PHP change: `docker compose exec php vendor/bin/pint --dirty`
 
-### TypeScript (client/)
-- Check `client/types/api.ts` **before** using any API response field
+### TypeScript (client/ and server/resources/js/)
+- **`.tsx` files are clean** — no `interface` or `type` definitions inside `.tsx` files
+- Types live in separate `.ts` files:
+  - Component-specific → `ComponentName.types.ts` (colocated)
+  - Directory-shared → `types.ts` in the same directory
+  - API response types → `client/types/api.ts` (check before writing any API call)
 - Server components → `serverFetch()` from `lib/server-fetch.ts`
 - Client components (`"use client"`) → `api` from `lib/axios.ts`
 - All links use `useLocalePath()` or `lp()` — URLs are locale-prefixed (`/en/`, `/pl/`)

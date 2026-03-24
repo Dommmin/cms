@@ -79,6 +79,26 @@ Add JSON-LD: `<JsonLd data={buildProduct(product)} />` from `components/json-ld.
 - Modal/dialog: focus trap (Tab/Shift+Tab inside), `role="dialog" aria-modal="true"`
 - Skip link in root layout: `<a href="#main-content">Skip to main content</a>`
 
+## Types in Separate Files
+
+`.tsx` files are clean — **no `interface` or `type` definitions inside `.tsx`**.
+
+```
+ProductCard.tsx           ← component only
+ProductCard.types.ts      ← Props + local types
+
+components/cart/types.ts  ← types shared within the directory
+types/api.ts              ← global API response types (check before writing)
+```
+
+```ts
+// ProductCard.types.ts
+export interface ProductCardProps { product: Product; showBadge?: boolean; }
+
+// ProductCard.tsx
+import type { ProductCardProps } from "./ProductCard.types";
+```
+
 ## Key Dependencies
 
 - TanStack Query for server state (client components)
