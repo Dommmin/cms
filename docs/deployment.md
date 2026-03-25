@@ -126,6 +126,71 @@ GOTENBERG_URL=http://gotenberg:3000
 
 ---
 
+## CI / CD Pipeline
+
+All workflows live in **`.github/workflows/`** at the repo root. Do **not** put workflows in `server/.github/` or `client/.github/` — GitHub Actions only reads the root `.github/workflows/` directory.
+
+### Workflow files
+
+| File | Trigger | Purpose |
+|------|---------|---------|
+| `ci.yml` | push / PR → master, main | Lint + tests only (fast feedback on PRs) |
+| `deploy.yml` | push → master, main | Full pipeline: lint → test → build → deploy |
+
+### Job order in `deploy.yml`
+
+```
+lint ──┐
+       ├──► build-server ──┐
+test ──┘                   ├──► deploy
+       ├──► build-client ──┘
+```
+
+Build jobs only start if **both** lint and test pass. Deploy only starts if **both** images build successfully.
+
+### GitHub Actions — pinned versions
+
+Always use the latest major version of each action. Current pinned versions:
+
+| Action | Version | Notes |
+|--------|---------|-------|
+| `actions/checkout` | `v6` | Latest as of 2026-03 |
+| `actions/setup-node` | `v4` | |
+| `shivammathur/setup-php` | `v2` | Stable major |
+| `docker/login-action` | `v3` | |
+| `docker/setup-buildx-action` | `v3` | |
+| `docker/build-push-action` | `v6` | |
+| `azure/setup-kubectl` | `v4` | |
+
+> When adding a new action, check [github.com/marketplace](https://github.com/marketplace?type=actions) for the latest major version tag and update this table.
+
+### Required GitHub secrets & variables
+
+| Name | Type | Used in |
+|------|------|---------|
+| `GITHUB_TOKEN` | auto | Push images to GHCR |
+| `KUBECONFIG_PROD` | secret | base64-encoded kubeconfig for production cluster |
+| `NEXT_PUBLIC_API_URL` | variable (vars) | Baked into Next.js client image at build time |
+| `NEXT_PUBLIC_APP_NAME` | variable (vars) | Baked into Next.js client image at build time |
+
+### Lint checks
+
+The `lint` job runs in check-only mode (never auto-commits):
+- **Pint** — `vendor/bin/pint --test` (fails if any file needs formatting)
+- **Rector** — `vendor/bin/rector process --dry-run` (fails if any refactoring is needed)
+- **ESLint** — `npx eslint . --max-warnings=0`
+- **Prettier** — `npm run format:check`
+
+Run locally before pushing:
+```bash
+docker compose exec php vendor/bin/pint --dirty
+docker compose exec php vendor/bin/rector process --dry-run
+docker compose exec node npm run lint
+docker compose exec node npm run format:check
+```
+
+---
+
 ## Production Checklist
 
 Before deploying to production:
