@@ -1,7 +1,7 @@
 "use client";
 
 import { X, ExternalLink, Settings } from "lucide-react";
-import { useAdminPreview, type AdminPreviewEntity } from "@/hooks/use-admin-preview";
+import { useAdminPreview } from "@/hooks/use-admin-preview";
 import type { AdminBarProps } from './admin-bar.types';
 
 const ENTITY_LABELS: Record<string, string> = {
@@ -16,11 +16,12 @@ function exitPreview() {
   window.location.reload();
 }
 
-export function AdminBar({ entity: entityOverride }: AdminBarProps = {}) {
-  const { isPreview, entity: cookieEntity } = useAdminPreview();
-  const entity = entityOverride ?? cookieEntity;
+export function AdminBar({ entity: serverEntity }: AdminBarProps = {}) {
+  const { entity: cookieEntity } = useAdminPreview();
+  // Prefer server-provided entity (SSR-consistent); fall back to client-side cookie read
+  const entity = serverEntity ?? cookieEntity;
 
-  if (!isPreview && !entityOverride) return null;
+  if (!entity) return null;
 
   const entityType = entity?.type;
   const entityLabel = entityType ? ENTITY_LABELS[entityType] ?? entityType : null;

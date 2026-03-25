@@ -6,6 +6,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { AdminBar } from "@/components/admin/admin-bar";
+import type { AdminBarProps } from "@/components/admin/admin-bar.types";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { ChatWidgetLoader } from "@/components/chat/chat-widget-loader";
 import { GoogleTagManager } from "@/components/layout/google-tag-manager";
@@ -73,7 +74,17 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const locale = cookieStore.get("locale")?.value ?? "en";
-  const isAdminPreview = !!cookieStore.get("admin_preview")?.value;
+  const adminPreviewRaw = cookieStore.get("admin_preview")?.value;
+  const isAdminPreview = !!adminPreviewRaw;
+  let adminPreviewEntity: AdminBarProps["entity"] = null;
+  if (adminPreviewRaw) {
+    try {
+      const parsed = JSON.parse(decodeURIComponent(adminPreviewRaw)) as { entity?: typeof adminPreviewEntity };
+      adminPreviewEntity = parsed.entity ?? null;
+    } catch {
+      // malformed cookie — ignore
+    }
+  }
 
   const publicSettings = await getPublicSettings();
   const gtmId = publicSettings?.settings.seo?.google_tag_manager ?? null;
@@ -132,7 +143,7 @@ export default async function RootLayout({
         </a>
         <QueryProvider>
           <TranslationProvider initialLocale={locale}>
-            <AdminBar />
+            <AdminBar entity={adminPreviewEntity} />
             <div className="flex min-h-screen flex-col">
               <AnnouncementBar />
               <Header />
