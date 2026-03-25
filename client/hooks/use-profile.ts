@@ -52,7 +52,7 @@ export function useDeleteAccount() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: deleteAccount,
+    mutationFn: (password: string) => deleteAccount(password),
     onSuccess: () => {
       removeToken();
       queryClient.clear();

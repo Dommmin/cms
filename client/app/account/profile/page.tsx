@@ -17,7 +17,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { useLocalePath } from "@/hooks/use-locale";
 import { api } from "@/lib/axios";
 import type { Address } from "@/types/api";
-import type { AddressForm } from './page.types';
+import type { AddressForm, DeleteAccountModalState } from './page.types';
 
 const EMPTY_ADDRESS: AddressForm = {
   type: "shipping",
@@ -56,6 +56,7 @@ export default function ProfilePage() {
   const [addressErrors, setAddressErrors] = useState<Record<string, string[]>>({});
   const [passwordErrors, setPasswordErrors] = useState<Record<string, string[]>>({});
   const [exportingData, setExportingData] = useState(false);
+  const [deleteModal, setDeleteModal] = useState<DeleteAccountModalState>({ open: false, password: "", error: null });
 
   async function handleExportData() {
     setExportingData(true);
@@ -391,15 +392,7 @@ export default function ProfilePage() {
             {exportingData ? t("account.downloading_data", "Downloading…") : t("account.download_data", "Download my data")}
           </button>
           <button
-            onClick={() => {
-              if (
-                confirm(
-                  t("account.delete_confirm", "Are you sure you want to delete your account? This cannot be undone."),
-                )
-              ) {
-                deleteAccount();
-              }
-            }}
+            onClick={() => setDeleteModal({ open: true, password: "", error: null })}
             disabled={deletingAccount}
             className="rounded-lg border border-destructive px-4 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 disabled:opacity-50"
           >
@@ -407,6 +400,72 @@ export default function ProfilePage() {
           </button>
         </div>
       </section>
+
+      {/* ── Delete account modal ─────────────────────────────────────── */}
+      {deleteModal.open && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-account-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        >
+          <div className="w-full max-w-md rounded-xl bg-background p-6 shadow-xl">
+            <h2 id="delete-account-title" className="mb-2 text-base font-semibold text-destructive">
+              {t("account.delete_account", "Delete account")}
+            </h2>
+            <p className="mb-4 text-sm text-muted-foreground">
+              {t("account.delete_confirm", "Are you sure you want to delete your account? This cannot be undone.")}
+            </p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setDeleteModal((s) => ({ ...s, error: null }));
+                deleteAccount(deleteModal.password, {
+                  onError: (err: any) => {
+                    const msg =
+                      err?.response?.data?.errors?.password?.[0] ??
+                      err?.response?.data?.message ??
+                      t("account.delete_error", "Failed to delete account.");
+                    setDeleteModal((s) => ({ ...s, error: msg }));
+                  },
+                });
+              }}
+            >
+              <label htmlFor="delete-password" className="mb-1 block text-sm font-medium">
+                {t("account.confirm_password", "Confirm your password")}
+              </label>
+              <input
+                id="delete-password"
+                type="password"
+                autoFocus
+                value={deleteModal.password}
+                onChange={(e) => setDeleteModal((s) => ({ ...s, password: e.target.value }))}
+                className="mb-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-destructive"
+                required
+              />
+              {deleteModal.error && (
+                <p className="mb-3 text-xs text-destructive">{deleteModal.error}</p>
+              )}
+              <div className="mt-4 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setDeleteModal({ open: false, password: "", error: null })}
+                  className="rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-accent"
+                >
+                  {t("common.cancel", "Cancel")}
+                </button>
+                <button
+                  type="submit"
+                  disabled={deletingAccount || !deleteModal.password}
+                  className="rounded-lg border border-destructive bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50"
+                >
+                  {deletingAccount ? t("account.deleting_account", "Deleting…") : t("account.delete_account", "Delete account")}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

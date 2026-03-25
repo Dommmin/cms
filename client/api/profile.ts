@@ -22,8 +22,8 @@ export async function updatePassword(payload: UpdatePasswordPayload): Promise<vo
   await api.put("/profile/password", payload);
 }
 
-export async function deleteAccount(): Promise<void> {
-  await api.delete("/profile");
+export async function deleteAccount(password: string): Promise<void> {
+  await api.delete("/profile", { data: { password } });
 }
 
 export async function exportData(): Promise<Blob> {
