@@ -39,11 +39,7 @@ class FormController extends Controller
         $rules = [];
         foreach ($form->fields as $field) {
             $fieldRules = [];
-            if ($field->is_required) {
-                $fieldRules[] = 'required';
-            } else {
-                $fieldRules[] = 'nullable';
-            }
+            $fieldRules[] = $field->is_required ? 'required' : 'nullable';
 
             match ($field->type) {
                 'email' => $fieldRules[] = 'email',
@@ -52,7 +48,7 @@ class FormController extends Controller
                 default => $fieldRules[] = 'string',
             };
 
-            $rules["fields.{$field->name}"] = $fieldRules;
+            $rules['fields.'.$field->name] = $fieldRules;
         }
 
         $validated = $request->validate($rules);

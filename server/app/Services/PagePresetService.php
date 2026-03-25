@@ -17,19 +17,17 @@ class PagePresetService
 {
     public function createFromPreset(string $presetKey): Page
     {
-        $preset = config("cms.page_presets.{$presetKey}");
-        if (! $preset) {
-            throw new RuntimeException('Nie znaleziono presetu.');
-        }
+        $preset = config('cms.page_presets.'.$presetKey);
+        throw_unless($preset, RuntimeException::class, 'Nie znaleziono presetu.');
 
         $pageData = Arr::get($preset, 'page', []);
-        $slugService = app(PageSlugService::class);
+        $slugService = resolve(PageSlugService::class);
         $pageType = $pageData['page_type'] ?? 'blocks';
         $moduleName = $pageData['module_name'] ?? null;
         $moduleConfig = null;
 
         if ($pageType === 'module' && $moduleName === 'content') {
-            $entry = ContentEntry::create([
+            $entry = ContentEntry::query()->create([
                 'name' => $pageData['title'] ?? ($preset['label'] ?? 'Nowa strona'),
                 'content' => $pageData['content'] ?? '',
                 'is_active' => true,
@@ -37,7 +35,7 @@ class PagePresetService
             $moduleConfig = ['content_id' => $entry->id];
         }
 
-        $page = Page::create([
+        $page = Page::query()->create([
             'title' => $pageData['title'] ?? ($preset['label'] ?? 'Nowa strona'),
             'slug' => $pageData['slug'] ?? $slugService->uniqueSlug($pageData['title'] ?? ($preset['label'] ?? 'Nowa strona')),
             'page_type' => $pageType,
@@ -51,7 +49,7 @@ class PagePresetService
         if (! empty($sectionsPresetKeys)) {
             $sections = [];
             foreach ($sectionsPresetKeys as $key) {
-                $sectionPreset = config("cms.section_presets.{$key}");
+                $sectionPreset = config('cms.section_presets.'.$key);
                 if (! $sectionPreset) {
                     continue;
                 }
@@ -80,7 +78,7 @@ class PagePresetService
             $childModuleConfig = null;
 
             if ($childPageType === 'module' && $childModuleName === 'content') {
-                $entry = ContentEntry::create([
+                $entry = ContentEntry::query()->create([
                     'name' => $child['title'],
                     'content' => $child['content'] ?? '',
                     'is_active' => true,
@@ -89,7 +87,7 @@ class PagePresetService
             } elseif (isset($child['content']) && $child['content'] !== '') {
                 $childPageType = 'module';
                 $childModuleName = 'content';
-                $entry = ContentEntry::create([
+                $entry = ContentEntry::query()->create([
                     'name' => $child['title'],
                     'content' => $child['content'],
                     'is_active' => true,
@@ -97,7 +95,7 @@ class PagePresetService
                 $childModuleConfig = ['content_id' => $entry->id];
             }
 
-            $childPages[] = Page::create([
+            $childPages[] = Page::query()->create([
                 'parent_id' => $page->id,
                 'title' => $child['title'],
                 'slug' => $child['slug'] ?? $slugService->uniqueSlug($child['title'], $page->id),
@@ -119,9 +117,9 @@ class PagePresetService
                     ['name' => $location->label(), 'is_active' => true]
                 );
 
-                if (! empty($menuConfig['include_children']) && ! empty($childPages)) {
+                if (! empty($menuConfig['include_children']) && $childPages !== []) {
                     foreach ($childPages as $index => $childPage) {
-                        MenuItem::create([
+                        MenuItem::query()->create([
                             'menu_id' => $menu->id,
                             'label' => $childPage->title,
                             'link_type' => MenuLinkTypeEnum::Page->value,

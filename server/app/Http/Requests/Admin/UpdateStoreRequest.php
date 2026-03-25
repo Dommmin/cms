@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateStoreRequest extends FormRequest
@@ -14,7 +15,7 @@ class UpdateStoreRequest extends FormRequest
     }
 
     /**
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -22,7 +23,7 @@ class UpdateStoreRequest extends FormRequest
 
         return [
             'name' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', "unique:stores,slug,{$storeId}"],
+            'slug' => ['nullable', 'string', 'max:255', 'unique:stores,slug,'.$storeId],
             'address' => ['required', 'string', 'max:500'],
             'city' => ['required', 'string', 'max:255'],
             'country' => ['required', 'string', 'max:10'],

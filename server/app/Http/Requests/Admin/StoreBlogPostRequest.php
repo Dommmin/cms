@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreBlogPostRequest extends FormRequest
@@ -14,7 +15,7 @@ class StoreBlogPostRequest extends FormRequest
     }
 
     /**
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -23,13 +24,13 @@ class StoreBlogPostRequest extends FormRequest
         return [
             'title' => ['required', 'array'],
             'title.*' => ['nullable', 'string', 'max:255'],
-            "title.{$defaultLocale}" => ['required', 'string', 'max:255'],
+            'title.'.$defaultLocale => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', 'unique:blog_posts,slug'],
             'excerpt' => ['nullable', 'array'],
             'excerpt.*' => ['nullable', 'string', 'max:500'],
             'content' => ['required', 'array'],
             'content.*' => ['nullable', 'string'],
-            "content.{$defaultLocale}" => ['required', 'string'],
+            'content.'.$defaultLocale => ['required', 'string'],
             'content_type' => ['required', 'in:richtext,markdown'],
             'status' => ['required', 'in:draft,scheduled,published,archived'],
             'published_at' => ['nullable', 'date', 'required_if:status,scheduled'],
@@ -51,8 +52,8 @@ class StoreBlogPostRequest extends FormRequest
         $defaultLocale = config('app.locale');
 
         return [
-            "title.{$defaultLocale}.required" => 'The title is required for the default language.',
-            "content.{$defaultLocale}.required" => 'The content is required for the default language.',
+            sprintf('title.%s.required', $defaultLocale) => 'The title is required for the default language.',
+            sprintf('content.%s.required', $defaultLocale) => 'The content is required for the default language.',
         ];
     }
 }

@@ -41,7 +41,7 @@ class AdminProductData extends Data
     {
         $defaultVariant = $product->defaultVariant;
 
-        $images = $product->images->map(fn ($img) => new ImageData(
+        $images = $product->images->map(fn ($img): ImageData => new ImageData(
             id: $img->id,
             media_id: $img->media_id,
             url: $img->media?->getUrl() ?? $img->media?->getTemporaryUrl() ?? '',
@@ -81,7 +81,7 @@ class AdminProductData extends Data
                 position: $defaultVariant->position,
             ) : null,
             images: $images,
-            categories: $product->categories->map(fn ($cat) => CategoryData::from($cat))->all(),
+            categories: $product->categories->map(fn ($cat): CategoryData => CategoryData::from($cat))->all(),
             flag_ids: $product->flags->pluck('id')->values()->all(),
         );
     }

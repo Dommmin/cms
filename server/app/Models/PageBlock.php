@@ -77,7 +77,7 @@ class PageBlock extends Model
     {
         $relations = $this->getRelationsByType($type, $key);
 
-        $config = config("blocks.relation_types.{$type}");
+        $config = config('blocks.relation_types.'.$type);
         if (! $config) {
             return collect();
         }
@@ -108,7 +108,7 @@ class PageBlock extends Model
             ->whereIn('relation_type', ['media.image', 'media.icon', 'media.file'])
             ->first();
 
-        return $relation ? Media::find($relation->relation_id) : null;
+        return $relation ? Media::query()->find($relation->relation_id) : null;
     }
 
     public function toFrontendArray(): array
@@ -124,7 +124,7 @@ class PageBlock extends Model
         $groupedRelations = $this->relations->groupBy('relation_type');
 
         foreach ($groupedRelations as $type => $relations) {
-            $config = config("blocks.relation_types.{$type}");
+            $config = config('blocks.relation_types.'.$type);
             if (! $config) {
                 continue;
             }
@@ -136,7 +136,7 @@ class PageBlock extends Model
             $byKey = $relations->groupBy('relation_key');
 
             foreach ($byKey as $key => $keyRelations) {
-                $resolvedModels = $keyRelations->map(function ($rel) use ($models) {
+                $resolvedModels = $keyRelations->map(function ($rel) use ($models): ?array {
                     $model = $models->firstWhere('id', $rel->relation_id);
 
                     return $model ? [

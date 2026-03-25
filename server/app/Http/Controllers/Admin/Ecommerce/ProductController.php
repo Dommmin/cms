@@ -47,7 +47,7 @@ class ProductController extends Controller
             'categories' => Category::all(),
             'types' => ProductType::all(),
             'brands' => Brand::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
-            'flags' => ProductFlag::active()->ordered()->get(),
+            'flags' => ProductFlag::query()->active()->ordered()->get(),
         ]);
     }
 
@@ -55,7 +55,7 @@ class ProductController extends Controller
     {
         $this->productService->createProduct($request->validated());
 
-        return redirect()->route('admin.ecommerce.products.index')
+        return to_route('admin.ecommerce.products.index')
             ->with('success', 'Product created successfully.');
     }
 
@@ -64,7 +64,7 @@ class ProductController extends Controller
         $product->load(['category', 'categories', 'images', 'defaultVariant.priceHistory', 'brand', 'flags']);
 
         $priceHistory = $product->defaultVariant?->priceHistory
-            ->map(fn ($ph) => [
+            ->map(fn ($ph): array => [
                 'id' => $ph->id,
                 'price' => $ph->price,
                 'recorded_at' => $ph->recorded_at->toIsoString(),
@@ -76,7 +76,7 @@ class ProductController extends Controller
             'categories' => Category::all(),
             'types' => ProductType::all(),
             'brands' => Brand::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
-            'flags' => ProductFlag::active()->ordered()->get(),
+            'flags' => ProductFlag::query()->active()->ordered()->get(),
             'price_history' => $priceHistory,
         ]);
     }
@@ -85,7 +85,7 @@ class ProductController extends Controller
     {
         $this->productService->updateProduct($product, $request->validated());
 
-        return redirect()->back()->with('success', 'Product updated successfully.');
+        return back()->with('success', 'Product updated successfully.');
     }
 
     public function export(Request $request): BinaryFileResponse
@@ -99,13 +99,13 @@ class ProductController extends Controller
     {
         Excel::import(new ProductsImport, $request->file('file'));
 
-        return redirect()->back()->with('success', 'Products imported successfully.');
+        return back()->with('success', 'Products imported successfully.');
     }
 
     public function destroy(Product $product): RedirectResponse
     {
         $this->productService->deleteProduct($product);
 
-        return redirect()->back()->with('success', 'Product deleted successfully.');
+        return back()->with('success', 'Product deleted successfully.');
     }
 }

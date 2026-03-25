@@ -13,7 +13,7 @@ class PromotionSeeder extends Seeder
     public function run(): void
     {
         // ── Sale na całą kolekcję letnią ──────────────────────────────────────
-        $summerSale = Promotion::query()->updateOrCreate(
+        Promotion::query()->updateOrCreate(
             ['slug' => 'letnia-wyprzedaz-2026'],
             [
                 'name' => 'Letnia Wyprzedaż 2026',

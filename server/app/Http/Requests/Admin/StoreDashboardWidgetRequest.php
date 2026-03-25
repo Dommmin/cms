@@ -55,7 +55,7 @@ class StoreDashboardWidgetRequest extends FormRequest
                 'format' => $this->stat_format ?? 'number',
                 'trend' => (bool) $this->stat_trend,
                 'comparison_period' => $this->stat_period ?? 'last_month',
-            ], fn ($v) => $v !== null && $v !== false),
+            ], fn ($v): bool => $v !== null && $v !== false),
 
             'chart' => $this->chart_type === 'donut'
                 ? ['chart_type' => 'donut']

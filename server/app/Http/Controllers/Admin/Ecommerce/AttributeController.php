@@ -36,15 +36,15 @@ class AttributeController extends Controller
     {
         $data = $request->validated();
 
-        $data['is_filterable'] = $data['is_filterable'] ?? false;
-        $data['is_variant_selection'] = $data['is_variant_selection'] ?? false;
-        $data['position'] = $data['position'] ?? 0;
+        $data['is_filterable'] ??= false;
+        $data['is_variant_selection'] ??= false;
+        $data['position'] ??= 0;
 
-        DB::transaction(function () use ($data) {
+        DB::transaction(function () use ($data): void {
             $values = $data['values'] ?? [];
             unset($data['values']);
 
-            $attribute = Attribute::create($data);
+            $attribute = Attribute::query()->create($data);
 
             foreach ($values as $index => $valueData) {
                 $attribute->values()->create([
@@ -56,7 +56,7 @@ class AttributeController extends Controller
             }
         });
 
-        return redirect()->route('admin.ecommerce.attributes.index')->with('success', 'Atrybut został utworzony');
+        return to_route('admin.ecommerce.attributes.index')->with('success', 'Atrybut został utworzony');
     }
 
     public function edit(Attribute $attribute): Response
@@ -74,13 +74,13 @@ class AttributeController extends Controller
 
         $attribute->update($data);
 
-        return redirect()->back()->with('success', 'Atrybut został zaktualizowany');
+        return back()->with('success', 'Atrybut został zaktualizowany');
     }
 
     public function destroy(Attribute $attribute): RedirectResponse
     {
         $attribute->delete();
 
-        return redirect()->back()->with('success', 'Atrybut został usunięty');
+        return back()->with('success', 'Atrybut został usunięty');
     }
 }

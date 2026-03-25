@@ -29,7 +29,7 @@ class DashboardWidgetController extends Controller
             'config' => $request->buildConfig(),
         ]);
 
-        return redirect()->back()->with('flash', ['success' => 'Widget created.']);
+        return back()->with('flash', ['success' => 'Widget created.']);
     }
 
     /** Toggle a widget's active state */
@@ -42,7 +42,7 @@ class DashboardWidgetController extends Controller
 
         $dashboardWidget->update($request->only(['is_active', 'order']));
 
-        return redirect()->back();
+        return back();
     }
 
     /** Delete a widget */
@@ -50,14 +50,14 @@ class DashboardWidgetController extends Controller
     {
         $dashboardWidget->delete();
 
-        return redirect()->back()->with('flash', ['success' => 'Widget deleted.']);
+        return back()->with('flash', ['success' => 'Widget deleted.']);
     }
 
     /** Restore all default widgets from seeder */
     public function reset(): RedirectResponse
     {
-        app(DashboardWidgetSeeder::class)->run();
+        resolve(DashboardWidgetSeeder::class)->run();
 
-        return redirect()->back();
+        return back();
     }
 }

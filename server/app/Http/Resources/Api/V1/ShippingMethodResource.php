@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Enums\ShippingCarrierEnum;
 use App\Models\ShippingMethod;
 use BackedEnum;
 use Illuminate\Http\Request;
@@ -29,7 +30,7 @@ class ShippingMethodResource extends JsonResource
         $locale = $request->query('locale', app()->getLocale());
 
         $missingConfig = [];
-        if ($method->carrier instanceof \App\Enums\ShippingCarrierEnum) {
+        if ($method->carrier instanceof ShippingCarrierEnum) {
             foreach ($method->carrier->checkoutEnvVars() as $envVar) {
                 if (empty(config(self::ENV_TO_CONFIG[$envVar] ?? ''))) {
                     $missingConfig[] = $envVar;
@@ -47,7 +48,7 @@ class ShippingMethodResource extends JsonResource
             'estimated_days_min' => $method->estimated_days_min,
             'estimated_days_max' => $method->estimated_days_max,
             'requires_pickup_point' => $method->requiresPickupPoint(),
-            'uses_native_widget' => $method->carrier instanceof \App\Enums\ShippingCarrierEnum && $method->carrier->usesNativeWidget(),
+            'uses_native_widget' => $method->carrier instanceof ShippingCarrierEnum && $method->carrier->usesNativeWidget(),
             'configured' => $missingConfig === [],
             'missing_config' => $missingConfig,
         ];

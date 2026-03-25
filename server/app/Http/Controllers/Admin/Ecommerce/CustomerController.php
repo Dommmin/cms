@@ -71,17 +71,17 @@ class CustomerController extends Controller
 
         $customer->update($data);
 
-        return redirect()->back()->with('success', 'Klient został zaktualizowany');
+        return back()->with('success', 'Klient został zaktualizowany');
     }
 
     public function destroy(Customer $customer): RedirectResponse
     {
         if ($customer->orders()->exists()) {
-            return redirect()->back()->with('error', 'Nie można usunąć klienta z historią zamówień');
+            return back()->with('error', 'Nie można usunąć klienta z historią zamówień');
         }
 
         $customer->delete();
 
-        return redirect()->back()->with('success', 'Klient został usunięty');
+        return back()->with('success', 'Klient został usunięty');
     }
 }

@@ -39,10 +39,10 @@ class CategoryController extends Controller
     public function store(StoreCategoryRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        $data['is_active'] = $data['is_active'] ?? true;
-        Category::create($data);
+        $data['is_active'] ??= true;
+        Category::query()->create($data);
 
-        return redirect()->route('admin.ecommerce.categories.index')->with('success', 'Category created');
+        return to_route('admin.ecommerce.categories.index')->with('success', 'Category created');
     }
 
     public function edit(Category $category): Response
@@ -68,24 +68,24 @@ class CategoryController extends Controller
     public function update(UpdateCategoryRequest $request, Category $category): RedirectResponse
     {
         $data = $request->validated();
-        $data['is_active'] = $data['is_active'] ?? true;
+        $data['is_active'] ??= true;
         $category->update($data);
 
-        return redirect()->route('admin.ecommerce.categories.index')->with('success', 'Category updated');
+        return to_route('admin.ecommerce.categories.index')->with('success', 'Category updated');
     }
 
     public function destroy(Category $category): RedirectResponse
     {
         if ($category->children()->count() > 0) {
-            return redirect()->back()->withErrors(['delete' => 'Cannot delete category with subcategories']);
+            return back()->withErrors(['delete' => 'Cannot delete category with subcategories']);
         }
 
         $category->delete();
 
-        return redirect()->back()->with('success', 'Category deleted');
+        return back()->with('success', 'Category deleted');
     }
 
-    private function buildCategoryTree($categories, $parentId = null, $depth = 0): array
+    private function buildCategoryTree($categories, $parentId = null, int|float $depth = 0): array
     {
         $result = [];
 
@@ -123,7 +123,7 @@ class CategoryController extends Controller
         }
 
         foreach ($children as $childId) {
-            $child = Category::find($childId);
+            $child = Category::query()->find($childId);
             if ($child && $this->isDescendant($child, $parentId)) {
                 return true;
             }

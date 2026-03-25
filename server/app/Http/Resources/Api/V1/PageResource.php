@@ -45,7 +45,7 @@ class PageResource extends JsonResource
             'meta_robots' => $page->meta_robots ?? 'index, follow',
             'og_image' => $page->og_image,
             'sitemap_exclude' => (bool) $page->sitemap_exclude,
-            'sections' => $page->relationLoaded('sections') ? $page->sections->map(fn ($section) => [
+            'sections' => $page->relationLoaded('sections') ? $page->sections->map(fn ($section): array => [
                 'id' => $section->id,
                 'section_type' => $section->section_type,
                 'layout' => $section->layout,
@@ -53,7 +53,7 @@ class PageResource extends JsonResource
                 'settings' => $section->settings,
                 'position' => $section->position,
                 'is_active' => (bool) $section->is_active,
-                'blocks' => $section->relationLoaded('blocks') ? $section->blocks->map(fn ($block) => [
+                'blocks' => $section->relationLoaded('blocks') ? $section->blocks->map(fn ($block): array => [
                     'id' => $block->id,
                     'type' => $block->type instanceof BackedEnum ? $block->type->value : $block->type,
                     'configuration' => $this->resolveBlockConfiguration($block, $resolvedForms),
@@ -81,7 +81,7 @@ class PageResource extends JsonResource
         if ($type === 'featured_posts' && ($config['source'] ?? null) === 'latest') {
             $posts = $autoPostsLookup[$block->id] ?? [];
 
-            return array_values(array_map(fn ($post, $pos) => [
+            return array_values(array_map(fn ($post, $pos): array => [
                 'id' => 0,
                 'relation_type' => 'blog_post',
                 'relation_id' => $post['id'],
@@ -96,7 +96,7 @@ class PageResource extends JsonResource
             return [];
         }
 
-        return $block->relations->map(fn ($rel) => [
+        return $block->relations->map(fn ($rel): array => [
             'id' => $rel->id,
             'relation_type' => $rel->relation_type,
             'relation_id' => $rel->relation_id,
@@ -122,7 +122,7 @@ class PageResource extends JsonResource
 
         $autoBlocks = $page->sections
             ->flatMap(fn ($s) => $s->relationLoaded('blocks') ? $s->blocks : collect())
-            ->filter(function ($b) {
+            ->filter(function ($b): bool {
                 $type = $b->type instanceof BackedEnum ? $b->type->value : $b->type;
 
                 return $type === 'featured_posts' && ($b->configuration['source'] ?? null) === 'latest';
@@ -133,7 +133,7 @@ class PageResource extends JsonResource
         }
 
         // Find the maximum max_items across all auto-source blocks
-        $maxNeeded = $autoBlocks->max(fn ($b) => (int) ($b->configuration['max_items'] ?? 3));
+        $maxNeeded = $autoBlocks->max(fn ($b): int => (int) ($b->configuration['max_items'] ?? 3));
 
         $posts = BlogPost::with(['author', 'category'])
             ->published()
@@ -141,7 +141,7 @@ class PageResource extends JsonResource
             ->limit($maxNeeded)
             ->get();
 
-        $serialized = $posts->map(fn ($post) => [
+        $serialized = $posts->map(fn ($post): array => [
             'id' => $post->id,
             'title' => $post->title,
             'slug' => $post->slug,
@@ -159,7 +159,7 @@ class PageResource extends JsonResource
 
         // Also populate the relation lookup so resolved data is consistent
         foreach ($posts as $post) {
-            $relationLookup['blog_post'][$post->id] = $serialized[array_search($post->id, array_column($serialized, 'id'))];
+            $relationLookup['blog_post'][$post->id] = $serialized[array_search($post->id, array_column($serialized, 'id'), true)];
         }
 
         $result = [];
@@ -206,13 +206,13 @@ class PageResource extends JsonResource
                     $prices = $variants->pluck('price');
                     $priceMin = $prices->min() ?? 0;
                     $priceMax = $prices->max() ?? 0;
-                    $isOnSale = $variants->some(fn ($v) => $v->compare_at_price && $v->compare_at_price > $v->price);
-                    $maxDiscount = $variants->map(fn ($v) => $v->compare_at_price && $v->price
+                    $isOnSale = $variants->some(fn ($v): bool => $v->compare_at_price && $v->compare_at_price > $v->price);
+                    $maxDiscount = $variants->map(fn ($v): ?int => $v->compare_at_price && $v->price
                         ? (int) round((1 - $v->price / $v->compare_at_price) * 100)
                         : null
                     )->filter()->max();
                     $cheapestOnSale = $variants
-                        ->filter(fn ($v) => $v->compare_at_price && $v->compare_at_price > $v->price)
+                        ->filter(fn ($v): bool => $v->compare_at_price && $v->compare_at_price > $v->price)
                         ->sortBy('price')
                         ->first();
 
@@ -228,7 +228,7 @@ class PageResource extends JsonResource
                         'discount_percentage' => $maxDiscount ?: null,
                         'compare_at_price_min' => $cheapestOnSale?->compare_at_price,
                         'omnibus_price_min' => null,
-                        'variants' => $variants->map(fn ($v) => [
+                        'variants' => $variants->map(fn ($v): array => [
                             'id' => $v->id,
                             'price' => $v->price,
                             'compare_at_price' => $v->compare_at_price,
@@ -270,7 +270,7 @@ class PageResource extends JsonResource
                     ];
                 }
             } elseif ($type === 'category') {
-                $categories = Category::whereIn('id', $ids)->get();
+                $categories = Category::query()->whereIn('id', $ids)->get();
 
                 foreach ($categories as $cat) {
                     $lookup[$type][$cat->id] = [
@@ -283,7 +283,7 @@ class PageResource extends JsonResource
                     ];
                 }
             } elseif ($type === 'brand') {
-                $brands = Brand::whereIn('id', $ids)->get();
+                $brands = Brand::query()->whereIn('id', $ids)->get();
 
                 foreach ($brands as $brand) {
                     $lookup[$type][$brand->id] = [
@@ -312,7 +312,7 @@ class PageResource extends JsonResource
 
         $formIds = $page->sections
             ->flatMap(fn ($s) => $s->relationLoaded('blocks') ? $s->blocks : collect())
-            ->filter(fn ($b) => ($b->type instanceof BackedEnum ? $b->type->value : $b->type) === 'form_embed')
+            ->filter(fn ($b): bool => ($b->type instanceof BackedEnum ? $b->type->value : $b->type) === 'form_embed')
             ->map(fn ($b) => ($b->configuration['form_id'] ?? null))
             ->filter()
             ->unique()
@@ -354,7 +354,7 @@ class PageResource extends JsonResource
             'fields' => $form->fields
                 ->sortBy('position')
                 ->values()
-                ->map(fn ($f) => [
+                ->map(fn ($f): array => [
                     'id' => $f->id,
                     'name' => $f->name,
                     'label' => $f->label,

@@ -30,7 +30,7 @@ class ExchangeRateController extends Controller
 
     public function create(): Response
     {
-        $currencies = (new ExchangeRateIndexQuery(request()))->getActiveCurrencies();
+        $currencies = new ExchangeRateIndexQuery(request())->getActiveCurrencies();
 
         return inertia('admin/exchange-rates/create', [
             'currencies' => $currencies,
@@ -41,17 +41,17 @@ class ExchangeRateController extends Controller
     {
         $data = $request->validated();
 
-        $data['fetched_at'] = $data['fetched_at'] ?? now();
+        $data['fetched_at'] ??= now();
 
-        ExchangeRate::create($data);
+        ExchangeRate::query()->create($data);
 
-        return redirect()->route('admin.exchange-rates.index')->with('success', 'Kurs wymiany został dodany');
+        return to_route('admin.exchange-rates.index')->with('success', 'Kurs wymiany został dodany');
     }
 
     public function edit(ExchangeRate $exchangeRate): Response
     {
         $exchangeRate->load('currency');
-        $currencies = (new ExchangeRateIndexQuery(request()))->getActiveCurrencies();
+        $currencies = new ExchangeRateIndexQuery(request())->getActiveCurrencies();
 
         return inertia('admin/exchange-rates/edit', [
             'rate' => $exchangeRate,
@@ -65,13 +65,13 @@ class ExchangeRateController extends Controller
 
         $exchangeRate->update($data);
 
-        return redirect()->back()->with('success', 'Kurs wymiany został zaktualizowany');
+        return back()->with('success', 'Kurs wymiany został zaktualizowany');
     }
 
     public function destroy(ExchangeRate $exchangeRate): RedirectResponse
     {
         $exchangeRate->delete();
 
-        return redirect()->back()->with('success', 'Kurs wymiany został usunięty');
+        return back()->with('success', 'Kurs wymiany został usunięty');
     }
 }

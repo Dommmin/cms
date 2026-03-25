@@ -12,12 +12,12 @@ class BlockRelationService
 {
     public function syncRelations(PageBlock $block, array $relations): void
     {
-        DB::transaction(function () use ($block, $relations) {
+        DB::transaction(function () use ($block, $relations): void {
             $block->relations()->delete();
 
             foreach ($relations as $key => $data) {
                 if (isset($data['type']) && isset($data['id'])) {
-                    BlockRelation::create([
+                    BlockRelation::query()->create([
                         'page_block_id' => $block->id,
                         'relation_type' => $data['type'],
                         'relation_id' => $data['id'],
@@ -31,11 +31,15 @@ class BlockRelationService
 
                 if (is_array($data)) {
                     foreach ($data as $index => $item) {
-                        if (! isset($item['type']) || ! isset($item['id'])) {
+                        if (! isset($item['type'])) {
                             continue;
                         }
 
-                        BlockRelation::create([
+                        if (! isset($item['id'])) {
+                            continue;
+                        }
+
+                        BlockRelation::query()->create([
                             'page_block_id' => $block->id,
                             'relation_type' => $item['type'],
                             'relation_id' => $item['id'],
@@ -61,7 +65,7 @@ class BlockRelationService
             ->where('relation_key', $key)
             ->max('position') ?? -1;
 
-        return BlockRelation::create([
+        return BlockRelation::query()->create([
             'page_block_id' => $block->id,
             'relation_type' => $type,
             'relation_id' => $id,
@@ -78,7 +82,7 @@ class BlockRelationService
 
     public function reorderRelations(PageBlock $block, string $type, ?string $key, array $orderedIds): void
     {
-        DB::transaction(function () use ($block, $type, $key, $orderedIds) {
+        DB::transaction(function () use ($block, $type, $key, $orderedIds): void {
             $relations = $block->relations()
                 ->where('relation_type', $type)
                 ->where('relation_key', $key)
@@ -95,7 +99,7 @@ class BlockRelationService
 
     public function validateRelations(string $blockTypeKey, array $relations): array
     {
-        $config = config("blocks.block_types.{$blockTypeKey}");
+        $config = config('blocks.block_types.'.$blockTypeKey);
         if (! $config || ! isset($config['allowed_relations'])) {
             return ['error' => 'Invalid block type or missing configuration'];
         }
@@ -105,7 +109,7 @@ class BlockRelationService
 
         foreach ($relations as $key => $data) {
             if (! isset($allowedRelations[$key])) {
-                $errors[] = "Relation key '{$key}' is not allowed for this block type";
+                $errors[] = sprintf("Relation key '%s' is not allowed for this block type", $key);
 
                 continue;
             }
@@ -116,7 +120,7 @@ class BlockRelationService
 
             foreach ($items as $item) {
                 if (! isset($item['type']) || ! in_array($item['type'], $allowedTypes, true)) {
-                    $errors[] = "Relation type '{$item['type']}' is not allowed for key '{$key}'";
+                    $errors[] = sprintf("Relation type '%s' is not allowed for key '%s'", $item['type'], $key);
                 }
             }
         }

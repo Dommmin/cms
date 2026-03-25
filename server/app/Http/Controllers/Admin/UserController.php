@@ -56,7 +56,7 @@ class UserController extends Controller
         $roles = $data['roles'] ?? [];
         unset($data['roles']);
 
-        $user = User::create($data);
+        $user = User::query()->create($data);
 
         if (! empty($roles)) {
             $user->assignRole($roles);
@@ -94,7 +94,7 @@ class UserController extends Controller
 
     public function bulkDestroy(Request $request): RedirectResponse
     {
-        User::whereIn('id', $request->ids)->each(fn (User $user) => (new AnonymizeUserData)->handle($user));
+        User::query()->whereIn('id', $request->ids)->each(fn (User $user) => (new AnonymizeUserData)->handle($user));
 
         return back()->with('success', 'Users deleted');
     }

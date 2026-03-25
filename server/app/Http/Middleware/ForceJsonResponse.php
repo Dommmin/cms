@@ -26,7 +26,7 @@ class ForceJsonResponse
 
         // Pass through binary/file responses (PDFs, downloads, etc.)
         $contentType = $response->headers->get('Content-Type', '');
-        if (str_starts_with($contentType, 'application/pdf') || $response->headers->has('Content-Disposition')) {
+        if (str_starts_with((string) $contentType, 'application/pdf') || $response->headers->has('Content-Disposition')) {
             return $response;
         }
 

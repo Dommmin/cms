@@ -10,14 +10,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('locales', function (Blueprint $table) {
+        Schema::table('locales', function (Blueprint $table): void {
             $table->string('currency_code', 3)->nullable()->after('flag_emoji');
         });
     }
 
     public function down(): void
     {
-        Schema::table('locales', function (Blueprint $table) {
+        Schema::table('locales', function (Blueprint $table): void {
             $table->dropColumn('currency_code');
         });
     }

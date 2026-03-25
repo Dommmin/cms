@@ -125,9 +125,9 @@ class ProductsImport implements OnEachRow, WithChunkReading, WithHeadingRow, Wit
 
         $isFirstVariant = $product->variants()->count() === 0;
 
-        $variantPrice = ! empty($data['variant_price'])
-            ? (int) round((float) $data['variant_price'] * 100)
-            : (int) round((float) ($data['price'] ?? 0) * 100);
+        $variantPrice = empty($data['variant_price'])
+            ? (int) round((float) ($data['price'] ?? 0) * 100)
+            : (int) round((float) $data['variant_price'] * 100);
 
         $variant = ProductVariant::query()->create([
             'product_id' => $product->id,
@@ -150,7 +150,11 @@ class ProductsImport implements OnEachRow, WithChunkReading, WithHeadingRow, Wit
     private function linkAttributeValues(ProductVariant $variant, array $row): void
     {
         foreach ($row as $column => $value) {
-            if (! str_starts_with($column, 'attribute_') || empty($value)) {
+            if (! str_starts_with($column, 'attribute_')) {
+                continue;
+            }
+
+            if (empty($value)) {
                 continue;
             }
 

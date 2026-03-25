@@ -11,7 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::dropIfExists('model_versions');
-        Schema::create('model_versions', function (Blueprint $table) {
+        Schema::create('model_versions', function (Blueprint $table): void {
             $table->id();
             $table->morphs('versionable');
             $table->unsignedInteger('version_number');

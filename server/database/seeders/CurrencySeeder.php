@@ -13,7 +13,7 @@ class CurrencySeeder extends Seeder
     public function run(): void
     {
         // PLN — base currency (all prices stored in PLN cents)
-        $pln = Currency::firstOrCreate(['code' => 'PLN'], [
+        Currency::query()->firstOrCreate(['code' => 'PLN'], [
             'name' => 'Polish Złoty',
             'symbol' => 'zł',
             'decimal_places' => 2,
@@ -22,7 +22,7 @@ class CurrencySeeder extends Seeder
         ]);
 
         // USD
-        $usd = Currency::firstOrCreate(['code' => 'USD'], [
+        $usd = Currency::query()->firstOrCreate(['code' => 'USD'], [
             'name' => 'US Dollar',
             'symbol' => '$',
             'decimal_places' => 2,
@@ -31,7 +31,7 @@ class CurrencySeeder extends Seeder
         ]);
 
         // EUR
-        $eur = Currency::firstOrCreate(['code' => 'EUR'], [
+        $eur = Currency::query()->firstOrCreate(['code' => 'EUR'], [
             'name' => 'Euro',
             'symbol' => '€',
             'decimal_places' => 2,
@@ -47,12 +47,12 @@ class CurrencySeeder extends Seeder
         ];
 
         foreach ($rates as $item) {
-            $existing = ExchangeRate::where('currency_id', $item['currency']->id)
+            $existing = ExchangeRate::query()->where('currency_id', $item['currency']->id)
                 ->latest('fetched_at')
                 ->first();
 
             if (! $existing) {
-                ExchangeRate::create([
+                ExchangeRate::query()->create([
                     'currency_id' => $item['currency']->id,
                     'rate' => $item['rate'],
                     'source' => 'manual',

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Enums\PaymentProviderEnum;
 use App\Services\PaymentGatewayManager;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -28,7 +29,7 @@ class ProcessPaymentWebhook implements ShouldQueue
 
     public function handle(PaymentGatewayManager $gatewayManager): void
     {
-        $providerEnum = \App\Enums\PaymentProviderEnum::from($this->provider);
+        $providerEnum = PaymentProviderEnum::from($this->provider);
         $gateway = $gatewayManager->driver($providerEnum);
         $gateway->handleWebhook($this->payload);
     }

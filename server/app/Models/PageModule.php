@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -24,6 +25,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class PageModule extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'key',
         'name',
@@ -100,7 +103,7 @@ class PageModule extends Model
 
         // Replace {slug}, {id}, etc. in pattern
         return str_replace(
-            ['{slug}', '{id}', "{{$this->route_key_name}}"],
+            ['{slug}', '{id}', sprintf('{%s}', $this->route_key_name)],
             $routeKey,
             $this->detail_route_pattern
         );

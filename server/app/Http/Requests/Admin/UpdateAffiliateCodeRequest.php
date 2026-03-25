@@ -22,7 +22,7 @@ class UpdateAffiliateCodeRequest extends FormRequest
 
         return [
             'user_id' => ['required', 'integer', 'exists:users,id'],
-            'code' => ['required', 'string', 'max:50', "unique:affiliate_codes,code,{$codeId}", 'regex:/^[A-Z0-9_-]+$/'],
+            'code' => ['required', 'string', 'max:50', 'unique:affiliate_codes,code,'.$codeId, 'regex:/^[A-Z0-9_-]+$/'],
             'discount_type' => ['required', 'string', 'in:percentage,fixed,none'],
             'discount_value' => ['required', 'integer', 'min:0', 'max:100000'],
             'commission_rate' => ['required', 'numeric', 'min:0', 'max:100'],

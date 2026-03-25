@@ -23,7 +23,7 @@ class UpdateUserRequest extends FormRequest
     {
         /** @var User $user */
         $user = $this->route('user');
-        $roleIds = Role::pluck('id')->toArray();
+        $roleIds = Role::query()->pluck('id')->toArray();
 
         return [
             'name' => ['required', 'string', 'max:255'],

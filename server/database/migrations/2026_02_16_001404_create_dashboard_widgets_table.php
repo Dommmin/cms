@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('dashboard_widgets', function (Blueprint $table) {
+        Schema::create('dashboard_widgets', function (Blueprint $table): void {
             $table->id();
             $table->string('title');
             $table->string('type'); // stat, chart, table, recent_activity, quick_actions

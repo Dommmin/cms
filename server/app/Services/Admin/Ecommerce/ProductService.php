@@ -13,7 +13,7 @@ class ProductService
     public function createProduct(array $data): Product
     {
         return DB::transaction(function () use ($data) {
-            $product = Product::create([
+            $product = Product::query()->create([
                 'name' => $data['name'],
                 'slug' => $data['slug'],
                 'description' => $data['description'] ?? null,
@@ -116,7 +116,7 @@ class ProductService
     {
         $defaultVariant = $product->getDefaultVariant();
 
-        if ($defaultVariant) {
+        if ($defaultVariant instanceof ProductVariant) {
             $defaultVariant->update([
                 'sku' => $variantData['sku'],
                 'name' => $variantData['name'] ?? $product->name,
@@ -143,7 +143,7 @@ class ProductService
         );
 
         foreach ($normalizedImages as $index => $imageData) {
-            $image = is_array($imageData) ? $imageData : json_decode($imageData, true);
+            $image = is_array($imageData) ? $imageData : json_decode((string) $imageData, true);
 
             if ($image) {
                 $product->images()->create([

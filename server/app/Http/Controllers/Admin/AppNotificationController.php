@@ -26,9 +26,9 @@ class AppNotificationController extends Controller
         return inertia('admin/notifications/index', [
             'notifications' => $notifications,
             'filters' => $request->only(['search', 'type', 'channel', 'status']),
-            'types' => array_map(fn ($t) => ['value' => $t->value, 'label' => $t->label()], NotificationTypeEnum::cases()),
-            'channels' => array_map(fn ($c) => ['value' => $c->value, 'label' => $c->label()], NotificationChannelEnum::cases()),
-            'statuses' => array_map(fn ($s) => ['value' => $s->value, 'label' => $s->label()], NotificationStatusEnum::cases()),
+            'types' => array_map(fn (NotificationTypeEnum $t): array => ['value' => $t->value, 'label' => $t->label()], NotificationTypeEnum::cases()),
+            'channels' => array_map(fn (NotificationChannelEnum $c): array => ['value' => $c->value, 'label' => $c->label()], NotificationChannelEnum::cases()),
+            'statuses' => array_map(fn (NotificationStatusEnum $s): array => ['value' => $s->value, 'label' => $s->label()], NotificationStatusEnum::cases()),
         ]);
     }
 
@@ -44,7 +44,7 @@ class AppNotificationController extends Controller
     public function resend(AppNotification $notification): RedirectResponse
     {
         if ($notification->status !== NotificationStatusEnum::Failed) {
-            return redirect()->back()->with('error', 'Można ponawiać tylko powiadomienia z błędem');
+            return back()->with('error', 'Można ponawiać tylko powiadomienia z błędem');
         }
 
         // Reset statusu
@@ -56,35 +56,35 @@ class AppNotificationController extends Controller
 
         // TODO: Dispatch job do wysłania
 
-        return redirect()->back()->with('success', 'Powiadomienie zostało dodane do kolejki');
+        return back()->with('success', 'Powiadomienie zostało dodane do kolejki');
     }
 
     public function destroy(AppNotification $notification): RedirectResponse
     {
         $notification->delete();
 
-        return redirect()->back()->with('success', 'Powiadomienie zostało usunięte');
+        return back()->with('success', 'Powiadomienie zostało usunięte');
     }
 
     public function bulkDelete(Request $request): RedirectResponse
     {
         $ids = $request->input('ids', []);
 
-        AppNotification::whereIn('id', $ids)->delete();
+        AppNotification::query()->whereIn('id', $ids)->delete();
 
-        return redirect()->back()->with('success', 'Zaznaczone powiadomienia zostały usunięte');
+        return back()->with('success', 'Zaznaczone powiadomienia zostały usunięte');
     }
 
     public function create(): Response
     {
-        $customers = Customer::select(['id', 'first_name', 'last_name', 'email'])
+        $customers = Customer::query()->select(['id', 'first_name', 'last_name', 'email'])
             ->orderBy('last_name')
             ->get();
 
         return inertia('admin/notifications/create', [
             'customers' => $customers,
-            'types' => array_map(fn ($t) => ['value' => $t->value, 'label' => $t->label()], NotificationTypeEnum::cases()),
-            'channels' => array_map(fn ($c) => ['value' => $c->value, 'label' => $c->label()], NotificationChannelEnum::cases()),
+            'types' => array_map(fn (NotificationTypeEnum $t): array => ['value' => $t->value, 'label' => $t->label()], NotificationTypeEnum::cases()),
+            'channels' => array_map(fn (NotificationChannelEnum $c): array => ['value' => $c->value, 'label' => $c->label()], NotificationChannelEnum::cases()),
         ]);
     }
 
@@ -93,8 +93,8 @@ class AppNotificationController extends Controller
         $data = $request->validated();
         $data['status'] = NotificationStatusEnum::Pending->value;
 
-        AppNotification::create($data);
+        AppNotification::query()->create($data);
 
-        return redirect()->route('admin.notifications.index')->with('success', 'Powiadomienie zostało utworzone');
+        return to_route('admin.notifications.index')->with('success', 'Powiadomienie zostało utworzone');
     }
 }

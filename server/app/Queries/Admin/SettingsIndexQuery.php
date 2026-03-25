@@ -16,11 +16,11 @@ class SettingsIndexQuery
     public function execute()
     {
         return Setting::query()
-            ->when($this->request->search, function ($query, $search) {
-                $query->where('key', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+            ->when($this->request->search, function ($query, $search): void {
+                $query->where('key', 'like', sprintf('%%%s%%', $search))
+                    ->orWhere('description', 'like', sprintf('%%%s%%', $search));
             })
-            ->when($this->request->group, function ($query, $group) {
+            ->when($this->request->group, function ($query, $group): void {
                 $query->where('group', $group);
             })
             ->orderBy('group')

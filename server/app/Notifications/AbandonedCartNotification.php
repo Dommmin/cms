@@ -28,15 +28,15 @@ class AbandonedCartNotification extends Notification implements ShouldQueue
     {
         $mail = (new MailMessage)
             ->subject('You left something behind!')
-            ->greeting("Hello {$notifiable->name}!")
+            ->greeting(sprintf('Hello %s!', $notifiable->name))
             ->line("It looks like you left some items in your cart. Don't forget to complete your purchase!");
 
         foreach ($this->cart->items as $item) {
-            $mail->line("- {$item->variant?->product?->name} x{$item->quantity}");
+            $mail->line(sprintf('- %s x%s', $item->variant?->product?->name, $item->quantity));
         }
 
         if ($this->discountCode) {
-            $mail->line("Use code **{$this->discountCode}** to get a discount on your order.");
+            $mail->line(sprintf('Use code **%s** to get a discount on your order.', $this->discountCode));
         }
 
         return $mail

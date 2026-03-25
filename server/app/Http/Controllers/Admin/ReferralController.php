@@ -21,7 +21,7 @@ class ReferralController extends Controller
                 'order:id,reference_number,total,status',
                 'referredUser:id,name,email',
             ])
-            ->when($request->input('search'), fn ($q, $s) => $q->whereHas('affiliateCode', fn ($cq) => $cq->where('code', 'like', "%{$s}%")))
+            ->when($request->input('search'), fn ($q, string $s) => $q->whereHas('affiliateCode', fn ($cq) => $cq->where('code', 'like', sprintf('%%%s%%', $s))))
             ->when($request->input('status'), fn ($q, $s) => $q->where('status', $s))
             ->latest()
             ->paginate(20)
@@ -44,34 +44,34 @@ class ReferralController extends Controller
     public function approve(Referral $referral): RedirectResponse
     {
         if ($referral->status !== 'pending') {
-            return redirect()->back()->with('error', 'Only pending referrals can be approved.');
+            return back()->with('error', 'Only pending referrals can be approved.');
         }
 
         $referral->update(['status' => 'approved']);
 
-        return redirect()->back()->with('success', 'Referral approved.');
+        return back()->with('success', 'Referral approved.');
     }
 
     public function markPaid(Referral $referral): RedirectResponse
     {
         if ($referral->status !== 'approved') {
-            return redirect()->back()->with('error', 'Only approved referrals can be marked as paid.');
+            return back()->with('error', 'Only approved referrals can be marked as paid.');
         }
 
         $referral->update(['status' => 'paid', 'paid_at' => now()]);
 
-        return redirect()->back()->with('success', 'Referral marked as paid.');
+        return back()->with('success', 'Referral marked as paid.');
     }
 
     public function cancel(Referral $referral): RedirectResponse
     {
-        if (in_array($referral->status, ['paid'])) {
-            return redirect()->back()->with('error', 'Paid referrals cannot be cancelled.');
+        if ($referral->status === 'paid') {
+            return back()->with('error', 'Paid referrals cannot be cancelled.');
         }
 
         $referral->update(['status' => 'cancelled']);
 
-        return redirect()->back()->with('success', 'Referral cancelled.');
+        return back()->with('success', 'Referral cancelled.');
     }
 
     public function bulkMarkPaid(Request $request): RedirectResponse
@@ -83,6 +83,6 @@ class ReferralController extends Controller
             ->where('status', 'approved')
             ->update(['status' => 'paid', 'paid_at' => now()]);
 
-        return redirect()->back()->with('success', 'Selected referrals marked as paid.');
+        return back()->with('success', 'Selected referrals marked as paid.');
     }
 }

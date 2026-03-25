@@ -47,18 +47,18 @@ function wlVariant(): ProductVariant
 // Authentication gate
 // ---------------------------------------------------------------------------
 
-describe('Wishlist – authentication', function () {
-    it('guest cannot view wishlist — requires auth', function () {
+describe('Wishlist – authentication', function (): void {
+    it('guest cannot view wishlist — requires auth', function (): void {
         $this->getJson('/api/v1/wishlist')->assertUnauthorized();
     });
 
-    it('guest cannot add item to wishlist — requires auth', function () {
+    it('guest cannot add item to wishlist — requires auth', function (): void {
         $variant = wlVariant();
         $this->postJson('/api/v1/wishlist/items', ['variant_id' => $variant->id])
             ->assertUnauthorized();
     });
 
-    it('guest cannot remove item from wishlist — requires auth', function () {
+    it('guest cannot remove item from wishlist — requires auth', function (): void {
         $this->deleteJson('/api/v1/wishlist/items/1')->assertUnauthorized();
     });
 });
@@ -67,8 +67,8 @@ describe('Wishlist – authentication', function () {
 // CRUD
 // ---------------------------------------------------------------------------
 
-describe('Wishlist – CRUD', function () {
-    it('creates an empty wishlist for a new user on first access', function () {
+describe('Wishlist – CRUD', function (): void {
+    it('creates an empty wishlist for a new user on first access', function (): void {
         $user = User::factory()->create();
 
         $this->actingAs($user, 'sanctum')
@@ -78,7 +78,7 @@ describe('Wishlist – CRUD', function () {
             ->assertJsonPath('data.items', []);
     });
 
-    it('adds a product variant to the wishlist', function () {
+    it('adds a product variant to the wishlist', function (): void {
         $user = User::factory()->create();
         $variant = wlVariant();
 
@@ -88,7 +88,7 @@ describe('Wishlist – CRUD', function () {
             ->assertJsonCount(1, 'data.items');
     });
 
-    it('adding the same variant twice is idempotent — no duplicate items', function () {
+    it('adding the same variant twice is idempotent — no duplicate items', function (): void {
         $user = User::factory()->create();
         $variant = wlVariant();
 
@@ -102,7 +102,7 @@ describe('Wishlist – CRUD', function () {
             ->assertJsonCount(1, 'data.items');
     });
 
-    it('removes a variant from the wishlist', function () {
+    it('removes a variant from the wishlist', function (): void {
         $user = User::factory()->create();
         $variant = wlVariant();
 
@@ -110,22 +110,22 @@ describe('Wishlist – CRUD', function () {
             ->postJson('/api/v1/wishlist/items', ['variant_id' => $variant->id]);
 
         $this->actingAs($user->fresh(), 'sanctum')
-            ->deleteJson("/api/v1/wishlist/items/{$variant->id}")
+            ->deleteJson('/api/v1/wishlist/items/'.$variant->id)
             ->assertOk()
             ->assertJsonPath('data.items', []);
     });
 
-    it('removing a variant that is not in the wishlist is a no-op', function () {
+    it('removing a variant that is not in the wishlist is a no-op', function (): void {
         $user = User::factory()->create();
         $variant = wlVariant();
 
         // Delete without adding first — should not throw
         $this->actingAs($user, 'sanctum')
-            ->deleteJson("/api/v1/wishlist/items/{$variant->id}")
+            ->deleteJson('/api/v1/wishlist/items/'.$variant->id)
             ->assertOk();
     });
 
-    it('rejects invalid variant_id', function () {
+    it('rejects invalid variant_id', function (): void {
         $user = User::factory()->create();
 
         $this->actingAs($user, 'sanctum')
@@ -138,8 +138,8 @@ describe('Wishlist – CRUD', function () {
 // Isolation — users cannot see each other's wishlists
 // ---------------------------------------------------------------------------
 
-describe('Wishlist – isolation', function () {
-    it('each user has their own wishlist', function () {
+describe('Wishlist – isolation', function (): void {
+    it('each user has their own wishlist', function (): void {
         $userA = User::factory()->create();
         $userB = User::factory()->create();
         $variant = wlVariant();

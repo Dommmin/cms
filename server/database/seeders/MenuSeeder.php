@@ -31,10 +31,7 @@ class MenuSeeder extends Seeder
 
     private function seedHeaderMenu(): void
     {
-        $menu = Menu::updateOrCreate(
-            ['location' => MenuLocationEnum::Header->value],
-            ['name' => 'Header Navigation', 'is_active' => true]
-        );
+        $menu = Menu::query()->updateOrCreate(['location' => MenuLocationEnum::Header->value], ['name' => 'Header Navigation', 'is_active' => true]);
 
         $menu->allItems()->delete();
 
@@ -74,7 +71,7 @@ class MenuSeeder extends Seeder
         ];
 
         foreach ($items as $item) {
-            MenuItem::create([
+            MenuItem::query()->create([
                 'menu_id' => $menu->id,
                 'parent_id' => null,
                 'label' => $item['label'],
@@ -90,10 +87,7 @@ class MenuSeeder extends Seeder
 
     private function seedFooterMenu(): void
     {
-        $menu = Menu::updateOrCreate(
-            ['location' => MenuLocationEnum::Footer->value],
-            ['name' => 'Footer Links', 'is_active' => true]
-        );
+        $menu = Menu::query()->updateOrCreate(['location' => MenuLocationEnum::Footer->value], ['name' => 'Footer Links', 'is_active' => true]);
 
         $menu->allItems()->delete();
 
@@ -125,7 +119,7 @@ class MenuSeeder extends Seeder
         ];
 
         foreach ($items as $item) {
-            MenuItem::create([
+            MenuItem::query()->create([
                 'menu_id' => $menu->id,
                 'parent_id' => null,
                 'label' => $item['label'],
@@ -141,10 +135,7 @@ class MenuSeeder extends Seeder
 
     private function seedFooterLegalMenu(): void
     {
-        $menu = Menu::updateOrCreate(
-            ['location' => MenuLocationEnum::FooterLegal->value],
-            ['name' => 'Footer Legal', 'is_active' => true]
-        );
+        $menu = Menu::query()->updateOrCreate(['location' => MenuLocationEnum::FooterLegal->value], ['name' => 'Footer Legal', 'is_active' => true]);
 
         $menu->allItems()->delete();
 
@@ -189,7 +180,7 @@ class MenuSeeder extends Seeder
         ];
 
         foreach ($items as $item) {
-            MenuItem::create([
+            MenuItem::query()->create([
                 'menu_id' => $menu->id,
                 'parent_id' => null,
                 'label' => $item['label'],

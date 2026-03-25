@@ -25,12 +25,12 @@ class ProductResource extends JsonResource
             }
 
             $isOnSale = $product->relationLoaded('activeVariants')
-                ? $product->activeVariants->some(fn ($v) => $v->compare_at_price && $v->compare_at_price > $v->price)
+                ? $product->activeVariants->some(fn ($v): bool => $v->compare_at_price && $v->compare_at_price > $v->price)
                 : false;
             $product->setAttribute('is_on_sale', $isOnSale);
 
             $maxDiscount = $product->relationLoaded('activeVariants')
-                ? $product->activeVariants->map(fn ($v) => $v->compare_at_price && $v->price
+                ? $product->activeVariants->map(fn ($v): ?int => $v->compare_at_price && $v->price
                     ? (int) round((1 - $v->price / $v->compare_at_price) * 100)
                     : null
                 )->filter()->max()
@@ -41,14 +41,14 @@ class ProductResource extends JsonResource
 
             if ($product->relationLoaded('activeVariants')) {
                 $variants = $product->activeVariants;
-                $data['variants'] = $variants->map(fn ($v) => [
+                $data['variants'] = $variants->map(fn ($v): array => [
                     'id' => $v->id,
                     'price' => $v->price,
                     'compare_at_price' => $v->compare_at_price,
                 ])->values()->all();
 
                 $cheapestOnSale = $variants
-                    ->filter(fn ($v) => $v->compare_at_price && $v->compare_at_price > $v->price)
+                    ->filter(fn ($v): bool => $v->compare_at_price && $v->compare_at_price > $v->price)
                     ->sortBy('price')
                     ->first();
                 $data['compare_at_price_min'] = $cheapestOnSale?->compare_at_price;

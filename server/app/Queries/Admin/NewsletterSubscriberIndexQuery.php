@@ -16,14 +16,14 @@ class NewsletterSubscriberIndexQuery
     public function execute()
     {
         return NewsletterSubscriber::query()
-            ->when($this->request->search, function ($query, $search) {
-                $query->where('email', 'like', "%{$search}%");
+            ->when($this->request->search, function ($query, string $search): void {
+                $query->where('email', 'like', sprintf('%%%s%%', $search));
             })
-            ->when($this->request->status, function ($query, $status) {
+            ->when($this->request->status, function ($query, $status): void {
                 $query->where('status', $status);
             })
-            ->when($this->request->segment, function ($query, $segment) {
-                $query->whereHas('segments', function ($q) use ($segment) {
+            ->when($this->request->segment, function ($query, $segment): void {
+                $query->whereHas('segments', function ($q) use ($segment): void {
                     $q->where('newsletter_segments.id', $segment);
                 });
             })

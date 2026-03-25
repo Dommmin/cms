@@ -44,19 +44,19 @@ class FaqController extends Controller
     {
         $data = $request->validated();
 
-        $data['is_active'] = $data['is_active'] ?? true;
-        $data['position'] = $data['position'] ?? 0;
+        $data['is_active'] ??= true;
+        $data['position'] ??= 0;
         $data['views_count'] = 0;
         $data['helpful_count'] = 0;
 
-        Faq::create($data);
+        Faq::query()->create($data);
 
-        return redirect()->route('admin.faqs.index')->with('success', 'FAQ zostało utworzone');
+        return to_route('admin.faqs.index')->with('success', 'FAQ zostało utworzone');
     }
 
     public function edit(Faq $faq): Response
     {
-        $categories = Faq::whereNotNull('category')
+        $categories = Faq::query()->whereNotNull('category')
             ->distinct()
             ->pluck('category')
             ->filter()
@@ -75,14 +75,14 @@ class FaqController extends Controller
 
         $faq->update($data);
 
-        return redirect()->back()->with('success', 'FAQ zostało zaktualizowane');
+        return back()->with('success', 'FAQ zostało zaktualizowane');
     }
 
     public function destroy(Faq $faq): RedirectResponse
     {
         $faq->delete();
 
-        return redirect()->back()->with('success', 'FAQ zostało usunięte');
+        return back()->with('success', 'FAQ zostało usunięte');
     }
 
     public function toggleActive(Faq $faq): RedirectResponse
@@ -91,19 +91,19 @@ class FaqController extends Controller
 
         $message = $faq->is_active ? 'FAQ zostało aktywowane' : 'FAQ zostało dezaktywowane';
 
-        return redirect()->back()->with('success', $message);
+        return back()->with('success', $message);
     }
 
     public function reorder(ReorderFaqRequest $request): RedirectResponse
     {
         $data = $request->validated();
 
-        DB::transaction(function () use ($data) {
+        DB::transaction(function () use ($data): void {
             foreach ($data['items'] as $item) {
-                Faq::where('id', $item['id'])->update(['position' => $item['position']]);
+                Faq::query()->where('id', $item['id'])->update(['position' => $item['position']]);
             }
         });
 
-        return redirect()->back()->with('success', 'Kolejność została zaktualizowana');
+        return back()->with('success', 'Kolejność została zaktualizowana');
     }
 }

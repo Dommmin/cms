@@ -17,7 +17,7 @@ class FormController extends Controller
 {
     public function index(Request $request): Response
     {
-        $forms = (new FormIndexQuery($request))->execute();
+        $forms = new FormIndexQuery($request)->execute();
 
         return inertia('admin/forms/index', [
             'forms' => $forms,
@@ -34,7 +34,7 @@ class FormController extends Controller
     {
         $data = $request->validated();
 
-        Form::create($data);
+        Form::query()->create($data);
 
         return redirect('/admin/forms')->with('success', 'Form created');
     }

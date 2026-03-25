@@ -40,13 +40,13 @@ class BlogCategoryController extends Controller
     {
         $data = $request->validated();
 
-        $data['slug'] = $data['slug'] ?? Str::slug($data['name']);
-        $data['is_active'] = $data['is_active'] ?? true;
-        $data['position'] = $data['position'] ?? 0;
+        $data['slug'] ??= Str::slug($data['name']);
+        $data['is_active'] ??= true;
+        $data['position'] ??= 0;
 
-        BlogCategory::create($data);
+        BlogCategory::query()->create($data);
 
-        return redirect()->route('admin.blog.categories.index')->with('success', 'Blog category created successfully');
+        return to_route('admin.blog.categories.index')->with('success', 'Blog category created successfully');
     }
 
     public function edit(BlogCategory $category): Response
@@ -63,17 +63,17 @@ class BlogCategoryController extends Controller
     {
         $data = $request->validated();
 
-        $data['slug'] = $data['slug'] ?? Str::slug($data['name']);
+        $data['slug'] ??= Str::slug($data['name']);
 
         $category->update($data);
 
-        return redirect()->back()->with('success', 'Blog category updated successfully');
+        return back()->with('success', 'Blog category updated successfully');
     }
 
     public function destroy(BlogCategory $category): RedirectResponse
     {
         $category->delete();
 
-        return redirect()->back()->with('success', 'Blog category deleted successfully');
+        return back()->with('success', 'Blog category deleted successfully');
     }
 }

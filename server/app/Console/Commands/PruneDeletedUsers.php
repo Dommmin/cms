@@ -31,7 +31,7 @@ class PruneDeletedUsers extends Command
             ->where('deleted_at', '<', now()->subDays($days))
             ->each(fn (User $user) => $user->forceDelete());
 
-        $this->info("Pruned {$count} deleted user(s) older than {$days} days.");
+        $this->info(sprintf('Pruned %d deleted user(s) older than %d days.', $count, $days));
 
         return self::SUCCESS;
     }

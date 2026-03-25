@@ -24,7 +24,7 @@ class CategoryController extends Controller
             ->orderBy('position')
             ->get()
             // Exclude categories with no products (directly or through one level of children)
-            ->filter(fn (Category $cat) => $cat->products_count > 0
+            ->filter(fn (Category $cat): bool => $cat->products_count > 0
                 || $cat->children->sum('products_count') > 0)
             ->values();
 

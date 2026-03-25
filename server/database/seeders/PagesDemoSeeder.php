@@ -52,12 +52,12 @@ class PagesDemoSeeder extends Seeder
             ['question' => 'How do I track my order?', 'answer' => '<p>Once your order ships you will receive an email with a tracking number. You can also check the status in <strong>My Account → Orders</strong>.</p>', 'category' => 'orders', 'position' => 3],
             ['question' => 'Do you offer gift wrapping?', 'answer' => '<p>Yes! During checkout you can add a gift-wrap option for a small fee and include a personalised message card.</p>', 'category' => 'orders', 'position' => 4],
             ['question' => 'How long does delivery take?', 'answer' => '<p>Standard shipping takes 3–5 business days. Express shipping (1–2 business days) is available at checkout for an additional fee.</p>', 'category' => 'shipping', 'position' => 1],
-            ['question' => 'Do you ship internationally?', 'answer' => '<p>We currently ship to the EU, UK, USA, and Canada. International orders may be subject to customs duties which are the buyer\'s responsibility.</p>', 'category' => 'shipping', 'position' => 2],
+            ['question' => 'Do you ship internationally?', 'answer' => "<p>We currently ship to the EU, UK, USA, and Canada. International orders may be subject to customs duties which are the buyer's responsibility.</p>", 'category' => 'shipping', 'position' => 2],
             ['question' => 'Is free shipping available?', 'answer' => '<p>Free standard shipping is available on all orders over €75 within the EU.</p>', 'category' => 'shipping', 'position' => 3],
             ['question' => 'What is your return policy?', 'answer' => '<p>We offer a 30-day return window from the date of delivery. Items must be unused, in original packaging, and accompanied by a receipt.</p>', 'category' => 'returns', 'position' => 1],
-            ['question' => 'How do I start a return?', 'answer' => '<p>Log in to your account, navigate to <strong>My Orders</strong>, select the item, and click <em>Request Return</em>. We\'ll email you a prepaid label within 24 hours.</p>', 'category' => 'returns', 'position' => 2],
+            ['question' => 'How do I start a return?', 'answer' => "<p>Log in to your account, navigate to <strong>My Orders</strong>, select the item, and click <em>Request Return</em>. We'll email you a prepaid label within 24 hours.</p>", 'category' => 'returns', 'position' => 2],
             ['question' => 'When will I receive my refund?', 'answer' => '<p>Refunds are processed within 3–5 business days of us receiving the returned item. The credit may take a further 5–10 days to appear on your statement depending on your bank.</p>', 'category' => 'returns', 'position' => 3],
-            ['question' => 'Can I exchange an item?', 'answer' => '<p>Yes. When submitting a return request, select <em>Exchange</em> and choose the replacement size or colour. We\'ll ship the new item as soon as we receive your return.</p>', 'category' => 'returns', 'position' => 4],
+            ['question' => 'Can I exchange an item?', 'answer' => "<p>Yes. When submitting a return request, select <em>Exchange</em> and choose the replacement size or colour. We'll ship the new item as soon as we receive your return.</p>", 'category' => 'returns', 'position' => 4],
             ['question' => 'What payment methods do you accept?', 'answer' => '<p>We accept Visa, Mastercard, American Express, PayPal, Apple Pay, and Google Pay. All transactions are secured with 256-bit SSL encryption.</p>', 'category' => 'payments', 'position' => 1],
             ['question' => 'Is my payment information secure?', 'answer' => '<p>Absolutely. We never store card details. Payments are processed by a PCI-DSS Level 1 certified payment processor.</p>', 'category' => 'payments', 'position' => 2],
             ['question' => 'Can I pay in instalments?', 'answer' => '<p>Yes, we offer 0% instalment plans through Klarna for eligible orders over €100. Select Klarna at checkout to see your options.</p>', 'category' => 'payments', 'position' => 3],
@@ -65,15 +65,12 @@ class PagesDemoSeeder extends Seeder
             ['question' => 'Are your products ethically made?', 'answer' => '<p>We partner only with suppliers who meet our ethical manufacturing standards, including fair wages and safe working conditions. Many of our products are certified organic or recycled.</p>', 'category' => 'products', 'position' => 2],
             ['question' => 'Do you restock sold-out items?', 'answer' => '<p>Popular items are usually restocked within 4–6 weeks. Click the <em>Notify me</em> button on the product page and we\'ll email you as soon as it\'s back.</p>', 'category' => 'products', 'position' => 3],
             ['question' => 'How do I create an account?', 'answer' => '<p>Click <em>Sign Up</em> at the top of any page, enter your email and a password, and verify your email address. It takes less than a minute.</p>', 'category' => 'account', 'position' => 1],
-            ['question' => 'I forgot my password. What should I do?', 'answer' => '<p>Click <em>Forgot password?</em> on the login page and enter your email. We\'ll send a reset link that is valid for 60 minutes.</p>', 'category' => 'account', 'position' => 2],
+            ['question' => 'I forgot my password. What should I do?', 'answer' => "<p>Click <em>Forgot password?</em> on the login page and enter your email. We'll send a reset link that is valid for 60 minutes.</p>", 'category' => 'account', 'position' => 2],
             ['question' => 'How do I delete my account?', 'answer' => '<p>You can request account deletion from <strong>Settings → Privacy → Delete Account</strong>. All personal data is permanently removed within 30 days in accordance with GDPR.</p>', 'category' => 'account', 'position' => 3],
         ];
 
         foreach ($faqs as $faq) {
-            Faq::updateOrCreate(
-                ['question' => $faq['question']],
-                array_merge($faq, ['is_active' => true])
-            );
+            Faq::query()->updateOrCreate(['question' => $faq['question']], array_merge($faq, ['is_active' => true]));
         }
     }
 
@@ -83,20 +80,17 @@ class PagesDemoSeeder extends Seeder
 
     private function seedHomepage(): void
     {
-        $page = Page::updateOrCreate(
-            ['slug' => 'home'],
-            [
-                'parent_id' => null,
-                'title' => ['en' => 'Home', 'pl' => 'Strona główna'],
-                'slug_translations' => ['pl' => 'strona-glowna'],
-                'page_type' => 'blocks',
-                'is_published' => true,
-                'published_at' => now(),
-                'position' => 1,
-                'seo_title' => 'Shop the Best Fashion, Home & Lifestyle',
-                'seo_description' => 'Discover curated collections of fashion, home décor, beauty, and sportswear. Free shipping on orders over €75.',
-            ]
-        );
+        $page = Page::query()->updateOrCreate(['slug' => 'home'], [
+            'parent_id' => null,
+            'title' => ['en' => 'Home', 'pl' => 'Strona główna'],
+            'slug_translations' => ['pl' => 'strona-glowna'],
+            'page_type' => 'blocks',
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 1,
+            'seo_title' => 'Shop the Best Fashion, Home & Lifestyle',
+            'seo_description' => 'Discover curated collections of fashion, home décor, beauty, and sportswear. Free shipping on orders over €75.',
+        ]);
 
         $page->allSections()->delete();
 
@@ -162,16 +156,13 @@ class PagesDemoSeeder extends Seeder
         $s = $this->section($page, 'standard', 'contained', 'muted', ['padding' => 'xl', 'animation' => 'fade-up'], $pos++);
         $catBlock = $this->block($page, $s, 'categories_grid', [
             'title' => 'Shop by Category',
-            'subtitle' => 'Find exactly what you\'re looking for',
+            'subtitle' => "Find exactly what you're looking for",
             'columns' => 4,
             'show_title' => true,
         ], 1);
-        $topCats = Category::whereNull('parent_id')->orderBy('position')->take(4)->get();
+        $topCats = Category::query()->whereNull('parent_id')->orderBy('position')->take(4)->get();
         foreach ($topCats as $i => $cat) {
-            BlockRelation::updateOrCreate(
-                ['page_block_id' => $catBlock->id, 'relation_type' => 'category', 'relation_id' => $cat->id],
-                ['relation_key' => 'categories', 'position' => $i + 1, 'metadata' => []]
-            );
+            BlockRelation::query()->updateOrCreate(['page_block_id' => $catBlock->id, 'relation_type' => 'category', 'relation_id' => $cat->id], ['relation_key' => 'categories', 'position' => $i + 1, 'metadata' => []]);
         }
 
         // ── 6 · How It Works ────────────────────────────────────────────────
@@ -197,27 +188,25 @@ class PagesDemoSeeder extends Seeder
             'view_all_url' => '/products',
             'view_all_label' => 'View all products',
         ], 1);
-        $bestsellers = Product::whereHas('flags', fn ($q) => $q->where('name', 'Bestseller'))->take(8)->get();
+        $bestsellers = Product::query()->whereHas('flags', fn ($q) => $q->where('name', 'Bestseller'))->take(8)->get();
         if ($bestsellers->isEmpty()) {
-            $bestsellers = Product::orderBy('id')->take(8)->get();
+            $bestsellers = Product::query()->orderBy('id')->take(8)->get();
         }
+
         foreach ($bestsellers as $i => $product) {
-            BlockRelation::updateOrCreate(
-                ['page_block_id' => $featBlock->id, 'relation_type' => 'product', 'relation_id' => $product->id],
-                ['relation_key' => 'products', 'position' => $i + 1, 'metadata' => []]
-            );
+            BlockRelation::query()->updateOrCreate(['page_block_id' => $featBlock->id, 'relation_type' => 'product', 'relation_id' => $product->id], ['relation_key' => 'products', 'position' => $i + 1, 'metadata' => []]);
         }
 
         // ── 8 · Why Choose Us (Icon List) ───────────────────────────────────
         $s = $this->section($page, 'standard', 'contained', 'light', ['padding' => 'xl', 'animation' => 'fade-left'], $pos++);
         $this->block($page, $s, 'icon_list', [
             'title' => 'Why Thousands Choose Us',
-            'subtitle' => 'We\'ve built every part of our service around what matters most to you.',
+            'subtitle' => "We've built every part of our service around what matters most to you.",
             'columns' => 2,
             'style' => 'horizontal',
             'items' => [
                 ['icon' => 'leaf', 'title' => 'Ethically Sourced', 'description' => 'Every brand in our network is audited annually for fair wages, safe conditions, and sustainable sourcing practices.'],
-                ['icon' => 'award', 'title' => 'Curated Quality', 'description' => 'Our team hand-picks each product. If it doesn\'t meet our standards for materials and craftsmanship, it doesn\'t make the cut.'],
+                ['icon' => 'award', 'title' => 'Curated Quality', 'description' => "Our team hand-picks each product. If it doesn't meet our standards for materials and craftsmanship, it doesn't make the cut."],
                 ['icon' => 'truck', 'title' => 'Fast & Free Shipping', 'description' => 'Free tracked delivery on all orders over €75. Orders placed before 1 PM are dispatched the same day.'],
                 ['icon' => 'return', 'title' => 'Easy 30-Day Returns', 'description' => 'Changed your mind? No problem. Return anything within 30 days for a full refund, no questions asked.'],
                 ['icon' => 'lock', 'title' => 'Bank-Grade Security', 'description' => 'Your payment data is protected by 256-bit SSL encryption and processed by a PCI-DSS Level 1 provider.'],
@@ -289,12 +278,9 @@ class PagesDemoSeeder extends Seeder
             'cta_text' => 'Read all articles',
             'cta_url' => '/blog',
         ], 1);
-        $latestPosts = BlogPost::published()->orderByDesc('published_at')->take(3)->get();
+        $latestPosts = BlogPost::query()->published()->orderByDesc('published_at')->take(3)->get();
         foreach ($latestPosts as $i => $post) {
-            BlockRelation::updateOrCreate(
-                ['page_block_id' => $postsBlock->id, 'relation_type' => 'blog_post', 'relation_id' => $post->id],
-                ['relation_key' => 'posts', 'position' => $i + 1, 'metadata' => []]
-            );
+            BlockRelation::query()->updateOrCreate(['page_block_id' => $postsBlock->id, 'relation_type' => 'blog_post', 'relation_id' => $post->id], ['relation_key' => 'posts', 'position' => $i + 1, 'metadata' => []]);
         }
 
         // ── 12 · Countdown Timer (Flash Sale) ───────────────────────────────
@@ -329,20 +315,17 @@ class PagesDemoSeeder extends Seeder
 
     private function seedAboutPage(): void
     {
-        $page = Page::updateOrCreate(
-            ['slug' => 'about-us'],
-            [
-                'parent_id' => null,
-                'title' => ['en' => 'About Us', 'pl' => 'O nas'],
-                'slug_translations' => ['pl' => 'o-nas'],
-                'page_type' => 'blocks',
-                'is_published' => true,
-                'published_at' => now(),
-                'position' => 10,
-                'seo_title' => 'About Us — Our Story & Values',
-                'seo_description' => 'Learn about our mission to bring thoughtfully designed, ethically made products to everyday life.',
-            ]
-        );
+        $page = Page::query()->updateOrCreate(['slug' => 'about-us'], [
+            'parent_id' => null,
+            'title' => ['en' => 'About Us', 'pl' => 'O nas'],
+            'slug_translations' => ['pl' => 'o-nas'],
+            'page_type' => 'blocks',
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 10,
+            'seo_title' => 'About Us — Our Story & Values',
+            'seo_description' => 'Learn about our mission to bring thoughtfully designed, ethically made products to everyday life.',
+        ]);
 
         $page->allSections()->delete();
         $pos = 1;
@@ -393,7 +376,7 @@ class PagesDemoSeeder extends Seeder
             'columns' => 3,
             'style' => 'centered',
             'items' => [
-                ['icon' => 'leaf', 'title' => 'Sustainability', 'description' => 'Over 70% of our products use recycled, organic, or responsibly sourced materials. We\'re on a path to full carbon neutrality by 2027.'],
+                ['icon' => 'leaf', 'title' => 'Sustainability', 'description' => "Over 70% of our products use recycled, organic, or responsibly sourced materials. We're on a path to full carbon neutrality by 2027."],
                 ['icon' => 'heart', 'title' => 'Fair Trade', 'description' => 'Every supplier in our network is audited annually for fair wages, safe conditions, and ethical sourcing practices.'],
                 ['icon' => 'award', 'title' => 'Lasting Quality', 'description' => 'We design for longevity, not obsolescence. Our products come with extended warranties and repair programmes.'],
             ],
@@ -471,23 +454,20 @@ class PagesDemoSeeder extends Seeder
         ];
 
         foreach ($legalPages as $def) {
-            $p = Page::updateOrCreate(
-                ['slug' => $def['slug']],
-                [
-                    'parent_id' => null,
-                    'title' => $def['title'],
-                    'slug_translations' => $def['slug_translations'],
-                    'page_type' => 'module',
-                    'module_name' => 'content',
-                    'module_config' => ['html' => $def['content']],
-                    'content' => $def['content'],
-                    'is_published' => true,
-                    'published_at' => now(),
-                    'position' => $def['position'],
-                    'seo_title' => $def['seo_title'],
-                    'seo_description' => $def['seo_description'],
-                ]
-            );
+            $p = Page::query()->updateOrCreate(['slug' => $def['slug']], [
+                'parent_id' => null,
+                'title' => $def['title'],
+                'slug_translations' => $def['slug_translations'],
+                'page_type' => 'module',
+                'module_name' => 'content',
+                'module_config' => ['html' => $def['content']],
+                'content' => $def['content'],
+                'is_published' => true,
+                'published_at' => now(),
+                'position' => $def['position'],
+                'seo_title' => $def['seo_title'],
+                'seo_description' => $def['seo_description'],
+            ]);
             $p->allSections()->delete();
         }
     }
@@ -500,29 +480,26 @@ class PagesDemoSeeder extends Seeder
     {
         $faqs = Faq::active()->orderBy('category')->orderBy('position')->get();
 
-        $page = Page::updateOrCreate(
-            ['slug' => 'faq'],
-            [
-                'parent_id' => null,
-                'title' => ['en' => 'Frequently Asked Questions', 'pl' => 'Najczęstsze pytania'],
-                'slug_translations' => ['pl' => 'faq'],
-                'page_type' => 'module',
-                'module_name' => 'faq',
-                'module_config' => [
-                    'items' => $faqs->map(fn ($f) => [
-                        'id' => $f->id,
-                        'question' => $f->question,
-                        'answer' => $f->answer,
-                        'category' => $f->category,
-                    ])->values()->toArray(),
-                ],
-                'is_published' => true,
-                'published_at' => now(),
-                'position' => 30,
-                'seo_title' => 'FAQ — Frequently Asked Questions',
-                'seo_description' => 'Answers to common questions about ordering, shipping, returns, and more.',
-            ]
-        );
+        $page = Page::query()->updateOrCreate(['slug' => 'faq'], [
+            'parent_id' => null,
+            'title' => ['en' => 'Frequently Asked Questions', 'pl' => 'Najczęstsze pytania'],
+            'slug_translations' => ['pl' => 'faq'],
+            'page_type' => 'module',
+            'module_name' => 'faq',
+            'module_config' => [
+                'items' => $faqs->map(fn ($f): array => [
+                    'id' => $f->id,
+                    'question' => $f->question,
+                    'answer' => $f->answer,
+                    'category' => $f->category,
+                ])->values()->all(),
+            ],
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 30,
+            'seo_title' => 'FAQ — Frequently Asked Questions',
+            'seo_description' => 'Answers to common questions about ordering, shipping, returns, and more.',
+        ]);
         $page->allSections()->delete();
     }
 
@@ -532,67 +509,58 @@ class PagesDemoSeeder extends Seeder
 
     private function seedShippingPage(): void
     {
-        $p = Page::updateOrCreate(
-            ['slug' => 'shipping-policy'],
-            [
-                'parent_id' => null,
-                'title' => ['en' => 'Shipping Policy', 'pl' => 'Polityka wysyłki'],
-                'slug_translations' => ['pl' => 'polityka-wysylki'],
-                'page_type' => 'module',
-                'module_name' => 'content',
-                'module_config' => ['html' => $this->shippingPolicyHtml()],
-                'content' => $this->shippingPolicyHtml(),
-                'is_published' => true,
-                'published_at' => now(),
-                'position' => 22,
-                'seo_title' => 'Shipping Policy',
-                'seo_description' => 'Everything you need to know about our shipping options, delivery times, and costs.',
-            ]
-        );
+        $p = Page::query()->updateOrCreate(['slug' => 'shipping-policy'], [
+            'parent_id' => null,
+            'title' => ['en' => 'Shipping Policy', 'pl' => 'Polityka wysyłki'],
+            'slug_translations' => ['pl' => 'polityka-wysylki'],
+            'page_type' => 'module',
+            'module_name' => 'content',
+            'module_config' => ['html' => $this->shippingPolicyHtml()],
+            'content' => $this->shippingPolicyHtml(),
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 22,
+            'seo_title' => 'Shipping Policy',
+            'seo_description' => 'Everything you need to know about our shipping options, delivery times, and costs.',
+        ]);
         $p->allSections()->delete();
     }
 
     private function seedReturnPolicyPage(): void
     {
-        $p = Page::updateOrCreate(
-            ['slug' => 'return-policy'],
-            [
-                'parent_id' => null,
-                'title' => ['en' => 'Return & Refund Policy', 'pl' => 'Polityka zwrotów'],
-                'slug_translations' => ['pl' => 'polityka-zwrotow'],
-                'page_type' => 'module',
-                'module_name' => 'content',
-                'module_config' => ['html' => $this->returnPolicyHtml()],
-                'content' => $this->returnPolicyHtml(),
-                'is_published' => true,
-                'published_at' => now(),
-                'position' => 23,
-                'seo_title' => 'Return & Refund Policy',
-                'seo_description' => 'Our hassle-free 30-day return and refund policy.',
-            ]
-        );
+        $p = Page::query()->updateOrCreate(['slug' => 'return-policy'], [
+            'parent_id' => null,
+            'title' => ['en' => 'Return & Refund Policy', 'pl' => 'Polityka zwrotów'],
+            'slug_translations' => ['pl' => 'polityka-zwrotow'],
+            'page_type' => 'module',
+            'module_name' => 'content',
+            'module_config' => ['html' => $this->returnPolicyHtml()],
+            'content' => $this->returnPolicyHtml(),
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 23,
+            'seo_title' => 'Return & Refund Policy',
+            'seo_description' => 'Our hassle-free 30-day return and refund policy.',
+        ]);
         $p->allSections()->delete();
     }
 
     private function seedCookiePolicyPage(): void
     {
-        $p = Page::updateOrCreate(
-            ['slug' => 'cookie-policy'],
-            [
-                'parent_id' => null,
-                'title' => ['en' => 'Cookie Policy', 'pl' => 'Polityka cookies'],
-                'slug_translations' => ['pl' => 'polityka-cookies'],
-                'page_type' => 'module',
-                'module_name' => 'content',
-                'module_config' => ['html' => $this->cookiePolicyHtml()],
-                'content' => $this->cookiePolicyHtml(),
-                'is_published' => true,
-                'published_at' => now(),
-                'position' => 24,
-                'seo_title' => 'Cookie Policy',
-                'seo_description' => 'How we use cookies and similar technologies on our website.',
-            ]
-        );
+        $p = Page::query()->updateOrCreate(['slug' => 'cookie-policy'], [
+            'parent_id' => null,
+            'title' => ['en' => 'Cookie Policy', 'pl' => 'Polityka cookies'],
+            'slug_translations' => ['pl' => 'polityka-cookies'],
+            'page_type' => 'module',
+            'module_name' => 'content',
+            'module_config' => ['html' => $this->cookiePolicyHtml()],
+            'content' => $this->cookiePolicyHtml(),
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 24,
+            'seo_title' => 'Cookie Policy',
+            'seo_description' => 'How we use cookies and similar technologies on our website.',
+        ]);
         $p->allSections()->delete();
     }
 
@@ -604,20 +572,17 @@ class PagesDemoSeeder extends Seeder
     {
         $contactForm = Form::query()->where('slug', 'contact')->first();
 
-        $page = Page::updateOrCreate(
-            ['slug' => 'contact'],
-            [
-                'parent_id' => null,
-                'title' => ['en' => 'Contact Us', 'pl' => 'Kontakt'],
-                'slug_translations' => ['pl' => 'kontakt'],
-                'page_type' => 'blocks',
-                'is_published' => true,
-                'published_at' => now(),
-                'position' => 20,
-                'seo_title' => 'Contact Us — We\'d Love to Hear From You',
-                'seo_description' => 'Have a question or need help? Reach out and we\'ll get back to you within 1–2 business days.',
-            ]
-        );
+        $page = Page::query()->updateOrCreate(['slug' => 'contact'], [
+            'parent_id' => null,
+            'title' => ['en' => 'Contact Us', 'pl' => 'Kontakt'],
+            'slug_translations' => ['pl' => 'kontakt'],
+            'page_type' => 'blocks',
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 20,
+            'seo_title' => 'Contact Us — We\'d Love to Hear From You',
+            'seo_description' => 'Have a question or need help? Reach out and we\'ll get back to you within 1–2 business days.',
+        ]);
 
         $page->allSections()->delete();
         $pos = 1;
@@ -648,10 +613,7 @@ class PagesDemoSeeder extends Seeder
             'form_id' => $contactForm?->id,
         ], 1);
         if ($contactForm) {
-            BlockRelation::updateOrCreate(
-                ['page_block_id' => $formBlock->id, 'relation_type' => 'form', 'relation_id' => $contactForm->id],
-                ['relation_key' => 'form', 'position' => 1, 'metadata' => []]
-            );
+            BlockRelation::query()->updateOrCreate(['page_block_id' => $formBlock->id, 'relation_type' => 'form', 'relation_id' => $contactForm->id], ['relation_key' => 'form', 'position' => 1, 'metadata' => []]);
         }
 
         // Map
@@ -671,19 +633,16 @@ class PagesDemoSeeder extends Seeder
 
     private function seedPolishHomepage(): void
     {
-        $page = Page::updateOrCreate(
-            ['slug' => 'strona-glowna', 'locale' => 'pl'],
-            [
-                'parent_id' => null,
-                'title' => ['pl' => 'Strona główna', 'en' => 'Home'],
-                'page_type' => 'blocks',
-                'is_published' => true,
-                'published_at' => now(),
-                'position' => 1,
-                'seo_title' => 'Kupuj modę, dom i lifestyle w najlepszej jakości',
-                'seo_description' => 'Odkryj starannie wyselekcjonowane kolekcje mody, dekoracji domu, urody i sportu. Darmowa dostawa od 299 zł.',
-            ]
-        );
+        $page = Page::query()->updateOrCreate(['slug' => 'strona-glowna', 'locale' => 'pl'], [
+            'parent_id' => null,
+            'title' => ['pl' => 'Strona główna', 'en' => 'Home'],
+            'page_type' => 'blocks',
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 1,
+            'seo_title' => 'Kupuj modę, dom i lifestyle w najlepszej jakości',
+            'seo_description' => 'Odkryj starannie wyselekcjonowane kolekcje mody, dekoracji domu, urody i sportu. Darmowa dostawa od 299 zł.',
+        ]);
 
         $page->allSections()->delete();
         $pos = 1;
@@ -752,12 +711,9 @@ class PagesDemoSeeder extends Seeder
             'columns' => 4,
             'show_title' => true,
         ], 1);
-        $topCats = Category::whereNull('parent_id')->orderBy('position')->take(4)->get();
+        $topCats = Category::query()->whereNull('parent_id')->orderBy('position')->take(4)->get();
         foreach ($topCats as $i => $cat) {
-            BlockRelation::updateOrCreate(
-                ['page_block_id' => $catBlock->id, 'relation_type' => 'category', 'relation_id' => $cat->id],
-                ['relation_key' => 'categories', 'position' => $i + 1, 'metadata' => []]
-            );
+            BlockRelation::query()->updateOrCreate(['page_block_id' => $catBlock->id, 'relation_type' => 'category', 'relation_id' => $cat->id], ['relation_key' => 'categories', 'position' => $i + 1, 'metadata' => []]);
         }
 
         // ── 6 · How It Works ────────────────────────────────────────────────
@@ -783,15 +739,13 @@ class PagesDemoSeeder extends Seeder
             'view_all_url' => '/produkty',
             'view_all_label' => 'Zobacz wszystkie produkty',
         ], 1);
-        $bestsellers = Product::whereHas('flags', fn ($q) => $q->where('name', 'Bestseller'))->take(8)->get();
+        $bestsellers = Product::query()->whereHas('flags', fn ($q) => $q->where('name', 'Bestseller'))->take(8)->get();
         if ($bestsellers->isEmpty()) {
-            $bestsellers = Product::orderBy('id')->take(8)->get();
+            $bestsellers = Product::query()->orderBy('id')->take(8)->get();
         }
+
         foreach ($bestsellers as $i => $product) {
-            BlockRelation::updateOrCreate(
-                ['page_block_id' => $featBlock->id, 'relation_type' => 'product', 'relation_id' => $product->id],
-                ['relation_key' => 'products', 'position' => $i + 1, 'metadata' => []]
-            );
+            BlockRelation::query()->updateOrCreate(['page_block_id' => $featBlock->id, 'relation_type' => 'product', 'relation_id' => $product->id], ['relation_key' => 'products', 'position' => $i + 1, 'metadata' => []]);
         }
 
         // ── 8 · Why Choose Us (Icon List) ───────────────────────────────────
@@ -875,12 +829,9 @@ class PagesDemoSeeder extends Seeder
             'cta_text' => 'Czytaj wszystkie artykuły',
             'cta_url' => '/blog',
         ], 1);
-        $latestPosts = BlogPost::published()->orderByDesc('published_at')->take(3)->get();
+        $latestPosts = BlogPost::query()->published()->orderByDesc('published_at')->take(3)->get();
         foreach ($latestPosts as $i => $post) {
-            BlockRelation::updateOrCreate(
-                ['page_block_id' => $postsBlock->id, 'relation_type' => 'blog_post', 'relation_id' => $post->id],
-                ['relation_key' => 'posts', 'position' => $i + 1, 'metadata' => []]
-            );
+            BlockRelation::query()->updateOrCreate(['page_block_id' => $postsBlock->id, 'relation_type' => 'blog_post', 'relation_id' => $post->id], ['relation_key' => 'posts', 'position' => $i + 1, 'metadata' => []]);
         }
 
         // ── 12 · Countdown Timer (Flash Sale) ───────────────────────────────
@@ -911,19 +862,16 @@ class PagesDemoSeeder extends Seeder
 
     private function seedPolishAboutPage(): void
     {
-        $page = Page::updateOrCreate(
-            ['slug' => 'o-nas', 'locale' => 'pl'],
-            [
-                'parent_id' => null,
-                'title' => ['pl' => 'O nas', 'en' => 'About Us'],
-                'page_type' => 'blocks',
-                'is_published' => true,
-                'published_at' => now(),
-                'position' => 10,
-                'seo_title' => 'O nas — Nasza historia i wartości',
-                'seo_description' => 'Poznaj naszą misję: dostarczać starannie zaprojektowane, etycznie wytwarzane produkty do codziennego życia.',
-            ]
-        );
+        $page = Page::query()->updateOrCreate(['slug' => 'o-nas', 'locale' => 'pl'], [
+            'parent_id' => null,
+            'title' => ['pl' => 'O nas', 'en' => 'About Us'],
+            'page_type' => 'blocks',
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 10,
+            'seo_title' => 'O nas — Nasza historia i wartości',
+            'seo_description' => 'Poznaj naszą misję: dostarczać starannie zaprojektowane, etycznie wytwarzane produkty do codziennego życia.',
+        ]);
 
         $page->allSections()->delete();
         $pos = 1;
@@ -1046,22 +994,19 @@ class PagesDemoSeeder extends Seeder
         ];
 
         foreach ($legalPages as $def) {
-            $p = Page::updateOrCreate(
-                ['slug' => $def['slug'], 'locale' => 'pl'],
-                [
-                    'parent_id' => null,
-                    'title' => $def['title'],
-                    'page_type' => 'module',
-                    'module_name' => 'content',
-                    'module_config' => ['html' => $def['content']],
-                    'content' => $def['content'],
-                    'is_published' => true,
-                    'published_at' => now(),
-                    'position' => $def['position'],
-                    'seo_title' => $def['seo_title'],
-                    'seo_description' => $def['seo_description'],
-                ]
-            );
+            $p = Page::query()->updateOrCreate(['slug' => $def['slug'], 'locale' => 'pl'], [
+                'parent_id' => null,
+                'title' => $def['title'],
+                'page_type' => 'module',
+                'module_name' => 'content',
+                'module_config' => ['html' => $def['content']],
+                'content' => $def['content'],
+                'is_published' => true,
+                'published_at' => now(),
+                'position' => $def['position'],
+                'seo_title' => $def['seo_title'],
+                'seo_description' => $def['seo_description'],
+            ]);
             $p->allSections()->delete();
         }
     }
@@ -1070,91 +1015,79 @@ class PagesDemoSeeder extends Seeder
     {
         $faqs = Faq::active()->orderBy('category')->orderBy('position')->get();
 
-        $page = Page::updateOrCreate(
-            ['slug' => 'faq', 'locale' => 'pl'],
-            [
-                'parent_id' => null,
-                'title' => ['pl' => 'Najczęstsze pytania', 'en' => 'FAQ'],
-                'page_type' => 'module',
-                'module_name' => 'faq',
-                'module_config' => [
-                    'items' => $faqs->map(fn ($f) => [
-                        'id' => $f->id,
-                        'question' => $f->question,
-                        'answer' => $f->answer,
-                        'category' => $f->category,
-                    ])->values()->toArray(),
-                ],
-                'is_published' => true,
-                'published_at' => now(),
-                'position' => 30,
-                'seo_title' => 'FAQ — Najczęstsze pytania',
-                'seo_description' => 'Odpowiedzi na najczęstsze pytania dotyczące zamówień, dostawy, zwrotów i płatności.',
-            ]
-        );
+        $page = Page::query()->updateOrCreate(['slug' => 'faq', 'locale' => 'pl'], [
+            'parent_id' => null,
+            'title' => ['pl' => 'Najczęstsze pytania', 'en' => 'FAQ'],
+            'page_type' => 'module',
+            'module_name' => 'faq',
+            'module_config' => [
+                'items' => $faqs->map(fn ($f): array => [
+                    'id' => $f->id,
+                    'question' => $f->question,
+                    'answer' => $f->answer,
+                    'category' => $f->category,
+                ])->values()->all(),
+            ],
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 30,
+            'seo_title' => 'FAQ — Najczęstsze pytania',
+            'seo_description' => 'Odpowiedzi na najczęstsze pytania dotyczące zamówień, dostawy, zwrotów i płatności.',
+        ]);
         $page->allSections()->delete();
     }
 
     private function seedPolishShippingPage(): void
     {
-        $p = Page::updateOrCreate(
-            ['slug' => 'polityka-wysylki', 'locale' => 'pl'],
-            [
-                'parent_id' => null,
-                'title' => ['pl' => 'Polityka wysyłki', 'en' => 'Shipping Policy'],
-                'page_type' => 'module',
-                'module_name' => 'content',
-                'module_config' => ['html' => $this->shippingPolicyHtmlPl()],
-                'content' => $this->shippingPolicyHtmlPl(),
-                'is_published' => true,
-                'published_at' => now(),
-                'position' => 22,
-                'seo_title' => 'Polityka wysyłki',
-                'seo_description' => 'Wszystko, co musisz wiedzieć o opcjach dostawy, czasach realizacji i kosztach wysyłki.',
-            ]
-        );
+        $p = Page::query()->updateOrCreate(['slug' => 'polityka-wysylki', 'locale' => 'pl'], [
+            'parent_id' => null,
+            'title' => ['pl' => 'Polityka wysyłki', 'en' => 'Shipping Policy'],
+            'page_type' => 'module',
+            'module_name' => 'content',
+            'module_config' => ['html' => $this->shippingPolicyHtmlPl()],
+            'content' => $this->shippingPolicyHtmlPl(),
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 22,
+            'seo_title' => 'Polityka wysyłki',
+            'seo_description' => 'Wszystko, co musisz wiedzieć o opcjach dostawy, czasach realizacji i kosztach wysyłki.',
+        ]);
         $p->allSections()->delete();
     }
 
     private function seedPolishReturnPolicyPage(): void
     {
-        $p = Page::updateOrCreate(
-            ['slug' => 'polityka-zwrotow', 'locale' => 'pl'],
-            [
-                'parent_id' => null,
-                'title' => ['pl' => 'Polityka zwrotów', 'en' => 'Return Policy'],
-                'page_type' => 'module',
-                'module_name' => 'content',
-                'module_config' => ['html' => $this->returnPolicyHtmlPl()],
-                'content' => $this->returnPolicyHtmlPl(),
-                'is_published' => true,
-                'published_at' => now(),
-                'position' => 23,
-                'seo_title' => 'Polityka zwrotów i reklamacji',
-                'seo_description' => 'Nasza bezproblemowa polityka zwrotów i reklamacji w ciągu 30 dni.',
-            ]
-        );
+        $p = Page::query()->updateOrCreate(['slug' => 'polityka-zwrotow', 'locale' => 'pl'], [
+            'parent_id' => null,
+            'title' => ['pl' => 'Polityka zwrotów', 'en' => 'Return Policy'],
+            'page_type' => 'module',
+            'module_name' => 'content',
+            'module_config' => ['html' => $this->returnPolicyHtmlPl()],
+            'content' => $this->returnPolicyHtmlPl(),
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 23,
+            'seo_title' => 'Polityka zwrotów i reklamacji',
+            'seo_description' => 'Nasza bezproblemowa polityka zwrotów i reklamacji w ciągu 30 dni.',
+        ]);
         $p->allSections()->delete();
     }
 
     private function seedPolishCookiePolicyPage(): void
     {
-        $p = Page::updateOrCreate(
-            ['slug' => 'polityka-cookies', 'locale' => 'pl'],
-            [
-                'parent_id' => null,
-                'title' => ['pl' => 'Polityka cookies', 'en' => 'Cookie Policy'],
-                'page_type' => 'module',
-                'module_name' => 'content',
-                'module_config' => ['html' => $this->cookiePolicyHtmlPl()],
-                'content' => $this->cookiePolicyHtmlPl(),
-                'is_published' => true,
-                'published_at' => now(),
-                'position' => 24,
-                'seo_title' => 'Polityka plików cookies',
-                'seo_description' => 'Jak używamy plików cookies i podobnych technologii na naszej stronie.',
-            ]
-        );
+        $p = Page::query()->updateOrCreate(['slug' => 'polityka-cookies', 'locale' => 'pl'], [
+            'parent_id' => null,
+            'title' => ['pl' => 'Polityka cookies', 'en' => 'Cookie Policy'],
+            'page_type' => 'module',
+            'module_name' => 'content',
+            'module_config' => ['html' => $this->cookiePolicyHtmlPl()],
+            'content' => $this->cookiePolicyHtmlPl(),
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 24,
+            'seo_title' => 'Polityka plików cookies',
+            'seo_description' => 'Jak używamy plików cookies i podobnych technologii na naszej stronie.',
+        ]);
         $p->allSections()->delete();
     }
 
@@ -1162,19 +1095,16 @@ class PagesDemoSeeder extends Seeder
     {
         $contactForm = Form::query()->where('slug', 'contact')->first();
 
-        $page = Page::updateOrCreate(
-            ['slug' => 'kontakt', 'locale' => 'pl'],
-            [
-                'parent_id' => null,
-                'title' => ['pl' => 'Kontakt', 'en' => 'Contact Us'],
-                'page_type' => 'blocks',
-                'is_published' => true,
-                'published_at' => now(),
-                'position' => 20,
-                'seo_title' => 'Kontakt — Chętnie odpiszemy',
-                'seo_description' => 'Masz pytanie lub potrzebujesz pomocy? Skontaktuj się z nami, a odpiszemy w ciągu 1–2 dni roboczych.',
-            ]
-        );
+        $page = Page::query()->updateOrCreate(['slug' => 'kontakt', 'locale' => 'pl'], [
+            'parent_id' => null,
+            'title' => ['pl' => 'Kontakt', 'en' => 'Contact Us'],
+            'page_type' => 'blocks',
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 20,
+            'seo_title' => 'Kontakt — Chętnie odpiszemy',
+            'seo_description' => 'Masz pytanie lub potrzebujesz pomocy? Skontaktuj się z nami, a odpiszemy w ciągu 1–2 dni roboczych.',
+        ]);
 
         $page->allSections()->delete();
         $pos = 1;
@@ -1205,10 +1135,7 @@ class PagesDemoSeeder extends Seeder
             'form_id' => $contactForm?->id,
         ], 1);
         if ($contactForm) {
-            BlockRelation::updateOrCreate(
-                ['page_block_id' => $formBlock->id, 'relation_type' => 'form', 'relation_id' => $contactForm->id],
-                ['relation_key' => 'form', 'position' => 1, 'metadata' => []]
-            );
+            BlockRelation::query()->updateOrCreate(['page_block_id' => $formBlock->id, 'relation_type' => 'form', 'relation_id' => $contactForm->id], ['relation_key' => 'form', 'position' => 1, 'metadata' => []]);
         }
 
         // Map
@@ -1355,7 +1282,7 @@ HTML;
         array $settings,
         int $position
     ): PageSection {
-        return PageSection::create([
+        return PageSection::query()->create([
             'page_id' => $page->id,
             'section_type' => $type,
             'layout' => $layout,
@@ -1373,7 +1300,7 @@ HTML;
         array $configuration,
         int $position
     ): PageBlock {
-        return PageBlock::create([
+        return PageBlock::query()->create([
             'page_id' => $page->id,
             'section_id' => $section->id,
             'type' => $type,
@@ -1386,12 +1313,9 @@ HTML;
     /** Attach all active brands to a block as 'brands' relations */
     private function attachBrands(PageBlock $block): void
     {
-        $brands = Brand::where('is_active', true)->orderBy('position')->get();
+        $brands = Brand::query()->where('is_active', true)->orderBy('position')->get();
         foreach ($brands as $i => $brand) {
-            BlockRelation::updateOrCreate(
-                ['page_block_id' => $block->id, 'relation_type' => 'brand', 'relation_id' => $brand->id],
-                ['relation_key' => 'brands', 'position' => $i + 1, 'metadata' => []]
-            );
+            BlockRelation::query()->updateOrCreate(['page_block_id' => $block->id, 'relation_type' => 'brand', 'relation_id' => $brand->id], ['relation_key' => 'brands', 'position' => $i + 1, 'metadata' => []]);
         }
     }
 

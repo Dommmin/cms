@@ -17,9 +17,7 @@ class AdminAccess
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user() || ! $request->user()->hasRole(['admin', 'editor'])) {
-            abort(404);
-        }
+        abort_if(! $request->user() || ! $request->user()->hasRole(['admin', 'editor']), 404);
 
         return $next($request);
     }

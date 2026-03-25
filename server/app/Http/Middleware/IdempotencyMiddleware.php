@@ -15,11 +15,11 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class IdempotencyMiddleware
 {
-    private const HEADER = 'Idempotency-Key';
+    private const string HEADER = 'Idempotency-Key';
 
-    private const TTL = 86400; // 24 hours
+    private const int TTL = 86400; // 24 hours
 
-    private const LOCK_TTL = 10; // seconds to wait for a concurrent identical request
+    private const int LOCK_TTL = 10; // seconds to wait for a concurrent identical request
 
     public function handle(Request $request, Closure $next): Response
     {
@@ -44,7 +44,7 @@ class IdempotencyMiddleware
 
         if ($cached = Cache::get($cacheKey)) {
             return response()
-                ->json(json_decode($cached['body'], associative: true), $cached['status'])
+                ->json(json_decode((string) $cached['body'], associative: true), $cached['status'])
                 ->header('X-Idempotent-Replayed', 'true');
         }
 

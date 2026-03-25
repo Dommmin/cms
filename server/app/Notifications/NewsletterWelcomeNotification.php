@@ -30,9 +30,9 @@ class NewsletterWelcomeNotification extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject('Welcome to our newsletter!')
-            ->greeting('Welcome'.($this->subscriber->first_name ? ", {$this->subscriber->first_name}" : '').'!')
-            ->line('Your subscription has been confirmed. You\'re now on our list!')
-            ->line('You\'ll receive updates about new products, promotions, and news from us.')
+            ->greeting('Welcome'.($this->subscriber->first_name ? ', '.$this->subscriber->first_name : '').'!')
+            ->line("Your subscription has been confirmed. You're now on our list!")
+            ->line("You'll receive updates about new products, promotions, and news from us.")
             ->line('If you ever want to unsubscribe, click the link below.')
             ->action('Unsubscribe', $unsubscribeUrl);
     }

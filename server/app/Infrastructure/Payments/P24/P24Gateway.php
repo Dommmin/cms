@@ -38,7 +38,7 @@ class P24Gateway implements PaymentGatewayInterface
     public function processPayment(Payment $payment, array $options = []): array
     {
         $order = $payment->order;
-        $sessionId = "p24-{$payment->id}";
+        $sessionId = 'p24-'.$payment->id;
         $merchantId = (int) config('services.p24.merchant_id');
         $posId = (int) config('services.p24.pos_id');
         $currency = mb_strtoupper($payment->currency_code);

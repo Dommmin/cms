@@ -24,25 +24,25 @@ class ShippingMethodController extends Controller
         return inertia('admin/ecommerce/shipping-methods/index', [
             'methods' => $methods,
             'filters' => $request->only(['search', 'carrier', 'is_active']),
-            'carriers' => array_map(fn ($c) => ['value' => $c->value, 'label' => $c->getLabel()], ShippingCarrierEnum::cases()),
+            'carriers' => array_map(fn (ShippingCarrierEnum $c): array => ['value' => $c->value, 'label' => $c->getLabel()], ShippingCarrierEnum::cases()),
         ]);
     }
 
     public function create(): Response
     {
         return inertia('admin/ecommerce/shipping-methods/create', [
-            'carriers' => array_map(fn ($c) => ['value' => $c->value, 'label' => $c->getLabel()], ShippingCarrierEnum::cases()),
+            'carriers' => array_map(fn (ShippingCarrierEnum $c): array => ['value' => $c->value, 'label' => $c->getLabel()], ShippingCarrierEnum::cases()),
         ]);
     }
 
     public function store(StoreShippingMethodRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        $data['is_active'] = $data['is_active'] ?? true;
+        $data['is_active'] ??= true;
 
-        ShippingMethod::create($data);
+        ShippingMethod::query()->create($data);
 
-        return redirect()->route('admin.ecommerce.shipping-methods.index')->with('success', 'Metoda dostawy została utworzona');
+        return to_route('admin.ecommerce.shipping-methods.index')->with('success', 'Metoda dostawy została utworzona');
     }
 
     public function edit(ShippingMethod $shippingMethod): Response
@@ -51,29 +51,29 @@ class ShippingMethodController extends Controller
 
         return inertia('admin/ecommerce/shipping-methods/edit', [
             'method' => $shippingMethod,
-            'carriers' => array_map(fn ($c) => ['value' => $c->value, 'label' => $c->getLabel()], ShippingCarrierEnum::cases()),
+            'carriers' => array_map(fn (ShippingCarrierEnum $c): array => ['value' => $c->value, 'label' => $c->getLabel()], ShippingCarrierEnum::cases()),
         ]);
     }
 
     public function update(UpdateShippingMethodRequest $request, ShippingMethod $shippingMethod): RedirectResponse
     {
         $data = $request->validated();
-        $data['is_active'] = $data['is_active'] ?? true;
+        $data['is_active'] ??= true;
 
         $shippingMethod->update($data);
 
-        return redirect()->back()->with('success', 'Metoda dostawy została zaktualizowana');
+        return back()->with('success', 'Metoda dostawy została zaktualizowana');
     }
 
     public function destroy(ShippingMethod $shippingMethod): RedirectResponse
     {
         if ($shippingMethod->shipments()->exists()) {
-            return redirect()->back()->with('error', 'Nie można usunąć metody użytej w przesyłkach');
+            return back()->with('error', 'Nie można usunąć metody użytej w przesyłkach');
         }
 
         $shippingMethod->delete();
 
-        return redirect()->back()->with('success', 'Metoda dostawy została usunięta');
+        return back()->with('success', 'Metoda dostawy została usunięta');
     }
 
     public function toggleActive(ShippingMethod $shippingMethod): RedirectResponse
@@ -82,6 +82,6 @@ class ShippingMethodController extends Controller
 
         $message = $shippingMethod->is_active ? 'Metoda dostawy została aktywowana' : 'Metoda dostawy została dezaktywowana';
 
-        return redirect()->back()->with('success', $message);
+        return back()->with('success', $message);
     }
 }

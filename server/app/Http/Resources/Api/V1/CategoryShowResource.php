@@ -25,7 +25,7 @@ class CategoryShowResource extends JsonResource
 
         return [
             'category' => $category instanceof CategoryData ? $category->toArray() : (array) $category,
-            'breadcrumb' => collect($breadcrumb)->map(fn ($c) => $c instanceof CategoryData ? $c->toArray() : (array) $c)->all(),
+            'breadcrumb' => collect($breadcrumb)->map(fn ($c): array => $c instanceof CategoryData ? $c->toArray() : (array) $c)->all(),
         ];
     }
 }

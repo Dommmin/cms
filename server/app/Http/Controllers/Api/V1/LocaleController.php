@@ -27,7 +27,7 @@ class LocaleController extends Controller
             ->get()
             ->keyBy('code');
 
-        $result = array_map(function ($locale) use ($currencies) {
+        $result = array_map(function ($locale) use ($currencies): array {
             $data = [
                 'code' => $locale->code,
                 'name' => $locale->name,

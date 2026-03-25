@@ -179,10 +179,7 @@ class DashboardWidgetSeeder extends Seeder
         ];
 
         foreach ($widgets as $widget) {
-            DashboardWidget::updateOrCreate(
-                ['title' => $widget['title'], 'type' => $widget['type']],
-                $widget,
-            );
+            DashboardWidget::query()->updateOrCreate(['title' => $widget['title'], 'type' => $widget['type']], $widget);
         }
     }
 }

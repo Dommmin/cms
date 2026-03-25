@@ -97,7 +97,7 @@ class InPostLockerCarrier implements ShippingCarrierInterface
 
         $url = (string) ($response['url'] ?? $response['label_url'] ?? '');
 
-        if ($url) {
+        if ($url !== '' && $url !== '0') {
             $shipment->update(['label_url' => $url]);
         }
 
@@ -126,7 +126,7 @@ class InPostLockerCarrier implements ShippingCarrierInterface
     {
         $shipmentId = (string) ($payload['shipment']['id'] ?? $payload['id'] ?? '');
 
-        if (! $shipmentId) {
+        if ($shipmentId === '' || $shipmentId === '0') {
             return;
         }
 
@@ -138,7 +138,7 @@ class InPostLockerCarrier implements ShippingCarrierInterface
         }
 
         $status = $this->mapStatus($payload['shipment']['status'] ?? $payload['status'] ?? '');
-        if ($status) {
+        if ($status instanceof ShipmentStatusEnum) {
             $shipment->update(['status' => $status->value]);
         }
     }

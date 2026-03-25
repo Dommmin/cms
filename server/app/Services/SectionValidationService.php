@@ -25,11 +25,11 @@ class SectionValidationService
         }
 
         foreach ($sectionConfig['fields'] as $field) {
-            $fieldName = "configuration.{$field['name']}";
+            $fieldName = 'configuration.'.$field['name'];
             $fieldRules = $this->buildValidationRules($field);
             $fieldMessages = $this->buildValidationMessages($field, $fieldName);
 
-            if (! empty($fieldRules)) {
+            if ($fieldRules !== '' && $fieldRules !== '0') {
                 $rules[$fieldName] = $fieldRules;
                 $messages = array_merge($messages, $fieldMessages);
             }
@@ -37,11 +37,11 @@ class SectionValidationService
             // Handle nested fields (groups, repeaters)
             if (isset($field['fields']) && is_array($field['fields'])) {
                 foreach ($field['fields'] as $nestedField) {
-                    $nestedFieldName = "{$fieldName}.{$nestedField['name']}";
+                    $nestedFieldName = sprintf('%s.%s', $fieldName, $nestedField['name']);
                     $nestedRules = $this->buildValidationRules($nestedField);
                     $nestedMessages = $this->buildValidationMessages($nestedField, $nestedFieldName);
 
-                    if (! empty($nestedRules)) {
+                    if ($nestedRules !== '' && $nestedRules !== '0') {
                         $rules[$nestedFieldName] = $nestedRules;
                         $messages = array_merge($messages, $nestedMessages);
                     }
@@ -55,7 +55,7 @@ class SectionValidationService
         $validator = Validator::make($data, $rules, $messages);
 
         return [
-            'valid' => $validator->passes() && empty($businessRuleErrors),
+            'valid' => $validator->passes() && $businessRuleErrors === [],
             'errors' => array_merge($validator->errors()->toArray(), $businessRuleErrors),
         ];
     }
@@ -69,11 +69,7 @@ class SectionValidationService
     {
         $rules = [];
 
-        if (isset($field['required']) && $field['required']) {
-            $rules[] = 'required';
-        } else {
-            $rules[] = 'nullable';
-        }
+        $rules[] = isset($field['required']) && $field['required'] ? 'required' : 'nullable';
 
         if (! isset($field['validation'])) {
             return implode('|', $rules);
@@ -83,34 +79,36 @@ class SectionValidationService
 
         if (isset($validation['min'])) {
             if ($field['type'] === 'text' || $field['type'] === 'textarea') {
-                $rules[] = "min:{$validation['min']}";
+                $rules[] = 'min:'.$validation['min'];
             } elseif ($field['type'] === 'number') {
-                $rules[] = "min:{$validation['min']}";
+                $rules[] = 'min:'.$validation['min'];
             }
         }
 
         if (isset($validation['max'])) {
             if ($field['type'] === 'text' || $field['type'] === 'textarea') {
-                $rules[] = "max:{$validation['max']}";
+                $rules[] = 'max:'.$validation['max'];
             } elseif ($field['type'] === 'number') {
-                $rules[] = "max:{$validation['max']}";
+                $rules[] = 'max:'.$validation['max'];
             }
         }
 
         if (isset($validation['mimes'])) {
             $mimes = is_array($validation['mimes']) ? implode(',', $validation['mimes']) : $validation['mimes'];
-            $rules[] = "mimes:{$mimes}";
+            $rules[] = 'mimes:'.$mimes;
         }
 
         if (isset($validation['dimensions'])) {
             $dimensions = [];
             if (isset($validation['dimensions']['min_width'])) {
-                $dimensions[] = "min_width={$validation['dimensions']['min_width']}";
+                $dimensions[] = 'min_width='.$validation['dimensions']['min_width'];
             }
+
             if (isset($validation['dimensions']['min_height'])) {
-                $dimensions[] = "min_height={$validation['dimensions']['min_height']}";
+                $dimensions[] = 'min_height='.$validation['dimensions']['min_height'];
             }
-            if (! empty($dimensions)) {
+
+            if ($dimensions !== []) {
                 $rules[] = 'dimensions:'.implode(',', $dimensions);
             }
         }
@@ -129,11 +127,11 @@ class SectionValidationService
         $messages = [];
         $label = $field['label'] ?? $field['name'];
 
-        $messages["{$fieldName}.required"] = "Pole '{$label}' jest wymagane.";
-        $messages["{$fieldName}.min"] = "Pole '{$label}' musi mieć minimum :min znaków.";
-        $messages["{$fieldName}.max"] = "Pole '{$label}' może mieć maksimum :max znaków.";
-        $messages["{$fieldName}.mimes"] = "Pole '{$label}' musi być plikiem typu: :values.";
-        $messages["{$fieldName}.dimensions"] = "Pole '{$label}' ma nieprawidłowe wymiary.";
+        $messages[$fieldName.'.required'] = sprintf("Pole '%s' jest wymagane.", $label);
+        $messages[$fieldName.'.min'] = sprintf("Pole '%s' musi mieć minimum :min znaków.", $label);
+        $messages[$fieldName.'.max'] = sprintf("Pole '%s' może mieć maksimum :max znaków.", $label);
+        $messages[$fieldName.'.mimes'] = sprintf("Pole '%s' musi być plikiem typu: :values.", $label);
+        $messages[$fieldName.'.dimensions'] = sprintf("Pole '%s' ma nieprawidłowe wymiary.", $label);
 
         return $messages;
     }
@@ -164,7 +162,7 @@ class SectionValidationService
         if (isset($businessRules['required_fields'])) {
             foreach ($businessRules['required_fields'] as $requiredField) {
                 if (! isset($data['configuration'][$requiredField]) || empty($data['configuration'][$requiredField])) {
-                    $errors["configuration.{$requiredField}"] = ["Pole '{$requiredField}' jest wymagane dla tego typu sekcji."];
+                    $errors['configuration.'.$requiredField] = [sprintf("Pole '%s' jest wymagane dla tego typu sekcji.", $requiredField)];
                 }
             }
         }

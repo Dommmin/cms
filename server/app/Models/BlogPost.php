@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Concerns\HasVersions;
 use App\Enums\BlogPostStatusEnum;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -73,21 +74,6 @@ class BlogPost extends Model
         return $this->belongsTo(BlogCategory::class, 'blog_category_id');
     }
 
-    public function scopePublished(Builder $query): Builder
-    {
-        return $query->where('status', BlogPostStatusEnum::Published);
-    }
-
-    public function scopeDraft(Builder $query): Builder
-    {
-        return $query->where('status', BlogPostStatusEnum::Draft);
-    }
-
-    public function scopeFeatured(Builder $query): Builder
-    {
-        return $query->where('is_featured', true);
-    }
-
     public function incrementViews(): void
     {
         $this->increment('views_count');
@@ -98,6 +84,24 @@ class BlogPost extends Model
         $wordCount = str_word_count(strip_tags($content));
 
         return (int) max(1, ceil($wordCount / 200));
+    }
+
+    #[Scope]
+    protected function published(Builder $query): Builder
+    {
+        return $query->where('status', BlogPostStatusEnum::Published);
+    }
+
+    #[Scope]
+    protected function draft(Builder $query): Builder
+    {
+        return $query->where('status', BlogPostStatusEnum::Draft);
+    }
+
+    #[Scope]
+    protected function featured(Builder $query): Builder
+    {
+        return $query->where('is_featured', true);
     }
 
     protected function casts(): array

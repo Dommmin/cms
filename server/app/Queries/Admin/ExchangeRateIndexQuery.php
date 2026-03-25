@@ -18,20 +18,20 @@ final readonly class ExchangeRateIndexQuery
     {
         return ExchangeRate::query()
             ->with('currency:id,code,name')
-            ->when($this->request->currency_id, function ($query, $currencyId) {
+            ->when($this->request->currency_id, function ($query, $currencyId): void {
                 $query->where('currency_id', $currencyId);
             })
-            ->when($this->request->has('source'), function ($query) {
+            ->when($this->request->has('source'), function ($query): void {
                 $query->where('source', $this->request->source);
             })
-            ->orderByDesc('fetched_at')
+            ->latest('fetched_at')
             ->paginate(20)
             ->withQueryString();
     }
 
     public function getActiveCurrencies(): Collection
     {
-        return Currency::where('is_active', true)
+        return Currency::query()->where('is_active', true)
             ->where('is_base', false)
             ->get(['id', 'code', 'name']);
     }

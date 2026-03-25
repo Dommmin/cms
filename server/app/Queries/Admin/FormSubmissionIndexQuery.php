@@ -17,22 +17,21 @@ class FormSubmissionIndexQuery
     {
         return FormSubmission::query()
             ->with('form')
-            ->when($this->request->search, function ($query, $search) {
-                $query->where('email', 'like', "%{$search}%")
-                    ->orWhereHas('form', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%");
+            ->when($this->request->search, function ($query, string $search): void {
+                $query->where('email', 'like', sprintf('%%%s%%', $search))
+                    ->orWhereHas('form', function ($q) use ($search): void {
+                        $q->where('name', 'like', sprintf('%%%s%%', $search));
                     });
             })
-            ->when($this->request->form_id, function ($query, $formId) {
+            ->when($this->request->form_id, function ($query, $formId): void {
                 $query->where('form_id', $formId);
             })
-            ->when($this->request->date_from, function ($query, $date) {
+            ->when($this->request->date_from, function ($query, $date): void {
                 $query->whereDate('created_at', '>=', $date);
             })
-            ->when($this->request->date_to, function ($query, $date) {
+            ->when($this->request->date_to, function ($query, $date): void {
                 $query->whereDate('created_at', '<=', $date);
-            })
-            ->orderBy('created_at', 'desc')
+            })->latest()
             ->paginate(25)
             ->withQueryString();
     }

@@ -3,63 +3,73 @@
 declare(strict_types=1);
 
 use App\Enums\PageBlockTypeEnum;
+use App\Models\BlogCategory;
+use App\Models\BlogPost;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Faq;
+use App\Models\Form;
+use App\Models\Menu;
+use App\Models\Page;
+use App\Models\Product;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 return [
     'relation_types' => [
         'media.image' => [
-            'model' => Spatie\MediaLibrary\MediaCollections\Models\Media::class,
+            'model' => Media::class,
             'label' => 'Image',
             'collection' => 'block-images',
         ],
         'media.icon' => [
-            'model' => Spatie\MediaLibrary\MediaCollections\Models\Media::class,
+            'model' => Media::class,
             'label' => 'Icon',
             'collection' => 'block-icons',
         ],
         'media.file' => [
-            'model' => Spatie\MediaLibrary\MediaCollections\Models\Media::class,
+            'model' => Media::class,
             'label' => 'File/PDF',
             'collection' => 'block-files',
         ],
         'media.video' => [
-            'model' => Spatie\MediaLibrary\MediaCollections\Models\Media::class,
+            'model' => Media::class,
             'label' => 'Video',
             'collection' => 'block-videos',
         ],
         'product' => [
-            'model' => App\Models\Product::class,
+            'model' => Product::class,
             'label' => 'Product',
         ],
         'category' => [
-            'model' => App\Models\Category::class,
+            'model' => Category::class,
             'label' => 'Category',
         ],
         'brand' => [
-            'model' => App\Models\Brand::class,
+            'model' => Brand::class,
             'label' => 'Brand',
         ],
         'page' => [
-            'model' => App\Models\Page::class,
+            'model' => Page::class,
             'label' => 'Page',
         ],
         'menu' => [
-            'model' => App\Models\Menu::class,
+            'model' => Menu::class,
             'label' => 'Menu',
         ],
         'form' => [
-            'model' => App\Models\Form::class,
+            'model' => Form::class,
             'label' => 'Form',
         ],
         'faq' => [
-            'model' => App\Models\Faq::class,
+            'model' => Faq::class,
             'label' => 'FAQ',
         ],
         'blog_post' => [
-            'model' => App\Models\BlogPost::class,
+            'model' => BlogPost::class,
             'label' => 'Blog Post',
         ],
         'blog_category' => [
-            'model' => App\Models\BlogCategory::class,
+            'model' => BlogCategory::class,
             'label' => 'Blog Category',
         ],
     ],

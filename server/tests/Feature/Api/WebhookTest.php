@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Queue;
 // PayU webhooks
 // ---------------------------------------------------------------------------
 
-describe('PayU webhook', function () {
-    it('rejects request with an invalid signature and returns 400', function () {
+describe('PayU webhook', function (): void {
+    it('rejects request with an invalid signature and returns 400', function (): void {
         Config::set('services.payu.md5_key', 'secret');
 
         $this->postJson('/api/v1/webhooks/payu',
@@ -20,7 +20,7 @@ describe('PayU webhook', function () {
         )->assertStatus(400);
     });
 
-    it('rejects request with missing signature header', function () {
+    it('rejects request with missing signature header', function (): void {
         Config::set('services.payu.md5_key', 'secret');
 
         $this->postJson('/api/v1/webhooks/payu', [
@@ -28,7 +28,7 @@ describe('PayU webhook', function () {
         ])->assertStatus(400);
     });
 
-    it('accepts valid signature and dispatches ProcessPaymentWebhook job', function () {
+    it('accepts valid signature and dispatches ProcessPaymentWebhook job', function (): void {
         Queue::fake();
         Config::set('services.payu.md5_key', 'topsecret');
 
@@ -37,13 +37,13 @@ describe('PayU webhook', function () {
         $sig = md5($body.'topsecret');
 
         $this->withHeaders([
-            'OpenPayu-Signature' => "sender=checkout;signature={$sig};algorithm=MD5",
+            'OpenPayu-Signature' => sprintf('sender=checkout;signature=%s;algorithm=MD5', $sig),
         ])->postJson('/api/v1/webhooks/payu', $payload)->assertOk();
 
         Queue::assertPushed(ProcessPaymentWebhook::class);
     });
 
-    it('does not dispatch job when signature is invalid', function () {
+    it('does not dispatch job when signature is invalid', function (): void {
         Queue::fake();
         Config::set('services.payu.md5_key', 'topsecret');
 
@@ -55,7 +55,7 @@ describe('PayU webhook', function () {
         Queue::assertNotPushed(ProcessPaymentWebhook::class);
     });
 
-    it('returns 200 OK immediately after dispatching (PayU requires <10s response)', function () {
+    it('returns 200 OK immediately after dispatching (PayU requires <10s response)', function (): void {
         Queue::fake();
         Config::set('services.payu.md5_key', 'key');
 
@@ -64,18 +64,18 @@ describe('PayU webhook', function () {
         $sig = md5($body.'key');
 
         $this->withHeaders([
-            'OpenPayu-Signature' => "sender=checkout;signature={$sig};algorithm=MD5",
+            'OpenPayu-Signature' => sprintf('sender=checkout;signature=%s;algorithm=MD5', $sig),
         ])->postJson('/api/v1/webhooks/payu', $payload)->assertOk()
             ->assertJsonPath('message', 'OK');
     });
 
-    it('signature is case-sensitive — wrong case fails', function () {
+    it('signature is case-sensitive — wrong case fails', function (): void {
         Config::set('services.payu.md5_key', 'key');
         $body = json_encode(['order' => ['status' => 'COMPLETED']]);
         $sig = mb_strtoupper(md5($body.'key')); // correct MD5 but uppercased
 
         $this->withHeaders([
-            'OpenPayu-Signature' => "sender=checkout;signature={$sig};algorithm=MD5",
+            'OpenPayu-Signature' => sprintf('sender=checkout;signature=%s;algorithm=MD5', $sig),
         ])->postJson('/api/v1/webhooks/payu', json_decode($body, true))
             ->assertStatus(400);
     });
@@ -85,8 +85,8 @@ describe('PayU webhook', function () {
 // P24 webhooks
 // ---------------------------------------------------------------------------
 
-describe('P24 webhook', function () {
-    it('accepts any P24 webhook and dispatches ProcessPaymentWebhook job', function () {
+describe('P24 webhook', function (): void {
+    it('accepts any P24 webhook and dispatches ProcessPaymentWebhook job', function (): void {
         Queue::fake();
 
         $this->postJson('/api/v1/webhooks/p24', [
@@ -99,17 +99,16 @@ describe('P24 webhook', function () {
             'sign' => 'fakesignature',
         ])->assertOk()->assertJsonPath('message', 'OK');
 
-        Queue::assertPushed(ProcessPaymentWebhook::class, function ($job) {
+        Queue::assertPushed(ProcessPaymentWebhook::class, function ($job): bool {
             // Verify the provider argument passed to the job
             $reflection = new ReflectionClass($job);
             $prop = $reflection->getProperty('provider');
-            $prop->setAccessible(true);
 
             return $prop->getValue($job) === 'p24';
         });
     });
 
-    it('P24 webhook is publicly accessible without authentication', function () {
+    it('P24 webhook is publicly accessible without authentication', function (): void {
         Queue::fake();
 
         // No auth header, no session — must still succeed

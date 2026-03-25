@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // Add new JSON translation columns
-        Schema::table('shipping_methods', function (Blueprint $table) {
+        Schema::table('shipping_methods', function (Blueprint $table): void {
             $table->json('name_new')->nullable()->after('name');
             $table->json('description_new')->nullable()->after('description');
         });
@@ -22,11 +22,11 @@ return new class extends Migration
         DB::statement('UPDATE shipping_methods SET description_new = JSON_OBJECT("en", description) WHERE description IS NOT NULL');
 
         // Drop old string columns and rename JSON ones
-        Schema::table('shipping_methods', function (Blueprint $table) {
+        Schema::table('shipping_methods', function (Blueprint $table): void {
             $table->dropColumn(['name', 'description']);
         });
 
-        Schema::table('shipping_methods', function (Blueprint $table) {
+        Schema::table('shipping_methods', function (Blueprint $table): void {
             $table->renameColumn('name_new', 'name');
             $table->renameColumn('description_new', 'description');
         });
@@ -34,7 +34,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('shipping_methods', function (Blueprint $table) {
+        Schema::table('shipping_methods', function (Blueprint $table): void {
             $table->string('name_old')->nullable()->after('name');
             $table->string('description_old')->nullable()->after('description');
         });
@@ -42,11 +42,11 @@ return new class extends Migration
         DB::statement("UPDATE shipping_methods SET name_old = JSON_UNQUOTE(JSON_EXTRACT(name, '$.en'))");
         DB::statement("UPDATE shipping_methods SET description_old = JSON_UNQUOTE(JSON_EXTRACT(description, '$.en')) WHERE description IS NOT NULL");
 
-        Schema::table('shipping_methods', function (Blueprint $table) {
+        Schema::table('shipping_methods', function (Blueprint $table): void {
             $table->dropColumn(['name', 'description']);
         });
 
-        Schema::table('shipping_methods', function (Blueprint $table) {
+        Schema::table('shipping_methods', function (Blueprint $table): void {
             $table->renameColumn('name_old', 'name');
             $table->renameColumn('description_old', 'description');
         });

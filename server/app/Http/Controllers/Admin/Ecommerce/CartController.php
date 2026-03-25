@@ -15,21 +15,21 @@ class CartController extends Controller
     {
         $carts = Cart::query()
             ->with(['customer:id,first_name,last_name,email', 'items.variant.product'])
-            ->when($request->search, function ($query, $search) {
-                $query->whereHas('customer', function ($q) use ($search) {
-                    $q->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
+            ->when($request->search, function ($query, $search): void {
+                $query->whereHas('customer', function ($q) use ($search): void {
+                    $q->where('first_name', 'like', sprintf('%%%s%%', $search))
+                        ->orWhere('last_name', 'like', sprintf('%%%s%%', $search))
+                        ->orWhere('email', 'like', sprintf('%%%s%%', $search));
                 });
             })
-            ->when($request->has('is_empty'), function ($query) use ($request) {
+            ->when($request->has('is_empty'), function ($query) use ($request): void {
                 if ($request->boolean('is_empty')) {
                     $query->whereDoesntHave('items');
                 } else {
                     $query->has('items');
                 }
             })
-            ->orderByDesc('updated_at')
+            ->latest('updated_at')
             ->paginate(20)
             ->withQueryString();
 

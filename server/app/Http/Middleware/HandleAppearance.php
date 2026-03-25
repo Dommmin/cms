@@ -81,7 +81,7 @@ class HandleAppearance
                     && mb_strlen($value) <= 100
                     && preg_match('/^[#(),.%\\-\\sa-zA-Z0-9]+$/', $value) === 1
             )
-            ->map(fn (string $value, string $key): string => "--{$key}: {$value};")
+            ->map(fn (string $value, string $key): string => sprintf('--%s: %s;', $key, $value))
             ->values()
             ->all();
 

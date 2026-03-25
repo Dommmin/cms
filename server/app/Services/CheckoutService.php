@@ -21,6 +21,7 @@ use App\Models\ProductVariant;
 use App\Models\Referral;
 use App\Models\Shipment;
 use App\Models\ShippingMethod;
+use App\Models\TaxRate;
 use App\Models\User;
 use Illuminate\Support\Arr;
 
@@ -46,7 +47,7 @@ class CheckoutService
         ?string $notes = null,
         ?string $referralCode = null
     ): Order {
-        if ($user !== null) {
+        if ($user instanceof User) {
             if (! $user->customer) {
                 Customer::query()->create([
                     'user_id' => $user->id,
@@ -67,16 +68,14 @@ class CheckoutService
 
         $cart->load('items.variant.product.category');
 
-        if ($cart->isEmpty()) {
-            abort(422, 'Cart is empty');
-        }
+        abort_if($cart->isEmpty(), 422, 'Cart is empty');
 
         $shippingMethod = ShippingMethod::query()->where('is_active', true)->findOrFail($shippingMethodId);
 
         [$discountAmount, $freeShipping] = $this->resolveDiscount($cart);
 
         $affiliateCode = $this->resolveAffiliateCode($referralCode);
-        if ($affiliateCode) {
+        if ($affiliateCode instanceof AffiliateCode) {
             $subtotalBeforeAffiliate = $cart->subtotal();
             $affiliateDiscount = $affiliateCode->calculateDiscount($subtotalBeforeAffiliate);
             $discountAmount = max($discountAmount, $affiliateDiscount);
@@ -153,7 +152,7 @@ class CheckoutService
         $cart->items()->delete();
         $cart->update(['discount_code' => null]);
 
-        if ($affiliateCode && $user !== null) {
+        if ($affiliateCode && $user instanceof User) {
             $commission = $affiliateCode->calculateCommission($order->total);
             Referral::query()->create([
                 'affiliate_code_id' => $affiliateCode->id,
@@ -196,7 +195,7 @@ class CheckoutService
             $gross = $variant->price * (int) $item->quantity;
             $taxRate = $variant->effectiveTaxRate();
 
-            return $taxRate ? $taxRate->taxFromGross($gross) : 0;
+            return $taxRate instanceof TaxRate ? $taxRate->taxFromGross($gross) : 0;
         });
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Shipping\InPost;
 
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -19,12 +20,12 @@ class InPostClient
     {
         $orgId = $this->organizationId();
         $response = $this->client()->post(
-            $this->baseUrl()."/organizations/{$orgId}/shipments",
+            $this->baseUrl().sprintf('/organizations/%s/shipments', $orgId),
             $data
         );
 
         if (! $response->successful()) {
-            throw new RuntimeException("InPost ShipX error [{$response->status()}]: ".$response->body());
+            throw new RuntimeException(sprintf('InPost ShipX error [%d]: ', $response->status()).$response->body());
         }
 
         return $response->json() ?? [];
@@ -37,10 +38,10 @@ class InPostClient
      */
     public function getShipment(string $shipmentId): array
     {
-        $response = $this->client()->get($this->baseUrl()."/shipments/{$shipmentId}");
+        $response = $this->client()->get($this->baseUrl().('/shipments/'.$shipmentId));
 
         if (! $response->successful()) {
-            throw new RuntimeException("InPost ShipX error [{$response->status()}]: ".$response->body());
+            throw new RuntimeException(sprintf('InPost ShipX error [%d]: ', $response->status()).$response->body());
         }
 
         return $response->json() ?? [];
@@ -55,12 +56,12 @@ class InPostClient
     {
         $orgId = $this->organizationId();
         $response = $this->client()->get(
-            $this->baseUrl()."/organizations/{$orgId}/shipments/labels",
+            $this->baseUrl().sprintf('/organizations/%s/shipments/labels', $orgId),
             ['shipment_ids' => [$shipmentId], 'format' => $format]
         );
 
         if (! $response->successful()) {
-            throw new RuntimeException("InPost label error [{$response->status()}]: ".$response->body());
+            throw new RuntimeException(sprintf('InPost label error [%d]: ', $response->status()).$response->body());
         }
 
         return $response->json() ?? [];
@@ -71,7 +72,7 @@ class InPostClient
         return mb_rtrim((string) config('services.inpost_shipx.base_url'), '/');
     }
 
-    private function client(): \Illuminate\Http\Client\PendingRequest
+    private function client(): PendingRequest
     {
         return Http::withToken((string) config('services.inpost_shipx.token'))
             ->acceptJson();

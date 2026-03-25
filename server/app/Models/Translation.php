@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,12 +26,14 @@ class Translation extends Model
         return $this->belongsTo(Locale::class, 'locale_code', 'code');
     }
 
-    public function scopeForLocale(\Illuminate\Database\Eloquent\Builder $query, string $localeCode): \Illuminate\Database\Eloquent\Builder
+    #[Scope]
+    protected function forLocale(Builder $query, string $localeCode): Builder
     {
         return $query->where('locale_code', $localeCode);
     }
 
-    public function scopeInGroup(\Illuminate\Database\Eloquent\Builder $query, string $group): \Illuminate\Database\Eloquent\Builder
+    #[Scope]
+    protected function inGroup(Builder $query, string $group): Builder
     {
         return $query->where('group', $group);
     }

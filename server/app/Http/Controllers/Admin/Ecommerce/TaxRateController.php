@@ -34,15 +34,15 @@ class TaxRateController extends Controller
     public function store(StoreTaxRateRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        $data['is_active'] = $data['is_active'] ?? true;
+        $data['is_active'] ??= true;
 
         if ($data['is_default'] ?? false) {
-            TaxRate::where('is_default', true)->update(['is_default' => false]);
+            TaxRate::query()->where('is_default', true)->update(['is_default' => false]);
         }
 
-        TaxRate::create($data);
+        TaxRate::query()->create($data);
 
-        return redirect()->route('admin.ecommerce.tax-rates.index')->with('success', 'Stawka VAT została utworzona');
+        return to_route('admin.ecommerce.tax-rates.index')->with('success', 'Stawka VAT została utworzona');
     }
 
     public function edit(TaxRate $taxRate): Response
@@ -59,26 +59,26 @@ class TaxRateController extends Controller
         $data = $request->validated();
 
         if (($data['is_default'] ?? false) && ! $taxRate->is_default) {
-            TaxRate::where('is_default', true)->update(['is_default' => false]);
+            TaxRate::query()->where('is_default', true)->update(['is_default' => false]);
         }
 
         $taxRate->update($data);
 
-        return redirect()->back()->with('success', 'Stawka VAT została zaktualizowana');
+        return back()->with('success', 'Stawka VAT została zaktualizowana');
     }
 
     public function destroy(TaxRate $taxRate): RedirectResponse
     {
         if ($taxRate->is_default) {
-            return redirect()->back()->with('error', 'Nie można usunąć domyślnej stawki VAT');
+            return back()->with('error', 'Nie można usunąć domyślnej stawki VAT');
         }
 
         if ($taxRate->categories()->exists() || $taxRate->variants()->exists()) {
-            return redirect()->back()->with('error', 'Nie można usunąć stawki przypisanej do kategorii lub produktów');
+            return back()->with('error', 'Nie można usunąć stawki przypisanej do kategorii lub produktów');
         }
 
         $taxRate->delete();
 
-        return redirect()->back()->with('success', 'Stawka VAT została usunięta');
+        return back()->with('success', 'Stawka VAT została usunięta');
     }
 }

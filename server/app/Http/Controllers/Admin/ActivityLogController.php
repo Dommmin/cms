@@ -40,9 +40,9 @@ class ActivityLogController extends Controller
 
         $activities = $query->paginate($request->integer('per_page', 50))->withQueryString();
 
-        $users = User::orderBy('name')->get(['id', 'name', 'email']);
+        $users = User::query()->orderBy('name')->get(['id', 'name', 'email']);
 
-        $logNames = Activity::distinct()->pluck('log_name')->sort()->values();
+        $logNames = Activity::query()->distinct()->pluck('log_name')->sort()->values();
 
         return inertia('admin/activity-log/index', [
             'activities' => $activities,

@@ -21,8 +21,8 @@ class FaqIndexQuery
 
                 $query->where(function (Builder $query) use ($search): void {
                     $query
-                        ->where('question', 'like', "%{$search}%")
-                        ->orWhere('answer', 'like', "%{$search}%");
+                        ->where('question', 'like', sprintf('%%%s%%', $search))
+                        ->orWhere('answer', 'like', sprintf('%%%s%%', $search));
                 });
             })
             ->when($filters['category'] ?? null, fn (Builder $query, mixed $category): Builder => $query->where('category', (string) $category))

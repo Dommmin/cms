@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Sorts;
 
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\Sorts\Sort;
 
 /**
- * @implements Sort<\App\Models\Product>
+ * @implements Sort<Product>
  */
 class VariantPriceSort implements Sort
 {

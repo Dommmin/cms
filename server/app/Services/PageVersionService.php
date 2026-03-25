@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\Page;
 use App\Models\PageVersion;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -18,30 +19,25 @@ class PageVersionService
     {
         $versionNumber = $this->getNextVersionNumber($page);
 
-        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Modules\Core\Domain\Models\PageSection> $sections */
+        /** @var Collection<int, \App\Modules\Core\Domain\Models\PageSection> $sections */
         $sections = $page->allSections()
             ->with('allBlocks')
             ->get();
 
-        $sections = $sections->map(function ($section): array {
-            /** @var \App\Modules\Core\Domain\Models\PageSection $section */
-            $section = $section;
-
-            return [
-                'section' => $section->toArray(),
-                'blocks' => $section->allBlocks()->get()->map(fn ($block) => $block->toArray())->toArray(),
-            ];
-        })
-            ->toArray();
+        $sections = $sections->map(fn ($section): array => [
+            'section' => $section->toArray(),
+            'blocks' => $section->allBlocks()->get()->map(fn ($block) => $block->toArray())->toArray(),
+        ])
+            ->all();
 
         $snapshot = [
             'page' => $page->toArray(),
             'sections' => $sections,
-            'legacy_blocks' => $page->allBlocks()->get()->map(fn ($block) => $block->toArray())->toArray(),
+            'legacy_blocks' => $page->allBlocks()->get()->map(fn ($block) => $block->toArray())->all(),
             'created_at' => now()->toIso8601String(),
         ];
 
-        return PageVersion::create([
+        return PageVersion::query()->create([
             'page_id' => $page->id,
             'version_number' => $versionNumber,
             'snapshot' => $snapshot,
@@ -96,7 +92,7 @@ class PageVersionService
                 $page->allSections()->delete();
 
                 // Restore from section snapshot if available
-                if (isset($snapshot['sections']) && is_array($snapshot['sections']) && count($snapshot['sections']) > 0) {
+                if (isset($snapshot['sections']) && is_array($snapshot['sections']) && $snapshot['sections'] !== []) {
                     foreach ($snapshot['sections'] as $sectionData) {
                         /** @var \App\Modules\Core\Domain\Models\PageSection $section */
                         $section = $page->allSections()->create([
@@ -156,11 +152,11 @@ class PageVersionService
     /**
      * Get all versions for a page
      *
-     * @return \Illuminate\Database\Eloquent\Collection<int, PageVersion>
+     * @return Collection<int, PageVersion>
      */
     public function getVersions(Page $page)
     {
-        return PageVersion::where('page_id', $page->id)
+        return PageVersion::query()->where('page_id', $page->id)
             ->orderByDesc('version_number')
             ->with('creator')
             ->get();
@@ -171,7 +167,7 @@ class PageVersionService
      */
     private function getNextVersionNumber(Page $page): int
     {
-        $latestVersion = PageVersion::where('page_id', $page->id)
+        $latestVersion = PageVersion::query()->where('page_id', $page->id)
             ->orderByDesc('version_number')
             ->first();
 

@@ -18,13 +18,13 @@ final readonly class MenuIndexQuery
     {
         return Menu::query()
             ->withCount('allItems')
-            ->when($this->request->search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%");
+            ->when($this->request->search, function ($query, string $search): void {
+                $query->where('name', 'like', sprintf('%%%s%%', $search));
             })
-            ->when($this->request->location, function ($query, $location) {
+            ->when($this->request->location, function ($query, $location): void {
                 $query->where('location', $location);
             })
-            ->when($this->request->has('is_active'), function ($query) {
+            ->when($this->request->has('is_active'), function ($query): void {
                 $query->where('is_active', $this->request->boolean('is_active'));
             })
             ->orderBy('name')
@@ -34,7 +34,7 @@ final readonly class MenuIndexQuery
 
     public function getLocations(): Collection
     {
-        return collect(MenuLocationEnum::cases())->map(fn ($l) => [
+        return collect(MenuLocationEnum::cases())->map(fn ($l): array => [
             'value' => $l->value,
             'label' => $l->label(),
         ]);

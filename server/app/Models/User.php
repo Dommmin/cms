@@ -18,7 +18,13 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, HasRoles, LogsActivity, Notifiable, SoftDeletes, TwoFactorAuthenticatable;
+    use HasApiTokens;
+    use HasFactory;
+    use HasRoles;
+    use LogsActivity;
+    use Notifiable;
+    use SoftDeletes;
+    use TwoFactorAuthenticatable;
 
     protected $fillable = [
         'name',
@@ -50,9 +56,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Customer::class);
     }
 
-    public function getAdminAttribute(): bool
+    protected function getAdminAttribute(): bool
     {
-        return $this->hasRole('admin') || $this->hasRole('editor');
+        if ($this->hasRole('admin')) {
+            return true;
+        }
+
+        return $this->hasRole('editor');
     }
 
     protected function casts(): array

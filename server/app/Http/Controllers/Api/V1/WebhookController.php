@@ -24,7 +24,7 @@ class WebhookController extends Controller
 
         $payload = json_decode($body, true) ?? [];
 
-        ProcessPaymentWebhook::dispatch('payu', $payload, $body, (string) $signatureHeader);
+        dispatch(new ProcessPaymentWebhook('payu', $payload, $body, (string) $signatureHeader));
 
         return response()->json(['message' => 'OK']);
     }
@@ -35,7 +35,7 @@ class WebhookController extends Controller
         $body = $request->getContent();
         $signature = (string) ($payload['sign'] ?? '');
 
-        ProcessPaymentWebhook::dispatch('p24', $payload, $body, $signature);
+        dispatch(new ProcessPaymentWebhook('p24', $payload, $body, $signature));
 
         return response()->json(['message' => 'OK']);
     }

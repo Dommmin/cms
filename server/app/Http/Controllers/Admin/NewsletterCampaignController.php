@@ -30,7 +30,7 @@ class NewsletterCampaignController extends Controller
 
     public function create(): Response
     {
-        $segments = (new NewsletterCampaignIndexQuery(request()))->getActiveSegments();
+        $segments = new NewsletterCampaignIndexQuery(request())->getActiveSegments();
 
         return inertia('admin/newsletter/campaigns/create', [
             'segments' => $segments,
@@ -43,9 +43,9 @@ class NewsletterCampaignController extends Controller
 
         $data['status'] = CampaignStatusEnum::Draft->value;
 
-        $campaign = NewsletterCampaign::create($data);
+        $campaign = NewsletterCampaign::query()->create($data);
 
-        return redirect()->route('admin.newsletter.campaigns.edit', $campaign)->with('success', 'Kampania została utworzona');
+        return to_route('admin.newsletter.campaigns.edit', $campaign)->with('success', 'Kampania została utworzona');
     }
 
     public function show(NewsletterCampaign $campaign): Response
@@ -70,7 +70,7 @@ class NewsletterCampaignController extends Controller
     public function edit(NewsletterCampaign $campaign): Response
     {
         $campaign->load('segment');
-        $segments = (new NewsletterCampaignIndexQuery(request()))->getActiveSegments();
+        $segments = new NewsletterCampaignIndexQuery(request())->getActiveSegments();
 
         return inertia('admin/newsletter/campaigns/edit', [
             'campaign' => $campaign,
@@ -84,27 +84,27 @@ class NewsletterCampaignController extends Controller
 
         $campaign->update($data);
 
-        return redirect()->back()->with('success', 'Kampania została zaktualizowana');
+        return back()->with('success', 'Kampania została zaktualizowana');
     }
 
     public function destroy(NewsletterCampaign $campaign): RedirectResponse
     {
         $campaign->delete();
 
-        return redirect()->back()->with('success', 'Kampania została usunięta');
+        return back()->with('success', 'Kampania została usunięta');
     }
 
     public function send(NewsletterCampaign $campaign): RedirectResponse
     {
         if ($campaign->status !== CampaignStatusEnum::Draft->value) {
-            return redirect()->back()->with('error', 'Kampania została już wysłana');
+            return back()->with('error', 'Kampania została już wysłana');
         }
 
         $campaign->update(['status' => CampaignStatusEnum::Sending->value]);
 
         // Tutaj dispatch job do wysyłki
 
-        return redirect()->back()->with('success', 'Wysyłanie kampanii zostało rozpoczęte');
+        return back()->with('success', 'Wysyłanie kampanii zostało rozpoczęte');
     }
 
     public function schedule(ScheduleNewsletterCampaignRequest $request, NewsletterCampaign $campaign): RedirectResponse
@@ -116,7 +116,7 @@ class NewsletterCampaignController extends Controller
             'scheduled_at' => $data['scheduled_at'],
         ]);
 
-        return redirect()->back()->with('success', 'Kampania została zaplanowana');
+        return back()->with('success', 'Kampania została zaplanowana');
     }
 
     public function duplicate(NewsletterCampaign $campaign): RedirectResponse
@@ -136,6 +136,6 @@ class NewsletterCampaignController extends Controller
         $newCampaign->total_unsubscribed = 0;
         $newCampaign->save();
 
-        return redirect()->route('admin.newsletter.campaigns.edit', $newCampaign)->with('success', 'Kampania została skopiowana');
+        return to_route('admin.newsletter.campaigns.edit', $newCampaign)->with('success', 'Kampania została skopiowana');
     }
 }

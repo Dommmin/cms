@@ -14,11 +14,11 @@ class PageController extends Controller
     public function show(string $slug): JsonResponse
     {
         $locale = app()->getLocale();
-        $segments = array_filter(explode('/', $slug), fn (string $s) => $s !== '');
+        $segments = array_filter(explode('/', $slug), fn (string $s): bool => $s !== '');
 
         $page = Page::findByLocalizedPath(array_values($segments), $locale);
 
-        abort_unless($page !== null, 404);
+        abort_unless($page instanceof Page, 404);
 
         $page->load([
             'sections' => fn ($q) => $q->where('is_active', true)->orderBy('position'),

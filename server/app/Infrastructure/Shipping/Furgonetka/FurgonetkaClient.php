@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Shipping\Furgonetka;
 
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -31,7 +32,7 @@ class FurgonetkaClient
      */
     public function getLabel(string $shipmentId): array
     {
-        return $this->request('GET', "/v1/shipments/{$shipmentId}/label");
+        return $this->request('GET', sprintf('/v1/shipments/%s/label', $shipmentId));
     }
 
     /**
@@ -41,7 +42,7 @@ class FurgonetkaClient
      */
     public function getTracking(string $shipmentId): array
     {
-        return $this->request('GET', "/v1/shipments/{$shipmentId}/tracking");
+        return $this->request('GET', sprintf('/v1/shipments/%s/tracking', $shipmentId));
     }
 
     /**
@@ -77,13 +78,13 @@ class FurgonetkaClient
         }
 
         if (! $response->successful()) {
-            throw new RuntimeException("Furgonetka API error [{$response->status()}]: ".$response->body());
+            throw new RuntimeException(sprintf('Furgonetka API error [%d]: ', $response->status()).$response->body());
         }
 
         return $response->json() ?? [];
     }
 
-    private function send(string $method, string $path, array $data): \Illuminate\Http\Client\Response
+    private function send(string $method, string $path, array $data): Response
     {
         $baseUrl = config('services.furgonetka.base_url');
         $token = $this->tokenService->getToken();
@@ -93,7 +94,7 @@ class FurgonetkaClient
         return match (mb_strtoupper($method)) {
             'POST' => $client->post($baseUrl.$path, $data),
             'GET' => $client->get($baseUrl.$path, $data),   // $data as query params
-            default => throw new RuntimeException("Unsupported method: {$method}"),
+            default => throw new RuntimeException('Unsupported method: '.$method),
         };
     }
 }

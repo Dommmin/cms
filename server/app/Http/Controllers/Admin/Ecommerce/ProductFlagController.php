@@ -34,17 +34,17 @@ class ProductFlagController extends Controller
     public function store(StoreProductFlagRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        $data['is_active'] = $data['is_active'] ?? true;
+        $data['is_active'] ??= true;
 
-        ProductFlag::create($data);
+        ProductFlag::query()->create($data);
 
-        return redirect()->route('admin.ecommerce.product-flags.index')
+        return to_route('admin.ecommerce.product-flags.index')
             ->with('success', 'Flaga produktu została utworzona');
     }
 
     public function show(ProductFlag $productFlag): Response
     {
-        $productFlag->load(['products' => function ($query) {
+        $productFlag->load(['products' => function ($query): void {
             $query->select('id', 'name', 'sku', 'price')->orderBy('name');
         }]);
 
@@ -64,37 +64,37 @@ class ProductFlagController extends Controller
     {
         $productFlag->update($request->validated());
 
-        return redirect()->route('admin.ecommerce.product-flags.index')
+        return to_route('admin.ecommerce.product-flags.index')
             ->with('success', 'Flaga produktu została zaktualizowana');
     }
 
     public function destroy(ProductFlag $productFlag): RedirectResponse
     {
         if ($productFlag->products()->exists()) {
-            return redirect()->back()
+            return back()
                 ->with('error', 'Nie można usunąć flagi przypisanej do produktów');
         }
 
         $productFlag->delete();
 
-        return redirect()->route('admin.ecommerce.product-flags.index')
+        return to_route('admin.ecommerce.product-flags.index')
             ->with('success', 'Flaga produktu została usunięta');
     }
 
     public function reorder(Request $request): RedirectResponse
     {
         $request->validate([
-            'flags' => 'required|array',
-            'flags.*.id' => 'required|exists:product_flags,id',
-            'flags.*.position' => 'required|integer|min:0',
+            'flags' => ['required', 'array'],
+            'flags.*.id' => ['required', 'exists:product_flags,id'],
+            'flags.*.position' => ['required', 'integer', 'min:0'],
         ]);
 
         foreach ($request->flags as $flagData) {
-            ProductFlag::where('id', $flagData['id'])
+            ProductFlag::query()->where('id', $flagData['id'])
                 ->update(['position' => $flagData['position']]);
         }
 
-        return redirect()->back()
+        return back()
             ->with('success', 'Kolejność flag została zaktualizowana');
     }
 }

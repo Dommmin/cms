@@ -6,6 +6,7 @@ namespace App\Exports;
 
 use App\Models\Order;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -16,19 +17,18 @@ class OrdersExport implements FromQuery, ShouldAutoSize, ShouldQueue, WithHeadin
 {
     public function __construct(private readonly Request $request) {}
 
-    public function query(): \Illuminate\Database\Eloquent\Builder
+    public function query(): Builder
     {
         return Order::query()
             ->with(['customer', 'payment', 'shipment.shippingMethod'])
-            ->when($this->request->input('search'), function ($query, $search) {
-                $query->where('reference_number', 'like', "%{$search}%")
-                    ->orWhereHas('customer', fn ($q) => $q->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%"));
+            ->when($this->request->input('search'), function ($query, $search): void {
+                $query->where('reference_number', 'like', sprintf('%%%s%%', $search))
+                    ->orWhereHas('customer', fn ($q) => $q->where('first_name', 'like', sprintf('%%%s%%', $search))
+                        ->orWhere('email', 'like', sprintf('%%%s%%', $search)));
             })
             ->when($this->request->input('status'), fn ($q, $s) => $q->where('status', $s))
             ->when($this->request->input('date_from'), fn ($q, $d) => $q->whereDate('created_at', '>=', $d))
-            ->when($this->request->input('date_to'), fn ($q, $d) => $q->whereDate('created_at', '<=', $d))
-            ->orderByDesc('created_at');
+            ->when($this->request->input('date_to'), fn ($q, $d) => $q->whereDate('created_at', '<=', $d))->latest();
     }
 
     /** @return string[] */

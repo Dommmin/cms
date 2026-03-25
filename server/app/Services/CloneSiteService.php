@@ -27,11 +27,7 @@ class CloneSiteService
             ->where('locale', $targetLocale)
             ->count();
 
-        if ($existingCount > 0) {
-            throw new RuntimeException(
-                "Target locale '{$targetLocale}' already has {$existingCount} page(s). Delete them first or choose a different target locale.",
-            );
-        }
+        throw_if($existingCount > 0, RuntimeException::class, sprintf("Target locale '%s' already has %d page(s). Delete them first or choose a different target locale.", $targetLocale, $existingCount));
 
         DB::transaction(function () use ($resolvedSource, $targetLocale): void {
             $sourcePages = Page::query()
@@ -74,9 +70,9 @@ class CloneSiteService
             }
 
             // Remap parent_id to new page IDs
-            foreach ($pageIdMap as $oldId => $data) {
+            foreach ($pageIdMap as $data) {
                 if ($data['old_parent'] !== null && isset($pageIdMap[$data['old_parent']])) {
-                    Page::where('id', $data['new_id'])->update([
+                    Page::query()->where('id', $data['new_id'])->update([
                         'parent_id' => $pageIdMap[$data['old_parent']]['new_id'],
                     ]);
                 }

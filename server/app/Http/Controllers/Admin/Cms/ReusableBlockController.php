@@ -20,7 +20,7 @@ class ReusableBlockController extends Controller
             ->withCount('pageBlocks')
             ->latest()
             ->get()
-            ->map(fn (ReusableBlock $block) => [
+            ->map(fn (ReusableBlock $block): array => [
                 'id' => $block->id,
                 'name' => $block->name,
                 'description' => $block->description,
@@ -46,7 +46,7 @@ class ReusableBlockController extends Controller
             'relations_config' => ['nullable', 'array'],
         ]);
 
-        $block = ReusableBlock::create([
+        $block = ReusableBlock::query()->create([
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
             'type' => $validated['type'],
@@ -110,7 +110,7 @@ class ReusableBlockController extends Controller
             ->where('is_active', true)
             ->latest()
             ->get()
-            ->map(fn (ReusableBlock $block) => [
+            ->map(fn (ReusableBlock $block): array => [
                 'id' => $block->id,
                 'name' => $block->name,
                 'description' => $block->description,

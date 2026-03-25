@@ -32,9 +32,9 @@ class SupportCannedResponseController extends Controller
 
     public function store(StoreSupportCannedResponseRequest $request): RedirectResponse
     {
-        SupportCannedResponse::create($request->validated());
+        SupportCannedResponse::query()->create($request->validated());
 
-        return redirect()->route('admin.support.canned-responses.index')
+        return to_route('admin.support.canned-responses.index')
             ->with('success', 'Odpowiedź zapisana.');
     }
 
@@ -49,7 +49,7 @@ class SupportCannedResponseController extends Controller
     {
         $cannedResponse->update($request->validated());
 
-        return redirect()->route('admin.support.canned-responses.index')
+        return to_route('admin.support.canned-responses.index')
             ->with('success', 'Odpowiedź zaktualizowana.');
     }
 
@@ -57,7 +57,7 @@ class SupportCannedResponseController extends Controller
     {
         $cannedResponse->delete();
 
-        return redirect()->route('admin.support.canned-responses.index')
+        return to_route('admin.support.canned-responses.index')
             ->with('success', 'Odpowiedź usunięta.');
     }
 }

@@ -29,59 +29,59 @@ class BlockRelationController extends Controller
 
         $results = match ($type) {
             'category' => Category::query()
-                ->when($query, fn ($q) => $q->where('name', 'like', "%{$query}%"))
+                ->when($query, fn ($q) => $q->where('name', 'like', sprintf('%%%s%%', $query)))
                 ->orderBy('name')
                 ->limit(20)
                 ->get(['id', 'name'])
-                ->map(fn ($item) => ['id' => $item->id, 'name' => $item->getTranslation('name', 'en')]),
+                ->map(fn ($item): array => ['id' => $item->id, 'name' => $item->getTranslation('name', 'en')]),
 
             'product' => Product::query()
-                ->when($query, fn ($q) => $q->where('name', 'like', "%{$query}%"))
+                ->when($query, fn ($q) => $q->where('name', 'like', sprintf('%%%s%%', $query)))
                 ->orderBy('name')
                 ->limit(20)
                 ->get(['id', 'name'])
-                ->map(fn ($item) => ['id' => $item->id, 'name' => $item->getTranslation('name', 'en')]),
+                ->map(fn ($item): array => ['id' => $item->id, 'name' => $item->getTranslation('name', 'en')]),
 
             'brand' => Brand::query()
-                ->when($query, fn ($q) => $q->where('name', 'like', "%{$query}%"))
+                ->when($query, fn ($q) => $q->where('name', 'like', sprintf('%%%s%%', $query)))
                 ->orderBy('name')
                 ->limit(20)
                 ->get(['id', 'name']),
 
             'page' => Page::query()
-                ->when($query, fn ($q) => $q->where('title', 'like', "%{$query}%"))
+                ->when($query, fn ($q) => $q->where('title', 'like', sprintf('%%%s%%', $query)))
                 ->orderBy('title')
                 ->limit(20)
                 ->get(['id', 'title'])
-                ->map(fn ($item) => ['id' => $item->id, 'name' => $item->getTranslation('title', 'en')]),
+                ->map(fn ($item): array => ['id' => $item->id, 'name' => $item->getTranslation('title', 'en')]),
 
             'menu' => Menu::query()
-                ->when($query, fn ($q) => $q->where('name', 'like', "%{$query}%"))
+                ->when($query, fn ($q) => $q->where('name', 'like', sprintf('%%%s%%', $query)))
                 ->orderBy('name')
                 ->limit(20)
                 ->get(['id', 'name']),
 
             'form' => Form::query()
-                ->when($query, fn ($q) => $q->where('name', 'like', "%{$query}%"))
+                ->when($query, fn ($q) => $q->where('name', 'like', sprintf('%%%s%%', $query)))
                 ->orderBy('name')
                 ->limit(20)
                 ->get(['id', 'name']),
 
             'faq' => Faq::query()
-                ->when($query, fn ($q) => $q->where('question', 'like', "%{$query}%"))
+                ->when($query, fn ($q) => $q->where('question', 'like', sprintf('%%%s%%', $query)))
                 ->orderBy('question')
                 ->limit(20)
                 ->get(['id', 'question as name']),
 
             'blog_post' => BlogPost::query()
-                ->when($query, fn ($q) => $q->where('title', 'like', "%{$query}%"))
-                ->orderByDesc('published_at')
+                ->when($query, fn ($q) => $q->where('title', 'like', sprintf('%%%s%%', $query)))
+                ->latest('published_at')
                 ->limit(20)
                 ->get(['id', 'title'])
-                ->map(fn ($item) => ['id' => $item->id, 'name' => $item->getTranslation('title', 'en')]),
+                ->map(fn ($item): array => ['id' => $item->id, 'name' => $item->getTranslation('title', 'en')]),
 
             'blog_category' => BlogCategory::query()
-                ->when($query, fn ($q) => $q->where('name', 'like', "%{$query}%"))
+                ->when($query, fn ($q) => $q->where('name', 'like', sprintf('%%%s%%', $query)))
                 ->orderBy('name')
                 ->limit(20)
                 ->get(['id', 'name']),

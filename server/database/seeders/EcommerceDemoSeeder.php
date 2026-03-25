@@ -161,7 +161,7 @@ class EcommerceDemoSeeder extends Seeder
             return [$model->slug => $model];
         });
 
-        return compact('color', 'colorValues', 'size', 'sizeValues', 'shoeSize', 'shoeSizeValues', 'scent', 'scentValues');
+        return ['color' => $color, 'colorValues' => $colorValues, 'size' => $size, 'sizeValues' => $sizeValues, 'shoeSize' => $shoeSize, 'shoeSizeValues' => $shoeSizeValues, 'scent' => $scent, 'scentValues' => $scentValues];
     }
 
     // ── Product Types ─────────────────────────────────────────────────────────
@@ -303,8 +303,11 @@ class EcommerceDemoSeeder extends Seeder
             $category = $categories->get($item['category']);
             $type = $productTypes->get($item['type']);
             $brand = $brands->get(Str::slug($item['brand']));
+            if (! $category) {
+                continue;
+            }
 
-            if (! $category || ! $type) {
+            if (! $type) {
                 continue;
             }
 
@@ -431,6 +434,7 @@ class EcommerceDemoSeeder extends Seeder
                         'recorded_at' => now()->subDays($daysAgo),
                     ]);
                 }
+
                 // NOTE: the current sale price is intentionally NOT recorded.
                 // lowestPriceInLast30Days() falls back to $variant->price when
                 // price_history has no entry <= $salePrice in the window, so the

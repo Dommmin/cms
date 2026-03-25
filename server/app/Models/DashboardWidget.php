@@ -6,10 +6,15 @@ namespace App\Models;
 
 use App\Enums\WidgetSize;
 use App\Enums\WidgetType;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class DashboardWidget extends Model
 {
+    use HasFactory;
+    use HasFactory;
+
     protected $fillable = [
         'title',
         'type',
@@ -22,12 +27,14 @@ class DashboardWidget extends Model
         'color',
     ];
 
-    public function scopeActive($query)
+    #[Scope]
+    protected function active($query)
     {
         return $query->where('is_active', true);
     }
 
-    public function scopeOrdered($query)
+    #[Scope]
+    protected function ordered($query)
     {
         return $query->orderBy('order');
     }

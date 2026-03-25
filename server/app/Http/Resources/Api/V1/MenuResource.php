@@ -9,6 +9,7 @@ use App\Models\MenuItem;
 use BackedEnum;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Collection;
 
 /**
  * @mixin Menu
@@ -28,11 +29,11 @@ class MenuResource extends JsonResource
         ];
     }
 
-    private function mapItems(\Illuminate\Support\Collection $items): array
+    private function mapItems(Collection $items): array
     {
         $locale = request()->cookie('locale', request()->query('locale', 'en'));
 
-        return $items->values()->map(fn (MenuItem $item) => [
+        return $items->values()->map(fn (MenuItem $item): array => [
             'id' => $item->id,
             'label' => $item->getLocalizedLabel($locale),
             'url' => $item->resolvedUrl($locale),

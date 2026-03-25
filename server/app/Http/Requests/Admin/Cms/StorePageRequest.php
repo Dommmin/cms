@@ -6,6 +6,7 @@ namespace App\Http\Requests\Admin\Cms;
 
 use App\Enums\PageLayoutEnum;
 use App\Enums\PageTypeEnum;
+use App\Models\Locale;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -25,7 +26,7 @@ class StorePageRequest extends FormRequest
 
         return [
             'parent_id' => ['nullable', 'integer', 'exists:pages,id'],
-            'locale' => ['nullable', 'string', 'max:10', Rule::in(\App\Models\Locale::pluck('code')->toArray())],
+            'locale' => ['nullable', 'string', 'max:10', Rule::in(Locale::query()->pluck('code')->toArray())],
             'title' => ['required'],
             'title.*' => ['nullable', 'string', 'max:255'],
             'slug' => [
@@ -41,14 +42,14 @@ class StorePageRequest extends FormRequest
             'layout' => ['required', Rule::enum(PageLayoutEnum::class)],
             'page_type' => ['required', Rule::enum(PageTypeEnum::class)],
             'module_name' => [
-                Rule::requiredIf(fn () => $this->input('page_type') === PageTypeEnum::Module->value),
+                Rule::requiredIf(fn (): bool => $this->input('page_type') === PageTypeEnum::Module->value),
                 'nullable',
                 'string',
                 Rule::in($modules),
             ],
             'module_config' => ['nullable', 'array'],
             'module_config.content_id' => [
-                Rule::requiredIf(fn () => $this->input('page_type') === PageTypeEnum::Module->value && $this->input('module_name') === 'content'),
+                Rule::requiredIf(fn (): bool => $this->input('page_type') === PageTypeEnum::Module->value && $this->input('module_name') === 'content'),
                 'integer',
                 'exists:content_entries,id',
             ],

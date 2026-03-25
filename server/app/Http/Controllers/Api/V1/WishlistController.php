@@ -67,7 +67,7 @@ class WishlistController extends Controller
         $wishlist = $customer->wishlists()->first();
 
         if (! $wishlist) {
-            $wishlist = $customer->wishlists()->create([
+            return $customer->wishlists()->create([
                 'name' => 'Wishlist',
                 'is_public' => false,
             ]);

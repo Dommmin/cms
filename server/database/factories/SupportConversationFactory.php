@@ -6,10 +6,11 @@ namespace Database\Factories;
 
 use App\Enums\SupportChannelEnum;
 use App\Enums\SupportConversationStatusEnum;
+use App\Models\SupportConversation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SupportConversation>
+ * @extends Factory<SupportConversation>
  */
 class SupportConversationFactory extends Factory
 {

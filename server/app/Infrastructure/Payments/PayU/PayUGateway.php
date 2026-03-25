@@ -15,8 +15,7 @@ use RuntimeException;
 class PayUGateway implements PaymentGatewayInterface
 {
     public function __construct(
-        private readonly PayUClient $client,
-        private readonly PayUWebhookVerifier $verifier
+        private readonly PayUClient $client
     ) {}
 
     public function createPayment(Order $order, array $data = []): Payment
@@ -42,7 +41,7 @@ class PayUGateway implements PaymentGatewayInterface
         $paymentMethod = $options['payment_method'] ?? null;
         $customerIp = $options['customer_ip'] ?? '127.0.0.1';
         $continueUrl = $options['continue_url'] ?? config('app.frontend_url').'/checkout/pending?payment='.$payment->id;
-        $returnUrl = $options['return_url'] ?? config('app.frontend_url').'/checkout/success';
+        $options['return_url'] ?? config('app.frontend_url').'/checkout/success';
 
         $body = [
             'notifyUrl' => config('app.url').'/api/v1/webhooks/payu',
@@ -146,9 +145,7 @@ class PayUGateway implements PaymentGatewayInterface
         $keyPath = config('services.apple_pay.key_path');
         $merchantId = config('services.apple_pay.merchant_id');
 
-        if (! $certPath || ! $keyPath || ! $merchantId) {
-            throw new RuntimeException('Apple Pay certificates not configured');
-        }
+        throw_if(! $certPath || ! $keyPath || ! $merchantId, RuntimeException::class, 'Apple Pay certificates not configured');
 
         $payload = json_encode([
             'merchantIdentifier' => $merchantId,
@@ -170,9 +167,7 @@ class PayUGateway implements PaymentGatewayInterface
         $error = curl_error($ch);
         curl_close($ch);
 
-        if ($error) {
-            throw new RuntimeException('Apple Pay validation failed: '.$error);
-        }
+        throw_if($error, RuntimeException::class, 'Apple Pay validation failed: '.$error);
 
         return json_decode((string) $result, true) ?? [];
     }
@@ -256,7 +251,7 @@ class PayUGateway implements PaymentGatewayInterface
             ];
         }
 
-        return $order->items->map(fn ($item) => [
+        return $order->items->map(fn ($item): array => [
             'name' => $item->product_name ?? 'Produkt',
             'unitPrice' => (string) $item->unit_price,
             'quantity' => (string) $item->quantity,

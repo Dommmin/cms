@@ -35,15 +35,15 @@ class NewsletterSubscriberController extends Controller
     {
         $data = $request->validated();
 
-        $data['is_active'] = $data['is_active'] ?? true;
+        $data['is_active'] ??= true;
         $data['consent_given'] = true;
         $data['consent_given_at'] = now();
         $data['consent_source'] = 'manual';
         $data['token'] = bin2hex(random_bytes(16));
 
-        NewsletterSubscriber::create($data);
+        NewsletterSubscriber::query()->create($data);
 
-        return redirect()->route('admin.newsletter.subscribers.index')->with('success', 'Subskrybent został dodany');
+        return to_route('admin.newsletter.subscribers.index')->with('success', 'Subskrybent został dodany');
     }
 
     public function show(NewsletterSubscriber $subscriber): Response
@@ -75,40 +75,40 @@ class NewsletterSubscriberController extends Controller
 
         $subscriber->update($data);
 
-        return redirect()->back()->with('success', 'Subskrybent został zaktualizowany');
+        return back()->with('success', 'Subskrybent został zaktualizowany');
     }
 
     public function destroy(NewsletterSubscriber $subscriber): RedirectResponse
     {
         $subscriber->delete();
 
-        return redirect()->back()->with('success', 'Subskrybent został usunięty');
+        return back()->with('success', 'Subskrybent został usunięty');
     }
 
     public function bulkActivate(Request $request): RedirectResponse
     {
         $ids = $request->input('ids', []);
 
-        NewsletterSubscriber::whereIn('id', $ids)->update(['is_active' => true]);
+        NewsletterSubscriber::query()->whereIn('id', $ids)->update(['is_active' => true]);
 
-        return redirect()->back()->with('success', 'Zaznaczeni subskrybenci zostali aktywowani');
+        return back()->with('success', 'Zaznaczeni subskrybenci zostali aktywowani');
     }
 
     public function bulkDeactivate(Request $request): RedirectResponse
     {
         $ids = $request->input('ids', []);
 
-        NewsletterSubscriber::whereIn('id', $ids)->update(['is_active' => false]);
+        NewsletterSubscriber::query()->whereIn('id', $ids)->update(['is_active' => false]);
 
-        return redirect()->back()->with('success', 'Zaznaczeni subskrybenci zostali dezaktywowani');
+        return back()->with('success', 'Zaznaczeni subskrybenci zostali dezaktywowani');
     }
 
     public function bulkDelete(Request $request): RedirectResponse
     {
         $ids = $request->input('ids', []);
 
-        NewsletterSubscriber::whereIn('id', $ids)->delete();
+        NewsletterSubscriber::query()->whereIn('id', $ids)->delete();
 
-        return redirect()->back()->with('success', 'Zaznaczeni subskrybenci zostali usunięci');
+        return back()->with('success', 'Zaznaczeni subskrybenci zostali usunięci');
     }
 }

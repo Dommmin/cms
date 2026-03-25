@@ -6,6 +6,7 @@ namespace App\Exports;
 
 use App\Models\Customer;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -16,17 +17,16 @@ class CustomersExport implements FromQuery, ShouldAutoSize, ShouldQueue, WithHea
 {
     public function __construct(private readonly Request $request) {}
 
-    public function query(): \Illuminate\Database\Eloquent\Builder
+    public function query(): Builder
     {
         return Customer::query()
             ->withCount('orders')
             ->withSum('orders', 'total')
-            ->when($this->request->input('search'), function ($q, $s) {
-                $q->where('first_name', 'like', "%{$s}%")
-                    ->orWhere('last_name', 'like', "%{$s}%")
-                    ->orWhere('email', 'like', "%{$s}%");
-            })
-            ->orderByDesc('created_at');
+            ->when($this->request->input('search'), function ($q, $s): void {
+                $q->where('first_name', 'like', sprintf('%%%s%%', $s))
+                    ->orWhere('last_name', 'like', sprintf('%%%s%%', $s))
+                    ->orWhere('email', 'like', sprintf('%%%s%%', $s));
+            })->latest();
     }
 
     /** @return string[] */

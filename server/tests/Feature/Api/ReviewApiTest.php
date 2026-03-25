@@ -40,8 +40,8 @@ function reviewableProduct(): Product
 // Listing reviews
 // ---------------------------------------------------------------------------
 
-describe('Reviews – listing', function () {
-    it('returns approved reviews for a product', function () {
+describe('Reviews – listing', function (): void {
+    it('returns approved reviews for a product', function (): void {
         $product = reviewableProduct();
 
         $user = User::factory()->create();
@@ -61,12 +61,12 @@ describe('Reviews – listing', function () {
             'helpful_count' => 0,
         ]);
 
-        $this->getJson("/api/v1/products/{$product->slug}/reviews")
+        $this->getJson(sprintf('/api/v1/products/%s/reviews', $product->slug))
             ->assertOk()
             ->assertJsonCount(1, 'data');
     });
 
-    it('does not return pending reviews in the public listing', function () {
+    it('does not return pending reviews in the public listing', function (): void {
         $product = reviewableProduct();
 
         $user = User::factory()->create();
@@ -84,7 +84,7 @@ describe('Reviews – listing', function () {
             'helpful_count' => 0,
         ]);
 
-        $this->getJson("/api/v1/products/{$product->slug}/reviews")
+        $this->getJson(sprintf('/api/v1/products/%s/reviews', $product->slug))
             ->assertOk()
             ->assertJsonCount(0, 'data');
     });
@@ -94,8 +94,8 @@ describe('Reviews – listing', function () {
 // Submitting reviews
 // ---------------------------------------------------------------------------
 
-describe('Reviews – submission', function () {
-    it('authenticated user with a customer profile can submit a review', function () {
+describe('Reviews – submission', function (): void {
+    it('authenticated user with a customer profile can submit a review', function (): void {
         $product = reviewableProduct();
         $user = User::factory()->create();
         Customer::query()->create([
@@ -105,7 +105,7 @@ describe('Reviews – submission', function () {
         ]);
 
         $response = $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/products/{$product->slug}/reviews", [
+            ->postJson(sprintf('/api/v1/products/%s/reviews', $product->slug), [
                 'rating' => 5,
                 'title' => 'Excellent product',
                 'body' => 'Would buy again.',
@@ -122,7 +122,7 @@ describe('Reviews – submission', function () {
         ]);
     });
 
-    it('new review starts in pending status (not immediately approved)', function () {
+    it('new review starts in pending status (not immediately approved)', function (): void {
         $product = reviewableProduct();
         $user = User::factory()->create();
         Customer::query()->create([
@@ -132,7 +132,7 @@ describe('Reviews – submission', function () {
         ]);
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/products/{$product->slug}/reviews", [
+            ->postJson(sprintf('/api/v1/products/%s/reviews', $product->slug), [
                 'rating' => 3,
                 'body' => 'Average.',
             ])->assertStatus(201);
@@ -144,7 +144,7 @@ describe('Reviews – submission', function () {
         ]);
     });
 
-    it('user cannot submit two reviews for the same product', function () {
+    it('user cannot submit two reviews for the same product', function (): void {
         $product = reviewableProduct();
         $user = User::factory()->create();
         Customer::query()->create([
@@ -154,28 +154,28 @@ describe('Reviews – submission', function () {
         ]);
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/products/{$product->slug}/reviews", [
+            ->postJson(sprintf('/api/v1/products/%s/reviews', $product->slug), [
                 'rating' => 5,
                 'body' => 'First review.',
             ])->assertStatus(201);
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/products/{$product->slug}/reviews", [
+            ->postJson(sprintf('/api/v1/products/%s/reviews', $product->slug), [
                 'rating' => 1,
                 'body' => 'Second review attempt.',
             ])->assertUnprocessable();
     });
 
-    it('guest cannot submit a review — requires authentication', function () {
+    it('guest cannot submit a review — requires authentication', function (): void {
         $product = reviewableProduct();
 
-        $this->postJson("/api/v1/products/{$product->slug}/reviews", [
+        $this->postJson(sprintf('/api/v1/products/%s/reviews', $product->slug), [
             'rating' => 5,
             'body' => 'Should not work.',
         ])->assertUnauthorized();
     });
 
-    it('rejects rating below 1', function () {
+    it('rejects rating below 1', function (): void {
         $product = reviewableProduct();
         $user = User::factory()->create();
         Customer::query()->create([
@@ -185,12 +185,12 @@ describe('Reviews – submission', function () {
         ]);
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/products/{$product->slug}/reviews", [
+            ->postJson(sprintf('/api/v1/products/%s/reviews', $product->slug), [
                 'rating' => 0,
             ])->assertUnprocessable();
     });
 
-    it('rejects rating above 5', function () {
+    it('rejects rating above 5', function (): void {
         $product = reviewableProduct();
         $user = User::factory()->create();
         Customer::query()->create([
@@ -200,7 +200,7 @@ describe('Reviews – submission', function () {
         ]);
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/products/{$product->slug}/reviews", [
+            ->postJson(sprintf('/api/v1/products/%s/reviews', $product->slug), [
                 'rating' => 6,
             ])->assertUnprocessable();
     });
@@ -210,8 +210,8 @@ describe('Reviews – submission', function () {
 // Helpful votes
 // ---------------------------------------------------------------------------
 
-describe('Reviews – helpful votes', function () {
-    it('authenticated user can vote helpful on a review', function () {
+describe('Reviews – helpful votes', function (): void {
+    it('authenticated user can vote helpful on a review', function (): void {
         $product = reviewableProduct();
 
         $authorUser = User::factory()->create();
@@ -237,13 +237,13 @@ describe('Reviews – helpful votes', function () {
         ]);
 
         $this->actingAs($voter, 'sanctum')
-            ->postJson("/api/v1/reviews/{$review->id}/helpful")
+            ->postJson(sprintf('/api/v1/reviews/%s/helpful', $review->id))
             ->assertOk()
             ->assertJsonPath('voted', true)
             ->assertJsonPath('helpful_count', 1);
     });
 
-    it('voting helpful twice removes the vote (toggle behaviour)', function () {
+    it('voting helpful twice removes the vote (toggle behaviour)', function (): void {
         $product = reviewableProduct();
 
         $authorUser = User::factory()->create();
@@ -269,10 +269,10 @@ describe('Reviews – helpful votes', function () {
         ]);
 
         $this->actingAs($voter, 'sanctum')
-            ->postJson("/api/v1/reviews/{$review->id}/helpful");
+            ->postJson(sprintf('/api/v1/reviews/%s/helpful', $review->id));
 
         $this->actingAs($voter->fresh(), 'sanctum')
-            ->postJson("/api/v1/reviews/{$review->id}/helpful")
+            ->postJson(sprintf('/api/v1/reviews/%s/helpful', $review->id))
             ->assertOk()
             ->assertJsonPath('voted', false)
             ->assertJsonPath('helpful_count', 0);

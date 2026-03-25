@@ -17,9 +17,10 @@ use App\Http\Controllers\Admin\Ecommerce\ReturnRequestController;
 use App\Http\Controllers\Admin\Ecommerce\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\Ecommerce\ShippingMethodController;
 use App\Http\Controllers\Admin\Ecommerce\TaxRateController;
+use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('ecommerce')->name('ecommerce.')->group(function () {
+Route::prefix('ecommerce')->name('ecommerce.')->group(function (): void {
     Route::resource('categories', AdminCategoryController::class)
         ->except(['show'])
         ->names(['create' => 'ecommerce.categories.create', 'edit' => 'ecommerce.categories.edit']);
@@ -28,13 +29,13 @@ Route::prefix('ecommerce')->name('ecommerce.')->group(function () {
     Route::resource('products', AdminProductController::class)
         ->except(['show'])
         ->names(['create' => 'ecommerce.products.create', 'edit' => 'ecommerce.products.edit']);
-    Route::get('products/{product}', fn (App\Models\Product $product) => redirect()->route('admin.ecommerce.ecommerce.products.edit', $product));
-    Route::get('orders/export', [AdminOrderController::class, 'export'])->name('orders.export');
-    Route::get('orders/{order}/invoice', [AdminOrderController::class, 'invoice'])->name('orders.invoice');
+    Route::get('products/{product}', fn (Product $product) => to_route('admin.ecommerce.ecommerce.products.edit', $product));
+    Route::get('orders/export', new AdminOrderController()->export(...))->name('orders.export');
+    Route::get('orders/{order}/invoice', new AdminOrderController()->invoice(...))->name('orders.invoice');
     Route::resource('orders', AdminOrderController::class)
         ->only(['index', 'show'])
         ->names(['create' => 'ecommerce.orders.create', 'edit' => 'ecommerce.orders.edit']);
-    Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('ecommerce.orders.update-status');
+    Route::patch('orders/{order}/status', new AdminOrderController()->updateStatus(...))->name('ecommerce.orders.update-status');
     Route::get('customers/export', [CustomerController::class, 'export'])->name('customers.export');
     Route::resource('reviews', AdminReviewController::class)
         ->only(['index', 'show', 'update', 'destroy'])

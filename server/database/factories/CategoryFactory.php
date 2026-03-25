@@ -6,8 +6,11 @@ namespace Database\Factories;
 
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 
+/**
+ * @extends Factory<Category>
+ */
 class CategoryFactory extends Factory
 {
     protected $model = Category::class;
@@ -23,8 +26,8 @@ class CategoryFactory extends Factory
             'position' => $this->faker->randomNumber(),
             'seo_title' => $this->faker->word(),
             'seo_description' => $this->faker->text(),
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
+            'created_at' => Date::now(),
+            'updated_at' => Date::now(),
 
             'product_type_id' => null,
             'parent_id' => null,

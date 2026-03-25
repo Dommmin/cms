@@ -82,7 +82,7 @@ class FurgonetkaCarrier implements ShippingCarrierInterface
 
         $url = (string) ($response['url'] ?? $response['label_url'] ?? '');
 
-        if ($url) {
+        if ($url !== '' && $url !== '0') {
             $shipment->update(['label_url' => $url]);
         }
 
@@ -111,7 +111,7 @@ class FurgonetkaCarrier implements ShippingCarrierInterface
     {
         $shipmentId = (string) ($payload['shipment_id'] ?? $payload['id'] ?? '');
 
-        if (! $shipmentId) {
+        if ($shipmentId === '' || $shipmentId === '0') {
             return;
         }
 
@@ -123,7 +123,7 @@ class FurgonetkaCarrier implements ShippingCarrierInterface
         }
 
         $status = $this->mapStatus($payload['status'] ?? '');
-        if ($status) {
+        if ($status instanceof ShipmentStatusEnum) {
             $shipment->update(['status' => $status->value]);
         }
 

@@ -16,9 +16,7 @@ class SetLocale
     {
         $requested = $request->query('locale') ?? $request->getPreferredLanguage() ?? config('app.locale');
 
-        $active = Cache::remember('active_locale_codes', 3600, function (): array {
-            return Locale::query()->active()->pluck('code')->all();
-        });
+        $active = Cache::remember('active_locale_codes', 3600, fn (): array => Locale::query()->active()->pluck('code')->all());
 
         $locale = in_array($requested, $active, true) ? $requested : config('app.locale');
 

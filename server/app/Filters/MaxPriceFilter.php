@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filters;
 
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\Filters\Filter;
 
 /**
- * @implements Filter<\App\Models\Product>
+ * @implements Filter<Product>
  */
 class MaxPriceFilter implements Filter
 {

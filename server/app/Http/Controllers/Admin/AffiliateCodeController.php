@@ -19,7 +19,7 @@ class AffiliateCodeController extends Controller
     {
         $codes = AffiliateCode::query()
             ->with('user:id,name,email')
-            ->when($request->input('search'), fn ($q, $s) => $q->where('code', 'like', "%{$s}%")->orWhereHas('user', fn ($uq) => $uq->where('name', 'like', "%{$s}%")))
+            ->when($request->input('search'), fn ($q, $s) => $q->where('code', 'like', sprintf('%%%s%%', $s))->orWhereHas('user', fn ($uq) => $uq->where('name', 'like', sprintf('%%%s%%', $s))))
             ->when($request->input('status'), fn ($q, $s) => match ($s) {
                 'active' => $q->where('is_active', true),
                 'inactive' => $q->where('is_active', false),
@@ -50,7 +50,7 @@ class AffiliateCodeController extends Controller
     {
         AffiliateCode::query()->create($request->validated());
 
-        return redirect()->route('admin.affiliates.codes.index')->with('success', 'Affiliate code created successfully.');
+        return to_route('admin.affiliates.codes.index')->with('success', 'Affiliate code created successfully.');
     }
 
     public function edit(AffiliateCode $code): Response
@@ -67,20 +67,20 @@ class AffiliateCodeController extends Controller
     {
         $code->update($request->validated());
 
-        return redirect()->back()->with('success', 'Affiliate code updated successfully.');
+        return back()->with('success', 'Affiliate code updated successfully.');
     }
 
     public function destroy(AffiliateCode $code): RedirectResponse
     {
         $code->delete();
 
-        return redirect()->back()->with('success', 'Affiliate code deleted.');
+        return back()->with('success', 'Affiliate code deleted.');
     }
 
     public function toggleActive(AffiliateCode $code): RedirectResponse
     {
         $code->update(['is_active' => ! $code->is_active]);
 
-        return redirect()->back()->with('success', $code->is_active ? 'Code activated.' : 'Code deactivated.');
+        return back()->with('success', $code->is_active ? 'Code activated.' : 'Code deactivated.');
     }
 }

@@ -33,6 +33,6 @@ class Form extends Model
 
     public function submissions(): HasMany
     {
-        return $this->hasMany(FormSubmission::class)->orderByDesc('created_at');
+        return $this->hasMany(FormSubmission::class)->latest();
     }
 }

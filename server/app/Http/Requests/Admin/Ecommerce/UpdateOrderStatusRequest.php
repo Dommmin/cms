@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\Ecommerce;
 
+use App\Enums\OrderStatusEnum;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateOrderStatusRequest extends FormRequest
 {
@@ -22,7 +24,7 @@ class UpdateOrderStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['required', \Illuminate\Validation\Rule::enum(\App\Enums\OrderStatusEnum::class)],
+            'status' => ['required', Rule::enum(OrderStatusEnum::class)],
             'notes' => ['nullable', 'string', 'max:500'],
             'tracking_number' => ['nullable', 'string', 'max:100'],
         ];

@@ -52,8 +52,8 @@ class BlogPostController extends Controller
         $titleForSlug = is_array($data['title'])
             ? ($data['title'][config('app.locale')] ?? array_values($data['title'])[0] ?? '')
             : (string) $data['title'];
-        $data['slug'] = $data['slug'] ?? Str::slug($titleForSlug);
-        $data['is_featured'] = $data['is_featured'] ?? false;
+        $data['slug'] ??= Str::slug($titleForSlug);
+        $data['is_featured'] ??= false;
         $contentForEstimate = is_array($data['content'])
             ? ($data['content'][config('app.locale')] ?? array_values($data['content'])[0] ?? '')
             : (string) $data['content'];
@@ -62,14 +62,14 @@ class BlogPostController extends Controller
         $status = $data['status'] ?? 'draft';
 
         if ($status === 'published') {
-            $data['published_at'] = $data['published_at'] ?? now();
+            $data['published_at'] ??= now();
         } elseif ($status !== 'scheduled') {
             $data['published_at'] = null;
         }
 
-        BlogPost::create($data);
+        BlogPost::query()->create($data);
 
-        return redirect()->route('admin.blog.posts.index')->with('success', 'Blog post created successfully');
+        return to_route('admin.blog.posts.index')->with('success', 'Blog post created successfully');
     }
 
     public function edit(BlogPost $post): Response
@@ -95,8 +95,8 @@ class BlogPostController extends Controller
         $titleForSlug = is_array($data['title'])
             ? ($data['title'][config('app.locale')] ?? array_values($data['title'])[0] ?? '')
             : (string) $data['title'];
-        $data['slug'] = $data['slug'] ?? Str::slug($titleForSlug);
-        $data['is_featured'] = $data['is_featured'] ?? false;
+        $data['slug'] ??= Str::slug($titleForSlug);
+        $data['is_featured'] ??= false;
         $contentForEstimate = is_array($data['content'])
             ? ($data['content'][config('app.locale')] ?? array_values($data['content'])[0] ?? '')
             : (string) $data['content'];
@@ -105,21 +105,21 @@ class BlogPostController extends Controller
         $status = $data['status'] ?? 'draft';
 
         if ($status === 'published' && $post->published_at === null) {
-            $data['published_at'] = $data['published_at'] ?? now();
+            $data['published_at'] ??= now();
         } elseif ($status !== 'scheduled' && $status !== 'published') {
             $data['published_at'] = null;
         }
 
         $post->update($data);
 
-        return redirect()->back()->with('success', 'Blog post updated successfully');
+        return back()->with('success', 'Blog post updated successfully');
     }
 
     public function destroy(BlogPost $post): RedirectResponse
     {
         $post->delete();
 
-        return redirect()->back()->with('success', 'Blog post deleted successfully');
+        return back()->with('success', 'Blog post deleted successfully');
     }
 
     public function publish(BlogPost $post): RedirectResponse
@@ -129,14 +129,14 @@ class BlogPostController extends Controller
             'published_at' => $post->published_at ?? now(),
         ]);
 
-        return redirect()->back()->with('success', 'Blog post published successfully');
+        return back()->with('success', 'Blog post published successfully');
     }
 
     public function unpublish(BlogPost $post): RedirectResponse
     {
         $post->update(['status' => BlogPostStatusEnum::Draft]);
 
-        return redirect()->back()->with('success', 'Blog post unpublished successfully');
+        return back()->with('success', 'Blog post unpublished successfully');
     }
 
     public function toggleFeatured(BlogPost $post): RedirectResponse
@@ -145,6 +145,6 @@ class BlogPostController extends Controller
 
         $message = $post->is_featured ? 'Blog post marked as featured' : 'Blog post removed from featured';
 
-        return redirect()->back()->with('success', $message);
+        return back()->with('success', $message);
     }
 }

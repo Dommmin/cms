@@ -26,7 +26,7 @@ class BlockUsageService
             $pages = $items->map(fn (PageBlock $b) => $b->page)
                 ->filter()
                 ->unique('id')
-                ->map(fn ($page) => [
+                ->map(fn ($page): array => [
                     'id' => $page->id,
                     'title' => $page->title,
                     'slug' => $page->slug,

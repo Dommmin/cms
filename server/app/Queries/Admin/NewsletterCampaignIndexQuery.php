@@ -18,23 +18,22 @@ final readonly class NewsletterCampaignIndexQuery
     {
         return NewsletterCampaign::query()
             ->with('segment:id,name')
-            ->when($this->request->search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('subject', 'like', "%{$search}%");
+            ->when($this->request->search, function ($query, $search): void {
+                $query->where('name', 'like', sprintf('%%%s%%', $search))
+                    ->orWhere('subject', 'like', sprintf('%%%s%%', $search));
             })
-            ->when($this->request->status, function ($query, $status) {
+            ->when($this->request->status, function ($query, $status): void {
                 $query->where('status', $status);
             })
-            ->when($this->request->type, function ($query, $type) {
+            ->when($this->request->type, function ($query, $type): void {
                 $query->where('type', $type);
-            })
-            ->orderByDesc('created_at')
+            })->latest()
             ->paginate(20)
             ->withQueryString();
     }
 
     public function getActiveSegments(): Collection
     {
-        return NewsletterSegment::where('is_active', true)->get(['id', 'name']);
+        return NewsletterSegment::query()->where('is_active', true)->get(['id', 'name']);
     }
 }

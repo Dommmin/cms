@@ -6,7 +6,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Concerns\HasVersions;
 use App\Http\Controllers\Controller;
+use App\Models\BlogPost;
+use App\Models\Category;
 use App\Models\ModelVersion;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -18,9 +21,9 @@ class ModelVersionController extends Controller
      * @var array<string, class-string<Model>>
      */
     private array $allowedTypes = [
-        'product' => \App\Models\Product::class,
-        'blog-post' => \App\Models\BlogPost::class,
-        'category' => \App\Models\Category::class,
+        'product' => Product::class,
+        'blog-post' => BlogPost::class,
+        'category' => Category::class,
         // Page uses PageVersion (builder draft/publish system) instead of ModelVersion
     ];
 
@@ -69,7 +72,7 @@ class ModelVersionController extends Controller
         $modelClass = $this->resolveModelClass($type);
 
         /** @var Model&HasVersions $model */
-        $model = $modelClass::findOrFail($id);
+        $model = $modelClass::query()->findOrFail($id);
 
         $version = ModelVersion::query()
             ->where('versionable_type', $modelClass)
@@ -79,7 +82,7 @@ class ModelVersionController extends Controller
 
         $model->restoreVersion($version);
 
-        return redirect()->back()->with('success', "Restored to version {$versionNumber}");
+        return back()->with('success', 'Restored to version '.$versionNumber);
     }
 
     /**

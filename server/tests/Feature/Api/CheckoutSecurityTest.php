@@ -94,7 +94,7 @@ function secureCheckoutCart(int $price = 5000, int $qty = 2): array
     return [$user, $cart, $variant];
 }
 
-beforeEach(function () {
+beforeEach(function (): void {
     Notification::fake();
 });
 
@@ -102,8 +102,8 @@ beforeEach(function () {
 // Price integrity – total is always calculated server-side
 // ---------------------------------------------------------------------------
 
-describe('Checkout – price integrity', function () {
-    it('order.subtotal equals sum of variant prices × quantities (server-calculated)', function () {
+describe('Checkout – price integrity', function (): void {
+    it('order.subtotal equals sum of variant prices × quantities (server-calculated)', function (): void {
         [$user, , $variant] = secureCheckoutCart(price: 3000, qty: 3); // 3 × 3000 = 9000
         $shipping = secureShipping();
 
@@ -118,13 +118,14 @@ describe('Checkout – price integrity', function () {
             ]);
 
         $response->assertStatus(201);
+
         $order = $response->json('order');
 
         expect($order['subtotal'])->toBe(9000)
             ->and($order['discount_amount'])->toBe(0);
     });
 
-    it('order.total = subtotal + shipping_cost when no discount', function () {
+    it('order.total = subtotal + shipping_cost when no discount', function (): void {
         [$user] = secureCheckoutCart(price: 2000, qty: 1);
         $shipping = secureShipping(); // base_price = 1500
 
@@ -139,12 +140,13 @@ describe('Checkout – price integrity', function () {
             ]);
 
         $response->assertStatus(201);
+
         $order = $response->json('order');
 
         expect($order['total'])->toBe($order['subtotal'] + $order['shipping_cost']);
     });
 
-    it('total can never go negative even with oversized discount stored in cart', function () {
+    it('total can never go negative even with oversized discount stored in cart', function (): void {
         // Manually craft a cart with a discount that exceeds subtotal
         [$user, $cart] = secureCheckoutCart(price: 100, qty: 1); // subtotal = 100
 
@@ -170,10 +172,11 @@ describe('Checkout – price integrity', function () {
             ]);
 
         $response->assertStatus(201);
+
         expect($response->json('order.total'))->toBeGreaterThanOrEqual(0);
     });
 
-    it('stock quantity is NOT decremented after checkout (documenting current behavior)', function () {
+    it('stock quantity is NOT decremented after checkout (documenting current behavior)', function (): void {
         [$user, , $variant] = secureCheckoutCart(price: 1000, qty: 2);
         $stockBefore = $variant->stock_quantity;
         $shipping = secureShipping();
@@ -198,8 +201,8 @@ describe('Checkout – price integrity', function () {
 // Discount revalidation at checkout
 // ---------------------------------------------------------------------------
 
-describe('Checkout – discount revalidation', function () {
-    it('applies discount code stored in cart and sets order.discount_amount correctly', function () {
+describe('Checkout – discount revalidation', function (): void {
+    it('applies discount code stored in cart and sets order.discount_amount correctly', function (): void {
         [$user, $cart] = secureCheckoutCart(price: 10000, qty: 1); // subtotal = 10000
 
         $discount = Discount::factory()->create([
@@ -226,7 +229,7 @@ describe('Checkout – discount revalidation', function () {
         expect($order['total'])->toBeLessThan(10000 + $order['shipping_cost']);
     });
 
-    it('ignores discount code that expired between cart apply and checkout', function () {
+    it('ignores discount code that expired between cart apply and checkout', function (): void {
         [$user, $cart] = secureCheckoutCart(price: 10000, qty: 1);
 
         // Code is expired NOW (ends_at in the past)
@@ -255,7 +258,7 @@ describe('Checkout – discount revalidation', function () {
         expect($response->json('order.discount_amount'))->toBe(0);
     });
 
-    it('ignores discount code that was deactivated before checkout', function () {
+    it('ignores discount code that was deactivated before checkout', function (): void {
         [$user, $cart] = secureCheckoutCart(price: 5000, qty: 1);
 
         Discount::factory()->create([
@@ -281,7 +284,7 @@ describe('Checkout – discount revalidation', function () {
         expect($response->json('order.discount_amount'))->toBe(0);
     });
 
-    it('free_shipping discount sets order.shipping_cost to zero', function () {
+    it('free_shipping discount sets order.shipping_cost to zero', function (): void {
         [$user, $cart] = secureCheckoutCart(price: 5000, qty: 1);
 
         Discount::factory()->create([
@@ -307,7 +310,7 @@ describe('Checkout – discount revalidation', function () {
         expect($response->json('order.shipping_cost'))->toBe(0);
     });
 
-    it('cart is cleared after successful checkout', function () {
+    it('cart is cleared after successful checkout', function (): void {
         [$user, $cart] = secureCheckoutCart(price: 1000, qty: 1);
         $shipping = secureShipping();
 
@@ -329,8 +332,8 @@ describe('Checkout – discount revalidation', function () {
 // Affiliate / referral codes
 // ---------------------------------------------------------------------------
 
-describe('Checkout – affiliate codes', function () {
-    it('valid affiliate code discounts the order and creates a Referral record', function () {
+describe('Checkout – affiliate codes', function (): void {
+    it('valid affiliate code discounts the order and creates a Referral record', function (): void {
         [$user, $cart] = secureCheckoutCart(price: 10000, qty: 1); // subtotal = 10000
 
         $code = AffiliateCode::query()->create([
@@ -367,7 +370,7 @@ describe('Checkout – affiliate codes', function () {
         expect($code->fresh()->uses_count)->toBe(1);
     });
 
-    it('invalid or expired affiliate code is silently ignored and checkout proceeds', function () {
+    it('invalid or expired affiliate code is silently ignored and checkout proceeds', function (): void {
         [$user] = secureCheckoutCart(price: 5000, qty: 1);
         $shipping = secureShipping();
 
@@ -386,7 +389,7 @@ describe('Checkout – affiliate codes', function () {
         expect(Referral::query()->count())->toBe(0);
     });
 
-    it('deactivated affiliate code is ignored at checkout', function () {
+    it('deactivated affiliate code is ignored at checkout', function (): void {
         [$user] = secureCheckoutCart(price: 5000, qty: 1);
 
         AffiliateCode::query()->create([
@@ -415,7 +418,7 @@ describe('Checkout – affiliate codes', function () {
         expect($response->json('order.discount_amount'))->toBe(0);
     });
 
-    it('fixed affiliate discount is capped at cart subtotal', function () {
+    it('fixed affiliate discount is capped at cart subtotal', function (): void {
         [$user] = secureCheckoutCart(price: 200, qty: 1); // subtotal = 200
 
         AffiliateCode::query()->create([

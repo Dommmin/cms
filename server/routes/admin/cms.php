@@ -5,8 +5,9 @@ declare(strict_types=1);
 use App\Http\Controllers\Admin\Cms\PageBuilderController;
 use App\Http\Controllers\Admin\Cms\PageController;
 use App\Http\Controllers\Admin\Cms\ReusableBlockController;
+use Illuminate\Support\Facades\Route;
 
-Route::prefix('cms')->name('cms.')->group(function () {
+Route::prefix('cms')->name('cms.')->group(function (): void {
     Route::post('pages/clone-site', [PageController::class, 'cloneSite'])->name('pages.clone-site');
     Route::resource('pages', PageController::class)->except(['show'])
         ->names([

@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogPostController;
+use Illuminate\Support\Facades\Route;
 
-Route::prefix('blog')->name('blog.')->group(function () {
+Route::prefix('blog')->name('blog.')->group(function (): void {
     Route::resource('posts', BlogPostController::class)->except(['show']);
     Route::post('posts/{post}/publish', [BlogPostController::class, 'publish'])->name('posts.publish');
     Route::post('posts/{post}/unpublish', [BlogPostController::class, 'unpublish'])->name('posts.unpublish');

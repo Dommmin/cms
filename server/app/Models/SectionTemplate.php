@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,11 +26,11 @@ class SectionTemplate extends Model
     /**
      * Get templates for a specific section type
      *
-     * @return \Illuminate\Database\Eloquent\Collection<int, SectionTemplate>
+     * @return Collection<int, SectionTemplate>
      */
     public static function forSectionType(string $sectionType)
     {
-        return self::where('section_type', $sectionType)
+        return self::query()->where('section_type', $sectionType)
             ->where(function ($query): void {
                 $query->where('is_global', true)
                     ->orWhereNull('is_global');

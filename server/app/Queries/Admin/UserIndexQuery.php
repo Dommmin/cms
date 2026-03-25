@@ -17,14 +17,14 @@ class UserIndexQuery
     {
         return User::query()
             ->with('roles:id,name')
-            ->when($this->request->search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+            ->when($this->request->search, function ($query, $search): void {
+                $query->where('name', 'like', sprintf('%%%s%%', $search))
+                    ->orWhere('email', 'like', sprintf('%%%s%%', $search));
             })
-            ->when($this->request->role, function ($query, $role) {
+            ->when($this->request->role, function ($query, $role): void {
                 $query->where('role', $role);
             })
-            ->when($this->request->has('is_active'), function ($query) {
+            ->when($this->request->has('is_active'), function ($query): void {
                 $query->where('is_active', $this->request->boolean('is_active'));
             })
             ->orderBy('name')

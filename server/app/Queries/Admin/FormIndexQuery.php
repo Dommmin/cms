@@ -16,11 +16,11 @@ final readonly class FormIndexQuery
     {
         return Form::query()
             ->withCount('submissions')
-            ->when($this->request->search, function ($query) {
+            ->when($this->request->search, function ($query): void {
                 $query->where('name', 'like', '%'.$this->request->search.'%')
                     ->orWhere('slug', 'like', '%'.$this->request->search.'%');
             })
-            ->orderBy('updated_at', 'desc')
+            ->latest('updated_at')
             ->paginate($this->request->per_page ?? 10)
             ->withQueryString();
     }

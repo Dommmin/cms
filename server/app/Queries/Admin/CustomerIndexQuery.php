@@ -16,12 +16,12 @@ class CustomerIndexQuery
     public function execute()
     {
         return Customer::query()
-            ->when($this->request->search, function ($query, $search) {
-                $query->where('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+            ->when($this->request->search, function ($query, $search): void {
+                $query->where('first_name', 'like', sprintf('%%%s%%', $search))
+                    ->orWhere('last_name', 'like', sprintf('%%%s%%', $search))
+                    ->orWhere('email', 'like', sprintf('%%%s%%', $search));
             })
-            ->when($this->request->has('is_active'), function ($query) {
+            ->when($this->request->has('is_active'), function ($query): void {
                 $query->where('is_active', $this->request->boolean('is_active'));
             })
             ->orderBy('last_name')

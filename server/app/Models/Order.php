@@ -9,6 +9,7 @@ use App\Events\OrderCreated;
 use App\Events\OrderDelivered;
 use App\Events\OrderPaid;
 use App\Events\OrderShipped;
+use App\Notifications\OrderStatusChangedNotification;
 use App\States\Order\AwaitingPaymentState;
 use App\States\Order\CancelledState;
 use App\States\Order\DeliveredState;
@@ -137,7 +138,7 @@ class Order extends Model
 
         $user = $this->customer?->user;
         if ($user) {
-            $user->notify(new \App\Notifications\OrderStatusChangedNotification($this, $newStatus));
+            $user->notify(new OrderStatusChangedNotification($this, $newStatus));
         }
     }
 

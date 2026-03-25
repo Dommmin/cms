@@ -38,7 +38,7 @@ use App\Http\Controllers\Admin\TranslationController as AdminTranslationControll
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('dashboard/widgets', [DashboardWidgetController::class, 'store'])->name('dashboard.widgets.store');
     Route::patch('dashboard/widgets/{dashboardWidget}', [DashboardWidgetController::class, 'update'])->name('dashboard.widgets.update');
@@ -51,7 +51,7 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     Route::get('/preview', PreviewController::class)->name('preview');
 
     // Model Versioning
-    Route::prefix('versions/{type}/{id}')->name('versions.')->group(function () {
+    Route::prefix('versions/{type}/{id}')->name('versions.')->group(function (): void {
         Route::get('/', [ModelVersionController::class, 'index'])->name('index');
         Route::get('/compare/{versionA}/{versionB}', [ModelVersionController::class, 'compare'])->name('compare');
         Route::post('/{versionNumber}/restore', [ModelVersionController::class, 'restore'])->name('restore');
@@ -67,7 +67,7 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     require __DIR__.'/admin/ecommerce.php';
 
     // Newsletter routes
-    Route::prefix('newsletter')->name('newsletter.')->group(function () {
+    Route::prefix('newsletter')->name('newsletter.')->group(function (): void {
         Route::resource('subscribers', NewsletterSubscriberController::class)->except(['show']);
         Route::post('subscribers/bulk-activate', [NewsletterSubscriberController::class, 'bulkActivate'])->name('subscribers.bulk-activate');
         Route::post('subscribers/bulk-deactivate', [NewsletterSubscriberController::class, 'bulkDeactivate'])->name('subscribers.bulk-deactivate');
@@ -84,7 +84,7 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     });
 
     // Currency & Exchange Rates (admin only)
-    Route::middleware('role:admin')->group(function () {
+    Route::middleware('role:admin')->group(function (): void {
         Route::resource('currencies', CurrencyController::class)->except(['show']);
         Route::resource('exchange-rates', ExchangeRateController::class)->except(['show']);
     });
@@ -113,7 +113,7 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     Route::post('section-templates/{sectionTemplate}/duplicate', [SectionTemplateController::class, 'duplicate'])->name('section-templates.duplicate');
 
     // Opcjonalne - Read only / relacje
-    Route::prefix('ecommerce')->name('ecommerce.')->group(function () {
+    Route::prefix('ecommerce')->name('ecommerce.')->group(function (): void {
         // Carts (read-only)
         Route::resource('carts', CartController::class)->only(['index', 'show']);
 
@@ -129,14 +129,14 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     Route::resource('cookie-consents', CookieConsentController::class)->only(['index', 'show'])->middleware('role:admin');
 
     // Users (admin only)
-    Route::middleware('role:admin')->group(function () {
+    Route::middleware('role:admin')->group(function (): void {
         Route::resource('users', UserController::class)
             ->except(['show'])
             ->names([
                 'create' => 'users.create',
                 'edit' => 'users.edit',
             ]);
-        Route::prefix('users')->name('users.')->group(function () {
+        Route::prefix('users')->name('users.')->group(function (): void {
             Route::get('trashed', [UserController::class, 'trashed'])->name('trashed');
             Route::post('{user}/restore', [UserController::class, 'restore'])
                 ->name('restore')->withTrashed();
@@ -172,7 +172,7 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     Route::delete('forms/{form}/submissions/{submission}', [FormSubmissionController::class, 'destroy'])->name('forms.submissions.destroy');
 
     // Settings (admin only)
-    Route::middleware('role:admin')->group(function () {
+    Route::middleware('role:admin')->group(function (): void {
         Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
         Route::post('settings/mail/test', [SettingsController::class, 'testMail'])->name('settings.mail.test');
@@ -181,11 +181,11 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     // i18n — Locales & Translations
     Route::resource('locales', LocaleController::class)->except(['show', 'create', 'edit']);
     Route::post('locales/{locale}/set-default', [LocaleController::class, 'setDefault'])->name('locales.set-default');
-    Route::post('translations/sync', [AdminTranslationController::class, 'sync'])->name('translations.sync');
+    Route::post('translations/sync', new AdminTranslationController()->sync(...))->name('translations.sync');
     Route::resource('translations', AdminTranslationController::class)->except(['show', 'create', 'edit']);
 
     // Affiliates & Referrals (admin only)
-    Route::prefix('affiliates')->name('affiliates.')->middleware('role:admin')->group(function () {
+    Route::prefix('affiliates')->name('affiliates.')->middleware('role:admin')->group(function (): void {
         Route::resource('codes', AffiliateCodeController::class)->except(['show']);
         Route::post('codes/{code}/toggle-active', [AffiliateCodeController::class, 'toggleActive'])->name('codes.toggle-active');
 
@@ -200,7 +200,7 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     Route::get('editor', fn () => inertia('admin/editor'))->name('editor');
 
     // Support
-    Route::prefix('support')->name('support.')->group(function () {
+    Route::prefix('support')->name('support.')->group(function (): void {
         Route::get('/', [SupportConversationController::class, 'index'])->name('index');
 
         Route::resource('canned-responses', SupportCannedResponseController::class)

@@ -47,9 +47,9 @@ class CheckoutRequest extends FormRequest
             'referral_code' => ['nullable', 'string', 'max:50'],
             'terms_accepted' => ['required', 'accepted'],
             'billing_address' => ['required', 'array'],
-            ...collect($addressRules)->mapWithKeys(fn ($rules, $key) => ["billing_address.{$key}" => $rules])->all(),
+            ...collect($addressRules)->mapWithKeys(fn ($rules, $key): array => ['billing_address.'.$key => $rules])->all(),
             'shipping_address' => ['required', 'array'],
-            ...collect($addressRules)->mapWithKeys(fn ($rules, $key) => ["shipping_address.{$key}" => $rules])->all(),
+            ...collect($addressRules)->mapWithKeys(fn ($rules, $key): array => ['shipping_address.'.$key => $rules])->all(),
         ];
     }
 

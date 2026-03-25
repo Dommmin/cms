@@ -82,7 +82,7 @@ class BlogSeeder extends Seeder
             [
                 'title' => 'Sustainability Report 2025',
                 'slug' => 'sustainability-report-2025',
-                'excerpt' => 'A look back at our environmental milestones last year and what we\'re committing to in 2026.',
+                'excerpt' => "A look back at our environmental milestones last year and what we're committing to in 2026.",
                 'content' => '<p>Sustainability isn\'t a checkbox for us — it\'s woven into every decision we make, from packaging to supplier selection. Here\'s what we achieved in 2025 and where we\'re headed.</p><h2>Key milestones</h2><ul><li>Eliminated single-use plastic from all outbound packaging</li><li>Partnered with 12 new certified fair-trade suppliers</li><li>Offset 100% of our shipping carbon through certified forest projects</li><li>Donated 2% of revenue to environmental NGOs</li></ul><h2>2026 commitments</h2><p>This year we\'re aiming for a fully circular returns programme, meaning every returned item is either resold, repaired or donated — nothing goes to landfill.</p>',
                 'category' => 'sustainability',
                 'days_ago' => 25,
@@ -122,7 +122,7 @@ class BlogSeeder extends Seeder
             [
                 'title' => 'How We Choose Our Suppliers',
                 'slug' => 'how-we-choose-our-suppliers',
-                'excerpt' => 'Our supplier vetting process goes beyond certifications. Here\'s what we actually look for.',
+                'excerpt' => "Our supplier vetting process goes beyond certifications. Here's what we actually look for.",
                 'content' => '<p>Every product you see on our site has passed through a rigorous supplier assessment. We don\'t just check for certifications — we visit factories, interview workers, and review audit reports. Here\'s our process.</p><h2>Step 1: Documentation review</h2><p>We start with documentation: GOTS or OEKO-TEX certifications, Fair Trade status, environmental impact assessments, and most importantly, wages paid to workers compared to local living wage benchmarks.</p><h2>Step 2: Site visit</h2><p>Our sourcing team visits every new supplier before the first order. We look at working conditions, safety equipment, and — crucially — how the factory manager behaves when workers are present.</p><h2>Step 3: Trial order</h2><p>We place a small initial order and assess quality, communication, lead times, and any issues that arise. How a supplier handles problems is as important as their certifications.</p><h2>Step 4: Annual reviews</h2><p>We re-audit every supplier annually. Conditions can change, and we take our responsibility to workers seriously.</p>',
                 'category' => 'behind-the-brand',
                 'days_ago' => 45,
@@ -152,7 +152,7 @@ class BlogSeeder extends Seeder
             [
                 'title' => 'Creating a Sustainable Home: Where to Start',
                 'slug' => 'creating-a-sustainable-home-where-to-start',
-                'excerpt' => 'Feeling overwhelmed by sustainable living advice? Start small. Here\'s our practical guide to a greener home.',
+                'excerpt' => "Feeling overwhelmed by sustainable living advice? Start small. Here's our practical guide to a greener home.",
                 'content' => '<p>Sustainability can feel overwhelming when you\'re starting from scratch. The good news: small, consistent changes add up to a meaningful impact. Here\'s where we\'d start.</p><h2>The kitchen</h2><p>Replace single-use plastic with beeswax wraps and reusable containers. Invest in a compost bin — kitchen scraps make excellent garden compost. A good water filter cuts down on bottled water significantly.</p><h2>The bathroom</h2><p>Solid shampoo and conditioner bars eliminate plastic bottles. Bamboo toothbrushes, refillable deodorant, and a safety razor (the blades are recyclable) make a significant difference over a year.</p><h2>Textiles</h2><p>Buy less and buy better. Wash clothes at 30°C. Air dry where possible. Repair before replacing — our repair guide is coming soon.</p><h2>Energy</h2><p>Switch to a renewable energy tariff. Switch to LED bulbs if you haven\'t already. A smart thermostat can reduce heating bills by 15–25%.</p>',
                 'category' => 'sustainability',
                 'days_ago' => 55,
@@ -162,7 +162,7 @@ class BlogSeeder extends Seeder
             [
                 'title' => 'The Perfect Bookshelf Styling Guide',
                 'slug' => 'perfect-bookshelf-styling-guide',
-                'excerpt' => 'Your bookshelf says a lot about you. Here\'s how to style it so it also looks beautiful.',
+                'excerpt' => "Your bookshelf says a lot about you. Here's how to style it so it also looks beautiful.",
                 'content' => '<p>A bookshelf is both functional and decorative. Getting the balance right takes a little thought — here\'s how to style yours like a pro.</p><h2>The rule of three</h2><p>Group objects in odd numbers — threes work best. Combine books with a small plant, a sculptural object, and a framed photo for a balanced vignette.</p><h2>Vary the height</h2><p>Mix upright books with horizontal stacks. Add objects at different heights — a tall vase next to a small ceramic dish creates rhythm.</p><h2>Edit ruthlessly</h2><p>Remove anything you wouldn\'t keep if you were moving house. Space between objects is as important as the objects themselves.</p><h2>Use colour intentionally</h2><p>Grouping books by colour is controversial but effective. Alternatively, keep it neutral and let the objects provide colour interest.</p>',
                 'category' => 'living-home',
                 'days_ago' => 60,
@@ -182,7 +182,7 @@ class BlogSeeder extends Seeder
             [
                 'title' => 'Why We Moved to Plastic-Free Packaging',
                 'slug' => 'why-we-moved-to-plastic-free-packaging',
-                'excerpt' => 'Last year we eliminated single-use plastic from all our packaging. Here\'s what we learned.',
+                'excerpt' => "Last year we eliminated single-use plastic from all our packaging. Here's what we learned.",
                 'content' => '<p>In January 2025, we made the switch to 100% plastic-free packaging across all our shipments. It wasn\'t without challenges — here\'s an honest account of what it took and what we\'d do differently.</p><h2>The problem with plastic mailers</h2><p>Polybag mailers are cheap, lightweight, and waterproof — which is why the industry defaulted to them. But they\'re not recyclable in most curbside programmes and shed microplastics throughout their life.</p><h2>Our solution</h2><p>We switched to compostable mailers made from PBAT and cornstarch for smaller orders, and recycled cardboard boxes for larger shipments. Inner packaging uses shredded paper and compostable void fill.</p><h2>The cost</h2><p>Honestly? It cost us more. Our packaging costs increased by roughly 18%. We absorbed this rather than passing it on — it felt like the right thing to do.</p><h2>What we learned</h2><p>The biggest surprise was how positively customers responded. Unpacking a parcel that arrives in compostable packaging is a different, better experience. It signals care at every touchpoint.</p>',
                 'category' => 'sustainability',
                 'days_ago' => 75,

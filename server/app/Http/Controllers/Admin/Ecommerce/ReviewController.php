@@ -17,8 +17,8 @@ class ReviewController extends Controller
         $reviews = ProductReview::query()
             ->with(['product', 'customer'])
             ->when($request->input('search'), function ($q, string $search): void {
-                $q->whereHas('product', fn ($p) => $p->where('name->en', 'like', "%{$search}%"))
-                    ->orWhereHas('customer', fn ($c) => $c->where('name', 'like', "%{$search}%"));
+                $q->whereHas('product', fn ($p) => $p->where('name->en', 'like', sprintf('%%%s%%', $search)))
+                    ->orWhereHas('customer', fn ($c) => $c->where('name', 'like', sprintf('%%%s%%', $search)));
             })
             ->latest()
             ->paginate(20)

@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Enums\BlogPostStatusEnum;
+use App\Models\BlogPost;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\BlogPost>
+ * @extends Factory<BlogPost>
  */
 class BlogPostFactory extends Factory
 {
@@ -41,7 +42,7 @@ class BlogPostFactory extends Factory
 
     public function published(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'status' => BlogPostStatusEnum::Published,
             'published_at' => now(),
         ]);
@@ -49,12 +50,12 @@ class BlogPostFactory extends Factory
 
     public function featured(): static
     {
-        return $this->state(fn (array $attributes) => ['is_featured' => true]);
+        return $this->state(fn (array $attributes): array => ['is_featured' => true]);
     }
 
     public function draft(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'status' => BlogPostStatusEnum::Draft,
             'published_at' => null,
         ]);

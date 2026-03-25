@@ -10,15 +10,13 @@ use RuntimeException;
 
 class PayUTokenService
 {
-    private const CACHE_KEY = 'payu_access_token';
+    private const string CACHE_KEY = 'payu_access_token';
 
-    private const TTL_SECONDS = 39_600; // 11 hours (token valid 43199s)
+    private const int TTL_SECONDS = 39_600; // 11 hours (token valid 43199s)
 
     public function getToken(): string
     {
-        return Cache::remember(self::CACHE_KEY, self::TTL_SECONDS, function (): string {
-            return $this->fetchToken();
-        });
+        return Cache::remember(self::CACHE_KEY, self::TTL_SECONDS, fn (): string => $this->fetchToken());
     }
 
     public function invalidate(): void
@@ -43,9 +41,7 @@ class PayUTokenService
 
         $token = $response->json('access_token');
 
-        if (! is_string($token) || $token === '') {
-            throw new RuntimeException('PayU OAuth returned empty access_token');
-        }
+        throw_if(! is_string($token) || $token === '', RuntimeException::class, 'PayU OAuth returned empty access_token');
 
         return $token;
     }

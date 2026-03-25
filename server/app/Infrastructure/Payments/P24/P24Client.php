@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Payments\P24;
 
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -59,7 +60,7 @@ class P24Client
         return (string) config('services.p24.base_url');
     }
 
-    private function client(): \Illuminate\Http\Client\PendingRequest
+    private function client(): PendingRequest
     {
         return Http::withBasicAuth(
             (string) config('services.p24.pos_id'),

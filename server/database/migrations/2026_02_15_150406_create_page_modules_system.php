@@ -11,7 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         // Page Modules - definiuje dostępne moduły (ecommerce, job offers, etc.)
-        Schema::create('page_modules', function (Blueprint $table) {
+        Schema::create('page_modules', function (Blueprint $table): void {
             $table->id();
             $table->string('key', 100)->unique(); // 'ecommerce', 'job_offers', 'blog'
             $table->string('name'); // "E-commerce"
@@ -34,7 +34,7 @@ return new class extends Migration
         });
 
         // Module Layouts - layouty dla każdego modułu
-        Schema::create('module_layouts', function (Blueprint $table) {
+        Schema::create('module_layouts', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('page_module_id')->constrained('page_modules')->cascadeOnDelete();
             $table->string('key', 100); // 'grid', 'list', 'card'
@@ -51,7 +51,7 @@ return new class extends Migration
         });
 
         // Rozszerz tabelę pages o moduły
-        Schema::table('pages', function (Blueprint $table) {
+        Schema::table('pages', function (Blueprint $table): void {
             // Check if columns already exist to avoid duplicates
             // page_type, module_name, module_config, published_at, published_version_id już istnieją
 
@@ -75,7 +75,7 @@ return new class extends Migration
 
         // Rozszerz page_versions o dodatkowe pola (jeśli jeszcze ich nie ma)
         if (! Schema::hasColumn('page_versions', 'is_published')) {
-            Schema::table('page_versions', function (Blueprint $table) {
+            Schema::table('page_versions', function (Blueprint $table): void {
                 $table->boolean('is_published')->default(false)->after('change_note');
                 $table->timestamp('published_at')->nullable()->after('is_published');
             });
@@ -88,12 +88,12 @@ return new class extends Migration
     {
         // Rollback page_versions changes
         if (Schema::hasColumn('page_versions', 'is_published')) {
-            Schema::table('page_versions', function (Blueprint $table) {
+            Schema::table('page_versions', function (Blueprint $table): void {
                 $table->dropColumn(['is_published', 'published_at']);
             });
         }
 
-        Schema::table('pages', function (Blueprint $table) {
+        Schema::table('pages', function (Blueprint $table): void {
             $table->dropForeign(['page_module_id']);
             $table->dropForeign(['module_layout_id']);
             $table->dropColumn([

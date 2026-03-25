@@ -18,7 +18,7 @@ class CurrencyController extends Controller
 {
     public function index(Request $request): Response
     {
-        $currencies = (new CurrencyIndexQuery($request))->execute();
+        $currencies = new CurrencyIndexQuery($request)->execute();
 
         return inertia('admin/currencies/index', [
             'currencies' => $currencies,
@@ -35,15 +35,15 @@ class CurrencyController extends Controller
     {
         $data = $request->validated();
 
-        $data['is_active'] = $data['is_active'] ?? true;
+        $data['is_active'] ??= true;
 
         if ($data['is_base'] ?? false) {
-            Currency::where('is_base', true)->update(['is_base' => false]);
+            Currency::query()->where('is_base', true)->update(['is_base' => false]);
         }
 
-        Currency::create($data);
+        Currency::query()->create($data);
 
-        return redirect()->route('admin.currencies.index')->with('success', 'Waluta została utworzona');
+        return to_route('admin.currencies.index')->with('success', 'Waluta została utworzona');
     }
 
     public function edit(Currency $currency): Response
@@ -60,12 +60,12 @@ class CurrencyController extends Controller
         $data = $request->validated();
 
         if (($data['is_base'] ?? false) && ! $currency->is_base) {
-            Currency::where('is_base', true)->update(['is_base' => false]);
+            Currency::query()->where('is_base', true)->update(['is_base' => false]);
         }
 
         // Zapobiegamy usunięciu is_base gdyby to była ostatnia waluta
         if (! ($data['is_base'] ?? false) && $currency->is_base) {
-            $baseCount = Currency::where('is_base', true)->count();
+            $baseCount = Currency::query()->where('is_base', true)->count();
             if ($baseCount <= 1) {
                 unset($data['is_base']);
             }
@@ -73,20 +73,20 @@ class CurrencyController extends Controller
 
         $currency->update($data);
 
-        return redirect()->back()->with('success', 'Waluta została zaktualizowana');
+        return back()->with('success', 'Waluta została zaktualizowana');
     }
 
     public function destroy(Currency $currency): RedirectResponse
     {
         if ($currency->is_base) {
-            return redirect()->back()->with('error', 'Nie można usunąć waluty bazowej');
+            return back()->with('error', 'Nie można usunąć waluty bazowej');
         }
 
-        DB::transaction(function () use ($currency) {
+        DB::transaction(function () use ($currency): void {
             $currency->exchangeRates()->delete();
             $currency->delete();
         });
 
-        return redirect()->back()->with('success', 'Waluta została usunięta');
+        return back()->with('success', 'Waluta została usunięta');
     }
 }

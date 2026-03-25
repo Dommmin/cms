@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -25,26 +26,6 @@ class Faq extends Model
     ];
 
     /**
-     * Scope a query to only include active FAQs.
-     */
-    public function scopeActive(Builder $query): Builder
-    {
-        return $query->where('is_active', true);
-    }
-
-    /**
-     * Scope a query to filter by category.
-     */
-    public function scopeByCategory(Builder $query, ?string $category): Builder
-    {
-        if ($category === null || $category === 'all') {
-            return $query;
-        }
-
-        return $query->where('category', $category);
-    }
-
-    /**
      * Increment views count.
      */
     public function incrementViews(): void
@@ -58,6 +39,28 @@ class Faq extends Model
     public function incrementHelpful(): void
     {
         $this->increment('helpful_count');
+    }
+
+    /**
+     * Scope a query to only include active FAQs.
+     */
+    #[Scope]
+    protected function active(Builder $query): Builder
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope a query to filter by category.
+     */
+    #[Scope]
+    protected function byCategory(Builder $query, ?string $category): Builder
+    {
+        if ($category === null || $category === 'all') {
+            return $query;
+        }
+
+        return $query->where('category', $category);
     }
 
     protected function casts(): array

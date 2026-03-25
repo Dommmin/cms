@@ -21,7 +21,7 @@ class ProductVariantController extends Controller
 {
     public function index(Product $product): Response
     {
-        $variants = (new ProductVariantIndexQuery(request()))->execute($product);
+        $variants = new ProductVariantIndexQuery(request())->execute($product);
 
         return inertia('admin/ecommerce/products/variants/index', [
             'product' => $product,
@@ -31,7 +31,7 @@ class ProductVariantController extends Controller
 
     public function create(Product $product): Response
     {
-        $taxRates = (new ProductVariantIndexQuery(request()))->getTaxRates();
+        $taxRates = new ProductVariantIndexQuery(request())->getTaxRates();
 
         return inertia('admin/ecommerce/products/variants/create', [
             'product' => $product,
@@ -45,11 +45,11 @@ class ProductVariantController extends Controller
         $data = $request->validated();
 
         $data['product_id'] = $product->id;
-        $data['is_active'] = $data['is_active'] ?? true;
-        $data['is_default'] = $data['is_default'] ?? false;
+        $data['is_active'] ??= true;
+        $data['is_default'] ??= false;
 
         if ($data['is_default']) {
-            ProductVariant::where('product_id', $product->id)
+            ProductVariant::query()->where('product_id', $product->id)
                 ->where('is_default', true)
                 ->update(['is_default' => false]);
         }
@@ -57,17 +57,17 @@ class ProductVariantController extends Controller
         $attributeValueIds = $data['attribute_values'] ?? [];
         unset($data['attribute_values']);
 
-        $variant = ProductVariant::create($data);
+        $variant = ProductVariant::query()->create($data);
         $this->syncVariantAttributeValues($variant, $attributeValueIds);
 
-        return redirect()->route('admin.ecommerce.products.variants.index', $product)
+        return to_route('admin.ecommerce.products.variants.index', $product)
             ->with('success', 'Wariant produktu został utworzony');
     }
 
     public function edit(Product $product, ProductVariant $variant): Response
     {
         $variant->load(['taxRate', 'attributeValues.attribute']);
-        $taxRates = (new ProductVariantIndexQuery(request()))->getTaxRates();
+        $taxRates = new ProductVariantIndexQuery(request())->getTaxRates();
 
         return inertia('admin/ecommerce/products/variants/edit', [
             'product' => $product,
@@ -82,7 +82,7 @@ class ProductVariantController extends Controller
         $data = $request->validated();
 
         if (($data['is_default'] ?? false) && ! $variant->is_default) {
-            ProductVariant::where('product_id', $product->id)
+            ProductVariant::query()->where('product_id', $product->id)
                 ->where('is_default', true)
                 ->update(['is_default' => false]);
         }
@@ -93,14 +93,14 @@ class ProductVariantController extends Controller
         $variant->update($data);
         $this->syncVariantAttributeValues($variant, $attributeValueIds);
 
-        return redirect()->back()->with('success', 'Wariant produktu został zaktualizowany');
+        return back()->with('success', 'Wariant produktu został zaktualizowany');
     }
 
     public function destroy(Product $product, ProductVariant $variant): RedirectResponse
     {
         $variant->delete();
 
-        return redirect()->back()->with('success', 'Wariant produktu został usunięty');
+        return back()->with('success', 'Wariant produktu został usunięty');
     }
 
     public function updateStock(UpdateStockRequest $request, Product $product, ProductVariant $variant): RedirectResponse
@@ -110,7 +110,7 @@ class ProductVariantController extends Controller
         $newQuantity = max(0, $variant->stock_quantity + $data['quantity']);
         $variant->update(['stock_quantity' => $newQuantity]);
 
-        return redirect()->back()->with('success', 'Stan magazynowy został zaktualizowany');
+        return back()->with('success', 'Stan magazynowy został zaktualizowany');
     }
 
     private function variantAttributes(Product $product): Collection
@@ -119,7 +119,7 @@ class ProductVariantController extends Controller
 
         return $product->productType?->productTypeAttributes
             ->sortBy('position')
-            ->map(function ($productTypeAttribute) {
+            ->map(function ($productTypeAttribute): array {
                 $attribute = $productTypeAttribute->attribute;
 
                 return [
@@ -127,7 +127,7 @@ class ProductVariantController extends Controller
                     'name' => $attribute->name,
                     'slug' => $attribute->slug,
                     'is_required' => $productTypeAttribute->is_required,
-                    'values' => $attribute->values->map(fn ($value) => [
+                    'values' => $attribute->values->map(fn ($value): array => [
                         'id' => $value->id,
                         'value' => $value->value,
                         'slug' => $value->slug,
@@ -150,7 +150,7 @@ class ProductVariantController extends Controller
         $records = $attributeValues
             ->unique('attribute_id')
             ->values()
-            ->map(fn (AttributeValue $attributeValue) => [
+            ->map(fn (AttributeValue $attributeValue): array => [
                 'variant_id' => $variant->id,
                 'attribute_id' => $attributeValue->attribute_id,
                 'attribute_value_id' => $attributeValue->id,

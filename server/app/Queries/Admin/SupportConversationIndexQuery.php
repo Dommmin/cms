@@ -18,9 +18,9 @@ final readonly class SupportConversationIndexQuery
             ->with(['assignedTo:id,name'])
             ->withCount(['messages', 'unreadMessages'])
             ->when($this->request->search, function ($query, string $search): void {
-                $query->where('subject', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('name', 'like', "%{$search}%");
+                $query->where('subject', 'like', sprintf('%%%s%%', $search))
+                    ->orWhere('email', 'like', sprintf('%%%s%%', $search))
+                    ->orWhere('name', 'like', sprintf('%%%s%%', $search));
             })
             ->when($this->request->status, function ($query, string $status): void {
                 $query->where('status', $status);
@@ -28,7 +28,7 @@ final readonly class SupportConversationIndexQuery
             ->when($this->request->assigned_to, function ($query, string $assignedTo): void {
                 $query->where('assigned_to', $assignedTo);
             })
-            ->orderByDesc('last_reply_at')
+            ->latest('last_reply_at')
             ->paginate(20)
             ->withQueryString();
     }

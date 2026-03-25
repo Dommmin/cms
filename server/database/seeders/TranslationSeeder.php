@@ -404,14 +404,8 @@ class TranslationSeeder extends Seeder
         ];
 
         foreach ($translations as $translation) {
-            Translation::firstOrCreate(
-                ['locale_code' => 'en', 'group' => $translation['group'], 'key' => $translation['key']],
-                ['value' => $translation['en']]
-            );
-            Translation::firstOrCreate(
-                ['locale_code' => 'pl', 'group' => $translation['group'], 'key' => $translation['key']],
-                ['value' => $translation['pl']]
-            );
+            Translation::query()->firstOrCreate(['locale_code' => 'en', 'group' => $translation['group'], 'key' => $translation['key']], ['value' => $translation['en']]);
+            Translation::query()->firstOrCreate(['locale_code' => 'pl', 'group' => $translation['group'], 'key' => $translation['key']], ['value' => $translation['pl']]);
         }
     }
 }

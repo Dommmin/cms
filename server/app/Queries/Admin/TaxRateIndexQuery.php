@@ -16,13 +16,13 @@ class TaxRateIndexQuery
     public function execute()
     {
         return TaxRate::query()
-            ->when($this->request->search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%");
+            ->when($this->request->search, function ($query, string $search): void {
+                $query->where('name', 'like', sprintf('%%%s%%', $search));
             })
-            ->when($this->request->has('is_active'), function ($query) {
+            ->when($this->request->has('is_active'), function ($query): void {
                 $query->where('is_active', $this->request->boolean('is_active'));
             })
-            ->when($this->request->has('is_default'), function ($query) {
+            ->when($this->request->has('is_default'), function ($query): void {
                 $query->where('is_default', $this->request->boolean('is_default'));
             })
             ->orderBy('name')

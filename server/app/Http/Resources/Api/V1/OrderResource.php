@@ -46,7 +46,7 @@ class OrderResource extends JsonResource
                 'status' => $order->shipment->status->value,
             ] : null,
             'status_history' => $order->relationLoaded('statusHistory')
-                ? $order->statusHistory->map(fn ($h) => [
+                ? $order->statusHistory->map(fn ($h): array => [
                     'status' => $h->status,
                     'note' => $h->note,
                     'created_at' => $h->created_at?->toISOString(),

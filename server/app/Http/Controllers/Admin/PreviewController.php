@@ -22,7 +22,7 @@ class PreviewController extends Controller
         ]);
 
         $adminUrl = $request->input('admin_url');
-        if ($adminUrl && str_starts_with($adminUrl, '/')) {
+        if ($adminUrl && str_starts_with((string) $adminUrl, '/')) {
             $adminUrl = config('app.url').$adminUrl;
         }
 

@@ -10,11 +10,13 @@ use App\Models\ProductReview;
 use App\Models\ProductVariant;
 use App\Models\SupportConversation;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Sleep;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class NotificationController extends Controller
 {
-    private const LOW_STOCK_THRESHOLD = 5;
+    private const int LOW_STOCK_THRESHOLD = 5;
 
     public function index(): JsonResponse
     {
@@ -37,7 +39,7 @@ class NotificationController extends Controller
             $lastSentHash = '';
 
             while ((time() - $startTime) < $maxDuration) {
-                if (connection_aborted()) {
+                if (connection_aborted() !== 0) {
                     break;
                 }
 
@@ -55,7 +57,7 @@ class NotificationController extends Controller
                     flush();
                 }
 
-                sleep($pollInterval);
+                Sleep::sleep($pollInterval);
             }
 
             // Signal the client to reconnect immediately
@@ -71,39 +73,37 @@ class NotificationController extends Controller
         ]);
     }
 
-    private function buildNotifications(): \Illuminate\Support\Collection
+    private function buildNotifications(): Collection
     {
         $notifications = collect();
 
         $newOrders = Order::query()
-            ->where('created_at', '>=', now()->subHour())
-            ->orderByDesc('created_at')
+            ->where('created_at', '>=', now()->subHour())->latest()
             ->limit(5)
             ->get();
 
         foreach ($newOrders as $order) {
             $notifications->push([
-                'id' => "order-{$order->id}",
+                'id' => 'order-'.$order->id,
                 'type' => 'new_order',
-                'title' => "New order #{$order->reference_number}",
+                'title' => 'New order #'.$order->reference_number,
                 'message' => 'A new order was placed.',
                 'created_at' => $order->created_at->toISOString(),
-                'url' => "/admin/ecommerce/orders/{$order->id}",
+                'url' => '/admin/ecommerce/orders/'.$order->id,
             ]);
         }
 
         $pendingReviews = ProductReview::query()
-            ->where('status', 'pending')
-            ->orderByDesc('created_at')
+            ->where('status', 'pending')->latest()
             ->limit(5)
             ->get();
 
         foreach ($pendingReviews as $review) {
             $notifications->push([
-                'id' => "review-{$review->id}",
+                'id' => 'review-'.$review->id,
                 'type' => 'pending_review',
                 'title' => 'Review awaiting approval',
-                'message' => "\"{$review->title}\" — {$review->rating}/5",
+                'message' => sprintf('"%s" — %s/5', $review->title, $review->rating),
                 'created_at' => $review->created_at->toISOString(),
                 'url' => '/admin/ecommerce/reviews',
             ]);
@@ -120,10 +120,10 @@ class NotificationController extends Controller
 
         foreach ($lowStock as $variant) {
             $notifications->push([
-                'id' => "stock-{$variant->id}",
+                'id' => 'stock-'.$variant->id,
                 'type' => 'low_stock',
                 'title' => 'Low stock alert',
-                'message' => ($variant->product?->name ?? "Variant #{$variant->id}")." — {$variant->stock_quantity} left",
+                'message' => ($variant->product?->name ?? 'Variant #'.$variant->id).sprintf(' — %s left', $variant->stock_quantity),
                 'created_at' => now()->toISOString(),
                 'url' => '/admin/ecommerce/products',
             ]);
@@ -131,18 +131,18 @@ class NotificationController extends Controller
 
         $unreadConversations = SupportConversation::query()
             ->whereHas('unreadMessages')
-            ->orderByDesc('last_reply_at')
+            ->latest('last_reply_at')
             ->limit(5)
             ->get();
 
         foreach ($unreadConversations as $conversation) {
             $notifications->push([
-                'id' => "support-{$conversation->id}",
+                'id' => 'support-'.$conversation->id,
                 'type' => 'unread_support',
                 'title' => 'New support message',
                 'message' => $conversation->subject,
                 'created_at' => ($conversation->last_reply_at ?? $conversation->created_at)->toISOString(),
-                'url' => "/admin/support/{$conversation->id}",
+                'url' => '/admin/support/'.$conversation->id,
             ]);
         }
 

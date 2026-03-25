@@ -27,19 +27,19 @@ class SyncTranslations extends Command
             : realpath(base_path('../client'));
 
         if (! $basePath || ! is_dir($basePath)) {
-            $this->error("Client directory not found: {$basePath}");
+            $this->error('Client directory not found: '.$basePath);
 
             return self::FAILURE;
         }
 
-        $this->info("Scanning: {$basePath}");
+        $this->info('Scanning: '.$basePath);
 
         $keys = $this->extractKeys($basePath);
         $this->info('Found '.count($keys).' unique translation keys.');
 
         if ($this->option('dry-run')) {
             $this->table(['Group', 'Key', 'Fallback (EN)'], array_map(
-                fn ($k) => [$k['group'], $k['key'], $k['fallback']],
+                fn (array $k): array => [$k['group'], $k['key'], $k['fallback']],
                 $keys,
             ));
 
@@ -63,7 +63,7 @@ class SyncTranslations extends Command
                 ])->exists();
 
                 if (! $exists) {
-                    Translation::create([
+                    Translation::query()->create([
                         'locale_code' => $locale,
                         'group' => $entry['group'],
                         'key' => $entry['key'],
@@ -75,10 +75,10 @@ class SyncTranslations extends Command
         }
 
         foreach ($localeCodes as $locale) {
-            Cache::forget("translations.{$locale}");
+            Cache::forget('translations.'.$locale);
         }
 
-        $this->info("Done. Created {$created} new entries.");
+        $this->info(sprintf('Done. Created %d new entries.', $created));
 
         return self::SUCCESS;
     }

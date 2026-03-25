@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\ReusableBlock;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -10,7 +11,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('page_blocks', function (Blueprint $table) {
+        Schema::table('page_blocks', function (Blueprint $table): void {
             $table->foreignId('reusable_block_id')
                 ->nullable()
                 ->after('is_active')
@@ -21,8 +22,8 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('page_blocks', function (Blueprint $table) {
-            $table->dropForeignIdFor(App\Models\ReusableBlock::class);
+        Schema::table('page_blocks', function (Blueprint $table): void {
+            $table->dropForeignIdFor(ReusableBlock::class);
             $table->dropColumn('reusable_block_id');
         });
     }

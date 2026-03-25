@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -41,24 +42,6 @@ class Promotion extends Model
             ->withTimestamps();
     }
 
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true)
-            ->where(function ($q) {
-                $q->whereNull('starts_at')
-                    ->orWhere('starts_at', '<=', now());
-            })
-            ->where(function ($q) {
-                $q->whereNull('ends_at')
-                    ->orWhere('ends_at', '>=', now());
-            });
-    }
-
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('priority')->orderBy('name');
-    }
-
     public function getApplicableProducts()
     {
         if ($this->apply_to === 'all') {
@@ -70,7 +53,7 @@ class Promotion extends Model
         }
 
         if ($this->apply_to === 'specific_categories') {
-            return Product::whereHas('categories', function ($query) {
+            return Product::query()->whereHas('categories', function ($query): void {
                 $query->whereIn('categories.id', $this->categories()->pluck('categories.id'));
             });
         }
@@ -116,5 +99,25 @@ class Promotion extends Model
         }
 
         return $discountValue;
+    }
+
+    #[Scope]
+    protected function active($query)
+    {
+        return $query->where('is_active', true)
+            ->where(function ($q): void {
+                $q->whereNull('starts_at')
+                    ->orWhere('starts_at', '<=', now());
+            })
+            ->where(function ($q): void {
+                $q->whereNull('ends_at')
+                    ->orWhere('ends_at', '>=', now());
+            });
+    }
+
+    #[Scope]
+    protected function ordered($query)
+    {
+        return $query->orderBy('priority')->orderBy('name');
     }
 }

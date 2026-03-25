@@ -23,7 +23,7 @@ class AdminSearchController extends Controller
             return response()->json([]);
         }
 
-        $like = "%{$q}%";
+        $like = sprintf('%%%s%%', $q);
         $results = [];
 
         // Products
@@ -37,14 +37,14 @@ class AdminSearchController extends Controller
                     'group' => 'Products',
                     'label' => $p->name,
                     'meta' => $p->is_active ? null : 'inactive',
-                    'url' => "/admin/ecommerce/products/{$p->id}/edit",
+                    'url' => sprintf('/admin/ecommerce/products/%s/edit', $p->id),
                 ];
             });
 
         // Blog Posts
         BlogPost::query()
             ->where('title', 'LIKE', $like)
-            ->orderByDesc('published_at')
+            ->latest('published_at')
             ->limit(5)
             ->get(['id', 'title', 'status'])
             ->each(function (BlogPost $p) use (&$results): void {
@@ -52,7 +52,7 @@ class AdminSearchController extends Controller
                     'group' => 'Blog Posts',
                     'label' => $p->title,
                     'meta' => is_string($p->status) ? $p->status : $p->status?->value,
-                    'url' => "/admin/blog/posts/{$p->id}/edit",
+                    'url' => sprintf('/admin/blog/posts/%s/edit', $p->id),
                 ];
             });
 
@@ -67,7 +67,7 @@ class AdminSearchController extends Controller
                     'group' => 'Pages',
                     'label' => $p->title,
                     'meta' => $p->slug,
-                    'url' => "/admin/cms/pages/{$p->id}/edit",
+                    'url' => sprintf('/admin/cms/pages/%d/edit', $p->id),
                 ];
             });
 
@@ -79,9 +79,9 @@ class AdminSearchController extends Controller
             ->each(function (Order $o) use (&$results): void {
                 $results[] = [
                     'group' => 'Orders',
-                    'label' => "#{$o->reference_number}",
+                    'label' => '#'.$o->reference_number,
                     'meta' => is_string($o->status) ? $o->status : $o->status?->value,
-                    'url' => "/admin/ecommerce/orders/{$o->id}",
+                    'url' => '/admin/ecommerce/orders/'.$o->id,
                 ];
             });
 
@@ -96,7 +96,7 @@ class AdminSearchController extends Controller
                     'group' => 'Users',
                     'label' => $u->name,
                     'meta' => $u->email,
-                    'url' => "/admin/users/{$u->id}/edit",
+                    'url' => sprintf('/admin/users/%s/edit', $u->id),
                 ];
             });
 

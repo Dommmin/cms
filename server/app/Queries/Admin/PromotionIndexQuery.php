@@ -17,14 +17,14 @@ class PromotionIndexQuery
     {
         return Promotion::query()
             ->with(['products', 'categories'])
-            ->when($this->request->search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+            ->when($this->request->search, function ($query, $search): void {
+                $query->where('name', 'like', sprintf('%%%s%%', $search))
+                    ->orWhere('description', 'like', sprintf('%%%s%%', $search));
             })
-            ->when($this->request->is_active !== null, function ($query, $isActive) {
+            ->when($this->request->is_active !== null, function ($query, $isActive): void {
                 $query->where('is_active', $isActive);
             })
-            ->when($this->request->type, function ($query, $type) {
+            ->when($this->request->type, function ($query, $type): void {
                 $query->where('type', $type);
             })
             ->orderBy('priority')

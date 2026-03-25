@@ -28,7 +28,7 @@ class PayUClient
      */
     public function getOrder(string $orderId): array
     {
-        return $this->request('GET', "/api/v2_1/orders/{$orderId}");
+        return $this->request('GET', '/api/v2_1/orders/'.$orderId);
     }
 
     /**
@@ -37,7 +37,7 @@ class PayUClient
      */
     public function createRefund(string $orderId, array $data): array
     {
-        return $this->request('POST', "/api/v2_1/orders/{$orderId}/refunds", $data);
+        return $this->request('POST', sprintf('/api/v2_1/orders/%s/refunds', $orderId), $data);
     }
 
     /**
@@ -56,7 +56,7 @@ class PayUClient
 
         // PayU returns 302 for order creation (follow is disabled to capture orderId + redirect)
         if (! $response->successful() && $response->status() !== 302) {
-            throw new RuntimeException("PayU API error [{$response->status()}]: ".$response->body());
+            throw new RuntimeException(sprintf('PayU API error [%s]: ', $response->status()).$response->body());
         }
 
         return $response->json() ?? [];
@@ -74,7 +74,7 @@ class PayUClient
         return match (mb_strtoupper($method)) {
             'POST' => $client->post($baseUrl.$path, $data),
             'GET' => $client->get($baseUrl.$path),
-            default => throw new RuntimeException("Unsupported HTTP method: {$method}"),
+            default => throw new RuntimeException('Unsupported HTTP method: '.$method),
         };
     }
 }

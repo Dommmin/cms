@@ -21,7 +21,7 @@ use RecursiveIteratorIterator;
 class SyncAdminTranslations extends Command
 {
     /** Regex patterns to extract __('key', 'fallback') calls from TSX. */
-    private const PATTERNS = [
+    private const array PATTERNS = [
         '/__\([\'"]([a-z][a-z0-9._-]+)[\'"](?:,\s*[\'"]([^\'"]*)[\'"]\s*)?\)/u',
     ];
 
@@ -50,6 +50,7 @@ class SyncAdminTranslations extends Command
             $this->info('Scanning: '.$scanDir);
             $files = array_merge($files, $this->getTsxFiles($scanDir));
         }
+
         foreach ($files as $file) {
             $content = file_get_contents($file);
             foreach (self::PATTERNS as $pattern) {
@@ -98,13 +99,13 @@ class SyncAdminTranslations extends Command
             }
 
             if ($added === 0) {
-                $this->line("  <comment>{$locale}</comment>: already up-to-date.");
+                $this->line(sprintf('  <comment>%s</comment>: already up-to-date.', $locale));
 
                 continue;
             }
 
             if ($isDryRun) {
-                $this->line("  <comment>{$locale}</comment>: would add {$added} keys.");
+                $this->line(sprintf('  <comment>%s</comment>: would add %d keys.', $locale, $added));
 
                 continue;
             }
@@ -114,7 +115,7 @@ class SyncAdminTranslations extends Command
             ksort($nested);
 
             $this->writeLangFile($langFile, $nested, $locale);
-            $this->line("  <info>{$locale}</info>: added {$added} new keys → {$langFile}");
+            $this->line(sprintf('  <info>%s</info>: added %d new keys → %s', $locale, $added, $langFile));
         }
 
         $this->newLine();

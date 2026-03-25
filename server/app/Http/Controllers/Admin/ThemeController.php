@@ -36,7 +36,7 @@ class ThemeController extends Controller
     {
         $data = $request->validated();
 
-        $data['is_active'] = $data['is_active'] ?? true;
+        $data['is_active'] ??= true;
         $shouldActivate = filter_var($data['is_active'], FILTER_VALIDATE_BOOLEAN);
 
         DB::transaction(function () use ($data, $shouldActivate): void {
@@ -47,7 +47,7 @@ class ThemeController extends Controller
             Theme::query()->create($data);
         });
 
-        return redirect()->route('admin.themes.index')->with('success', 'Motyw został utworzony');
+        return to_route('admin.themes.index')->with('success', 'Motyw został utworzony');
     }
 
     public function show(Theme $theme): Response
@@ -84,35 +84,35 @@ class ThemeController extends Controller
             $theme->update($data);
         });
 
-        return redirect()->back()->with('success', 'Motyw został zaktualizowany');
+        return back()->with('success', 'Motyw został zaktualizowany');
     }
 
     public function destroy(Theme $theme): RedirectResponse
     {
         if ($theme->pages()->exists()) {
-            return redirect()->back()->with('error', 'Nie można usunąć motywu używanego przez strony');
+            return back()->with('error', 'Nie można usunąć motywu używanego przez strony');
         }
 
         $theme->delete();
 
-        return redirect()->back()->with('success', 'Motyw został usunięty');
+        return back()->with('success', 'Motyw został usunięty');
     }
 
     public function activate(Theme $theme): RedirectResponse
     {
-        DB::transaction(function () use ($theme) {
-            Theme::where('is_active', true)->update(['is_active' => false]);
+        DB::transaction(function () use ($theme): void {
+            Theme::query()->where('is_active', true)->update(['is_active' => false]);
             $theme->update(['is_active' => true]);
         });
 
-        return redirect()->back()->with('success', 'Motyw został aktywowany');
+        return back()->with('success', 'Motyw został aktywowany');
     }
 
     public function disable(): RedirectResponse
     {
         Theme::query()->where('is_active', true)->update(['is_active' => false]);
 
-        return redirect()->back()->with('success', 'Niestandardowy motyw został wyłączony');
+        return back()->with('success', 'Niestandardowy motyw został wyłączony');
     }
 
     public function duplicate(Theme $theme): RedirectResponse
@@ -123,6 +123,6 @@ class ThemeController extends Controller
         $newTheme->is_active = false;
         $newTheme->save();
 
-        return redirect()->route('admin.themes.edit', $newTheme)->with('success', 'Motyw został skopiowany');
+        return to_route('admin.themes.edit', $newTheme)->with('success', 'Motyw został skopiowany');
     }
 }

@@ -17,17 +17,14 @@ class FormSeeder extends Seeder
 
     private function seedContactForm(): void
     {
-        $form = Form::updateOrCreate(
-            ['slug' => 'contact'],
-            [
-                'name' => 'Contact Form',
-                'description' => 'General contact form',
-                'notification_email' => null,
-                'success_message' => 'Thank you for your message! We\'ll get back to you within 1-2 business days.',
-                'allow_multiple' => true,
-                'is_active' => true,
-            ]
-        );
+        $form = Form::query()->updateOrCreate(['slug' => 'contact'], [
+            'name' => 'Contact Form',
+            'description' => 'General contact form',
+            'notification_email' => null,
+            'success_message' => "Thank you for your message! We'll get back to you within 1-2 business days.",
+            'allow_multiple' => true,
+            'is_active' => true,
+        ]);
 
         $form->fields()->delete();
 
@@ -63,7 +60,7 @@ class FormSeeder extends Seeder
         ];
 
         foreach ($fields as $field) {
-            FormField::create(array_merge($field, ['form_id' => $form->id]));
+            FormField::query()->create(array_merge($field, ['form_id' => $form->id]));
         }
     }
 }

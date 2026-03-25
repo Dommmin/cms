@@ -19,6 +19,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Middleware\RoleMiddleware;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -50,14 +51,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'admin' => AdminAccess::class,
-            'role' => Spatie\Permission\Middleware\RoleMiddleware::class,
+            'role' => RoleMiddleware::class,
             'force.json' => ForceJsonResponse::class,
             'log.api' => LogApiRequests::class,
             'verified' => EnsureEmailVerified::class,
             'idempotent' => IdempotencyMiddleware::class,
         ]);
 
-        $middleware->redirectUsersTo(fn (Request $request) => route('admin.dashboard'));
+        $middleware->redirectUsersTo(fn (Request $request): string => route('admin.dashboard'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (AuthenticationException $e, Request $request) {
@@ -76,7 +77,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->is('api/*')) {
                 $model = class_basename($e->getModel());
 
-                return response()->json(['message' => "{$model} not found."], 404);
+                return response()->json(['message' => $model.' not found.'], 404);
             }
         });
 

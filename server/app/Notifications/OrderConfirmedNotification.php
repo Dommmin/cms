@@ -29,13 +29,13 @@ class OrderConfirmedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $mail = (new MailMessage)
-            ->subject("Order Confirmed – {$this->order->reference_number}")
-            ->greeting("Hello {$notifiable->name}!")
+            ->subject('Order Confirmed – '.$this->order->reference_number)
+            ->greeting(sprintf('Hello %s!', $notifiable->name))
             ->line("Thank you for your order! We've received your order and it's being processed.")
-            ->line("**Order:** {$this->order->reference_number}")
-            ->line("**Total:** {$this->order->formattedTotal()}")
+            ->line('**Order:** '.$this->order->reference_number)
+            ->line('**Total:** '.$this->order->formattedTotal())
             ->line('**Status:** '.OrderStatusEnum::from((string) $this->order->status)->getLabel())
-            ->action('View Order', url("/orders/{$this->order->reference_number}"))
+            ->action('View Order', url('/orders/'.$this->order->reference_number))
             ->line('If you have any questions, please contact our support team.');
 
         $this->attachInvoice($mail);
@@ -53,13 +53,13 @@ class OrderConfirmedNotification extends Notification implements ShouldQueue
 
     private function attachInvoice(MailMessage $mail): void
     {
-        $filename = "invoice-{$this->order->reference_number}.pdf";
-        $storagePath = "invoices/{$filename}";
+        $filename = sprintf('invoice-%s.pdf', $this->order->reference_number);
+        $storagePath = 'invoices/'.$filename;
 
         Storage::makeDirectory('invoices');
 
         try {
-            app(InvoiceService::class)->save($this->order, Storage::path($storagePath));
+            resolve(InvoiceService::class)->save($this->order, Storage::path($storagePath));
 
             $mail->attachData(
                 Storage::get($storagePath),

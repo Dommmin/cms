@@ -64,7 +64,7 @@ class PageController extends Controller
 
         $page = Page::query()->create($data);
 
-        return redirect()->route('admin.cms.pages.edit', $page)->with('success', 'Page created');
+        return to_route('admin.cms.pages.edit', $page)->with('success', 'Page created');
     }
 
     public function edit(Page $page): Response
@@ -98,7 +98,7 @@ class PageController extends Controller
         if (isset($data['slug_translations'])) {
             $data['slug_translations'] = array_filter(
                 $data['slug_translations'],
-                fn ($v) => is_string($v) && $v !== '',
+                fn ($v): bool => is_string($v) && $v !== '',
             ) ?: null;
         }
 
@@ -131,7 +131,7 @@ class PageController extends Controller
         $copy->draft_version_id = null;
         $copy->save();
 
-        return redirect()->route('admin.cms.pages.edit', $copy)->with('success', 'Page duplicated');
+        return to_route('admin.cms.pages.edit', $copy)->with('success', 'Page duplicated');
     }
 
     public function cloneSite(CloneSiteRequest $request, CloneSiteService $service): RedirectResponse
@@ -141,8 +141,8 @@ class PageController extends Controller
                 sourceLocale: $request->validated('source_locale'),
                 targetLocale: $request->validated('target_locale'),
             );
-        } catch (RuntimeException $e) {
-            return back()->withErrors(['target_locale' => $e->getMessage()]);
+        } catch (RuntimeException $runtimeException) {
+            return back()->withErrors(['target_locale' => $runtimeException->getMessage()]);
         }
 
         return back()->with('success', 'Site cloned successfully.');

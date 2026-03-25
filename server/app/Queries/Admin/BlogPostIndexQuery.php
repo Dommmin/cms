@@ -23,14 +23,13 @@ class BlogPostIndexQuery
 
                 $query->where(function (Builder $query) use ($search): void {
                     $query
-                        ->where('title', 'like', "%{$search}%")
-                        ->orWhere('excerpt', 'like', "%{$search}%");
+                        ->where('title', 'like', sprintf('%%%s%%', $search))
+                        ->orWhere('excerpt', 'like', sprintf('%%%s%%', $search));
                 });
             })
             ->when($filters['category_id'] ?? null, fn (Builder $query, mixed $categoryId): Builder => $query->where('blog_category_id', (int) $categoryId))
             ->when($filters['status'] ?? null, fn (Builder $query, mixed $status): Builder => $query->where('status', (string) $status))
-            ->when($filters['content_type'] ?? null, fn (Builder $query, mixed $contentType): Builder => $query->where('content_type', (string) $contentType))
-            ->orderByDesc('created_at')
+            ->when($filters['content_type'] ?? null, fn (Builder $query, mixed $contentType): Builder => $query->where('content_type', (string) $contentType))->latest()
             ->paginate((int) ($filters['per_page'] ?? 15))
             ->withQueryString();
     }

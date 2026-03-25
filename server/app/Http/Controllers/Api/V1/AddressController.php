@@ -80,7 +80,7 @@ class AddressController extends Controller
         $customer = $user->customer;
 
         if (! $customer) {
-            $customer = Customer::query()->create([
+            return Customer::query()->create([
                 'user_id' => $user->id,
                 'email' => $user->email,
                 'first_name' => $user->name,
@@ -93,8 +93,6 @@ class AddressController extends Controller
     private function authorizeAddress(Request $request, Address $address): void
     {
         $user = $request->user();
-        if (! $user->customer || $address->customer_id !== $user->customer->id) {
-            abort(403, 'Address does not belong to you');
-        }
+        abort_if(! $user->customer || $address->customer_id !== $user->customer->id, 403, 'Address does not belong to you');
     }
 }

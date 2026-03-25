@@ -22,8 +22,8 @@ class GusController extends Controller
     {
         try {
             $data = $this->gusService->lookupByNip($nip);
-        } catch (RuntimeException $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
+        } catch (RuntimeException $runtimeException) {
+            return response()->json(['message' => $runtimeException->getMessage()], 422);
         }
 
         return response()->json($data);

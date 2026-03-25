@@ -15,7 +15,7 @@ class CartService
 
     public function getOrCreateCart(?User $user = null, ?string $cartToken = null): Cart
     {
-        if ($user !== null) {
+        if ($user instanceof User) {
             // Ensure a Customer record always exists for authenticated users.
             // Without this, cart items added post-login go into the guest token cart
             // while checkout uses the (empty) customer cart, causing a mismatch.
@@ -76,6 +76,7 @@ class CartService
             'session_token' => $sessionToken,
         ]);
         $cart->save();
+
         session()->put(self::SESSION_CART_KEY, $sessionToken);
 
         return $cart;
@@ -100,7 +101,7 @@ class CartService
             $guestCart = $this->getGuestCartByToken($cartToken)?->load('items.variant');
         } else {
             $sessionToken = $this->getSessionToken();
-            if (! $sessionToken) {
+            if ($sessionToken === '' || $sessionToken === '0') {
                 return;
             }
 
@@ -118,11 +119,13 @@ class CartService
 
             return;
         }
+
         $customerCart = $customer->cart;
         if (! $customerCart instanceof Cart) {
             $customerCart = new Cart(['customer_id' => $customer->id]);
             $customerCart->save();
         }
+
         $customerCart->load('items');
 
         foreach ($guestCart->items as $guestItem) {

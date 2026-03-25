@@ -51,7 +51,7 @@ function makeCustomerForUser(User $user): Customer
     );
 }
 
-beforeEach(function () {
+beforeEach(function (): void {
     Notification::fake();
 });
 
@@ -59,8 +59,8 @@ beforeEach(function () {
 // Listing orders
 // ---------------------------------------------------------------------------
 
-describe('Order listing', function () {
-    it('authenticated user can list their orders', function () {
+describe('Order listing', function (): void {
+    it('authenticated user can list their orders', function (): void {
         $user = User::factory()->create();
         $customer = makeCustomerForUser($user);
         makeOrderForCustomer($customer);
@@ -72,7 +72,7 @@ describe('Order listing', function () {
             ->assertJsonCount(2, 'data');
     });
 
-    it('returns empty list when the user has no orders', function () {
+    it('returns empty list when the user has no orders', function (): void {
         $user = User::factory()->create();
 
         $this->actingAs($user, 'sanctum')
@@ -81,7 +81,7 @@ describe('Order listing', function () {
             ->assertJsonPath('data', []);
     });
 
-    it('guest cannot list orders — requires authentication', function () {
+    it('guest cannot list orders — requires authentication', function (): void {
         $this->getJson('/api/v1/orders')->assertUnauthorized();
     });
 });
@@ -90,20 +90,20 @@ describe('Order listing', function () {
 // Viewing a single order
 // ---------------------------------------------------------------------------
 
-describe('Order detail', function () {
-    it('user can view their own order', function () {
+describe('Order detail', function (): void {
+    it('user can view their own order', function (): void {
         $user = User::factory()->create();
         $customer = makeCustomerForUser($user);
         $order = makeOrderForCustomer($customer);
 
         $this->actingAs($user, 'sanctum')
-            ->getJson("/api/v1/orders/{$order->reference_number}")
+            ->getJson('/api/v1/orders/'.$order->reference_number)
             ->assertOk()
             ->assertJsonPath('data.reference_number', $order->reference_number)
             ->assertJsonPath('data.status', 'pending');
     });
 
-    it('user cannot view another user order — gets 404 not 403', function () {
+    it('user cannot view another user order — gets 404 not 403', function (): void {
         $owner = User::factory()->create();
         $ownerCustomer = makeCustomerForUser($owner);
         $order = makeOrderForCustomer($ownerCustomer);
@@ -111,11 +111,11 @@ describe('Order detail', function () {
         $attacker = User::factory()->create();
 
         $this->actingAs($attacker, 'sanctum')
-            ->getJson("/api/v1/orders/{$order->reference_number}")
+            ->getJson('/api/v1/orders/'.$order->reference_number)
             ->assertNotFound();
     });
 
-    it('returns 404 for a completely nonexistent reference number', function () {
+    it('returns 404 for a completely nonexistent reference number', function (): void {
         $user = User::factory()->create();
 
         $this->actingAs($user, 'sanctum')
@@ -123,12 +123,12 @@ describe('Order detail', function () {
             ->assertNotFound();
     });
 
-    it('guest cannot view any order — requires authentication', function () {
+    it('guest cannot view any order — requires authentication', function (): void {
         $user = User::factory()->create();
         $customer = makeCustomerForUser($user);
         $order = makeOrderForCustomer($customer);
 
-        $this->getJson("/api/v1/orders/{$order->reference_number}")
+        $this->getJson('/api/v1/orders/'.$order->reference_number)
             ->assertUnauthorized();
     });
 });
@@ -137,66 +137,66 @@ describe('Order detail', function () {
 // Cancelling an order
 // ---------------------------------------------------------------------------
 
-describe('Order cancellation', function () {
-    it('user can cancel their own pending order', function () {
+describe('Order cancellation', function (): void {
+    it('user can cancel their own pending order', function (): void {
         $user = User::factory()->create();
         $customer = makeCustomerForUser($user);
         $order = makeOrderForCustomer($customer, 'pending');
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/orders/{$order->reference_number}/cancel")
+            ->postJson(sprintf('/api/v1/orders/%s/cancel', $order->reference_number))
             ->assertOk()
             ->assertJsonPath('data.status', OrderStatusEnum::CANCELLED->value);
 
         expect($order->fresh()->getRawOriginal('status'))->toBe(OrderStatusEnum::CANCELLED->value);
     });
 
-    it('user can cancel their own awaiting_payment order', function () {
+    it('user can cancel their own awaiting_payment order', function (): void {
         $user = User::factory()->create();
         $customer = makeCustomerForUser($user);
         $order = makeOrderForCustomer($customer, 'awaiting_payment');
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/orders/{$order->reference_number}/cancel")
+            ->postJson(sprintf('/api/v1/orders/%s/cancel', $order->reference_number))
             ->assertOk()
             ->assertJsonPath('data.status', OrderStatusEnum::CANCELLED->value);
 
         expect($order->fresh()->getRawOriginal('status'))->toBe(OrderStatusEnum::CANCELLED->value);
     });
 
-    it('cannot cancel an order that is already shipped', function () {
+    it('cannot cancel an order that is already shipped', function (): void {
         $user = User::factory()->create();
         $customer = makeCustomerForUser($user);
         $order = makeOrderForCustomer($customer, 'shipped');
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/orders/{$order->reference_number}/cancel")
+            ->postJson(sprintf('/api/v1/orders/%s/cancel', $order->reference_number))
             ->assertUnprocessable();
 
         expect($order->fresh()->getRawOriginal('status'))->toBe('shipped');
     });
 
-    it('cannot cancel a delivered order', function () {
+    it('cannot cancel a delivered order', function (): void {
         $user = User::factory()->create();
         $customer = makeCustomerForUser($user);
         $order = makeOrderForCustomer($customer, 'delivered');
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/orders/{$order->reference_number}/cancel")
+            ->postJson(sprintf('/api/v1/orders/%s/cancel', $order->reference_number))
             ->assertUnprocessable();
     });
 
-    it('cannot cancel a cancelled order again', function () {
+    it('cannot cancel a cancelled order again', function (): void {
         $user = User::factory()->create();
         $customer = makeCustomerForUser($user);
         $order = makeOrderForCustomer($customer, 'cancelled');
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/orders/{$order->reference_number}/cancel")
+            ->postJson(sprintf('/api/v1/orders/%s/cancel', $order->reference_number))
             ->assertUnprocessable();
     });
 
-    it('user cannot cancel another user order — gets 404', function () {
+    it('user cannot cancel another user order — gets 404', function (): void {
         $owner = User::factory()->create();
         $ownerCustomer = makeCustomerForUser($owner);
         $order = makeOrderForCustomer($ownerCustomer, 'pending');
@@ -204,7 +204,7 @@ describe('Order cancellation', function () {
         $attacker = User::factory()->create();
 
         $this->actingAs($attacker, 'sanctum')
-            ->postJson("/api/v1/orders/{$order->reference_number}/cancel")
+            ->postJson(sprintf('/api/v1/orders/%s/cancel', $order->reference_number))
             ->assertNotFound();
 
         expect($order->fresh()->getRawOriginal('status'))->toBe('pending');
@@ -215,8 +215,8 @@ describe('Order cancellation', function () {
 // Return requests
 // ---------------------------------------------------------------------------
 
-describe('Return request', function () {
-    it('user can request return on a delivered order', function () {
+describe('Return request', function (): void {
+    it('user can request return on a delivered order', function (): void {
         $user = User::factory()->create();
         $customer = makeCustomerForUser($user);
         $order = makeOrderForCustomer($customer, 'delivered');
@@ -257,7 +257,7 @@ describe('Return request', function () {
         ]);
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/orders/{$order->reference_number}/return", [
+            ->postJson(sprintf('/api/v1/orders/%s/return', $order->reference_number), [
                 'reason' => 'Item arrived damaged',
                 'type' => 'return',
                 'items' => [
@@ -274,13 +274,13 @@ describe('Return request', function () {
         ]);
     });
 
-    it('cannot request return on a pending order', function () {
+    it('cannot request return on a pending order', function (): void {
         $user = User::factory()->create();
         $customer = makeCustomerForUser($user);
         $order = makeOrderForCustomer($customer, 'pending');
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/orders/{$order->reference_number}/return", [
+            ->postJson(sprintf('/api/v1/orders/%s/return', $order->reference_number), [
                 'reason' => 'Changed my mind',
                 'type' => 'return',
                 'items' => [['order_item_id' => 1, 'quantity' => 1]],
@@ -288,7 +288,7 @@ describe('Return request', function () {
             ->assertUnprocessable();
     });
 
-    it('cannot request return on another user order — gets 404', function () {
+    it('cannot request return on another user order — gets 404', function (): void {
         $owner = User::factory()->create();
         $ownerCustomer = makeCustomerForUser($owner);
         $order = makeOrderForCustomer($ownerCustomer, 'delivered');
@@ -296,7 +296,7 @@ describe('Return request', function () {
         $attacker = User::factory()->create();
 
         $this->actingAs($attacker, 'sanctum')
-            ->postJson("/api/v1/orders/{$order->reference_number}/return", [
+            ->postJson(sprintf('/api/v1/orders/%s/return', $order->reference_number), [
                 'reason' => 'IDOR attempt',
                 'type' => 'return',
                 'items' => [['order_item_id' => 1, 'quantity' => 1]],

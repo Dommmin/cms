@@ -21,9 +21,9 @@ class StoreController extends Controller
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search): void {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('city', 'like', "%{$search}%")
-                    ->orWhere('address', 'like', "%{$search}%");
+                $q->where('name', 'like', sprintf('%%%s%%', $search))
+                    ->orWhere('city', 'like', sprintf('%%%s%%', $search))
+                    ->orWhere('address', 'like', sprintf('%%%s%%', $search));
             });
         }
 
@@ -49,13 +49,13 @@ class StoreController extends Controller
         }
 
         if (! empty($data['opening_hours'])) {
-            $decoded = json_decode($data['opening_hours'], true);
+            $decoded = json_decode((string) $data['opening_hours'], true);
             $data['opening_hours'] = $decoded ?? $data['opening_hours'];
         }
 
-        Store::create($data);
+        Store::query()->create($data);
 
-        return redirect()->route('admin.stores.index')->with('success', 'Sklep został utworzony');
+        return to_route('admin.stores.index')->with('success', 'Sklep został utworzony');
     }
 
     public function edit(Store $store): Response
@@ -74,20 +74,20 @@ class StoreController extends Controller
         }
 
         if (! empty($data['opening_hours'])) {
-            $decoded = json_decode($data['opening_hours'], true);
+            $decoded = json_decode((string) $data['opening_hours'], true);
             $data['opening_hours'] = $decoded ?? $data['opening_hours'];
         }
 
         $store->update($data);
 
-        return redirect()->back()->with('success', 'Sklep został zaktualizowany');
+        return back()->with('success', 'Sklep został zaktualizowany');
     }
 
     public function destroy(Store $store): RedirectResponse
     {
         $store->delete();
 
-        return redirect()->back()->with('success', 'Sklep został usunięty');
+        return back()->with('success', 'Sklep został usunięty');
     }
 
     public function toggleActive(Store $store): RedirectResponse
@@ -96,6 +96,6 @@ class StoreController extends Controller
 
         $message = $store->is_active ? 'Sklep został aktywowany' : 'Sklep został dezaktywowany';
 
-        return redirect()->back()->with('success', $message);
+        return back()->with('success', $message);
     }
 }

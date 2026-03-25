@@ -17,9 +17,9 @@ class BlogPostController extends Controller
     {
         $locale = $request->query('locale', app()->getLocale());
 
-        $posts = BlogPost::published()
+        $posts = BlogPost::query()->published()
             ->with(['author:id,name', 'category:id,name,slug'])
-            ->where(function ($q) use ($locale) {
+            ->where(function ($q) use ($locale): void {
                 $q->whereNull('available_locales')
                     ->orWhereJsonContains('available_locales', $locale);
             })
@@ -27,9 +27,9 @@ class BlogPostController extends Controller
                 'category', fn ($c) => $c->where('slug', $slug)
             ))
             ->when($request->featured, fn ($q) => $q->featured())
-            ->when($request->search, fn ($q, $search) => $q->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('excerpt', 'like', "%{$search}%");
+            ->when($request->search, fn ($q, $search) => $q->where(function ($q) use ($search): void {
+                $q->where('title', 'like', sprintf('%%%s%%', $search))
+                    ->orWhere('excerpt', 'like', sprintf('%%%s%%', $search));
             }))
             ->latest('published_at')
             ->paginate($request->integer('per_page', 15))
@@ -42,9 +42,9 @@ class BlogPostController extends Controller
     {
         $locale = $request->query('locale', app()->getLocale());
 
-        $post = BlogPost::published()
+        $post = BlogPost::query()->published()
             ->where('slug', $slug)
-            ->where(function ($q) use ($locale) {
+            ->where(function ($q) use ($locale): void {
                 $q->whereNull('available_locales')
                     ->orWhereJsonContains('available_locales', $locale);
             })
@@ -60,11 +60,11 @@ class BlogPostController extends Controller
     {
         $locale = $request->query('locale', app()->getLocale());
 
-        $category = BlogCategory::active()->where('slug', $slug)->firstOrFail();
+        $category = BlogCategory::query()->active()->where('slug', $slug)->firstOrFail();
 
-        $posts = BlogPost::published()
+        $posts = BlogPost::query()->published()
             ->where('blog_category_id', $category->id)
-            ->where(function ($q) use ($locale) {
+            ->where(function ($q) use ($locale): void {
                 $q->whereNull('available_locales')
                     ->orWhereJsonContains('available_locales', $locale);
             })

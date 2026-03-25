@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Form;
 use App\Models\FormSubmission;
 use App\Queries\Admin\FormSubmissionIndexQuery;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Response;
 
@@ -34,7 +35,7 @@ class FormSubmissionController extends Controller
         ]);
     }
 
-    public function destroy(Form $form, FormSubmission $submission): \Illuminate\Http\RedirectResponse
+    public function destroy(Form $form, FormSubmission $submission): RedirectResponse
     {
         $submission->delete();
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\Ecommerce;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreReturnRequest extends FormRequest
@@ -19,16 +20,16 @@ class StoreReturnRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'order_id' => 'required|exists:orders,id',
-            'customer_id' => 'required|exists:customers,id',
-            'reason' => 'required|string|max:255',
-            'status' => 'required|string',
-            'notes' => 'nullable|string',
+            'order_id' => ['required', 'exists:orders,id'],
+            'customer_id' => ['required', 'exists:customers,id'],
+            'reason' => ['required', 'string', 'max:255'],
+            'status' => ['required', 'string'],
+            'notes' => ['nullable', 'string'],
         ];
     }
 }

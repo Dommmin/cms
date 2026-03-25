@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\SettingTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\TestMailRequest;
 use App\Http\Requests\Admin\UpdateSettingsRequest;
@@ -13,6 +14,7 @@ use App\Queries\Admin\SettingsIndexQuery;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Response;
 use Throwable;
@@ -45,12 +47,12 @@ class SettingsController extends Controller
                 continue;
             }
 
-            if ($setting->type === \App\Enums\SettingTypeEnum::Boolean) {
+            if ($setting->type === SettingTypeEnum::Boolean) {
                 $value = json_encode(filter_var($rawValue, FILTER_VALIDATE_BOOLEAN));
-            } elseif ($setting->type === \App\Enums\SettingTypeEnum::Integer) {
+            } elseif ($setting->type === SettingTypeEnum::Integer) {
                 $value = json_encode((int) $rawValue);
-            } elseif ($setting->type === \App\Enums\SettingTypeEnum::Encrypted && filled($rawValue)) {
-                $value = json_encode(\Illuminate\Support\Facades\Crypt::encryptString((string) $rawValue));
+            } elseif ($setting->type === SettingTypeEnum::Encrypted && filled($rawValue)) {
+                $value = json_encode(Crypt::encryptString((string) $rawValue));
             } else {
                 $value = json_encode($rawValue === '' ? null : $rawValue);
             }
@@ -72,8 +74,8 @@ class SettingsController extends Controller
     {
         try {
             Mail::to($request->validated('email'))->send(new TestMail(now()->toDateTimeString()));
-        } catch (Throwable $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
+        } catch (Throwable $throwable) {
+            return response()->json(['message' => $throwable->getMessage()], 422);
         }
 
         return response()->json(['message' => 'Test email sent successfully.']);

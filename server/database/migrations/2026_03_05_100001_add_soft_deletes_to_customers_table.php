@@ -10,14 +10,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('customers', function (Blueprint $table) {
+        Schema::table('customers', function (Blueprint $table): void {
             $table->softDeletes();
         });
     }
 
     public function down(): void
     {
-        Schema::table('customers', function (Blueprint $table) {
+        Schema::table('customers', function (Blueprint $table): void {
             $table->dropSoftDeletes();
         });
     }

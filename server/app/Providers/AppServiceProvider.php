@@ -74,7 +74,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(InPostClient::class);
         $this->app->singleton(InPostLockerCarrier::class);
 
-        $this->app->singleton(ShippingCarrierManager::class, function ($app) {
+        $this->app->singleton(function ($app): ShippingCarrierManager {
             $furgonetka = $app->make(FurgonetkaClient::class);
 
             return new ShippingCarrierManager([
@@ -89,14 +89,12 @@ class AppServiceProvider extends ServiceProvider
             ]);
         });
 
-        $this->app->singleton(PaymentGatewayManager::class, function ($app) {
-            return new PaymentGatewayManager([
-                PaymentProviderEnum::P24->value => $app->make(P24Gateway::class),
-                PaymentProviderEnum::PAYU->value => $app->make(PayUGateway::class),
-                PaymentProviderEnum::CASH_ON_DELIVERY->value => new CashOnDeliveryGateway(),
-                PaymentProviderEnum::BANK_TRANSFER->value => new BankTransferGateway(),
-            ]);
-        });
+        $this->app->singleton(fn ($app): PaymentGatewayManager => new PaymentGatewayManager([
+            PaymentProviderEnum::P24->value => $app->make(P24Gateway::class),
+            PaymentProviderEnum::PAYU->value => $app->make(PayUGateway::class),
+            PaymentProviderEnum::CASH_ON_DELIVERY->value => new CashOnDeliveryGateway(),
+            PaymentProviderEnum::BANK_TRANSFER->value => new BankTransferGateway(),
+        ]));
     }
 
     /**
@@ -158,12 +156,10 @@ class AppServiceProvider extends ServiceProvider
     protected function configureMailFromSettings(): void
     {
         try {
-            $rows = cache()->remember('settings.mail', now()->addHour(), function () {
-                return DB::table('settings')
-                    ->where('group', 'mail')
-                    ->pluck('value', 'key')
-                    ->toArray();
-            });
+            $rows = cache()->remember('settings.mail', now()->addHour(), fn () => DB::table('settings')
+                ->where('group', 'mail')
+                ->pluck('value', 'key')
+                ->toArray());
 
             if (empty($rows)) {
                 return;
@@ -197,15 +193,19 @@ class AppServiceProvider extends ServiceProvider
                 if ($host) {
                     config(['mail.mailers.smtp.host' => $host]);
                 }
+
                 if ($port) {
                     config(['mail.mailers.smtp.port' => $port]);
                 }
+
                 if ($encryption !== null) {
                     config(['mail.mailers.smtp.encryption' => $encryption ?: null]);
                 }
+
                 if ($username) {
                     config(['mail.mailers.smtp.username' => $username]);
                 }
+
                 if ($password) {
                     config(['mail.mailers.smtp.password' => $password]);
                 }
@@ -214,6 +214,7 @@ class AppServiceProvider extends ServiceProvider
             if ($fromAddress) {
                 config(['mail.from.address' => $fromAddress]);
             }
+
             if ($fromName) {
                 config(['mail.from.name' => $fromName]);
             }
@@ -229,12 +230,10 @@ class AppServiceProvider extends ServiceProvider
     protected function configurePaymentsFromSettings(): void
     {
         try {
-            $rows = cache()->remember('settings.payments', now()->addHour(), function () {
-                return DB::table('settings')
-                    ->where('group', 'payments')
-                    ->pluck('value', 'key')
-                    ->toArray();
-            });
+            $rows = cache()->remember('settings.payments', now()->addHour(), fn () => DB::table('settings')
+                ->where('group', 'payments')
+                ->pluck('value', 'key')
+                ->toArray());
 
             if (empty($rows)) {
                 return;
@@ -245,6 +244,7 @@ class AppServiceProvider extends ServiceProvider
                 if (! $v) {
                     return null;
                 }
+
                 try {
                     return Crypt::decryptString($v);
                 } catch (Throwable) {
@@ -256,12 +256,15 @@ class AppServiceProvider extends ServiceProvider
             if ($v = $decode($rows['payu_client_id'] ?? null)) {
                 config(['services.payu.client_id' => $v]);
             }
+
             if ($v = $decrypt($decode($rows['payu_client_secret'] ?? null))) {
                 config(['services.payu.client_secret' => $v]);
             }
+
             if ($v = $decode($rows['payu_pos_id'] ?? null)) {
                 config(['services.payu.pos_id' => $v]);
             }
+
             if ($v = $decrypt($decode($rows['payu_md5_key'] ?? null))) {
                 config(['services.payu.md5_key' => $v]);
             }
@@ -276,12 +279,15 @@ class AppServiceProvider extends ServiceProvider
             if ($v = $decode($rows['p24_merchant_id'] ?? null)) {
                 config(['services.p24.merchant_id' => $v]);
             }
+
             if ($v = $decode($rows['p24_pos_id'] ?? null)) {
                 config(['services.p24.pos_id' => $v]);
             }
+
             if ($v = $decrypt($decode($rows['p24_crc'] ?? null))) {
                 config(['services.p24.crc' => $v]);
             }
+
             if ($v = $decrypt($decode($rows['p24_api_key'] ?? null))) {
                 config(['services.p24.api_key' => $v]);
             }
@@ -291,8 +297,8 @@ class AppServiceProvider extends ServiceProvider
 
             // Bank Transfer
             foreach (['account_name', 'iban', 'swift', 'bank_name'] as $field) {
-                if ($v = $decode($rows["bank_transfer_{$field}"] ?? null)) {
-                    config(["services.bank_transfer.{$field}" => $v]);
+                if ($v = $decode($rows['bank_transfer_'.$field] ?? null)) {
+                    config(['services.bank_transfer.'.$field => $v]);
                 }
             }
         } catch (Throwable) {
@@ -307,12 +313,10 @@ class AppServiceProvider extends ServiceProvider
     protected function configureShippingFromSettings(): void
     {
         try {
-            $rows = cache()->remember('settings.shipping', now()->addHour(), function () {
-                return DB::table('settings')
-                    ->where('group', 'shipping')
-                    ->pluck('value', 'key')
-                    ->toArray();
-            });
+            $rows = cache()->remember('settings.shipping', now()->addHour(), fn () => DB::table('settings')
+                ->where('group', 'shipping')
+                ->pluck('value', 'key')
+                ->toArray());
 
             if (empty($rows)) {
                 return;
@@ -323,6 +327,7 @@ class AppServiceProvider extends ServiceProvider
                 if (! $v) {
                     return null;
                 }
+
                 try {
                     return Crypt::decryptString($v);
                 } catch (Throwable) {
@@ -334,6 +339,7 @@ class AppServiceProvider extends ServiceProvider
             if ($v = $decode($rows['furgonetka_client_id'] ?? null)) {
                 config(['services.furgonetka.client_id' => $v]);
             }
+
             if ($v = $decrypt($decode($rows['furgonetka_client_secret'] ?? null))) {
                 config(['services.furgonetka.client_secret' => $v]);
             }
@@ -341,8 +347,8 @@ class AppServiceProvider extends ServiceProvider
             // Furgonetka sender details
             $senderFields = ['name', 'email', 'phone', 'street', 'city', 'postal_code', 'country_code'];
             foreach ($senderFields as $field) {
-                if ($v = $decode($rows["furgonetka_sender_{$field}"] ?? null)) {
-                    config(["services.furgonetka.sender_{$field}" => $v]);
+                if ($v = $decode($rows['furgonetka_sender_'.$field] ?? null)) {
+                    config(['services.furgonetka.sender_'.$field => $v]);
                 }
             }
 
@@ -350,9 +356,11 @@ class AppServiceProvider extends ServiceProvider
             if ($v = $decrypt($decode($rows['inpost_shipx_token'] ?? null))) {
                 config(['services.inpost_shipx.token' => $v]);
             }
+
             if ($v = $decode($rows['inpost_shipx_organization_id'] ?? null)) {
                 config(['services.inpost_shipx.organization_id' => $v]);
             }
+
             if ($v = $decode($rows['inpost_geowidget_token'] ?? null)) {
                 config(['services.inpost_shipx.geowidget_token' => $v]);
             }
@@ -368,12 +376,10 @@ class AppServiceProvider extends ServiceProvider
     protected function configureIntegrationsFromSettings(): void
     {
         try {
-            $rows = cache()->remember('settings.integrations', now()->addHour(), function () {
-                return DB::table('settings')
-                    ->where('group', 'integrations')
-                    ->pluck('value', 'key')
-                    ->toArray();
-            });
+            $rows = cache()->remember('settings.integrations', now()->addHour(), fn () => DB::table('settings')
+                ->where('group', 'integrations')
+                ->pluck('value', 'key')
+                ->toArray());
 
             if (empty($rows)) {
                 return;
@@ -384,6 +390,7 @@ class AppServiceProvider extends ServiceProvider
                 if (! $v) {
                     return null;
                 }
+
                 try {
                     return Crypt::decryptString($v);
                 } catch (Throwable) {
@@ -395,6 +402,7 @@ class AppServiceProvider extends ServiceProvider
             if ($v = $decode($rows['google_client_id'] ?? null)) {
                 config(['services.google.client_id' => $v]);
             }
+
             if ($v = $decrypt($decode($rows['google_client_secret'] ?? null))) {
                 config(['services.google.client_secret' => $v]);
             }
@@ -403,6 +411,7 @@ class AppServiceProvider extends ServiceProvider
             if ($v = $decode($rows['github_client_id'] ?? null)) {
                 config(['services.github.client_id' => $v]);
             }
+
             if ($v = $decrypt($decode($rows['github_client_secret'] ?? null))) {
                 config(['services.github.client_secret' => $v]);
             }
@@ -411,6 +420,7 @@ class AppServiceProvider extends ServiceProvider
             if ($v = $decrypt($decode($rows['cloudflare_turnstile_secret_key'] ?? null))) {
                 config(['services.cloudflare.turnstile_secret' => $v]);
             }
+
             if ($v = $decrypt($decode($rows['cloudflare_turnstile_site_key'] ?? null))) {
                 config(['services.cloudflare.turnstile_site' => $v]);
             }
@@ -419,9 +429,11 @@ class AppServiceProvider extends ServiceProvider
             if ($v = $decode($rows['stripe_public_key'] ?? null)) {
                 config(['services.stripe.key' => $v]);
             }
+
             if ($v = $decrypt($decode($rows['stripe_secret_key'] ?? null))) {
                 config(['services.stripe.secret' => $v]);
             }
+
             if ($v = $decrypt($decode($rows['stripe_webhook_secret'] ?? null))) {
                 config(['services.stripe.webhook_secret' => $v]);
             }
@@ -430,6 +442,7 @@ class AppServiceProvider extends ServiceProvider
             if ($v = $decrypt($decode($rows['mailerlite_api_key'] ?? null))) {
                 config(['services.mailerlite.api_key' => $v]);
             }
+
             if ($v = $decode($rows['mailerlite_group_id'] ?? null)) {
                 config(['services.mailerlite.group_id' => $v]);
             }

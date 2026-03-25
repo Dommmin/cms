@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications;
 
+use App\Models\ProductVariant;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -15,7 +16,7 @@ class LowStockNotification extends Notification implements ShouldQueue
     use Queueable;
 
     /**
-     * @param  Collection<int, \App\Models\ProductVariant>  $variants
+     * @param  Collection<int, ProductVariant>  $variants
      */
     public function __construct(
         public readonly Collection $variants,
@@ -34,7 +35,7 @@ class LowStockNotification extends Notification implements ShouldQueue
             ->line('The following product variants are running low on stock:');
 
         foreach ($this->variants as $variant) {
-            $mail->line("- **{$variant->product?->name}** ({$variant->sku}): {$variant->stock_quantity} remaining (threshold: {$variant->stock_threshold})");
+            $mail->line(sprintf('- **%s** (%s): %d remaining (threshold: %d)', $variant->product?->name, $variant->sku, $variant->stock_quantity, $variant->stock_threshold));
         }
 
         return $mail

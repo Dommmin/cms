@@ -23,9 +23,9 @@ class DashboardController extends Controller
         // Load all widgets (active + inactive) so the dashboard can render toggle buttons.
         // Widget shells (id/type/size/config) are returned immediately; live data is deferred
         // so the page paints instantly while the aggregations run in the background.
-        $widgets = DashboardWidget::ordered()->get();
+        $widgets = DashboardWidget::query()->ordered()->get();
 
-        $shells = $widgets->map(fn ($w) => [
+        $shells = $widgets->map(fn ($w): array => [
             'id' => $w->id,
             'title' => $w->title,
             'type' => $w->type->value,
@@ -39,20 +39,18 @@ class DashboardController extends Controller
 
         return Inertia::render('admin/dashboard', [
             'widgetShells' => $shells,
-            'widgets' => Inertia::defer(function () use ($widgets) {
-                return $widgets->map(fn ($w) => [
-                    'id' => $w->id,
-                    'title' => $w->title,
-                    'type' => $w->type->value,
-                    'size' => $w->size->value,
-                    'icon' => $w->icon,
-                    'color' => $w->color,
-                    'is_active' => $w->is_active,
-                    'order' => $w->order,
-                    'config' => $w->config,
-                    'data' => $w->is_active ? $this->getWidgetData($w) : null,
-                ]);
-            }),
+            'widgets' => Inertia::defer(fn () => $widgets->map(fn ($w): array => [
+                'id' => $w->id,
+                'title' => $w->title,
+                'type' => $w->type->value,
+                'size' => $w->size->value,
+                'icon' => $w->icon,
+                'color' => $w->color,
+                'is_active' => $w->is_active,
+                'order' => $w->order,
+                'config' => $w->config,
+                'data' => $w->is_active ? $this->getWidgetData($w) : null,
+            ])),
         ]);
     }
 
@@ -62,7 +60,7 @@ class DashboardController extends Controller
             'stat' => $this->getStatData($widget),
             'chart' => $this->getChartData($widget),
             'table' => $this->getTableData($widget),
-            'quick_actions' => collect($widget->config['actions'] ?? [])->map(function ($action) {
+            'quick_actions' => collect($widget->config['actions'] ?? [])->map(function (array $action) {
                 if (isset($action['url'])) {
                     return $action;
                 }
@@ -74,7 +72,7 @@ class DashboardController extends Controller
                 }
 
                 return [...$action, 'url' => $url];
-            })->toArray(),
+            })->all(),
             default => null,
         };
     }
@@ -178,14 +176,14 @@ class DashboardController extends Controller
             ->pluck('count', 'status');
 
         return collect($statuses)
-            ->map(fn ($status) => [
+            ->map(fn ($status): array => [
                 'label' => ucfirst($status),
                 'date' => ucfirst($status),
                 'value' => (int) ($counts[$status] ?? 0),
             ])
-            ->filter(fn ($item) => $item['value'] > 0)
+            ->filter(fn ($item): bool => $item['value'] > 0)
             ->values()
-            ->toArray();
+            ->all();
     }
 
     private function getLowStockData(int $threshold): array
@@ -197,13 +195,13 @@ class DashboardController extends Controller
             ->orderBy('stock_quantity')
             ->limit(10)
             ->get()
-            ->map(fn ($variant) => [
+            ->map(fn ($variant): array => [
                 'id' => $variant->id,
-                'name' => $variant->product?->name ?? "Variant #{$variant->id}",
+                'name' => $variant->product?->name ?? 'Variant #'.$variant->id,
                 'sku' => $variant->sku,
                 'stock' => $variant->stock_quantity,
             ])
-            ->toArray();
+            ->all();
     }
 
     private function getTopProductsData(int $limit): array
@@ -214,12 +212,12 @@ class DashboardController extends Controller
             ->orderByDesc('total_revenue')
             ->limit($limit)
             ->get()
-            ->map(fn ($row) => [
+            ->map(fn ($row): array => [
                 'name' => $row->product_name,
                 'total_qty' => (int) $row->total_qty,
                 'total_revenue' => (int) $row->total_revenue,
             ])
-            ->toArray();
+            ->all();
     }
 
     private function getTableData(DashboardWidget $widget): array
@@ -238,7 +236,7 @@ class DashboardController extends Controller
                 ->latest()
                 ->limit($config['limit'] ?? 5)
                 ->get()
-                ->map(fn ($review) => [
+                ->map(fn ($review): array => [
                     'id' => $review->id,
                     'name' => $review->product?->name ?? '—',
                     'author' => $review->author ?? 'Anonymous',
@@ -246,7 +244,7 @@ class DashboardController extends Controller
                     'status' => $review->status,
                     'created_at' => $review->created_at?->diffForHumans(),
                 ])
-                ->toArray();
+                ->all();
         }
 
         $model = $config['model'] ?? null;
@@ -269,7 +267,7 @@ class DashboardController extends Controller
             ->orderBy($config['order_by'] ?? 'created_at', $config['order_direction'] ?? 'desc')
             ->limit($config['limit'] ?? 5)
             ->get()
-            ->map(function ($item) use ($config) {
+            ->map(function ($item) use ($config): array {
                 $data = ['id' => $item->id];
 
                 foreach ($config['columns'] ?? [] as $column) {
@@ -282,6 +280,6 @@ class DashboardController extends Controller
 
                 return $data;
             })
-            ->toArray();
+            ->all();
     }
 }

@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\States\Order;
 
+use App\Models\Order;
 use Spatie\ModelStates\State;
 use Spatie\ModelStates\StateConfig;
 
 /**
- * @extends State<\App\Models\Order>
+ * @extends State<Order>
  */
 abstract class OrderState extends State
 {

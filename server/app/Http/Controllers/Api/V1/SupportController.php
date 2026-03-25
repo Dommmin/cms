@@ -25,7 +25,7 @@ class SupportController extends Controller
         $email = $customer?->email ?? $data['email'] ?? null;
         $name = $customer ? ($customer->first_name.' '.$customer->last_name) : ($data['name'] ?? null);
 
-        $conversation = SupportConversation::create([
+        $conversation = SupportConversation::query()->create([
             'customer_id' => $customer?->id,
             'email' => $email,
             'name' => $name,
@@ -35,7 +35,7 @@ class SupportController extends Controller
             'last_reply_at' => now(),
         ]);
 
-        SupportMessage::create([
+        SupportMessage::query()->create([
             'conversation_id' => $conversation->id,
             'sender_type' => 'customer',
             'sender_name' => $name ?? $email ?? 'Gość',
@@ -71,7 +71,7 @@ class SupportController extends Controller
         $customer = $user?->customer;
         $name = $customer ? ($customer->first_name.' '.$customer->last_name) : ($conversation->name ?? $conversation->email ?? 'Gość');
 
-        $message = SupportMessage::create([
+        $message = SupportMessage::query()->create([
             'conversation_id' => $conversation->id,
             'sender_type' => 'customer',
             'sender_name' => $name,

@@ -10,15 +10,13 @@ use RuntimeException;
 
 class FurgonetkaTokenService
 {
-    private const CACHE_KEY = 'furgonetka_access_token';
+    private const string CACHE_KEY = 'furgonetka_access_token';
 
-    private const TTL_SECONDS = 3_600; // 1 hour
+    private const int TTL_SECONDS = 3_600; // 1 hour
 
     public function getToken(): string
     {
-        return Cache::remember(self::CACHE_KEY, self::TTL_SECONDS, function (): string {
-            return $this->fetchToken();
-        });
+        return Cache::remember(self::CACHE_KEY, self::TTL_SECONDS, fn (): string => $this->fetchToken());
     }
 
     public function invalidate(): void
@@ -44,9 +42,7 @@ class FurgonetkaTokenService
 
         $token = $response->json('access_token');
 
-        if (! is_string($token) || $token === '') {
-            throw new RuntimeException('Furgonetka OAuth returned empty access_token');
-        }
+        throw_if(! is_string($token) || $token === '', RuntimeException::class, 'Furgonetka OAuth returned empty access_token');
 
         return $token;
     }

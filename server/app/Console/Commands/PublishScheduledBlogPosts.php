@@ -21,7 +21,7 @@ class PublishScheduledBlogPosts extends Command
             ->where('published_at', '<=', now())
             ->update(['status' => BlogPostStatusEnum::Published]);
 
-        $this->info("Published {$count} scheduled blog post(s).");
+        $this->info(sprintf('Published %d scheduled blog post(s).', $count));
 
         return self::SUCCESS;
     }

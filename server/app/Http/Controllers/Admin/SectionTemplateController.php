@@ -17,7 +17,7 @@ class SectionTemplateController extends Controller
 {
     public function index(Request $request): Response
     {
-        $templates = (new SectionTemplateIndexQuery($request))->execute();
+        $templates = new SectionTemplateIndexQuery($request)->execute();
         $categories = SectionTemplate::query()->distinct()->pluck('category')->filter()->values();
 
         return inertia('admin/section-templates/index', [
@@ -38,7 +38,7 @@ class SectionTemplateController extends Controller
 
     public function store(StoreSectionTemplateRequest $request): RedirectResponse
     {
-        SectionTemplate::create($request->validated());
+        SectionTemplate::query()->create($request->validated());
 
         return redirect('/admin/section-templates')->with('success', 'Template created');
     }
@@ -69,7 +69,7 @@ class SectionTemplateController extends Controller
 
     public function duplicate(SectionTemplate $sectionTemplate): RedirectResponse
     {
-        SectionTemplate::create([
+        SectionTemplate::query()->create([
             'name' => $sectionTemplate->name.' (copy)',
             'section_type' => $sectionTemplate->section_type,
             'variant' => $sectionTemplate->variant,

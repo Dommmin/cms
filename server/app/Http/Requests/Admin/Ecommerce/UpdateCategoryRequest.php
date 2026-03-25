@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\Ecommerce;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 
@@ -20,18 +21,18 @@ class UpdateCategoryRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'name' => 'required',
-            'name.*' => 'nullable|string|max:255',
+            'name' => ['required'],
+            'name.*' => ['nullable', 'string', 'max:255'],
             'slug' => 'required|string|max:255|unique:categories,slug,'.$this->category->id,
-            'description' => 'nullable',
-            'description.*' => 'nullable|string',
-            'parent_id' => 'nullable|exists:categories,id',
-            'is_active' => 'boolean',
+            'description' => ['nullable'],
+            'description.*' => ['nullable', 'string'],
+            'parent_id' => ['nullable', 'exists:categories,id'],
+            'is_active' => ['boolean'],
         ];
     }
 

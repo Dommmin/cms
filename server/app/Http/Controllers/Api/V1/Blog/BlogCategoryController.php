@@ -13,7 +13,7 @@ class BlogCategoryController extends Controller
 {
     public function index(): JsonResponse
     {
-        $categories = BlogCategory::active()
+        $categories = BlogCategory::query()->active()
             ->roots()
             ->withCount(['posts' => fn ($q) => $q->published()])
             ->orderBy('position')

@@ -33,9 +33,9 @@ class LocaleSeeder extends Seeder
         ];
 
         foreach ($locales as $locale) {
-            Locale::firstOrCreate(['code' => $locale['code']], $locale);
+            Locale::query()->firstOrCreate(['code' => $locale['code']], $locale);
             // Update currency_code for existing records
-            Locale::where('code', $locale['code'])->update(['currency_code' => $locale['currency_code']]);
+            Locale::query()->where('code', $locale['code'])->update(['currency_code' => $locale['currency_code']]);
         }
     }
 }

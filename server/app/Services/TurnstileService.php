@@ -10,7 +10,7 @@ use Throwable;
 
 class TurnstileService
 {
-    private const VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+    private const string VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
     /**
      * Verify a Cloudflare Turnstile token.
@@ -26,7 +26,7 @@ class TurnstileService
             return true;
         }
 
-        if (empty($token)) {
+        if ($token === '' || $token === '0') {
             return false;
         }
 
@@ -42,8 +42,8 @@ class TurnstileService
                 ->post(self::VERIFY_URL, $payload);
 
             return $response->successful() && $response->json('success') === true;
-        } catch (Throwable $e) {
-            Log::warning('Turnstile verification error', ['error' => $e->getMessage()]);
+        } catch (Throwable $throwable) {
+            Log::warning('Turnstile verification error', ['error' => $throwable->getMessage()]);
 
             return false;
         }

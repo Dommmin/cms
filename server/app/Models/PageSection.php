@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,8 +20,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $position
  * @property bool $is_active
  * @property-read Page $page
- * @property-read \Illuminate\Database\Eloquent\Collection<int, PageBlock> $blocks
- * @property-read \Illuminate\Database\Eloquent\Collection<int, PageBlock> $allBlocks
+ * @property-read Collection<int, PageBlock> $blocks
+ * @property-read Collection<int, PageBlock> $allBlocks
  */
 class PageSection extends Model
 {

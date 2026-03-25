@@ -15,11 +15,11 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  */
 class BlockMediaService
 {
-    private const BUCKET_ID = 1;
+    private const int BUCKET_ID = 1;
 
-    private const COLLECTION_IMAGES = 'block-images';
+    private const string COLLECTION_IMAGES = 'block-images';
 
-    private const COLLECTION_FILES = 'block-files';
+    private const string COLLECTION_FILES = 'block-files';
 
     /**
      * Add a file from storage path (e.g. from Filament FileUpload) to the bucket and return media id.
@@ -30,9 +30,7 @@ class BlockMediaService
         $bucket = $this->bucket();
         $fullPath = Storage::disk('public')->path($path);
 
-        if (! is_file($fullPath)) {
-            throw new InvalidArgumentException("File not found: {$path}");
-        }
+        throw_unless(is_file($fullPath), InvalidArgumentException::class, 'File not found: '.$path);
 
         $media = $bucket->addMedia($fullPath)->toMediaCollection($collection);
 
@@ -44,17 +42,15 @@ class BlockMediaService
      */
     public function urlFor(int $mediaId): ?string
     {
-        $media = Media::find($mediaId);
+        $media = Media::query()->find($mediaId);
 
         return $media?->getUrl() ?? null;
     }
 
     public function bucket(): CmsMedia
     {
-        $bucket = CmsMedia::find(self::BUCKET_ID);
-        if (! $bucket) {
-            throw new RuntimeException('CMS media bucket (CmsMedia id=1) does not exist. Run CmsMediaSeeder.');
-        }
+        $bucket = CmsMedia::query()->find(self::BUCKET_ID);
+        throw_unless($bucket, RuntimeException::class, 'CMS media bucket (CmsMedia id=1) does not exist. Run CmsMediaSeeder.');
 
         return $bucket;
     }

@@ -16,14 +16,14 @@ class ProductTypeIndexQuery
     public function execute()
     {
         return ProductType::query()
-            ->when($this->request->search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+            ->when($this->request->search, function ($query, $search): void {
+                $query->where('name', 'like', sprintf('%%%s%%', $search))
+                    ->orWhere('description', 'like', sprintf('%%%s%%', $search));
             })
-            ->when($this->request->has('has_variants'), function ($query) {
+            ->when($this->request->has('has_variants'), function ($query): void {
                 $query->where('has_variants', $this->request->boolean('has_variants'));
             })
-            ->when($this->request->has('is_shippable'), function ($query) {
+            ->when($this->request->has('is_shippable'), function ($query): void {
                 $query->where('is_shippable', $this->request->boolean('is_shippable'));
             })
             ->orderBy('name')

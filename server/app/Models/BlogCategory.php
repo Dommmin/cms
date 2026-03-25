@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -38,12 +39,14 @@ class BlogCategory extends Model
         return $this->hasMany(BlogPost::class);
     }
 
-    public function scopeActive(Builder $query): Builder
+    #[Scope]
+    protected function active(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
 
-    public function scopeRoots(Builder $query): Builder
+    #[Scope]
+    protected function roots(Builder $query): Builder
     {
         return $query->whereNull('parent_id');
     }

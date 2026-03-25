@@ -17,8 +17,8 @@ class AnonymizeUserData
 
         // 2. Anonymize User PII
         $user->forceFill([
-            'name' => "Deleted User #{$user->id}",
-            'email' => "deleted+{$user->id}@deleted.invalid",
+            'name' => 'Deleted User #'.$user->id,
+            'email' => sprintf('deleted+%s@deleted.invalid', $user->id),
             'password' => bcrypt(Str::random(40)),
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
@@ -46,7 +46,7 @@ class AnonymizeUserData
         }
 
         // 4. Remove cookie consents (not financial data)
-        CookieConsent::where('user_id', $user->id)->delete();
+        CookieConsent::query()->where('user_id', $user->id)->delete();
 
         // 5. Soft-delete the User
         // Orders, ProductReviews, AffiliateCode are retained (financial/legal obligation)

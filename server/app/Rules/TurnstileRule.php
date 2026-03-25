@@ -23,7 +23,7 @@ class TurnstileRule implements ValidationRule
             return;
         }
 
-        $verified = app(TurnstileService::class)->verify((string) $value, request()->ip());
+        $verified = resolve(TurnstileService::class)->verify((string) $value, request()->ip());
 
         if (! $verified) {
             $fail('Security challenge failed. Please try again.');

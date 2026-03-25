@@ -18,7 +18,7 @@ class LocaleController extends Controller
     public function index(Request $request): Response
     {
         $locales = Locale::query()
-            ->when($request->input('search'), fn ($q, $search) => $q->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%"))
+            ->when($request->input('search'), fn ($q, $search) => $q->where('name', 'like', sprintf('%%%s%%', $search))->orWhere('code', 'like', sprintf('%%%s%%', $search)))
             ->orderByDesc('is_default')
             ->orderBy('name')
             ->paginate(20)
@@ -45,9 +45,9 @@ class LocaleController extends Controller
             Locale::query()->update(['is_default' => false]);
         }
 
-        Locale::create($data);
+        Locale::query()->create($data);
 
-        return redirect()->route('admin.locales.index')->with('success', 'Locale created');
+        return to_route('admin.locales.index')->with('success', 'Locale created');
     }
 
     public function update(UpdateLocaleRequest $request, Locale $locale): RedirectResponse
@@ -60,18 +60,18 @@ class LocaleController extends Controller
 
         $locale->update($data);
 
-        return redirect()->back()->with('success', 'Locale updated');
+        return back()->with('success', 'Locale updated');
     }
 
     public function destroy(Locale $locale): RedirectResponse
     {
         if ($locale->is_default) {
-            return redirect()->back()->with('error', 'Cannot delete the default locale');
+            return back()->with('error', 'Cannot delete the default locale');
         }
 
         $locale->delete();
 
-        return redirect()->back()->with('success', 'Locale deleted');
+        return back()->with('success', 'Locale deleted');
     }
 
     public function setDefault(Locale $locale): RedirectResponse
@@ -79,6 +79,6 @@ class LocaleController extends Controller
         Locale::query()->update(['is_default' => false]);
         $locale->update(['is_default' => true]);
 
-        return redirect()->back()->with('success', 'Default locale updated');
+        return back()->with('success', 'Default locale updated');
     }
 }

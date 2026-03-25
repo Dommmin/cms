@@ -48,7 +48,7 @@ class PageBuilderRulesService
             if ($maxPerPage !== null && $count > $maxPerPage) {
                 $label = $sectionsConfig[$blockType]['label'] ?? $blockType;
                 throw new RuntimeException(
-                    "Na stronie może być co najwyżej {$maxPerPage} blok(ów) „{$label}".'.'
+                    sprintf('Na stronie może być co najwyżej %s blok(ów) „%s', $maxPerPage, $label).'.'
                 );
             }
 
@@ -58,7 +58,7 @@ class PageBuilderRulesService
                     if ($item['type'] === $blockType && $item['section_index'] !== 0) {
                         $label = $sectionsConfig[$blockType]['label'] ?? $blockType;
                         throw new RuntimeException(
-                            "Blok „{$label}".' może znajdować się tylko na górze strony (pierwsza sekcja).'
+                            'Blok „'.$label.' może znajdować się tylko na górze strony (pierwsza sekcja).'
                         );
                     }
                 }

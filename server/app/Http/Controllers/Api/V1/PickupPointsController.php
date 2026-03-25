@@ -92,7 +92,7 @@ class PickupPointsController extends Controller
                 $street = $p['address']['street'] ?? $p['street'] ?? '';
                 $city = $p['address']['city'] ?? $p['city'] ?? '';
                 $zip = $p['address']['zip'] ?? $p['zip'] ?? '';
-                $address = mb_trim(implode(', ', array_filter([$street, $zip ? "{$zip} {$city}" : $city])));
+                $address = mb_trim(implode(', ', array_filter([$street, $zip ? sprintf('%s %s', $zip, $city) : $city])));
 
                 return [
                     'id' => (string) ($p['code'] ?? $p['id'] ?? ''),
@@ -103,7 +103,7 @@ class PickupPointsController extends Controller
                     'lng' => (float) ($p['location']['longitude'] ?? $p['longitude'] ?? 0),
                 ];
             })
-            ->filter(fn (array $p) => $p['id'] !== '' && ($p['lat'] !== 0.0 || $p['lng'] !== 0.0))
+            ->filter(fn (array $p): bool => $p['id'] !== '' && ($p['lat'] !== 0.0 || $p['lng'] !== 0.0))
             ->values()
             ->all();
     }

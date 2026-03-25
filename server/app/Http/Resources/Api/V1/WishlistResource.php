@@ -22,7 +22,7 @@ class WishlistResource extends JsonResource
         return [
             'id' => $wishlist->id,
             'name' => $wishlist->name,
-            'items' => $wishlist->items->map(fn (WishlistItem $item) => [
+            'items' => $wishlist->items->map(fn (WishlistItem $item): array => [
                 'id' => $item->id,
                 'variant_id' => $item->product_variant_id,
                 'notes' => $item->notes,
@@ -32,7 +32,7 @@ class WishlistResource extends JsonResource
                     'slug' => $item->variant->product->slug,
                     'thumbnail' => null,
                 ] : null,
-                'variant' => $item->relationLoaded('variant') && $item->variant ? (function () use ($item) {
+                'variant' => $item->relationLoaded('variant') && $item->variant ? (function () use ($item): array {
                     $variant = $item->variant;
                     $isOnSale = $variant->compare_at_price && $variant->compare_at_price > $variant->price;
 

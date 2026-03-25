@@ -20,7 +20,7 @@ class BlogCategoryIndexQuery
             ->with('parent')
             ->when($filters['search'] ?? null, function (Builder $query, mixed $search): void {
                 $search = (string) $search;
-                $query->where('name', 'like', "%{$search}%");
+                $query->where('name', 'like', sprintf('%%%s%%', $search));
             })
             ->when(array_key_exists('is_active', $filters) && $filters['is_active'] !== null && $filters['is_active'] !== '', function (Builder $query) use ($filters): void {
                 $query->where('is_active', filter_var($filters['is_active'], FILTER_VALIDATE_BOOL));

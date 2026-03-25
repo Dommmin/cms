@@ -20,7 +20,7 @@ class SupportConversationController extends Controller
 {
     public function index(Request $request): Response
     {
-        $conversations = (new SupportConversationIndexQuery($request))->execute();
+        $conversations = new SupportConversationIndexQuery($request)->execute();
 
         $agents = User::query()
             ->select(['id', 'name'])
@@ -37,7 +37,7 @@ class SupportConversationController extends Controller
             'agents' => $agents,
             'open_count' => $openCount,
             'statuses' => array_map(
-                fn ($s) => ['value' => $s->value, 'label' => $s->getLabel(), 'color' => $s->getColor()],
+                fn (SupportConversationStatusEnum $s): array => ['value' => $s->value, 'label' => $s->getLabel(), 'color' => $s->getColor()],
                 SupportConversationStatusEnum::cases()
             ),
         ]);
@@ -65,7 +65,7 @@ class SupportConversationController extends Controller
             'agents' => $agents,
             'canned_responses' => $cannedResponses,
             'statuses' => array_map(
-                fn ($s) => ['value' => $s->value, 'label' => $s->getLabel(), 'color' => $s->getColor()],
+                fn (SupportConversationStatusEnum $s): array => ['value' => $s->value, 'label' => $s->getLabel(), 'color' => $s->getColor()],
                 SupportConversationStatusEnum::cases()
             ),
         ]);
@@ -75,7 +75,7 @@ class SupportConversationController extends Controller
     {
         $data = $request->validated();
 
-        SupportMessage::create([
+        SupportMessage::query()->create([
             'conversation_id' => $conversation->id,
             'sender_type' => 'agent',
             'sender_name' => $request->user()->name,
@@ -90,7 +90,7 @@ class SupportConversationController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Odpowiedź wysłana.');
+        return back()->with('success', 'Odpowiedź wysłana.');
     }
 
     public function assign(Request $request, SupportConversation $conversation): RedirectResponse
@@ -99,7 +99,7 @@ class SupportConversationController extends Controller
 
         $conversation->update(['assigned_to' => $request->assigned_to]);
 
-        return redirect()->back()->with('success', 'Konwersacja przypisana.');
+        return back()->with('success', 'Konwersacja przypisana.');
     }
 
     public function changeStatus(Request $request, SupportConversation $conversation): RedirectResponse
@@ -108,14 +108,14 @@ class SupportConversationController extends Controller
 
         $conversation->update(['status' => $request->status]);
 
-        return redirect()->back()->with('success', 'Status zmieniony.');
+        return back()->with('success', 'Status zmieniony.');
     }
 
     public function destroy(SupportConversation $conversation): RedirectResponse
     {
         $conversation->delete();
 
-        return redirect()->route('admin.support.index')->with('success', 'Konwersacja usunięta.');
+        return to_route('admin.support.index')->with('success', 'Konwersacja usunięta.');
     }
 
     private function markCustomerMessagesRead(SupportConversation $conversation): void

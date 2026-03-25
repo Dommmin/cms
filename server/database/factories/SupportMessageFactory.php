@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\SupportConversation;
+use App\Models\SupportMessage;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SupportMessage>
+ * @extends Factory<SupportMessage>
  */
 class SupportMessageFactory extends Factory
 {

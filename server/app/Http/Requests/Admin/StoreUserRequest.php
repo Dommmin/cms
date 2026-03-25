@@ -20,7 +20,7 @@ class StoreUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $roleIds = Role::pluck('id')->toArray();
+        $roleIds = Role::query()->pluck('id')->toArray();
 
         return [
             'name' => ['required', 'string', 'max:255'],

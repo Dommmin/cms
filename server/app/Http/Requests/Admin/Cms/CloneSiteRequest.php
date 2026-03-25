@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\Cms;
 
+use App\Models\Locale;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -20,7 +21,7 @@ class CloneSiteRequest extends FormRequest
      */
     public function rules(): array
     {
-        $localeCodes = \App\Models\Locale::pluck('code')->toArray();
+        $localeCodes = Locale::query()->pluck('code')->toArray();
         $sourceOptions = array_merge(['global'], $localeCodes);
 
         return [

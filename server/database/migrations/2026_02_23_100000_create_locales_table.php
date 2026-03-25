@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('locales', function (Blueprint $table) {
+        Schema::create('locales', function (Blueprint $table): void {
             $table->id();
             $table->string('code', 10)->unique();
             $table->string('name');

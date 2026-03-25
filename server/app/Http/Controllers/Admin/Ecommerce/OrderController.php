@@ -44,7 +44,7 @@ class OrderController extends Controller
 
         return inertia('admin/ecommerce/orders/show', [
             'order' => $order,
-            'statuses' => collect(OrderStatusEnum::cases())->map(fn ($s) => [
+            'statuses' => collect(OrderStatusEnum::cases())->map(fn ($s): array => [
                 'value' => $s->value,
                 'label' => $s->getLabel(),
                 'color' => $s->getColor(),
@@ -75,8 +75,8 @@ class OrderController extends Controller
                 changedBy: 'admin',
                 notes: $data['notes'] ?? null,
             );
-        } catch (CouldNotPerformTransition $e) {
-            return redirect()->back()->with('error', 'Ta zmiana statusu nie jest dozwolona dla bieżącego statusu zamówienia.');
+        } catch (CouldNotPerformTransition) {
+            return back()->with('error', 'Ta zmiana statusu nie jest dozwolona dla bieżącego statusu zamówienia.');
         }
 
         // If SHIPPED and tracking number provided — update shipment
@@ -87,6 +87,6 @@ class OrderController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Status zamówienia został zaktualizowany.');
+        return back()->with('success', 'Status zamówienia został zaktualizowany.');
     }
 }

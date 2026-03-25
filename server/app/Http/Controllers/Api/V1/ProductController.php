@@ -26,10 +26,10 @@ class ProductController extends Controller
 
         $products = QueryBuilder::for(Product::available())
             ->allowedFilters([
-                AllowedFilter::callback('name', function ($query, $value) use ($locale): void {
+                AllowedFilter::callback('name', function ($query, string $value) use ($locale): void {
                     $query->whereJsonContainsLocale('name', $locale, '%'.$value.'%', 'like');
                 }),
-                AllowedFilter::callback('description', function ($query, $value) use ($locale): void {
+                AllowedFilter::callback('description', function ($query, string $value) use ($locale): void {
                     $query->whereJsonContainsLocale('description', $locale, '%'.$value.'%', 'like');
                 }),
                 AllowedFilter::exact('brand_id'),
@@ -47,7 +47,7 @@ class ProductController extends Controller
             ->paginate(24)
             ->withQueryString();
 
-        return (new ProductCollection($products))->response();
+        return new ProductCollection($products)->response();
     }
 
     public function show(string $slug): JsonResponse
@@ -88,7 +88,7 @@ class ProductController extends Controller
                     'alt' => $product->thumbnail->media?->name ?? $product->name,
                     'position' => $product->thumbnail->position,
                 ] : null,
-                'images' => $product->images->map(fn ($img) => [
+                'images' => $product->images->map(fn ($img): array => [
                     'id' => $img->id,
                     'url' => $img->media?->getUrl() ?? '',
                     'thumb_url' => $img->media?->getUrl() ?? '',
@@ -118,7 +118,7 @@ class ProductController extends Controller
                 'meta_robots' => $product->meta_robots ?? 'index, follow',
                 'og_image' => $product->og_image,
                 'sitemap_exclude' => (bool) $product->sitemap_exclude,
-                'variants' => $product->activeVariants->map(fn ($variant) => [
+                'variants' => $product->activeVariants->map(fn ($variant): array => [
                     'id' => $variant->id,
                     'sku' => $variant->sku,
                     'price' => $variant->price,
@@ -127,7 +127,7 @@ class ProductController extends Controller
                     'is_available' => $variant->isInStock(),
                     'is_default' => $variant->is_default,
                     'attributes' => $variant->attributeValues->mapWithKeys(
-                        fn ($av) => [$av->attribute->name => $av->attributeValue->value]
+                        fn ($av): array => [$av->attribute->name => $av->attributeValue->value]
                     )->all(),
                     'omnibus_price' => $variant->lowestPriceInLast30Days(),
                 ]),
@@ -145,7 +145,7 @@ class ProductController extends Controller
             ], 422);
         }
 
-        $ids = array_map('intval', $ids);
+        $ids = array_map(intval(...), $ids);
 
         $products = Product::query()
             ->available()
@@ -171,7 +171,7 @@ class ProductController extends Controller
             ], 422);
         }
 
-        $data = $products->map(fn (Product $product) => [
+        $data = $products->map(fn (Product $product): array => [
             'id' => $product->id,
             'name' => $product->name,
             'slug' => $product->slug,
@@ -192,7 +192,7 @@ class ProductController extends Controller
                 'id' => $product->brand->id,
                 'name' => $product->brand->name,
             ] : null,
-            'variants' => $product->activeVariants->map(fn ($variant) => [
+            'variants' => $product->activeVariants->map(fn ($variant): array => [
                 'id' => $variant->id,
                 'sku' => $variant->sku,
                 'price' => $variant->price,
@@ -200,7 +200,7 @@ class ProductController extends Controller
                 'is_available' => $variant->isInStock(),
                 'is_default' => $variant->is_default,
                 'attributes' => $variant->attributeValues->mapWithKeys(
-                    fn ($av) => [$av->attribute->name => $av->attributeValue->value]
+                    fn ($av): array => [$av->attribute->name => $av->attributeValue->value]
                 )->all(),
             ]),
         ]);
@@ -228,6 +228,6 @@ class ProductController extends Controller
             ->paginate(24)
             ->withQueryString();
 
-        return (new ProductCollection($products))->response();
+        return new ProductCollection($products)->response();
     }
 }

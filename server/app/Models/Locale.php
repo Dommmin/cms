@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -42,12 +43,14 @@ class Locale extends Model
         return $this->hasMany(Translation::class, 'locale_code', 'code');
     }
 
-    public function scopeActive(Builder $query): Builder
+    #[Scope]
+    protected function active(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
 
-    public function scopeDefault(Builder $query): Builder
+    #[Scope]
+    protected function default(Builder $query): Builder
     {
         return $query->where('is_default', true);
     }

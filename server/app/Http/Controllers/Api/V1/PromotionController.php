@@ -16,9 +16,9 @@ class PromotionController extends Controller
             ->ordered()
             ->whereNotNull('metadata')
             ->get()
-            ->filter(fn ($p) => ! empty($p->metadata['banner_text']))
+            ->filter(fn ($p): bool => ! empty($p->metadata['banner_text']))
             ->values()
-            ->map(fn ($p) => [
+            ->map(fn ($p): array => [
                 'id' => $p->id,
                 'name' => $p->name,
                 'banner_text' => $p->metadata['banner_text'] ?? null,

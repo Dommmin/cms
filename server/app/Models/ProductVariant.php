@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Modules\Core\Domain\Models\Currency;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -32,9 +33,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property int $position
  * @property-read Product|null $product
  * @property-read TaxRate|null $taxRate
- * @property-read \Illuminate\Database\Eloquent\Collection<int, VariantAttributeValue> $attributeValues
- * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductImage> $images
- * @property-read \Illuminate\Database\Eloquent\Collection<int, PriceHistory> $priceHistory
+ * @property-read Collection<int, VariantAttributeValue> $attributeValues
+ * @property-read Collection<int, ProductImage> $images
+ * @property-read Collection<int, PriceHistory> $priceHistory
  */
 class ProductVariant extends Model
 {
@@ -115,16 +116,14 @@ class ProductVariant extends Model
         $cutoff = now()->subDays(30);
 
         if ($this->relationLoaded('priceHistory')) {
-            $lowest = $this->priceHistory
-                ->filter(fn ($h) => $h->recorded_at >= $cutoff)
-                ->min('price');
-        } else {
-            $lowest = $this->priceHistory()
-                ->where('recorded_at', '>=', $cutoff)
+            return $this->priceHistory
+                ->filter(fn ($h): bool => $h->recorded_at >= $cutoff)
                 ->min('price');
         }
 
-        return $lowest;
+        return $this->priceHistory()
+            ->where('recorded_at', '>=', $cutoff)
+            ->min('price');
     }
 
     /**

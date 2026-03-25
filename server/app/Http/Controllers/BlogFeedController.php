@@ -15,11 +15,9 @@ class BlogFeedController extends Controller
     {
         $locale = $request->query('locale', config('app.locale', 'en'));
 
-        $cacheKey = "blog_rss_feed_{$locale}";
+        $cacheKey = 'blog_rss_feed_'.$locale;
 
-        $xml = Cache::remember($cacheKey, 3600, function () use ($locale): string {
-            return $this->buildFeed($locale);
-        });
+        $xml = Cache::remember($cacheKey, 3600, fn (): string => $this->buildFeed($locale));
 
         return response($xml, 200, [
             'Content-Type' => 'application/rss+xml; charset=UTF-8',
@@ -49,7 +47,7 @@ class BlogFeedController extends Controller
         $items = $posts->map(function (BlogPost $post) use ($siteUrl, $locale): string {
             $postTitle = e($post->getTranslation('title', $locale, false) ?: $post->getTranslation('title', 'en', false) ?: $post->title);
             $excerpt = e($post->getTranslation('excerpt', $locale, false) ?: $post->getTranslation('excerpt', 'en', false) ?: $post->excerpt ?? '');
-            $link = e("{$siteUrl}/blog/{$post->slug}");
+            $link = e(sprintf('%s/blog/%s', $siteUrl, $post->slug));
             $pubDate = $post->published_at?->toRfc2822String() ?? now()->toRfc2822String();
             $author = e($post->author?->name ?? '');
 
@@ -83,10 +81,10 @@ XML;
 
     private function authorTag(string $author): string
     {
-        if (! $author) {
+        if ($author === '' || $author === '0') {
             return '';
         }
 
-        return "<author>{$author}</author>";
+        return sprintf('<author>%s</author>', $author);
     }
 }

@@ -6,7 +6,10 @@ namespace App\Models;
 
 use App\Enums\PageLayoutEnum;
 use App\Enums\PageTypeEnum;
+use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -33,20 +36,20 @@ use Spatie\Translatable\HasTranslations;
  * @property bool $is_published
  * @property int|null $published_version_id
  * @property int|null $draft_version_id
- * @property \Carbon\CarbonInterface|null $published_at
+ * @property CarbonInterface|null $published_at
  * @property int $position
  * @property string|null $seo_title
  * @property string|null $seo_description
  * @property string|null $seo_canonical
  * @property array<int, string>|null $available_locales
  * @property-read Page|null $parent
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Page> $children
- * @property-read \Illuminate\Database\Eloquent\Collection<int, PageBlock> $blocks
- * @property-read \Illuminate\Database\Eloquent\Collection<int, PageBlock> $allBlocks
- * @property-read \Illuminate\Database\Eloquent\Collection<int, PageSection> $sections
- * @property-read \Illuminate\Database\Eloquent\Collection<int, PageSection> $allSections
- * @property-read \Illuminate\Database\Eloquent\Collection<int, PageBlock> $sectionBlocks
- * @property-read \Illuminate\Database\Eloquent\Collection<int, PageVersion> $versions
+ * @property-read Collection<int, Page> $children
+ * @property-read Collection<int, PageBlock> $blocks
+ * @property-read Collection<int, PageBlock> $allBlocks
+ * @property-read Collection<int, PageSection> $sections
+ * @property-read Collection<int, PageSection> $allSections
+ * @property-read Collection<int, PageBlock> $sectionBlocks
+ * @property-read Collection<int, PageVersion> $versions
  * @property-read PageVersion|null $publishedVersion
  * @property-read PageVersion|null $draftVersion
  * @property-read Theme|null $theme
@@ -86,6 +89,7 @@ class Page extends Model
             } else {
                 $query->where('parent_id', $page->id);
             }
+
             $page = $query->first();
             if (! $page) {
                 return null;
@@ -110,26 +114,12 @@ class Page extends Model
         $page = null;
         foreach ($segments as $segment) {
             $page = self::findSegmentWithLocaleFallback($segment, $locale, $page?->id);
-            if (! $page) {
+            if (! $page instanceof self) {
                 return null;
             }
         }
 
         return $page;
-    }
-
-    /**
-     * Scope to filter pages by site locale.
-     *
-     * @param  string|null  $locale  'global' = whereNull('locale'), code = where('locale', code), null = no filter
-     */
-    public function scopeForLocale(Builder $query, ?string $locale): void
-    {
-        if ($locale === 'global') {
-            $query->whereNull('locale');
-        } elseif ($locale !== null) {
-            $query->where('locale', $locale);
-        }
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -220,36 +210,6 @@ class Page extends Model
     }
 
     /**
-     * Scope to eager load full content with blocks
-     */
-    public function scopeWithFullContent($query)
-    {
-        return $query->with([
-            'sections' => function ($q) {
-                $q->orderBy('position');
-            },
-            'sections.blocks' => function ($q) {
-                $q->orderBy('position');
-            },
-            'allSections' => function ($q) {
-                $q->orderBy('position');
-            },
-            'allSections.allBlocks' => function ($q) {
-                $q->orderBy('position');
-            },
-            'blocks' => function ($q) {
-                $q->orderBy('position');
-            },
-            'allBlocks' => function ($q) {
-                $q->orderBy('position');
-            },
-            'parent',
-            'children',
-            'theme',
-        ]);
-    }
-
-    /**
      * Return the slug for a given locale, falling back to the canonical slug.
      */
     public function getSlugForLocale(string $locale): string
@@ -257,6 +217,52 @@ class Page extends Model
         $translations = $this->slug_translations ?? [];
 
         return $translations[$locale] ?? $this->slug;
+    }
+
+    /**
+     * Scope to filter pages by site locale.
+     *
+     * @param  string|null  $locale  'global' = whereNull('locale'), code = where('locale', code), null = no filter
+     */
+    #[Scope]
+    protected function forLocale(Builder $query, ?string $locale): void
+    {
+        if ($locale === 'global') {
+            $query->whereNull('locale');
+        } elseif ($locale !== null) {
+            $query->where('locale', $locale);
+        }
+    }
+
+    /**
+     * Scope to eager load full content with blocks
+     */
+    #[Scope]
+    protected function withFullContent($query)
+    {
+        return $query->with([
+            'sections' => function ($q): void {
+                $q->orderBy('position');
+            },
+            'sections.blocks' => function ($q): void {
+                $q->orderBy('position');
+            },
+            'allSections' => function ($q): void {
+                $q->orderBy('position');
+            },
+            'allSections.allBlocks' => function ($q): void {
+                $q->orderBy('position');
+            },
+            'blocks' => function ($q): void {
+                $q->orderBy('position');
+            },
+            'allBlocks' => function ($q): void {
+                $q->orderBy('position');
+            },
+            'parent',
+            'children',
+            'theme',
+        ]);
     }
 
     protected function casts(): array
@@ -286,7 +292,7 @@ class Page extends Model
             ->where('is_published', true)
             ->where(function ($q) use ($segment, $locale): void {
                 $q->where('slug', $segment)
-                    ->orWhere("slug_translations->{$locale}", $segment);
+                    ->orWhere('slug_translations->'.$locale, $segment);
             })
             ->when($parentId === null,
                 fn ($q) => $q->whereNull('parent_id'),

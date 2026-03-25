@@ -28,21 +28,21 @@ class OrderStatusChangedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $message = (new MailMessage)
-            ->subject("Order Update – {$this->order->reference_number}")
-            ->greeting("Hello {$notifiable->name}!")
+            ->subject('Order Update – '.$this->order->reference_number)
+            ->greeting(sprintf('Hello %s!', $notifiable->name))
             ->line('Your order status has been updated.')
-            ->line("**Order:** {$this->order->reference_number}")
+            ->line('**Order:** '.$this->order->reference_number)
             ->line('**New Status:** '.OrderStatusEnum::from((string) $this->order->status)->getLabel());
 
         if (OrderStatusEnum::from((string) $this->order->status) === OrderStatusEnum::SHIPPED) {
             $shipment = $this->order->shipment;
             if ($shipment?->tracking_number) {
-                $message->line("**Tracking:** {$shipment->tracking_number}");
+                $message->line('**Tracking:** '.$shipment->tracking_number);
             }
         }
 
         return $message
-            ->action('View Order', url("/orders/{$this->order->reference_number}"))
+            ->action('View Order', url('/orders/'.$this->order->reference_number))
             ->line('Thank you for shopping with us!');
     }
 

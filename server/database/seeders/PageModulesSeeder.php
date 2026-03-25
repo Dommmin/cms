@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Product;
 use App\Services\ModuleRegistryService;
 use Illuminate\Database\Seeder;
 
@@ -31,7 +32,7 @@ class PageModulesSeeder extends Seeder
             'has_detail_page' => true,
             'list_route_pattern' => '/shop',
             'detail_route_pattern' => '/shop/{slug}',
-            'model_class' => \App\Models\Product::class,
+            'model_class' => Product::class,
             'route_key_name' => 'slug',
 
             // List layouts

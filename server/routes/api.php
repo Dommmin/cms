@@ -79,7 +79,7 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
 
     // ── Public ───────────────────────────────────────────────────────────────
     Route::middleware('throttle:api.public')->group(function (): void {
-        Route::get('locales', [ApiLocaleController::class, 'index'])->name('locales.index');
+        Route::get('locales', new ApiLocaleController()->index(...))->name('locales.index');
         Route::get('translations/{locale}', [TranslationController::class, 'show'])->name('translations.show');
         Route::get('pages/{slug}', [PageController::class, 'show'])->where('slug', '.*')->name('pages.show');
         Route::get('menus/{location}', [MenuController::class, 'show'])->name('menus.show');
@@ -100,16 +100,16 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
 
         Route::get('brands', [BrandController::class, 'index'])->name('brands.index');
         Route::get('faqs', [FaqController::class, 'index'])->name('faqs.index');
-        Route::get('stores', [ApiStoreController::class, 'index'])->name('stores.index');
-        Route::get('stores/{store}', [ApiStoreController::class, 'show'])->name('stores.show');
+        Route::get('stores', new ApiStoreController()->index(...))->name('stores.index');
+        Route::get('stores/{store}', new ApiStoreController()->show(...))->name('stores.show');
         Route::get('promotions', [PromotionController::class, 'index'])->name('promotions.index');
 
         // Blog
         Route::prefix('blog')->name('blog.')->group(function (): void {
-            Route::get('posts', [ApiBlogPostController::class, 'index'])->name('posts.index');
-            Route::get('posts/{slug}', [ApiBlogPostController::class, 'show'])->name('posts.show');
-            Route::get('categories', [ApiBlogCategoryController::class, 'index'])->name('categories.index');
-            Route::get('categories/{slug}/posts', [ApiBlogPostController::class, 'byCategory'])->name('categories.posts');
+            Route::get('posts', new ApiBlogPostController()->index(...))->name('posts.index');
+            Route::get('posts/{slug}', new ApiBlogPostController()->show(...))->name('posts.show');
+            Route::get('categories', new ApiBlogCategoryController()->index(...))->name('categories.index');
+            Route::get('categories/{slug}/posts', new ApiBlogPostController()->byCategory(...))->name('categories.posts');
         });
         Route::post('forms/{id}/submit', [FormController::class, 'submit'])->name('forms.submit');
         Route::post('consent', [ConsentController::class, 'store'])->name('consent.store');

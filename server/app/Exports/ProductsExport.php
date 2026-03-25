@@ -6,6 +6,7 @@ namespace App\Exports;
 
 use App\Models\Product;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -16,16 +17,15 @@ class ProductsExport implements FromQuery, ShouldAutoSize, ShouldQueue, WithHead
 {
     public function __construct(private readonly Request $request) {}
 
-    public function query(): \Illuminate\Database\Eloquent\Builder
+    public function query(): Builder
     {
         return Product::query()
             ->with(['categories', 'brand', 'defaultVariant'])
-            ->when($this->request->input('search'), function ($q, $s) {
-                $q->where('name', 'like', "%{$s}%")
-                    ->orWhere('slug', 'like', "%{$s}%");
+            ->when($this->request->input('search'), function ($q, $s): void {
+                $q->where('name', 'like', sprintf('%%%s%%', $s))
+                    ->orWhere('slug', 'like', sprintf('%%%s%%', $s));
             })
-            ->when($this->request->input('is_active') !== null, fn ($q) => $q->where('is_active', $this->request->boolean('is_active')))
-            ->orderByDesc('created_at');
+            ->when($this->request->input('is_active') !== null, fn ($q) => $q->where('is_active', $this->request->boolean('is_active')))->latest();
     }
 
     /** @return string[] */

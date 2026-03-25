@@ -15,7 +15,7 @@ use Throwable;
 
 class SocialLoginController extends Controller
 {
-    private const ALLOWED_PROVIDERS = ['google', 'github'];
+    private const array ALLOWED_PROVIDERS = ['google', 'github'];
 
     public function redirect(string $provider): JsonResponse
     {
@@ -54,7 +54,7 @@ class SocialLoginController extends Controller
                 'avatar_url' => $socialUser->getAvatar(),
             ]);
         } else {
-            $user = User::create([
+            $user = User::query()->create([
                 'name' => $socialUser->getName() ?? $socialUser->getNickname() ?? 'User',
                 'email' => $socialUser->getEmail(),
                 'password' => Hash::make(Str::random(32)),

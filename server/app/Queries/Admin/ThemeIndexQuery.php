@@ -16,11 +16,11 @@ class ThemeIndexQuery
     public function execute()
     {
         return Theme::query()
-            ->when($this->request->search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+            ->when($this->request->search, function ($query, $search): void {
+                $query->where('name', 'like', sprintf('%%%s%%', $search))
+                    ->orWhere('description', 'like', sprintf('%%%s%%', $search));
             })
-            ->when($this->request->has('is_active'), function ($query) {
+            ->when($this->request->has('is_active'), function ($query): void {
                 $query->where('is_active', $this->request->boolean('is_active'));
             })
             ->orderBy('name')

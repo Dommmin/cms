@@ -27,15 +27,15 @@ class ReviewRequestNotification extends Notification implements ShouldQueue
     {
         $mail = (new MailMessage)
             ->subject('How was your order? Share your thoughts!')
-            ->greeting("Hello {$notifiable->name}!")
-            ->line("Your order **{$this->order->reference_number}** has been delivered. We hope you love your purchase!")
+            ->greeting(sprintf('Hello %s!', $notifiable->name))
+            ->line(sprintf('Your order **%s** has been delivered. We hope you love your purchase!', $this->order->reference_number))
             ->line("We'd love to hear what you think. Your feedback helps other shoppers and helps us improve.");
 
         foreach ($this->order->items as $item) {
             $slug = $item->variant?->product?->slug;
             if ($slug) {
-                $reviewUrl = url("/products/{$slug}?review=1");
-                $mail->action("Review: {$item->product_name}", $reviewUrl);
+                $reviewUrl = url(sprintf('/products/%s?review=1', $slug));
+                $mail->action('Review: '.$item->product_name, $reviewUrl);
             }
         }
 

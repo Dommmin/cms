@@ -34,12 +34,12 @@ class ProductTypeController extends Controller
     public function store(StoreProductTypeRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        $data['has_variants'] = $data['has_variants'] ?? false;
-        $data['is_shippable'] = $data['is_shippable'] ?? true;
+        $data['has_variants'] ??= false;
+        $data['is_shippable'] ??= true;
 
-        ProductType::create($data);
+        ProductType::query()->create($data);
 
-        return redirect()->route('admin.ecommerce.product-types.index')->with('success', 'Typ produktu został utworzony');
+        return to_route('admin.ecommerce.product-types.index')->with('success', 'Typ produktu został utworzony');
     }
 
     public function edit(ProductType $productType): Response
@@ -57,17 +57,17 @@ class ProductTypeController extends Controller
 
         $productType->update($data);
 
-        return redirect()->back()->with('success', 'Typ produktu został zaktualizowany');
+        return back()->with('success', 'Typ produktu został zaktualizowany');
     }
 
     public function destroy(ProductType $productType): RedirectResponse
     {
         if ($productType->products()->exists()) {
-            return redirect()->back()->with('error', 'Nie można usunąć typu przypisanego do produktów');
+            return back()->with('error', 'Nie można usunąć typu przypisanego do produktów');
         }
 
         $productType->delete();
 
-        return redirect()->back()->with('success', 'Typ produktu został usunięty');
+        return back()->with('success', 'Typ produktu został usunięty');
     }
 }

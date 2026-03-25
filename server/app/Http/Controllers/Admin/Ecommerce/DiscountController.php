@@ -36,11 +36,11 @@ class DiscountController extends Controller
     {
         $data = $request->validated();
 
-        $data['is_active'] = $data['is_active'] ?? true;
-        $data['is_stackable'] = $data['is_stackable'] ?? false;
-        $data['apply_to_discounted_products'] = $data['apply_to_discounted_products'] ?? true;
-        $data['is_auto_apply'] = $data['is_auto_apply'] ?? false;
-        $data['priority'] = $data['priority'] ?? 0;
+        $data['is_active'] ??= true;
+        $data['is_stackable'] ??= false;
+        $data['apply_to_discounted_products'] ??= true;
+        $data['is_auto_apply'] ??= false;
+        $data['priority'] ??= 0;
         $data['uses_count'] = 0;
 
         $conditions = $data['conditions'] ?? [];
@@ -49,8 +49,8 @@ class DiscountController extends Controller
 
         unset($data['conditions'], $data['products'], $data['categories']);
 
-        DB::transaction(function () use ($data, $conditions, $products, $categories) {
-            $discount = Discount::create($data);
+        DB::transaction(function () use ($data, $conditions, $products, $categories): void {
+            $discount = Discount::query()->create($data);
 
             foreach ($conditions as $conditionData) {
                 $discount->conditions()->create($conditionData);
@@ -65,7 +65,7 @@ class DiscountController extends Controller
             }
         });
 
-        return redirect()->route('admin.ecommerce.discounts.index')->with('success', 'Rabat został utworzony');
+        return to_route('admin.ecommerce.discounts.index')->with('success', 'Rabat został utworzony');
     }
 
     public function edit(Discount $discount): Response
@@ -86,21 +86,21 @@ class DiscountController extends Controller
 
         unset($data['products'], $data['categories']);
 
-        DB::transaction(function () use ($discount, $data, $products, $categories) {
+        DB::transaction(function () use ($discount, $data, $products, $categories): void {
             $discount->update($data);
 
             $discount->products()->sync($products);
             $discount->categories()->sync($categories);
         });
 
-        return redirect()->back()->with('success', 'Rabat został zaktualizowany');
+        return back()->with('success', 'Rabat został zaktualizowany');
     }
 
     public function destroy(Discount $discount): RedirectResponse
     {
         $discount->delete();
 
-        return redirect()->back()->with('success', 'Rabat został usunięty');
+        return back()->with('success', 'Rabat został usunięty');
     }
 
     public function toggleActive(Discount $discount): RedirectResponse
@@ -109,6 +109,6 @@ class DiscountController extends Controller
 
         $message = $discount->is_active ? 'Rabat został aktywowany' : 'Rabat został dezaktywowany';
 
-        return redirect()->back()->with('success', $message);
+        return back()->with('success', $message);
     }
 }

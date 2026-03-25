@@ -13,7 +13,7 @@ class TranslationController extends Controller
 {
     public function show(string $locale): JsonResponse
     {
-        $translations = Cache::remember("translations.{$locale}", 3600, function () use ($locale): array {
+        $translations = Cache::remember('translations.'.$locale, 3600, function () use ($locale): array {
             $rows = Translation::query()
                 ->where('locale_code', $locale)
                 ->select('group', 'key', 'value')
@@ -26,7 +26,7 @@ class TranslationController extends Controller
                     ->get();
             }
 
-            return $rows->mapWithKeys(fn ($row) => ["{$row->group}.{$row->key}" => $row->value])->all();
+            return $rows->mapWithKeys(fn ($row): array => [sprintf('%s.%s', $row->group, $row->key) => $row->value])->all();
         });
 
         return response()->json($translations);

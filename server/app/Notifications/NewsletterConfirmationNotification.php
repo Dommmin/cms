@@ -30,7 +30,7 @@ class NewsletterConfirmationNotification extends Notification implements ShouldQ
 
         return (new MailMessage)
             ->subject('Please confirm your newsletter subscription')
-            ->greeting('Hello'.($this->subscriber->first_name ? ", {$this->subscriber->first_name}" : '').'!')
+            ->greeting('Hello'.($this->subscriber->first_name ? ', '.$this->subscriber->first_name : '').'!')
             ->line('Thank you for subscribing to our newsletter.')
             ->line('Please click the button below to confirm your subscription.')
             ->action('Confirm Subscription', $confirmUrl)

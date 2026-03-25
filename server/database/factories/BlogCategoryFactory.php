@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\BlogCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\BlogCategory>
+ * @extends Factory<BlogCategory>
  */
 class BlogCategoryFactory extends Factory
 {
@@ -28,6 +29,6 @@ class BlogCategoryFactory extends Factory
 
     public function inactive(): static
     {
-        return $this->state(fn (array $attributes) => ['is_active' => false]);
+        return $this->state(fn (array $attributes): array => ['is_active' => false]);
     }
 }

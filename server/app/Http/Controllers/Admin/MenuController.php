@@ -31,7 +31,7 @@ class MenuController extends Controller
 
     public function create(): Response
     {
-        $locations = (new MenuIndexQuery(request()))->getLocations();
+        $locations = new MenuIndexQuery(request())->getLocations();
 
         return inertia('admin/menus/create', [
             'locations' => $locations,
@@ -42,11 +42,11 @@ class MenuController extends Controller
     {
         $data = $request->validated();
 
-        $data['is_active'] = $data['is_active'] ?? true;
+        $data['is_active'] ??= true;
 
-        Menu::create($data);
+        Menu::query()->create($data);
 
-        return redirect()->route('admin.menus.index')->with('success', 'Menu zostało utworzone');
+        return to_route('admin.menus.index')->with('success', 'Menu zostało utworzone');
     }
 
     public function show(Menu $menu): Response
@@ -61,7 +61,7 @@ class MenuController extends Controller
     public function edit(Menu $menu): Response
     {
         $menu->load(['items' => fn ($q) => $q->with(['children' => fn ($q) => $q->orderBy('position')])]);
-        $locations = (new MenuIndexQuery(request()))->getLocations();
+        $locations = new MenuIndexQuery(request())->getLocations();
 
         return inertia('admin/menus/edit', [
             'menu' => [
@@ -69,7 +69,7 @@ class MenuController extends Controller
                 'name' => $menu->name,
                 'location' => $menu->location?->value,
                 'is_active' => $menu->is_active,
-                'items' => $menu->items->map(fn (MenuItem $item) => $this->serializeItem($item))->values(),
+                'items' => $menu->items->map(fn (MenuItem $item): array => $this->serializeItem($item))->values(),
             ],
             'locations' => $locations,
         ]);
@@ -92,7 +92,7 @@ class MenuController extends Controller
             $this->createMenuItem($menu->id, $itemData, null, $position);
         }
 
-        return redirect()->back()->with('success', 'Menu zostało zaktualizowane');
+        return back()->with('success', 'Menu zostało zaktualizowane');
     }
 
     public function destroy(Menu $menu): RedirectResponse
@@ -100,7 +100,7 @@ class MenuController extends Controller
         $menu->allItems()->delete();
         $menu->delete();
 
-        return redirect()->route('admin.menus.index')->with('success', 'Menu zostało usunięte');
+        return to_route('admin.menus.index')->with('success', 'Menu zostało usunięte');
     }
 
     public function duplicate(Menu $menu): RedirectResponse
@@ -115,7 +115,7 @@ class MenuController extends Controller
             $this->duplicateMenuItem($item, $newMenu->id);
         }
 
-        return redirect()->route('admin.menus.edit', $newMenu)->with('success', 'Menu zostało skopiowane');
+        return to_route('admin.menus.edit', $newMenu)->with('success', 'Menu zostało skopiowane');
     }
 
     private function serializeItem(MenuItem $item): array
@@ -128,13 +128,13 @@ class MenuController extends Controller
             'icon' => $item->icon,
             'position' => $item->position,
             'parent_id' => $item->parent_id,
-            'children' => $item->children->map(fn (MenuItem $c) => $this->serializeItem($c))->values(),
+            'children' => $item->children->map(fn (MenuItem $c): array => $this->serializeItem($c))->values(),
         ];
     }
 
     private function createMenuItem(int $menuId, array $data, ?int $parentId, int $position): void
     {
-        $item = MenuItem::create([
+        $item = MenuItem::query()->create([
             'menu_id' => $menuId,
             'parent_id' => $parentId,
             'label' => $data['label'],

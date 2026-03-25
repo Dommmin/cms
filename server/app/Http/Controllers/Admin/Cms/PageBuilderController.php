@@ -14,14 +14,14 @@ use App\Models\Page;
 use App\Models\PageBlock;
 use App\Models\PageSection;
 use App\Services\PageBuilderSyncService;
-use App\Services\SectionValidationService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class PageBuilderController extends Controller
 {
     public function __construct(
-        private readonly SectionValidationService $validationService,
         private readonly PageBuilderSyncService $syncService
     ) {}
 
@@ -29,36 +29,32 @@ class PageBuilderController extends Controller
     {
         $pageModel = Page::with(['sections.blocks', 'sections.allBlocks', 'sections.blocks.relations', 'sections.blocks.reusableBlock'])->findOrFail($page);
 
-        $sections = $pageModel->sections->map(function (PageSection $section) {
-            return [
-                'id' => $section->id,
-                'section_type' => $section->section_type,
-                'layout' => $section->layout,
-                'variant' => $section->variant,
-                'settings' => $section->settings,
-                'position' => $section->position,
-                'is_active' => $section->is_active,
-                'blocks' => $section->blocks->map(function (PageBlock $block) {
-                    return [
-                        'id' => $block->id,
-                        'type' => $block->type->value,
-                        'configuration' => $block->configuration,
-                        'position' => $block->position,
-                        'is_active' => $block->is_active,
-                        'reusable_block_id' => $block->reusable_block_id,
-                        'reusable_block_name' => $block->reusableBlock?->name,
-                        'relations' => $block->relations->map(fn ($rel) => [
-                            'id' => $rel->id,
-                            'relation_type' => $rel->relation_type,
-                            'relation_id' => $rel->relation_id,
-                            'relation_key' => $rel->relation_key,
-                            'position' => $rel->position,
-                            'metadata' => $rel->metadata,
-                        ])->toArray(),
-                    ];
-                }),
-            ];
-        });
+        $sections = $pageModel->sections->map(fn (PageSection $section): array => [
+            'id' => $section->id,
+            'section_type' => $section->section_type,
+            'layout' => $section->layout,
+            'variant' => $section->variant,
+            'settings' => $section->settings,
+            'position' => $section->position,
+            'is_active' => $section->is_active,
+            'blocks' => $section->blocks->map(fn (PageBlock $block): array => [
+                'id' => $block->id,
+                'type' => $block->type->value,
+                'configuration' => $block->configuration,
+                'position' => $block->position,
+                'is_active' => $block->is_active,
+                'reusable_block_id' => $block->reusable_block_id,
+                'reusable_block_name' => $block->reusableBlock?->name,
+                'relations' => $block->relations->map(fn ($rel): array => [
+                    'id' => $rel->id,
+                    'relation_type' => $rel->relation_type,
+                    'relation_id' => $rel->relation_id,
+                    'relation_key' => $rel->relation_key,
+                    'position' => $rel->position,
+                    'metadata' => $rel->metadata,
+                ])->all(),
+            ]),
+        ]);
 
         return Inertia::render('admin/cms/pages/builder', [
             'page' => [
@@ -72,20 +68,20 @@ class PageBuilderController extends Controller
         ]);
     }
 
-    public function preview(int $page): \Inertia\Response
+    public function preview(int $page): Response
     {
         $pageModel = Page::with([
             'sections' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
             'sections.blocks' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
         ])->findOrFail($page);
 
-        $sections = $pageModel->sections->map(fn (PageSection $section) => [
+        $sections = $pageModel->sections->map(fn (PageSection $section): array => [
             'id' => $section->id,
             'section_type' => $section->section_type,
             'layout' => $section->layout,
             'variant' => $section->variant,
             'settings' => $section->settings,
-            'blocks' => $section->blocks->map(fn (PageBlock $block) => [
+            'blocks' => $section->blocks->map(fn (PageBlock $block): array => [
                 'id' => $block->id,
                 'type' => $block->type->value,
                 'configuration' => $block->configuration,
@@ -102,19 +98,19 @@ class PageBuilderController extends Controller
         ]);
     }
 
-    public function update(UpdatePageBuilderRequest $request, int $page): \Illuminate\Http\RedirectResponse
+    public function update(UpdatePageBuilderRequest $request, int $page): RedirectResponse
     {
         $request->validated();
 
         $snapshot = $request->input('snapshot');
         if (is_array($snapshot)) {
-            $pageModel = Page::findOrFail($page);
+            $pageModel = Page::query()->findOrFail($page);
             $this->syncService->sync($pageModel, $snapshot);
 
             return back();
         }
 
-        $page = Page::findOrFail($request->get('page_id', $page));
+        $page = Page::query()->findOrFail($request->get('page_id', $page));
 
         $sections = $request->input('sections', []);
 
@@ -160,9 +156,9 @@ class PageBuilderController extends Controller
     {
         $request->validated();
 
-        $page = Page::findOrFail($page);
+        $page = Page::query()->findOrFail($page);
 
-        $sectionConfig = config("cms.sections.{$request->input('section_type')}");
+        $sectionConfig = config('cms.sections.'.$request->input('section_type'));
 
         $section = $page->allSections()->create([
             'section_type' => $request->input('section_type'),
@@ -190,7 +186,7 @@ class PageBuilderController extends Controller
 
     public function updateSection(UpdateSectionRequest $request, int $page, int $section): JsonResponse
     {
-        $section = PageSection::where('page_id', $page)->findOrFail($section);
+        $section = PageSection::query()->where('page_id', $page)->findOrFail($section);
 
         $request->validated();
 
@@ -203,7 +199,7 @@ class PageBuilderController extends Controller
 
     public function deleteSection(int $page, int $section): JsonResponse
     {
-        $section = PageSection::where('page_id', $page)->findOrFail($section);
+        $section = PageSection::query()->where('page_id', $page)->findOrFail($section);
         $section->allBlocks()->delete();
         $section->delete();
 
@@ -214,7 +210,7 @@ class PageBuilderController extends Controller
     {
         $request->validated();
 
-        $section = PageSection::where('page_id', $page)->findOrFail($section);
+        $section = PageSection::query()->where('page_id', $page)->findOrFail($section);
 
         $block = $section->allBlocks()->create([
             'page_id' => $page,
@@ -238,7 +234,7 @@ class PageBuilderController extends Controller
 
     public function updateBlock(UpdateBlockRequest $request, int $page, int $section, int $block): JsonResponse
     {
-        $block = PageBlock::where('page_id', $page)->where('section_id', $section)->findOrFail($block);
+        $block = PageBlock::query()->where('page_id', $page)->where('section_id', $section)->findOrFail($block);
 
         $request->validated();
 
@@ -249,7 +245,7 @@ class PageBuilderController extends Controller
 
     public function deleteBlock(int $page, int $section, int $block): JsonResponse
     {
-        $block = PageBlock::where('page_id', $page)->where('section_id', $section)->findOrFail($block);
+        $block = PageBlock::query()->where('page_id', $page)->where('section_id', $section)->findOrFail($block);
         $block->delete();
 
         return response()->json(['success' => true]);

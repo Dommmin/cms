@@ -1,8 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
-use App\Models\Cart;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Discount;
@@ -64,15 +62,15 @@ function makeAuthUser(): User
 // Guest cart (session-based)
 // ---------------------------------------------------------------------------
 
-describe('Cart – guest (session)', function () {
-    it('guest gets an empty cart on first request', function () {
+describe('Cart – guest (session)', function (): void {
+    it('guest gets an empty cart on first request', function (): void {
         $this->getJson('/api/v1/cart')
             ->assertOk()
             ->assertJsonPath('items', [])
             ->assertJsonPath('items_count', 0);
     });
 
-    it('guest cart persists in session across requests', function () {
+    it('guest cart persists in session across requests', function (): void {
         $variant = makeVariant();
 
         $this->postJson('/api/v1/cart/items', ['variant_id' => $variant->id, 'quantity' => 1])
@@ -83,7 +81,7 @@ describe('Cart – guest (session)', function () {
             ->assertJsonPath('items_count', 1);
     });
 
-    it('guest cart token is returned in response', function () {
+    it('guest cart token is returned in response', function (): void {
         $response = $this->getJson('/api/v1/cart')->assertOk();
 
         // Token may be null for brand-new session cart or present as a string
@@ -96,8 +94,8 @@ describe('Cart – guest (session)', function () {
 // Auth cart
 // ---------------------------------------------------------------------------
 
-describe('Cart – authenticated user', function () {
-    it('authenticated user gets a dedicated cart', function () {
+describe('Cart – authenticated user', function (): void {
+    it('authenticated user gets a dedicated cart', function (): void {
         $user = makeAuthUser();
 
         $this->actingAs($user, 'sanctum')
@@ -106,7 +104,7 @@ describe('Cart – authenticated user', function () {
             ->assertJsonStructure(['id', 'items', 'subtotal', 'total', 'items_count']);
     });
 
-    it('auth user cart is isolated from other users', function () {
+    it('auth user cart is isolated from other users', function (): void {
         $userA = makeAuthUser();
         $userB = makeAuthUser();
         $variant = makeVariant();
@@ -125,8 +123,8 @@ describe('Cart – authenticated user', function () {
 // Adding items
 // ---------------------------------------------------------------------------
 
-describe('Cart – adding items', function () {
-    it('adds a variant to the cart', function () {
+describe('Cart – adding items', function (): void {
+    it('adds a variant to the cart', function (): void {
         $variant = makeVariant(price: 1500, stock: 5);
 
         $this->postJson('/api/v1/cart/items', ['variant_id' => $variant->id, 'quantity' => 1])
@@ -134,7 +132,7 @@ describe('Cart – adding items', function () {
             ->assertJsonPath('items_count', 1);
     });
 
-    it('adding the same variant twice accumulates quantity', function () {
+    it('adding the same variant twice accumulates quantity', function (): void {
         $variant = makeVariant(price: 1000, stock: 10);
 
         $this->postJson('/api/v1/cart/items', ['variant_id' => $variant->id, 'quantity' => 2]);
@@ -143,14 +141,14 @@ describe('Cart – adding items', function () {
             ->assertJsonPath('items_count', 5);
     });
 
-    it('rejects adding more items than available stock', function () {
+    it('rejects adding more items than available stock', function (): void {
         $variant = makeVariant(price: 1000, stock: 2);
 
         $this->postJson('/api/v1/cart/items', ['variant_id' => $variant->id, 'quantity' => 5])
             ->assertUnprocessable();
     });
 
-    it('rejects accumulation that would exceed stock', function () {
+    it('rejects accumulation that would exceed stock', function (): void {
         $variant = makeVariant(price: 1000, stock: 3);
 
         $this->postJson('/api/v1/cart/items', ['variant_id' => $variant->id, 'quantity' => 2]);
@@ -159,19 +157,19 @@ describe('Cart – adding items', function () {
             ->assertUnprocessable();
     });
 
-    it('rejects a non-existent variant_id', function () {
+    it('rejects a non-existent variant_id', function (): void {
         $this->postJson('/api/v1/cart/items', ['variant_id' => 99999, 'quantity' => 1])
             ->assertUnprocessable();
     });
 
-    it('rejects quantity of zero', function () {
+    it('rejects quantity of zero', function (): void {
         $variant = makeVariant();
 
         $this->postJson('/api/v1/cart/items', ['variant_id' => $variant->id, 'quantity' => 0])
             ->assertUnprocessable();
     });
 
-    it('price injection — submitted price is silently ignored, server uses variant price', function () {
+    it('price injection — submitted price is silently ignored, server uses variant price', function (): void {
         $variant = makeVariant(price: 5000);
         $user = makeAuthUser();
 
@@ -192,29 +190,29 @@ describe('Cart – adding items', function () {
 // Updating items
 // ---------------------------------------------------------------------------
 
-describe('Cart – updating items', function () {
-    it('updates item quantity', function () {
+describe('Cart – updating items', function (): void {
+    it('updates item quantity', function (): void {
         $variant = makeVariant(stock: 10);
 
         $this->postJson('/api/v1/cart/items', ['variant_id' => $variant->id, 'quantity' => 1]);
         $cartItemId = $this->getJson('/api/v1/cart')->json('items.0.id');
 
-        $this->putJson("/api/v1/cart/items/{$cartItemId}", ['quantity' => 4])
+        $this->putJson('/api/v1/cart/items/'.$cartItemId, ['quantity' => 4])
             ->assertOk()
             ->assertJsonPath('items_count', 4);
     });
 
-    it('rejects update that would exceed stock', function () {
+    it('rejects update that would exceed stock', function (): void {
         $variant = makeVariant(stock: 3);
 
         $this->postJson('/api/v1/cart/items', ['variant_id' => $variant->id, 'quantity' => 1]);
         $cartItemId = $this->getJson('/api/v1/cart')->json('items.0.id');
 
-        $this->putJson("/api/v1/cart/items/{$cartItemId}", ['quantity' => 99])
+        $this->putJson('/api/v1/cart/items/'.$cartItemId, ['quantity' => 99])
             ->assertUnprocessable();
     });
 
-    it('cannot update a cart item belonging to another user', function () {
+    it('cannot update a cart item belonging to another user', function (): void {
         $variant = makeVariant();
         $owner = makeAuthUser();
         $attacker = makeAuthUser();
@@ -227,7 +225,7 @@ describe('Cart – updating items', function () {
             ->json('items.0.id');
 
         $this->actingAs($attacker, 'sanctum')
-            ->putJson("/api/v1/cart/items/{$cartItemId}", ['quantity' => 2])
+            ->putJson('/api/v1/cart/items/'.$cartItemId, ['quantity' => 2])
             ->assertForbidden();
     });
 });
@@ -236,19 +234,19 @@ describe('Cart – updating items', function () {
 // Removing items
 // ---------------------------------------------------------------------------
 
-describe('Cart – removing items', function () {
-    it('removes an item from the cart', function () {
+describe('Cart – removing items', function (): void {
+    it('removes an item from the cart', function (): void {
         $variant = makeVariant();
 
         $this->postJson('/api/v1/cart/items', ['variant_id' => $variant->id, 'quantity' => 1]);
         $cartItemId = $this->getJson('/api/v1/cart')->json('items.0.id');
 
-        $this->deleteJson("/api/v1/cart/items/{$cartItemId}")
+        $this->deleteJson('/api/v1/cart/items/'.$cartItemId)
             ->assertOk()
             ->assertJsonPath('items_count', 0);
     });
 
-    it('cannot remove a cart item belonging to another user', function () {
+    it('cannot remove a cart item belonging to another user', function (): void {
         $variant = makeVariant();
         $owner = makeAuthUser();
         $attacker = makeAuthUser();
@@ -261,7 +259,7 @@ describe('Cart – removing items', function () {
             ->json('items.0.id');
 
         $this->actingAs($attacker, 'sanctum')
-            ->deleteJson("/api/v1/cart/items/{$cartItemId}")
+            ->deleteJson('/api/v1/cart/items/'.$cartItemId)
             ->assertForbidden();
     });
 });
@@ -270,8 +268,8 @@ describe('Cart – removing items', function () {
 // Clear cart
 // ---------------------------------------------------------------------------
 
-describe('Cart – clear', function () {
-    it('clears all items from the cart', function () {
+describe('Cart – clear', function (): void {
+    it('clears all items from the cart', function (): void {
         $variantA = makeVariant();
         $variantB = makeVariant();
 
@@ -284,7 +282,7 @@ describe('Cart – clear', function () {
             ->assertJsonPath('items', []);
     });
 
-    it('clear also removes applied discount code', function () {
+    it('clear also removes applied discount code', function (): void {
         $variant = makeVariant();
         $discount = Discount::factory()->create([
             'code' => 'CLEARDISCOUNT',
@@ -307,8 +305,8 @@ describe('Cart – clear', function () {
 // Price integrity
 // ---------------------------------------------------------------------------
 
-describe('Cart – price integrity', function () {
-    it('subtotal equals sum of variant prices times quantities (server-calculated)', function () {
+describe('Cart – price integrity', function (): void {
+    it('subtotal equals sum of variant prices times quantities (server-calculated)', function (): void {
         $variantA = makeVariant(price: 1000);
         $variantB = makeVariant(price: 2500);
 
@@ -321,7 +319,7 @@ describe('Cart – price integrity', function () {
             ->assertJsonPath('subtotal', 4500);
     });
 
-    it('subtotal recalculates correctly after item removal', function () {
+    it('subtotal recalculates correctly after item removal', function (): void {
         $variantA = makeVariant(price: 3000);
         $variantB = makeVariant(price: 1000);
 
@@ -329,7 +327,7 @@ describe('Cart – price integrity', function () {
         $this->postJson('/api/v1/cart/items', ['variant_id' => $variantB->id, 'quantity' => 1]);
 
         $cartItemId = $this->getJson('/api/v1/cart')->json('items.0.id');
-        $this->deleteJson("/api/v1/cart/items/{$cartItemId}");
+        $this->deleteJson('/api/v1/cart/items/'.$cartItemId);
 
         $subtotal = $this->getJson('/api/v1/cart')->json('subtotal');
         // One of the two items remains; subtotal must be either 3000 or 1000
@@ -341,8 +339,8 @@ describe('Cart – price integrity', function () {
 // Discount codes
 // ---------------------------------------------------------------------------
 
-describe('Cart – discount codes', function () {
-    it('applies a valid percentage discount code', function () {
+describe('Cart – discount codes', function (): void {
+    it('applies a valid percentage discount code', function (): void {
         $variant = makeVariant(price: 10000); // 100.00
         $discount = Discount::factory()->create([
             'code' => 'SAVE20',
@@ -360,7 +358,7 @@ describe('Cart – discount codes', function () {
         expect($response->json('discount.discount_amount'))->toBe(2000);
     });
 
-    it('applies a valid fixed_amount discount code', function () {
+    it('applies a valid fixed_amount discount code', function (): void {
         $variant = makeVariant(price: 10000);
         Discount::factory()->create([
             'code' => 'FIXED500',
@@ -377,7 +375,7 @@ describe('Cart – discount codes', function () {
         expect($response->json('discount.discount_amount'))->toBe(500);
     });
 
-    it('stores the discount code in the cart (verified via GET)', function () {
+    it('stores the discount code in the cart (verified via GET)', function (): void {
         $variant = makeVariant(price: 5000);
         Discount::factory()->create([
             'code' => 'STOREDCODE',
@@ -395,12 +393,12 @@ describe('Cart – discount codes', function () {
             ->assertJsonPath('discount_code', 'STOREDCODE');
     });
 
-    it('rejects an invalid discount code', function () {
+    it('rejects an invalid discount code', function (): void {
         $this->postJson('/api/v1/cart/discount', ['code' => 'DOESNOTEXIST'])
             ->assertUnprocessable();
     });
 
-    it('rejects an expired discount code', function () {
+    it('rejects an expired discount code', function (): void {
         Discount::factory()->create([
             'code' => 'EXPIRED',
             'type' => 'percentage',
@@ -413,7 +411,7 @@ describe('Cart – discount codes', function () {
             ->assertUnprocessable();
     });
 
-    it('rejects a deactivated discount code', function () {
+    it('rejects a deactivated discount code', function (): void {
         Discount::factory()->create([
             'code' => 'DISABLED',
             'type' => 'percentage',
@@ -425,7 +423,7 @@ describe('Cart – discount codes', function () {
             ->assertUnprocessable();
     });
 
-    it('rejects discount code when cart subtotal is below min_order_value', function () {
+    it('rejects discount code when cart subtotal is below min_order_value', function (): void {
         $variant = makeVariant(price: 500); // 5.00 PLN
         Discount::factory()->create([
             'code' => 'MINORDER',
@@ -441,7 +439,7 @@ describe('Cart – discount codes', function () {
             ->assertUnprocessable();
     });
 
-    it('removes the discount code from the cart', function () {
+    it('removes the discount code from the cart', function (): void {
         $variant = makeVariant(price: 5000);
         Discount::factory()->create([
             'code' => 'TOREMOVE',
@@ -460,7 +458,7 @@ describe('Cart – discount codes', function () {
             ->assertJsonPath('discount_code', null);
     });
 
-    it('discount calculation is server-side — subtotal is recalculated from variant prices', function () {
+    it('discount calculation is server-side — subtotal is recalculated from variant prices', function (): void {
         $variant = makeVariant(price: 8000);
         Discount::factory()->create([
             'code' => 'SERVERSIDE25',
@@ -484,8 +482,8 @@ describe('Cart – discount codes', function () {
 // Security — IDOR prevention
 // ---------------------------------------------------------------------------
 
-describe('Cart – security (IDOR)', function () {
-    it('attacker cannot manipulate another user cart item via update', function () {
+describe('Cart – security (IDOR)', function (): void {
+    it('attacker cannot manipulate another user cart item via update', function (): void {
         $variant = makeVariant(stock: 10);
         $owner = makeAuthUser();
         $attacker = makeAuthUser();
@@ -499,7 +497,7 @@ describe('Cart – security (IDOR)', function () {
 
         // Attacker guesses/discovers the cart item ID and tries to modify it
         $this->actingAs($attacker, 'sanctum')
-            ->putJson("/api/v1/cart/items/{$ownerCartItemId}", ['quantity' => 99])
+            ->putJson('/api/v1/cart/items/'.$ownerCartItemId, ['quantity' => 99])
             ->assertForbidden();
 
         // Owner's cart is unchanged
@@ -508,7 +506,7 @@ describe('Cart – security (IDOR)', function () {
             ->assertJsonPath('items.0.quantity', 1);
     });
 
-    it('attacker cannot delete another user cart item', function () {
+    it('attacker cannot delete another user cart item', function (): void {
         $variant = makeVariant();
         $owner = makeAuthUser();
         $attacker = makeAuthUser();
@@ -521,7 +519,7 @@ describe('Cart – security (IDOR)', function () {
             ->json('items.0.id');
 
         $this->actingAs($attacker, 'sanctum')
-            ->deleteJson("/api/v1/cart/items/{$ownerCartItemId}")
+            ->deleteJson('/api/v1/cart/items/'.$ownerCartItemId)
             ->assertForbidden();
 
         // Item still in owner's cart
@@ -535,8 +533,8 @@ describe('Cart – security (IDOR)', function () {
 // Buy X Get Y — promotion model unit-level calculations
 // ---------------------------------------------------------------------------
 
-describe('Promotion – buy X get Y calculations', function () {
-    it('buy 2 get 1 free: 6 items at 1000 = 3 free items → discount 3000', function () {
+describe('Promotion – buy X get Y calculations', function (): void {
+    it('buy 2 get 1 free: 6 items at 1000 = 3 free items → discount 3000', function (): void {
         $variant = makeVariant(price: 1000, stock: 10);
         $product = $variant->product;
 
@@ -549,7 +547,7 @@ describe('Promotion – buy X get Y calculations', function () {
         expect($discount)->toEqual(3000);
     });
 
-    it('buy 3 get 1 free: 4 items at 2000 = 1 free item → discount 2000', function () {
+    it('buy 3 get 1 free: 4 items at 2000 = 1 free item → discount 2000', function (): void {
         $variant = makeVariant(price: 2000, stock: 10);
         $product = $variant->product;
 
@@ -562,7 +560,7 @@ describe('Promotion – buy X get Y calculations', function () {
         expect($discount)->toEqual(2000);
     });
 
-    it('buy 2 get 1 at 50% off: 4 items at 1000 → discount 1000', function () {
+    it('buy 2 get 1 at 50% off: 4 items at 1000 → discount 1000', function (): void {
         $variant = makeVariant(price: 1000, stock: 10);
         $product = $variant->product;
 
@@ -575,7 +573,7 @@ describe('Promotion – buy X get Y calculations', function () {
         expect($discount)->toEqual(1000);
     });
 
-    it('max_discount caps the promotion discount', function () {
+    it('max_discount caps the promotion discount', function (): void {
         $variant = makeVariant(price: 1000, stock: 10);
         $product = $variant->product;
 
@@ -588,7 +586,7 @@ describe('Promotion – buy X get Y calculations', function () {
         expect($discount)->toEqual(1500);
     });
 
-    it('quantity below buy_quantity threshold gives zero discount', function () {
+    it('quantity below buy_quantity threshold gives zero discount', function (): void {
         $variant = makeVariant(price: 1000, stock: 10);
         $product = $variant->product;
 

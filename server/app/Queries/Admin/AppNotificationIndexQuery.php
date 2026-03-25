@@ -17,25 +17,24 @@ class AppNotificationIndexQuery
     {
         return AppNotification::query()
             ->with('customer')
-            ->when($this->request->search, function ($query, $search) {
-                $query->where('type', 'like', "%{$search}%")
-                    ->orWhere('channel', 'like', "%{$search}%")
-                    ->orWhereHas('customer', function ($q) use ($search) {
-                        $q->where('first_name', 'like', "%{$search}%")
-                            ->orWhere('last_name', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%");
+            ->when($this->request->search, function ($query, $search): void {
+                $query->where('type', 'like', sprintf('%%%s%%', $search))
+                    ->orWhere('channel', 'like', sprintf('%%%s%%', $search))
+                    ->orWhereHas('customer', function ($q) use ($search): void {
+                        $q->where('first_name', 'like', sprintf('%%%s%%', $search))
+                            ->orWhere('last_name', 'like', sprintf('%%%s%%', $search))
+                            ->orWhere('email', 'like', sprintf('%%%s%%', $search));
                     });
             })
-            ->when($this->request->type, function ($query, $type) {
+            ->when($this->request->type, function ($query, $type): void {
                 $query->where('type', $type);
             })
-            ->when($this->request->channel, function ($query, $channel) {
+            ->when($this->request->channel, function ($query, $channel): void {
                 $query->where('channel', $channel);
             })
-            ->when($this->request->status, function ($query, $status) {
+            ->when($this->request->status, function ($query, $status): void {
                 $query->where('status', $status);
-            })
-            ->orderBy('created_at', 'desc')
+            })->latest()
             ->paginate(20)
             ->withQueryString();
     }

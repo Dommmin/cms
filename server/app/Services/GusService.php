@@ -15,9 +15,6 @@ use Throwable;
 
 class GusService
 {
-    /** @var array<string, mixed>|null */
-    private ?array $cachedApiKey = null;
-
     /**
      * Look up a company by NIP number.
      *
@@ -29,9 +26,7 @@ class GusService
     {
         $nip = preg_replace('/\D/', '', $nip);
 
-        if (! $this->isValidNip($nip)) {
-            throw new RuntimeException('Invalid NIP number format.');
-        }
+        throw_unless($this->isValidNip($nip), RuntimeException::class, 'Invalid NIP number format.');
 
         $apiKey = $this->resolveApiKey();
         $api = $this->buildClient($apiKey);
@@ -79,11 +74,9 @@ class GusService
             ->where('key', 'gus_api_key')
             ->value('value');
 
-        if (! $row) {
-            throw new RuntimeException('GUS API key is not configured. Set it in Settings → Integrations.');
-        }
+        throw_unless($row, RuntimeException::class, 'GUS API key is not configured. Set it in Settings → Integrations.');
 
-        $encrypted = json_decode($row, true);
+        $encrypted = json_decode((string) $row, true);
 
         try {
             $key = Crypt::decryptString($encrypted);

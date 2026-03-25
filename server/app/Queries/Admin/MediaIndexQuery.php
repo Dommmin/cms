@@ -15,18 +15,17 @@ final readonly class MediaIndexQuery
     public function execute(): LengthAwarePaginator
     {
         $media = Media::query()
-            ->when($this->request->search, function ($query) {
+            ->when($this->request->search, function ($query): void {
                 $query->where('name', 'like', '%'.$this->request->search.'%')
                     ->orWhere('file_name', 'like', '%'.$this->request->search.'%');
             })
-            ->when($this->request->extension, function ($query) {
+            ->when($this->request->extension, function ($query): void {
                 $query->where('file_name', 'like', '%.'.$this->request->extension);
-            })
-            ->orderBy('created_at', 'desc')
+            })->latest()
             ->paginate($this->request->per_page ?? 20)
             ->withQueryString();
 
-        $media->getCollection()->transform(fn ($item) => $this->transformItem($item));
+        $media->getCollection()->transform(fn (Media $item): Media => $this->transformItem($item));
 
         return $media;
     }
@@ -34,18 +33,17 @@ final readonly class MediaIndexQuery
     public function executeForSearch(): LengthAwarePaginator
     {
         $media = Media::query()
-            ->when($this->request->search, function ($query) {
+            ->when($this->request->search, function ($query): void {
                 $query->where('name', 'like', '%'.$this->request->search.'%')
                     ->orWhere('file_name', 'like', '%'.$this->request->search.'%');
             })
-            ->when($this->request->extension, function ($query) {
+            ->when($this->request->extension, function ($query): void {
                 $query->where('file_name', 'like', '%.'.$this->request->extension);
-            })
-            ->orderBy('created_at', 'desc')
+            })->latest()
             ->paginate($this->request->per_page ?? 40)
             ->withQueryString();
 
-        $media->getCollection()->transform(fn ($item) => $this->transformItem($item));
+        $media->getCollection()->transform(fn (Media $item): Media => $this->transformItem($item));
 
         return $media;
     }

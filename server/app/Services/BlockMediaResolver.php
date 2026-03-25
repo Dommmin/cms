@@ -20,7 +20,7 @@ class BlockMediaResolver
      */
     public function resolveInConfiguration(array $configuration, string $blockType): array
     {
-        $sectionConfig = config("cms.sections.{$blockType}");
+        $sectionConfig = config('cms.sections.'.$blockType);
         if (! is_array($sectionConfig)) {
             return $configuration;
         }
@@ -36,7 +36,7 @@ class BlockMediaResolver
     public function resolveWithConfig(array $configuration, array $sectionConfig): array
     {
         $mediaFields = $this->getMediaFieldNames($sectionConfig);
-        if (empty($mediaFields)) {
+        if ($mediaFields === []) {
             return $configuration;
         }
 
@@ -52,7 +52,7 @@ class BlockMediaResolver
     {
         $result = [];
         foreach ($data as $key => $value) {
-            $fullPath = $path ? "{$path}.{$key}" : $key;
+            $fullPath = $path !== '' && $path !== '0' ? sprintf('%s.%s', $path, $key) : $key;
             if (is_array($value) && ! $this->isListOfMediaIds($value)) {
                 $result[$key] = $this->resolveRecursive($value, $mediaFields, $fullPath);
             } elseif (in_array($key, $mediaFields, true) && is_array($value)) {
@@ -69,7 +69,7 @@ class BlockMediaResolver
 
     private function resolveMediaId(int $mediaId): ?string
     {
-        $media = Media::find($mediaId);
+        $media = Media::query()->find($mediaId);
 
         return $media?->getUrl() ?? null;
     }
@@ -84,18 +84,13 @@ class BlockMediaResolver
         if ($value === []) {
             return false;
         }
+
         $keys = array_keys($value);
         if ($keys !== range(0, count($value) - 1)) {
             return false;
         }
 
-        foreach ($value as $v) {
-            if (! is_numeric($v)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($value, fn ($v): bool => is_numeric($v));
     }
 
     /**
@@ -116,14 +111,20 @@ class BlockMediaResolver
     private function collectMediaFields(array $fields, array &$names, string $prefix): void
     {
         foreach ($fields as $field) {
-            if (! is_array($field) || empty($field['name'])) {
+            if (! is_array($field)) {
                 continue;
             }
+
+            if (empty($field['name'])) {
+                continue;
+            }
+
             $name = $field['name'];
-            $fullName = $prefix ? "{$prefix}.{$name}" : $name;
+            $fullName = $prefix !== '' && $prefix !== '0' ? sprintf('%s.%s', $prefix, $name) : $name;
             if (in_array($field['type'] ?? '', ['image', 'file-upload'], true)) {
                 $names[] = $name;
             }
+
             if (isset($field['fields']) && is_array($field['fields'])) {
                 $this->collectMediaFields($field['fields'], $names, $fullName);
             }

@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\SupportCannedResponse;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SupportCannedResponse>
+ * @extends Factory<SupportCannedResponse>
  */
 class SupportCannedResponseFactory extends Factory
 {

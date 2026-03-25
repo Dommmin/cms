@@ -16,7 +16,7 @@ class PagePreviewService
     {
         $token = Str::random(64);
 
-        PagePreviewToken::create([
+        PagePreviewToken::query()->create([
             'page_id' => $page->id,
             'page_version_id' => $version?->id,
             'token_hash' => hash('sha256', $token),

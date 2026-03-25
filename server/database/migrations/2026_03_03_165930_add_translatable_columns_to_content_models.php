@@ -31,7 +31,7 @@ return new class extends Migration
             foreach ($cols as $col) {
                 // Wrap existing non-null values as {"en": "value"}
                 DB::statement(
-                    "UPDATE `{$table}` SET `{$col}` = JSON_OBJECT('en', `{$col}`) WHERE `{$col}` IS NOT NULL",
+                    sprintf("UPDATE `%s` SET `%s` = JSON_OBJECT('en', `%s`) WHERE `%s` IS NOT NULL", $table, $col, $col, $col),
                 );
 
                 // Change column type to json (nullable)
@@ -52,7 +52,7 @@ return new class extends Migration
                 });
 
                 DB::statement(
-                    "UPDATE `{$table}` SET `{$col}` = JSON_UNQUOTE(JSON_EXTRACT(`{$col}`, '$.en')) WHERE `{$col}` IS NOT NULL",
+                    sprintf("UPDATE `%s` SET `%s` = JSON_UNQUOTE(JSON_EXTRACT(`%s`, '\$.en')) WHERE `%s` IS NOT NULL", $table, $col, $col, $col),
                 );
             }
         }

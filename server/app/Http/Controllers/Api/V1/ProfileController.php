@@ -105,12 +105,12 @@ class ProfileController extends Controller
                 ->where('customer_id', $customer->id)
                 ->with(['items.variant', 'shipment'])
                 ->get()
-                ->map(fn ($o) => [
+                ->map(fn ($o): array => [
                     'reference_number' => $o->reference_number,
                     'status' => $o->status,
                     'total' => $o->total,
                     'created_at' => $o->created_at,
-                    'items' => $o->items->map(fn ($i) => [
+                    'items' => $o->items->map(fn ($i): array => [
                         'product_name' => $i->product_name,
                         'quantity' => $i->quantity,
                         'unit_price' => $i->unit_price,
@@ -119,7 +119,7 @@ class ProfileController extends Controller
             : [];
 
         $reviews = $customer
-            ? $customer->reviews()->with('product:id,name')->get()->map(fn ($r) => [
+            ? $customer->reviews()->with('product:id,name')->get()->map(fn ($r): array => [
                 'product_name' => $r->product?->name,
                 'rating' => $r->rating,
                 'body' => $r->body,
@@ -144,7 +144,7 @@ class ProfileController extends Controller
                 'last_name' => $customer->last_name,
                 'phone' => $customer->phone,
                 'company_name' => $customer->company_name,
-                'addresses' => $customer->addresses->map(fn ($a) => [
+                'addresses' => $customer->addresses->map(fn ($a): array => [
                     'street' => $a->street,
                     'street2' => $a->street2,
                     'city' => $a->city,
@@ -162,7 +162,7 @@ class ProfileController extends Controller
     {
         $settings = Setting::query()->where('is_public', true)->get();
 
-        $grouped = $settings->groupBy('group')->map(fn ($group) => $group->mapWithKeys(fn ($setting) => [
+        $grouped = $settings->groupBy('group')->map(fn ($group) => $group->mapWithKeys(fn ($setting): array => [
             $setting->key => $setting->value,
         ]));
 

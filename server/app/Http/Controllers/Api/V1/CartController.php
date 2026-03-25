@@ -53,6 +53,7 @@ class CartController extends Controller
                     'available' => $variant->stock_quantity,
                 ], 422);
             }
+
             $existing->update(['quantity' => $newQty]);
         } else {
             $cart->items()->create([
@@ -70,9 +71,7 @@ class CartController extends Controller
     {
         $cart = $this->cartService->getOrCreateCart($request->user(), $request->header('X-Cart-Token'));
 
-        if (! $this->cartService->cartItemBelongsToCurrentCart($cartItem, $cart)) {
-            abort(403, 'Cart item does not belong to your cart');
-        }
+        abort_unless($this->cartService->cartItemBelongsToCurrentCart($cartItem, $cart), 403, 'Cart item does not belong to your cart');
 
         $data = $request->validated();
         $variant = $cartItem->variant;
@@ -94,9 +93,7 @@ class CartController extends Controller
     {
         $cart = $this->cartService->getOrCreateCart($request->user(), $request->header('X-Cart-Token'));
 
-        if (! $this->cartService->cartItemBelongsToCurrentCart($cartItem, $cart)) {
-            abort(403, 'Cart item does not belong to your cart');
-        }
+        abort_unless($this->cartService->cartItemBelongsToCurrentCart($cartItem, $cart), 403, 'Cart item does not belong to your cart');
 
         $cartItem->delete();
         $cart->load('items.variant.product');
@@ -120,7 +117,7 @@ class CartController extends Controller
         $cart = $this->cartService->getOrCreateCart($request->user(), $request->header('X-Cart-Token'));
 
         $discount = Discount::query()
-            ->where('code', mb_strtoupper($data['code']))
+            ->where('code', mb_strtoupper((string) $data['code']))
             ->where('is_active', true)
             ->first();
 
@@ -131,14 +128,14 @@ class CartController extends Controller
         $subtotal = $cart->subtotal();
         if ($discount->min_order_value && $subtotal < $discount->min_order_value) {
             return response()->json([
-                'message' => "Minimum order value of {$discount->min_order_value} cents required",
+                'message' => sprintf('Minimum order value of %s cents required', $discount->min_order_value),
             ], 422);
         }
 
         $cart->getConnection()
             ->table('carts')
             ->where('id', $cart->id)
-            ->update(['discount_code' => mb_strtoupper($data['code'])]);
+            ->update(['discount_code' => mb_strtoupper((string) $data['code'])]);
 
         $discountAmount = $discount->calculateDiscount($subtotal);
         $cart->load('items.variant.product');

@@ -27,8 +27,7 @@ class OrderController extends Controller
 
         $orders = Order::query()
             ->where('customer_id', $customer->id)
-            ->with(['items'])
-            ->orderBy('created_at', 'desc')
+            ->with(['items'])->latest()
             ->paginate(10)
             ->withQueryString();
 

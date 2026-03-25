@@ -20,7 +20,7 @@ class MediaController extends Controller
 {
     public function index(Request $request): Response
     {
-        $media = (new MediaIndexQuery($request))->execute();
+        $media = new MediaIndexQuery($request)->execute();
 
         return inertia('admin/media/index', [
             'media' => $media,
@@ -30,7 +30,7 @@ class MediaController extends Controller
 
     public function search(Request $request): JsonResponse
     {
-        $media = (new MediaIndexQuery($request))->executeForSearch();
+        $media = new MediaIndexQuery($request)->executeForSearch();
 
         return response()->json([
             'data' => $media->items(),
@@ -54,7 +54,7 @@ class MediaController extends Controller
         }
 
         foreach ($files as $file) {
-            $cmsMedia = CmsMedia::create();
+            $cmsMedia = CmsMedia::query()->create();
             $cmsMedia->addMedia($file)
                 ->withCustomProperties(['alt' => '', 'caption' => '', 'description' => '', 'author' => ''])
                 ->toMediaCollection($request->input('collection', 'default'));
@@ -92,7 +92,7 @@ class MediaController extends Controller
         $uploaded = [];
 
         foreach ($files as $file) {
-            $cmsMedia = CmsMedia::create();
+            $cmsMedia = CmsMedia::query()->create();
             $media = $cmsMedia->addMedia($file)
                 ->withCustomProperties(['alt' => '', 'caption' => '', 'description' => '', 'author' => ''])
                 ->toMediaCollection($request->input('collection', 'default'));
@@ -115,7 +115,7 @@ class MediaController extends Controller
     {
         $request->validated();
 
-        Media::whereIn('id', $request->ids)->delete();
+        Media::query()->whereIn('id', $request->ids)->delete();
 
         return back()->with('success', 'Files deleted');
     }

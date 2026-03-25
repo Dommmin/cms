@@ -28,9 +28,9 @@ class TranslationController extends Controller
             ->where('locale_code', $locale)
             ->when($group, fn ($q) => $q->where('group', $group))
             ->when($missing, fn ($q) => $q->where(fn ($q) => $q->whereNull('value')->orWhere('value', '')))
-            ->when($search, fn ($q) => $q->where(function ($q) use ($search) {
-                $q->where('key', 'like', "%{$search}%")
-                    ->orWhere('value', 'like', "%{$search}%");
+            ->when($search, fn ($q) => $q->where(function ($q) use ($search): void {
+                $q->where('key', 'like', sprintf('%%%s%%', $search))
+                    ->orWhere('value', 'like', sprintf('%%%s%%', $search));
             }))
             ->orderBy('group')
             ->orderBy('key')
@@ -52,30 +52,27 @@ class TranslationController extends Controller
     {
         $data = $request->validated();
 
-        Translation::firstOrCreate(
-            ['locale_code' => $data['locale_code'], 'group' => $data['group'], 'key' => $data['key']],
-            ['value' => $data['value']]
-        );
+        Translation::query()->firstOrCreate(['locale_code' => $data['locale_code'], 'group' => $data['group'], 'key' => $data['key']], ['value' => $data['value']]);
 
-        Cache::forget("translations.{$data['locale_code']}");
+        Cache::forget('translations.'.$data['locale_code']);
 
-        return redirect()->back()->with('success', 'Translation created');
+        return back()->with('success', 'Translation created');
     }
 
     public function update(UpdateTranslationRequest $request, Translation $translation): RedirectResponse
     {
         $translation->update($request->validated());
 
-        Cache::forget("translations.{$translation->locale_code}");
+        Cache::forget('translations.'.$translation->locale_code);
 
-        return redirect()->back()->with('success', 'Translation updated');
+        return back()->with('success', 'Translation updated');
     }
 
     public function sync(): RedirectResponse
     {
         Artisan::call('translations:sync');
 
-        return redirect()->back()->with('success', 'Translations synced from frontend files');
+        return back()->with('success', 'Translations synced from frontend files');
     }
 
     public function destroy(Translation $translation): RedirectResponse
@@ -83,8 +80,8 @@ class TranslationController extends Controller
         $localeCode = $translation->locale_code;
         $translation->delete();
 
-        Cache::forget("translations.{$localeCode}");
+        Cache::forget('translations.'.$localeCode);
 
-        return redirect()->back()->with('success', 'Translation deleted');
+        return back()->with('success', 'Translation deleted');
     }
 }

@@ -22,7 +22,7 @@ class ReturnRequestController extends Controller
         return inertia('admin/ecommerce/returns/index', [
             'returns' => $returns,
             'filters' => $request->only(['search', 'status', 'return_type']),
-            'statuses' => array_map(fn ($s) => ['value' => $s->value, 'label' => $s->label()], ReturnStatusEnum::cases()),
+            'statuses' => array_map(fn (ReturnStatusEnum $s): array => ['value' => $s->value, 'label' => $s->label()], ReturnStatusEnum::cases()),
         ]);
     }
 
@@ -41,7 +41,7 @@ class ReturnRequestController extends Controller
 
         return inertia('admin/ecommerce/returns/edit', [
             'return' => $return,
-            'statuses' => array_map(fn ($s) => ['value' => $s->value, 'label' => $s->label()], ReturnStatusEnum::cases()),
+            'statuses' => array_map(fn (ReturnStatusEnum $s): array => ['value' => $s->value, 'label' => $s->label()], ReturnStatusEnum::cases()),
         ]);
     }
 
@@ -61,14 +61,14 @@ class ReturnRequestController extends Controller
             'refund_amount' => $data['refund_amount'] ?? $return->refund_amount,
         ]);
 
-        return redirect()->back()->with('success', 'Zwrot został zaktualizowany');
+        return back()->with('success', 'Zwrot został zaktualizowany');
     }
 
     public function destroy(ReturnRequest $return): RedirectResponse
     {
         $return->delete();
 
-        return redirect()->route('admin.ecommerce.returns.index')
+        return to_route('admin.ecommerce.returns.index')
             ->with('success', 'Zwrot został usunięty');
     }
 
@@ -76,14 +76,14 @@ class ReturnRequestController extends Controller
     {
         $return->changeStatus(ReturnStatusEnum::Approved, 'admin');
 
-        return redirect()->back()->with('success', 'Zwrot został zatwierdzony');
+        return back()->with('success', 'Zwrot został zatwierdzony');
     }
 
     public function reject(ReturnRequest $return): RedirectResponse
     {
         $return->changeStatus(ReturnStatusEnum::Rejected, 'admin');
 
-        return redirect()->back()->with('success', 'Zwrot został odrzucony');
+        return back()->with('success', 'Zwrot został odrzucony');
     }
 
     public function processRefund(ReturnRequest $return): RedirectResponse
@@ -91,6 +91,6 @@ class ReturnRequestController extends Controller
         // TODO: Implementacja zwrotu środków przez bramkę płatności
         $return->changeStatus(ReturnStatusEnum::Refunded, 'admin', 'Zwrot środków przetworzony');
 
-        return redirect()->back()->with('success', 'Zwrot środków został przetworzony');
+        return back()->with('success', 'Zwrot środków został przetworzony');
     }
 }

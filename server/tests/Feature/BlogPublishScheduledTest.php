@@ -6,8 +6,8 @@ use App\Enums\BlogPostStatusEnum;
 use App\Models\BlogPost;
 use App\Models\User;
 
-describe('blog:publish-scheduled command', function () {
-    it('publishes scheduled posts whose publish date has passed', function () {
+describe('blog:publish-scheduled command', function (): void {
+    it('publishes scheduled posts whose publish date has passed', function (): void {
         $user = User::factory()->create();
 
         $post = BlogPost::factory()->create([
@@ -21,7 +21,7 @@ describe('blog:publish-scheduled command', function () {
         expect($post->fresh()->status->value)->toBe(BlogPostStatusEnum::Published->value);
     });
 
-    it('does not publish posts scheduled for the future', function () {
+    it('does not publish posts scheduled for the future', function (): void {
         $user = User::factory()->create();
 
         $post = BlogPost::factory()->create([
@@ -35,7 +35,7 @@ describe('blog:publish-scheduled command', function () {
         expect($post->fresh()->status->value)->toBe(BlogPostStatusEnum::Scheduled->value);
     });
 
-    it('does not affect already published posts', function () {
+    it('does not affect already published posts', function (): void {
         $user = User::factory()->create();
 
         $post = BlogPost::factory()->create([
@@ -49,7 +49,7 @@ describe('blog:publish-scheduled command', function () {
         expect($post->fresh()->status->value)->toBe(BlogPostStatusEnum::Published->value);
     });
 
-    it('does not affect draft posts', function () {
+    it('does not affect draft posts', function (): void {
         $user = User::factory()->create();
 
         $post = BlogPost::factory()->create([
@@ -63,7 +63,7 @@ describe('blog:publish-scheduled command', function () {
         expect($post->fresh()->status->value)->toBe(BlogPostStatusEnum::Draft->value);
     });
 
-    it('processes multiple posts in one run', function () {
+    it('processes multiple posts in one run', function (): void {
         $user = User::factory()->create();
 
         $posts = BlogPost::factory()->count(3)->create([
@@ -79,7 +79,7 @@ describe('blog:publish-scheduled command', function () {
         }
     });
 
-    it('outputs how many posts were published', function () {
+    it('outputs how many posts were published', function (): void {
         $user = User::factory()->create();
 
         BlogPost::factory()->count(2)->create([

@@ -22,7 +22,7 @@ class PageCacheService
     public function getCachedPage(string $slug): ?array
     {
         return Cache::remember(
-            "page:{$slug}",
+            'page:'.$slug,
             now()->addHours(24),
             function () use ($slug): ?array {
                 $page = Page::query()
@@ -45,19 +45,19 @@ class PageCacheService
      */
     public function invalidatePage(Page $page): void
     {
-        Cache::forget("page:{$page->slug}");
+        Cache::forget('page:'.$page->slug);
 
         // Also invalidate parent pages if this is a child page
         if ($page->parent_id) {
-            $parent = Page::find($page->parent_id);
+            $parent = Page::query()->find($page->parent_id);
             if ($parent) {
-                Cache::forget("page:{$parent->slug}");
+                Cache::forget('page:'.$parent->slug);
             }
         }
 
         // Invalidate children pages
         foreach ($page->children()->get(['id', 'slug']) as $child) {
-            Cache::forget("page:{$child->slug}");
+            Cache::forget('page:'.$child->slug);
         }
     }
 
@@ -105,14 +105,14 @@ class PageCacheService
         // Dla typu blocks - zwróć bloki
         if ($page->isBlocksType()) {
             if ($page->sections->isNotEmpty()) {
-                $data['sections'] = $page->sections->map(fn ($section) => [
+                $data['sections'] = $page->sections->map(fn ($section): array => [
                     'id' => $section->id,
                     'section_type' => $section->section_type,
                     'layout' => $section->layout,
                     'variant' => $section->variant,
                     'settings' => $section->settings,
                     'position' => $section->position,
-                    'blocks' => $section->blocks->map(fn ($block) => [
+                    'blocks' => $section->blocks->map(fn ($block): array => [
                         'id' => $block->id,
                         'type' => $block->type->value,
                         'configuration' => $this->mediaResolver->resolveInConfiguration(
@@ -120,8 +120,8 @@ class PageCacheService
                             $block->type->value
                         ),
                         'position' => $block->position,
-                    ])->toArray(),
-                ])->toArray();
+                    ])->all(),
+                ])->all();
             } else {
                 $data['sections'] = [
                     [
@@ -131,7 +131,7 @@ class PageCacheService
                         'variant' => null,
                         'settings' => null,
                         'position' => 0,
-                        'blocks' => $page->blocks->map(fn ($block) => [
+                        'blocks' => $page->blocks->map(fn ($block): array => [
                             'id' => $block->id,
                             'type' => $block->type->value,
                             'configuration' => $this->mediaResolver->resolveInConfiguration(
@@ -139,7 +139,7 @@ class PageCacheService
                                 $block->type->value
                             ),
                             'position' => $block->position,
-                        ])->toArray(),
+                        ])->all(),
                     ],
                 ];
             }

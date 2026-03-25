@@ -34,11 +34,11 @@ class BlogPostResource extends JsonResource
             'meta_robots' => $this->meta_robots ?? 'index, follow',
             'og_image' => $this->og_image,
             'sitemap_exclude' => (bool) $this->sitemap_exclude,
-            'author' => $this->whenLoaded('author', fn () => [
+            'author' => $this->whenLoaded('author', fn (): array => [
                 'id' => $this->author->id,
                 'name' => $this->author->name,
             ]),
-            'category' => $this->whenLoaded('category', fn () => $this->category ? [
+            'category' => $this->whenLoaded('category', fn (): ?array => $this->category ? [
                 'id' => $this->category->id,
                 'name' => $this->category->name,
                 'slug' => $this->category->slug,

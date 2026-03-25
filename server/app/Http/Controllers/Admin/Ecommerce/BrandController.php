@@ -34,12 +34,12 @@ class BrandController extends Controller
     public function store(StoreBrandRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        $data['is_active'] = $data['is_active'] ?? true;
-        $data['position'] = $data['position'] ?? 0;
+        $data['is_active'] ??= true;
+        $data['position'] ??= 0;
 
-        Brand::create($data);
+        Brand::query()->create($data);
 
-        return redirect()->route('admin.ecommerce.brands.index')->with('success', 'Marka została utworzona');
+        return to_route('admin.ecommerce.brands.index')->with('success', 'Marka została utworzona');
     }
 
     public function edit(Brand $brand): Response
@@ -54,38 +54,38 @@ class BrandController extends Controller
     public function update(UpdateBrandRequest $request, Brand $brand): RedirectResponse
     {
         $data = $request->validated();
-        $data['is_active'] = $data['is_active'] ?? true;
+        $data['is_active'] ??= true;
 
         $brand->update($data);
 
-        return redirect()->back()->with('success', 'Marka została zaktualizowana');
+        return back()->with('success', 'Marka została zaktualizowana');
     }
 
     public function destroy(Brand $brand): RedirectResponse
     {
         if ($brand->products()->exists()) {
-            return redirect()->back()->with('error', 'Nie można usunąć marki przypisanej do produktów');
+            return back()->with('error', 'Nie można usunąć marki przypisanej do produktów');
         }
 
         $brand->delete();
 
-        return redirect()->back()->with('success', 'Marka została usunięta');
+        return back()->with('success', 'Marka została usunięta');
     }
 
     public function bulkDestroy(Request $request): RedirectResponse
     {
         $ids = $request->input('ids', []);
 
-        $brandsWithProducts = Brand::whereIn('id', $ids)
+        $brandsWithProducts = Brand::query()->whereIn('id', $ids)
             ->whereHas('products')
             ->count();
 
         if ($brandsWithProducts > 0) {
-            return redirect()->back()->with('error', 'Niektóre marki są przypisane do produktów i nie mogą zostać usunięte');
+            return back()->with('error', 'Niektóre marki są przypisane do produktów i nie mogą zostać usunięte');
         }
 
-        Brand::whereIn('id', $ids)->delete();
+        Brand::query()->whereIn('id', $ids)->delete();
 
-        return redirect()->back()->with('success', 'Zaznaczone marki zostały usunięte');
+        return back()->with('success', 'Zaznaczone marki zostały usunięte');
     }
 }

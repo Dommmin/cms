@@ -9,7 +9,7 @@ use DateTimeImmutable;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Promotion>
+ * @extends Factory<Promotion>
  */
 class PromotionFactory extends Factory
 {
@@ -80,7 +80,7 @@ class PromotionFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_active' => true,
             'starts_at' => now()->subDays(1),
             'ends_at' => now()->addDays(30),
@@ -92,7 +92,7 @@ class PromotionFactory extends Factory
      */
     public function inactive(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_active' => false,
         ]);
     }
@@ -102,7 +102,7 @@ class PromotionFactory extends Factory
      */
     public function percentage(?int $percentage = null): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'type' => 'percentage',
             'value' => $percentage ?? $this->faker->numberBetween(5, 50),
             'metadata' => null,
@@ -114,7 +114,7 @@ class PromotionFactory extends Factory
      */
     public function fixedAmount(?int $amount = null): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'type' => 'fixed_amount',
             'value' => $amount ?? $this->faker->numberBetween(10, 200),
             'metadata' => null,
@@ -126,7 +126,7 @@ class PromotionFactory extends Factory
      */
     public function buyXGetY(int $buyQuantity = 2, int $getQuantity = 1, int $discountPercentage = 100): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'type' => 'buy_x_get_y',
             'value' => null,
             'metadata' => [
@@ -142,7 +142,7 @@ class PromotionFactory extends Factory
      */
     public function freeShipping(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'type' => 'free_shipping',
             'value' => null,
             'metadata' => null,
@@ -154,7 +154,7 @@ class PromotionFactory extends Factory
      */
     public function applyToAll(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'apply_to' => 'all',
         ]);
     }
@@ -164,7 +164,7 @@ class PromotionFactory extends Factory
      */
     public function applyToSpecificProducts(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'apply_to' => 'specific_products',
         ]);
     }
@@ -174,7 +174,7 @@ class PromotionFactory extends Factory
      */
     public function applyToSpecificCategories(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'apply_to' => 'specific_categories',
         ]);
     }
@@ -184,7 +184,7 @@ class PromotionFactory extends Factory
      */
     public function stackable(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_stackable' => true,
         ]);
     }
@@ -194,7 +194,7 @@ class PromotionFactory extends Factory
      */
     public function notStackable(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_stackable' => false,
         ]);
     }
@@ -204,7 +204,7 @@ class PromotionFactory extends Factory
      */
     public function priority(int $priority): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'priority' => $priority,
         ]);
     }
@@ -214,7 +214,7 @@ class PromotionFactory extends Factory
      */
     public function withDates(?DateTimeImmutable $startsAt = null, ?DateTimeImmutable $endsAt = null): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'starts_at' => $startsAt ?? $this->faker->dateTimeBetween('-1 month', '+1 month'),
             'ends_at' => $endsAt ?? $this->faker->dateTimeBetween('+1 week', '+6 months'),
         ]);
@@ -225,7 +225,7 @@ class PromotionFactory extends Factory
      */
     public function withMinValue(float $minValue): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'min_value' => $minValue,
         ]);
     }
@@ -235,7 +235,7 @@ class PromotionFactory extends Factory
      */
     public function withMaxDiscount(float $maxDiscount): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'max_discount' => $maxDiscount,
         ]);
     }

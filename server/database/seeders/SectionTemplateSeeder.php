@@ -192,10 +192,7 @@ class SectionTemplateSeeder extends Seeder
         ];
 
         foreach ($templates as $template) {
-            SectionTemplate::firstOrCreate(
-                ['name' => $template['name']],
-                $template,
-            );
+            SectionTemplate::query()->firstOrCreate(['name' => $template['name']], $template);
         }
     }
 }

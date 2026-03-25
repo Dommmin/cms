@@ -81,7 +81,7 @@ trait HasVersions
         $this->save();
 
         // Mark the restored version with a new entry
-        $this->createVersion('restored', "Restored from version {$version->version_number}");
+        $this->createVersion('restored', 'Restored from version '.$version->version_number);
     }
 
     /**

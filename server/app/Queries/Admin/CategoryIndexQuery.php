@@ -18,14 +18,14 @@ class CategoryIndexQuery
         $perPage = min(max($this->request->integer('per_page', 20), 1), 100);
 
         return Category::query()
-            ->when($this->request->search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+            ->when($this->request->search, function ($query, $search): void {
+                $query->where('name', 'like', sprintf('%%%s%%', $search))
+                    ->orWhere('description', 'like', sprintf('%%%s%%', $search));
             })
-            ->when($this->request->parent_id, function ($query, $parentId) {
+            ->when($this->request->parent_id, function ($query, $parentId): void {
                 $query->where('parent_id', $parentId);
             })
-            ->when($this->request->has('is_active'), function ($query) {
+            ->when($this->request->has('is_active'), function ($query): void {
                 $query->where('is_active', $this->request->boolean('is_active'));
             })
             ->with('parent')

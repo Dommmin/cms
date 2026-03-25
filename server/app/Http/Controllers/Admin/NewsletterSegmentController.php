@@ -18,10 +18,10 @@ class NewsletterSegmentController extends Controller
     {
         $segments = NewsletterSegment::query()
             ->withCount('campaigns')
-            ->when($request->search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%");
+            ->when($request->search, function ($query, string $search): void {
+                $query->where('name', 'like', sprintf('%%%s%%', $search));
             })
-            ->when($request->has('is_active'), function ($query) use ($request) {
+            ->when($request->has('is_active'), function ($query) use ($request): void {
                 $query->where('is_active', $request->boolean('is_active'));
             })
             ->orderBy('name')
@@ -43,11 +43,11 @@ class NewsletterSegmentController extends Controller
     {
         $data = $request->validated();
 
-        $data['is_active'] = $data['is_active'] ?? true;
+        $data['is_active'] ??= true;
 
-        NewsletterSegment::create($data);
+        NewsletterSegment::query()->create($data);
 
-        return redirect()->route('admin.newsletter.segments.index')->with('success', 'Segment został utworzony');
+        return to_route('admin.newsletter.segments.index')->with('success', 'Segment został utworzony');
     }
 
     public function edit(NewsletterSegment $segment): Response
@@ -65,35 +65,35 @@ class NewsletterSegmentController extends Controller
 
         $segment->update($data);
 
-        return redirect()->back()->with('success', 'Segment został zaktualizowany');
+        return back()->with('success', 'Segment został zaktualizowany');
     }
 
     public function destroy(NewsletterSegment $segment): RedirectResponse
     {
         if ($segment->campaigns()->exists()) {
-            return redirect()->back()->with('error', 'Nie można usunąć segmentu używanego w kampaniach');
+            return back()->with('error', 'Nie można usunąć segmentu używanego w kampaniach');
         }
 
         $segment->delete();
 
-        return redirect()->back()->with('success', 'Segment został usunięty');
+        return back()->with('success', 'Segment został usunięty');
     }
 
     public function bulkActivate(Request $request): RedirectResponse
     {
         $ids = $request->input('ids', []);
 
-        NewsletterSegment::whereIn('id', $ids)->update(['is_active' => true]);
+        NewsletterSegment::query()->whereIn('id', $ids)->update(['is_active' => true]);
 
-        return redirect()->back()->with('success', 'Zaznaczone segmenty zostały aktywowane');
+        return back()->with('success', 'Zaznaczone segmenty zostały aktywowane');
     }
 
     public function bulkDeactivate(Request $request): RedirectResponse
     {
         $ids = $request->input('ids', []);
 
-        NewsletterSegment::whereIn('id', $ids)->update(['is_active' => false]);
+        NewsletterSegment::query()->whereIn('id', $ids)->update(['is_active' => false]);
 
-        return redirect()->back()->with('success', 'Zaznaczone segmenty zostały dezaktywowane');
+        return back()->with('success', 'Zaznaczone segmenty zostały dezaktywowane');
     }
 }

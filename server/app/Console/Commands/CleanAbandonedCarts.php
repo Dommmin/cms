@@ -30,8 +30,8 @@ class CleanAbandonedCarts extends Command
             ->where('updated_at', '<', now()->subDays($guestDays))
             ->delete();
 
-        $this->info("Deleted {$authDeleted} authenticated cart(s) older than {$authDays} days.");
-        $this->info("Deleted {$guestDeleted} guest cart(s) older than {$guestDays} days.");
+        $this->info(sprintf('Deleted %d authenticated cart(s) older than %d days.', $authDeleted, $authDays));
+        $this->info(sprintf('Deleted %d guest cart(s) older than %d days.', $guestDeleted, $guestDays));
 
         return self::SUCCESS;
     }

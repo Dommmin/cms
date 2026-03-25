@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -34,12 +35,14 @@ class ProductFlag extends Model
             ->orderBy('position');
     }
 
-    public function scopeActive($query)
+    #[Scope]
+    protected function active($query)
     {
         return $query->where('is_active', true);
     }
 
-    public function scopeOrdered($query)
+    #[Scope]
+    protected function ordered($query)
     {
         return $query->orderBy('position')->orderBy('name');
     }

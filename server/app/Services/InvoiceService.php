@@ -15,7 +15,7 @@ class InvoiceService
         $order->loadMissing(['items', 'billingAddress', 'shippingAddress', 'customer']);
 
         return Pdf::view('pdf.invoice', ['order' => $order])
-            ->name("invoice-{$order->reference_number}.pdf")
+            ->name(sprintf('invoice-%s.pdf', $order->reference_number))
             ->download()
             ->toResponse(request());
     }

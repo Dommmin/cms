@@ -41,17 +41,17 @@ class PromotionController extends Controller
     {
         $data = $request->validated();
 
-        $data['is_active'] = $data['is_active'] ?? true;
-        $data['is_stackable'] = $data['is_stackable'] ?? false;
-        $data['priority'] = $data['priority'] ?? 0;
+        $data['is_active'] ??= true;
+        $data['is_stackable'] ??= false;
+        $data['priority'] ??= 0;
 
         $products = $data['products'] ?? [];
         $categories = $data['categories'] ?? [];
 
         unset($data['products'], $data['categories']);
 
-        DB::transaction(function () use ($data, $products, $categories) {
-            $promotion = Promotion::create($data);
+        DB::transaction(function () use ($data, $products, $categories): void {
+            $promotion = Promotion::query()->create($data);
 
             if (! empty($products)) {
                 $promotionProducts = [];
@@ -65,6 +65,7 @@ class PromotionController extends Controller
                         'updated_at' => now(),
                     ];
                 }
+
                 DB::table('promotion_products')->insert($promotionProducts);
             }
 
@@ -80,11 +81,12 @@ class PromotionController extends Controller
                         'updated_at' => now(),
                     ];
                 }
+
                 DB::table('promotion_categories')->insert($promotionCategories);
             }
         });
 
-        return redirect()->route('admin.ecommerce.promotions.index')->with('success', 'Promocja została utworzona');
+        return to_route('admin.ecommerce.promotions.index')->with('success', 'Promocja została utworzona');
     }
 
     public function edit(Promotion $promotion): Response
@@ -107,7 +109,7 @@ class PromotionController extends Controller
 
         unset($data['products'], $data['categories']);
 
-        DB::transaction(function () use ($promotion, $data, $products, $categories) {
+        DB::transaction(function () use ($promotion, $data, $products, $categories): void {
             $promotion->update($data);
 
             // Sync products
@@ -124,6 +126,7 @@ class PromotionController extends Controller
                         'updated_at' => now(),
                     ];
                 }
+
                 DB::table('promotion_products')->insert($promotionProducts);
             }
 
@@ -141,24 +144,25 @@ class PromotionController extends Controller
                         'updated_at' => now(),
                     ];
                 }
+
                 DB::table('promotion_categories')->insert($promotionCategories);
             }
         });
 
-        return redirect()->back()->with('success', 'Promocja została zaktualizowana');
+        return back()->with('success', 'Promocja została zaktualizowana');
     }
 
     public function destroy(Promotion $promotion): RedirectResponse
     {
         $promotion->delete();
 
-        return redirect()->back()->with('success', 'Promocja została usunięta');
+        return back()->with('success', 'Promocja została usunięta');
     }
 
     public function toggle(Promotion $promotion): RedirectResponse
     {
         $promotion->update(['is_active' => ! $promotion->is_active]);
 
-        return redirect()->back()->with('success', $promotion->is_active ? 'Promocja została aktywowana' : 'Promocja została dezaktywowana');
+        return back()->with('success', $promotion->is_active ? 'Promocja została aktywowana' : 'Promocja została dezaktywowana');
     }
 }

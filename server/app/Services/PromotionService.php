@@ -24,7 +24,7 @@ class PromotionService
         ];
 
         foreach ($cartItems as $cartItem) {
-            $product = Product::find($cartItem['product_id']);
+            $product = Product::query()->find($cartItem['product_id']);
             if (! $product) {
                 continue;
             }
@@ -115,12 +115,12 @@ class PromotionService
     {
         return Promotion::active()
             ->ordered()
-            ->where(function ($query) use ($product) {
+            ->where(function ($query) use ($product): void {
                 $query->where('apply_to', 'all')
-                    ->orWhereHas('products', function ($q) use ($product) {
+                    ->orWhereHas('products', function ($q) use ($product): void {
                         $q->where('products.id', $product->id);
                     })
-                    ->orWhereHas('categories', function ($q) use ($product) {
+                    ->orWhereHas('categories', function ($q) use ($product): void {
                         $q->whereIn('categories.id', $product->categories()->pluck('categories.id'));
                     });
             })
@@ -132,7 +132,7 @@ class PromotionService
      */
     public function applyDiscountCode(string $code, array $cartItems): array
     {
-        $discount = Discount::where('code', mb_strtoupper($code))
+        $discount = Discount::query()->where('code', mb_strtoupper($code))
             ->where('is_active', true)
             ->first();
 
@@ -150,14 +150,12 @@ class PromotionService
             ];
         }
 
-        $cartTotal = collect($cartItems)->sum(function ($item) {
-            return ($item['price'] ?? 0) * $item['quantity'];
-        });
+        $cartTotal = collect($cartItems)->sum(fn (array $item): int|float => ($item['price'] ?? 0) * $item['quantity']);
 
         if ($discount->min_order_value && $cartTotal < $discount->min_order_value) {
             return [
                 'success' => false,
-                'message' => "Minimalna wartość zamówienia to {$discount->min_order_value} zł",
+                'message' => sprintf('Minimalna wartość zamówienia to %s zł', $discount->min_order_value),
             ];
         }
 
