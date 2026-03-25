@@ -31,15 +31,33 @@ Rules that AI must follow automatically in this project.
 - Workflows belong **only** in `.github/workflows/` at the repo root — never in `server/.github/` or `client/.github/`
 - The pipeline order is always: lint → test → build → deploy (enforced via `needs:`)
 - Lint runs in check-only mode: `pint --test`, `rector --dry-run`, `eslint --max-warnings=0`, `prettier --check`
+- Locally use **write** mode before committing: `pint` (no flags), `npx prettier --write`, then verify with `npm run lint`
 
 ---
 
 ## Code Quality Rules
 
 ### Before every commit (local)
+
+**PHP (`server/`):**
 - Run `docker compose exec php vendor/bin/pint` (no `--dirty` — fixes **all** PHP files, not just git-modified ones)
 - Run `docker compose exec php php artisan test --compact` — all tests must pass
-- Reason: `--dirty` only processes uncommitted changes; previously committed files with style issues will still fail `pint --test` in CI
+- Why: `--dirty` only processes uncommitted changes; previously committed files with style issues still fail `pint --test` in CI
+
+**TypeScript (`client/`):**
+- Run `docker compose exec node npm run lint` — ESLint must pass with 0 warnings (`--max-warnings=0` in CI)
+- Run `docker compose exec node npx prettier --write .` — format all TS/TSX files
+- Why: CI runs `eslint --max-warnings=0` and `prettier --check` and will fail on any violation
+
+**TypeScript (`server/resources/js/`):**
+- Run `docker compose exec node npx eslint resources/js --max-warnings=0`
+- Run `docker compose exec node npx prettier --write resources/js`
+
+### Write lint-compliant code from the start
+- **PHP**: follow Pint/PSR-12 style — no unused imports, correct spacing, trailing commas in arrays/params, `declare(strict_types=1)` at top
+- **TypeScript**: no unused variables, no `any` types, no `console.log` left in, imports organized (prettier-plugin-organize-imports runs on format)
+- **Tailwind**: class order enforced by prettier-plugin-tailwindcss — always run prettier after adding Tailwind classes
+- Never leave code that will fail linting — fix it before committing, not after CI fails
 
 ### Always
 - Run `docker compose exec php vendor/bin/pint` after any PHP changes
