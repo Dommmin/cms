@@ -31,7 +31,8 @@ Rules that AI must follow automatically in this project.
 - Workflows belong **only** in `.github/workflows/` at the repo root — never in `server/.github/` or `client/.github/`
 - The pipeline order is always: lint → test → build → deploy (enforced via `needs:`)
 - Lint runs in check-only mode: `pint --test`, `rector --dry-run`, `eslint --max-warnings=0`, `prettier --check`
-- Locally use **write** mode before committing: `pint` (no flags), `npx prettier --write`, then verify with `npm run lint`
+- Locally use **write** mode before committing: `pint` (no flags), `php -d memory_limit=1G vendor/bin/rector process`, `npx prettier --write`, then verify with `npm run lint`
+- rector.php must have `->withoutParallel()` — Docker containers OOM-kill rector child processes otherwise
 
 ---
 
@@ -41,8 +42,10 @@ Rules that AI must follow automatically in this project.
 
 **PHP (`server/`):**
 - Run `docker compose exec php vendor/bin/pint` (no `--dirty` — fixes **all** PHP files, not just git-modified ones)
+- Run `docker compose exec php php -d memory_limit=1G vendor/bin/rector process` — applies automated refactors (rector.php uses `withoutParallel()` to avoid Docker OOM)
+- Run `docker compose exec php vendor/bin/pint` again after rector (rector output may need style normalisation)
 - Run `docker compose exec php php artisan test --compact` — all tests must pass
-- Why: `--dirty` only processes uncommitted changes; previously committed files with style issues still fail `pint --test` in CI
+- Why: `--dirty` only processes uncommitted changes; rector + pint must both be clean before CI runs `--dry-run` / `--test`
 
 **TypeScript (`client/`):**
 - Run `docker compose exec node npm run lint` — ESLint must pass with 0 warnings (`--max-warnings=0` in CI)
