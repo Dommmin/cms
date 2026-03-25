@@ -240,7 +240,7 @@ class AppServiceProvider extends ServiceProvider
                 return;
             }
 
-            $decode  = fn (?string $v): mixed => $v !== null ? json_decode($v, true) : null;
+            $decode = fn (?string $v): mixed => $v !== null ? json_decode($v, true) : null;
             $decrypt = function (?string $v): ?string {
                 if (! $v) {
                     return null;
@@ -253,22 +253,38 @@ class AppServiceProvider extends ServiceProvider
             };
 
             // PayU
-            if ($v = $decode($rows['payu_client_id'] ?? null))            config(['services.payu.client_id'     => $v]);
-            if ($v = $decrypt($decode($rows['payu_client_secret'] ?? null))) config(['services.payu.client_secret' => $v]);
-            if ($v = $decode($rows['payu_pos_id'] ?? null))                config(['services.payu.pos_id'        => $v]);
-            if ($v = $decrypt($decode($rows['payu_md5_key'] ?? null)))     config(['services.payu.md5_key'       => $v]);
+            if ($v = $decode($rows['payu_client_id'] ?? null)) {
+                config(['services.payu.client_id' => $v]);
+            }
+            if ($v = $decrypt($decode($rows['payu_client_secret'] ?? null))) {
+                config(['services.payu.client_secret' => $v]);
+            }
+            if ($v = $decode($rows['payu_pos_id'] ?? null)) {
+                config(['services.payu.pos_id' => $v]);
+            }
+            if ($v = $decrypt($decode($rows['payu_md5_key'] ?? null))) {
+                config(['services.payu.md5_key' => $v]);
+            }
 
             $payuSandbox = $decode($rows['payu_sandbox'] ?? null) ?? true;
             config([
-                'services.payu.base_url'   => $payuSandbox ? 'https://sandbox.snd.payu.com' : 'https://secure.payu.com',
-                'services.payu.oauth_url'  => $payuSandbox ? 'https://secure.snd.payu.com' : 'https://secure.payu.com',
+                'services.payu.base_url' => $payuSandbox ? 'https://sandbox.snd.payu.com' : 'https://secure.payu.com',
+                'services.payu.oauth_url' => $payuSandbox ? 'https://secure.snd.payu.com' : 'https://secure.payu.com',
             ]);
 
             // P24
-            if ($v = $decode($rows['p24_merchant_id'] ?? null))         config(['services.p24.merchant_id' => $v]);
-            if ($v = $decode($rows['p24_pos_id'] ?? null))              config(['services.p24.pos_id'      => $v]);
-            if ($v = $decrypt($decode($rows['p24_crc'] ?? null)))       config(['services.p24.crc'         => $v]);
-            if ($v = $decrypt($decode($rows['p24_api_key'] ?? null)))   config(['services.p24.api_key'     => $v]);
+            if ($v = $decode($rows['p24_merchant_id'] ?? null)) {
+                config(['services.p24.merchant_id' => $v]);
+            }
+            if ($v = $decode($rows['p24_pos_id'] ?? null)) {
+                config(['services.p24.pos_id' => $v]);
+            }
+            if ($v = $decrypt($decode($rows['p24_crc'] ?? null))) {
+                config(['services.p24.crc' => $v]);
+            }
+            if ($v = $decrypt($decode($rows['p24_api_key'] ?? null))) {
+                config(['services.p24.api_key' => $v]);
+            }
 
             $p24Sandbox = $decode($rows['p24_sandbox'] ?? null) ?? true;
             config(['services.p24.base_url' => $p24Sandbox ? 'https://sandbox.przelewy24.pl' : 'https://secure.przelewy24.pl']);
@@ -302,7 +318,7 @@ class AppServiceProvider extends ServiceProvider
                 return;
             }
 
-            $decode  = fn (?string $v): mixed => $v !== null ? json_decode($v, true) : null;
+            $decode = fn (?string $v): mixed => $v !== null ? json_decode($v, true) : null;
             $decrypt = function (?string $v): ?string {
                 if (! $v) {
                     return null;
@@ -315,8 +331,12 @@ class AppServiceProvider extends ServiceProvider
             };
 
             // Furgonetka credentials
-            if ($v = $decode($rows['furgonetka_client_id'] ?? null))             config(['services.furgonetka.client_id'           => $v]);
-            if ($v = $decrypt($decode($rows['furgonetka_client_secret'] ?? null))) config(['services.furgonetka.client_secret'        => $v]);
+            if ($v = $decode($rows['furgonetka_client_id'] ?? null)) {
+                config(['services.furgonetka.client_id' => $v]);
+            }
+            if ($v = $decrypt($decode($rows['furgonetka_client_secret'] ?? null))) {
+                config(['services.furgonetka.client_secret' => $v]);
+            }
 
             // Furgonetka sender details
             $senderFields = ['name', 'email', 'phone', 'street', 'city', 'postal_code', 'country_code'];
@@ -327,9 +347,15 @@ class AppServiceProvider extends ServiceProvider
             }
 
             // InPost
-            if ($v = $decrypt($decode($rows['inpost_shipx_token'] ?? null)))          config(['services.inpost_shipx.token'           => $v]);
-            if ($v = $decode($rows['inpost_shipx_organization_id'] ?? null))          config(['services.inpost_shipx.organization_id' => $v]);
-            if ($v = $decode($rows['inpost_geowidget_token'] ?? null))                config(['services.inpost_shipx.geowidget_token'  => $v]);
+            if ($v = $decrypt($decode($rows['inpost_shipx_token'] ?? null))) {
+                config(['services.inpost_shipx.token' => $v]);
+            }
+            if ($v = $decode($rows['inpost_shipx_organization_id'] ?? null)) {
+                config(['services.inpost_shipx.organization_id' => $v]);
+            }
+            if ($v = $decode($rows['inpost_geowidget_token'] ?? null)) {
+                config(['services.inpost_shipx.geowidget_token' => $v]);
+            }
         } catch (Throwable) {
             // Graceful degradation — DB unavailable during artisan migrate etc.
         }
@@ -353,7 +379,7 @@ class AppServiceProvider extends ServiceProvider
                 return;
             }
 
-            $decode  = fn (?string $v): mixed => $v !== null ? json_decode($v, true) : null;
+            $decode = fn (?string $v): mixed => $v !== null ? json_decode($v, true) : null;
             $decrypt = function (?string $v): ?string {
                 if (! $v) {
                     return null;
@@ -366,25 +392,47 @@ class AppServiceProvider extends ServiceProvider
             };
 
             // Google OAuth (Socialite)
-            if ($v = $decode($rows['google_client_id'] ?? null))             config(['services.google.client_id'     => $v]);
-            if ($v = $decrypt($decode($rows['google_client_secret'] ?? null))) config(['services.google.client_secret' => $v]);
+            if ($v = $decode($rows['google_client_id'] ?? null)) {
+                config(['services.google.client_id' => $v]);
+            }
+            if ($v = $decrypt($decode($rows['google_client_secret'] ?? null))) {
+                config(['services.google.client_secret' => $v]);
+            }
 
             // GitHub OAuth (Socialite)
-            if ($v = $decode($rows['github_client_id'] ?? null))             config(['services.github.client_id'     => $v]);
-            if ($v = $decrypt($decode($rows['github_client_secret'] ?? null))) config(['services.github.client_secret' => $v]);
+            if ($v = $decode($rows['github_client_id'] ?? null)) {
+                config(['services.github.client_id' => $v]);
+            }
+            if ($v = $decrypt($decode($rows['github_client_secret'] ?? null))) {
+                config(['services.github.client_secret' => $v]);
+            }
 
             // Cloudflare Turnstile
-            if ($v = $decrypt($decode($rows['cloudflare_turnstile_secret_key'] ?? null))) config(['services.cloudflare.turnstile_secret' => $v]);
-            if ($v = $decrypt($decode($rows['cloudflare_turnstile_site_key'] ?? null)))   config(['services.cloudflare.turnstile_site'   => $v]);
+            if ($v = $decrypt($decode($rows['cloudflare_turnstile_secret_key'] ?? null))) {
+                config(['services.cloudflare.turnstile_secret' => $v]);
+            }
+            if ($v = $decrypt($decode($rows['cloudflare_turnstile_site_key'] ?? null))) {
+                config(['services.cloudflare.turnstile_site' => $v]);
+            }
 
             // Stripe
-            if ($v = $decode($rows['stripe_public_key'] ?? null))               config(['services.stripe.key'            => $v]);
-            if ($v = $decrypt($decode($rows['stripe_secret_key'] ?? null)))     config(['services.stripe.secret'         => $v]);
-            if ($v = $decrypt($decode($rows['stripe_webhook_secret'] ?? null))) config(['services.stripe.webhook_secret' => $v]);
+            if ($v = $decode($rows['stripe_public_key'] ?? null)) {
+                config(['services.stripe.key' => $v]);
+            }
+            if ($v = $decrypt($decode($rows['stripe_secret_key'] ?? null))) {
+                config(['services.stripe.secret' => $v]);
+            }
+            if ($v = $decrypt($decode($rows['stripe_webhook_secret'] ?? null))) {
+                config(['services.stripe.webhook_secret' => $v]);
+            }
 
             // MailerLite
-            if ($v = $decrypt($decode($rows['mailerlite_api_key'] ?? null))) config(['services.mailerlite.api_key'  => $v]);
-            if ($v = $decode($rows['mailerlite_group_id'] ?? null))          config(['services.mailerlite.group_id' => $v]);
+            if ($v = $decrypt($decode($rows['mailerlite_api_key'] ?? null))) {
+                config(['services.mailerlite.api_key' => $v]);
+            }
+            if ($v = $decode($rows['mailerlite_group_id'] ?? null)) {
+                config(['services.mailerlite.group_id' => $v]);
+            }
         } catch (Throwable) {
             // Graceful degradation — DB unavailable during artisan migrate etc.
         }

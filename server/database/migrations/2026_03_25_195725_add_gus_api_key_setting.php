@@ -12,15 +12,15 @@ return new class extends Migration
         $now = now();
 
         DB::table('settings')->insertOrIgnore([
-            'group'       => 'integrations',
-            'key'         => 'gus_api_key',
-            'label'       => 'GUS / REGON API Key',
-            'type'        => 'encrypted',
-            'value'       => null,
+            'group' => 'integrations',
+            'key' => 'gus_api_key',
+            'label' => 'GUS / REGON API Key',
+            'type' => 'encrypted',
+            'value' => null,
             'description' => 'API key for the GUS REGON database (stat.gov.pl). Used to look up company data by NIP. Get a key at https://api.stat.gov.pl/Home/RegonApi.',
-            'is_public'   => false,
-            'created_at'  => $now,
-            'updated_at'  => $now,
+            'is_public' => false,
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
     }
 

@@ -17,6 +17,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Response;
+use RuntimeException;
 
 class PageController extends Controller
 {
@@ -140,7 +141,7 @@ class PageController extends Controller
                 sourceLocale: $request->validated('source_locale'),
                 targetLocale: $request->validated('target_locale'),
             );
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             return back()->withErrors(['target_locale' => $e->getMessage()]);
         }
 

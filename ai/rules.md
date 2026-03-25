@@ -36,8 +36,13 @@ Rules that AI must follow automatically in this project.
 
 ## Code Quality Rules
 
+### Before every commit (local)
+- Run `docker compose exec php vendor/bin/pint` (no `--dirty` — fixes **all** PHP files, not just git-modified ones)
+- Run `docker compose exec php php artisan test --compact` — all tests must pass
+- Reason: `--dirty` only processes uncommitted changes; previously committed files with style issues will still fail `pint --test` in CI
+
 ### Always
-- Run `docker compose exec php vendor/bin/pint --dirty` after any PHP changes
+- Run `docker compose exec php vendor/bin/pint` after any PHP changes
 - Run `docker compose exec php php artisan test --compact` — all tests must pass
 - Write tests for every feature — no exceptions
 - Use factories in tests (create them if missing)

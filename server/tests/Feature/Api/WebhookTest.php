@@ -72,7 +72,7 @@ describe('PayU webhook', function () {
     it('signature is case-sensitive — wrong case fails', function () {
         Config::set('services.payu.md5_key', 'key');
         $body = json_encode(['order' => ['status' => 'COMPLETED']]);
-        $sig = strtoupper(md5($body.'key')); // correct MD5 but uppercased
+        $sig = mb_strtoupper(md5($body.'key')); // correct MD5 but uppercased
 
         $this->withHeaders([
             'OpenPayu-Signature' => "sender=checkout;signature={$sig};algorithm=MD5",

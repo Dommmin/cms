@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\BlockRelation;
 use App\Models\Page;
-use App\Models\PageBlock;
 use App\Models\PageSection;
 use Illuminate\Support\Facades\DB;
+use RuntimeException;
 
 class CloneSiteService
 {
@@ -18,7 +17,7 @@ class CloneSiteService
      * @param  string  $sourceLocale  'global' = locale IS NULL, or a locale code
      * @param  string  $targetLocale  locale code e.g. 'pl', 'en'
      *
-     * @throws \RuntimeException when target locale already has pages
+     * @throws RuntimeException when target locale already has pages
      */
     public function clone(string $sourceLocale, string $targetLocale): void
     {
@@ -29,7 +28,7 @@ class CloneSiteService
             ->count();
 
         if ($existingCount > 0) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 "Target locale '{$targetLocale}' already has {$existingCount} page(s). Delete them first or choose a different target locale.",
             );
         }
@@ -90,11 +89,11 @@ class CloneSiteService
         foreach ($sourcePage->allSections as $section) {
             $newSection = $newPage->allSections()->create([
                 'section_type' => $section->section_type,
-                'layout'       => $section->layout,
-                'variant'      => $section->variant,
-                'settings'     => $section->settings,
-                'position'     => $section->position,
-                'is_active'    => $section->is_active,
+                'layout' => $section->layout,
+                'variant' => $section->variant,
+                'settings' => $section->settings,
+                'position' => $section->position,
+                'is_active' => $section->is_active,
             ]);
 
             $this->cloneBlocks($section, $newSection, $newPage->id);
@@ -105,21 +104,21 @@ class CloneSiteService
     {
         foreach ($sourceSection->allBlocks as $block) {
             $newBlock = $newSection->allBlocks()->create([
-                'page_id'           => $newPageId,
-                'type'              => $block->type,
-                'configuration'     => $block->configuration,
-                'position'          => $block->position,
-                'is_active'         => $block->is_active,
+                'page_id' => $newPageId,
+                'type' => $block->type,
+                'configuration' => $block->configuration,
+                'position' => $block->position,
+                'is_active' => $block->is_active,
                 'reusable_block_id' => $block->reusable_block_id,
             ]);
 
             foreach ($block->relations as $relation) {
                 $newBlock->relations()->create([
                     'relation_type' => $relation->relation_type,
-                    'relation_id'   => $relation->relation_id,
-                    'relation_key'  => $relation->relation_key,
-                    'position'      => $relation->position,
-                    'metadata'      => $relation->metadata,
+                    'relation_id' => $relation->relation_id,
+                    'relation_key' => $relation->relation_key,
+                    'position' => $relation->position,
+                    'metadata' => $relation->metadata,
                 ]);
             }
         }

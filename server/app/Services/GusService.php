@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace App\Services;
 
 use GusApi\Adapter\Soap\SoapAdapter;
-use GusApi\Exception\InvalidUserKeyException;
 use GusApi\Exception\NotFoundException;
 use GusApi\GusApi;
 use GusApi\RegonConstantsInterface;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use Throwable;
 
@@ -36,7 +34,7 @@ class GusService
         }
 
         $apiKey = $this->resolveApiKey();
-        $api    = $this->buildClient($apiKey);
+        $api = $this->buildClient($apiKey);
 
         $sid = $api->login();
 
@@ -51,12 +49,12 @@ class GusService
         $report = $results[0];
 
         return [
-            'name'     => $report->getName(),
-            'regon'    => $report->getRegon(),
-            'city'     => $report->getCity(),
+            'name' => $report->getName(),
+            'regon' => $report->getRegon(),
+            'city' => $report->getCity(),
             'zip_code' => $report->getZipCode(),
-            'street'   => $report->getStreet(),
-            'type'     => $report->getType(),
+            'street' => $report->getStreet(),
+            'type' => $report->getType(),
         ];
     }
 
@@ -113,12 +111,12 @@ class GusService
      */
     private function isValidNip(string $nip): bool
     {
-        if (strlen($nip) !== 10) {
+        if (mb_strlen($nip) !== 10) {
             return false;
         }
 
         $weights = [6, 5, 7, 2, 3, 4, 5, 6, 7];
-        $sum     = 0;
+        $sum = 0;
 
         for ($i = 0; $i < 9; $i++) {
             $sum += (int) $nip[$i] * $weights[$i];

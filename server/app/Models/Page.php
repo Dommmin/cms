@@ -6,9 +6,9 @@ namespace App\Models;
 
 use App\Enums\PageLayoutEnum;
 use App\Enums\PageTypeEnum;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -116,32 +116,6 @@ class Page extends Model
         }
 
         return $page;
-    }
-
-    /**
-     * Find a single path segment, trying locale-specific first, then global fallback.
-     */
-    private static function findSegmentWithLocaleFallback(
-        string $segment,
-        string $locale,
-        ?int $parentId
-    ): ?self {
-        $baseQuery = fn () => self::query()
-            ->where('is_published', true)
-            ->where(function ($q) use ($segment, $locale): void {
-                $q->where('slug', $segment)
-                    ->orWhere("slug_translations->{$locale}", $segment);
-            })
-            ->when($parentId === null,
-                fn ($q) => $q->whereNull('parent_id'),
-                fn ($q) => $q->where('parent_id', $parentId),
-            );
-
-        // 1. Locale-specific page (highest priority)
-        $found = $baseQuery()->where('locale', $locale)->first();
-
-        // 2. Global page fallback (locale = null)
-        return $found ?? $baseQuery()->whereNull('locale')->first();
     }
 
     /**
@@ -298,5 +272,31 @@ class Page extends Model
             'published_at' => 'datetime',
             'sitemap_exclude' => 'boolean',
         ];
+    }
+
+    /**
+     * Find a single path segment, trying locale-specific first, then global fallback.
+     */
+    private static function findSegmentWithLocaleFallback(
+        string $segment,
+        string $locale,
+        ?int $parentId
+    ): ?self {
+        $baseQuery = fn () => self::query()
+            ->where('is_published', true)
+            ->where(function ($q) use ($segment, $locale): void {
+                $q->where('slug', $segment)
+                    ->orWhere("slug_translations->{$locale}", $segment);
+            })
+            ->when($parentId === null,
+                fn ($q) => $q->whereNull('parent_id'),
+                fn ($q) => $q->where('parent_id', $parentId),
+            );
+
+        // 1. Locale-specific page (highest priority)
+        $found = $baseQuery()->where('locale', $locale)->first();
+
+        // 2. Global page fallback (locale = null)
+        return $found ?? $baseQuery()->whereNull('locale')->first();
     }
 }

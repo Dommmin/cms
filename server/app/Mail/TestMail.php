@@ -19,7 +19,7 @@ class TestMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Mail Configuration Test — ' . config('app.name'),
+            subject: 'Mail Configuration Test — '.config('app.name'),
         );
     }
 

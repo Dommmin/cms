@@ -22,7 +22,7 @@ return new class extends Migration
             ['group' => 'payments', 'key' => 'p24_pos_id',      'label' => 'P24 POS ID',      'type' => 'string',    'value' => null,   'description' => 'Przelewy24 point of sale identifier.',                                'is_public' => false],
             ['group' => 'payments', 'key' => 'p24_crc',         'label' => 'P24 CRC Key',     'type' => 'encrypted', 'value' => null,   'description' => 'Przelewy24 CRC key for signature verification (stored encrypted).',   'is_public' => false],
             ['group' => 'payments', 'key' => 'p24_api_key',     'label' => 'P24 API Key',     'type' => 'encrypted', 'value' => null,   'description' => 'Przelewy24 REST API key (stored encrypted).',                         'is_public' => false],
-            ['group' => 'payments', 'key' => 'p24_sandbox',     'label' => 'P24 Sandbox Mode','type' => 'boolean',   'value' => 'true', 'description' => 'Use Przelewy24 sandbox environment. Disable on production.',           'is_public' => false],
+            ['group' => 'payments', 'key' => 'p24_sandbox',     'label' => 'P24 Sandbox Mode', 'type' => 'boolean',   'value' => 'true', 'description' => 'Use Przelewy24 sandbox environment. Disable on production.',           'is_public' => false],
 
             // ── Payments — Bank Transfer ─────────────────────────────────────
             ['group' => 'payments', 'key' => 'bank_transfer_account_name', 'label' => 'Account Holder Name', 'type' => 'string', 'value' => null, 'description' => 'Bank account holder name shown to customers.', 'is_public' => true],
@@ -61,15 +61,15 @@ return new class extends Migration
 
         foreach ($settings as $setting) {
             DB::table('settings')->insertOrIgnore([
-                'group'       => $setting['group'],
-                'key'         => $setting['key'],
-                'label'       => $setting['label'],
-                'type'        => $setting['type'],
-                'value'       => $setting['value'] !== null ? json_encode($setting['value']) : null,
+                'group' => $setting['group'],
+                'key' => $setting['key'],
+                'label' => $setting['label'],
+                'type' => $setting['type'],
+                'value' => $setting['value'] !== null ? json_encode($setting['value']) : null,
                 'description' => $setting['description'],
-                'is_public'   => $setting['is_public'],
-                'created_at'  => $now,
-                'updated_at'  => $now,
+                'is_public' => $setting['is_public'],
+                'created_at' => $now,
+                'updated_at' => $now,
             ]);
         }
     }

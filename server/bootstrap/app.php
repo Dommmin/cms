@@ -19,9 +19,9 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -57,7 +57,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'idempotent' => IdempotencyMiddleware::class,
         ]);
 
-        $middleware->redirectUsersTo(fn(Request $request) => route('admin.dashboard'));
+        $middleware->redirectUsersTo(fn (Request $request) => route('admin.dashboard'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (AuthenticationException $e, Request $request) {
@@ -90,7 +90,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->is('api/*')) {
                 return response()->json([
                     'message' => $e->getMessage(),
-                    'errors'  => $e->errors(),
+                    'errors' => $e->errors(),
                 ], 422);
             }
         });
