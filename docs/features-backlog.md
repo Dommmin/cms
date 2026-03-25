@@ -578,6 +578,7 @@
 - **Bulk order / quote request** — ❌ request pricing for large quantities
 - **Net payment terms** — ❌ "Pay in 30 days" for B2B customers
 - **Per-customer pricing** — ❌ custom price lists per customer/company
+- **GUS / REGON NIP autofill** — ❌ wire `GET /api/v1/gus/nip/{nip}` into B2B registration/checkout form to pre-fill company name + address from GUS database. Backend ready (`GusService`, `GusController`, `gusapi/gusapi` installed, API key in Settings → Integrations). Implement frontend when B2B/B2C user split is in place.
 
 ---
 

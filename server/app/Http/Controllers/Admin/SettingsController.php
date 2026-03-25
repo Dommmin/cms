@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\TestMailRequest;
 use App\Http\Requests\Admin\UpdateSettingsRequest;
+use App\Mail\TestMail;
 use App\Models\Setting;
 use App\Queries\Admin\SettingsIndexQuery;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Response;
+use Throwable;
 
 class SettingsController extends Controller
 {
@@ -55,9 +60,22 @@ class SettingsController extends Controller
                 ->update(['value' => $value]);
         }
 
-        // Flush cached mail config so the new values take effect immediately
-        cache()->forget('settings.mail');
+        // Flush cached configs so the new values take effect immediately
+        foreach (['settings.mail', 'settings.payments', 'settings.shipping', 'settings.integrations'] as $key) {
+            cache()->forget($key);
+        }
 
         return back()->with('success', 'Settings saved');
+    }
+
+    public function testMail(TestMailRequest $request): JsonResponse
+    {
+        try {
+            Mail::to($request->validated('email'))->send(new TestMail(now()->toDateTimeString()));
+        } catch (Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json(['message' => 'Test email sent successfully.']);
     }
 }

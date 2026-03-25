@@ -1,11 +1,14 @@
 import { Head, router } from '@inertiajs/react';
 import {
+    CreditCardIcon,
     GlobeIcon,
     MailIcon,
     SearchIcon,
+    SendIcon,
     SettingsIcon,
     ShareIcon,
     ShoppingBagIcon,
+    TruckIcon,
     ZapIcon,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -34,6 +37,8 @@ const GROUP_ICONS: Record<
     seo: SearchIcon,
     social: ShareIcon,
     ecommerce: ShoppingBagIcon,
+    payments: CreditCardIcon,
+    shipping: TruckIcon,
     integrations: ZapIcon,
 };
 
@@ -135,13 +140,17 @@ export default function Index({ settings, groups, currentGroup }: IndexProps) {
     );
     const [values, setValues] = useState<Record<string, string>>(initialValues);
     const [processing, setProcessing] = useState(false);
+    const [testEmail, setTestEmail] = useState('');
+    const [testingMail, setTestingMail] = useState(false);
 
     const groupLabels: Record<string, string> = {
         general: __('nav.settings', 'General'),
         mail: __('settings.group_mail', 'Mail'),
-        seo: __('nav.settings', 'SEO'),
+        seo: __('settings.group_seo', 'SEO'),
         social: __('settings.group_social', 'Social Media'),
         ecommerce: __('nav.shop', 'E-commerce'),
+        payments: __('settings.group_payments', 'Payments'),
+        shipping: __('settings.group_shipping', 'Shipping'),
         integrations: __('settings.group_integrations', 'Integrations'),
     };
 
@@ -159,6 +168,32 @@ export default function Index({ settings, groups, currentGroup }: IndexProps) {
         router.visit(`/admin/settings?group=${group}`, {
             preserveState: false,
         });
+    };
+
+    const handleTestMail = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setTestingMail(true);
+        try {
+            const xsrf = document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] ?? '';
+            const res = await fetch('/admin/settings/mail/test', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-XSRF-TOKEN': decodeURIComponent(xsrf),
+                },
+                body: JSON.stringify({ email: testEmail }),
+            });
+            const json = await res.json() as { message: string };
+            if (res.ok) {
+                toast.success(json.message);
+            } else {
+                toast.error(json.message ?? __('settings.mail_test_failed', 'Failed to send test email.'));
+            }
+        } catch {
+            toast.error(__('settings.mail_test_failed', 'Failed to send test email.'));
+        } finally {
+            setTestingMail(false);
+        }
     };
 
     const handleSave = () => {
@@ -280,6 +315,48 @@ export default function Index({ settings, groups, currentGroup }: IndexProps) {
                                         )}
                                     </p>
                                 </div>
+
+                                {currentGroup === 'mail' && (
+                                    <div className="rounded-lg border bg-card p-6">
+                                        <div className="mb-4 flex items-center gap-2 border-b pb-4">
+                                            <MailIcon className="h-5 w-5 text-muted-foreground" />
+                                            <h2 className="font-semibold">
+                                                {__('settings.mail_test_title', 'Send Test Email')}
+                                            </h2>
+                                        </div>
+                                        <p className="mb-4 text-sm text-muted-foreground">
+                                            {__(
+                                                'settings.mail_test_desc',
+                                                'Send a test email to verify the current mail configuration is working correctly.',
+                                            )}
+                                        </p>
+                                        <form onSubmit={handleTestMail} className="flex items-end gap-3">
+                                            <div className="flex-1 space-y-1.5">
+                                                <Label htmlFor="test-email">
+                                                    {__('settings.mail_test_recipient', 'Recipient Email')}
+                                                </Label>
+                                                <Input
+                                                    id="test-email"
+                                                    type="email"
+                                                    value={testEmail}
+                                                    onChange={(e) => setTestEmail(e.target.value)}
+                                                    placeholder="you@example.com"
+                                                    required
+                                                />
+                                            </div>
+                                            <Button
+                                                type="submit"
+                                                variant="outline"
+                                                disabled={testingMail || !testEmail}
+                                            >
+                                                <SendIcon className="mr-2 h-4 w-4" />
+                                                {testingMail
+                                                    ? __('misc.sending', 'Sending...')
+                                                    : __('settings.mail_test_btn', 'Send Test')}
+                                            </Button>
+                                        </form>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

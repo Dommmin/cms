@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\CheckoutController;
 use App\Http\Controllers\Api\V1\ConsentController;
 use App\Http\Controllers\Api\V1\FaqController;
 use App\Http\Controllers\Api\V1\FormController;
+use App\Http\Controllers\Api\V1\GusController;
 use App\Http\Controllers\Api\V1\LocaleController as ApiLocaleController;
 use App\Http\Controllers\Api\V1\MenuController;
 use App\Http\Controllers\Api\V1\NewsletterController;
@@ -174,6 +175,11 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         // Reviews
         Route::post('products/{slug}/reviews', [ReviewController::class, 'store'])->name('products.reviews.store');
         Route::post('reviews/{review}/helpful', [ReviewController::class, 'markHelpful'])->name('reviews.helpful');
+
+        // GUS / REGON company lookup
+        Route::get('gus/nip/{nip}', [GusController::class, 'lookupByNip'])
+            ->middleware('throttle:api.strict')
+            ->name('gus.nip');
     });
 
     // ── Support (public + optional auth) ────────────────────────────────────

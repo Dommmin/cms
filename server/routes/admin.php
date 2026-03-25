@@ -175,6 +175,7 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     Route::middleware('role:admin')->group(function () {
         Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
+        Route::post('settings/mail/test', [SettingsController::class, 'testMail'])->name('settings.mail.test');
     });
 
     // i18n — Locales & Translations
