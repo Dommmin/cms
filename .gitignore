@@ -159,3 +159,7 @@ Homestead.json
 .idea/
 /client_old/
 /server_old/
+
+# Local dev certificates
+/certs/
+.DS_Store
