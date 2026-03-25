@@ -155,14 +155,16 @@ Always use the latest major version of each action. Current pinned versions:
 | Action | Version | Notes |
 |--------|---------|-------|
 | `actions/checkout` | `v6` | Latest as of 2026-03 |
-| `actions/setup-node` | `v4` | |
+| `actions/setup-node` | `v6` | Latest as of 2026-03 |
 | `shivammathur/setup-php` | `v2` | Stable major |
 | `docker/login-action` | `v3` | |
 | `docker/setup-buildx-action` | `v3` | |
 | `docker/build-push-action` | `v6` | |
 | `azure/setup-kubectl` | `v4` | |
 
-> When adding a new action, check [github.com/marketplace](https://github.com/marketplace?type=actions) for the latest major version tag and update this table.
+**Node version:** always match the version used in `docker-compose.yml` / `.docker/node/Dockerfile`. Currently **Node 24** (`node:24-bookworm` in Docker, `node-version: '24'` in CI).
+
+> When adding a new action or updating versions, check [github.com/marketplace](https://github.com/marketplace?type=actions) for the latest major version tag and update this table.
 
 ### Required GitHub secrets & variables
 

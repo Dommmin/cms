@@ -24,6 +24,14 @@ Rules that AI must follow automatically in this project.
 - Add factory if one doesn't exist
 - Note soft-delete status in `ai/guide.md` if applicable
 
+### When editing GitHub Actions workflows (`.github/workflows/`):
+- Always use the latest major version of each action — see the pinned versions table in `docs/deployment.md`
+- Node version in CI must match the Docker setup: currently **Node 24** (`node:24-bookworm`)
+- PHP version in CI must match production: currently **PHP 8.5**
+- Workflows belong **only** in `.github/workflows/` at the repo root — never in `server/.github/` or `client/.github/`
+- The pipeline order is always: lint → test → build → deploy (enforced via `needs:`)
+- Lint runs in check-only mode: `pint --test`, `rector --dry-run`, `eslint --max-warnings=0`, `prettier --check`
+
 ---
 
 ## Code Quality Rules
