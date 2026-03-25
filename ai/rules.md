@@ -30,9 +30,10 @@ Rules that AI must follow automatically in this project.
 - PHP version in CI must match production: currently **PHP 8.5**
 - Workflows belong **only** in `.github/workflows/` at the repo root — never in `server/.github/` or `client/.github/`
 - The pipeline order is always: lint → test → build → deploy (enforced via `needs:`)
-- Lint runs in check-only mode: `pint --test`, `rector --dry-run`, `eslint --max-warnings=0`, `prettier --check`
-- Locally use **write** mode before committing: `pint` (no flags), `php -d memory_limit=1G vendor/bin/rector process`, `npx prettier --write`, then verify with `npm run lint`
+- Lint runs in check-only mode: `pint --test`, `rector --dry-run`, `phpstan analyse`, `eslint --max-warnings=0`, `prettier --check`
+- Locally use **write** mode before committing: `pint` → `rector process` → `pint` (again) → `phpstan analyse` → `npm run lint` + `prettier --write`
 - rector.php must have `->withoutParallel()` — Docker containers OOM-kill rector child processes otherwise
+- phpstan level: 5 with baseline; regenerate baseline with `--generate-baseline` when stale entries appear after refactors
 
 ---
 
@@ -44,8 +45,10 @@ Rules that AI must follow automatically in this project.
 - Run `docker compose exec php vendor/bin/pint` (no `--dirty` — fixes **all** PHP files, not just git-modified ones)
 - Run `docker compose exec php php -d memory_limit=1G vendor/bin/rector process` — applies automated refactors (rector.php uses `withoutParallel()` to avoid Docker OOM)
 - Run `docker compose exec php vendor/bin/pint` again after rector (rector output may need style normalisation)
+- Run `docker compose exec php php -d memory_limit=1G vendor/bin/phpstan analyse --no-progress` — must report "No errors" (baseline in `phpstan-baseline.neon` suppresses pre-existing issues)
+- If phpstan reports stale baseline entries after code changes, regenerate: `vendor/bin/phpstan analyse --generate-baseline`
 - Run `docker compose exec php php artisan test --compact` — all tests must pass
-- Why: `--dirty` only processes uncommitted changes; rector + pint must both be clean before CI runs `--dry-run` / `--test`
+- Why: `--dirty` only processes uncommitted changes; pint + rector + larastan must all be clean before CI
 
 **TypeScript (`client/`):**
 - Run `docker compose exec node npm run lint` — ESLint must pass with 0 warnings (`--max-warnings=0` in CI)

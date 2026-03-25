@@ -19,7 +19,7 @@ jobs:
   # ============================================================================
   lint:
   # ============================================================================
-    name: Lint (Pint + Rector + ESLint)
+    name: Lint (Pint + Rector + Larastan + ESLint)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -52,6 +52,9 @@ jobs:
 
       - name: PHP static analysis (Rector dry-run)
         run: vendor/bin/rector process --dry-run
+
+      - name: PHP static analysis (Larastan)
+        run: php -d memory_limit=1G vendor/bin/phpstan analyse --no-progress
 
       - name: Frontend lint (ESLint)
         run: npx eslint . --max-warnings=0

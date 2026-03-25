@@ -13,18 +13,6 @@ parameters:
 			path: app/Actions/AnonymizeUserData.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\CookieConsent\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Actions/AnonymizeUserData.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\User\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Actions/Fortify/CreateNewUser.php
-
-		-
 			message: '#^Method App\\Actions\\Fortify\\CreateNewUser\:\:emailRules\(\) should return array\<int, array\<mixed\>\|Illuminate\\Contracts\\Validation\\Rule\|string\> but returns array\<int, Illuminate\\Validation\\Rules\\Unique\|string\>\.$#'
 			identifier: return.type
 			count: 1
@@ -63,12 +51,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Locale\>\:\:active\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: app/Console/Commands/SyncTranslations.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Translation\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
 			count: 1
 			path: app/Console/Commands/SyncTranslations.php
 
@@ -241,12 +223,6 @@ parameters:
 			path: app/Exports/CustomersExport.php
 
 		-
-			message: '#^Method App\\Exports\\CustomersExport\:\:query\(\) should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\Query\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Exports/CustomersExport.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Order\:\:\$created_at\.$#'
 			identifier: property.notFound
 			count: 1
@@ -367,12 +343,6 @@ parameters:
 			path: app/Exports/ProductsExport.php
 
 		-
-			message: '#^Method App\\Exports\\ProductsExport\:\:query\(\) should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\Query\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Exports/ProductsExport.php
-
-		-
 			message: '#^Using nullsafe property access "\?\-\>price" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
 			identifier: nullsafe.neverNull
 			count: 1
@@ -411,18 +381,6 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$log_name\.$#'
 			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/ActivityLogController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\User\:\:orderBy\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/ActivityLogController.php
-
-		-
-			message: '#^Call to an undefined static method Spatie\\Activitylog\\Models\\Activity\:\:distinct\(\)\.$#'
-			identifier: staticMethod.notFound
 			count: 1
 			path: app/Http/Controllers/Admin/ActivityLogController.php
 
@@ -541,40 +499,16 @@ parameters:
 			path: app/Http/Controllers/Admin/AppNotificationController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\AppNotification\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/AppNotificationController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\AppNotification\:\:whereIn\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/AppNotificationController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Customer\:\:select\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/AppNotificationController.php
-
-		-
 			message: '#^Cannot call method getTranslation\(\) on stdClass\.$#'
 			identifier: method.nonObject
-			count: 3
+			count: 4
 			path: app/Http/Controllers/Admin/BlockRelationController.php
 
 		-
 			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,stdClass\>\:\:map\(\) contains unresolvable type\.$#'
 			identifier: argument.unresolvableType
-			count: 3
+			count: 4
 			path: app/Http/Controllers/Admin/BlockRelationController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\BlogCategory\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/BlogCategoryController.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$available_locales\.$#'
@@ -601,12 +535,6 @@ parameters:
 			path: app/Http/Controllers/Admin/BlogPostController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\BlogPost\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/BlogPostController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\PageBlock\:\:\$reusableBlock\.$#'
 			identifier: property.notFound
 			count: 1
@@ -619,7 +547,25 @@ parameters:
 			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
 
 		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$configuration\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$layout\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
@@ -633,7 +579,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$position\.$#'
 			identifier: property.notFound
-			count: 1
+			count: 3
 			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
 
 		-
@@ -655,21 +601,33 @@ parameters:
 			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\Page\:\:findOrFail\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 3
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$section_type\.$#'
+			identifier: property.notFound
+			count: 1
 			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\PageBlock\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 2
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$settings\.$#'
+			identifier: property.notFound
+			count: 1
 			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\PageSection\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 3
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$variant\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:allBlocks\(\)\.$#'
+			identifier: method.notFound
+			count: 1
 			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
 
 		-
@@ -687,12 +645,6 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\PageSection\>\:\:map\(\) contains unresolvable type\.$#'
 			identifier: argument.unresolvableType
-			count: 1
-			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
-
-		-
-			message: '#^Property App\\Http\\Controllers\\Admin\\Cms\\PageBuilderController\:\:\$validationService is never read, only written\.$#'
-			identifier: property.onlyWritten
 			count: 1
 			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
 
@@ -723,7 +675,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property App\\Models\\ReusableBlock\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 3
+			count: 4
 			path: app/Http/Controllers/Admin/Cms/ReusableBlockController.php
 
 		-
@@ -735,7 +687,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property App\\Models\\ReusableBlock\:\:\$name\.$#'
 			identifier: property.notFound
-			count: 3
+			count: 4
 			path: app/Http/Controllers/Admin/Cms/ReusableBlockController.php
 
 		-
@@ -757,12 +709,6 @@ parameters:
 			path: app/Http/Controllers/Admin/Cms/ReusableBlockController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\ReusableBlock\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Cms/ReusableBlockController.php
-
-		-
 			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\ReusableBlock\>\:\:map\(\) contains unresolvable type\.$#'
 			identifier: argument.unresolvableType
 			count: 2
@@ -771,18 +717,6 @@ parameters:
 		-
 			message: '#^Access to an undefined property App\\Models\\Currency\:\:\$is_base\.$#'
 			identifier: property.notFound
-			count: 3
-			path: app/Http/Controllers/Admin/CurrencyController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Currency\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/CurrencyController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Currency\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
 			count: 3
 			path: app/Http/Controllers/Admin/CurrencyController.php
 
@@ -799,8 +733,8 @@ parameters:
 			path: app/Http/Controllers/Admin/DashboardController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\DashboardWidget\:\:ordered\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\DashboardWidget\>\:\:ordered\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: app/Http/Controllers/Admin/DashboardController.php
 
@@ -847,27 +781,9 @@ parameters:
 			path: app/Http/Controllers/Admin/Ecommerce/AddressController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\Address\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Call to an undefined method Illuminate\\Database\\Query\\Builder\:\:whereHas\(\)\.$#'
+			identifier: method.notFound
 			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/AddressController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Attribute\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/AttributeController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Brand\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/BrandController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Brand\:\:whereIn\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 2
 			path: app/Http/Controllers/Admin/Ecommerce/BrandController.php
 
 		-
@@ -901,18 +817,6 @@ parameters:
 			path: app/Http/Controllers/Admin/Ecommerce/CategoryController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\Category\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/CategoryController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Category\:\:find\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/CategoryController.php
-
-		-
 			message: '#^Method App\\Http\\Controllers\\Admin\\Ecommerce\\CategoryController\:\:buildCategoryTree\(\) is unused\.$#'
 			identifier: method.unused
 			count: 1
@@ -933,19 +837,13 @@ parameters:
 		-
 			message: '#^Call to an undefined method App\\Models\\Discount\:\:categories\(\)\.$#'
 			identifier: method.notFound
-			count: 1
+			count: 2
 			path: app/Http/Controllers/Admin/Ecommerce/DiscountController.php
 
 		-
 			message: '#^Call to an undefined method App\\Models\\Discount\:\:products\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/DiscountController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Discount\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
+			count: 2
 			path: app/Http/Controllers/Admin/Ecommerce/DiscountController.php
 
 		-
@@ -967,8 +865,8 @@ parameters:
 			path: app/Http/Controllers/Admin/Ecommerce/ProductController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\ProductFlag\:\:active\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\ProductFlag\>\:\:active\(\)\.$#'
+			identifier: method.notFound
 			count: 2
 			path: app/Http/Controllers/Admin/Ecommerce/ProductController.php
 
@@ -977,24 +875,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Controllers/Admin/Ecommerce/ProductFlagController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\ProductFlag\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/ProductFlagController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\ProductFlag\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/ProductFlagController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\ProductType\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/ProductTypeController.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\AttributeValue\:\:\$attribute_id\.$#'
@@ -1021,15 +901,9 @@ parameters:
 			path: app/Http/Controllers/Admin/Ecommerce/ProductVariantController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\ProductVariant\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/ProductVariantController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\ProductVariant\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 2
+			message: '#^Class App\\Queries\\Admin\\ProductVariantIndexQuery does not have a constructor and must be instantiated without any parameters\.$#'
+			identifier: new.noConstructor
+			count: 3
 			path: app/Http/Controllers/Admin/Ecommerce/ProductVariantController.php
 
 		-
@@ -1047,19 +921,13 @@ parameters:
 		-
 			message: '#^Access to an undefined property App\\Models\\Promotion\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 2
+			count: 4
 			path: app/Http/Controllers/Admin/Ecommerce/PromotionController.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Promotion\:\:\$is_active\.$#'
 			identifier: property.notFound
 			count: 2
-			path: app/Http/Controllers/Admin/Ecommerce/PromotionController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Promotion\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
 			path: app/Http/Controllers/Admin/Ecommerce/PromotionController.php
 
 		-
@@ -1099,26 +967,8 @@ parameters:
 			path: app/Http/Controllers/Admin/Ecommerce/ShippingMethodController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\ShippingMethod\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/ShippingMethodController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\TaxRate\:\:\$is_default\.$#'
 			identifier: property.notFound
-			count: 2
-			path: app/Http/Controllers/Admin/Ecommerce/TaxRateController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\TaxRate\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/TaxRateController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\TaxRate\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
 			count: 2
 			path: app/Http/Controllers/Admin/Ecommerce/TaxRateController.php
 
@@ -1129,40 +979,10 @@ parameters:
 			path: app/Http/Controllers/Admin/Ecommerce/WishlistController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\ExchangeRate\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/ExchangeRateController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Faq\:\:\$is_active\.$#'
 			identifier: property.notFound
 			count: 2
 			path: app/Http/Controllers/Admin/FaqController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Faq\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/FaqController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Faq\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/FaqController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Faq\:\:whereNotNull\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/FaqController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Form\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/FormController.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Locale\:\:\$id\.$#'
@@ -1173,12 +993,6 @@ parameters:
 		-
 			message: '#^Access to an undefined property App\\Models\\Locale\:\:\$is_default\.$#'
 			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/LocaleController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Locale\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
 			count: 1
 			path: app/Http/Controllers/Admin/LocaleController.php
 
@@ -1195,14 +1009,8 @@ parameters:
 			path: app/Http/Controllers/Admin/MediaController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\CmsMedia\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 2
-			path: app/Http/Controllers/Admin/MediaController.php
-
-		-
-			message: '#^Call to an undefined static method Spatie\\MediaLibrary\\MediaCollections\\Models\\Media\:\:whereIn\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Access to an undefined property Spatie\\MediaLibrary\\MediaCollections\\Models\\Media\:\:\$id\.$#'
+			identifier: property.notFound
 			count: 1
 			path: app/Http/Controllers/Admin/MediaController.php
 
@@ -1257,7 +1065,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property App\\Models\\MenuItem\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 1
+			count: 2
 			path: app/Http/Controllers/Admin/MenuController.php
 
 		-
@@ -1277,24 +1085,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Controllers/Admin/MenuController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Menu\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/MenuController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\MenuItem\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/MenuController.php
-
-		-
-			message: '#^Call to an undefined static method Illuminate\\Database\\Eloquent\\Model\:\:findOrFail\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/ModelVersionController.php
 
 		-
 			message: '#^PHPDoc tag @var for variable \$model contains unresolvable type\.$#'
@@ -1375,40 +1165,10 @@ parameters:
 			path: app/Http/Controllers/Admin/NewsletterCampaignController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\NewsletterCampaign\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/NewsletterCampaignController.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$search\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Controllers/Admin/NewsletterSegmentController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\NewsletterSegment\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/NewsletterSegmentController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\NewsletterSegment\:\:whereIn\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 2
-			path: app/Http/Controllers/Admin/NewsletterSegmentController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\NewsletterSubscriber\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/NewsletterSubscriberController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\NewsletterSubscriber\:\:whereIn\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 3
-			path: app/Http/Controllers/Admin/NewsletterSubscriberController.php
 
 		-
 			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
@@ -1465,12 +1225,6 @@ parameters:
 			path: app/Http/Controllers/Admin/SectionTemplateController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\SectionTemplate\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 2
-			path: app/Http/Controllers/Admin/SectionTemplateController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Setting\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
@@ -1489,18 +1243,6 @@ parameters:
 			path: app/Http/Controllers/Admin/StoreController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\Store\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/StoreController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\SupportCannedResponse\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/SupportCannedResponseController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\SupportConversation\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
@@ -1515,12 +1257,6 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$status\.$#'
 			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/SupportConversationController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\SupportMessage\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
 			count: 1
 			path: app/Http/Controllers/Admin/SupportConversationController.php
 
@@ -1549,12 +1285,6 @@ parameters:
 			path: app/Http/Controllers/Admin/ThemeController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\Theme\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/ThemeController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Translation\:\:\$locale_code\.$#'
 			identifier: property.notFound
 			count: 2
@@ -1563,12 +1293,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Locale\>\:\:active\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/TranslationController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Translation\:\:firstOrCreate\(\)\.$#'
-			identifier: staticMethod.notFound
 			count: 1
 			path: app/Http/Controllers/Admin/TranslationController.php
 
@@ -1585,14 +1309,8 @@ parameters:
 			path: app/Http/Controllers/Admin/UserController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\User\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/UserController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\User\:\:whereIn\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Query\\Builder\:\:each\(\) expects callable\(stdClass, int\)\: mixed, Closure\(App\\Models\\User\)\: void given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Http/Controllers/Admin/UserController.php
 
@@ -1633,14 +1351,8 @@ parameters:
 			path: app/Http/Controllers/Api/V1/Auth/SocialLoginController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\User\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/Auth/SocialLoginController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\BlogCategory\:\:active\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\BlogCategory\>\:\:active\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: app/Http/Controllers/Api/V1/Blog/BlogCategoryController.php
 
@@ -1663,14 +1375,14 @@ parameters:
 			path: app/Http/Controllers/Api/V1/Blog/BlogPostController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\BlogCategory\:\:active\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\BlogCategory\>\:\:active\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: app/Http/Controllers/Api/V1/Blog/BlogPostController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\BlogPost\:\:published\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\BlogPost\>\:\:published\(\)\.$#'
+			identifier: method.notFound
 			count: 3
 			path: app/Http/Controllers/Api/V1/Blog/BlogPostController.php
 
@@ -1717,8 +1429,26 @@ parameters:
 			path: app/Http/Controllers/Api/V1/CartController.php
 
 		-
+			message: '#^Access to an undefined property App\\Models\\Category\:\:\$children\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/CategoryController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Category\:\:\$products_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/CategoryController.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$parent_id\.$#'
 			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/CategoryController.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,stdClass\>\:\:filter\(\) expects \(callable\(stdClass, int\)\: bool\)\|null, Closure\(App\\Models\\Category\)\: bool given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Http/Controllers/Api/V1/CategoryController.php
 
@@ -2005,8 +1735,14 @@ parameters:
 			path: app/Http/Controllers/Api/V1/ProfileController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\Promotion\:\:active\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Method App\\Models\\Promotion\:\:active\(\) invoked with 0 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: app/Http/Controllers/Api/V1/PromotionController.php
+
+		-
+			message: '#^Static call to instance method App\\Models\\Promotion\:\:active\(\)\.$#'
+			identifier: method.staticCall
 			count: 1
 			path: app/Http/Controllers/Api/V1/PromotionController.php
 
@@ -2035,15 +1771,9 @@ parameters:
 			path: app/Http/Controllers/Api/V1/StoreController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\SupportConversation\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Access to an undefined property App\\Models\\SupportConversation\:\:\$id\.$#'
+			identifier: property.notFound
 			count: 1
-			path: app/Http/Controllers/Api/V1/SupportController.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\SupportMessage\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 2
 			path: app/Http/Controllers/Api/V1/SupportController.php
 
 		-
@@ -2251,12 +1981,6 @@ parameters:
 			path: app/Http/Requests/Admin/StoreMenuRequest.php
 
 		-
-			message: '#^Call to an undefined static method Spatie\\Permission\\Models\\Role\:\:pluck\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Http/Requests/Admin/StoreUserRequest.php
-
-		-
 			message: '#^Method App\\Http\\Requests\\Admin\\StoreUserRequest\:\:rules\(\) should return array\<string, array\<int, string\>\|string\> but returns array\<string, list\<Illuminate\\Validation\\Rules\\Password\|string\|null\>\>\.$#'
 			identifier: return.type
 			count: 1
@@ -2307,12 +2031,6 @@ parameters:
 		-
 			message: '#^Access to an undefined property App\\Models\\User\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 1
-			path: app/Http/Requests/Admin/UpdateUserRequest.php
-
-		-
-			message: '#^Call to an undefined static method Spatie\\Permission\\Models\\Role\:\:pluck\(\)\.$#'
-			identifier: staticMethod.notFound
 			count: 1
 			path: app/Http/Requests/Admin/UpdateUserRequest.php
 
@@ -2947,9 +2665,15 @@ parameters:
 			path: app/Http/Resources/Api/V1/PageResource.php
 
 		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\BlogPost\>\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/PageResource.php
+
+		-
 			message: '#^Instanceof between App\\Enums\\PageBlockTypeEnum and BackedEnum will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
-			count: 2
+			count: 3
 			path: app/Http/Resources/Api/V1/PageResource.php
 
 		-
@@ -2965,6 +2689,12 @@ parameters:
 			path: app/Http/Resources/Api/V1/PageResource.php
 
 		-
+			message: '#^Parameter \#1 \$array \(list\<array\{id\: 0, relation_type\: ''blog_post'', relation_id\: mixed, relation_key\: ''posts'', position\: int, metadata\: null, data\: mixed\}\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: app/Http/Resources/Api/V1/PageResource.php
+
+		-
 			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\PageBlock\>\:\:map\(\) contains unresolvable type\.$#'
 			identifier: argument.unresolvableType
 			count: 1
@@ -2973,6 +2703,12 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\PageSection\>\:\:map\(\) contains unresolvable type\.$#'
 			identifier: argument.unresolvableType
+			count: 1
+			path: app/Http/Resources/Api/V1/PageResource.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
 			count: 1
 			path: app/Http/Resources/Api/V1/PageResource.php
 
@@ -3529,12 +3265,6 @@ parameters:
 			path: app/Infrastructure/Payments/PayU/PayUGateway.php
 
 		-
-			message: '#^Property App\\Infrastructure\\Payments\\PayU\\PayUGateway\:\:\$verifier is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: app/Infrastructure/Payments/PayU/PayUGateway.php
-
-		-
 			message: '#^Using nullsafe property access "\?\-\>email" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
 			identifier: nullsafe.neverNull
 			count: 1
@@ -3877,13 +3607,13 @@ parameters:
 			path: app/Models/AttributeValue.php
 
 		-
-			message: '#^Method App\\Models\\BlockRelation\:\:scopeOrdered\(\) should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\Query\\Builder\.$#'
+			message: '#^Method App\\Models\\BlockRelation\:\:ordered\(\) should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\Query\\Builder\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Models/BlockRelation.php
 
 		-
-			message: '#^Method App\\Models\\BlogCategory\:\:scopeRoots\(\) should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\Query\\Builder\.$#'
+			message: '#^Method App\\Models\\BlogCategory\:\:roots\(\) should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\Query\\Builder\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Models/BlogCategory.php
@@ -4123,7 +3853,7 @@ parameters:
 			path: app/Models/Form.php
 
 		-
-			message: '#^Method App\\Models\\Form\:\:submissions\(\) should return Illuminate\\Database\\Eloquent\\Relations\\HasMany but returns Illuminate\\Database\\Query\\Builder\.$#'
+			message: '#^Method App\\Models\\Form\:\:submissions\(\) should return Illuminate\\Database\\Eloquent\\Relations\\HasMany but returns Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\FormSubmission\>\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Models/Form.php
@@ -4311,12 +4041,6 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$relation_id\.$#'
 			identifier: property.notFound
-			count: 1
-			path: app/Models/PageBlock.php
-
-		-
-			message: '#^Call to an undefined static method Spatie\\MediaLibrary\\MediaCollections\\Models\\Media\:\:find\(\)\.$#'
-			identifier: staticMethod.notFound
 			count: 1
 			path: app/Models/PageBlock.php
 
@@ -4621,12 +4345,6 @@ parameters:
 			path: app/Models/Promotion.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\Product\:\:whereHas\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Models/Promotion.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\ReturnRequest\:\:\$status\.$#'
 			identifier: property.notFound
 			count: 1
@@ -4655,12 +4373,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/Models/ReviewHelpfulVote.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\SectionTemplate\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Models/SectionTemplate.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Setting\:\:\$group\.$#'
@@ -4735,7 +4447,7 @@ parameters:
 			path: app/Models/SupportConversation.php
 
 		-
-			message: '#^Method App\\Models\\SupportConversation\:\:messages\(\) should return Illuminate\\Database\\Eloquent\\Relations\\HasMany but returns Illuminate\\Database\\Query\\Builder\.$#'
+			message: '#^Method App\\Models\\SupportConversation\:\:messages\(\) should return Illuminate\\Database\\Eloquent\\Relations\\HasMany but returns Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\SupportMessage\>\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Models/SupportConversation.php
@@ -5125,18 +4837,6 @@ parameters:
 			path: app/Queries/Admin/CookieConsentIndexQuery.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\CookieConsent\:\:count\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Queries/Admin/CookieConsentIndexQuery.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\CookieConsent\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 2
-			path: app/Queries/Admin/CookieConsentIndexQuery.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$search\.$#'
 			identifier: property.notFound
 			count: 1
@@ -5169,12 +4869,6 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$source\.$#'
 			identifier: property.notFound
-			count: 1
-			path: app/Queries/Admin/ExchangeRateIndexQuery.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Currency\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
 			count: 1
 			path: app/Queries/Admin/ExchangeRateIndexQuery.php
 
@@ -5263,12 +4957,6 @@ parameters:
 			path: app/Queries/Admin/NewsletterCampaignIndexQuery.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\NewsletterSegment\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Queries/Admin/NewsletterCampaignIndexQuery.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$search\.$#'
 			identifier: property.notFound
 			count: 1
@@ -5325,6 +5013,12 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$status\.$#'
 			identifier: property.notFound
+			count: 1
+			path: app/Queries/Admin/PageIndexQuery.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Page\>\:\:forLocale\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: app/Queries/Admin/PageIndexQuery.php
 
@@ -5445,18 +5139,6 @@ parameters:
 		-
 			message: '#^Access to an undefined property App\\Models\\Product\:\:\$variants\.$#'
 			identifier: property.notFound
-			count: 1
-			path: app/Queries/Admin/ProductVariantIndexQuery.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\TaxRate\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Queries/Admin/ProductVariantIndexQuery.php
-
-		-
-			message: '#^Property App\\Queries\\Admin\\ProductVariantIndexQuery\:\:\$request is never read, only written\.$#'
-			identifier: property.onlyWritten
 			count: 1
 			path: app/Queries/Admin/ProductVariantIndexQuery.php
 
@@ -5605,46 +5287,16 @@ parameters:
 			path: app/Services/Admin/Ecommerce/ProductService.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\Product\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Services/Admin/Ecommerce/ProductService.php
-
-		-
 			message: '#^Method App\\Services\\Admin\\Ecommerce\\ProductService\:\:createVariant\(\) should return App\\Models\\ProductVariant but returns Illuminate\\Database\\Eloquent\\Model\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Services/Admin/Ecommerce/ProductService.php
 
 		-
-			message: '#^Call to an undefined static method Spatie\\MediaLibrary\\MediaCollections\\Models\\Media\:\:find\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Services/BlockMediaResolver.php
-
-		-
 			message: '#^Parameter &\$names by\-ref type of method App\\Services\\BlockMediaResolver\:\:collectMediaFields\(\) expects array\<int, string\>, array\<int, mixed\> given\.$#'
 			identifier: parameterByRef.type
 			count: 1
 			path: app/Services/BlockMediaResolver.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\CmsMedia\:\:find\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Services/BlockMediaService.php
-
-		-
-			message: '#^Call to an undefined static method Spatie\\MediaLibrary\\MediaCollections\\Models\\Media\:\:find\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Services/BlockMediaService.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\BlockRelation\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 3
-			path: app/Services/BlockRelationService.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Cart\:\:\$customer_id\.$#'
@@ -5797,6 +5449,36 @@ parameters:
 			path: app/Services/CheckoutService.php
 
 		-
+			message: '#^Access to an undefined property App\\Models\\PageBlock\:\:\$reusable_block_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/CloneSiteService.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:relations\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Services/CloneSiteService.php
+
+		-
+			message: '#^Cannot call method replicate\(\) on stdClass\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Services/CloneSiteService.php
+
+		-
+			message: '#^Parameter \#1 \$sourcePage of method App\\Services\\CloneSiteService\:\:cloneSections\(\) expects App\\Models\\Page, stdClass given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/CloneSiteService.php
+
+		-
+			message: '#^Parameter \#2 \$newSection of method App\\Services\\CloneSiteService\:\:cloneBlocks\(\) expects App\\Models\\PageSection, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/CloneSiteService.php
+
+		-
 			message: '#^Access to an undefined property App\\Models\\Order\:\:\$reference_number\.$#'
 			identifier: property.notFound
 			count: 1
@@ -5809,14 +5491,62 @@ parameters:
 			path: app/Services/MediaService.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\ModuleLayout\:\:updateOrCreate\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 2
+			message: '#^Offset ''description'' on \*NEVER\* on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
 			path: app/Services/ModuleRegistryService.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\PageModule\:\:updateOrCreate\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Offset ''detail_layouts'' on \*NEVER\* in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 1
+			path: app/Services/ModuleRegistryService.php
+
+		-
+			message: '#^Offset ''detail_route_pattern'' on \*NEVER\* on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Services/ModuleRegistryService.php
+
+		-
+			message: '#^Offset ''has_detail_page'' on \*NEVER\* on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Services/ModuleRegistryService.php
+
+		-
+			message: '#^Offset ''has_list_page'' on \*NEVER\* on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Services/ModuleRegistryService.php
+
+		-
+			message: '#^Offset ''icon'' on \*NEVER\* on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Services/ModuleRegistryService.php
+
+		-
+			message: '#^Offset ''list_layouts'' on \*NEVER\* in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 1
+			path: app/Services/ModuleRegistryService.php
+
+		-
+			message: '#^Offset ''list_route_pattern'' on \*NEVER\* on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Services/ModuleRegistryService.php
+
+		-
+			message: '#^Offset ''model_class'' on \*NEVER\* on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Services/ModuleRegistryService.php
+
+		-
+			message: '#^Offset ''route_key_name'' on \*NEVER\* on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
 			count: 1
 			path: app/Services/ModuleRegistryService.php
 
@@ -5869,10 +5599,10 @@ parameters:
 			path: app/Services/PageCacheService.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\Page\:\:find\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Services/PageCacheService.php
+			message: '#^Access to an undefined property App\\Models\\ContentEntry\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Services/PagePresetService.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Menu\:\:\$id\.$#'
@@ -5881,32 +5611,8 @@ parameters:
 			path: app/Services/PagePresetService.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\ContentEntry\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 3
-			path: app/Services/PagePresetService.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\MenuItem\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: app/Services/PagePresetService.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Page\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 2
-			path: app/Services/PagePresetService.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\PageVersion\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 1
-			path: app/Services/PagePreviewService.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\PagePreviewToken\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
 			count: 1
 			path: app/Services/PagePreviewService.php
 
@@ -5923,15 +5629,9 @@ parameters:
 			path: app/Services/PageVersionService.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\PageVersion\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Call to an undefined method Illuminate\\Database\\Query\\Builder\:\:with\(\)\.$#'
+			identifier: method.notFound
 			count: 1
-			path: app/Services/PageVersionService.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\PageVersion\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 2
 			path: app/Services/PageVersionService.php
 
 		-
@@ -5949,7 +5649,7 @@ parameters:
 		-
 			message: '#^PHPDoc tag @var for variable \$section contains unknown class App\\Modules\\Core\\Domain\\Models\\PageSection\.$#'
 			identifier: class.notFound
-			count: 3
+			count: 2
 			path: app/Services/PageVersionService.php
 
 		-
@@ -5971,26 +5671,62 @@ parameters:
 			path: app/Services/PageVersionService.php
 
 		-
+			message: '#^Access to an undefined property App\\Models\\Discount\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/PromotionService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Discount\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/PromotionService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Discount\:\:\$min_order_value\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/PromotionService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Discount\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/PromotionService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Discount\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/PromotionService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Discount\:\:\$value\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/PromotionService.php
+
+		-
 			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 2
 			path: app/Services/PromotionService.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\Discount\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Access to an undefined property App\\Models\\Product\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Product\>\:\:\$price\.$#'
+			identifier: property.notFound
 			count: 1
 			path: app/Services/PromotionService.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\Product\:\:find\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
+			message: '#^Method App\\Models\\Promotion\:\:active\(\) invoked with 0 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 2
 			path: app/Services/PromotionService.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\Promotion\:\:active\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Static call to instance method App\\Models\\Promotion\:\:active\(\)\.$#'
+			identifier: method.staticCall
 			count: 2
 			path: app/Services/PromotionService.php
 
@@ -6031,28 +5767,10 @@ parameters:
 			path: database/seeders/BlogSeeder.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\Currency\:\:firstOrCreate\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 3
+			message: '#^Access to an undefined property App\\Models\\Currency\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
 			path: database/seeders/CurrencySeeder.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\ExchangeRate\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: database/seeders/CurrencySeeder.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\ExchangeRate\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: database/seeders/CurrencySeeder.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\DashboardWidget\:\:updateOrCreate\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: database/seeders/DashboardWidgetSeeder.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Attribute\:\:\$id\.$#'
@@ -6133,111 +5851,39 @@ parameters:
 			path: database/seeders/EcommerceDemoSeeder.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\Form\:\:updateOrCreate\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Access to an undefined property App\\Models\\Form\:\:\$id\.$#'
+			identifier: property.notFound
 			count: 1
 			path: database/seeders/FormSeeder.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\FormField\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: database/seeders/FormSeeder.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Locale\:\:firstOrCreate\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: database/seeders/LocaleSeeder.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Locale\:\:where\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: database/seeders/LocaleSeeder.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Menu\:\:updateOrCreate\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Access to an undefined property App\\Models\\Menu\:\:\$id\.$#'
+			identifier: property.notFound
 			count: 3
-			path: database/seeders/MenuSeeder.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\MenuItem\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 3
-			path: database/seeders/MenuSeeder.php
-
-		-
-			message: '#^Offset ''page_slug'' on array\{label\: array\{en\: ''Cookie Policy'', pl\: ''Polityka cookies''\}, page_slug\: ''cookie\-policy'', link_type\: App\\Enums\\MenuLinkTypeEnum\:\:Page, position\: 5\}\|array\{label\: array\{en\: ''Privacy Policy'', pl\: ''Polityka prywatności''\}, page_slug\: ''privacy\-policy'', link_type\: App\\Enums\\MenuLinkTypeEnum\:\:Page, position\: 1\}\|array\{label\: array\{en\: ''Return Policy'', pl\: ''Polityka zwrotów''\}, page_slug\: ''return\-policy'', link_type\: App\\Enums\\MenuLinkTypeEnum\:\:Page, position\: 4\}\|array\{label\: array\{en\: ''Shipping Policy'', pl\: ''Polityka wysyłki''\}, page_slug\: ''shipping\-policy'', link_type\: App\\Enums\\MenuLinkTypeEnum\:\:Page, position\: 3\}\|array\{label\: array\{en\: ''Terms of Service'', pl\: ''Regulamin''\}, page_slug\: ''terms\-of\-service'', link_type\: App\\Enums\\MenuLinkTypeEnum\:\:Page, position\: 2\} in isset\(\) always exists and is not nullable\.$#'
-			identifier: isset.offset
-			count: 1
-			path: database/seeders/MenuSeeder.php
-
-		-
-			message: '#^Offset ''url'' on array\{label\: array\{en\: ''Cookie Policy'', pl\: ''Polityka cookies''\}, page_slug\: ''cookie\-policy'', link_type\: App\\Enums\\MenuLinkTypeEnum\:\:Page, position\: 5\}\|array\{label\: array\{en\: ''Privacy Policy'', pl\: ''Polityka prywatności''\}, page_slug\: ''privacy\-policy'', link_type\: App\\Enums\\MenuLinkTypeEnum\:\:Page, position\: 1\}\|array\{label\: array\{en\: ''Return Policy'', pl\: ''Polityka zwrotów''\}, page_slug\: ''return\-policy'', link_type\: App\\Enums\\MenuLinkTypeEnum\:\:Page, position\: 4\}\|array\{label\: array\{en\: ''Shipping Policy'', pl\: ''Polityka wysyłki''\}, page_slug\: ''shipping\-policy'', link_type\: App\\Enums\\MenuLinkTypeEnum\:\:Page, position\: 3\}\|array\{label\: array\{en\: ''Terms of Service'', pl\: ''Regulamin''\}, page_slug\: ''terms\-of\-service'', link_type\: App\\Enums\\MenuLinkTypeEnum\:\:Page, position\: 2\} on left side of \?\? does not exist\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
 			path: database/seeders/MenuSeeder.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Form\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 1
+			count: 4
 			path: database/seeders/PagesDemoSeeder.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\BlockRelation\:\:updateOrCreate\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\BlogPost\>\:\:published\(\)\.$#'
+			identifier: method.notFound
 			count: 2
 			path: database/seeders/PagesDemoSeeder.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\Category\:\:whereNull\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
+			message: '#^Method App\\Models\\Faq\:\:active\(\) invoked with 0 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 2
 			path: database/seeders/PagesDemoSeeder.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\Faq\:\:active\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: database/seeders/PagesDemoSeeder.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Faq\:\:updateOrCreate\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: database/seeders/PagesDemoSeeder.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Page\:\:updateOrCreate\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 8
-			path: database/seeders/PagesDemoSeeder.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\PageBlock\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: database/seeders/PagesDemoSeeder.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\PageSection\:\:create\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: database/seeders/PagesDemoSeeder.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Product\:\:take\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: database/seeders/PagesDemoSeeder.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Product\:\:whereHas\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
+			message: '#^Static call to instance method App\\Models\\Faq\:\:active\(\)\.$#'
+			identifier: method.staticCall
+			count: 2
 			path: database/seeders/PagesDemoSeeder.php
 
 		-
@@ -6247,76 +5893,10 @@ parameters:
 			path: database/seeders/PromotionSeeder.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\SectionTemplate\:\:firstOrCreate\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: database/seeders/SectionTemplateSeeder.php
-
-		-
-			message: '#^Call to an undefined static method App\\Models\\Translation\:\:firstOrCreate\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 2
-			path: database/seeders/TranslationSeeder.php
-
-		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Model\:\:assignRole\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: database/seeders/UserSeeder.php
-
-		-
-			message: '#^Call to static method post\(\) on an unknown class Route\.$#'
-			identifier: class.notFound
-			count: 3
-			path: routes/admin/blog.php
-
-		-
-			message: '#^Call to static method prefix\(\) on an unknown class Route\.$#'
-			identifier: class.notFound
-			count: 1
-			path: routes/admin/blog.php
-
-		-
-			message: '#^Call to static method resource\(\) on an unknown class Route\.$#'
-			identifier: class.notFound
-			count: 2
-			path: routes/admin/blog.php
-
-		-
-			message: '#^Call to static method delete\(\) on an unknown class Route\.$#'
-			identifier: class.notFound
-			count: 2
-			path: routes/admin/cms.php
-
-		-
-			message: '#^Call to static method get\(\) on an unknown class Route\.$#'
-			identifier: class.notFound
-			count: 4
-			path: routes/admin/cms.php
-
-		-
-			message: '#^Call to static method post\(\) on an unknown class Route\.$#'
-			identifier: class.notFound
-			count: 5
-			path: routes/admin/cms.php
-
-		-
-			message: '#^Call to static method prefix\(\) on an unknown class Route\.$#'
-			identifier: class.notFound
-			count: 1
-			path: routes/admin/cms.php
-
-		-
-			message: '#^Call to static method put\(\) on an unknown class Route\.$#'
-			identifier: class.notFound
-			count: 3
-			path: routes/admin/cms.php
-
-		-
-			message: '#^Call to static method resource\(\) on an unknown class Route\.$#'
-			identifier: class.notFound
-			count: 2
-			path: routes/admin/cms.php
 
 		-
 			message: '#^Undefined variable\: \$this$#'
