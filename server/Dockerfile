@@ -25,11 +25,16 @@ WORKDIR /app
 COPY server/package.json server/package-lock.json ./
 RUN npm ci --prefer-offline
 
+ARG SERVER_ENV
+
 COPY server/ .
 COPY --from=vendor /app/vendor ./vendor
 
-RUN cp .env.example .env \
-    && php artisan key:generate --force \
+RUN if [ -n "$SERVER_ENV" ]; then \
+        printf '%s' "$SERVER_ENV" > .env; \
+    else \
+        cp .env.example .env && php artisan key:generate --force; \
+    fi \
     && npm run build
 
 # =============================================================================

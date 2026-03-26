@@ -181,6 +181,8 @@ jobs:
           tags: |
             ${{ steps.images.outputs.server }}:${{ steps.sha.outputs.short }}
             ${{ steps.images.outputs.server }}:latest
+          build-args: |
+            SERVER_ENV=${{ vars.SERVER_ENV }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
