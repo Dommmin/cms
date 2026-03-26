@@ -4,6 +4,8 @@ import { X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { useEffect, useState } from 'react';
+
 import {
   clearComparison,
   removeFromCompare,
@@ -18,8 +20,11 @@ export function ComparisonBar() {
   const lp = useLocalePath();
   const ids = useComparisonIds();
   const { data: products = [] } = useComparisonProducts();
+  const [mounted, setMounted] = useState(false);
 
-  if (ids.length === 0) return null;
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted || ids.length === 0) return null;
 
   return (
     <div className="border-border bg-background/95 fixed right-0 bottom-0 left-0 z-40 border-t shadow-lg backdrop-blur-sm">
