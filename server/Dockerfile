@@ -17,35 +17,23 @@ RUN composer install \
     --ignore-platform-reqs
 
 # =============================================================================
-# Stage 2: Pre-generate Wayfinder types (PHP needed, no DB required)
+# Stage 2: Build admin SPA — PHP + Node in one stage (Wayfinder + Vite)
 # =============================================================================
-FROM dommin/php-8.5-fpm-alpine:latest AS wayfinder
-
-WORKDIR /app
-COPY server/ .
-COPY --from=vendor /app/vendor ./vendor
-
-RUN APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA= \
-    APP_ENV=production \
-    php -d memory_limit=512M artisan wayfinder:generate --with-form
-
-# =============================================================================
-# Stage 3: Build admin SPA (Vite)
-# =============================================================================
-FROM node:24-alpine AS assets
+FROM dommin/php-8.5-fpm-alpine:latest AS assets
 
 WORKDIR /app
 COPY server/package.json server/package-lock.json ./
 RUN npm ci --prefer-offline
 
 COPY server/ .
-COPY --from=wayfinder /app/resources/js/actions ./resources/js/actions
+COPY --from=vendor /app/vendor ./vendor
 
-ENV SKIP_WAYFINDER=1
-RUN npm run build
+RUN APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA= \
+    APP_ENV=production \
+    npm run build
 
 # =============================================================================
-# Stage 4: Production image — custom PHP 8.5 Alpine base + Nginx + Supervisord
+# Stage 3: Production image — custom PHP 8.5 Alpine base + Nginx + Supervisord
 # All PHP extensions (gd, exif, intl, redis, …) pre-installed in the base image.
 # =============================================================================
 FROM dommin/php-8.5-fpm-alpine:latest AS production
