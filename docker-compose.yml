@@ -125,6 +125,7 @@ services:
     image: mailhog/mailhog:latest
     container_name: ${COMPOSE_PROJECT_NAME}_mailhog
     restart: on-failure
+    platform: arm64
     ports:
       - "1025:1025"
       - "8025:8025"
