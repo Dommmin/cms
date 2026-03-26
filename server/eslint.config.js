@@ -37,6 +37,8 @@ export default [
                 typescript: true,
                 node: true,
             },
+            // Treat @/ as internal — works even when Wayfinder-generated files don't exist in CI
+            'import/internal-regex': '^@/',
         },
         rules: {
             'import/order': [
