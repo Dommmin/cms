@@ -1,4 +1,4 @@
-import type { Brand, PageBlock } from "@/types/api";
+import type { PageBlock } from "@/types/api";
 
 export interface BrandsSliderConfig {
   title?: string;

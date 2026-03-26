@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 
 import Link from "next/link";
 
-import type { PageBlock } from "@/types/api";
 import type { CountdownTimerConfig, CountdownTimerProps } from './countdown-timer.types';
 
 function pad(n: number) {

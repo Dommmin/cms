@@ -14,9 +14,7 @@ import {
   useSetDefaultAddress,
 } from "@/hooks/use-profile";
 import { useTranslation } from "@/hooks/use-translation";
-import { useLocalePath } from "@/hooks/use-locale";
 import { api } from "@/lib/axios";
-import type { Address } from "@/types/api";
 import type { AddressForm, DeleteAccountModalState } from './page.types';
 
 const EMPTY_ADDRESS: AddressForm = {
@@ -38,7 +36,6 @@ export default function ProfilePage() {
   const { mutate: updatePassword, isPending: savingPassword } = useUpdatePassword();
   const { mutate: deleteAccount, isPending: deletingAccount } = useDeleteAccount();
   const { t } = useTranslation();
-  const lp = useLocalePath();
 
   const { data: addresses = [] } = useAddresses();
   const { mutate: createAddress, isPending: addingAddress } = useCreateAddress();
@@ -97,8 +94,8 @@ export default function ProfilePage() {
         setPasswordForm({ current_password: "", password: "", password_confirmation: "" });
         setPasswordErrors({});
       },
-      onError: (err: any) => {
-        const errors = err?.response?.data?.errors;
+      onError: (err: unknown) => {
+        const errors = (err as { response?: { data?: { errors?: Record<string, string[]> } } })?.response?.data?.errors;
         if (errors) setPasswordErrors(errors);
       },
     });
@@ -113,8 +110,8 @@ export default function ProfilePage() {
         setNewAddress({ ...EMPTY_ADDRESS });
         setAddressErrors({});
       },
-      onError: (err: any) => {
-        const errors = err?.response?.data?.errors;
+      onError: (err: unknown) => {
+        const errors = (err as { response?: { data?: { errors?: Record<string, string[]> } } })?.response?.data?.errors;
         if (errors) setAddressErrors(errors);
       },
     });
@@ -421,10 +418,11 @@ export default function ProfilePage() {
                 e.preventDefault();
                 setDeleteModal((s) => ({ ...s, error: null }));
                 deleteAccount(deleteModal.password, {
-                  onError: (err: any) => {
+                  onError: (err: unknown) => {
+                    const e = err as { response?: { data?: { errors?: { password?: string[] }; message?: string } } };
                     const msg =
-                      err?.response?.data?.errors?.password?.[0] ??
-                      err?.response?.data?.message ??
+                      e?.response?.data?.errors?.password?.[0] ??
+                      e?.response?.data?.message ??
                       t("account.delete_error", "Failed to delete account.");
                     setDeleteModal((s) => ({ ...s, error: msg }));
                   },

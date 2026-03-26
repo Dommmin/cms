@@ -1,4 +1,3 @@
-import type { PageBlock } from "@/types/api";
 import type { CustomHtmlConfig, CustomHtmlProps } from './custom-html.types';
 
 export function CustomHtmlBlock({ block }: CustomHtmlProps) {
@@ -9,12 +8,12 @@ export function CustomHtmlBlock({ block }: CustomHtmlProps) {
     <>
       {cfg.css && (
         <style
-          // eslint-disable-next-line react/no-danger
+           
           dangerouslySetInnerHTML={{ __html: cfg.css }}
         />
       )}
       <div
-        // eslint-disable-next-line react/no-danger
+         
         dangerouslySetInnerHTML={{ __html: cfg.html }}
       />
     </>

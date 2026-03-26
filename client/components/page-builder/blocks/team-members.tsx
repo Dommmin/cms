@@ -3,8 +3,7 @@ import Link from "next/link";
 
 import { Linkedin, Twitter } from "lucide-react";
 
-import type { PageBlock } from "@/types/api";
-import type { TeamMember, TeamMembersConfig, TeamMembersProps } from './team-members.types';
+import type { TeamMembersConfig, TeamMembersProps } from './team-members.types';
 
 export function TeamMembersBlock({ block }: TeamMembersProps) {
   const cfg = block.configuration as TeamMembersConfig;

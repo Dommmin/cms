@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Heart, Package, User, LogOut } from "lucide-react";
 
 import { useMe, useLogout } from "@/hooks/use-auth";
@@ -17,6 +17,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname();
   const lp = useLocalePath();
   const { t } = useTranslation();
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
   const NAV_LINKS = [
@@ -29,11 +30,11 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   const pathWithoutLocale = stripLocaleFromPath(pathname);
 
   useEffect(() => {
-    setMounted(true);
+    void Promise.resolve().then(() => setMounted(true));
     if (!getToken()) {
-      window.location.href = lp("/login");
+      router.push(lp("/login"));
     }
-  }, [lp]);
+  }, [lp, router]);
 
   // Show skeleton until mounted (avoids hydration mismatch from typeof window checks)
   if (!mounted || isLoading) {
@@ -45,7 +46,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   }
 
   if (!user) {
-    window.location.href = lp("/login");
+    router.push(lp("/login"));
     return null;
   }
 

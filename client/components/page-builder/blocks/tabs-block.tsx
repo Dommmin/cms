@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 
-import type { PageBlock } from "@/types/api";
-import type { Tab, TabsConfig, TabsBlockProps } from './tabs-block.types';
+import type { TabsConfig, TabsBlockProps } from './tabs-block.types';
 
 export function TabsBlock({ block }: TabsBlockProps) {
   const cfg = block.configuration as TabsConfig;

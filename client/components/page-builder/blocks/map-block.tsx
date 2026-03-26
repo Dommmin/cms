@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { StoreMap } from "@/components/store-map";
-import type { PageBlock, Store } from "@/types/api";
+import type { Store } from "@/types/api";
 import type { MapBlockConfig, MapBlockProps } from './map-block.types';
 
 export function MapBlock({ block }: MapBlockProps) {

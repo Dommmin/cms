@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { getRelationByKey } from "@/lib/format";
-import type { PageBlock } from "@/types/api";
 import type { PromotionalBannerConfig, PromotionalBannerProps } from './promotional-banner.types';
 
 export function PromotionalBannerBlock({ block }: PromotionalBannerProps) {

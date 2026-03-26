@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { Store } from "@/types/api";
 import type { StoreMapProps } from './store-map.types';
 
 const StoreMapInner = dynamic(() => import("./store-map-inner"), {

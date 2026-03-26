@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { getRelationsByKey } from "@/lib/format";
-import type { Category, PageBlock } from "@/types/api";
+import type { Category } from "@/types/api";
 import type { CategoriesGridConfig, CategoriesGridProps } from './categories-grid.types';
 
 export function CategoriesGridBlock({ block }: CategoriesGridProps) {

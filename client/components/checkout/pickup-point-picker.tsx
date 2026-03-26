@@ -29,7 +29,7 @@ export function PickupPointPicker({ carrier, postalCode = "", value, onChange }:
 
   // Sync postal code from billing address when it changes
   useEffect(() => {
-    if (postalCode && !search) setSearch(postalCode);
+    if (postalCode && !search) void Promise.resolve().then(() => setSearch(postalCode));
   }, [postalCode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { data: points = [], configured, missingEnv, isLoading } = usePickupPoints(carrier, search);

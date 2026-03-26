@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LogIn, UserPlus, ShoppingBag, ArrowLeft } from "lucide-react";
 
-import { localePath, getLocaleFromPath } from "@/lib/i18n";
+import { localePath } from "@/lib/i18n";
 
 export default async function CheckoutOptionsPage() {
   const cookieStore = await cookies();

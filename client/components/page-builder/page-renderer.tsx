@@ -1,5 +1,4 @@
 import { cookies } from "next/headers";
-import type { Page } from "@/types/api";
 
 import { ModuleRenderer } from "./module-renderer";
 import { SectionRenderer } from "./section-renderer";

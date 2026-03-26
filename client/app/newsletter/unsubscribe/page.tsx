@@ -17,7 +17,7 @@ export default function NewsletterUnsubscribePage() {
   // If token present in URL, auto-unsubscribe via token
   useEffect(() => {
     if (!token) return;
-    setStatus("loading");
+    void Promise.resolve().then(() => setStatus("loading"));
     api
       .get(`/newsletter/unsubscribe/${token}`)
       .then(() => setStatus("success"))

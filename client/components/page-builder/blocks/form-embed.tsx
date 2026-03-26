@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 import { submitForm } from "@/api/forms";
 import { TurnstileWidget } from "@/components/turnstile-widget";
-import type { Form, FormField, PageBlock } from "@/types/api";
+import type { FormField } from "@/types/api";
 import type { FormEmbedConfig, FormEmbedProps } from './form-embed.types';
 
 function FieldInput({ field }: { field: FormField }) {

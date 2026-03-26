@@ -11,7 +11,6 @@ import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { ChatWidgetLoader } from "@/components/chat/chat-widget-loader";
 import { GoogleTagManager } from "@/components/layout/google-tag-manager";
 import { CookieConsent } from "@/components/cookie-consent";
-import type { CookieSettings } from "@/components/cookie-consent.types";
 import { ComparisonBar } from "@/components/comparison-bar";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";

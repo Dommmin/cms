@@ -1,7 +1,6 @@
 import Image from "next/image";
 
 import { getRelationByKey } from "@/lib/format";
-import type { PageBlock } from "@/types/api";
 import type { TwoColumnsConfig, TwoColumnsProps } from './two-columns.types';
 
 export function TwoColumnsBlock({ block }: TwoColumnsProps) {

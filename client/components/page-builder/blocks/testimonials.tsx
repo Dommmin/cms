@@ -1,5 +1,4 @@
-import type { PageBlock } from "@/types/api";
-import type { Testimonial, TestimonialsConfig, TestimonialsProps } from './testimonials.types';
+import type { TestimonialsConfig, TestimonialsProps } from './testimonials.types';
 
 export function TestimonialsBlock({ block }: TestimonialsProps) {
   const cfg = block.configuration as TestimonialsConfig;
@@ -41,7 +40,7 @@ export function TestimonialsBlock({ block }: TestimonialsProps) {
                 ))}
               </div>
             )}
-            <p className="flex-1 text-muted-foreground">"{item.content}"</p>
+            <p className="flex-1 text-muted-foreground">&ldquo;{item.content}&rdquo;</p>
             <div className="flex items-center gap-3">
               {item.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element

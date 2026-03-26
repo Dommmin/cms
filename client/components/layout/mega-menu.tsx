@@ -7,7 +7,6 @@ import { ChevronDown } from "lucide-react";
 
 import { useLocalePath } from "@/hooks/use-locale";
 import { useTranslation } from "@/hooks/use-translation";
-import type { Category, MenuItem } from "@/types/api";
 import type { MegaMenuProps, OpenKey } from './mega-menu.types';
 
 /** Apply locale prefix to internal paths; leave external URLs (http//) untouched. */

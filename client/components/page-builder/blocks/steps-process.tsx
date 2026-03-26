@@ -1,5 +1,4 @@
-import type { PageBlock } from "@/types/api";
-import type { Step, StepsProcessConfig, StepsProcessProps } from './steps-process.types';
+import type { StepsProcessConfig, StepsProcessProps } from './steps-process.types';
 
 export function StepsProcessBlock({ block }: StepsProcessProps) {
   const cfg = block.configuration as StepsProcessConfig;

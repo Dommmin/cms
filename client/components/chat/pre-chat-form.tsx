@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Loader2Icon, SendIcon } from "lucide-react";
-import type { PreChatData, PreChatFormProps } from './pre-chat-form.types';
+import type { PreChatFormProps } from './pre-chat-form.types';
 
 const SUBJECTS = [
   "Pytanie o zamówienie",

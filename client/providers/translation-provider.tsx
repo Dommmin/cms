@@ -26,7 +26,7 @@ export function TranslationProvider({
 
   // Derive locale from URL (source of truth). Fall back to prop on initial SSR render.
   const localeFromPath = getLocaleFromPath(pathname);
-  const [locale, setLocaleState] = useState<string>(
+  const [locale] = useState<string>(
     localeFromPath !== "en" ? localeFromPath : (initialLocale ?? "en")
   );
 

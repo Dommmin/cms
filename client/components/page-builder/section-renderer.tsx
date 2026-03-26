@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import type { PageSection } from "@/types/api";
 import { AdminBlockOverlay } from "@/components/admin/admin-block-overlay";
 
 import { AnimatedSection } from "./animated-section";

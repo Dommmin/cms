@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { getRelationsByKey } from "@/lib/format";
-import type { BlogPost, PageBlock } from "@/types/api";
+import type { BlogPost } from "@/types/api";
 import type { FeaturedPostsConfig, FeaturedPostsProps } from './featured-posts.types';
 
 export function FeaturedPostsBlock({ block }: FeaturedPostsProps) {

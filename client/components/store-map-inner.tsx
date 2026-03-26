@@ -4,7 +4,6 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useEffect } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import type { Store } from "@/types/api";
 import type { StoreMapInnerProps } from './store-map-inner.types';
 
 // Fix default marker icon paths for webpack/Next.js

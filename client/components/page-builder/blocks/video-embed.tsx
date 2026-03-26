@@ -1,4 +1,3 @@
-import type { PageBlock } from "@/types/api";
 import type { VideoEmbedConfig, VideoEmbedProps } from './video-embed.types';
 
 function getEmbedUrl(url: string, autoplay: boolean, loop: boolean, muted: boolean): string {

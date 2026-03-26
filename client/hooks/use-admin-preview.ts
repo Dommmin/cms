@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export interface AdminPreviewEntity {
   type: "page" | "blog_post" | "product" | "category" | null;
@@ -37,14 +37,7 @@ function parsePreviewCookie(): AdminPreviewState {
 }
 
 export function useAdminPreview(): AdminPreviewState {
-  const [state, setState] = useState<AdminPreviewState>({
-    isPreview: false,
-    entity: null,
-  });
-
-  useEffect(() => {
-    setState(parsePreviewCookie());
-  }, []);
+  const [state] = useState<AdminPreviewState>(parsePreviewCookie);
 
   return state;
 }

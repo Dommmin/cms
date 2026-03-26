@@ -1,4 +1,4 @@
-import type { BlogPost, PageBlock } from "@/types/api";
+import type { PageBlock } from "@/types/api";
 
 export interface FeaturedPostsConfig {
   title?: string;

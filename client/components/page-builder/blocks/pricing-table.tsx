@@ -5,8 +5,7 @@ import { useState } from "react";
 import { Check } from "lucide-react";
 import Link from "next/link";
 
-import type { PageBlock } from "@/types/api";
-import type { Plan, PricingTableConfig, PricingTableProps } from './pricing-table.types';
+import type { PricingTableConfig, PricingTableProps } from './pricing-table.types';
 
 export function PricingTableBlock({ block }: PricingTableProps) {
   const cfg = block.configuration as PricingTableConfig;

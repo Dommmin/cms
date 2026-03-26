@@ -21,7 +21,6 @@ import { useLocalePath } from "@/hooks/use-locale";
 import { useTranslation } from "@/hooks/use-translation";
 import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
-import type { Category, MenuItem } from "@/types/api";
 import type { MobileMenuProps } from './mobile-menu.types';
 
 function localiseUrl(url: string | null | undefined, lp: (path: string) => string): string {
@@ -33,7 +32,7 @@ function localiseUrl(url: string | null | undefined, lp: (path: string) => strin
 export function MobileMenu({ items, categories }: MobileMenuProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [mounted, setMounted] = useState(false);
+  const [mounted] = useState(() => typeof window !== "undefined");
   const searchRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { data: user } = useMe();
@@ -58,8 +57,6 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
     close();
     router.push(lp(`/search?q=${encodeURIComponent(q)}`));
   }
-
-  useEffect(() => { setMounted(true); }, []);
 
   // Close on Escape
   useEffect(() => {

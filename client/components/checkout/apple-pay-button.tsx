@@ -18,7 +18,7 @@ export function ApplePayButton({ amount, currency, onToken }: ApplePayButtonProp
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.ApplePaySession?.canMakePayments()) {
-      setIsAvailable(true);
+      void Promise.resolve().then(() => setIsAvailable(true));
     }
   }, []);
 

@@ -4,8 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { useInView } from "framer-motion";
 
-import type { PageBlock } from "@/types/api";
-import type { StatItem, StatsCounterConfig, StatsCounterProps } from './stats-counter.types';
+import type { StatsCounterConfig, StatsCounterProps } from './stats-counter.types';
 
 function AnimatedNumber({ value, animate }: { value: string; animate: boolean }) {
   const numericValue = parseFloat(value.replace(/[^0-9.]/g, ""));

@@ -1,4 +1,4 @@
-import type { PageBlock, Store } from "@/types/api";
+import type { PageBlock } from "@/types/api";
 
 export interface MapBlockConfig {
   store_id?: number;

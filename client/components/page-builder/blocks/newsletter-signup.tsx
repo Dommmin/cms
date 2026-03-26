@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 
 import { subscribe } from "@/api/newsletter";
 import { TurnstileWidget } from "@/components/turnstile-widget";
-import type { PageBlock } from "@/types/api";
 import type { NewsletterSignupConfig, NewsletterSignupProps } from './newsletter-signup.types';
 
 export function NewsletterSignupBlock({ block }: NewsletterSignupProps) {

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Loader2Icon, SendIcon, Trash2Icon } from "lucide-react";
-import type { SupportMessage } from "@/types/api";
 import type { ChatPanelProps } from './chat-panel.types';
 
 function formatTime(dateStr: string): string {

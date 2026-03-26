@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { PageBlock } from "@/types/api";
-import type { IconListItem, IconListConfig, IconListProps } from './icon-list.types';
+import type { IconListConfig, IconListProps } from './icon-list.types';
 
 // Simple icon map — renders emoji or text fallback (full Lucide dynamic import avoided for bundle size)
 function BlockIcon({ name, color }: { name?: string; color?: string }) {

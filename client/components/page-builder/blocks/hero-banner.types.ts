@@ -1,4 +1,4 @@
-import type { BlockRelation, PageBlock } from "@/types/api";
+import type { PageBlock } from "@/types/api";
 
 export interface HeroBannerConfig {
   title?: string;

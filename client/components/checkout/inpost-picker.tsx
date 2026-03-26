@@ -14,7 +14,10 @@ function InpostWidget({
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<Element | null>(null);
   const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  });
 
   // Listen for pick events forwarded by the geowidget via custom DOM events.
   useEffect(() => {

@@ -59,8 +59,8 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { t } = useTranslation();
   const lp = useLocalePath();
-  const [mounted, setMounted] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
+  const [mounted] = useState(() => typeof window !== "undefined");
+  const [token] = useState<string | null>(() => typeof window !== "undefined" ? getToken() : null);
   const { data: cart, isLoading: cartLoading } = useCart();
   const { data: shippingMethods = [], isLoading: methodsLoading } = useShippingMethods();
   const { data: paymentMethods } = usePaymentMethods();
@@ -84,12 +84,7 @@ export default function CheckoutPage() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [submitAttempted, setSubmitAttempted] = useState(false);
 
-  // Resolve auth token client-side only — avoids server/client hydration mismatch
-  useEffect(() => {
-    const t = getToken();
-    setToken(t);
-    setMounted(true);
-  }, []);
+  // token and mounted are initialized via lazy useState — no effect needed
 
   // Fire begin_checkout once cart loads
   useEffect(() => {
@@ -102,7 +97,7 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (shippingMethods.length > 0 && selectedMethod === null) {
       const firstConfigured = shippingMethods.find((m) => m.configured);
-      if (firstConfigured) setSelectedMethod(firstConfigured.id);
+      if (firstConfigured) void Promise.resolve().then(() => setSelectedMethod(firstConfigured.id));
     }
   }, [shippingMethods, selectedMethod]);
 
@@ -122,7 +117,7 @@ export default function CheckoutPage() {
         savedAddresses.find((a) => a.is_default && a.type === "billing") ??
         savedAddresses.find((a) => a.is_default) ??
         savedAddresses[0];
-      setBilling(addressToPayload(defaultAddr));
+      void Promise.resolve().then(() => setBilling(addressToPayload(defaultAddr)));
     }
   }, [savedAddresses]);
 

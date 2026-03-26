@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { serverFetch } from "@/lib/server-fetch";
-import { generateCanonical, generateAlternates } from "@/lib/seo";
+import { generateAlternates } from "@/lib/seo";
 import type { Product } from "@/types/api";
 import ProductDetailClient from "./ProductDetailClient";
 import type { PageProps } from './page.types';

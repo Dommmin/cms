@@ -25,10 +25,9 @@ function saveIds(ids: number[]): void {
 }
 
 export function useComparisonIds() {
-  const [ids, setIds] = useState<number[]>([]);
+  const [ids, setIds] = useState<number[]>(() => getIds());
 
   useEffect(() => {
-    setIds(getIds());
     const handler = () => setIds(getIds());
     window.addEventListener("comparison-change", handler);
     return () => window.removeEventListener("comparison-change", handler);

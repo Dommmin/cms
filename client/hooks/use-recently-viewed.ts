@@ -33,11 +33,14 @@ function getRecentlyViewedIds(): number[] {
 }
 
 export function useRecentlyViewedProducts(excludeId?: number) {
-  const [ids, setIds] = useState<number[]>([]);
+  const [ids, setIds] = useState<number[]>(() => {
+    const all = getRecentlyViewedIds();
+    return excludeId ? all.filter((id) => id !== excludeId) : all;
+  });
 
   useEffect(() => {
     const all = getRecentlyViewedIds();
-    setIds(excludeId ? all.filter((id) => id !== excludeId) : all);
+    void Promise.resolve().then(() => setIds(excludeId ? all.filter((id) => id !== excludeId) : all));
   }, [excludeId]);
 
   return useQuery({

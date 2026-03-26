@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 
-import type { PageBlock } from "@/types/api";
-import type { AccordionItem, AccordionConfig, AccordionBlockProps } from './accordion-block.types';
+import type { AccordionConfig, AccordionBlockProps } from './accordion-block.types';
 
 export function AccordionBlock({ block }: AccordionBlockProps) {
   const cfg = block.configuration as AccordionConfig;

@@ -11,7 +11,6 @@ import { useAddToWishlist, useIsInWishlist, useRemoveFromWishlist } from "@/hook
 import { useAddToCart } from "@/hooks/use-cart";
 import { useMe } from "@/hooks/use-auth";
 import { PriceDisplay } from "@/components/price-display";
-import type { Product } from "@/types/api";
 import type { ProductCardProps } from './product-card.types';
 
 export function ProductCard({ product }: ProductCardProps) {

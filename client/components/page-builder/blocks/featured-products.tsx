@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { ProductCard } from "@/components/product-card";
 import { getRelationsByKey } from "@/lib/format";
-import type { PageBlock, Product } from "@/types/api";
+import type { Product } from "@/types/api";
 import type { FeaturedProductsConfig, FeaturedProductsProps } from './featured-products.types';
 
 export function FeaturedProductsBlock({ block }: FeaturedProductsProps) {

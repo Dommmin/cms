@@ -17,23 +17,24 @@ declare global {
 
 export function GooglePayButton({ amount, currency, onToken }: GooglePayButtonProps) {
   const [isReady, setIsReady] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
   const clientRef = useRef<GooglePayClient | null>(null);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const existingScript = document.querySelector('script[src*="pay.google.com"]');
-    if (existingScript) {
-      initClient();
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = "https://pay.google.com/gp/p/js/pay.js";
-    script.onload = () => initClient();
-    document.head.appendChild(script);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  function getPaymentMethod() {
+    return {
+      type: "CARD",
+      parameters: {
+        allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
+        allowedCardNetworks: ["MASTERCARD", "VISA"],
+      },
+      tokenizationSpecification: {
+        type: "PAYMENT_GATEWAY",
+        parameters: {
+          gateway: "payu",
+          gatewayMerchantId: process.env.NEXT_PUBLIC_PAYU_POS_ID ?? "",
+        },
+      },
+    };
+  }
 
   function initClient() {
     if (!window.google?.payments?.api) return;
@@ -53,22 +54,20 @@ export function GooglePayButton({ amount, currency, onToken }: GooglePayButtonPr
       .catch(() => setIsReady(false));
   }
 
-  function getPaymentMethod() {
-    return {
-      type: "CARD",
-      parameters: {
-        allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
-        allowedCardNetworks: ["MASTERCARD", "VISA"],
-      },
-      tokenizationSpecification: {
-        type: "PAYMENT_GATEWAY",
-        parameters: {
-          gateway: "payu",
-          gatewayMerchantId: process.env.NEXT_PUBLIC_PAYU_POS_ID ?? "",
-        },
-      },
-    };
-  }
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const existingScript = document.querySelector('script[src*="pay.google.com"]');
+    if (existingScript) {
+      initClient();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://pay.google.com/gp/p/js/pay.js";
+    script.onload = () => initClient();
+    document.head.appendChild(script);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleClick() {
     if (!clientRef.current) return;

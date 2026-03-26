@@ -6,7 +6,7 @@ import { X, Cookie } from "lucide-react";
 
 import { updateConsent } from "@/lib/datalayer";
 import { COOKIE_CONSENT_OPEN_EVENT } from "@/providers/cookie-consent-provider";
-import type { ConsentState, StoredConsent, CookieSettings, CookieConsentProps } from './cookie-consent.types';
+import type { ConsentState, StoredConsent, CookieConsentProps } from './cookie-consent.types';
 
 const STORAGE_KEY = "cookie_consent";
 
@@ -81,7 +81,7 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
   useEffect(() => {
     const stored = getStoredConsent();
     if (!stored || stored.version !== version) {
-      setVisible(true);
+      void Promise.resolve().then(() => setVisible(true));
     }
   }, [version]);
 

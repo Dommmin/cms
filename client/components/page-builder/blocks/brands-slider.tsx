@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 
 import { getRelationsByKey } from "@/lib/format";
-import type { Brand, PageBlock } from "@/types/api";
+import type { Brand } from "@/types/api";
 import type { BrandsSliderConfig, BrandsSliderProps } from './brands-slider.types';
 
 const pxPerSecond: Record<string, number> = {
@@ -66,7 +66,7 @@ export function BrandsSliderBlock({ block }: BrandsSliderProps) {
     return () => {
       track.getAnimations().forEach((a) => a.cancel());
     };
-  }, [speed, brands.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [speed, brands.length]);  
 
   if (brands.length === 0) return null;
 

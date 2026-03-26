@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { getRelationByKey } from "@/lib/format";
-import type { BlockRelation, PageBlock } from "@/types/api";
 import type { HeroBannerConfig, HeroBannerProps } from './hero-banner.types';
 
 export function HeroBannerBlock({ block }: HeroBannerProps) {

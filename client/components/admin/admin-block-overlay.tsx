@@ -1,7 +1,6 @@
 "use client";
 
 import { PencilIcon } from "lucide-react";
-import type { ReactNode } from "react";
 import type { AdminBlockOverlayProps } from './admin-block-overlay.types';
 
 export function AdminBlockOverlay({ blockId, blockType, pageId, adminBaseUrl, children }: AdminBlockOverlayProps) {

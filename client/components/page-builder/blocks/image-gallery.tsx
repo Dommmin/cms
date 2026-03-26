@@ -1,7 +1,6 @@
 import Image from "next/image";
 
 import { getRelationsByKey } from "@/lib/format";
-import type { PageBlock } from "@/types/api";
 import type { ImageGalleryConfig, ImageGalleryProps } from './image-gallery.types';
 
 export function ImageGalleryBlock({ block }: ImageGalleryProps) {

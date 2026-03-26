@@ -1,5 +1,4 @@
-import type { PageBlock } from "@/types/api";
-import type { Badge, TrustBadgesConfig, TrustBadgesProps } from './trust-badges.types';
+import type { TrustBadgesConfig, TrustBadgesProps } from './trust-badges.types';
 
 const iconMap: Record<string, string> = {
   truck: "🚚", shield: "🛡", return: "↩", lock: "🔒", star: "★",

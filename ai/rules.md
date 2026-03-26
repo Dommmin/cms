@@ -4,6 +4,31 @@ Rules that AI must follow automatically in this project.
 
 ---
 
+## Docker-First Rule
+
+**All commands MUST run inside Docker containers — never directly on the host.**
+
+```bash
+# Backend (PHP/Artisan/Pint/Rector/PHPStan/Pest)
+docker compose exec php php artisan <cmd>
+docker compose exec php vendor/bin/pint
+docker compose exec php vendor/bin/rector process
+docker compose exec php vendor/bin/phpstan analyse
+
+# Frontend (npm/eslint/prettier/playwright)
+docker compose exec node npm run lint
+docker compose exec node npm run build
+docker compose exec node npx prettier --write .
+docker compose exec node npx playwright test
+```
+
+If a Docker container is down or crashing, **report it and stop** — do not fall back to running commands on the host. Host has no DB/Redis access and different architecture binaries may produce incorrect results.
+
+To check container status: `docker compose ps`
+To see why a container is failing: `docker compose logs <service> --tail=30`
+
+---
+
 ## Auto-Update Rules
 
 ### After implementing a new feature:

@@ -1,4 +1,4 @@
-import type { Category, PageBlock } from "@/types/api";
+import type { PageBlock } from "@/types/api";
 
 export interface CategoriesGridConfig {
   title?: string;

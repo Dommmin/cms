@@ -4,8 +4,6 @@ import Link from "next/link";
 
 import { useTranslation } from "@/hooks/use-translation";
 import { openCookiePreferences } from "@/providers/cookie-consent-provider";
-import type { MenuItem } from "@/types/api";
-
 import { NewsletterForm } from "./newsletter-form";
 import type { FooterContentProps } from './footer-content.types';
 

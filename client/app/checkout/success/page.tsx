@@ -25,8 +25,9 @@ function SuccessContent() {
     try {
       const raw = sessionStorage.getItem("bank_transfer_details");
       if (raw) {
-        setBankDetails(JSON.parse(raw) as BankDetails);
+        const parsed = JSON.parse(raw) as BankDetails;
         sessionStorage.removeItem("bank_transfer_details");
+        void Promise.resolve().then(() => setBankDetails(parsed));
       }
     } catch {
       // ignore parse errors

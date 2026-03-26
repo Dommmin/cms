@@ -26,7 +26,6 @@ import { ThreeColumnsBlock } from "./blocks/three-columns";
 import { TimelineBlock } from "./blocks/timeline";
 import { TwoColumnsBlock } from "./blocks/two-columns";
 import { VideoEmbedBlock } from "./blocks/video-embed";
-import type { PageBlock } from "@/types/api";
 import type { BlockRendererProps } from './block-renderer.types';
 
 export function BlockRenderer({ block }: BlockRendererProps) {

@@ -1,7 +1,6 @@
 import Image from "next/image";
 
 import { getRelationsByKey } from "@/lib/format";
-import type { PageBlock } from "@/types/api";
 import type { LogoCloudConfig, LogoCloudProps } from './logo-cloud.types';
 
 export function LogoCloudBlock({ block }: LogoCloudProps) {

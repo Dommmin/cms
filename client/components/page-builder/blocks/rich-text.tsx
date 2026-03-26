@@ -1,4 +1,3 @@
-import type { PageBlock } from "@/types/api";
 import type { RichTextConfig, RichTextProps } from './rich-text.types';
 
 export function RichTextBlock({ block }: RichTextProps) {

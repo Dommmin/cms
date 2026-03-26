@@ -1,7 +1,6 @@
 import Image from "next/image";
 
 import { getRelationByKey } from "@/lib/format";
-import type { PageBlock } from "@/types/api";
 import type { ThreeColumnsConfig, ThreeColumnsProps } from './three-columns.types';
 
 export function ThreeColumnsBlock({ block }: ThreeColumnsProps) {

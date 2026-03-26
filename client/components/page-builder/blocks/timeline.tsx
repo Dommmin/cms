@@ -1,5 +1,4 @@
-import type { PageBlock } from "@/types/api";
-import type { TimelineItem, TimelineConfig, TimelineProps } from './timeline.types';
+import type { TimelineConfig, TimelineProps } from './timeline.types';
 
 export function TimelineBlock({ block }: TimelineProps) {
   const cfg = block.configuration as TimelineConfig;
