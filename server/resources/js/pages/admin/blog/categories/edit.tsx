@@ -20,7 +20,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
-import type { Category, BlogCategory, EditProps } from './edit.types';
+import type { EditProps } from './edit.types';
 
 export default function EditBlogCategory({
     category,

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { Customer, AppNotification, ShowProps } from './show.types';
+import type { ShowProps } from './show.types';
 
 export default function ShowNotification({ notification }: ShowProps) {
     const breadcrumbs: BreadcrumbItem[] = [

@@ -1,4 +1,4 @@
-import type { EditorConfig, NodeKey, SerializedTextNode } from 'lexical';
+import type { EditorConfig, NodeKey } from 'lexical';
 import { $applyNodeReplacement, TextNode } from 'lexical';
 import type { SerializedMentionNode } from './MentionNode.types';
 

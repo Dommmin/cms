@@ -2,8 +2,9 @@ import { Link, Head, router, usePage, useForm } from '@inertiajs/react';
 import { FileTextIcon, CopyIcon } from 'lucide-react';
 import { useState } from 'react';
 import { usePageColumns } from '@/components/columns/page-columns';
-import type { PageRow } from '@/components/columns/page-columns.types';
+
 import DataTable from '@/components/data-table';
+import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,7 +16,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import InputError from '@/components/input-error';
 import { Label } from '@/components/ui/label';
 import {
     Select,

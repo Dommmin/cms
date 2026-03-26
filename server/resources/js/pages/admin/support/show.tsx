@@ -17,7 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { Agent, StatusOption, Message, Order, Customer, Conversation, CannedResponse, ShowProps } from './show.types';
+import type { ShowProps } from './show.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Support', href: '/admin/support' },

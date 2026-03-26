@@ -12,7 +12,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
-import type { BlogCategory, CategoriesData, IndexProps } from './index.types';
+import type { BlogCategory, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Blog Categories', href: '/admin/blog/categories' },

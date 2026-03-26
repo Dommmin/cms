@@ -10,7 +10,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { formatDateTime } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
-import type { Customer, Order, ProductVariant, ReturnItem, StatusHistoryEntry, ReturnRequest } from './show.types';
+import type { ReturnRequest } from './show.types';
 
 const statusColors: Record<string, string> = {
     pending:

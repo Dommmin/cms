@@ -11,7 +11,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { AffiliateCode, CodesData, IndexProps } from './index.types';
+import type { AffiliateCode, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Affiliates', href: '/admin/affiliates/codes' },

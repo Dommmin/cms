@@ -19,7 +19,7 @@ import {
     Undo2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { PreviewDevice, BuilderToolbarProps } from './builder-toolbar.types';
+import type { BuilderToolbarProps } from './builder-toolbar.types';
 
 export function BuilderToolbar({
     pageId: _pageId,

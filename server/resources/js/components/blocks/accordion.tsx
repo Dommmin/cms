@@ -1,5 +1,5 @@
 import React from 'react';
-import type { AccordionItem, AccordionProps } from './accordion.types';
+import type { AccordionProps } from './accordion.types';
 
 // Simple accessible accordion block
 export default function AccordionBlock({ heading, items }: AccordionProps) {

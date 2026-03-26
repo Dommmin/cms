@@ -20,13 +20,11 @@ import {
 } from '@dnd-kit/sortable';
 import { useEffect, useState } from 'react';
 import { useBuilderState } from '../hooks/use-builder-state';
-import type { BuilderData, Section } from '../types';
 import { BuilderToolbar } from './builder-toolbar';
-import type { PreviewDevice } from './builder-toolbar.types';
-import type { SectionTemplate } from './section-templates-dialog.types';
-import { SectionTemplatesDialog } from './section-templates-dialog';
-import { SortableSection } from './sortable-section';
 import type { PageBuilderProps } from './page-builder.types';
+import { SectionTemplatesDialog } from './section-templates-dialog';
+import type { SectionTemplate } from './section-templates-dialog.types';
+import { SortableSection } from './sortable-section';
 
 export function PageBuilder({
     data,

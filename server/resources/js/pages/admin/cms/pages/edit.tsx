@@ -30,7 +30,7 @@ import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
-import type { ModuleConfig, PageData, ParentPage, EditProps } from './edit.types';
+import type { EditProps } from './edit.types';
 
 export default function Edit({ page, modules, pages }: EditProps) {
     const { locales, frontendUrl } = usePage().props as {

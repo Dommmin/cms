@@ -12,7 +12,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import type { SeoData, SeoPanelProps } from './seo-panel.types';
+import type { SeoPanelProps } from './seo-panel.types';
 
 function CharCounter({
     value,

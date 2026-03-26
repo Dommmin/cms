@@ -11,7 +11,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import type { Block, Section } from '../types';
+import type { Block } from '../types';
 import type { SectionTemplate, SectionTemplatesDialogProps } from './section-templates-dialog.types';
 
 // Pre-built templates — each defines the full section + block structure to insert.

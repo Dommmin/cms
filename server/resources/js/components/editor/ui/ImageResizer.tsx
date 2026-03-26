@@ -1,4 +1,3 @@
-import type { LexicalEditor } from 'lexical';
 import { type JSX } from 'react';
 import { useRef } from 'react';
 import type { ImageResizerProps } from './ImageResizer.types';

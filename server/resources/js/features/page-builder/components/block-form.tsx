@@ -14,9 +14,9 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import type { Block, BlockTypeConfig } from '../types';
-import { DynamicBlockForm } from './dynamic-block-form';
+import type { BlockTypeConfig } from '../types';
 import type { BlockFormProps } from './block-form.types';
+import { DynamicBlockForm } from './dynamic-block-form';
 
 export function BlockForm({
     block,

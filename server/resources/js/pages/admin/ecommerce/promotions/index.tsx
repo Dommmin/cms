@@ -16,7 +16,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { Promotion, PaginatedPromotions } from './index.types';
+import type { PaginatedPromotions } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Promotions', href: '/admin/ecommerce/promotions' },

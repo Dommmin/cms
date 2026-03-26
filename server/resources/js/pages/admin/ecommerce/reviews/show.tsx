@@ -23,7 +23,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
-import type { Customer, Product, Review, ShowProps } from './show.types';
+import type { ShowProps } from './show.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Reviews', href: '/admin/ecommerce/reviews' },

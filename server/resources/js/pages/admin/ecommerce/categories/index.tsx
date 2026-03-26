@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { PlusIcon } from 'lucide-react';
 import { useCategoryColumns } from '@/components/columns/category-columns';
-import type { CategoryRow } from '@/components/columns/category-columns.types';
+
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';

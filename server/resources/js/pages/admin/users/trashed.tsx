@@ -20,7 +20,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 
 import type { BreadcrumbItem } from '@/types';
-import type { TrashedUser, PaginatedUsers } from './trashed.types';
+import type { PaginatedUsers } from './trashed.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Users', href: '/admin/users' },

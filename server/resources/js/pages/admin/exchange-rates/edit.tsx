@@ -15,7 +15,7 @@ import {
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { Currency, ExchangeRate, EditProps } from './edit.types';
+import type { EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Exchange Rates', href: '/admin/exchange-rates' },

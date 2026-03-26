@@ -12,6 +12,7 @@ import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { useEffect, useRef, type JSX } from 'react';
+import type { EditorProps } from './Editor.types';
 import { nodes } from './nodes';
 import AutoLinkPlugin from './plugins/AutoLinkPlugin';
 import CopyCodePlugin from './plugins/CopyCodePlugin';
@@ -25,7 +26,6 @@ import TableActionMenuPlugin from './plugins/TableActionMenuPlugin';
 import ToolbarPlugin from './plugins/ToolbarPlugin';
 import WordCountPlugin from './plugins/WordCountPlugin';
 import { theme } from './theme';
-import type { EditorProps } from './Editor.types';
 
 function buildConfig(editable: boolean): InitialConfigType {
     return {

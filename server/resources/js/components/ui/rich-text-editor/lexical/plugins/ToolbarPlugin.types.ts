@@ -1,18 +1,4 @@
 import type {
-    $createParagraphNode,
-    $getSelection,
-    $insertNodes,
-    $isElementNode,
-    $isRangeSelection,
-    $isTextNode,
-    CAN_REDO_COMMAND,
-    CAN_UNDO_COMMAND,
-    COMMAND_PRIORITY_LOW,
-    FORMAT_ELEMENT_COMMAND,
-    FORMAT_TEXT_COMMAND,
-    REDO_COMMAND,
-    SELECTION_CHANGE_COMMAND,
-    UNDO_COMMAND,
     ElementFormatType,
 } from 'lexical';
 

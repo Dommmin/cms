@@ -26,7 +26,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { MenuItemData, Menu, EditProps } from './edit.types';
+import type { MenuItemData, EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Menus', href: '/admin/menus' },

@@ -1,4 +1,4 @@
-export type Cfg = Record<string, any>;
+export type Cfg = Record<string, unknown>;
 export type PreviewBlock = {
     id: number;
     type: string;

@@ -1,5 +1,4 @@
 import { Link, router } from '@inertiajs/react';
-import type { ColumnDef } from '@tanstack/react-table';
 import {
     useReactTable,
     getCoreRowModel,
@@ -16,7 +15,6 @@ import {
 } from '@/components/ui/select';
 import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
-import type { PaginationInfo } from '@/types';
 import type { DataTableProps } from './data-table.types';
 
 export default function DataTable<T>({

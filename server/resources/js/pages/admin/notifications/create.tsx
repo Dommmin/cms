@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { Customer, Option, CreateProps } from './create.types';
+import type { CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Notifications', href: '/admin/notifications' },

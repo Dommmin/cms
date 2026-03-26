@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { ExchangeRate, Currency, EditProps } from './edit.types';
+import type { EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Currencies', href: '/admin/currencies' },

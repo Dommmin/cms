@@ -3,8 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { PageBuilder } from '@/features/page-builder';
 import type {
-    AvailableSection,
-    BlockTypeConfig,
     PreviewDevice,
     Section,
 } from '@/features/page-builder';

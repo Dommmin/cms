@@ -4,13 +4,6 @@
  * Follows Open/Closed Principle - composed of smaller components
  */
 
-import type {
-    Section,
-    Block,
-    AvailableSection,
-    BlockTypeConfig,
-    ReusableBlock,
-} from '../types';
 import { BlocksList } from './blocks-list';
 import { SectionCard } from './section-card';
 import { SectionForm } from './section-form';

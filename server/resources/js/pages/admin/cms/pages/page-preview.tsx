@@ -1,9 +1,9 @@
 import { Head } from '@inertiajs/react';
 import type React from 'react';
 import { resolveLocalizedText } from '@/lib/localized-text';
-import type { Cfg, PreviewBlock, PreviewSection, PagePreviewProps } from './page-preview.types';
+import type { Cfg, PreviewBlock, PagePreviewProps } from './page-preview.types';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 
 // ─── Block preview components ─────────────────────────────────────────────────
 

@@ -14,7 +14,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import type { AvailableSection, Section } from '../types';
 import type { SectionFormProps } from './section-form.types';
 
 export function SectionForm({

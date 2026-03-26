@@ -1,4 +1,4 @@
-import type { BaseSelection, LexicalEditor, NodeKey } from 'lexical';
+import type { LexicalEditor, NodeKey } from 'lexical';
 
 export interface ImageComponentProps {
     altText: string;

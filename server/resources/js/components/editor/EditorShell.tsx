@@ -16,6 +16,7 @@ import { type JSX } from 'react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useSharedHistoryContext } from './context/SharedHistoryContext';
+import type { EditorShellProps } from './EditorShell.types';
 import ActionsPlugin from './plugins/ActionsPlugin';
 import AutoLinkPlugin from './plugins/AutoLinkPlugin';
 import CodeActionMenuPlugin from './plugins/CodeActionMenuPlugin';
@@ -35,7 +36,6 @@ import TwitterPlugin from './plugins/TwitterPlugin';
 import YouTubePlugin from './plugins/YouTubePlugin';
 import ContentEditable from './ui/ContentEditable';
 import Placeholder from './ui/Placeholder';
-import type { EditorShellProps } from './EditorShell.types';
 
 const isDev = process.env.NODE_ENV === 'development';
 

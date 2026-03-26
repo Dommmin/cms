@@ -19,7 +19,7 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes/admin';
 import type { BreadcrumbItem } from '@/types';
 import type { Widget, WidgetSize } from '@/types/widgets';
-import type { WidgetShell, DashboardProps } from './dashboard.types';
+import type { DashboardProps } from './dashboard.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: dashboard().url },

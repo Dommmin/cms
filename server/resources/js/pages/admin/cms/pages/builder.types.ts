@@ -1,7 +1,6 @@
 import type {
     AvailableSection,
     BlockTypeConfig,
-    PreviewDevice,
     Section,
 } from '@/features/page-builder';
 

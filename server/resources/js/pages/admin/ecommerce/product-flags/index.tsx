@@ -9,7 +9,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { ProductFlag, PaginationData, IndexProps } from './index.types';
+import type { IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Product Flags', href: '/admin/ecommerce/product-flags' },

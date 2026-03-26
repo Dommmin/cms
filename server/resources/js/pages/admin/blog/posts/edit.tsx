@@ -28,7 +28,7 @@ import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
-import type { Category, BlogPost, EditProps, FormData } from './edit.types';
+import type { EditProps, FormData } from './edit.types';
 
 export default function EditBlogPost({ post, categories }: EditProps) {
     const { frontendUrl, locales } = usePage().props as {

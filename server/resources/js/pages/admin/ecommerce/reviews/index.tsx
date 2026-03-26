@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { useReviewColumns } from '@/components/columns/review-columns';
-import type { ReviewRow } from '@/components/columns/review-columns.types';
+
 import DataTable from '@/components/data-table';
 import { PageHeader } from '@/components/page-header';
 import Wrapper from '@/components/wrapper';

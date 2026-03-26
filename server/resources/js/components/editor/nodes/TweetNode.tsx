@@ -1,8 +1,6 @@
 import type {
     EditorConfig,
     NodeKey,
-    SerializedLexicalNode,
-    Spread,
 } from 'lexical';
 import { $applyNodeReplacement, DecoratorNode } from 'lexical';
 import { type JSX } from 'react';

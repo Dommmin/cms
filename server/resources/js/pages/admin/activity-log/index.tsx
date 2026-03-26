@@ -17,7 +17,7 @@ import {
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { ActivityLog, PaginatedActivities, User, IndexProps } from './index.types';
+import type { ActivityLog, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Activity Log', href: '/admin/activity-log' },

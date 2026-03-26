@@ -1,5 +1,5 @@
 import type { InputHTMLAttributes } from 'react';
-import React from 'react';
+import type React from 'react';
 
 export interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement> {
     label: string;

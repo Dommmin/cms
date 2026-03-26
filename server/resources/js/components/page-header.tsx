@@ -1,7 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { ChevronRightIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { BreadcrumbItem } from '@/types';
 import type { PageHeaderProps, PageHeaderActionsProps } from './page-header.types';
 
 export function PageHeader({

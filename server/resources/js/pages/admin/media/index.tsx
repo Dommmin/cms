@@ -28,7 +28,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { formatFileSize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
-import type { MediaCustomProperties, MediaItem, MediaData, MetaForm } from './index.types';
+import type { MediaItem, MediaData, MetaForm } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Media', href: '/admin/media' },

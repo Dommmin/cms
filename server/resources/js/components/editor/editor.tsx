@@ -7,10 +7,10 @@ import type { EditorState } from 'lexical';
 import { useEffect, type JSX } from 'react';
 import { cn } from '@/lib/utils';
 import { SharedHistoryContext } from './context/SharedHistoryContext';
+import type { EditorProps } from './editor.types';
 import EditorShell from './EditorShell';
 import { nodes } from './nodes';
 import { theme } from './theme';
-import type { EditorProps } from './editor.types';
 
 // ─── InitialState Plugin ───────────────────────────────────────────────────────
 

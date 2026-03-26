@@ -9,7 +9,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 
 import type { BreadcrumbItem } from '@/types';
-import type { User } from '@/types/auth';
+
 import type { UserData } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [

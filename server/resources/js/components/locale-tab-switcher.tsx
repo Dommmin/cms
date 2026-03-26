@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import type { Locale, LocaleTabSwitcherProps } from './locale-tab-switcher.types';
+import type { LocaleTabSwitcherProps } from './locale-tab-switcher.types';
 
 export function LocaleTabSwitcher({
     locales,

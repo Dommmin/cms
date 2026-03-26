@@ -11,7 +11,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { ShippingMethod, MethodsData, IndexProps } from './index.types';
+import type { ShippingMethod, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Shipping Methods', href: '/admin/ecommerce/shipping-methods' },

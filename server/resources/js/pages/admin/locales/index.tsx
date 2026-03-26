@@ -34,7 +34,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { Locale, CurrencyOption, LocalesData, IndexProps, LocaleForm } from './index.types';
+import type { Locale, IndexProps, LocaleForm } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Locales', href: '/admin/locales' },

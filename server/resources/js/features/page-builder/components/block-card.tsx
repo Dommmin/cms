@@ -29,9 +29,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import type { Block } from '../types';
-import { BlockThumbnail } from './block-thumbnail';
 import type { BlockCardProps } from './block-card.types';
+import { BlockThumbnail } from './block-thumbnail';
 
 export function BlockCard({
     block,

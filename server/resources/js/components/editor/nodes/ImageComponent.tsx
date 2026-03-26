@@ -1,7 +1,7 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 import { mergeRegister } from '@lexical/utils';
-import type { BaseSelection, LexicalEditor, NodeKey } from 'lexical';
+import type { BaseSelection, LexicalEditor } from 'lexical';
 import {
     $getNodeByKey,
     $getSelection,
@@ -19,8 +19,8 @@ import { type JSX } from 'react';
 import { useCallback, useEffect, useRef, useState, Suspense } from 'react';
 import { cn } from '@/lib/utils';
 import ImageResizer from '../ui/ImageResizer';
-import { $isImageNode } from './ImageNode';
 import type { ImageComponentProps } from './ImageComponent.types';
+import { $isImageNode } from './ImageNode';
 
 export default function ImageComponent({
     src,

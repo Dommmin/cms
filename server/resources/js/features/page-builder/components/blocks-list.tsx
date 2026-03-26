@@ -22,7 +22,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import type { Block, BlockTypeConfig, ReusableBlock } from '../types';
+import type { Block, ReusableBlock } from '../types';
 import { BlockCard } from './block-card';
 import { BlockForm } from './block-form';
 import { BlockTypePicker } from './block-type-picker';

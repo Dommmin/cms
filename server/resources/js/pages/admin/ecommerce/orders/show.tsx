@@ -17,7 +17,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
-import type { Address, Customer, OrderItem, Payment, Shipment, StatusHistory, StatusOption, OrderView } from './show.types';
+import type { Address, StatusOption, OrderView } from './show.types';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 

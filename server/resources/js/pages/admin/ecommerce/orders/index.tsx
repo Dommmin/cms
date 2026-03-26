@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { DownloadIcon } from 'lucide-react';
 import { useOrderColumns } from '@/components/columns/order-columns';
-import type { OrderRow } from '@/components/columns/order-columns.types';
+
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';

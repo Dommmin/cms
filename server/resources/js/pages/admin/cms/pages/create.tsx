@@ -22,7 +22,7 @@ import { slugify } from '@/lib/slug';
 
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
-import type { ModuleConfig, ParentPage, CreateProps } from './create.types';
+import type { CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Pages', href: '/admin/cms/pages' },

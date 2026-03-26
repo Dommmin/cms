@@ -1,4 +1,4 @@
-import type { Block, Section } from '../types';
+import type { Section } from '../types';
 
 export type SectionTemplate = {
     id: string;

@@ -1,4 +1,4 @@
-import { createEmptyHistoryState, type HistoryState } from '@lexical/history';
+import { createEmptyHistoryState } from '@lexical/history';
 import { type JSX } from 'react';
 import { createContext, useContext, useMemo } from 'react';
 import type { ContextShape } from './SharedHistoryContext.types';
