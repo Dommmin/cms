@@ -28,9 +28,9 @@ RUN npm ci --prefer-offline
 COPY server/ .
 COPY --from=vendor /app/vendor ./vendor
 
-RUN APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA= \
-    APP_ENV=production \
-    npm run build
+RUN cp .env.example .env \
+    && php artisan key:generate --force \
+    && npm run build
 
 # =============================================================================
 # Stage 3: Production image — custom PHP 8.5 Alpine base + Nginx + Supervisord

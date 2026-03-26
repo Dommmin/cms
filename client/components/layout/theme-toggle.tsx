@@ -19,12 +19,12 @@ function resolveTheme(): Theme {
 }
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme | null>(() =>
-    typeof window !== 'undefined' ? resolveTheme() : null,
-  );
+  const [theme, setTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
-    if (theme !== null) applyTheme(theme);
+    const initial = resolveTheme();
+    setTheme(initial);
+    applyTheme(initial);
 
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = () => {
@@ -36,7 +36,7 @@ export function ThemeToggle() {
     };
     mq.addEventListener('change', handleChange);
     return () => mq.removeEventListener('change', handleChange);
-  }, [theme]);
+  }, []);
 
   function toggle() {
     const next: Theme = theme === 'dark' ? 'light' : 'dark';
