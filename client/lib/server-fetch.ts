@@ -38,6 +38,7 @@ export async function serverFetch<T>(
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
+    signal: AbortSignal.timeout(5000),
     ...(cacheDirective ? { cache: cacheDirective } : { next: nextOpts }),
   });
 
