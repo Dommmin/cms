@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/axios";
-import type { PickupPoint } from "@/types/api";
+import { api } from '@/lib/axios';
+import type { PickupPoint } from '@/types/api';
+import { useQuery } from '@tanstack/react-query';
 
 interface PickupPointsResponse {
   data: PickupPoint[];
@@ -9,15 +9,14 @@ interface PickupPointsResponse {
 }
 
 export function usePickupPoints(carrier: string, postalCode: string) {
-  const cleanPostal = postalCode.replace(/\s/g, "");
+  const cleanPostal = postalCode.replace(/\s/g, '');
 
   const query = useQuery<PickupPointsResponse>({
-    queryKey: ["pickup-points", carrier, cleanPostal],
+    queryKey: ['pickup-points', carrier, cleanPostal],
     queryFn: async () => {
-      const { data } = await api.get<PickupPointsResponse>(
-        "/checkout/pickup-points",
-        { params: { carrier, postal_code: cleanPostal } },
-      );
+      const { data } = await api.get<PickupPointsResponse>('/checkout/pickup-points', {
+        params: { carrier, postal_code: cleanPostal },
+      });
       // Normalise: older responses may not include configured field
       return {
         data: data.data ?? [],

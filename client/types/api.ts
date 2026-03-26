@@ -155,7 +155,7 @@ export interface Category {
 export interface CartItem {
   id: number;
   variant_id: number;
-  product: Pick<Product, "id" | "name" | "slug" | "thumbnail">;
+  product: Pick<Product, 'id' | 'name' | 'slug' | 'thumbnail'>;
   variant: ProductVariant;
   quantity: number;
   /** unit price in cents */
@@ -183,7 +183,7 @@ export interface Cart {
 
 export interface Address {
   id: number;
-  type: "billing" | "shipping";
+  type: 'billing' | 'shipping';
   first_name: string;
   last_name: string;
   company_name: string | null;
@@ -200,13 +200,13 @@ export interface Address {
 // ── Orders ────────────────────────────────────────────────────────────────────
 
 export type OrderStatus =
-  | "pending"
-  | "confirmed"
-  | "processing"
-  | "shipped"
-  | "delivered"
-  | "cancelled"
-  | "refunded";
+  | 'pending'
+  | 'confirmed'
+  | 'processing'
+  | 'shipped'
+  | 'delivered'
+  | 'cancelled'
+  | 'refunded';
 
 export interface OrderItem {
   id: number;
@@ -299,8 +299,8 @@ export interface PickupPoint {
 export interface WishlistItem {
   id: number;
   variant_id: number;
-  product: Pick<Product, "id" | "name" | "slug" | "thumbnail" | "price_min">;
-  variant: Pick<ProductVariant, "id" | "sku" | "price" | "attributes"> & {
+  product: Pick<Product, 'id' | 'name' | 'slug' | 'thumbnail' | 'price_min'>;
+  variant: Pick<ProductVariant, 'id' | 'sku' | 'price' | 'attributes'> & {
     compare_at_price: number | null;
     omnibus_price: number | null;
     is_on_sale: boolean;
@@ -317,7 +317,7 @@ export interface Wishlist {
 
 // ── Reviews ───────────────────────────────────────────────────────────────────
 
-export type ReviewStatus = "pending" | "approved" | "rejected";
+export type ReviewStatus = 'pending' | 'approved' | 'rejected';
 
 export interface ProductReview {
   id: number;
@@ -355,16 +355,16 @@ export interface NewsletterSubscribePayload {
 // ── Forms ─────────────────────────────────────────────────────────────────────
 
 export type FormFieldType =
-  | "text"
-  | "email"
-  | "phone"
-  | "textarea"
-  | "select"
-  | "checkbox"
-  | "radio"
-  | "date"
-  | "number"
-  | "file";
+  | 'text'
+  | 'email'
+  | 'phone'
+  | 'textarea'
+  | 'select'
+  | 'checkbox'
+  | 'radio'
+  | 'date'
+  | 'number'
+  | 'file';
 
 export interface FormField {
   id: number;
@@ -427,7 +427,7 @@ export interface MenuItem {
   id: number;
   label: string;
   url: string | null;
-  target: "_blank" | "_self";
+  target: '_blank' | '_self';
   icon: string | null;
   children?: MenuItem[];
 }
@@ -441,10 +441,10 @@ export interface Menu {
 
 // ── CMS – Pages & Page Builder ────────────────────────────────────────────────
 
-export type PageType = "blocks" | "module";
-export type PageLayout = "default" | "full_width" | "sidebar";
-export type SectionLayout = "contained" | "full-width" | "flush" | "two-col" | "three-col";
-export type SectionVariant = "light" | "dark" | "muted" | "brand" | "hero" | null;
+export type PageType = 'blocks' | 'module';
+export type PageLayout = 'default' | 'full_width' | 'sidebar';
+export type SectionLayout = 'contained' | 'full-width' | 'flush' | 'two-col' | 'three-col';
+export type SectionVariant = 'light' | 'dark' | 'muted' | 'brand' | 'hero' | null;
 
 export interface BlockRelation {
   id?: number;
@@ -479,34 +479,34 @@ export interface PageSection {
 }
 
 export type BlockType =
-  | "hero_banner"
-  | "rich_text"
-  | "featured_products"
-  | "categories_grid"
-  | "promotional_banner"
-  | "newsletter_signup"
-  | "testimonials"
-  | "image_gallery"
-  | "video_embed"
-  | "custom_html"
-  | "two_columns"
-  | "three_columns"
-  | "accordion"
-  | "tabs"
-  | "form_embed"
-  | "map"
-  | "featured_posts"
-  | "stats_counter"
-  | "call_to_action"
-  | "pricing_table"
-  | "brands_slider"
-  | "logo_cloud"
-  | "countdown_timer"
-  | "timeline"
-  | "team_members"
-  | "icon_list"
-  | "steps_process"
-  | "trust_badges";
+  | 'hero_banner'
+  | 'rich_text'
+  | 'featured_products'
+  | 'categories_grid'
+  | 'promotional_banner'
+  | 'newsletter_signup'
+  | 'testimonials'
+  | 'image_gallery'
+  | 'video_embed'
+  | 'custom_html'
+  | 'two_columns'
+  | 'three_columns'
+  | 'accordion'
+  | 'tabs'
+  | 'form_embed'
+  | 'map'
+  | 'featured_posts'
+  | 'stats_counter'
+  | 'call_to_action'
+  | 'pricing_table'
+  | 'brands_slider'
+  | 'logo_cloud'
+  | 'countdown_timer'
+  | 'timeline'
+  | 'team_members'
+  | 'icon_list'
+  | 'steps_process'
+  | 'trust_badges';
 
 export interface Page {
   id: number;
@@ -579,7 +579,7 @@ export interface ApiError {
 
 export interface SupportMessage {
   id: number;
-  sender_type: "customer" | "agent";
+  sender_type: 'customer' | 'agent';
   sender_name: string;
   body: string;
   is_internal: boolean;
@@ -591,8 +591,8 @@ export interface SupportConversation {
   id: number;
   token: string;
   subject: string;
-  status: "open" | "pending" | "resolved" | "closed";
-  channel: "widget" | "email";
+  status: 'open' | 'pending' | 'resolved' | 'closed';
+  channel: 'widget' | 'email';
   email: string | null;
   name: string | null;
   last_reply_at: string | null;

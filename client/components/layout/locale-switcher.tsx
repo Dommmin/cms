@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
-import { ChevronDown } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/axios";
-import { useTranslation } from "@/hooks/use-translation";
+import { useTranslation } from '@/hooks/use-translation';
+import { api } from '@/lib/axios';
+import { useQuery } from '@tanstack/react-query';
+import { ChevronDown } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import type { LocaleOption } from './locale-switcher.types';
 
 async function fetchLocales(): Promise<LocaleOption[]> {
-  const { data } = await api.get<LocaleOption[]>("/locales");
+  const { data } = await api.get<LocaleOption[]>('/locales');
   return data;
 }
 
@@ -18,7 +18,7 @@ export function LocaleSwitcher() {
   const ref = useRef<HTMLDivElement>(null);
 
   const { data: locales } = useQuery({
-    queryKey: ["locales"],
+    queryKey: ['locales'],
     queryFn: fetchLocales,
     staleTime: Infinity,
   });
@@ -29,8 +29,8 @@ export function LocaleSwitcher() {
         setOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   if (!locales || locales.length <= 1) return null;
@@ -42,7 +42,7 @@ export function LocaleSwitcher() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex cursor-pointer items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+        className="border-border bg-background text-foreground focus:ring-ring flex cursor-pointer items-center gap-1 rounded-md border px-2 py-1 text-sm focus:ring-2 focus:outline-none"
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label="Select language"
@@ -55,7 +55,7 @@ export function LocaleSwitcher() {
       {open && (
         <ul
           role="listbox"
-          className="absolute right-0 z-50 mt-1 min-w-full overflow-hidden rounded-md border border-border bg-background shadow-md"
+          className="border-border bg-background absolute right-0 z-50 mt-1 min-w-full overflow-hidden rounded-md border shadow-md"
         >
           {locales.map((l) => (
             <li key={l.code} role="option" aria-selected={l.code === locale}>
@@ -65,8 +65,8 @@ export function LocaleSwitcher() {
                   setLocale(l.code);
                   setOpen(false);
                 }}
-                className={`flex w-full items-center gap-2 px-3 py-1.5 text-sm hover:bg-accent ${
-                  l.code === locale ? "font-medium text-primary" : "text-foreground"
+                className={`hover:bg-accent flex w-full items-center gap-2 px-3 py-1.5 text-sm ${
+                  l.code === locale ? 'text-primary font-medium' : 'text-foreground'
                 }`}
               >
                 {l.flag_emoji && <span>{l.flag_emoji}</span>}

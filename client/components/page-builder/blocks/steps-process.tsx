@@ -3,7 +3,7 @@ import type { StepsProcessConfig, StepsProcessProps } from './steps-process.type
 export function StepsProcessBlock({ block }: StepsProcessProps) {
   const cfg = block.configuration as StepsProcessConfig;
   const steps = cfg.steps ?? [];
-  const layout = cfg.layout ?? "horizontal";
+  const layout = cfg.layout ?? 'horizontal';
 
   if (steps.length === 0) return null;
 
@@ -12,23 +12,23 @@ export function StepsProcessBlock({ block }: StepsProcessProps) {
       {(cfg.title || cfg.subtitle) && (
         <div className="text-center">
           {cfg.title && <h2 className="text-2xl font-bold md:text-3xl">{cfg.title}</h2>}
-          {cfg.subtitle && <p className="mt-2 text-muted-foreground">{cfg.subtitle}</p>}
+          {cfg.subtitle && <p className="text-muted-foreground mt-2">{cfg.subtitle}</p>}
         </div>
       )}
 
-      {layout === "vertical" ? (
+      {layout === 'vertical' ? (
         <div className="relative mx-auto max-w-2xl">
-          <div className="absolute left-6 top-0 h-full w-0.5 bg-border" />
+          <div className="bg-border absolute top-0 left-6 h-full w-0.5" />
           <div className="flex flex-col gap-10">
             {steps.map((step, i) => (
               <div key={i} className="flex gap-8">
-                <div className="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground ring-4 ring-background">
+                <div className="bg-primary text-primary-foreground ring-background relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg font-bold ring-4">
                   {i + 1}
                 </div>
-                <div className="pb-2 pt-2">
+                <div className="pt-2 pb-2">
                   {step.title && <h3 className="text-lg font-semibold">{step.title}</h3>}
                   {step.description && (
-                    <p className="mt-2 text-muted-foreground">{step.description}</p>
+                    <p className="text-muted-foreground mt-2">{step.description}</p>
                   )}
                 </div>
               </div>
@@ -39,24 +39,24 @@ export function StepsProcessBlock({ block }: StepsProcessProps) {
         <div
           className={`grid gap-8 ${
             steps.length <= 3
-              ? "md:grid-cols-3"
+              ? 'md:grid-cols-3'
               : steps.length === 4
-                ? "md:grid-cols-4"
-                : "md:grid-cols-3"
+                ? 'md:grid-cols-4'
+                : 'md:grid-cols-3'
           }`}
         >
           {steps.map((step, i) => (
             <div key={i} className="relative flex flex-col items-center gap-4 text-center">
               {/* Connector line between steps */}
               {i < steps.length - 1 && (
-                <div className="absolute left-[calc(50%+2.5rem)] top-6 hidden h-0.5 w-[calc(100%-5rem)] bg-border md:block" />
+                <div className="bg-border absolute top-6 left-[calc(50%+2.5rem)] hidden h-0.5 w-[calc(100%-5rem)] md:block" />
               )}
-              <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
-                {layout === "numbered" ? i + 1 : i + 1}
+              <div className="bg-primary text-primary-foreground relative z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold">
+                {layout === 'numbered' ? i + 1 : i + 1}
               </div>
               {step.title && <h3 className="font-semibold">{step.title}</h3>}
               {step.description && (
-                <p className="text-sm text-muted-foreground">{step.description}</p>
+                <p className="text-muted-foreground text-sm">{step.description}</p>
               )}
             </div>
           ))}

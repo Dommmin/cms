@@ -1,13 +1,17 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import { X } from "lucide-react";
+import { X } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { clearComparison, removeFromCompare, useComparisonProducts } from "@/hooks/use-comparison";
-import { useComparisonIds } from "@/hooks/use-comparison";
-import { useTranslation } from "@/hooks/use-translation";
-import { useLocalePath } from "@/hooks/use-locale";
+import {
+  clearComparison,
+  removeFromCompare,
+  useComparisonIds,
+  useComparisonProducts,
+} from '@/hooks/use-comparison';
+import { useLocalePath } from '@/hooks/use-locale';
+import { useTranslation } from '@/hooks/use-translation';
 
 export function ComparisonBar() {
   const { t } = useTranslation();
@@ -18,17 +22,17 @@ export function ComparisonBar() {
   if (ids.length === 0) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 shadow-lg backdrop-blur-sm">
+    <div className="border-border bg-background/95 fixed right-0 bottom-0 left-0 z-40 border-t shadow-lg backdrop-blur-sm">
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
-        <span className="shrink-0 text-sm font-medium text-muted-foreground">
-          {t("compare.title", "Compare")} ({ids.length})
+        <span className="text-muted-foreground shrink-0 text-sm font-medium">
+          {t('compare.title', 'Compare')} ({ids.length})
         </span>
 
         <div className="flex flex-1 flex-wrap items-center gap-2">
           {products.map((product) => (
             <div
               key={product.id}
-              className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-2 py-1"
+              className="border-border bg-card flex items-center gap-1.5 rounded-lg border px-2 py-1"
             >
               {product.thumbnail?.url && (
                 <Image
@@ -54,15 +58,15 @@ export function ComparisonBar() {
         <div className="flex shrink-0 items-center gap-2">
           <button
             onClick={clearComparison}
-            className="text-xs text-muted-foreground underline hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground text-xs underline"
           >
-            {t("compare.clear", "Clear")}
+            {t('compare.clear', 'Clear')}
           </button>
           <Link
-            href={lp("/compare")}
-            className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
+            href={lp('/compare')}
+            className="bg-primary text-primary-foreground rounded-lg px-4 py-2 text-xs font-semibold hover:opacity-90"
           >
-            {t("compare.view", "Compare ({n})").replace("{n}", String(ids.length))}
+            {t('compare.view', 'Compare ({n})').replace('{n}', String(ids.length))}
           </Link>
         </div>
       </div>

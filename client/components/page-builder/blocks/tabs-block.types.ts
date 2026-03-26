@@ -1,4 +1,4 @@
-import type { PageBlock } from "@/types/api";
+import type { PageBlock } from '@/types/api';
 
 export interface Tab {
   label: string;
@@ -8,7 +8,7 @@ export interface Tab {
 export interface TabsConfig {
   title?: string;
   tabs?: Tab[];
-  variant?: "underline" | "pills" | "boxed";
+  variant?: 'underline' | 'pills' | 'boxed';
 }
 export interface TabsBlockProps {
   block: PageBlock;

@@ -1,4 +1,4 @@
-import type { PageBlock } from "@/types/api";
+import type { PageBlock } from '@/types/api';
 
 export interface IconListItem {
   icon?: string;
@@ -9,7 +9,7 @@ export interface IconListConfig {
   title?: string;
   subtitle?: string;
   columns?: number;
-  style?: "horizontal" | "centered" | "compact";
+  style?: 'horizontal' | 'centered' | 'compact';
   icon_color?: string;
   items?: IconListItem[];
 }

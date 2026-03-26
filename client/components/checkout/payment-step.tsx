@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { AlertTriangle, Building2 } from "lucide-react";
+import { AlertTriangle, Building2 } from 'lucide-react';
 
-import type { PaymentMethodConfig } from "@/api/checkout";
-import { ApplePayButton } from "@/components/checkout/apple-pay-button";
-import { BlikInput } from "@/components/checkout/blik-input";
-import { GooglePayButton } from "@/components/checkout/google-pay-button";
-import { useTranslation } from "@/hooks/use-translation";
+import type { PaymentMethodConfig } from '@/api/checkout';
+import { ApplePayButton } from '@/components/checkout/apple-pay-button';
+import { BlikInput } from '@/components/checkout/blik-input';
+import { GooglePayButton } from '@/components/checkout/google-pay-button';
+import { useTranslation } from '@/hooks/use-translation';
 import type { PaymentMethodValue, PaymentStepProps } from './payment-step.types';
 
 const METHOD_DEFS: Array<{
@@ -15,39 +15,39 @@ const METHOD_DEFS: Array<{
   labelDefault: string;
   descKey: string;
   descDefault: string;
-  providerId: PaymentMethodConfig["id"];
+  providerId: PaymentMethodConfig['id'];
 }> = [
   {
-    value: "blik",
-    labelKey: "checkout.method_blik",
-    labelDefault: "BLIK",
-    descKey: "checkout.method_blik_desc",
-    descDefault: "Pay with a BLIK code from your banking app",
-    providerId: "payu",
+    value: 'blik',
+    labelKey: 'checkout.method_blik',
+    labelDefault: 'BLIK',
+    descKey: 'checkout.method_blik_desc',
+    descDefault: 'Pay with a BLIK code from your banking app',
+    providerId: 'payu',
   },
   {
-    value: "p24",
-    labelKey: "checkout.method_p24",
-    labelDefault: "Przelewy24",
-    descKey: "checkout.method_p24_desc",
-    descDefault: "Bank transfer, card, BLIK and other methods",
-    providerId: "p24",
+    value: 'p24',
+    labelKey: 'checkout.method_p24',
+    labelDefault: 'Przelewy24',
+    descKey: 'checkout.method_p24_desc',
+    descDefault: 'Bank transfer, card, BLIK and other methods',
+    providerId: 'p24',
   },
   {
-    value: "bank_transfer",
-    labelKey: "checkout.method_bank_transfer",
-    labelDefault: "Bank Transfer",
-    descKey: "checkout.method_bank_transfer_desc",
-    descDefault: "Transfer funds to our bank account",
-    providerId: "bank_transfer",
+    value: 'bank_transfer',
+    labelKey: 'checkout.method_bank_transfer',
+    labelDefault: 'Bank Transfer',
+    descKey: 'checkout.method_bank_transfer_desc',
+    descDefault: 'Transfer funds to our bank account',
+    providerId: 'bank_transfer',
   },
   {
-    value: "cash_on_delivery",
-    labelKey: "checkout.method_cod",
-    labelDefault: "Cash on Delivery",
-    descKey: "checkout.method_cod_desc",
-    descDefault: "Pay the courier upon delivery",
-    providerId: "cash_on_delivery",
+    value: 'cash_on_delivery',
+    labelKey: 'checkout.method_cod',
+    labelDefault: 'Cash on Delivery',
+    descKey: 'checkout.method_cod_desc',
+    descDefault: 'Pay the courier upon delivery',
+    providerId: 'cash_on_delivery',
   },
 ];
 
@@ -65,17 +65,17 @@ export function PaymentStep({
 }: PaymentStepProps) {
   const { t } = useTranslation();
 
-  function providerCfg(id: PaymentMethodConfig["id"]): PaymentMethodConfig | undefined {
+  function providerCfg(id: PaymentMethodConfig['id']): PaymentMethodConfig | undefined {
     return providerConfig?.find((p) => p.id === id);
   }
 
-  const applePayCfg = providerCfg("apple_pay");
-  const googlePayCfg = providerCfg("google_pay");
+  const applePayCfg = providerCfg('apple_pay');
+  const googlePayCfg = providerCfg('google_pay');
 
   return (
-    <div className="rounded-xl border border-border p-5">
+    <div className="border-border rounded-xl border p-5">
       <h2 className="mb-3 text-sm font-semibold">
-        {t("checkout.payment_method", "Payment Method")}
+        {t('checkout.payment_method', 'Payment Method')}
       </h2>
 
       {/* Apple Pay / Google Pay — shown above radio options when configured */}
@@ -87,7 +87,7 @@ export function PaymentStep({
                 amount={cartTotal}
                 currency={currency}
                 onToken={(token) => {
-                  onSelect("apple_pay");
+                  onSelect('apple_pay');
                   onApplePayToken(token);
                 }}
               />
@@ -99,7 +99,7 @@ export function PaymentStep({
                 amount={cartTotal}
                 currency={currency}
                 onToken={(token) => {
-                  onSelect("google_pay");
+                  onSelect('google_pay');
                   onGooglePayToken(token);
                 }}
               />
@@ -116,20 +116,18 @@ export function PaymentStep({
 
           // Dynamic label for Cash on Delivery when personal pickup is selected
           const labelKey =
-            method.value === "cash_on_delivery" && isPickup
-              ? "checkout.method_cod_pickup"
+            method.value === 'cash_on_delivery' && isPickup
+              ? 'checkout.method_cod_pickup'
               : method.labelKey;
           const labelDefault =
-            method.value === "cash_on_delivery" && isPickup
-              ? "Pay at pickup"
-              : method.labelDefault;
+            method.value === 'cash_on_delivery' && isPickup ? 'Pay at pickup' : method.labelDefault;
           const descKey =
-            method.value === "cash_on_delivery" && isPickup
-              ? "checkout.method_cod_pickup_desc"
+            method.value === 'cash_on_delivery' && isPickup
+              ? 'checkout.method_cod_pickup_desc'
               : method.descKey;
           const descDefault =
-            method.value === "cash_on_delivery" && isPickup
-              ? "Pay in-store when collecting your order"
+            method.value === 'cash_on_delivery' && isPickup
+              ? 'Pay in-store when collecting your order'
               : method.descDefault;
 
           return (
@@ -137,10 +135,10 @@ export function PaymentStep({
               key={method.value}
               className={`flex cursor-pointer flex-col rounded-lg border p-3 transition-colors ${
                 isUnconfigured
-                  ? "cursor-not-allowed border-border opacity-60"
+                  ? 'border-border cursor-not-allowed opacity-60'
                   : selected === method.value
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/50"
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary/50'
               }`}
             >
               <div className="flex items-start gap-3">
@@ -151,19 +149,22 @@ export function PaymentStep({
                   checked={selected === method.value}
                   onChange={() => !isUnconfigured && onSelect(method.value)}
                   disabled={isUnconfigured}
-                  className="mt-0.5 accent-primary"
+                  className="accent-primary mt-0.5"
                 />
                 <div className="flex-1">
                   <p className="text-sm font-medium">{t(labelKey, labelDefault)}</p>
-                  <p className="text-xs text-muted-foreground">{t(descKey, descDefault)}</p>
+                  <p className="text-muted-foreground text-xs">{t(descKey, descDefault)}</p>
 
                   {/* Missing config notice */}
                   {isUnconfigured && cfg.missing_env.length > 0 && (
                     <div className="mt-1.5 flex items-start gap-1.5 rounded-md bg-amber-50 px-2 py-1.5 dark:bg-amber-950">
                       <AlertTriangle className="mt-px h-3 w-3 shrink-0 text-amber-600 dark:text-amber-400" />
                       <span className="text-xs text-amber-700 dark:text-amber-300">
-                        Set in <code className="rounded bg-amber-100 px-0.5 dark:bg-amber-900">server/.env</code>:{" "}
-                        {cfg.missing_env.join(", ")}
+                        Set in{' '}
+                        <code className="rounded bg-amber-100 px-0.5 dark:bg-amber-900">
+                          server/.env
+                        </code>
+                        : {cfg.missing_env.join(', ')}
                       </span>
                     </div>
                   )}
@@ -171,19 +172,24 @@ export function PaymentStep({
               </div>
 
               {/* BLIK code input — shown inline when BLIK is selected */}
-              {method.value === "blik" && selected === "blik" && !isUnconfigured && (
+              {method.value === 'blik' && selected === 'blik' && !isUnconfigured && (
                 <BlikInput value={blikCode} onChange={onBlikCode} />
               )}
 
               {/* Bank transfer — note that details are shown on the success page */}
-              {method.value === "bank_transfer" && selected === "bank_transfer" && !isUnconfigured && (
-                <div className="mt-2 flex items-center gap-1.5 rounded-md bg-blue-50 px-2 py-1.5 dark:bg-blue-950">
-                  <Building2 className="h-3 w-3 shrink-0 text-blue-600 dark:text-blue-400" />
-                  <span className="text-xs text-blue-700 dark:text-blue-300">
-                    {t("checkout.bank_transfer_after_order", "Bank account details will be shown after you place your order.")}
-                  </span>
-                </div>
-              )}
+              {method.value === 'bank_transfer' &&
+                selected === 'bank_transfer' &&
+                !isUnconfigured && (
+                  <div className="mt-2 flex items-center gap-1.5 rounded-md bg-blue-50 px-2 py-1.5 dark:bg-blue-950">
+                    <Building2 className="h-3 w-3 shrink-0 text-blue-600 dark:text-blue-400" />
+                    <span className="text-xs text-blue-700 dark:text-blue-300">
+                      {t(
+                        'checkout.bank_transfer_after_order',
+                        'Bank account details will be shown after you place your order.',
+                      )}
+                    </span>
+                  </div>
+                )}
             </label>
           );
         })}
@@ -191,4 +197,3 @@ export function PaymentStep({
     </div>
   );
 }
-

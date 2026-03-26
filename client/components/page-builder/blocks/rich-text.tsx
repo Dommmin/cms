@@ -4,17 +4,17 @@ export function RichTextBlock({ block }: RichTextProps) {
   const cfg = block.configuration as RichTextConfig;
 
   const proseSize = {
-    sm: "prose-sm",
-    base: "",
-    lg: "prose-lg",
-    xl: "prose-xl",
-  }[cfg.text_size ?? "base"];
+    sm: 'prose-sm',
+    base: '',
+    lg: 'prose-lg',
+    xl: 'prose-xl',
+  }[cfg.text_size ?? 'base'];
 
   if (!cfg.content) return null;
 
   return (
     <div
-      className={`prose max-w-none dark:prose-invert ${proseSize}`}
+      className={`prose dark:prose-invert max-w-none ${proseSize}`}
       dangerouslySetInnerHTML={{ __html: cfg.content }}
     />
   );

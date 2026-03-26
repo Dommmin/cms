@@ -1,12 +1,12 @@
-import type { PaymentMethodConfig } from "@/api/checkout";
+import type { PaymentMethodConfig } from '@/api/checkout';
 
 export type PaymentMethodValue =
-  | "blik"
-  | "apple_pay"
-  | "google_pay"
-  | "p24"
-  | "cash_on_delivery"
-  | "bank_transfer";
+  | 'blik'
+  | 'apple_pay'
+  | 'google_pay'
+  | 'p24'
+  | 'cash_on_delivery'
+  | 'bank_transfer';
 export interface PaymentStepProps {
   selected: PaymentMethodValue;
   onSelect: (method: PaymentMethodValue) => void;

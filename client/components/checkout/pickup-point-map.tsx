@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import { useEffect } from "react";
-import type { PickupPoint } from "@/types/api";
+import type { PickupPoint } from '@/types/api';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { useEffect } from 'react';
+import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import type { PickupPointMapProps } from './pickup-point-map.types';
 
 // ── Custom SVG pin icon ──────────────────────────────────────────────────────
@@ -20,12 +20,12 @@ function createPin(color: string) {
     iconSize: [28, 38],
     iconAnchor: [14, 38],
     popupAnchor: [0, -40],
-    className: "",
+    className: '',
   });
 }
 
-const pinDefault  = createPin("#2563eb");
-const pinHovered  = createPin("#dc2626");
+const pinDefault = createPin('#2563eb');
+const pinHovered = createPin('#dc2626');
 
 // ── Auto-fit bounds when points change ──────────────────────────────────────
 
@@ -42,15 +42,14 @@ function FitBounds({ points }: { points: PickupPoint[] }) {
 // ── Main map component ───────────────────────────────────────────────────────
 
 export function PickupPointMap({ points, hoveredId, onSelect, onHover }: PickupPointMapProps) {
-  const center: [number, number] = points.length > 0
-    ? [points[0].lat, points[0].lng]
-    : [52.069, 19.48]; // Polska
+  const center: [number, number] =
+    points.length > 0 ? [points[0].lat, points[0].lng] : [52.069, 19.48]; // Polska
 
   return (
     <MapContainer
       center={center}
       zoom={points.length > 0 ? 13 : 6}
-      style={{ height: "100%", width: "100%" }}
+      style={{ height: '100%', width: '100%' }}
       scrollWheelZoom
     >
       <TileLayer
@@ -66,20 +65,20 @@ export function PickupPointMap({ points, hoveredId, onSelect, onHover }: PickupP
           position={[point.lat, point.lng]}
           icon={hoveredId === point.id ? pinHovered : pinDefault}
           eventHandlers={{
-            click:      () => onSelect(point),
-            mouseover:  () => onHover(point.id),
-            mouseout:   () => onHover(null),
+            click: () => onSelect(point),
+            mouseover: () => onHover(point.id),
+            mouseout: () => onHover(null),
           }}
         >
           <Popup>
             <div className="text-sm">
               <p className="font-semibold">{point.name}</p>
               <p className="text-muted-foreground">{point.address}</p>
-              {point.hours && <p className="mt-1 text-xs text-muted-foreground">{point.hours}</p>}
+              {point.hours && <p className="text-muted-foreground mt-1 text-xs">{point.hours}</p>}
               <button
                 type="button"
                 onClick={() => onSelect(point)}
-                className="mt-2 rounded bg-primary px-3 py-1 text-xs font-medium text-primary-foreground"
+                className="bg-primary text-primary-foreground mt-2 rounded px-3 py-1 text-xs font-medium"
               >
                 Wybierz
               </button>

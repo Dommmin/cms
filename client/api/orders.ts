@@ -1,10 +1,10 @@
-import { api } from "@/lib/axios";
-import type { Order, PaginatedResponse, ShippingMethod } from "@/types/api";
+import { api } from '@/lib/axios';
+import type { Order, PaginatedResponse, ShippingMethod } from '@/types/api';
 
 export async function getOrders(
   params: { page?: number; per_page?: number } = {},
 ): Promise<PaginatedResponse<Order>> {
-  const { data } = await api.get<PaginatedResponse<Order>>("/orders", { params });
+  const { data } = await api.get<PaginatedResponse<Order>>('/orders', { params });
   return data;
 }
 
@@ -19,7 +19,7 @@ export async function cancelOrder(reference: string): Promise<Order> {
 }
 
 export async function getShippingMethods(): Promise<ShippingMethod[]> {
-  const { data } = await api.get<{ data: ShippingMethod[] }>("/checkout/shipping-methods");
+  const { data } = await api.get<{ data: ShippingMethod[] }>('/checkout/shipping-methods');
   return data.data;
 }
 
@@ -32,6 +32,6 @@ export interface CheckoutPayload {
 }
 
 export async function checkout(payload: CheckoutPayload): Promise<Order> {
-  const { data } = await api.post<{ data: Order }>("/checkout", payload);
+  const { data } = await api.post<{ data: Order }>('/checkout', payload);
   return data.data;
 }

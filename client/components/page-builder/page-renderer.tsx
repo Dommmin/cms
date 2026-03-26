@@ -1,8 +1,8 @@
-import { cookies } from "next/headers";
+import { cookies } from 'next/headers';
 
-import { ModuleRenderer } from "./module-renderer";
-import { SectionRenderer } from "./section-renderer";
+import { ModuleRenderer } from './module-renderer';
 import type { PageRendererProps } from './page-renderer.types';
+import { SectionRenderer } from './section-renderer';
 
 /**
  * Top-level renderer for CMS pages.
@@ -19,13 +19,13 @@ export async function PageRenderer({ page }: PageRendererProps) {
     return null;
   }
 
-  if (page.page_type === "module") {
+  if (page.page_type === 'module') {
     return <ModuleRenderer page={page} />;
   }
 
   const cookieStore = await cookies();
-  const isPreview = !!cookieStore.get("admin_preview")?.value;
-  const adminBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") ?? "";
+  const isPreview = !!cookieStore.get('admin_preview')?.value;
+  const adminBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') ?? '';
 
   const activeSections = page.sections
     .filter((s) => s.is_active)

@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import Script from "next/script";
+import Script from 'next/script';
+import { useEffect, useRef } from 'react';
 import type { TurnstileWidgetProps } from './turnstile-widget.types';
 
-const SITE_KEY = process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY ?? "";
+const SITE_KEY = process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY ?? '';
 
 declare global {
   interface Window {
@@ -14,8 +14,8 @@ declare global {
         options: {
           sitekey: string;
           callback?: (token: string) => void;
-          "expired-callback"?: () => void;
-          theme?: "auto" | "light" | "dark";
+          'expired-callback'?: () => void;
+          theme?: 'auto' | 'light' | 'dark';
         },
       ) => string;
       reset: (widgetId: string) => void;
@@ -40,8 +40,8 @@ export function TurnstileWidget({ onVerify, onExpire, className }: TurnstileWidg
     widgetIdRef.current = window.turnstile.render(containerRef.current, {
       sitekey: SITE_KEY,
       callback: onVerify,
-      "expired-callback": onExpire,
-      theme: "auto",
+      'expired-callback': onExpire,
+      theme: 'auto',
     });
   }
 

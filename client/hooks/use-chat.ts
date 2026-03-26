@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addMessage,
   getConversation,
   getSupportToken,
   startConversation,
   type StartConversationPayload,
-} from "@/api/chat";
+} from '@/api/chat';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const chatKeys = {
-  conversation: (token: string) => ["chat", "conversation", token] as const,
+  conversation: (token: string) => ['chat', 'conversation', token] as const,
 };
 
 export function useConversation(token: string | null) {
   return useQuery({
-    queryKey: chatKeys.conversation(token ?? ""),
+    queryKey: chatKeys.conversation(token ?? ''),
     queryFn: () => getConversation(token!),
     enabled: !!token,
     staleTime: 5 * 1000,

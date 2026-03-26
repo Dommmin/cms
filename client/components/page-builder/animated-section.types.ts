@@ -5,7 +5,7 @@ export type AnimationPreset = {
 export interface AnimatedSectionProps {
   animation: string;
   className?: string;
-  "data-section-type"?: string;
-  "data-section-id"?: number;
+  'data-section-type'?: string;
+  'data-section-id'?: number;
   children: React.ReactNode;
 }

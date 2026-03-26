@@ -1,24 +1,24 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { getRelationsByKey } from "@/lib/format";
-import type { Category } from "@/types/api";
+import { getRelationsByKey } from '@/lib/format';
+import type { Category } from '@/types/api';
 import type { CategoriesGridConfig, CategoriesGridProps } from './categories-grid.types';
 
 export function CategoriesGridBlock({ block }: CategoriesGridProps) {
   const cfg = block.configuration as CategoriesGridConfig;
   const columns = cfg.columns ?? 3;
 
-  const categoryRelations = getRelationsByKey(block.relations, "categories");
+  const categoryRelations = getRelationsByKey(block.relations, 'categories');
   const categories = categoryRelations
     .map((r) => r.data as Category | null)
     .filter((c): c is Category => c !== null);
 
   const colClass = {
-    2: "grid-cols-1 sm:grid-cols-2",
-    3: "grid-cols-2 md:grid-cols-3",
-    4: "grid-cols-2 md:grid-cols-4",
-    6: "grid-cols-2 sm:grid-cols-3 md:grid-cols-6",
+    2: 'grid-cols-1 sm:grid-cols-2',
+    3: 'grid-cols-2 md:grid-cols-3',
+    4: 'grid-cols-2 md:grid-cols-4',
+    6: 'grid-cols-2 sm:grid-cols-3 md:grid-cols-6',
   }[columns];
 
   return (
@@ -26,9 +26,7 @@ export function CategoriesGridBlock({ block }: CategoriesGridProps) {
       {(cfg.title || cfg.subtitle) && (
         <div className="text-center">
           {cfg.title && <h2 className="text-2xl font-bold md:text-3xl">{cfg.title}</h2>}
-          {cfg.subtitle && (
-            <p className="mt-2 text-muted-foreground">{cfg.subtitle}</p>
-          )}
+          {cfg.subtitle && <p className="text-muted-foreground mt-2">{cfg.subtitle}</p>}
         </div>
       )}
 
@@ -37,7 +35,7 @@ export function CategoriesGridBlock({ block }: CategoriesGridProps) {
           <Link
             key={cat.id}
             href={`/categories/${cat.slug}`}
-            className="group relative flex aspect-square flex-col items-center justify-end overflow-hidden rounded-2xl bg-muted"
+            className="group bg-muted relative flex aspect-square flex-col items-center justify-end overflow-hidden rounded-2xl"
           >
             {cat.image_url && (
               <Image

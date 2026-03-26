@@ -1,4 +1,4 @@
-import type { Form, PageBlock } from "@/types/api";
+import type { Form, PageBlock } from '@/types/api';
 
 export interface FormEmbedConfig {
   title?: string;

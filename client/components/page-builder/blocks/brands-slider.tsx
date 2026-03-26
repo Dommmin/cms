@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import Image from "next/image";
+import Image from 'next/image';
+import { useEffect, useRef } from 'react';
 
-import { getRelationsByKey } from "@/lib/format";
-import type { Brand } from "@/types/api";
+import { getRelationsByKey } from '@/lib/format';
+import type { Brand } from '@/types/api';
 import type { BrandsSliderConfig, BrandsSliderProps } from './brands-slider.types';
 
 const pxPerSecond: Record<string, number> = {
@@ -17,12 +17,12 @@ export function BrandsSliderBlock({ block }: BrandsSliderProps) {
   const cfg = block.configuration as BrandsSliderConfig;
   const logoHeight = cfg.logo_height ?? 48;
   const grayscale = cfg.grayscale !== false;
-  const speed = cfg.speed ?? "normal";
+  const speed = cfg.speed ?? 'normal';
 
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
-  const brandRelations = getRelationsByKey(block.relations, "brands");
+  const brandRelations = getRelationsByKey(block.relations, 'brands');
   const brands = brandRelations
     .map((r) => r.data as Brand | null)
     .filter((b): b is Brand => b !== null);
@@ -46,34 +46,28 @@ export function BrandsSliderBlock({ block }: BrandsSliderProps) {
     const loopMs = (oneSetWidth / velocity) * 1000;
 
     const enterAnim = track.animate(
-      [
-        { transform: `translateX(${containerWidth}px)` },
-        { transform: "translateX(0px)" },
-      ],
-      { duration: enterMs, easing: "linear", fill: "forwards" },
+      [{ transform: `translateX(${containerWidth}px)` }, { transform: 'translateX(0px)' }],
+      { duration: enterMs, easing: 'linear', fill: 'forwards' },
     );
 
     enterAnim.onfinish = () => {
       track.animate(
-        [
-          { transform: "translateX(0px)" },
-          { transform: `translateX(-${oneSetWidth}px)` },
-        ],
-        { duration: loopMs, easing: "linear", iterations: Infinity },
+        [{ transform: 'translateX(0px)' }, { transform: `translateX(-${oneSetWidth}px)` }],
+        { duration: loopMs, easing: 'linear', iterations: Infinity },
       );
     };
 
     return () => {
       track.getAnimations().forEach((a) => a.cancel());
     };
-  }, [speed, brands.length]);  
+  }, [speed, brands.length]);
 
   if (brands.length === 0) return null;
 
   return (
     <div className="flex flex-col gap-8">
       {cfg.title && (
-        <p className="text-center text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+        <p className="text-muted-foreground text-center text-sm font-semibold tracking-widest uppercase">
           {cfg.title}
         </p>
       )}
@@ -87,7 +81,7 @@ export function BrandsSliderBlock({ block }: BrandsSliderProps) {
             <div
               key={`${brand.id}-${i}`}
               className={`flex min-w-[160px] shrink-0 items-center justify-center transition-all duration-300 ${
-                grayscale ? "grayscale hover:grayscale-0" : ""
+                grayscale ? 'grayscale hover:grayscale-0' : ''
               } opacity-70 hover:opacity-100`}
             >
               {brand.logo_url ? (
@@ -97,10 +91,10 @@ export function BrandsSliderBlock({ block }: BrandsSliderProps) {
                   width={160}
                   height={logoHeight}
                   className="object-contain"
-                  style={{ height: logoHeight, width: "auto" }}
+                  style={{ height: logoHeight, width: 'auto' }}
                 />
               ) : (
-                <span className="text-sm font-semibold text-muted-foreground">{brand.name}</span>
+                <span className="text-muted-foreground text-sm font-semibold">{brand.name}</span>
               )}
             </div>
           ))}

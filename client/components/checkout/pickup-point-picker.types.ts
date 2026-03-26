@@ -1,4 +1,4 @@
-import type { PickupPoint } from "@/types/api";
+import type { PickupPoint } from '@/types/api';
 
 export interface PickupPointPickerProps {
   carrier: string;

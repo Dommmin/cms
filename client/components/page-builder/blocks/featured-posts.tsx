@@ -1,45 +1,41 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { getRelationsByKey } from "@/lib/format";
-import type { BlogPost } from "@/types/api";
+import { getRelationsByKey } from '@/lib/format';
+import type { BlogPost } from '@/types/api';
 import type { FeaturedPostsConfig, FeaturedPostsProps } from './featured-posts.types';
 
 export function FeaturedPostsBlock({ block }: FeaturedPostsProps) {
   const cfg = block.configuration as FeaturedPostsConfig;
   const columns = cfg.columns ?? 3;
 
-  const postRelations = getRelationsByKey(block.relations, "posts");
+  const postRelations = getRelationsByKey(block.relations, 'posts');
   const posts = postRelations
     .map((r) => r.data as BlogPost | null)
     .filter((p): p is BlogPost => p !== null);
 
   const colClass =
     {
-      1: "grid-cols-1",
-      2: "grid-cols-1 sm:grid-cols-2",
-      3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
-      4: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
-    }[columns] ?? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
+      1: 'grid-cols-1',
+      2: 'grid-cols-1 sm:grid-cols-2',
+      3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+      4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+    }[columns] ?? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
 
   return (
     <div className="flex flex-col gap-8">
       {(cfg.title || cfg.subtitle || cfg.cta_url) && (
         <div className="flex items-end justify-between gap-4">
           <div>
-            {cfg.title && (
-              <h2 className="text-2xl font-bold md:text-3xl">{cfg.title}</h2>
-            )}
-            {cfg.subtitle && (
-              <p className="mt-1 text-muted-foreground">{cfg.subtitle}</p>
-            )}
+            {cfg.title && <h2 className="text-2xl font-bold md:text-3xl">{cfg.title}</h2>}
+            {cfg.subtitle && <p className="text-muted-foreground mt-1">{cfg.subtitle}</p>}
           </div>
           {cfg.cta_url && (
             <Link
               href={cfg.cta_url}
-              className="shrink-0 text-sm font-medium text-primary hover:underline"
+              className="text-primary shrink-0 text-sm font-medium hover:underline"
             >
-              {cfg.cta_text ?? "View all →"}
+              {cfg.cta_text ?? 'View all →'}
             </Link>
           )}
         </div>
@@ -64,34 +60,30 @@ export function FeaturedPostsBlock({ block }: FeaturedPostsProps) {
               )}
 
               <div className="flex flex-col gap-2">
-                {(cfg.show_category !== false && post.category) && (
-                  <span className="text-xs font-semibold uppercase tracking-wide text-primary">
+                {cfg.show_category !== false && post.category && (
+                  <span className="text-primary text-xs font-semibold tracking-wide uppercase">
                     {post.category.name}
                   </span>
                 )}
 
                 <Link href={`/blog/${post.slug}`}>
-                  <h3 className="text-lg font-semibold leading-snug hover:text-primary transition-colors">
+                  <h3 className="hover:text-primary text-lg leading-snug font-semibold transition-colors">
                     {post.title}
                   </h3>
                 </Link>
 
                 {cfg.show_excerpt !== false && post.excerpt && (
-                  <p className="line-clamp-3 text-sm text-muted-foreground">
-                    {post.excerpt}
-                  </p>
+                  <p className="text-muted-foreground line-clamp-3 text-sm">{post.excerpt}</p>
                 )}
 
-                <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                  {cfg.show_author !== false && post.author && (
-                    <span>{post.author.name}</span>
-                  )}
+                <div className="text-muted-foreground flex flex-wrap items-center gap-3 text-xs">
+                  {cfg.show_author !== false && post.author && <span>{post.author.name}</span>}
                   {cfg.show_date !== false && post.published_at && (
                     <span>
                       {new Date(post.published_at).toLocaleDateString(undefined, {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
                       })}
                     </span>
                   )}
@@ -104,7 +96,7 @@ export function FeaturedPostsBlock({ block }: FeaturedPostsProps) {
           ))}
         </div>
       ) : (
-        <p className="text-center text-muted-foreground">No posts to display.</p>
+        <p className="text-muted-foreground text-center">No posts to display.</p>
       )}
     </div>
   );

@@ -1,4 +1,4 @@
-import type { SupportMessage } from "@/types/api";
+import type { SupportMessage } from '@/types/api';
 
 export interface ChatPanelProps {
   messages: SupportMessage[];

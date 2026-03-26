@@ -1,4 +1,4 @@
-import type { CookieSettings } from "@/components/cookie-consent.types";
+import type { CookieSettings } from '@/components/cookie-consent.types';
 
 export type PublicSettingsResponse = {
   settings: {

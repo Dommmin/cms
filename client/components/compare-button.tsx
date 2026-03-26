@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { GitCompare } from "lucide-react";
+import { GitCompare } from 'lucide-react';
 
-import { useIsInComparison, useToggleComparison, useComparisonIds } from "@/hooks/use-comparison";
-import { useTranslation } from "@/hooks/use-translation";
+import { useComparisonIds, useIsInComparison, useToggleComparison } from '@/hooks/use-comparison';
+import { useTranslation } from '@/hooks/use-translation';
 import type { CompareButtonProps } from './compare-button.types';
 
 const MAX_COMPARE = 4;
 
-export function CompareButton({ productId, className = "" }: CompareButtonProps) {
+export function CompareButton({ productId, className = '' }: CompareButtonProps) {
   const { t } = useTranslation();
   const inComparison = useIsInComparison(productId);
   const toggle = useToggleComparison(productId);
@@ -22,17 +22,15 @@ export function CompareButton({ productId, className = "" }: CompareButtonProps)
         toggle();
       }}
       disabled={isFull}
-      title={isFull ? t("compare.max_reached", "Max 4 products") : undefined}
+      title={isFull ? t('compare.max_reached', 'Max 4 products') : undefined}
       className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-40 ${
         inComparison
-          ? "border-primary bg-primary text-primary-foreground"
-          : "border-border bg-background hover:bg-accent"
+          ? 'border-primary bg-primary text-primary-foreground'
+          : 'border-border bg-background hover:bg-accent'
       } ${className}`}
     >
       <GitCompare className="h-3.5 w-3.5" />
-      {inComparison
-        ? t("compare.remove", "Remove")
-        : t("compare.add", "Compare")}
+      {inComparison ? t('compare.remove', 'Remove') : t('compare.add', 'Compare')}
     </button>
   );
 }

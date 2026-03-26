@@ -1,4 +1,3 @@
-import type { getPage } from "@/api/cms";
+import type { getPage } from '@/api/cms';
 
 export type PageData = Awaited<ReturnType<typeof getPage>>;
-

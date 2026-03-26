@@ -1,4 +1,4 @@
-import type { PageBlock } from "@/types/api";
+import type { PageBlock } from '@/types/api';
 
 export interface VideoEmbedConfig {
   title?: string;
@@ -8,7 +8,7 @@ export interface VideoEmbedConfig {
   autoplay?: boolean;
   loop?: boolean;
   muted?: boolean;
-  aspect?: "video" | "square" | "portrait";
+  aspect?: 'video' | 'square' | 'portrait';
 }
 export interface VideoEmbedProps {
   block: PageBlock;

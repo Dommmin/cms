@@ -1,4 +1,4 @@
-import type { PageBlock } from "@/types/api";
+import type { PageBlock } from '@/types/api';
 
 export interface StatItem {
   value: string;
@@ -9,7 +9,7 @@ export interface StatItem {
 export interface StatsCounterConfig {
   title?: string;
   subtitle?: string;
-  style?: "plain" | "card" | "bordered" | "icon";
+  style?: 'plain' | 'card' | 'bordered' | 'icon';
   columns?: number;
   animate_numbers?: boolean;
   stats?: StatItem[];

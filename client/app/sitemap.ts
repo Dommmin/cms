@@ -1,8 +1,8 @@
-import type { MetadataRoute } from 'next';
-import { serverFetch } from '@/lib/server-fetch';
-import { absoluteUrl } from '@/lib/seo';
 import { LOCALES } from '@/lib/i18n';
-import type { PaginatedResponse, Product, BlogPost } from '@/types/api';
+import { absoluteUrl } from '@/lib/seo';
+import { serverFetch } from '@/lib/server-fetch';
+import type { BlogPost, PaginatedResponse, Product } from '@/types/api';
+import type { MetadataRoute } from 'next';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 
@@ -39,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Products
   try {
     const products = await serverFetch<PaginatedResponse<Product>>('/products?per_page=500');
-    for (const product of products.data.filter(p => !p.sitemap_exclude)) {
+    for (const product of products.data.filter((p) => !p.sitemap_exclude)) {
       const d = product.created_at ? new Date(product.created_at) : null;
       entries.push(
         sitemapEntry(
@@ -57,7 +57,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Blog posts
   try {
     const posts = await serverFetch<PaginatedResponse<BlogPost>>('/blog/posts?per_page=500');
-    for (const post of posts.data.filter(p => !p.sitemap_exclude)) {
+    for (const post of posts.data.filter((p) => !p.sitemap_exclude)) {
       entries.push(
         sitemapEntry(
           `/blog/${post.slug}`,

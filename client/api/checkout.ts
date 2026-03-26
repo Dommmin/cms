@@ -1,4 +1,4 @@
-import { api } from "@/lib/axios";
+import { api } from '@/lib/axios';
 
 export interface ShippingMethod {
   id: number;
@@ -18,7 +18,7 @@ export interface ShippingMethod {
 }
 
 export interface PaymentMethodConfig {
-  id: "cash_on_delivery" | "payu" | "p24" | "apple_pay" | "google_pay" | "bank_transfer";
+  id: 'cash_on_delivery' | 'payu' | 'p24' | 'apple_pay' | 'google_pay' | 'bank_transfer';
   configured: boolean;
   /** Names of missing env vars in server/.env */
   missing_env: string[];
@@ -63,7 +63,7 @@ export interface CheckoutPayload {
 
 export interface PaymentResult {
   id: number | null;
-  action: "redirect" | "wait" | "none";
+  action: 'redirect' | 'wait' | 'none';
   redirect_url: string | null;
   bank_details?: BankDetails | null;
 }
@@ -87,28 +87,20 @@ export interface CheckoutResponse {
 }
 
 export async function getPaymentMethods(): Promise<PaymentMethodConfig[]> {
-  const { data } = await api.get<{ data: PaymentMethodConfig[] }>("/checkout/payment-methods");
+  const { data } = await api.get<{ data: PaymentMethodConfig[] }>('/checkout/payment-methods');
   return data.data ?? [];
 }
 
 export async function getShippingMethods(): Promise<ShippingMethod[]> {
-  const { data } = await api.get<{ data: ShippingMethod[] }>(
-    "/checkout/shipping-methods",
-  );
+  const { data } = await api.get<{ data: ShippingMethod[] }>('/checkout/shipping-methods');
   return data.data ?? data;
 }
 
-export async function submitCheckout(
-  payload: CheckoutPayload,
-): Promise<CheckoutResponse> {
-  const { data } = await api.post<CheckoutResponse>(
-    "/checkout",
-    payload,
-    {
-      headers: {
-        "Idempotency-Key": `checkout-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-      },
+export async function submitCheckout(payload: CheckoutPayload): Promise<CheckoutResponse> {
+  const { data } = await api.post<CheckoutResponse>('/checkout', payload, {
+    headers: {
+      'Idempotency-Key': `checkout-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     },
-  );
+  });
   return data;
 }

@@ -1,4 +1,4 @@
-import type { Faq, Page } from "@/types/api";
+import type { Faq, Page } from '@/types/api';
 import type { ModuleRendererProps } from './module-renderer.types';
 
 /**
@@ -13,9 +13,7 @@ function ContentModule({ page }: { page: Page }) {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
       <h1 className="mb-8 text-4xl font-bold tracking-tight">{page.title}</h1>
-      {page.excerpt && (
-        <p className="mb-8 text-lg text-muted-foreground">{page.excerpt}</p>
-      )}
+      {page.excerpt && <p className="text-muted-foreground mb-8 text-lg">{page.excerpt}</p>}
       {html && (
         <div
           className="prose prose-lg dark:prose-invert"
@@ -32,19 +30,17 @@ function FaqModule({ page }: { page: Page }) {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
       <h1 className="mb-8 text-3xl font-bold">{page.title}</h1>
-      <div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border">
+      <div className="divide-border border-border flex flex-col divide-y overflow-hidden rounded-xl border">
         {items.map((faq) => (
           <details key={faq.id} className="group px-6 py-4">
             <summary className="cursor-pointer font-medium marker:content-none">
               <span className="flex items-center justify-between gap-4">
                 {faq.question}
-                <span className="shrink-0 transition-transform group-open:rotate-180">
-                  ▾
-                </span>
+                <span className="shrink-0 transition-transform group-open:rotate-180">▾</span>
               </span>
             </summary>
             <div
-              className="prose prose-sm mt-3 dark:prose-invert"
+              className="prose prose-sm dark:prose-invert mt-3"
               dangerouslySetInnerHTML={{ __html: faq.answer }}
             />
           </details>
@@ -56,14 +52,14 @@ function FaqModule({ page }: { page: Page }) {
 
 export function ModuleRenderer({ page }: ModuleRendererProps) {
   switch (page.module_name) {
-    case "content":
+    case 'content':
       return <ContentModule page={page} />;
-    case "faq":
+    case 'faq':
       return <FaqModule page={page} />;
     default:
-      if (process.env.NODE_ENV === "development") {
+      if (process.env.NODE_ENV === 'development') {
         return (
-          <div className="p-8 text-center text-muted-foreground">
+          <div className="text-muted-foreground p-8 text-center">
             Unknown module: <strong>{page.module_name}</strong>
           </div>
         );

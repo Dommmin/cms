@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
+import Link from 'next/link';
+import { useState } from 'react';
 
-import { useForgotPassword } from "@/hooks/use-auth";
+import { useForgotPassword } from '@/hooks/use-auth';
 
 export default function ForgotPasswordPage() {
   const { mutate: forgotPassword, isPending, isSuccess, error } = useForgotPassword();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -16,7 +16,7 @@ export default function ForgotPasswordPage() {
 
   const errorMessage =
     // @ts-expect-error axios error shape
-    error?.response?.data?.message ?? (error ? "Request failed. Please try again." : null);
+    error?.response?.data?.message ?? (error ? 'Request failed. Please try again.' : null);
 
   if (isSuccess) {
     return (
@@ -35,12 +35,12 @@ export default function ForgotPasswordPage() {
   return (
     <div className="mx-auto max-w-sm px-4 py-24 sm:px-6">
       <h1 className="mb-2 text-center text-3xl font-bold">Reset Password</h1>
-      <p className="mb-8 text-center text-muted-foreground">
+      <p className="text-muted-foreground mb-8 text-center">
         Enter your email and we&apos;ll send you a reset link.
       </p>
 
       {errorMessage && (
-        <div className="mb-4 rounded-xl border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+        <div className="border-destructive/50 bg-destructive/10 text-destructive mb-4 rounded-xl border p-4 text-sm">
           {errorMessage}
         </div>
       )}
@@ -57,21 +57,21 @@ export default function ForgotPasswordPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
-            className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            className="border-input bg-background focus:ring-ring w-full rounded-xl border px-4 py-2.5 text-sm focus:ring-2 focus:outline-none"
           />
         </div>
         <button
           type="submit"
           disabled={isPending}
-          className="w-full rounded-xl bg-primary py-2.5 font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50"
+          className="bg-primary text-primary-foreground w-full rounded-xl py-2.5 font-semibold hover:opacity-90 disabled:opacity-50"
         >
-          {isPending ? "Sending…" : "Send Reset Link"}
+          {isPending ? 'Sending…' : 'Send Reset Link'}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
-        Remembered your password?{" "}
-        <Link href="/login" className="font-medium underline hover:text-foreground">
+      <p className="text-muted-foreground mt-6 text-center text-sm">
+        Remembered your password?{' '}
+        <Link href="/login" className="hover:text-foreground font-medium underline">
           Sign in
         </Link>
       </p>

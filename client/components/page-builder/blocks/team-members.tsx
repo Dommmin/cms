@@ -1,7 +1,7 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { Linkedin, Twitter } from "lucide-react";
+import { Linkedin, Twitter } from 'lucide-react';
 
 import type { TeamMembersConfig, TeamMembersProps } from './team-members.types';
 
@@ -10,12 +10,13 @@ export function TeamMembersBlock({ block }: TeamMembersProps) {
   const members = cfg.members ?? [];
   const columns = cfg.columns ?? 4;
 
-  const colClass = {
-    2: "grid-cols-1 sm:grid-cols-2",
-    3: "grid-cols-1 sm:grid-cols-3",
-    4: "grid-cols-2 sm:grid-cols-4",
-    5: "grid-cols-2 sm:grid-cols-5",
-  }[columns as 2 | 3 | 4 | 5] ?? "grid-cols-2 sm:grid-cols-4";
+  const colClass =
+    {
+      2: 'grid-cols-1 sm:grid-cols-2',
+      3: 'grid-cols-1 sm:grid-cols-3',
+      4: 'grid-cols-2 sm:grid-cols-4',
+      5: 'grid-cols-2 sm:grid-cols-5',
+    }[columns as 2 | 3 | 4 | 5] ?? 'grid-cols-2 sm:grid-cols-4';
 
   if (members.length === 0) return null;
 
@@ -24,7 +25,7 @@ export function TeamMembersBlock({ block }: TeamMembersProps) {
       {(cfg.title || cfg.subtitle) && (
         <div className="text-center">
           {cfg.title && <h2 className="text-2xl font-bold md:text-3xl">{cfg.title}</h2>}
-          {cfg.subtitle && <p className="mt-2 text-muted-foreground">{cfg.subtitle}</p>}
+          {cfg.subtitle && <p className="text-muted-foreground mt-2">{cfg.subtitle}</p>}
         </div>
       )}
 
@@ -34,33 +35,37 @@ export function TeamMembersBlock({ block }: TeamMembersProps) {
             {member.photo_url ? (
               <Image
                 src={member.photo_url}
-                alt={member.name ?? ""}
+                alt={member.name ?? ''}
                 width={96}
                 height={96}
-                className="h-24 w-24 rounded-full object-cover ring-2 ring-border"
+                className="ring-border h-24 w-24 rounded-full object-cover ring-2"
               />
             ) : (
-              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-muted text-2xl font-bold text-muted-foreground">
-                {member.name?.charAt(0) ?? "?"}
+              <div className="bg-muted text-muted-foreground flex h-24 w-24 items-center justify-center rounded-full text-2xl font-bold">
+                {member.name?.charAt(0) ?? '?'}
               </div>
             )}
             <div>
               {member.name && <p className="font-semibold">{member.name}</p>}
-              {member.role && (
-                <p className="text-sm text-muted-foreground">{member.role}</p>
-              )}
+              {member.role && <p className="text-muted-foreground text-sm">{member.role}</p>}
             </div>
-            {member.bio && (
-              <p className="text-sm text-muted-foreground">{member.bio}</p>
-            )}
+            {member.bio && <p className="text-muted-foreground text-sm">{member.bio}</p>}
             <div className="flex gap-3">
               {member.linkedin_url && (
-                <Link href={member.linkedin_url} target="_blank" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link
+                  href={member.linkedin_url}
+                  target="_blank"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
                   <Linkedin className="h-4 w-4" />
                 </Link>
               )}
               {member.twitter_url && (
-                <Link href={member.twitter_url} target="_blank" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link
+                  href={member.twitter_url}
+                  target="_blank"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
                   <Twitter className="h-4 w-4" />
                 </Link>
               )}

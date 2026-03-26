@@ -1,16 +1,11 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import Script from "next/script";
+import Script from 'next/script';
+import { useEffect, useRef } from 'react';
 import type { InPostPoint, InpostPickerProps } from './inpost-picker.types';
 
 // Inner component — only rendered when the token is present (hooks are always called).
-function InpostWidget({
-  value,
-  onChange,
-  language,
-  token,
-}: InpostPickerProps & { token: string }) {
+function InpostWidget({ value, onChange, language, token }: InpostPickerProps & { token: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<Element | null>(null);
   const onChangeRef = useRef(onChange);
@@ -31,8 +26,8 @@ function InpostWidget({
       }
     };
 
-    container.addEventListener("inpost.point.select", handler);
-    return () => container.removeEventListener("inpost.point.select", handler);
+    container.addEventListener('inpost.point.select', handler);
+    return () => container.removeEventListener('inpost.point.select', handler);
   }, []);
 
   // Create the widget element imperatively — avoids React setting `token` as a
@@ -45,14 +40,14 @@ function InpostWidget({
       container.removeChild(widgetRef.current);
     }
 
-    const el = document.createElement("inpost-geowidget");
-    el.setAttribute("token", token);
-    el.setAttribute("language", language ?? "pl");
-    el.setAttribute("config", "parcelcollect");
-    el.setAttribute("onpoint", "inpost.point.select");
-    el.style.display = "block";
-    el.style.height = "480px";
-    el.style.width = "100%";
+    const el = document.createElement('inpost-geowidget');
+    el.setAttribute('token', token);
+    el.setAttribute('language', language ?? 'pl');
+    el.setAttribute('config', 'parcelcollect');
+    el.setAttribute('onpoint', 'inpost.point.select');
+    el.style.display = 'block';
+    el.style.height = '480px';
+    el.style.width = '100%';
 
     container.appendChild(el);
     widgetRef.current = el;
@@ -66,13 +61,13 @@ function InpostWidget({
   return (
     <div className="mt-3 space-y-2">
       {value && (
-        <div className="flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/5 px-3 py-2 text-sm">
-          <span className="font-medium text-primary">Wybrany paczkomat:</span>
+        <div className="border-primary/40 bg-primary/5 flex items-center gap-2 rounded-lg border px-3 py-2 text-sm">
+          <span className="text-primary font-medium">Wybrany paczkomat:</span>
           <span className="font-mono font-semibold">{value}</span>
           <button
             type="button"
-            onClick={() => onChangeRef.current("", { name: "", address: { line1: "", line2: "" } })}
-            className="ml-auto text-xs text-muted-foreground underline hover:text-foreground"
+            onClick={() => onChangeRef.current('', { name: '', address: { line1: '', line2: '' } })}
+            className="text-muted-foreground hover:text-foreground ml-auto text-xs underline"
           >
             Zmień
           </button>
@@ -80,14 +75,14 @@ function InpostWidget({
       )}
 
       <Script src="https://geowidget.inpost.pl/inpost-geowidget.js" strategy="lazyOnload" />
-      <div ref={containerRef} className="overflow-hidden rounded-xl border border-border" />
+      <div ref={containerRef} className="border-border overflow-hidden rounded-xl border" />
     </div>
   );
 }
 
 // Outer component — guards against missing NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN.
-export function InpostPicker({ value, onChange, language = "pl" }: InpostPickerProps) {
-  const token = process.env.NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN ?? "";
+export function InpostPicker({ value, onChange, language = 'pl' }: InpostPickerProps) {
+  const token = process.env.NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN ?? '';
 
   if (!token) {
     return (
@@ -96,7 +91,7 @@ export function InpostPicker({ value, onChange, language = "pl" }: InpostPickerP
           InPost Paczkomat picker unavailable — missing token
         </p>
         <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
-          Set the following variable in{" "}
+          Set the following variable in{' '}
           <code className="rounded bg-amber-100 px-1 dark:bg-amber-900">client/.env.local</code>:
         </p>
         <p className="mt-1.5 font-mono text-xs text-amber-900 dark:text-amber-100">

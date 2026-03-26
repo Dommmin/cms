@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { X, Cookie } from "lucide-react";
+import { Cookie, X } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 
-import { updateConsent } from "@/lib/datalayer";
-import { COOKIE_CONSENT_OPEN_EVENT } from "@/providers/cookie-consent-provider";
-import type { ConsentState, StoredConsent, CookieConsentProps } from './cookie-consent.types';
+import { updateConsent } from '@/lib/datalayer';
+import { COOKIE_CONSENT_OPEN_EVENT } from '@/providers/cookie-consent-provider';
+import type { ConsentState, CookieConsentProps, StoredConsent } from './cookie-consent.types';
 
-const STORAGE_KEY = "cookie_consent";
+const STORAGE_KEY = 'cookie_consent';
 
 function getStoredConsent(): StoredConsent | null {
-  if (typeof window === "undefined") return null;
+  if (typeof window === 'undefined') return null;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? (JSON.parse(raw) as StoredConsent) : null;
@@ -27,19 +27,16 @@ function storeConsent(consent: ConsentState, version: string): void {
   // Cookie for SSR reads — Secure flag added on HTTPS
   const expires = new Date();
   expires.setFullYear(expires.getFullYear() + 1);
-  const secure = location.protocol === "https:" ? "; Secure" : "";
+  const secure = location.protocol === 'https:' ? '; Secure' : '';
   document.cookie = `consent=${JSON.stringify(consent)}; path=/; expires=${expires.toUTCString()}; SameSite=Lax${secure}`;
 }
 
-async function recordConsentOnServer(
-  consent: ConsentState,
-  version: string,
-): Promise<void> {
+async function recordConsentOnServer(consent: ConsentState, version: string): Promise<void> {
   try {
     const sessionId = getOrCreateSessionId();
-    await fetch("/api/v1/consent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    await fetch('/api/v1/consent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         analytics: consent.analytics,
         marketing: consent.marketing,
@@ -54,7 +51,7 @@ async function recordConsentOnServer(
 }
 
 function getOrCreateSessionId(): string {
-  const key = "consent_session_id";
+  const key = 'consent_session_id';
   let id = localStorage.getItem(key);
   if (!id) {
     id = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
@@ -63,7 +60,8 @@ function getOrCreateSessionId(): string {
   return id;
 }
 
-const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export function CookieConsent({ settings = {} }: CookieConsentProps) {
   const [visible, setVisible] = useState(false);
@@ -75,7 +73,7 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
   });
   const dialogRef = useRef<HTMLDivElement>(null);
 
-  const version = settings.consent_version ?? "1.0";
+  const version = settings.consent_version ?? '1.0';
 
   // Show banner if no stored consent OR stored version differs from current
   useEffect(() => {
@@ -107,35 +105,41 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
     focusables()[0]?.focus();
 
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key !== "Tab") return;
+      if (e.key !== 'Tab') return;
       const items = focusables();
       if (items.length === 0) return;
       const first = items[0];
       const last = items[items.length - 1];
       if (e.shiftKey) {
-        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
       } else {
-        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     }
-    el.addEventListener("keydown", onKeyDown);
-    return () => el.removeEventListener("keydown", onKeyDown);
+    el.addEventListener('keydown', onKeyDown);
+    return () => el.removeEventListener('keydown', onKeyDown);
   }, [visible, showDetails]);
 
   if (!visible) return null;
 
-  const bannerTitle = settings.banner_title ?? "We use cookies";
+  const bannerTitle = settings.banner_title ?? 'We use cookies';
   const bannerDescription =
     settings.banner_description ??
-    "We use cookies to improve your experience, analyse traffic, and personalise content.";
-  const privacyUrl = settings.privacy_policy_url ?? "/privacy-policy";
-  const cookiePolicyUrl = settings.cookie_policy_url ?? "/cookie-policy";
+    'We use cookies to improve your experience, analyse traffic, and personalise content.';
+  const privacyUrl = settings.privacy_policy_url ?? '/privacy-policy';
+  const cookiePolicyUrl = settings.cookie_policy_url ?? '/cookie-policy';
   const analyticsDesc =
     settings.analytics_description ??
-    "Help us understand how visitors use the site (e.g. Google Analytics).";
+    'Help us understand how visitors use the site (e.g. Google Analytics).';
   const marketingDesc =
     settings.marketing_description ??
-    "Used to show relevant ads and measure their effectiveness (e.g. Google Ads, Meta Pixel).";
+    'Used to show relevant ads and measure their effectiveness (e.g. Google Ads, Meta Pixel).';
 
   function applyConsent(consent: ConsentState) {
     storeConsent(consent, version);
@@ -162,27 +166,27 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
       role="dialog"
       aria-modal="true"
       aria-label={bannerTitle}
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 shadow-lg backdrop-blur"
+      className="border-border bg-background/95 fixed right-0 bottom-0 left-0 z-50 border-t shadow-lg backdrop-blur"
     >
       <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
         {!showDetails ? (
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-3">
-              <Cookie className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">
-                {bannerDescription}{" "}
+              <Cookie className="text-muted-foreground mt-0.5 h-5 w-5 shrink-0" />
+              <p className="text-muted-foreground text-sm">
+                {bannerDescription}{' '}
                 <button
                   onClick={() => setShowDetails(true)}
-                  className="font-medium text-foreground underline"
+                  className="text-foreground font-medium underline"
                 >
                   Manage preferences
                 </button>
-                {" · "}
-                <Link href={privacyUrl} className="font-medium text-foreground underline">
+                {' · '}
+                <Link href={privacyUrl} className="text-foreground font-medium underline">
                   Privacy Policy
                 </Link>
-                {" · "}
-                <Link href={cookiePolicyUrl} className="font-medium text-foreground underline">
+                {' · '}
+                <Link href={cookiePolicyUrl} className="text-foreground font-medium underline">
                   Cookie Policy
                 </Link>
               </p>
@@ -190,13 +194,13 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
             <div className="flex shrink-0 items-center gap-2">
               <button
                 onClick={rejectAll}
-                className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-accent"
+                className="border-border hover:bg-accent rounded-lg border px-3 py-1.5 text-sm"
               >
                 Reject all
               </button>
               <button
                 onClick={acceptAll}
-                className="rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90"
+                className="bg-primary text-primary-foreground rounded-lg px-3 py-1.5 text-sm font-medium hover:opacity-90"
               >
                 Accept all
               </button>
@@ -215,7 +219,7 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                     setVisible(false);
                   }
                 }}
-                className="rounded p-1 hover:bg-accent"
+                className="hover:bg-accent rounded p-1"
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />
@@ -224,10 +228,10 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
 
             <div className="mb-4 space-y-3">
               {/* Functional — always on */}
-              <div className="flex items-center justify-between rounded-lg border border-border p-3">
+              <div className="border-border flex items-center justify-between rounded-lg border p-3">
                 <div>
                   <p className="text-sm font-medium">Functional (strictly necessary)</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Essential for the site to work — session, cart, security. Cannot be disabled.
                   </p>
                 </div>
@@ -235,10 +239,10 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
               </div>
 
               {/* Analytics */}
-              <div className="flex items-center justify-between rounded-lg border border-border p-3">
+              <div className="border-border flex items-center justify-between rounded-lg border p-3">
                 <div>
                   <p className="text-sm font-medium">Analytics</p>
-                  <p className="text-xs text-muted-foreground">{analyticsDesc}</p>
+                  <p className="text-muted-foreground text-xs">{analyticsDesc}</p>
                 </div>
                 <input
                   type="checkbox"
@@ -249,10 +253,10 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
               </div>
 
               {/* Marketing */}
-              <div className="flex items-center justify-between rounded-lg border border-border p-3">
+              <div className="border-border flex items-center justify-between rounded-lg border p-3">
                 <div>
                   <p className="text-sm font-medium">Marketing</p>
-                  <p className="text-xs text-muted-foreground">{marketingDesc}</p>
+                  <p className="text-muted-foreground text-xs">{marketingDesc}</p>
                 </div>
                 <input
                   type="checkbox"
@@ -266,29 +270,29 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={savePrefs}
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+                className="bg-primary text-primary-foreground rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90"
               >
                 Save preferences
               </button>
               <button
                 onClick={rejectAll}
-                className="rounded-lg border border-border px-4 py-2 text-sm hover:bg-accent"
+                className="border-border hover:bg-accent rounded-lg border px-4 py-2 text-sm"
               >
                 Reject all
               </button>
               <button
                 onClick={acceptAll}
-                className="rounded-lg border border-border px-4 py-2 text-sm hover:bg-accent"
+                className="border-border hover:bg-accent rounded-lg border px-4 py-2 text-sm"
               >
                 Accept all
               </button>
             </div>
 
-            <p className="mt-3 text-xs text-muted-foreground">
-              You can change your preferences at any time via the{" "}
+            <p className="text-muted-foreground mt-3 text-xs">
+              You can change your preferences at any time via the{' '}
               <Link href={cookiePolicyUrl} className="underline">
                 Cookie Policy
-              </Link>{" "}
+              </Link>{' '}
               or the link in the footer. Consent version: {version}.
             </p>
           </div>

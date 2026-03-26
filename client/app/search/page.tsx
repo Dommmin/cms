@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-import { ProductCard } from "@/components/product-card";
-import { useBrands, useCategories } from "@/hooks/use-cms";
-import { useProducts } from "@/hooks/use-products";
-import { trackSearch } from "@/lib/datalayer";
-import type { ProductFilters } from "@/api/products";
-import type { Brand } from "@/types/api";
+import type { ProductFilters } from '@/api/products';
+import { ProductCard } from '@/components/product-card';
+import { useBrands, useCategories } from '@/hooks/use-cms';
+import { useProducts } from '@/hooks/use-products';
+import { trackSearch } from '@/lib/datalayer';
+import type { Brand } from '@/types/api';
 
 const SORT_OPTIONS = [
-  { value: "", label: "Default" },
-  { value: "price", label: "Price: Low to High" },
-  { value: "-price", label: "Price: High to Low" },
-  { value: "-created_at", label: "Newest" },
+  { value: '', label: 'Default' },
+  { value: 'price', label: 'Price: Low to High' },
+  { value: '-price', label: 'Price: High to Low' },
+  { value: '-created_at', label: 'Newest' },
 ];
 
 export default function SearchPage() {
@@ -23,15 +23,15 @@ export default function SearchPage() {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const q = searchParams.get("q") ?? "";
+  const q = searchParams.get('q') ?? '';
   const filters: ProductFilters = {
     search: q || undefined,
-    category: searchParams.get("category") ?? undefined,
-    brand: searchParams.get("brand") ?? undefined,
-    sort: searchParams.get("sort") ?? undefined,
-    min_price: searchParams.get("min_price") ? Number(searchParams.get("min_price")) : undefined,
-    max_price: searchParams.get("max_price") ? Number(searchParams.get("max_price")) : undefined,
-    page: Number(searchParams.get("page") ?? 1),
+    category: searchParams.get('category') ?? undefined,
+    brand: searchParams.get('brand') ?? undefined,
+    sort: searchParams.get('sort') ?? undefined,
+    min_price: searchParams.get('min_price') ? Number(searchParams.get('min_price')) : undefined,
+    max_price: searchParams.get('max_price') ? Number(searchParams.get('max_price')) : undefined,
+    page: Number(searchParams.get('page') ?? 1),
   };
 
   const { data, isLoading } = useProducts(filters);
@@ -51,31 +51,31 @@ export default function SearchPage() {
     } else {
       params.delete(key);
     }
-    params.delete("page");
+    params.delete('page');
     router.push(`/search?${params.toString()}`);
   }
 
   function clearAll() {
-    router.push(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
+    router.push(q ? `/search?q=${encodeURIComponent(q)}` : '/search');
   }
 
   // Active filter chips (excluding q and page)
   const activeFilters: { key: string; label: string }[] = [];
   if (filters.category) {
     const cat = categories?.find((c) => c.slug === filters.category);
-    activeFilters.push({ key: "category", label: cat?.name ?? filters.category });
+    activeFilters.push({ key: 'category', label: cat?.name ?? filters.category });
   }
   if (filters.brand) {
     const brand = brands?.find((b: Brand) => String(b.id) === filters.brand);
-    activeFilters.push({ key: "brand", label: brand?.name ?? `Brand #${filters.brand}` });
+    activeFilters.push({ key: 'brand', label: brand?.name ?? `Brand #${filters.brand}` });
   }
   if (filters.min_price != null)
-    activeFilters.push({ key: "min_price", label: `From $${filters.min_price}` });
+    activeFilters.push({ key: 'min_price', label: `From $${filters.min_price}` });
   if (filters.max_price != null)
-    activeFilters.push({ key: "max_price", label: `To $${filters.max_price}` });
+    activeFilters.push({ key: 'max_price', label: `To $${filters.max_price}` });
   if (filters.sort) {
     const opt = SORT_OPTIONS.find((o) => o.value === filters.sort);
-    activeFilters.push({ key: "sort", label: opt?.label ?? filters.sort });
+    activeFilters.push({ key: 'sort', label: opt?.label ?? filters.sort });
   }
 
   return (
@@ -85,23 +85,23 @@ export default function SearchPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            const input = (e.currentTarget.elements.namedItem("q") as HTMLInputElement).value;
-            setParam("q", input);
+            const input = (e.currentTarget.elements.namedItem('q') as HTMLInputElement).value;
+            setParam('q', input);
           }}
           className="flex flex-1 items-center gap-2"
         >
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <input
               name="q"
               defaultValue={q}
               placeholder="Search products…"
-              className="w-full rounded-xl border border-input bg-background py-2.5 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              className="border-input bg-background focus:ring-ring w-full rounded-xl border py-2.5 pr-4 pl-9 text-sm focus:ring-2 focus:outline-none"
             />
           </div>
           <button
             type="submit"
-            className="rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90"
+            className="bg-primary text-primary-foreground rounded-xl px-4 py-2.5 text-sm font-medium hover:opacity-90"
           >
             Search
           </button>
@@ -109,9 +109,9 @@ export default function SearchPage() {
 
         <div className="flex items-center gap-2">
           <select
-            value={filters.sort ?? ""}
-            onChange={(e) => setParam("sort", e.target.value)}
-            className="rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            value={filters.sort ?? ''}
+            onChange={(e) => setParam('sort', e.target.value)}
+            className="border-input bg-background focus:ring-ring rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
           >
             {SORT_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -121,12 +121,12 @@ export default function SearchPage() {
           </select>
           <button
             onClick={() => setSidebarOpen((v) => !v)}
-            className="inline-flex items-center gap-2 rounded-xl border border-input bg-background px-3 py-2.5 text-sm hover:bg-accent lg:hidden"
+            className="border-input bg-background hover:bg-accent inline-flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm lg:hidden"
           >
             <SlidersHorizontal className="h-4 w-4" />
             Filters
             {activeFilters.length > 0 && (
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+              <span className="bg-primary text-primary-foreground flex h-5 w-5 items-center justify-center rounded-full text-xs">
                 {activeFilters.length}
               </span>
             )}
@@ -137,12 +137,12 @@ export default function SearchPage() {
       {/* Active filter chips */}
       {activeFilters.length > 0 && (
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          <span className="text-xs text-muted-foreground">Active:</span>
+          <span className="text-muted-foreground text-xs">Active:</span>
           {activeFilters.map((f) => (
             <button
               key={f.key}
-              onClick={() => setParam(f.key, "")}
-              className="inline-flex items-center gap-1 rounded-full border border-border bg-accent px-3 py-1 text-xs font-medium hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive"
+              onClick={() => setParam(f.key, '')}
+              className="border-border bg-accent hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium"
             >
               {f.label}
               <X className="h-3 w-3" />
@@ -150,7 +150,7 @@ export default function SearchPage() {
           ))}
           <button
             onClick={clearAll}
-            className="text-xs text-muted-foreground underline hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground text-xs underline"
           >
             Clear all
           </button>
@@ -159,23 +159,21 @@ export default function SearchPage() {
 
       <div className="flex gap-6">
         {/* Sidebar */}
-        <aside
-          className={`${sidebarOpen ? "block" : "hidden"} w-64 shrink-0 lg:block`}
-        >
-          <div className="space-y-6 rounded-xl border border-border bg-card p-4">
+        <aside className={`${sidebarOpen ? 'block' : 'hidden'} w-64 shrink-0 lg:block`}>
+          <div className="border-border bg-card space-y-6 rounded-xl border p-4">
             {/* Categories */}
             {categories && categories.length > 0 && (
               <div>
-                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
                   Categories
                 </p>
                 <div className="space-y-1">
                   <button
-                    onClick={() => setParam("category", "")}
+                    onClick={() => setParam('category', '')}
                     className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
                       !filters.category
-                        ? "bg-primary/10 font-medium text-primary"
-                        : "text-foreground/70 hover:bg-accent hover:text-foreground"
+                        ? 'bg-primary/10 text-primary font-medium'
+                        : 'text-foreground/70 hover:bg-accent hover:text-foreground'
                     }`}
                   >
                     All categories
@@ -183,11 +181,11 @@ export default function SearchPage() {
                   {categories.map((cat) => (
                     <button
                       key={cat.id}
-                      onClick={() => setParam("category", cat.slug)}
+                      onClick={() => setParam('category', cat.slug)}
                       className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
                         filters.category === cat.slug
-                          ? "bg-primary/10 font-medium text-primary"
-                          : "text-foreground/70 hover:bg-accent hover:text-foreground"
+                          ? 'bg-primary/10 text-primary font-medium'
+                          : 'text-foreground/70 hover:bg-accent hover:text-foreground'
                       }`}
                     >
                       {cat.name}
@@ -200,16 +198,16 @@ export default function SearchPage() {
             {/* Brands */}
             {brands && brands.length > 0 && (
               <div>
-                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
                   Brand
                 </p>
                 <div className="space-y-1">
                   <button
-                    onClick={() => setParam("brand", "")}
+                    onClick={() => setParam('brand', '')}
                     className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
                       !filters.brand
-                        ? "bg-primary/10 font-medium text-primary"
-                        : "text-foreground/70 hover:bg-accent hover:text-foreground"
+                        ? 'bg-primary/10 text-primary font-medium'
+                        : 'text-foreground/70 hover:bg-accent hover:text-foreground'
                     }`}
                   >
                     All brands
@@ -217,11 +215,11 @@ export default function SearchPage() {
                   {brands.map((brand: Brand) => (
                     <button
                       key={brand.id}
-                      onClick={() => setParam("brand", String(brand.id))}
+                      onClick={() => setParam('brand', String(brand.id))}
                       className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
                         filters.brand === String(brand.id)
-                          ? "bg-primary/10 font-medium text-primary"
-                          : "text-foreground/70 hover:bg-accent hover:text-foreground"
+                          ? 'bg-primary/10 text-primary font-medium'
+                          : 'text-foreground/70 hover:bg-accent hover:text-foreground'
                       }`}
                     >
                       {brand.name}
@@ -233,7 +231,7 @@ export default function SearchPage() {
 
             {/* Price range */}
             <div>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
                 Price range
               </p>
               <div className="flex items-center gap-2">
@@ -241,18 +239,18 @@ export default function SearchPage() {
                   type="number"
                   min={0}
                   placeholder="Min"
-                  defaultValue={filters.min_price ?? ""}
-                  onBlur={(e) => setParam("min_price", e.target.value)}
-                  className="w-full rounded-lg border border-input bg-background px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  defaultValue={filters.min_price ?? ''}
+                  onBlur={(e) => setParam('min_price', e.target.value)}
+                  className="border-input bg-background focus:ring-ring w-full rounded-lg border px-2 py-1.5 text-sm focus:ring-2 focus:outline-none"
                 />
                 <span className="text-muted-foreground">–</span>
                 <input
                   type="number"
                   min={0}
                   placeholder="Max"
-                  defaultValue={filters.max_price ?? ""}
-                  onBlur={(e) => setParam("max_price", e.target.value)}
-                  className="w-full rounded-lg border border-input bg-background px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  defaultValue={filters.max_price ?? ''}
+                  onBlur={(e) => setParam('max_price', e.target.value)}
+                  className="border-input bg-background focus:ring-ring w-full rounded-lg border px-2 py-1.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </div>
             </div>
@@ -260,17 +258,17 @@ export default function SearchPage() {
         </aside>
 
         {/* Results */}
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           {/* Result count */}
-          <p className="mb-4 text-sm text-muted-foreground">
+          <p className="text-muted-foreground mb-4 text-sm">
             {isLoading ? (
-              "Searching…"
+              'Searching…'
             ) : (
               <>
-                <span className="font-medium text-foreground">
+                <span className="text-foreground font-medium">
                   {data?.meta?.total ?? data?.data?.length ?? 0}
-                </span>{" "}
-                {q ? <>results for &ldquo;{q}&rdquo;</> : "products found"}
+                </span>{' '}
+                {q ? <>results for &ldquo;{q}&rdquo;</> : 'products found'}
               </>
             )}
           </p>
@@ -279,7 +277,7 @@ export default function SearchPage() {
           {isLoading && (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="aspect-square animate-pulse rounded-xl bg-muted" />
+                <div key={i} className="bg-muted aspect-square animate-pulse rounded-xl" />
               ))}
             </div>
           )}
@@ -287,30 +285,29 @@ export default function SearchPage() {
           {/* Empty */}
           {!isLoading && data?.data?.length === 0 && (
             <div className="py-20 text-center">
-              <p className="text-lg font-medium text-foreground">No results found</p>
+              <p className="text-foreground text-lg font-medium">No results found</p>
               {q && (
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="text-muted-foreground mt-1 text-sm">
                   Try a different search or remove filters
                 </p>
               )}
               {activeFilters.length > 0 && (
-                <button
-                  onClick={clearAll}
-                  className="mt-4 text-sm text-primary underline"
-                >
+                <button onClick={clearAll} className="text-primary mt-4 text-sm underline">
                   Clear all filters
                 </button>
               )}
               {/* Suggested categories */}
               {categories && categories.length > 0 && (
                 <div className="mt-8">
-                  <p className="mb-3 text-sm font-medium text-muted-foreground">Browse categories</p>
+                  <p className="text-muted-foreground mb-3 text-sm font-medium">
+                    Browse categories
+                  </p>
                   <div className="flex flex-wrap justify-center gap-2">
                     {categories.slice(0, 6).map((cat) => (
                       <button
                         key={cat.id}
-                        onClick={() => setParam("category", cat.slug)}
-                        className="rounded-full border border-border px-3 py-1 text-sm hover:bg-accent"
+                        onClick={() => setParam('category', cat.slug)}
+                        className="border-border hover:bg-accent rounded-full border px-3 py-1 text-sm"
                       >
                         {cat.name}
                       </button>
@@ -336,11 +333,11 @@ export default function SearchPage() {
                   {Array.from({ length: data.meta.last_page }, (_, i) => i + 1).map((page) => (
                     <button
                       key={page}
-                      onClick={() => setParam("page", String(page))}
+                      onClick={() => setParam('page', String(page))}
                       className={`h-9 w-9 rounded-md text-sm font-medium ${
                         page === data.meta!.current_page
-                          ? "bg-primary text-primary-foreground"
-                          : "border border-input hover:bg-accent"
+                          ? 'bg-primary text-primary-foreground'
+                          : 'border-input hover:bg-accent border'
                       }`}
                     >
                       {page}

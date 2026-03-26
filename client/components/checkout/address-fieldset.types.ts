@@ -1,5 +1,5 @@
-import type { AddressPayload } from "@/api/checkout";
-import type { Address } from "@/types/api";
+import type { AddressPayload } from '@/api/checkout';
+import type { Address } from '@/types/api';
 
 export type AddressErrors = Partial<Record<keyof AddressPayload, string>>;
 export interface NominatimResult {

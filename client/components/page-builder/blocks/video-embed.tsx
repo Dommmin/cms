@@ -7,24 +7,23 @@ function getEmbedUrl(url: string, autoplay: boolean, loop: boolean, muted: boole
     // YouTube
     const ytMatch = parsed.hostname.match(/youtube\.com|youtu\.be/);
     if (ytMatch) {
-      const videoId =
-        parsed.searchParams.get("v") ?? parsed.pathname.split("/").pop() ?? "";
+      const videoId = parsed.searchParams.get('v') ?? parsed.pathname.split('/').pop() ?? '';
       const params = new URLSearchParams({
-        autoplay: autoplay ? "1" : "0",
-        loop: loop ? "1" : "0",
-        mute: muted ? "1" : "0",
+        autoplay: autoplay ? '1' : '0',
+        loop: loop ? '1' : '0',
+        mute: muted ? '1' : '0',
         ...(loop && { playlist: videoId }),
       });
       return `https://www.youtube.com/embed/${videoId}?${params}`;
     }
 
     // Vimeo
-    if (parsed.hostname.includes("vimeo.com")) {
-      const videoId = parsed.pathname.split("/").pop() ?? "";
+    if (parsed.hostname.includes('vimeo.com')) {
+      const videoId = parsed.pathname.split('/').pop() ?? '';
       const params = new URLSearchParams({
-        autoplay: autoplay ? "1" : "0",
-        loop: loop ? "1" : "0",
-        muted: muted ? "1" : "0",
+        autoplay: autoplay ? '1' : '0',
+        loop: loop ? '1' : '0',
+        muted: muted ? '1' : '0',
       });
       return `https://player.vimeo.com/video/${videoId}?${params}`;
     }
@@ -39,10 +38,10 @@ export function VideoEmbedBlock({ block }: VideoEmbedProps) {
   if (!cfg.url) return null;
 
   const aspectClass = {
-    video: "aspect-video",
-    square: "aspect-square",
-    portrait: "aspect-[9/16]",
-  }[cfg.aspect ?? "video"];
+    video: 'aspect-video',
+    square: 'aspect-square',
+    portrait: 'aspect-[9/16]',
+  }[cfg.aspect ?? 'video'];
 
   const embedUrl = getEmbedUrl(
     cfg.url,
@@ -60,7 +59,7 @@ export function VideoEmbedBlock({ block }: VideoEmbedProps) {
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
           className="h-full w-full"
-          title={cfg.title ?? "Video"}
+          title={cfg.title ?? 'Video'}
         />
       </div>
     </div>

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import { StoreMap } from "@/components/store-map";
-import type { Store } from "@/types/api";
+import { StoreMap } from '@/components/store-map';
+import type { Store } from '@/types/api';
 import type { MapBlockConfig, MapBlockProps } from './map-block.types';
 
 export function MapBlock({ block }: MapBlockProps) {
@@ -19,7 +19,7 @@ export function MapBlock({ block }: MapBlockProps) {
       if (cfg.store_id) {
         try {
           const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL ?? "/api/v1"}/stores/${cfg.store_id}`,
+            `${process.env.NEXT_PUBLIC_API_URL ?? '/api/v1'}/stores/${cfg.store_id}`,
           );
           if (res.ok) {
             const json = await res.json();
@@ -37,11 +37,11 @@ export function MapBlock({ block }: MapBlockProps) {
             : [
                 {
                   id: 0,
-                  name: cfg.title ?? "Location",
-                  slug: "",
-                  address: "",
-                  city: "",
-                  country: "",
+                  name: cfg.title ?? 'Location',
+                  slug: '',
+                  address: '',
+                  city: '',
+                  country: '',
                   phone: null,
                   email: null,
                   opening_hours: null,
@@ -60,18 +60,13 @@ export function MapBlock({ block }: MapBlockProps) {
   }, []);
 
   if (loading) {
-    return (
-      <div
-        className="animate-pulse rounded-lg bg-muted"
-        style={{ height }}
-      />
-    );
+    return <div className="bg-muted animate-pulse rounded-lg" style={{ height }} />;
   }
 
   if (stores.length === 0) {
     return (
       <div
-        className="flex items-center justify-center rounded-lg border border-dashed border-border bg-muted text-sm text-muted-foreground"
+        className="border-border bg-muted text-muted-foreground flex items-center justify-center rounded-lg border border-dashed text-sm"
         style={{ height }}
       >
         No location configured.
@@ -81,10 +76,8 @@ export function MapBlock({ block }: MapBlockProps) {
 
   return (
     <div>
-      {cfg.title && (
-        <h2 className="mb-4 text-2xl font-bold">{cfg.title}</h2>
-      )}
-      <div className="overflow-hidden rounded-xl border border-border">
+      {cfg.title && <h2 className="mb-4 text-2xl font-bold">{cfg.title}</h2>}
+      <div className="border-border overflow-hidden rounded-xl border">
         <StoreMap stores={stores} height={height} zoom={zoom} />
       </div>
     </div>

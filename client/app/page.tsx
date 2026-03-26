@@ -1,19 +1,19 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
-import { getPage } from "@/api/cms";
-import { PageRenderer } from "@/components/page-builder/page-renderer";
-import { RecentlyViewed } from "@/components/recently-viewed";
-import { generateAlternates } from "@/lib/seo";
+import { getPage } from '@/api/cms';
+import { PageRenderer } from '@/components/page-builder/page-renderer';
+import { RecentlyViewed } from '@/components/recently-viewed';
+import { generateAlternates } from '@/lib/seo';
 import type { PageData } from './page.types';
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
-    const page = await getPage("home");
+    const page = await getPage('home');
     return {
       title: page.seo_title ?? page.title,
       description: page.seo_description ?? undefined,
-      alternates: generateAlternates("/"),
+      alternates: generateAlternates('/'),
     };
   } catch {
     return {};
@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const page = await getPage("home").catch(() => null);
+  const page = await getPage('home').catch(() => null);
   return <HomeContent page={page} />;
 }
 

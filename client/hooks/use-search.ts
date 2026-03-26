@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 
-import { getProducts } from "@/api/products";
+import { getProducts } from '@/api/products';
 
-const STORAGE_KEY = "recent_searches";
+const STORAGE_KEY = 'recent_searches';
 const MAX_RECENT = 5;
 
 export function getRecentSearches(): string[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === 'undefined') return [];
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
   } catch {
     return [];
   }
@@ -37,7 +37,7 @@ export function useSearchSuggestions(query: string) {
   }, [query]);
 
   return useQuery({
-    queryKey: ["search-suggestions", debounced],
+    queryKey: ['search-suggestions', debounced],
     queryFn: () => getProducts({ search: debounced, per_page: 5 }),
     enabled: debounced.trim().length >= 2,
     staleTime: 30_000,

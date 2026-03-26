@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/axios";
-import { useLocale } from "@/hooks/use-locale";
+import { useLocale } from '@/hooks/use-locale';
+import { api } from '@/lib/axios';
+import { useQuery } from '@tanstack/react-query';
 
 type LocaleWithCurrency = {
   code: string;
@@ -17,7 +17,7 @@ type LocaleWithCurrency = {
 };
 
 async function fetchLocales(): Promise<LocaleWithCurrency[]> {
-  const { data } = await api.get<LocaleWithCurrency[]>("/locales");
+  const { data } = await api.get<LocaleWithCurrency[]>('/locales');
   return data;
 }
 
@@ -33,7 +33,7 @@ export function useCurrency() {
   const locale = useLocale();
 
   const { data: locales } = useQuery({
-    queryKey: ["locales"],
+    queryKey: ['locales'],
     queryFn: fetchLocales,
     staleTime: Infinity,
   });
@@ -44,9 +44,9 @@ export function useCurrency() {
   const formatPrice = (cents: number): string => {
     if (!currency) {
       // Fallback: PLN
-      return new Intl.NumberFormat("pl-PL", {
-        style: "currency",
-        currency: "PLN",
+      return new Intl.NumberFormat('pl-PL', {
+        style: 'currency',
+        currency: 'PLN',
       }).format(cents / 100);
     }
 
@@ -59,21 +59,17 @@ export function useCurrency() {
 
     // Pick a sensible locale for formatting based on currency
     const intlLocale =
-      currency.code === "PLN"
-        ? "pl-PL"
-        : currency.code === "EUR"
-          ? "de-DE"
-          : "en-US";
+      currency.code === 'PLN' ? 'pl-PL' : currency.code === 'EUR' ? 'de-DE' : 'en-US';
 
     return new Intl.NumberFormat(intlLocale, {
-      style: "currency",
+      style: 'currency',
       currency: currency.code,
     }).format(amount);
   };
 
   return {
     currency,
-    currencyCode: currency?.code ?? "PLN",
+    currencyCode: currency?.code ?? 'PLN',
     formatPrice,
   };
 }

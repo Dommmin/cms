@@ -37,10 +37,9 @@ export async function GET(): Promise<Response> {
       const price = formatPrice(product.price_min);
       const imageUrl = product.thumbnail?.url ?? '';
       const productUrl = `${SITE_URL}/products/${product.slug}`;
-      const availability =
-        product.variants.some((v) => v.is_available && v.stock_quantity > 0)
-          ? 'in stock'
-          : 'out of stock';
+      const availability = product.variants.some((v) => v.is_available && v.stock_quantity > 0)
+        ? 'in stock'
+        : 'out of stock';
 
       return `
     <item>

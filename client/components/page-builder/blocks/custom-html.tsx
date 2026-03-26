@@ -6,16 +6,8 @@ export function CustomHtmlBlock({ block }: CustomHtmlProps) {
 
   return (
     <>
-      {cfg.css && (
-        <style
-           
-          dangerouslySetInnerHTML={{ __html: cfg.css }}
-        />
-      )}
-      <div
-         
-        dangerouslySetInnerHTML={{ __html: cfg.html }}
-      />
+      {cfg.css && <style dangerouslySetInnerHTML={{ __html: cfg.css }} />}
+      <div dangerouslySetInnerHTML={{ __html: cfg.html }} />
     </>
   );
 }

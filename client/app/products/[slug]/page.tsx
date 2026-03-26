@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
-import { serverFetch } from "@/lib/server-fetch";
-import { generateAlternates } from "@/lib/seo";
-import type { Product } from "@/types/api";
-import ProductDetailClient from "./ProductDetailClient";
+import { generateAlternates } from '@/lib/seo';
+import { serverFetch } from '@/lib/server-fetch';
+import type { Product } from '@/types/api';
+import type { Metadata } from 'next';
+import ProductDetailClient from './ProductDetailClient';
 import type { PageProps } from './page.types';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
       title: product.seo_title ?? product.name,
       description: product.seo_description ?? product.short_description ?? undefined,
-      robots: product.meta_robots ?? "index, follow",
+      robots: product.meta_robots ?? 'index, follow',
       alternates: generateAlternates(`/products/${slug}`),
       openGraph: {
         title: product.seo_title ?? product.name,
@@ -22,9 +22,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
           : product.images?.[0]?.url
             ? [product.images[0].url]
             : [],
-        type: "website",
+        type: 'website',
       },
-      twitter: { card: "summary_large_image" },
+      twitter: { card: 'summary_large_image' },
     };
   } catch {
     return {};

@@ -1,27 +1,26 @@
-"use client";
+'use client';
 
-import { useReducedMotion } from "framer-motion";
-import { motion } from "framer-motion";
-import type { AnimationPreset, AnimatedSectionProps } from './animated-section.types';
+import { motion, useReducedMotion } from 'framer-motion';
+import type { AnimatedSectionProps, AnimationPreset } from './animated-section.types';
 
 const PRESETS: Record<string, AnimationPreset> = {
-  "fade-in": {
+  'fade-in': {
     initial: { opacity: 0 },
     animate: { opacity: 1 },
   },
-  "fade-up": {
+  'fade-up': {
     initial: { opacity: 0, y: 50 },
     animate: { opacity: 1, y: 0 },
   },
-  "fade-left": {
+  'fade-left': {
     initial: { opacity: 0, x: -60 },
     animate: { opacity: 1, x: 0 },
   },
-  "fade-right": {
+  'fade-right': {
     initial: { opacity: 0, x: 60 },
     animate: { opacity: 1, x: 0 },
   },
-  "zoom-in": {
+  'zoom-in': {
     initial: { opacity: 0, scale: 0.92 },
     animate: { opacity: 1, scale: 1 },
   },
@@ -45,7 +44,7 @@ export function AnimatedSection({ animation, className, children, ...rest }: Ani
       initial={preset.initial}
       whileInView={preset.animate}
       viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.65, ease: "easeOut" }}
+      transition={{ duration: 0.65, ease: 'easeOut' }}
       {...rest}
     >
       {children}

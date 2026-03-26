@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
-import { useInView } from "framer-motion";
+import { useInView } from 'framer-motion';
 
 import type { StatsCounterConfig, StatsCounterProps } from './stats-counter.types';
 
 function AnimatedNumber({ value, animate }: { value: string; animate: boolean }) {
-  const numericValue = parseFloat(value.replace(/[^0-9.]/g, ""));
+  const numericValue = parseFloat(value.replace(/[^0-9.]/g, ''));
   const isNumeric = !isNaN(numericValue);
 
   const ref = useRef<HTMLSpanElement>(null);
@@ -27,11 +27,7 @@ function AnimatedNumber({ value, animate }: { value: string; animate: boolean })
     requestAnimationFrame(tick);
   }, [isInView, animate, isNumeric, numericValue]);
 
-  return (
-    <span ref={ref}>
-      {isNumeric ? displayed.toLocaleString() : value}
-    </span>
-  );
+  return <span ref={ref}>{isNumeric ? displayed.toLocaleString() : value}</span>;
 }
 
 export function StatsCounterBlock({ block }: StatsCounterProps) {
@@ -39,20 +35,21 @@ export function StatsCounterBlock({ block }: StatsCounterProps) {
   const stats = cfg.stats ?? [];
   const columns = cfg.columns ?? 4;
   const animate = cfg.animate_numbers !== false;
-  const style = cfg.style ?? "plain";
+  const style = cfg.style ?? 'plain';
 
-  const colClass = {
-    2: "grid-cols-1 sm:grid-cols-2",
-    3: "grid-cols-1 sm:grid-cols-3",
-    4: "grid-cols-2 sm:grid-cols-4",
-    5: "grid-cols-2 sm:grid-cols-5",
-  }[columns as 2 | 3 | 4 | 5] ?? "grid-cols-2 sm:grid-cols-4";
+  const colClass =
+    {
+      2: 'grid-cols-1 sm:grid-cols-2',
+      3: 'grid-cols-1 sm:grid-cols-3',
+      4: 'grid-cols-2 sm:grid-cols-4',
+      5: 'grid-cols-2 sm:grid-cols-5',
+    }[columns as 2 | 3 | 4 | 5] ?? 'grid-cols-2 sm:grid-cols-4';
 
   const itemClass = {
-    plain: "text-center",
-    card: "text-center rounded-xl bg-card border p-6 shadow-sm",
-    bordered: "text-center border-l-4 border-primary pl-6",
-    icon: "text-center",
+    plain: 'text-center',
+    card: 'text-center rounded-xl bg-card border p-6 shadow-sm',
+    bordered: 'text-center border-l-4 border-primary pl-6',
+    icon: 'text-center',
   }[style];
 
   if (stats.length === 0) return null;
@@ -62,18 +59,18 @@ export function StatsCounterBlock({ block }: StatsCounterProps) {
       {(cfg.title || cfg.subtitle) && (
         <div className="text-center">
           {cfg.title && <h2 className="text-2xl font-bold md:text-3xl">{cfg.title}</h2>}
-          {cfg.subtitle && <p className="mt-2 text-muted-foreground">{cfg.subtitle}</p>}
+          {cfg.subtitle && <p className="text-muted-foreground mt-2">{cfg.subtitle}</p>}
         </div>
       )}
       <div className={`grid gap-8 ${colClass}`}>
         {stats.map((stat, i) => (
           <div key={i} className={itemClass}>
-            <div className="text-4xl font-extrabold text-primary md:text-5xl">
-              <AnimatedNumber value={stat.value ?? "0"} animate={animate} />
+            <div className="text-primary text-4xl font-extrabold md:text-5xl">
+              <AnimatedNumber value={stat.value ?? '0'} animate={animate} />
               {stat.suffix && <span>{stat.suffix}</span>}
             </div>
             {stat.label && (
-              <p className="mt-2 text-sm font-medium uppercase tracking-wide text-muted-foreground">
+              <p className="text-muted-foreground mt-2 text-sm font-medium tracking-wide uppercase">
                 {stat.label}
               </p>
             )}

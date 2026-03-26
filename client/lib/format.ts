@@ -2,13 +2,9 @@
  * Formats a price given in cents to a localised currency string.
  * e.g. 1999 → "$19.99"
  */
-export function formatPrice(
-  cents: number,
-  currency = "USD",
-  locale = "en-US",
-): string {
+export function formatPrice(cents: number, currency = 'USD', locale = 'en-US'): string {
   return new Intl.NumberFormat(locale, {
-    style: "currency",
+    style: 'currency',
     currency,
     minimumFractionDigits: 2,
   }).format(cents / 100);

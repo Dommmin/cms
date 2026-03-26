@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { getProduct, getProductReviews, getProducts, getProductsByCategory } from "@/api/products";
-import { api } from "@/lib/axios";
-import type { ProductFilters } from "@/api/products";
+import type { ProductFilters } from '@/api/products';
+import { getProduct, getProductReviews, getProducts, getProductsByCategory } from '@/api/products';
+import { api } from '@/lib/axios';
 
 export const productKeys = {
-  all: ["products"] as const,
-  list: (filters: ProductFilters) => ["products", "list", filters] as const,
-  detail: (slug: string) => ["products", "detail", slug] as const,
-  reviews: (slug: string, page?: number) => ["products", slug, "reviews", page] as const,
+  all: ['products'] as const,
+  list: (filters: ProductFilters) => ['products', 'list', filters] as const,
+  detail: (slug: string) => ['products', 'detail', slug] as const,
+  reviews: (slug: string, page?: number) => ['products', slug, 'reviews', page] as const,
   byCategory: (categorySlug: string, filters: ProductFilters) =>
-    ["products", "category", categorySlug, filters] as const,
+    ['products', 'category', categorySlug, filters] as const,
 };
 
 export function useProducts(filters: ProductFilters = {}) {
@@ -32,7 +32,7 @@ export function useProduct(slug: string) {
 
 export function useProductsByCategory(
   categorySlug: string,
-  filters: Omit<ProductFilters, "category"> = {},
+  filters: Omit<ProductFilters, 'category'> = {},
 ) {
   return useQuery({
     queryKey: productKeys.byCategory(categorySlug, filters),
@@ -65,8 +65,7 @@ export function useMarkReviewHelpful(slug: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (reviewId: number) =>
-      api.post(`/reviews/${reviewId}/helpful`).then((r) => r.data),
+    mutationFn: (reviewId: number) => api.post(`/reviews/${reviewId}/helpful`).then((r) => r.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: productKeys.reviews(slug) });
     },

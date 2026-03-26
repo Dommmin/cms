@@ -1,10 +1,10 @@
-import { api } from "@/lib/axios";
-import type { SupportConversation, SupportMessage } from "@/types/api";
+import { api } from '@/lib/axios';
+import type { SupportConversation, SupportMessage } from '@/types/api';
 
-export const SUPPORT_TOKEN_KEY = "support_token";
+export const SUPPORT_TOKEN_KEY = 'support_token';
 
 export function getSupportToken(): string | null {
-  if (typeof localStorage === "undefined") return null;
+  if (typeof localStorage === 'undefined') return null;
   return localStorage.getItem(SUPPORT_TOKEN_KEY);
 }
 
@@ -21,11 +21,13 @@ export interface StartConversationPayload {
   name?: string;
   subject: string;
   body: string;
-  channel?: "widget" | "email";
+  channel?: 'widget' | 'email';
 }
 
-export async function startConversation(payload: StartConversationPayload): Promise<SupportConversation> {
-  const { data } = await api.post<SupportConversation>("/support/conversations", payload);
+export async function startConversation(
+  payload: StartConversationPayload,
+): Promise<SupportConversation> {
+  const { data } = await api.post<SupportConversation>('/support/conversations', payload);
   setSupportToken(data.token);
   return data;
 }
@@ -36,6 +38,8 @@ export async function getConversation(token: string): Promise<SupportConversatio
 }
 
 export async function addMessage(token: string, body: string): Promise<SupportMessage> {
-  const { data } = await api.post<SupportMessage>(`/support/conversations/${token}/messages`, { body });
+  const { data } = await api.post<SupportMessage>(`/support/conversations/${token}/messages`, {
+    body,
+  });
   return data;
 }

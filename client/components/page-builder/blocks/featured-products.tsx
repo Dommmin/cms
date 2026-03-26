@@ -1,8 +1,8 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import { ProductCard } from "@/components/product-card";
-import { getRelationsByKey } from "@/lib/format";
-import type { Product } from "@/types/api";
+import { ProductCard } from '@/components/product-card';
+import { getRelationsByKey } from '@/lib/format';
+import type { Product } from '@/types/api';
 import type { FeaturedProductsConfig, FeaturedProductsProps } from './featured-products.types';
 
 export function FeaturedProductsBlock({ block }: FeaturedProductsProps) {
@@ -10,7 +10,7 @@ export function FeaturedProductsBlock({ block }: FeaturedProductsProps) {
   const columns = cfg.columns ?? 4;
 
   // Products are embedded in relations as resolved data
-  const productRelations = getRelationsByKey(block.relations, "products");
+  const productRelations = getRelationsByKey(block.relations, 'products');
   const products = productRelations
     .map((r) => r.data as Product | null)
     .filter((p): p is Product => p !== null)
@@ -21,9 +21,9 @@ export function FeaturedProductsBlock({ block }: FeaturedProductsProps) {
     });
 
   const colClass = {
-    2: "grid-cols-1 sm:grid-cols-2",
-    3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
-    4: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
+    2: 'grid-cols-1 sm:grid-cols-2',
+    3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+    4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
   }[columns];
 
   return (
@@ -31,19 +31,15 @@ export function FeaturedProductsBlock({ block }: FeaturedProductsProps) {
       {(cfg.title || cfg.subtitle) && (
         <div className="flex items-end justify-between gap-4">
           <div>
-            {cfg.title && (
-              <h2 className="text-2xl font-bold md:text-3xl">{cfg.title}</h2>
-            )}
-            {cfg.subtitle && (
-              <p className="mt-1 text-muted-foreground">{cfg.subtitle}</p>
-            )}
+            {cfg.title && <h2 className="text-2xl font-bold md:text-3xl">{cfg.title}</h2>}
+            {cfg.subtitle && <p className="text-muted-foreground mt-1">{cfg.subtitle}</p>}
           </div>
           {cfg.view_all_url && (
             <Link
               href={cfg.view_all_url}
-              className="shrink-0 text-sm font-medium text-primary hover:underline"
+              className="text-primary shrink-0 text-sm font-medium hover:underline"
             >
-              {cfg.view_all_label ?? "View all →"}
+              {cfg.view_all_label ?? 'View all →'}
             </Link>
           )}
         </div>
@@ -56,7 +52,7 @@ export function FeaturedProductsBlock({ block }: FeaturedProductsProps) {
           ))}
         </div>
       ) : (
-        <p className="text-center text-muted-foreground">No products to display.</p>
+        <p className="text-muted-foreground text-center">No products to display.</p>
       )}
     </div>
   );

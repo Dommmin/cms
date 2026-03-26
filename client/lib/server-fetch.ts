@@ -8,9 +8,7 @@
  */
 
 const BASE_URL =
-  process.env.API_URL ??
-  process.env.NEXT_PUBLIC_API_URL ??
-  "http://localhost:8000/api/v1";
+  process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1';
 
 export async function serverFetch<T>(
   path: string,
@@ -22,14 +20,14 @@ export async function serverFetch<T>(
   },
 ): Promise<T> {
   const locale = options?.locale;
-  const separator = path.includes("?") ? "&" : "?";
-  const url = `${BASE_URL}${path}${locale ? `${separator}locale=${locale}` : ""}`;
+  const separator = path.includes('?') ? '&' : '?';
+  const url = `${BASE_URL}${path}${locale ? `${separator}locale=${locale}` : ''}`;
 
   const nextOpts: { revalidate?: number; tags?: string[] } = {};
-  let cacheDirective: RequestInit["cache"] | undefined;
+  let cacheDirective: RequestInit['cache'] | undefined;
 
   if (options?.revalidate === false) {
-    cacheDirective = "no-store";
+    cacheDirective = 'no-store';
   } else {
     nextOpts.revalidate = options?.revalidate ?? 60;
     if (options?.tags?.length) nextOpts.tags = options.tags;
@@ -37,8 +35,8 @@ export async function serverFetch<T>(
 
   const res = await fetch(url, {
     headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
     },
     ...(cacheDirective ? { cache: cacheDirective } : { next: nextOpts }),
   });

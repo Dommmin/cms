@@ -1,13 +1,13 @@
-import type { Metadata } from "next";
-import { Suspense } from "react";
-import { generateAlternates } from "@/lib/seo";
-import ProductsClient from "./ProductsClient";
+import { generateAlternates } from '@/lib/seo';
+import type { Metadata } from 'next';
+import { Suspense } from 'react';
+import ProductsClient from './ProductsClient';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Shop",
-    description: "Browse our products",
-    alternates: generateAlternates("/products"),
+    title: 'Shop',
+    description: 'Browse our products',
+    alternates: generateAlternates('/products'),
   };
 }
 

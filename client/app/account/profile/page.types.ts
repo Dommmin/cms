@@ -1,6 +1,6 @@
-import type { Address } from "@/types/api";
+import type { Address } from '@/types/api';
 
-export type AddressForm = Omit<Address, "id" | "is_default">;
+export type AddressForm = Omit<Address, 'id' | 'is_default'>;
 
 export interface DeleteAccountModalState {
   open: boolean;

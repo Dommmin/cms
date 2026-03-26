@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { X, ExternalLink, Settings } from "lucide-react";
-import { useAdminPreview } from "@/hooks/use-admin-preview";
+import { useAdminPreview } from '@/hooks/use-admin-preview';
+import { ExternalLink, Settings, X } from 'lucide-react';
 import type { AdminBarProps } from './admin-bar.types';
 
 const ENTITY_LABELS: Record<string, string> = {
-  page: "Page",
-  blog_post: "Blog Post",
-  product: "Product",
-  category: "Category",
+  page: 'Page',
+  blog_post: 'Blog Post',
+  product: 'Product',
+  category: 'Category',
 };
 
 function exitPreview() {
-  document.cookie = "admin_preview=; max-age=0; path=/";
+  document.cookie = 'admin_preview=; max-age=0; path=/';
   window.location.reload();
 }
 
@@ -24,12 +24,12 @@ export function AdminBar({ entity: serverEntity }: AdminBarProps = {}) {
   if (!entity) return null;
 
   const entityType = entity?.type;
-  const entityLabel = entityType ? ENTITY_LABELS[entityType] ?? entityType : null;
+  const entityLabel = entityType ? (ENTITY_LABELS[entityType] ?? entityType) : null;
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-[9999] flex h-10 items-center justify-between gap-4 bg-gray-950 px-4 text-sm text-gray-100 shadow-lg"
-      style={{ fontFamily: "system-ui, sans-serif" }}
+      className="fixed top-0 right-0 left-0 z-[9999] flex h-10 items-center justify-between gap-4 bg-gray-950 px-4 text-sm text-gray-100 shadow-lg"
+      style={{ fontFamily: 'system-ui, sans-serif' }}
     >
       {/* Left: label */}
       <div className="flex items-center gap-2 font-semibold tracking-wide">
@@ -44,9 +44,7 @@ export function AdminBar({ entity: serverEntity }: AdminBarProps = {}) {
             {entityLabel}
           </span>
         )}
-        {entity?.name && (
-          <span className="truncate max-w-xs text-gray-100">{entity.name}</span>
-        )}
+        {entity?.name && <span className="max-w-xs truncate text-gray-100">{entity.name}</span>}
       </div>
 
       {/* Right: actions */}
@@ -56,7 +54,7 @@ export function AdminBar({ entity: serverEntity }: AdminBarProps = {}) {
             href={entity.admin_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 rounded bg-indigo-600 px-3 py-1 text-xs font-medium text-white hover:bg-indigo-500 transition-colors"
+            className="inline-flex items-center gap-1 rounded bg-indigo-600 px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-indigo-500"
           >
             <ExternalLink className="h-3 w-3" />
             Edit in Admin
@@ -64,7 +62,7 @@ export function AdminBar({ entity: serverEntity }: AdminBarProps = {}) {
         )}
         <button
           onClick={exitPreview}
-          className="inline-flex items-center gap-1 rounded border border-gray-700 px-3 py-1 text-xs font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+          className="inline-flex items-center gap-1 rounded border border-gray-700 px-3 py-1 text-xs font-medium text-gray-300 transition-colors hover:bg-gray-800 hover:text-white"
         >
           <X className="h-3 w-3" />
           Exit Preview

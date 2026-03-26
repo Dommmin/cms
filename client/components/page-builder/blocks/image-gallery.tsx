@@ -1,25 +1,25 @@
-import Image from "next/image";
+import Image from 'next/image';
 
-import { getRelationsByKey } from "@/lib/format";
+import { getRelationsByKey } from '@/lib/format';
 import type { ImageGalleryConfig, ImageGalleryProps } from './image-gallery.types';
 
 export function ImageGalleryBlock({ block }: ImageGalleryProps) {
   const cfg = block.configuration as ImageGalleryConfig;
   const columns = cfg.columns ?? 3;
-  const aspect = cfg.aspect ?? "square";
+  const aspect = cfg.aspect ?? 'square';
 
-  const imageRelations = getRelationsByKey(block.relations, "images");
+  const imageRelations = getRelationsByKey(block.relations, 'images');
 
   const colClass = {
-    2: "grid-cols-1 sm:grid-cols-2",
-    3: "grid-cols-2 md:grid-cols-3",
-    4: "grid-cols-2 md:grid-cols-4",
+    2: 'grid-cols-1 sm:grid-cols-2',
+    3: 'grid-cols-2 md:grid-cols-3',
+    4: 'grid-cols-2 md:grid-cols-4',
   }[columns];
 
   const aspectClass = {
-    square: "aspect-square",
-    video: "aspect-video",
-    portrait: "aspect-[3/4]",
+    square: 'aspect-square',
+    video: 'aspect-video',
+    portrait: 'aspect-[3/4]',
   }[aspect];
 
   return (

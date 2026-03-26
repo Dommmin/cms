@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
+import { useCallback, useEffect, useState } from 'react';
 
-import { api } from "@/lib/axios";
-import type { Product } from "@/types/api";
+import { api } from '@/lib/axios';
+import type { Product } from '@/types/api';
 
-const STORAGE_KEY = "compare_ids";
+const STORAGE_KEY = 'compare_ids';
 const MAX_COMPARE = 4;
 
 function getIds(): number[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === 'undefined') return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? (JSON.parse(raw) as number[]) : [];
@@ -21,7 +21,7 @@ function getIds(): number[] {
 
 function saveIds(ids: number[]): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
-  window.dispatchEvent(new Event("comparison-change"));
+  window.dispatchEvent(new Event('comparison-change'));
 }
 
 export function useComparisonIds() {
@@ -29,8 +29,8 @@ export function useComparisonIds() {
 
   useEffect(() => {
     const handler = () => setIds(getIds());
-    window.addEventListener("comparison-change", handler);
-    return () => window.removeEventListener("comparison-change", handler);
+    window.addEventListener('comparison-change', handler);
+    return () => window.removeEventListener('comparison-change', handler);
   }, []);
 
   return ids;
@@ -63,14 +63,14 @@ export function useComparisonProducts() {
   const ids = useComparisonIds();
 
   return useQuery({
-    queryKey: ["comparison", ids.join(",")],
+    queryKey: ['comparison', ids.join(',')],
     queryFn: async (): Promise<Product[]> => {
       if (ids.length === 0) return [];
       const params = ids.reduce<Record<string, number>>((acc, id, i) => {
         acc[`ids[${i}]`] = id;
         return acc;
       }, {});
-      const { data } = await api.get<{ data: Product[] }>("/products/compare", { params });
+      const { data } = await api.get<{ data: Product[] }>('/products/compare', { params });
       return data.data;
     },
     enabled: ids.length >= 2,

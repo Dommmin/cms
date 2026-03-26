@@ -1,4 +1,4 @@
-import type { Store } from "@/types/api";
+import type { Store } from '@/types/api';
 
 export interface StoreMapProps {
   stores: Store[];

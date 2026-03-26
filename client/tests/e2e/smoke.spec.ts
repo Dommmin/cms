@@ -1,11 +1,6 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
-const PUBLIC_PAGES = [
-  '/',
-  '/products',
-  '/blog',
-  '/contact',
-];
+const PUBLIC_PAGES = ['/', '/products', '/blog', '/contact'];
 
 for (const path of PUBLIC_PAGES) {
   test(`${path} — loads without JS errors`, async ({ page }) => {

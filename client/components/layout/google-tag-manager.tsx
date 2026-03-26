@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import Script from "next/script";
-import { useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname } from 'next/navigation';
+import Script from 'next/script';
+import { useEffect } from 'react';
 
-import { trackPageView } from "@/lib/datalayer";
+import { trackPageView } from '@/lib/datalayer';
 import type { GoogleTagManagerProps } from './google-tag-manager.types';
 
 export function GoogleTagManager({ gtmId }: GoogleTagManagerProps) {
@@ -35,7 +35,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
           height="0"
           width="0"
-          style={{ display: "none", visibility: "hidden" }}
+          style={{ display: 'none', visibility: 'hidden' }}
         />
       </noscript>
     </>

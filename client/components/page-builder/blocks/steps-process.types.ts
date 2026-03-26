@@ -1,4 +1,4 @@
-import type { PageBlock } from "@/types/api";
+import type { PageBlock } from '@/types/api';
 
 export interface Step {
   title?: string;
@@ -8,7 +8,7 @@ export interface Step {
 export interface StepsProcessConfig {
   title?: string;
   subtitle?: string;
-  layout?: "horizontal" | "vertical" | "numbered";
+  layout?: 'horizontal' | 'vertical' | 'numbered';
   steps?: Step[];
 }
 export interface StepsProcessProps {

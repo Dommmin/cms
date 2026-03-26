@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
   addCartItem,
@@ -10,11 +10,11 @@ import {
   removeCartItem,
   removeDiscount,
   updateCartItem,
-} from "@/api/cart";
-import { trackAddToCart, trackRemoveFromCart } from "@/lib/datalayer";
+} from '@/api/cart';
+import { trackAddToCart, trackRemoveFromCart } from '@/lib/datalayer';
 
 export const cartKeys = {
-  cart: ["cart"] as const,
+  cart: ['cart'] as const,
 };
 
 export function useCart() {
@@ -60,7 +60,8 @@ export function useUpdateCartItem() {
 
 export function useRemoveCartItem() {
   const queryClient = useQueryClient();
-  const previousCart = () => queryClient.getQueryData<Awaited<ReturnType<typeof getCart>>>(cartKeys.cart);
+  const previousCart = () =>
+    queryClient.getQueryData<Awaited<ReturnType<typeof getCart>>>(cartKeys.cart);
 
   return useMutation({
     mutationFn: (cartItemId: number) => {

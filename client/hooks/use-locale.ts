@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { usePathname } from "next/navigation";
-import { getLocaleFromPath, localePath } from "@/lib/i18n";
+import { getLocaleFromPath, localePath } from '@/lib/i18n';
+import { usePathname } from 'next/navigation';
 
 /** Returns the current locale extracted from the URL pathname. */
 export function useLocale(): string {

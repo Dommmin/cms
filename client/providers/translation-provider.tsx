@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { createContext, useCallback, useState } from "react";
-import { usePathname } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { getTranslations } from "@/api/translations";
-import { getLocaleFromPath, localePath, stripLocaleFromPath } from "@/lib/i18n";
+import { getTranslations } from '@/api/translations';
+import { getLocaleFromPath, localePath, stripLocaleFromPath } from '@/lib/i18n';
+import { useQuery } from '@tanstack/react-query';
+import { usePathname } from 'next/navigation';
+import { createContext, useCallback, useState } from 'react';
 
 type TranslationContextType = {
   t: (key: string, fallback?: string) => string;
@@ -27,14 +27,14 @@ export function TranslationProvider({
   // Derive locale from URL (source of truth). Fall back to prop on initial SSR render.
   const localeFromPath = getLocaleFromPath(pathname);
   const [locale] = useState<string>(
-    localeFromPath !== "en" ? localeFromPath : (initialLocale ?? "en")
+    localeFromPath !== 'en' ? localeFromPath : (initialLocale ?? 'en'),
   );
 
   // Keep state in sync when URL changes (e.g. browser back/forward)
-  const currentLocale = localeFromPath !== "en" ? localeFromPath : locale;
+  const currentLocale = localeFromPath !== 'en' ? localeFromPath : locale;
 
   const { data: translations, isLoading } = useQuery({
-    queryKey: ["translations", currentLocale],
+    queryKey: ['translations', currentLocale],
     queryFn: () => getTranslations(currentLocale),
     staleTime: 1000 * 60 * 60,
   });
@@ -44,7 +44,7 @@ export function TranslationProvider({
       if (!translations) return fallback ?? key;
       return translations[key] ?? fallback ?? key;
     },
-    [translations]
+    [translations],
   );
 
   const setLocale = useCallback(
@@ -54,7 +54,7 @@ export function TranslationProvider({
       const pathWithoutLocale = stripLocaleFromPath(pathname);
       window.location.href = localePath(newLocale, pathWithoutLocale);
     },
-    [pathname]
+    [pathname],
   );
 
   return (

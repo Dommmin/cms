@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Clock, Search, X } from "lucide-react";
+import { ArrowRight, Clock, Search, X } from 'lucide-react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
-import { useCategories } from "@/hooks/use-cms";
-import { useLocalePath } from "@/hooks/use-locale";
+import { useCategories } from '@/hooks/use-cms';
+import { useLocalePath } from '@/hooks/use-locale';
 import {
   addRecentSearch,
   clearRecentSearches,
   getRecentSearches,
   useSearchSuggestions,
-} from "@/hooks/use-search";
-import { formatPrice } from "@/lib/format";
-import type { Category, Product } from "@/types/api";
+} from '@/hooks/use-search';
+import { formatPrice } from '@/lib/format';
+import type { Category, Product } from '@/types/api';
 
 function HighlightedText({ text, query }: { text: string; query: string }) {
   if (!query) return <span>{text}</span>;
@@ -23,7 +23,7 @@ function HighlightedText({ text, query }: { text: string; query: string }) {
   return (
     <span>
       {text.slice(0, idx)}
-      <mark className="bg-transparent font-semibold text-foreground">
+      <mark className="text-foreground bg-transparent font-semibold">
         {text.slice(idx, idx + query.length)}
       </mark>
       {text.slice(idx + query.length)}
@@ -36,7 +36,7 @@ export function SearchBar() {
   const lp = useLocalePath();
 
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -68,7 +68,7 @@ export function SearchBar() {
 
   function closeSearch() {
     setOpen(false);
-    setQuery("");
+    setQuery('');
     setActiveIndex(-1);
   }
 
@@ -86,17 +86,17 @@ export function SearchBar() {
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Escape") {
+    if (e.key === 'Escape') {
       closeSearch();
       return;
     }
-    if (e.key === "ArrowDown") {
+    if (e.key === 'ArrowDown') {
       e.preventDefault();
       setActiveIndex((i) => Math.min(i + 1, allItems.length - 1));
-    } else if (e.key === "ArrowUp") {
+    } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setActiveIndex((i) => Math.max(i - 1, -1));
-    } else if (e.key === "Enter" && activeIndex >= 0) {
+    } else if (e.key === 'Enter' && activeIndex >= 0) {
       e.preventDefault();
       navigate(allItems[activeIndex].url);
     }
@@ -105,17 +105,17 @@ export function SearchBar() {
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") closeSearch();
+      if (e.key === 'Escape') closeSearch();
     }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
   }, [open]);
 
   return (
     <>
       <button
         onClick={openSearch}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-accent"
+        className="hover:bg-accent inline-flex h-9 w-9 items-center justify-center rounded-md"
         aria-label="Search"
       >
         <Search className="h-4 w-4" />
@@ -127,11 +127,11 @@ export function SearchBar() {
           <div className="fixed inset-0 z-40 bg-black/30" onClick={closeSearch} />
 
           {/* Panel */}
-          <div className="fixed left-0 right-0 top-16 z-50 border-b border-border bg-background shadow-xl">
+          <div className="border-border bg-background fixed top-16 right-0 left-0 z-50 border-b shadow-xl">
             <div className="mx-auto max-w-2xl px-4 py-4">
               {/* Input row */}
               <form onSubmit={handleSubmit} className="flex items-center gap-2">
-                <Search className="h-5 w-5 shrink-0 text-muted-foreground" />
+                <Search className="text-muted-foreground h-5 w-5 shrink-0" />
                 <input
                   ref={inputRef}
                   value={query}
@@ -141,13 +141,13 @@ export function SearchBar() {
                   }}
                   onKeyDown={handleKeyDown}
                   placeholder="Search products, categories…"
-                  className="flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground"
+                  className="placeholder:text-muted-foreground flex-1 bg-transparent text-base outline-none"
                 />
                 {query && (
                   <button
                     type="button"
-                    onClick={() => setQuery("")}
-                    className="rounded p-1 hover:bg-accent"
+                    onClick={() => setQuery('')}
+                    className="hover:bg-accent rounded p-1"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -155,7 +155,7 @@ export function SearchBar() {
                 <button
                   type="button"
                   onClick={closeSearch}
-                  className="ml-1 text-sm text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground ml-1 text-sm"
                 >
                   Cancel
                 </button>
@@ -165,7 +165,7 @@ export function SearchBar() {
               {showRecent && (
                 <div className="mt-4">
                   <div className="mb-2 flex items-center justify-between">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    <span className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
                       Recent
                     </span>
                     <button
@@ -173,7 +173,7 @@ export function SearchBar() {
                         clearRecentSearches();
                         setRecentSearches([]);
                       }}
-                      className="text-xs text-muted-foreground hover:text-foreground"
+                      className="text-muted-foreground hover:text-foreground text-xs"
                     >
                       Clear
                     </button>
@@ -182,14 +182,12 @@ export function SearchBar() {
                     {recentSearches.map((q) => (
                       <button
                         key={q}
-                        onClick={() =>
-                          navigate(lp(`/search?q=${encodeURIComponent(q)}`), q)
-                        }
-                        className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-accent"
+                        onClick={() => navigate(lp(`/search?q=${encodeURIComponent(q)}`), q)}
+                        className="hover:bg-accent flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm"
                       >
-                        <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                        <Clock className="text-muted-foreground h-3.5 w-3.5" />
                         <span>{q}</span>
-                        <ArrowRight className="ml-auto h-3.5 w-3.5 text-muted-foreground" />
+                        <ArrowRight className="text-muted-foreground ml-auto h-3.5 w-3.5" />
                       </button>
                     ))}
                   </div>
@@ -202,7 +200,7 @@ export function SearchBar() {
                   {/* Categories */}
                   {matchedCategories.length > 0 && (
                     <div>
-                      <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      <span className="text-muted-foreground mb-2 block text-xs font-semibold tracking-wide uppercase">
                         Categories
                       </span>
                       <div className="space-y-0.5">
@@ -211,7 +209,7 @@ export function SearchBar() {
                             key={cat.id}
                             onClick={() => navigate(lp(`/products?category=${cat.slug}`))}
                             className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm ${
-                              activeIndex === i ? "bg-accent" : "hover:bg-accent"
+                              activeIndex === i ? 'bg-accent' : 'hover:bg-accent'
                             }`}
                           >
                             {cat.image_url ? (
@@ -223,7 +221,7 @@ export function SearchBar() {
                                 className="h-5 w-5 rounded object-cover"
                               />
                             ) : (
-                              <span className="flex h-5 w-5 items-center justify-center rounded bg-muted text-xs">
+                              <span className="bg-muted flex h-5 w-5 items-center justify-center rounded text-xs">
                                 {cat.name[0]}
                               </span>
                             )}
@@ -239,9 +237,9 @@ export function SearchBar() {
                     <div className="space-y-2">
                       {[1, 2, 3].map((i) => (
                         <div key={i} className="flex animate-pulse items-center gap-3">
-                          <div className="h-10 w-10 rounded-lg bg-muted" />
-                          <div className="h-4 flex-1 rounded bg-muted" />
-                          <div className="h-4 w-16 rounded bg-muted" />
+                          <div className="bg-muted h-10 w-10 rounded-lg" />
+                          <div className="bg-muted h-4 flex-1 rounded" />
+                          <div className="bg-muted h-4 w-16 rounded" />
                         </div>
                       ))}
                     </div>
@@ -250,7 +248,7 @@ export function SearchBar() {
                   {/* Products */}
                   {!isLoading && products.length > 0 && (
                     <div>
-                      <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      <span className="text-muted-foreground mb-2 block text-xs font-semibold tracking-wide uppercase">
                         Products
                       </span>
                       <div className="space-y-0.5">
@@ -261,7 +259,7 @@ export function SearchBar() {
                               key={product.id}
                               onClick={() => navigate(lp(`/products/${product.slug}`))}
                               className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm ${
-                                activeIndex === idx ? "bg-accent" : "hover:bg-accent"
+                                activeIndex === idx ? 'bg-accent' : 'hover:bg-accent'
                               }`}
                             >
                               {product.thumbnail ? (
@@ -273,12 +271,12 @@ export function SearchBar() {
                                   className="h-10 w-10 rounded-lg object-cover"
                                 />
                               ) : (
-                                <div className="h-10 w-10 shrink-0 rounded-lg bg-muted" />
+                                <div className="bg-muted h-10 w-10 shrink-0 rounded-lg" />
                               )}
                               <div className="flex-1 text-left">
                                 <HighlightedText text={product.name} query={query} />
                                 {product.category && (
-                                  <p className="text-xs text-muted-foreground">
+                                  <p className="text-muted-foreground text-xs">
                                     {product.category.name}
                                   </p>
                                 )}
@@ -294,24 +292,19 @@ export function SearchBar() {
                   )}
 
                   {/* No results */}
-                  {!isLoading &&
-                    products.length === 0 &&
-                    matchedCategories.length === 0 && (
-                      <p className="py-4 text-center text-sm text-muted-foreground">
-                        No results for &ldquo;{query}&rdquo;
-                      </p>
-                    )}
+                  {!isLoading && products.length === 0 && matchedCategories.length === 0 && (
+                    <p className="text-muted-foreground py-4 text-center text-sm">
+                      No results for &ldquo;{query}&rdquo;
+                    </p>
+                  )}
 
                   {/* View all */}
                   {(products.length > 0 || matchedCategories.length > 0) && (
                     <button
                       onClick={() =>
-                        navigate(
-                          lp(`/search?q=${encodeURIComponent(query.trim())}`),
-                          query.trim(),
-                        )
+                        navigate(lp(`/search?q=${encodeURIComponent(query.trim())}`), query.trim())
                       }
-                      className="flex w-full items-center justify-center gap-1 rounded-lg border border-border py-2 text-sm font-medium hover:bg-accent"
+                      className="border-border hover:bg-accent flex w-full items-center justify-center gap-1 rounded-lg border py-2 text-sm font-medium"
                     >
                       View all results for &ldquo;{query}&rdquo;
                       <ArrowRight className="h-3.5 w-3.5" />

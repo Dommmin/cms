@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { X } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
+import { X } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-import { api } from "@/lib/axios";
+import { api } from '@/lib/axios';
 import type { BannerPromotion } from './announcement-bar.types';
 
 function useCountdown(endsAt: string | null) {
@@ -36,7 +36,7 @@ function Countdown({ endsAt }: { endsAt: string }) {
   const t = useCountdown(endsAt);
   if (!t) return null;
 
-  const pad = (n: number) => String(n).padStart(2, "0");
+  const pad = (n: number) => String(n).padStart(2, '0');
 
   return (
     <span className="ml-2 font-mono font-bold tracking-wider">
@@ -51,11 +51,8 @@ export function AnnouncementBar() {
   const [index, setIndex] = useState(0);
 
   const { data } = useQuery({
-    queryKey: ["promotions", "banners"],
-    queryFn: () =>
-      api
-        .get<{ data: BannerPromotion[] }>("/promotions")
-        .then((r) => r.data.data),
+    queryKey: ['promotions', 'banners'],
+    queryFn: () => api.get<{ data: BannerPromotion[] }>('/promotions').then((r) => r.data.data),
     staleTime: 5 * 60 * 1_000,
   });
 
@@ -71,7 +68,7 @@ export function AnnouncementBar() {
   if (!promos.length) return null;
 
   const promo = promos[index % promos.length];
-  const bg = promo.banner_color ?? "#111827";
+  const bg = promo.banner_color ?? '#111827';
 
   const inner = (
     <div className="flex items-center justify-center gap-2 text-sm font-medium">
@@ -95,7 +92,7 @@ export function AnnouncementBar() {
 
       <button
         onClick={() => setDismissed(promo.id)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 opacity-70 transition-opacity hover:opacity-100"
+        className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full p-1 opacity-70 transition-opacity hover:opacity-100"
         aria-label="Dismiss"
       >
         <X className="h-3.5 w-3.5" />

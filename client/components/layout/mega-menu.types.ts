@@ -1,7 +1,7 @@
-import type { Category, MenuItem } from "@/types/api";
+import type { Category, MenuItem } from '@/types/api';
 
 export interface MegaMenuProps {
   items: MenuItem[];
   categories: Category[];
 }
-export type OpenKey = number | "categories" | null;
+export type OpenKey = number | 'categories' | null;

@@ -1,58 +1,58 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-import { api } from "@/lib/axios";
+import { api } from '@/lib/axios';
 
 export default function NewsletterUnsubscribePage() {
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
+  const token = searchParams.get('token');
 
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
   // If token present in URL, auto-unsubscribe via token
   useEffect(() => {
     if (!token) return;
-    void Promise.resolve().then(() => setStatus("loading"));
+    void Promise.resolve().then(() => setStatus('loading'));
     api
       .get(`/newsletter/unsubscribe/${token}`)
-      .then(() => setStatus("success"))
+      .then(() => setStatus('success'))
       .catch(() => {
-        setStatus("error");
-        setErrorMessage("Could not process your unsubscribe request. The link may be invalid.");
+        setStatus('error');
+        setErrorMessage('Could not process your unsubscribe request. The link may be invalid.');
       });
   }, [token]);
 
   function handleEmailUnsubscribe(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
-    setStatus("loading");
+    setStatus('loading');
     api
-      .post("/newsletter/unsubscribe", { email })
-      .then(() => setStatus("success"))
+      .post('/newsletter/unsubscribe', { email })
+      .then(() => setStatus('success'))
       .catch(() => {
-        setStatus("error");
-        setErrorMessage("Could not unsubscribe. Please try again.");
+        setStatus('error');
+        setErrorMessage('Could not unsubscribe. Please try again.');
       });
   }
 
-  if (status === "success") {
+  if (status === 'success') {
     return (
       <div className="mx-auto max-w-lg px-4 py-24 text-center sm:px-6">
         <CheckCircle className="mx-auto mb-4 h-12 w-12 text-green-500" />
         <h1 className="text-2xl font-bold">Successfully Unsubscribed</h1>
-        <p className="mt-2 text-muted-foreground">
+        <p className="text-muted-foreground mt-2">
           You have been removed from our newsletter list. We&apos;re sorry to see you go!
         </p>
       </div>
     );
   }
 
-  if (token && status === "loading") {
+  if (token && status === 'loading') {
     return (
       <div className="mx-auto max-w-lg px-4 py-24 text-center sm:px-6">
         <p className="text-muted-foreground">Processing your request…</p>
@@ -63,12 +63,12 @@ export default function NewsletterUnsubscribePage() {
   return (
     <div className="mx-auto max-w-lg px-4 py-24 sm:px-6">
       <h1 className="text-center text-2xl font-bold">Unsubscribe</h1>
-      <p className="mt-2 text-center text-muted-foreground">
+      <p className="text-muted-foreground mt-2 text-center">
         Enter your email address to unsubscribe from our newsletter.
       </p>
 
-      {status === "error" && (
-        <div className="mt-4 rounded-xl border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+      {status === 'error' && (
+        <div className="border-destructive/50 bg-destructive/10 text-destructive mt-4 rounded-xl border p-4 text-sm">
           {errorMessage}
         </div>
       )}
@@ -85,15 +85,15 @@ export default function NewsletterUnsubscribePage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="your@email.com"
-            className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            className="border-input bg-background focus:ring-ring w-full rounded-xl border px-4 py-2.5 text-sm focus:ring-2 focus:outline-none"
           />
         </div>
         <button
           type="submit"
-          disabled={status === "loading"}
-          className="w-full rounded-xl bg-primary py-2.5 font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50"
+          disabled={status === 'loading'}
+          className="bg-primary text-primary-foreground w-full rounded-xl py-2.5 font-semibold hover:opacity-90 disabled:opacity-50"
         >
-          {status === "loading" ? "Processing…" : "Unsubscribe"}
+          {status === 'loading' ? 'Processing…' : 'Unsubscribe'}
         </button>
       </form>
     </div>

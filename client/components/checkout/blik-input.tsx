@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 import type { BlikInputProps } from './blik-input.types';
 
 export function BlikInput({ value, onChange, autoFocus = true }: BlikInputProps) {
@@ -13,7 +13,7 @@ export function BlikInput({ value, onChange, autoFocus = true }: BlikInputProps)
   }, [autoFocus]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const digits = e.target.value.replace(/\D/g, "").slice(0, 6);
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 6);
     onChange(digits);
   }
 
@@ -21,7 +21,7 @@ export function BlikInput({ value, onChange, autoFocus = true }: BlikInputProps)
 
   return (
     <div className="mt-3">
-      <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
+      <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
         Kod BLIK (6 cyfr)
       </label>
       <input
@@ -33,17 +33,15 @@ export function BlikInput({ value, onChange, autoFocus = true }: BlikInputProps)
         value={value}
         onChange={handleChange}
         placeholder="000000"
-        className={`w-full rounded-lg border bg-background px-4 py-2.5 text-center text-xl font-mono tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-ring ${
+        className={`bg-background focus:ring-ring w-full rounded-lg border px-4 py-2.5 text-center font-mono text-xl tracking-[0.5em] focus:ring-2 focus:outline-none ${
           value.length > 0 && !isValid
-            ? "border-destructive focus:ring-destructive"
-            : "border-input"
+            ? 'border-destructive focus:ring-destructive'
+            : 'border-input'
         }`}
         autoComplete="one-time-code"
       />
       {value.length > 0 && !isValid && (
-        <p className="mt-1 text-xs text-destructive">
-          Wprowadź 6-cyfrowy kod BLIK
-        </p>
+        <p className="text-destructive mt-1 text-xs">Wprowadź 6-cyfrowy kod BLIK</p>
       )}
     </div>
   );

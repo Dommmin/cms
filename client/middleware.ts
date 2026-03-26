@@ -1,9 +1,8 @@
-import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 const LOCALES = ['en', 'pl'];
 const DEFAULT_LOCALE = 'en';
-
 
 function setLocaleCookie(response: NextResponse, locale: string): void {
   response.cookies.set('locale', locale, {

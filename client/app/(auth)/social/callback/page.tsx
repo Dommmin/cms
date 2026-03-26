@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2 } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 
-import { useSocialCallback } from "@/hooks/use-auth";
-import { useLocalePath } from "@/hooks/use-locale";
-import type { SocialProvider } from "@/api/auth";
+import type { SocialProvider } from '@/api/auth';
+import { useSocialCallback } from '@/hooks/use-auth';
+import { useLocalePath } from '@/hooks/use-locale';
 
 export default function SocialCallbackPage() {
   const searchParams = useSearchParams();
@@ -14,8 +14,8 @@ export default function SocialCallbackPage() {
   const lp = useLocalePath();
   const called = useRef(false);
 
-  const provider = (searchParams.get("provider") ?? "google") as SocialProvider;
-  const code = searchParams.get("code") ?? "";
+  const provider = (searchParams.get('provider') ?? 'google') as SocialProvider;
+  const code = searchParams.get('code') ?? '';
 
   const { mutate: handleCallback, error } = useSocialCallback(provider);
 
@@ -25,10 +25,10 @@ export default function SocialCallbackPage() {
 
     handleCallback(code, {
       onSuccess: () => {
-        router.push(lp("/account"));
+        router.push(lp('/account'));
       },
       onError: () => {
-        router.push(lp("/login"));
+        router.push(lp('/login'));
       },
     });
   }, [code, handleCallback, lp, router]);
@@ -43,8 +43,8 @@ export default function SocialCallbackPage() {
 
   return (
     <div className="mx-auto max-w-sm px-4 py-24 text-center">
-      <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-muted-foreground" />
-      <p className="text-sm text-muted-foreground">Signing you in…</p>
+      <Loader2 className="text-muted-foreground mx-auto mb-4 h-8 w-8 animate-spin" />
+      <p className="text-muted-foreground text-sm">Signing you in…</p>
     </div>
   );
 }

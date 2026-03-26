@@ -1,4 +1,4 @@
-import type { Product } from "@/types/api";
+import type { Product } from '@/types/api';
 
 export interface ProductCardProps {
   product: Product;

@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { cancelOrder, checkout, getOrder, getOrders, getShippingMethods } from "@/api/orders";
-import type { CheckoutPayload } from "@/api/orders";
-import { trackPurchase } from "@/lib/datalayer";
+import type { CheckoutPayload } from '@/api/orders';
+import { cancelOrder, checkout, getOrder, getOrders, getShippingMethods } from '@/api/orders';
+import { trackPurchase } from '@/lib/datalayer';
 
 export const orderKeys = {
-  all: ["orders"] as const,
-  list: (page?: number) => ["orders", "list", page] as const,
-  detail: (reference: string) => ["orders", "detail", reference] as const,
-  shippingMethods: ["checkout", "shipping-methods"] as const,
+  all: ['orders'] as const,
+  list: (page?: number) => ['orders', 'list', page] as const,
+  detail: (reference: string) => ['orders', 'detail', reference] as const,
+  shippingMethods: ['checkout', 'shipping-methods'] as const,
 };
 
 export function useOrders(page = 1) {
@@ -55,7 +55,7 @@ export function useCheckout() {
     mutationFn: (payload: CheckoutPayload) => checkout(payload),
     onSuccess: (order) => {
       queryClient.invalidateQueries({ queryKey: orderKeys.all });
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      queryClient.invalidateQueries({ queryKey: ['cart'] });
       trackPurchase({
         transactionId: order.reference_number,
         revenue: order.total,

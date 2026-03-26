@@ -1,7 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Cart', () => {
-  test('guest can add a product to cart and see it reflected in the header badge', async ({ page }) => {
+  test('guest can add a product to cart and see it reflected in the header badge', async ({
+    page,
+  }) => {
     await page.goto('/products');
     await page.waitForLoadState('networkidle');
 
@@ -10,7 +12,9 @@ test.describe('Cart', () => {
     await addBtn.click();
 
     // Badge / cart count should show 1
-    const badge = page.locator('[data-testid="cart-count"], [aria-label*="cart"], [aria-label*="koszyk"]');
+    const badge = page.locator(
+      '[data-testid="cart-count"], [aria-label*="cart"], [aria-label*="koszyk"]',
+    );
     await expect(badge.first()).toContainText('1', { timeout: 5_000 });
   });
 
@@ -33,7 +37,10 @@ test.describe('Cart', () => {
     await page.goto('/products');
     await page.waitForLoadState('networkidle');
 
-    await page.getByRole('button', { name: /add to cart|dodaj do koszyka/i }).first().click();
+    await page
+      .getByRole('button', { name: /add to cart|dodaj do koszyka/i })
+      .first()
+      .click();
 
     await page.goto('/cart');
     await page.waitForLoadState('networkidle');

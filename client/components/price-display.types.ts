@@ -4,6 +4,6 @@ export interface PriceDisplayProps {
   omnibusPrice?: number | null;
   isOnSale?: boolean;
   /** Tailwind text size class for the main price, e.g. "text-lg" (default) or "text-sm" */
-  size?: "sm" | "base" | "lg";
+  size?: 'sm' | 'base' | 'lg';
   className?: string;
 }

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
 export interface AdminPreviewEntity {
-  type: "page" | "blog_post" | "product" | "category" | null;
+  type: 'page' | 'blog_post' | 'product' | 'category' | null;
   id: number | null;
   name: string | null;
   admin_url: string | null;
@@ -15,20 +15,18 @@ export interface AdminPreviewState {
 }
 
 function parsePreviewCookie(): AdminPreviewState {
-  if (typeof document === "undefined") {
+  if (typeof document === 'undefined') {
     return { isPreview: false, entity: null };
   }
 
-  const match = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("admin_preview="));
+  const match = document.cookie.split('; ').find((row) => row.startsWith('admin_preview='));
 
   if (!match) {
     return { isPreview: false, entity: null };
   }
 
   try {
-    const value = decodeURIComponent(match.split("=").slice(1).join("="));
+    const value = decodeURIComponent(match.split('=').slice(1).join('='));
     const parsed = JSON.parse(value) as { entity?: AdminPreviewEntity };
     return { isPreview: true, entity: parsed.entity ?? null };
   } catch {

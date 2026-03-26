@@ -1,20 +1,20 @@
-import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
+import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:80/api/v1",
+  baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:80/api/v1',
   headers: {
-    Accept: "application/json",
-    "Content-Type": "application/json",
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
   },
   withCredentials: true,
 });
 
 // ── Token helpers ────────────────────────────────────────────────────────────
 
-const TOKEN_KEY = "auth_token";
+const TOKEN_KEY = 'auth_token';
 
 export function getToken(): string | null {
-  if (typeof document === "undefined") return null;
+  if (typeof document === 'undefined') return null;
   const match = document.cookie.match(new RegExp(`(?:^|; )${TOKEN_KEY}=([^;]*)`));
   return match ? decodeURIComponent(match[1]) : null;
 }
@@ -37,7 +37,7 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   }
 
   // Append ?locale= from cookie so the backend SetLocale middleware can translate responses
-  if (typeof document !== "undefined") {
+  if (typeof document !== 'undefined') {
     const localeMatch = document.cookie.match(/(?:^|; )locale=([^;]*)/);
     const locale = localeMatch ? decodeURIComponent(localeMatch[1]) : null;
     if (locale) {
@@ -57,10 +57,10 @@ api.interceptors.response.use(
       removeToken();
       // Don't redirect for background auth checks — let the UI reflect unauthenticated state naturally.
       // Only redirect when an actual authenticated action fails (checkout, profile, etc.).
-      const url = error.config?.url ?? "";
-      if (typeof window !== "undefined" && !url.endsWith("/auth/me")) {
+      const url = error.config?.url ?? '';
+      if (typeof window !== 'undefined' && !url.endsWith('/auth/me')) {
         const localeMatch = document.cookie.match(/(?:^|; )locale=([^;]*)/);
-        const locale = localeMatch ? decodeURIComponent(localeMatch[1]) : "en";
+        const locale = localeMatch ? decodeURIComponent(localeMatch[1]) : 'en';
         window.location.href = `/${locale}/login`;
       }
     }

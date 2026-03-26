@@ -1,4 +1,4 @@
-import type { Category, MenuItem } from "@/types/api";
+import type { Category, MenuItem } from '@/types/api';
 
 export interface MobileMenuProps {
   items: MenuItem[];

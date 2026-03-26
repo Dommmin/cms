@@ -1,26 +1,26 @@
-import { cookies } from "next/headers";
+import { cookies } from 'next/headers';
 
-import type { MenuItem } from "@/types/api";
-import { getMenu } from "@/api/cms";
+import { getMenu } from '@/api/cms';
+import type { MenuItem } from '@/types/api';
 
-import { FooterContent } from "./footer-content";
+import { FooterContent } from './footer-content';
 
 export async function Footer() {
   const cookieStore = await cookies();
-  const locale = cookieStore.get("locale")?.value ?? "en";
+  const locale = cookieStore.get('locale')?.value ?? 'en';
 
   let mainItems: MenuItem[] = [];
   let legalItems: MenuItem[] = [];
 
   try {
-    const menu = await getMenu("footer", locale);
+    const menu = await getMenu('footer', locale);
     mainItems = menu.items ?? [];
   } catch {
     // menu not seeded yet
   }
 
   try {
-    const menu = await getMenu("footer_legal", locale);
+    const menu = await getMenu('footer_legal', locale);
     legalItems = menu.items ?? [];
   } catch {
     // menu not seeded yet

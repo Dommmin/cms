@@ -1,24 +1,23 @@
-"use client";
+'use client';
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { forgotPassword, getMe, handleSocialCallback, login, logout, register } from "@/api/auth";
-import { getToken, removeToken, setToken } from "@/lib/axios";
-import { cartKeys } from "@/hooks/use-cart";
-import { trackLogin, trackSignUp } from "@/lib/datalayer";
-import type { LoginPayload, RegisterPayload } from "@/types/api";
-import type { SocialProvider } from "@/api/auth";
+import type { SocialProvider } from '@/api/auth';
+import { forgotPassword, getMe, handleSocialCallback, login, logout, register } from '@/api/auth';
+import { cartKeys } from '@/hooks/use-cart';
+import { getToken, removeToken, setToken } from '@/lib/axios';
+import { trackLogin, trackSignUp } from '@/lib/datalayer';
+import type { LoginPayload, RegisterPayload } from '@/types/api';
 
 function getLocalePath(path: string): string {
-  const localeMatch = typeof document !== "undefined"
-    ? document.cookie.match(/(?:^|; )locale=([^;]*)/)
-    : null;
-  const locale = localeMatch ? decodeURIComponent(localeMatch[1]) : "en";
-  return locale === "en" ? path : `/${locale}${path}`;
+  const localeMatch =
+    typeof document !== 'undefined' ? document.cookie.match(/(?:^|; )locale=([^;]*)/) : null;
+  const locale = localeMatch ? decodeURIComponent(localeMatch[1]) : 'en';
+  return locale === 'en' ? path : `/${locale}${path}`;
 }
 
 export const authKeys = {
-  me: ["auth", "me"] as const,
+  me: ['auth', 'me'] as const,
 };
 
 export function useMe() {
@@ -27,8 +26,8 @@ export function useMe() {
     queryFn: getMe,
     enabled: !!getToken(),
     retry: false,
-    staleTime: 5 * 60 * 1000,   // 5 min — user profile doesn't change frequently
-    gcTime: 30 * 60 * 1000,     // 30 min — keep logged-in user in memory
+    staleTime: 5 * 60 * 1000, // 5 min — user profile doesn't change frequently
+    gcTime: 30 * 60 * 1000, // 30 min — keep logged-in user in memory
   });
 }
 
@@ -42,7 +41,7 @@ export function useLogin() {
       queryClient.setQueryData(authKeys.me, user);
       queryClient.invalidateQueries({ queryKey: cartKeys.cart });
       trackLogin();
-      window.location.href = getLocalePath("/");
+      window.location.href = getLocalePath('/');
     },
   });
 }
@@ -57,7 +56,7 @@ export function useRegister() {
       queryClient.setQueryData(authKeys.me, user);
       queryClient.invalidateQueries({ queryKey: cartKeys.cart });
       trackSignUp();
-      window.location.href = getLocalePath("/");
+      window.location.href = getLocalePath('/');
     },
   });
 }
@@ -70,11 +69,10 @@ export function useLogout() {
     onSettled: () => {
       removeToken();
       queryClient.clear();
-      const localeMatch = typeof document !== "undefined"
-        ? document.cookie.match(/(?:^|; )locale=([^;]*)/)
-        : null;
-      const locale = localeMatch ? decodeURIComponent(localeMatch[1]) : "en";
-      window.location.href = locale === "en" ? "/login" : `/${locale}/login`;
+      const localeMatch =
+        typeof document !== 'undefined' ? document.cookie.match(/(?:^|; )locale=([^;]*)/) : null;
+      const locale = localeMatch ? decodeURIComponent(localeMatch[1]) : 'en';
+      window.location.href = locale === 'en' ? '/login' : `/${locale}/login`;
     },
   });
 }

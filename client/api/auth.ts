@@ -1,11 +1,11 @@
-import { api } from "@/lib/axios";
-import { getCartToken } from "@/api/cart";
-import type { AuthResponse, LoginPayload, RegisterPayload, User } from "@/types/api";
+import { getCartToken } from '@/api/cart';
+import { api } from '@/lib/axios';
+import type { AuthResponse, LoginPayload, RegisterPayload, User } from '@/types/api';
 
-export type SocialProvider = "google" | "github";
+export type SocialProvider = 'google' | 'github';
 
 export async function login(payload: LoginPayload): Promise<AuthResponse> {
-  const { data } = await api.post<AuthResponse>("/auth/login", {
+  const { data } = await api.post<AuthResponse>('/auth/login', {
     ...payload,
     cart_token: getCartToken(),
   });
@@ -13,7 +13,7 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
 }
 
 export async function register(payload: RegisterPayload): Promise<AuthResponse> {
-  const { data } = await api.post<AuthResponse>("/auth/register", {
+  const { data } = await api.post<AuthResponse>('/auth/register', {
     ...payload,
     cart_token: getCartToken(),
   });
@@ -21,16 +21,16 @@ export async function register(payload: RegisterPayload): Promise<AuthResponse> 
 }
 
 export async function logout(): Promise<void> {
-  await api.post("/auth/logout");
+  await api.post('/auth/logout');
 }
 
 export async function getMe(): Promise<User> {
-  const { data } = await api.get<{ user: User }>("/auth/me");
+  const { data } = await api.get<{ user: User }>('/auth/me');
   return data.user;
 }
 
 export async function forgotPassword(email: string): Promise<{ message: string }> {
-  const { data } = await api.post<{ message: string }>("/auth/forgot-password", { email });
+  const { data } = await api.post<{ message: string }>('/auth/forgot-password', { email });
   return data;
 }
 
@@ -40,7 +40,7 @@ export async function resetPassword(payload: {
   password: string;
   password_confirmation: string;
 }): Promise<{ message: string }> {
-  const { data } = await api.post<{ message: string }>("/auth/reset-password", payload);
+  const { data } = await api.post<{ message: string }>('/auth/reset-password', payload);
   return data;
 }
 

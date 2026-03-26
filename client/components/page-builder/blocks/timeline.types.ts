@@ -1,4 +1,4 @@
-import type { PageBlock } from "@/types/api";
+import type { PageBlock } from '@/types/api';
 
 export interface TimelineItem {
   date?: string;
@@ -9,7 +9,7 @@ export interface TimelineItem {
 export interface TimelineConfig {
   title?: string;
   subtitle?: string;
-  layout?: "left" | "center" | "right";
+  layout?: 'left' | 'center' | 'right';
   items?: TimelineItem[];
 }
 export interface TimelineProps {

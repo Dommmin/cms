@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { api } from "@/lib/axios";
+import { api } from '@/lib/axios';
+import { useEffect, useState } from 'react';
 import type { ApplePayButtonProps, ApplePaySessionInstance } from './apple-pay-button.types';
 
 declare global {
@@ -17,7 +17,7 @@ export function ApplePayButton({ amount, currency, onToken }: ApplePayButtonProp
   const [isAvailable, setIsAvailable] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.ApplePaySession?.canMakePayments()) {
+    if (typeof window !== 'undefined' && window.ApplePaySession?.canMakePayments()) {
       void Promise.resolve().then(() => setIsAvailable(true));
     }
   }, []);
@@ -26,12 +26,12 @@ export function ApplePayButton({ amount, currency, onToken }: ApplePayButtonProp
 
   function handleClick() {
     const request = {
-      countryCode: "PL",
+      countryCode: 'PL',
       currencyCode: currency.toUpperCase(),
-      supportedNetworks: ["visa", "masterCard"],
-      merchantCapabilities: ["supports3DS"],
+      supportedNetworks: ['visa', 'masterCard'],
+      merchantCapabilities: ['supports3DS'],
       total: {
-        label: "Zamówienie",
+        label: 'Zamówienie',
         amount: (amount / 100).toFixed(2),
       },
     };
@@ -40,7 +40,7 @@ export function ApplePayButton({ amount, currency, onToken }: ApplePayButtonProp
 
     session.onvalidatemerchant = async (event) => {
       try {
-        const { data } = await api.post("/payments/apple-pay/validate-merchant", {
+        const { data } = await api.post('/payments/apple-pay/validate-merchant', {
           validation_url: event.validationURL,
           domain: window.location.hostname,
         });
@@ -66,7 +66,7 @@ export function ApplePayButton({ amount, currency, onToken }: ApplePayButtonProp
       type="button"
       onClick={handleClick}
       className="flex w-full items-center justify-center rounded-lg bg-black px-4 py-3 text-sm font-medium text-white hover:opacity-90"
-      style={{ fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}
+      style={{ fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}
     >
       <span className="mr-1.5 text-base">🍎</span> Pay
     </button>

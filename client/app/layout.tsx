@@ -1,53 +1,56 @@
-import type { Metadata } from "next";
-import { cache } from "react";
-import { cookies } from "next/headers";
-import { Geist, Geist_Mono } from "next/font/google";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import { cookies } from 'next/headers';
+import { cache } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-import { AdminBar } from "@/components/admin/admin-bar";
-import type { AdminBarProps } from "@/components/admin/admin-bar.types";
-import { AnnouncementBar } from "@/components/layout/announcement-bar";
-import { ChatWidgetLoader } from "@/components/chat/chat-widget-loader";
-import { GoogleTagManager } from "@/components/layout/google-tag-manager";
-import { CookieConsent } from "@/components/cookie-consent";
-import { ComparisonBar } from "@/components/comparison-bar";
-import { Footer } from "@/components/layout/footer";
-import { Header } from "@/components/layout/header";
-import { JsonLd } from "@/components/json-ld";
-import { QueryProvider } from "@/providers/query-provider";
-import { TranslationProvider } from "@/providers/translation-provider";
-import { serverFetch } from "@/lib/server-fetch";
-import { buildOrganization, buildWebSite } from "@/lib/schema";
+import { AdminBar } from '@/components/admin/admin-bar';
+import type { AdminBarProps } from '@/components/admin/admin-bar.types';
+import { ChatWidgetLoader } from '@/components/chat/chat-widget-loader';
+import { ComparisonBar } from '@/components/comparison-bar';
+import { CookieConsent } from '@/components/cookie-consent';
+import { JsonLd } from '@/components/json-ld';
+import { AnnouncementBar } from '@/components/layout/announcement-bar';
+import { Footer } from '@/components/layout/footer';
+import { GoogleTagManager } from '@/components/layout/google-tag-manager';
+import { Header } from '@/components/layout/header';
+import { buildOrganization, buildWebSite } from '@/lib/schema';
+import { serverFetch } from '@/lib/server-fetch';
+import { QueryProvider } from '@/providers/query-provider';
+import { TranslationProvider } from '@/providers/translation-provider';
 
-import "./globals.css";
+import './globals.css';
 import type { PublicSettingsResponse } from './layout.types';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  display: "swap",
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+  display: 'swap',
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "swap",
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+  display: 'swap',
 });
 
 // Cached per-request: both generateMetadata and RootLayout share one fetch
 
 const getPublicSettings = cache(async () =>
-  serverFetch<PublicSettingsResponse>("/settings/public", { revalidate: 300, tags: ["settings"] }).catch(() => null),
+  serverFetch<PublicSettingsResponse>('/settings/public', {
+    revalidate: 300,
+    tags: ['settings'],
+  }).catch(() => null),
 );
 
 export async function generateMetadata(): Promise<Metadata> {
   const publicSettings = await getPublicSettings();
 
-  const siteName = publicSettings?.settings.general?.site_name ?? "Store";
+  const siteName = publicSettings?.settings.general?.site_name ?? 'Store';
   const siteDescription = publicSettings?.settings.general?.site_description;
   const disableIndexing =
-    publicSettings?.settings.seo?.disable_indexing === "true" ||
+    publicSettings?.settings.seo?.disable_indexing === 'true' ||
     publicSettings?.settings.seo?.disable_indexing === true;
 
   return {
@@ -55,13 +58,13 @@ export async function generateMetadata(): Promise<Metadata> {
       default: siteName,
       template: `%s | ${siteName}`,
     },
-    description: siteDescription ?? "Your online store",
+    description: siteDescription ?? 'Your online store',
     robots: disableIndexing ? { index: false, follow: false } : undefined,
     verification: {
       google: publicSettings?.settings.seo?.google_site_verification ?? undefined,
     },
     other: publicSettings?.settings.seo?.bing_site_verification
-      ? { "msvalidate.01": publicSettings.settings.seo.bing_site_verification }
+      ? { 'msvalidate.01': publicSettings.settings.seo.bing_site_verification }
       : undefined,
   };
 }
@@ -72,13 +75,15 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const locale = cookieStore.get("locale")?.value ?? "en";
-  const adminPreviewRaw = cookieStore.get("admin_preview")?.value;
+  const locale = cookieStore.get('locale')?.value ?? 'en';
+  const adminPreviewRaw = cookieStore.get('admin_preview')?.value;
   const isAdminPreview = !!adminPreviewRaw;
-  let adminPreviewEntity: AdminBarProps["entity"] = null;
+  let adminPreviewEntity: AdminBarProps['entity'] = null;
   if (adminPreviewRaw) {
     try {
-      const parsed = JSON.parse(decodeURIComponent(adminPreviewRaw)) as { entity?: typeof adminPreviewEntity };
+      const parsed = JSON.parse(decodeURIComponent(adminPreviewRaw)) as {
+        entity?: typeof adminPreviewEntity;
+      };
       adminPreviewEntity = parsed.entity ?? null;
     } catch {
       // malformed cookie — ignore
@@ -87,7 +92,7 @@ export default async function RootLayout({
 
   const publicSettings = await getPublicSettings();
   const gtmId = publicSettings?.settings.seo?.google_tag_manager ?? null;
-  const siteName = publicSettings?.settings.general?.site_name ?? "Store";
+  const siteName = publicSettings?.settings.general?.site_name ?? 'Store';
   const siteUrl = publicSettings?.settings.general?.site_url;
   const siteDescription = publicSettings?.settings.general?.site_description;
   const contactEmail = publicSettings?.settings.general?.contact_email;
@@ -101,10 +106,7 @@ export default async function RootLayout({
       <head>
         {/* Preconnect to API origin for faster TTFB on client-side fetches */}
         {process.env.NEXT_PUBLIC_API_URL && (
-          <link
-            rel="preconnect"
-            href={new URL(process.env.NEXT_PUBLIC_API_URL).origin}
-          />
+          <link rel="preconnect" href={new URL(process.env.NEXT_PUBLIC_API_URL).origin} />
         )}
         {/* Preconnect to Cloudflare Turnstile if key is configured */}
         {process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY && (
@@ -122,7 +124,9 @@ export default async function RootLayout({
             __html: `window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:"consent_default",analytics_storage:"denied",ad_storage:"denied",ad_user_data:"denied",ad_personalization:"denied",functionality_storage:"denied",security_storage:"granted"});`,
           }}
         />
-        <JsonLd data={buildWebSite({ name: siteName, url: siteUrl, description: siteDescription })} />
+        <JsonLd
+          data={buildWebSite({ name: siteName, url: siteUrl, description: siteDescription })}
+        />
         <JsonLd
           data={buildOrganization({
             name: siteName,
@@ -133,10 +137,12 @@ export default async function RootLayout({
           })}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased${isAdminPreview ? " pt-10" : ""}`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased${isAdminPreview ? 'pt-10' : ''}`}
+      >
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[9999] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground focus:outline-none"
+          className="focus:bg-primary focus:text-primary-foreground sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:rounded-md focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:outline-none"
         >
           Skip to main content
         </a>
@@ -146,7 +152,9 @@ export default async function RootLayout({
             <div className="flex min-h-screen flex-col">
               <AnnouncementBar />
               <Header />
-              <main id="main-content" className="flex-1">{children}</main>
+              <main id="main-content" className="flex-1">
+                {children}
+              </main>
               <Footer />
             </div>
             <CookieConsent settings={cookieSettings} />

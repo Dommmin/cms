@@ -1,4 +1,4 @@
-import type { PageBlock } from "@/types/api";
+import type { PageBlock } from '@/types/api';
 
 export interface Badge {
   icon?: string;
@@ -6,7 +6,7 @@ export interface Badge {
   sublabel?: string;
 }
 export interface TrustBadgesConfig {
-  style?: "row" | "card" | "minimal";
+  style?: 'row' | 'card' | 'minimal';
   badges?: Badge[];
 }
 export interface TrustBadgesProps {

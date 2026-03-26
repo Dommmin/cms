@@ -1,5 +1,5 @@
+import { DEFAULT_LOCALE, localePath, LOCALES } from '@/lib/i18n';
 import type { Metadata } from 'next';
-import { LOCALES, DEFAULT_LOCALE, localePath } from '@/lib/i18n';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 

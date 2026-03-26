@@ -1,35 +1,30 @@
-"use client";
+'use client';
 
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-import { useEffect } from "react";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { useEffect } from 'react';
+import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import type { StoreMapInnerProps } from './store-map-inner.types';
 
 // Fix default marker icon paths for webpack/Next.js
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  iconUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 });
 
 function MapInvalidateSize() {
   useEffect(() => {
-    window.dispatchEvent(new Event("resize"));
+    window.dispatchEvent(new Event('resize'));
   }, []);
   return null;
 }
 
 export default function StoreMapInner({ stores, height = 400, zoom = 13 }: StoreMapInnerProps) {
   const center: [number, number] =
-    stores.length > 0
-      ? [stores[0].lat, stores[0].lng]
-      : [52.2297, 21.0122];
+    stores.length > 0 ? [stores[0].lat, stores[0].lng] : [52.2297, 21.0122];
 
   const mapZoom = stores.length === 1 ? zoom : 6;
 
@@ -37,7 +32,7 @@ export default function StoreMapInner({ stores, height = 400, zoom = 13 }: Store
     <MapContainer
       center={center}
       zoom={mapZoom}
-      style={{ height, width: "100%" }}
+      style={{ height, width: '100%' }}
       scrollWheelZoom={false}
     >
       <MapInvalidateSize />
@@ -56,10 +51,7 @@ export default function StoreMapInner({ stores, height = 400, zoom = 13 }: Store
               </p>
               {store.phone && (
                 <p className="text-sm">
-                  <a
-                    href={`tel:${store.phone}`}
-                    className="text-blue-600 hover:underline"
-                  >
+                  <a href={`tel:${store.phone}`} className="text-blue-600 hover:underline">
                     {store.phone}
                   </a>
                 </p>
