@@ -32,6 +32,7 @@ services:
     working_dir: /var/www/client
     volumes:
       - ./client:/var/www/client
+      - client_node_modules:/var/www/client/node_modules
     environment:
       # Internal URL used by Next.js Server Components to reach Laravel API
       API_URL: http://nginx/api/v1
@@ -125,7 +126,7 @@ services:
     image: mailhog/mailhog:latest
     container_name: ${COMPOSE_PROJECT_NAME}_mailhog
     restart: on-failure
-    platform: arm64
+    platform: linux/arm64
     ports:
       - "1025:1025"
       - "8025:8025"
@@ -138,3 +139,4 @@ networks:
 
 volumes:
   mysql_data:
+  client_node_modules:
