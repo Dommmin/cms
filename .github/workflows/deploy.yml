@@ -67,7 +67,7 @@ jobs:
   # ============================================================================
   lint-client:
   # ============================================================================
-    name: Lint — client (Next.js ESLint)
+    name: Lint — client (Next.js ESLint + Prettier)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -88,6 +88,9 @@ jobs:
 
       - name: ESLint
         run: npm run lint
+
+      - name: Format check (Prettier)
+        run: npm run format:check
 
   # ============================================================================
   test:
