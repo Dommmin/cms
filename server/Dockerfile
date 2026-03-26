@@ -29,46 +29,13 @@ COPY server/ .
 RUN npm run build
 
 # =============================================================================
-# Stage 3: Production image — PHP 8.5 Alpine + Nginx + Supervisord
+# Stage 3: Production image — custom PHP 8.5 Alpine base + Nginx + Supervisord
+# All PHP extensions (gd, exif, intl, redis, …) pre-installed in the base image.
 # =============================================================================
-FROM php:8.5-fpm-alpine AS production
+FROM dommin/php-8.5-fpm-alpine:latest AS production
 
-# System packages
-RUN apk add --no-cache \
-    nginx \
-    supervisor \
-    # gd dependencies
-    freetype-dev \
-    libjpeg-turbo-dev \
-    libpng-dev \
-    libwebp-dev \
-    # intl dependency
-    icu-dev \
-    # zip dependency
-    libzip-dev \
+RUN apk add --no-cache nginx \
     && mkdir -p /var/log/supervisor /run/nginx
-
-# PHP extensions — configure gd with full codec support first
-RUN docker-php-ext-configure gd \
-        --with-freetype \
-        --with-jpeg \
-        --with-webp \
-    && docker-php-ext-install -j"$(nproc)" \
-        bcmath \
-        exif \
-        gd \
-        intl \
-        opcache \
-        pcntl \
-        pdo_mysql \
-        sockets \
-        zip \
-    # Redis via PECL
-    && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
-    && pecl install redis \
-    && docker-php-ext-enable redis \
-    && apk del .build-deps \
-    && rm -rf /tmp/pear
 
 WORKDIR /var/www/html
 
