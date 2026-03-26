@@ -11,7 +11,11 @@ import {
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import type { VersionEntry, DiffEntry, VersionHistoryProps } from './version-history.types';
+import type {
+    VersionEntry,
+    DiffEntry,
+    VersionHistoryProps,
+} from './version-history.types';
 
 function formatValue(val: unknown): string {
     if (val === null || val === undefined) return '—';

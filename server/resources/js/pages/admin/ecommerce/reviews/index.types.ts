@@ -1,6 +1,4 @@
-import type {
-    ReviewRow,
-} from '@/components/columns/review-columns.types';
+import type { ReviewRow } from '@/components/columns/review-columns.types';
 
 export type IndexProps = {
     reviews: {

@@ -2,10 +2,7 @@ import { Head, router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { PageBuilder } from '@/features/page-builder';
-import type {
-    PreviewDevice,
-    Section,
-} from '@/features/page-builder';
+import type { PreviewDevice, Section } from '@/features/page-builder';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { BuilderPageProps } from './builder.types';

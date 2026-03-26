@@ -49,7 +49,10 @@ function CloneSiteDialog({ locales }: { locales: SharedLocale[] }) {
 
     const sourceOptions = [
         { value: 'global', label: 'Global (no locale)' },
-        ...locales.map((l) => ({ value: l.code, label: `${l.name} (${l.code})` })),
+        ...locales.map((l) => ({
+            value: l.code,
+            label: `${l.name} (${l.code})`,
+        })),
     ];
     const targetOptions = locales.filter((l) => l.code !== data.source_locale);
 
@@ -73,7 +76,9 @@ function CloneSiteDialog({ locales }: { locales: SharedLocale[] }) {
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>{__('dialog.clone_site', 'Clone Site')}</DialogTitle>
+                    <DialogTitle>
+                        {__('dialog.clone_site', 'Clone Site')}
+                    </DialogTitle>
                     <DialogDescription>
                         {__(
                             'dialog.clone_site_desc',
@@ -83,7 +88,9 @@ function CloneSiteDialog({ locales }: { locales: SharedLocale[] }) {
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid gap-2">
-                        <Label>{__('label.source_locale', 'Source locale')}</Label>
+                        <Label>
+                            {__('label.source_locale', 'Source locale')}
+                        </Label>
                         <Select
                             value={data.source_locale}
                             onValueChange={(v) => setData('source_locale', v)}
@@ -99,16 +106,27 @@ function CloneSiteDialog({ locales }: { locales: SharedLocale[] }) {
                                 ))}
                             </SelectContent>
                         </Select>
-                        <InputError message={(errors as Record<string, string>).source_locale} />
+                        <InputError
+                            message={
+                                (errors as Record<string, string>).source_locale
+                            }
+                        />
                     </div>
                     <div className="grid gap-2">
-                        <Label>{__('label.target_locale', 'Target locale')}</Label>
+                        <Label>
+                            {__('label.target_locale', 'Target locale')}
+                        </Label>
                         <Select
                             value={data.target_locale}
                             onValueChange={(v) => setData('target_locale', v)}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder={__('placeholder.select_locale', 'Select locale')} />
+                                <SelectValue
+                                    placeholder={__(
+                                        'placeholder.select_locale',
+                                        'Select locale',
+                                    )}
+                                />
                             </SelectTrigger>
                             <SelectContent>
                                 {targetOptions.map((l) => (
@@ -118,7 +136,11 @@ function CloneSiteDialog({ locales }: { locales: SharedLocale[] }) {
                                 ))}
                             </SelectContent>
                         </Select>
-                        <InputError message={(errors as Record<string, string>).target_locale} />
+                        <InputError
+                            message={
+                                (errors as Record<string, string>).target_locale
+                            }
+                        />
                     </div>
                     <DialogFooter>
                         <Button
@@ -128,7 +150,10 @@ function CloneSiteDialog({ locales }: { locales: SharedLocale[] }) {
                         >
                             {__('action.cancel', 'Cancel')}
                         </Button>
-                        <Button type="submit" disabled={processing || !data.target_locale}>
+                        <Button
+                            type="submit"
+                            disabled={processing || !data.target_locale}
+                        >
                             {processing
                                 ? __('misc.cloning', 'Cloning...')
                                 : __('action.clone', 'Clone')}
@@ -163,7 +188,10 @@ export default function Index({
     const localeTabs = [
         { value: 'all', label: __('filter.all', 'All') },
         { value: 'global', label: __('filter.global', 'Global') },
-        ...locales.map((l) => ({ value: l.code, label: `${l.name} (${l.code})` })),
+        ...locales.map((l) => ({
+            value: l.code,
+            label: `${l.name} (${l.code})`,
+        })),
     ];
 
     return (
@@ -196,15 +224,15 @@ export default function Index({
                 </PageHeader>
 
                 {/* Locale filter tabs */}
-                <div className="flex gap-1 flex-wrap border-b pb-2 mb-4">
+                <div className="mb-4 flex flex-wrap gap-1 border-b pb-2">
                     {localeTabs.map((tab) => (
                         <button
                             key={tab.value}
                             onClick={() => setLocaleFilter(tab.value)}
-                            className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                            className={`rounded-md px-3 py-1.5 text-sm transition-colors ${
                                 activeLocale === tab.value
                                     ? 'bg-primary text-primary-foreground'
-                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                             }`}
                         >
                             {tab.label}

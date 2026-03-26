@@ -41,7 +41,18 @@ import { slugify } from '@/lib/slug';
 import { formatDateTime } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
-import type { Category, ProductType, Brand, ProductFlag, FormErrors, TabKey, ProductVariant, ProductImage, PriceHistoryEntry, FormData } from './edit.types';
+import type {
+    Category,
+    ProductType,
+    Brand,
+    ProductFlag,
+    FormErrors,
+    TabKey,
+    ProductVariant,
+    ProductImage,
+    PriceHistoryEntry,
+    FormData,
+} from './edit.types';
 
 const defaultVariant: ProductVariant = {
     sku: '',

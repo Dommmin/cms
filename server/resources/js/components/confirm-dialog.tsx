@@ -12,7 +12,10 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import type { ConfirmDialogProps, ConfirmButtonProps } from './confirm-dialog.types';
+import type {
+    ConfirmDialogProps,
+    ConfirmButtonProps,
+} from './confirm-dialog.types';
 
 export function ConfirmDialog({
     open,

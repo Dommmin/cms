@@ -1,4 +1,8 @@
-export type LocaleOption = { code: string; name: string; flag_emoji: string | null };
+export type LocaleOption = {
+    code: string;
+    name: string;
+    flag_emoji: string | null;
+};
 export type Translation = {
     id: number;
     locale_code: string;

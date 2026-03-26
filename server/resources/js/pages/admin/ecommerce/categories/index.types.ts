@@ -1,6 +1,4 @@
-import type {
-    CategoryRow,
-} from '@/components/columns/category-columns.types';
+import type { CategoryRow } from '@/components/columns/category-columns.types';
 
 export type CategoryData = {
     data: CategoryRow[];

@@ -10,7 +10,11 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { Submission, SubmissionsData, FormData } from './submissions.types';
+import type {
+    Submission,
+    SubmissionsData,
+    FormData,
+} from './submissions.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Forms', href: '/admin/forms' },

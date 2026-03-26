@@ -30,7 +30,15 @@ import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
-import type { Category, ProductType, Brand, ProductFlag, FormErrors, TabKey, FormData } from './create.types';
+import type {
+    Category,
+    ProductType,
+    Brand,
+    ProductFlag,
+    FormErrors,
+    TabKey,
+    FormData,
+} from './create.types';
 
 const formId = 'product-create-form';
 

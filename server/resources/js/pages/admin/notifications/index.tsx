@@ -30,7 +30,10 @@ const channelIcons: Record<string, string> = {
     in_app: '🔵',
 };
 
-export default function NotificationsIndex({ notifications, filters }: IndexProps) {
+export default function NotificationsIndex({
+    notifications,
+    filters,
+}: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<AppNotification>[] = [
         {

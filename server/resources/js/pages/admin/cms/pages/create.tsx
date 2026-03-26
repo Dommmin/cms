@@ -130,7 +130,10 @@ export default function Create({ modules, pages }: CreateProps) {
                                     {locales.length > 0 && (
                                         <div className="grid gap-2">
                                             <Label>
-                                                {__('label.site', 'Site / Locale')}
+                                                {__(
+                                                    'label.site',
+                                                    'Site / Locale',
+                                                )}
                                             </Label>
                                             <Select
                                                 value={locale}

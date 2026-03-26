@@ -18,7 +18,10 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Blog Categories', href: '/admin/blog/categories' },
 ];
 
-export default function BlogCategoriesIndex({ categories, filters }: IndexProps) {
+export default function BlogCategoriesIndex({
+    categories,
+    filters,
+}: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<BlogCategory>[] = [
         {

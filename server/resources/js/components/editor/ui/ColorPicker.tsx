@@ -2,7 +2,12 @@ import { type JSX } from 'react';
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
-import type { Position, MoveWrapperProps, HSV, ColorPickerProps } from './ColorPicker.types';
+import type {
+    Position,
+    MoveWrapperProps,
+    HSV,
+    ColorPickerProps,
+} from './ColorPicker.types';
 
 const WIDTH = 214;
 const HEIGHT = 150;
@@ -194,7 +199,10 @@ function hsvToHex(h: number, s: number, v: number): string {
     );
 }
 
-export default function ColorPicker({ color, onChange }: ColorPickerProps): JSX.Element {
+export default function ColorPicker({
+    color,
+    onChange,
+}: ColorPickerProps): JSX.Element {
     const [selfColor, setSelfColor] = useState(() => hexToHsv(toHex(color)));
     const [inputColor, setInputColor] = useState(color);
     const _innerDivRef = useRef<HTMLDivElement>(null);

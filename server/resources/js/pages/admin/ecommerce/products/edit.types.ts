@@ -12,7 +12,12 @@ export type ProductFlag = {
     description?: string | null;
 };
 export type FormErrors = Record<string, string>;
-export type TabKey = 'general' | 'pricing' | 'media' | 'metadata' | 'price_history';
+export type TabKey =
+    | 'general'
+    | 'pricing'
+    | 'media'
+    | 'metadata'
+    | 'price_history';
 export type ProductVariant = {
     id?: number;
     sku: string;

@@ -1,7 +1,10 @@
 import { Link } from '@inertiajs/react';
 import { ChevronRightIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { PageHeaderProps, PageHeaderActionsProps } from './page-header.types';
+import type {
+    PageHeaderProps,
+    PageHeaderActionsProps,
+} from './page-header.types';
 
 export function PageHeader({
     title,

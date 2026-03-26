@@ -183,7 +183,10 @@ export default function Edit({ page, modules, pages }: EditProps) {
                             {page.layout}
                         </Badge>
                         {page.locale ? (
-                            <Badge variant="outline" className="font-mono uppercase">
+                            <Badge
+                                variant="outline"
+                                className="font-mono uppercase"
+                            >
                                 {page.locale}
                             </Badge>
                         ) : (

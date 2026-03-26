@@ -1,6 +1,4 @@
-import type {
-    PageRow,
-} from '@/components/columns/page-columns.types';
+import type { PageRow } from '@/components/columns/page-columns.types';
 
 export type PagesData = {
     data: PageRow[];

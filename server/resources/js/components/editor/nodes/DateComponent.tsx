@@ -10,7 +10,10 @@ import {
 import type { DateComponentProps } from './DateComponent.types';
 import { $isDateNode } from './DateNode';
 
-export default function DateComponent({ isoDate, nodeKey }: DateComponentProps) {
+export default function DateComponent({
+    isoDate,
+    nodeKey,
+}: DateComponentProps) {
     const [editor] = useLexicalComposerContext();
     const [open, setOpen] = useState(false);
 

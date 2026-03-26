@@ -1,6 +1,4 @@
-import type {
-    OrderRow,
-} from '@/components/columns/order-columns.types';
+import type { OrderRow } from '@/components/columns/order-columns.types';
 
 export type OrderData = {
     data: OrderRow[];

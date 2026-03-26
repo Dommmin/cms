@@ -1,7 +1,12 @@
 import * as React from 'react';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import type { FormFieldProps, SelectFieldProps, TextareaFieldProps, CheckboxFieldProps } from './form-field.types';
+import type {
+    FormFieldProps,
+    SelectFieldProps,
+    TextareaFieldProps,
+    CheckboxFieldProps,
+} from './form-field.types';
 
 export const InputField = React.forwardRef<HTMLInputElement, FormFieldProps>(
     (

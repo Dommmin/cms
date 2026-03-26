@@ -30,7 +30,12 @@ import { INSERT_FIGMA_COMMAND } from '../FigmaPlugin';
 import { INSERT_LAYOUT_COMMAND } from '../LayoutPlugin/LayoutPlugin';
 import { INSERT_PAGE_BREAK_COMMAND } from '../PageBreakPlugin';
 import { INSERT_TWEET_COMMAND } from '../TwitterPlugin';
-import type { MediaItem, MediaResponse, ModalType, InsertDropdownProps } from './InsertDropdown.types';
+import type {
+    MediaItem,
+    MediaResponse,
+    ModalType,
+    InsertDropdownProps,
+} from './InsertDropdown.types';
 
 // ─── Media picker for image insertion ─────────────────────────────────────────
 
@@ -548,7 +553,9 @@ function InsertColumnsDialog({
     );
 }
 
-export default function InsertDropdown({ disabled }: InsertDropdownProps): JSX.Element {
+export default function InsertDropdown({
+    disabled,
+}: InsertDropdownProps): JSX.Element {
     const [editor] = useLexicalComposerContext();
     const [modal, setModal] = useState<ModalType>(null);
 

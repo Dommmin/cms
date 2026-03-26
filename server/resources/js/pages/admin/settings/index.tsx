@@ -183,14 +183,22 @@ export default function Index({ settings, groups, currentGroup }: IndexProps) {
                 },
                 body: JSON.stringify({ email: testEmail }),
             });
-            const json = await res.json() as { message: string };
+            const json = (await res.json()) as { message: string };
             if (res.ok) {
                 toast.success(json.message);
             } else {
-                toast.error(json.message ?? __('settings.mail_test_failed', 'Failed to send test email.'));
+                toast.error(
+                    json.message ??
+                        __(
+                            'settings.mail_test_failed',
+                            'Failed to send test email.',
+                        ),
+                );
             }
         } catch {
-            toast.error(__('settings.mail_test_failed', 'Failed to send test email.'));
+            toast.error(
+                __('settings.mail_test_failed', 'Failed to send test email.'),
+            );
         } finally {
             setTestingMail(false);
         }
@@ -321,7 +329,10 @@ export default function Index({ settings, groups, currentGroup }: IndexProps) {
                                         <div className="mb-4 flex items-center gap-2 border-b pb-4">
                                             <MailIcon className="h-5 w-5 text-muted-foreground" />
                                             <h2 className="font-semibold">
-                                                {__('settings.mail_test_title', 'Send Test Email')}
+                                                {__(
+                                                    'settings.mail_test_title',
+                                                    'Send Test Email',
+                                                )}
                                             </h2>
                                         </div>
                                         <p className="mb-4 text-sm text-muted-foreground">
@@ -330,16 +341,26 @@ export default function Index({ settings, groups, currentGroup }: IndexProps) {
                                                 'Send a test email to verify the current mail configuration is working correctly.',
                                             )}
                                         </p>
-                                        <form onSubmit={handleTestMail} className="flex items-end gap-3">
+                                        <form
+                                            onSubmit={handleTestMail}
+                                            className="flex items-end gap-3"
+                                        >
                                             <div className="flex-1 space-y-1.5">
                                                 <Label htmlFor="test-email">
-                                                    {__('settings.mail_test_recipient', 'Recipient Email')}
+                                                    {__(
+                                                        'settings.mail_test_recipient',
+                                                        'Recipient Email',
+                                                    )}
                                                 </Label>
                                                 <Input
                                                     id="test-email"
                                                     type="email"
                                                     value={testEmail}
-                                                    onChange={(e) => setTestEmail(e.target.value)}
+                                                    onChange={(e) =>
+                                                        setTestEmail(
+                                                            e.target.value,
+                                                        )
+                                                    }
                                                     placeholder="you@example.com"
                                                     required
                                                 />
@@ -347,12 +368,20 @@ export default function Index({ settings, groups, currentGroup }: IndexProps) {
                                             <Button
                                                 type="submit"
                                                 variant="outline"
-                                                disabled={testingMail || !testEmail}
+                                                disabled={
+                                                    testingMail || !testEmail
+                                                }
                                             >
                                                 <SendIcon className="mr-2 h-4 w-4" />
                                                 {testingMail
-                                                    ? __('misc.sending', 'Sending...')
-                                                    : __('settings.mail_test_btn', 'Send Test')}
+                                                    ? __(
+                                                          'misc.sending',
+                                                          'Sending...',
+                                                      )
+                                                    : __(
+                                                          'settings.mail_test_btn',
+                                                          'Send Test',
+                                                      )}
                                             </Button>
                                         </form>
                                     </div>

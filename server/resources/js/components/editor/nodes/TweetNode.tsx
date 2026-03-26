@@ -1,7 +1,4 @@
-import type {
-    EditorConfig,
-    NodeKey,
-} from 'lexical';
+import type { EditorConfig, NodeKey } from 'lexical';
 import { $applyNodeReplacement, DecoratorNode } from 'lexical';
 import { type JSX } from 'react';
 import type { SerializedTweetNode } from './TweetNode.types';

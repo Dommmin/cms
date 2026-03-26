@@ -63,7 +63,10 @@ export function usePageColumns(): ColumnDef<PageRow>[] {
             header: __('column.site', 'Site'),
             cell: ({ row }) =>
                 row.original.locale ? (
-                    <Badge variant="outline" className="text-xs font-mono uppercase">
+                    <Badge
+                        variant="outline"
+                        className="font-mono text-xs uppercase"
+                    >
                         {row.original.locale}
                     </Badge>
                 ) : (

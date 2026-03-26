@@ -33,7 +33,11 @@ function fmt(cents: number): string {
     return (cents / 100).toFixed(2);
 }
 
-export default function ReferralsIndex({ referrals, stats, filters }: IndexProps) {
+export default function ReferralsIndex({
+    referrals,
+    stats,
+    filters,
+}: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<Referral>[] = [
         {

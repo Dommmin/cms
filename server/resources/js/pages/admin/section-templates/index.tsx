@@ -18,7 +18,10 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Section Templates', href: '/admin/section-templates' },
 ];
 
-export default function SectionTemplatesIndex({ templates, filters }: IndexProps) {
+export default function SectionTemplatesIndex({
+    templates,
+    filters,
+}: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<SectionTemplate>[] = [
         {

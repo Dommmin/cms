@@ -160,8 +160,9 @@ export function SectionForm({
                     <Label htmlFor="section-animation">Scroll Animation</Label>
                     <Select
                         value={
-                            (section.settings?.animation as string | undefined) ??
-                            'none'
+                            (section.settings?.animation as
+                                | string
+                                | undefined) ?? 'none'
                         }
                         onValueChange={(value) =>
                             onUpdate({

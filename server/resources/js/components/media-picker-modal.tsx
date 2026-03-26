@@ -17,7 +17,12 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { MediaItem, SelectedImage, MediaData, MediaPickerModalProps } from './media-picker-modal.types';
+import type {
+    MediaItem,
+    SelectedImage,
+    MediaData,
+    MediaPickerModalProps,
+} from './media-picker-modal.types';
 
 const MIME_TYPE_ICONS: Record<string, React.ElementType> = {
     'image/': ImageIcon,

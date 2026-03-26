@@ -1,4 +1,9 @@
-export type MediaItem = { id: number; name: string; mime_type: string; url: string };
+export type MediaItem = {
+    id: number;
+    name: string;
+    mime_type: string;
+    url: string;
+};
 export type MediaResponse = {
     data: MediaItem[];
     next_page_url: string | null;

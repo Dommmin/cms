@@ -50,7 +50,11 @@ const defaultForm: LocaleForm = {
     is_active: true,
 };
 
-export default function LocalesIndex({ locales, filters, currencies }: IndexProps) {
+export default function LocalesIndex({
+    locales,
+    filters,
+    currencies,
+}: IndexProps) {
     const __ = useTranslation();
     const [open, setOpen] = useState(false);
     const [editLocale, setEditLocale] = useState<Locale | null>(null);

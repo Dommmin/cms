@@ -24,7 +24,10 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Edit', href: '#' },
 ];
 
-export default function EditSectionTemplate({ template, categories }: EditProps) {
+export default function EditSectionTemplate({
+    template,
+    categories,
+}: EditProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit Template: ${template.name}`} />

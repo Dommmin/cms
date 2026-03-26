@@ -1,6 +1,4 @@
-import type {
-    ProductRow,
-} from '@/components/columns/product-columns.types';
+import type { ProductRow } from '@/components/columns/product-columns.types';
 
 export type ProductData = {
     data: ProductRow[];
