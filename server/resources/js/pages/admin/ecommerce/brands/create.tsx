@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as BrandController from '@/actions/App/Http/Controllers/Admin/Ecommerce/BrandController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -29,21 +30,21 @@ export default function Create({
         ? [
               {
                   title: 'Brands',
-                  href: '/admin/ecommerce/brands',
+                  href: BrandController.index.url(),
               },
               {
                   title: 'Edit Brand',
-                  href: `/admin/ecommerce/brands/${brand.id}/edit`,
+                  href: BrandController.edit.url(brand.id),
               },
           ]
         : [
               {
                   title: 'Brands',
-                  href: '/admin/ecommerce/brands',
+                  href: BrandController.index.url(),
               },
               {
                   title: 'Create Brand',
-                  href: '/admin/ecommerce/brands/create',
+                  href: BrandController.create.url(),
               },
           ];
 
@@ -67,7 +68,7 @@ export default function Create({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/brands"
+                                href={BrandController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -81,8 +82,8 @@ export default function Create({
                 <Form
                     action={
                         isEditing
-                            ? `/admin/ecommerce/brands/${brand.id}`
-                            : '/admin/ecommerce/brands'
+                            ? BrandController.update.url(brand.id)
+                            : BrandController.store.url()
                     }
                     method={isEditing ? 'put' : 'post'}
                     id={formId}

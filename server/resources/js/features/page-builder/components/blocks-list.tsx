@@ -10,6 +10,7 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import axios from 'axios';
+import * as ReusableBlockController from '@/actions/App/Http/Controllers/Admin/Cms/ReusableBlockController';
 import { BookOpen, ClipboardPaste, Plus, SearchIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -54,7 +55,7 @@ function LibraryModal({
 
         setLoading(true);
         axios
-            .get<ReusableBlock[]>('/admin/cms/reusable-blocks/library')
+            .get<ReusableBlock[]>(ReusableBlockController.library.url())
             .then(({ data }) => {
                 const items = Array.isArray(data)
                     ? data
@@ -219,7 +220,7 @@ export function BlocksList({
         const block = blocks[blockIndex];
 
         try {
-            const { data } = await axios.post('/admin/cms/reusable-blocks', {
+            const { data } = await axios.post(ReusableBlockController.store.url(), {
                 name,
                 description,
                 type: block.type,

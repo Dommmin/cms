@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as CurrencyController from '@/actions/App/Http/Controllers/Admin/CurrencyController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -10,8 +11,8 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Currencies', href: '/admin/currencies' },
-    { title: 'Create', href: '/admin/currencies/create' },
+    { title: 'Currencies', href: CurrencyController.index.url() },
+    { title: 'Create', href: CurrencyController.create.url() },
 ];
 
 export default function Create() {
@@ -26,7 +27,7 @@ export default function Create() {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/currencies"
+                                href={CurrencyController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -38,7 +39,7 @@ export default function Create() {
                 </PageHeader>
 
                 <Form
-                    action="/admin/currencies"
+                    action={CurrencyController.store.url()}
                     method="post"
                     className="max-w-2xl space-y-6"
                 >

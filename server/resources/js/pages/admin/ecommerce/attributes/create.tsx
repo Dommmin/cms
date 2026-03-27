@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as AttributeController from '@/actions/App/Http/Controllers/Admin/Ecommerce/AttributeController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -39,21 +40,21 @@ export default function Create({
         ? [
               {
                   title: 'Attributes',
-                  href: '/admin/ecommerce/attributes',
+                  href: AttributeController.index.url(),
               },
               {
                   title: 'Edit Attribute',
-                  href: `/admin/ecommerce/attributes/${attribute.id}/edit`,
+                  href: AttributeController.edit.url(attribute.id),
               },
           ]
         : [
               {
                   title: 'Attributes',
-                  href: '/admin/ecommerce/attributes',
+                  href: AttributeController.index.url(),
               },
               {
                   title: 'Create Attribute',
-                  href: '/admin/ecommerce/attributes/create',
+                  href: AttributeController.create.url(),
               },
           ];
 
@@ -80,7 +81,7 @@ export default function Create({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/attributes"
+                                href={AttributeController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -94,8 +95,8 @@ export default function Create({
                 <Form
                     action={
                         isEditing
-                            ? `/admin/ecommerce/attributes/${attribute.id}`
-                            : '/admin/ecommerce/attributes'
+                            ? AttributeController.update.url(attribute.id)
+                            : AttributeController.store.url()
                     }
                     method={isEditing ? 'put' : 'post'}
                     id={formId}

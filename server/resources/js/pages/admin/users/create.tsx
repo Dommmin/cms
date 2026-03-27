@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as UserController from '@/actions/App/Http/Controllers/Admin/UserController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -14,11 +15,11 @@ import type { BreadcrumbItem } from '@/types';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Users',
-        href: '/admin/users',
+        href: UserController.index.url(),
     },
     {
         title: 'Create User',
-        href: '/admin/users/create',
+        href: UserController.create.url(),
     },
 ];
 
@@ -41,7 +42,7 @@ export default function Create({
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/users" prefetch cacheFor={30}>
+                            <Link href={UserController.index.url()} prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>
@@ -51,7 +52,7 @@ export default function Create({
 
                 <Form
                     id={formId}
-                    action="/admin/users"
+                    action={UserController.store.url()}
                     method="post"
                     className="max-w-xl space-y-6"
                 >

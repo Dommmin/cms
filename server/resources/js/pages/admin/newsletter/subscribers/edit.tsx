@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as NewsletterSubscriberController from '@/actions/App/Http/Controllers/Admin/NewsletterSubscriberController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -11,8 +12,8 @@ import type { BreadcrumbItem } from '@/types';
 import type { Subscriber } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Newsletter', href: '/admin/newsletter' },
-    { title: 'Subscribers', href: '/admin/newsletter/subscribers' },
+    { title: 'Newsletter', href: NewsletterSubscriberController.index.url() },
+    { title: 'Subscribers', href: NewsletterSubscriberController.index.url() },
     { title: 'Edit', href: '#' },
 ];
 
@@ -28,7 +29,7 @@ export default function Edit({ subscriber }: { subscriber: Subscriber }) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/newsletter/subscribers"
+                                href={NewsletterSubscriberController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -40,7 +41,7 @@ export default function Edit({ subscriber }: { subscriber: Subscriber }) {
                 </PageHeader>
 
                 <Form
-                    action={`/admin/newsletter/subscribers/${subscriber.id}`}
+                    action={NewsletterSubscriberController.update.url(subscriber.id)}
                     method="put"
                     options={{ preserveScroll: true }}
                     className="max-w-2xl space-y-6"

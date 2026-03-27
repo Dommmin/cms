@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as ProductTypeController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductTypeController';
 import { Box, PencilIcon, Plus, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
@@ -14,7 +15,7 @@ import type { IndexProps } from './index.types';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Product Types',
-        href: '/admin/ecommerce/product-types',
+        href: ProductTypeController.index.url(),
     },
 ];
 
@@ -33,7 +34,7 @@ export default function ProductTypesIndex({ types, filters }: IndexProps) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/product-types/create"
+                                href={ProductTypeController.create.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -94,7 +95,7 @@ export default function ProductTypesIndex({ types, filters }: IndexProps) {
                                 <div className="flex items-center gap-2">
                                     <Button asChild variant="outline" size="sm">
                                         <Link
-                                            href={`/admin/ecommerce/product-types/${row.original.id}/edit`}
+                                            href={ProductTypeController.edit.url(row.original.id)}
                                             prefetch
                                             cacheFor={30}
                                         >
@@ -112,7 +113,7 @@ export default function ProductTypesIndex({ types, filters }: IndexProps) {
                                         description={`Delete product type "${row.original.name}"?`}
                                         onConfirm={() => {
                                             router.delete(
-                                                `/admin/ecommerce/product-types/${row.original.id}`,
+                                                ProductTypeController.destroy.url(row.original.id),
                                                 {
                                                     onSuccess: () =>
                                                         toast.success(
@@ -146,7 +147,7 @@ export default function ProductTypesIndex({ types, filters }: IndexProps) {
                         'Search types...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/ecommerce/product-types"
+                    baseUrl={ProductTypeController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

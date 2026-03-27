@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as ThemeController from '@/actions/App/Http/Controllers/Admin/ThemeController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -12,8 +13,8 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Themes', href: '/admin/themes' },
-    { title: 'Create', href: '/admin/themes/create' },
+    { title: 'Themes', href: ThemeController.index.url() },
+    { title: 'Create', href: ThemeController.create.url() },
 ];
 
 const editableTokens = [
@@ -55,7 +56,7 @@ export default function Create() {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/themes" prefetch cacheFor={30}>
+                            <Link href={ThemeController.index.url()} prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 Back to Themes
                             </Link>
@@ -64,7 +65,7 @@ export default function Create() {
                 </PageHeader>
 
                 <Form
-                    action="/admin/themes"
+                    action={ThemeController.store.url()}
                     method="post"
                     id={formId}
                     className="max-w-2xl space-y-6"

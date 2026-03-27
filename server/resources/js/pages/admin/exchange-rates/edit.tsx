@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as ExchangeRateController from '@/actions/App/Http/Controllers/Admin/ExchangeRateController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -18,7 +19,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Exchange Rates', href: '/admin/exchange-rates' },
+    { title: 'Exchange Rates', href: ExchangeRateController.index.url() },
     { title: 'Edit', href: '' },
 ];
 
@@ -34,7 +35,7 @@ export default function Edit({ rate, currencies }: EditProps) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/exchange-rates"
+                                href={ExchangeRateController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -46,7 +47,7 @@ export default function Edit({ rate, currencies }: EditProps) {
                 </PageHeader>
 
                 <Form
-                    action={`/admin/exchange-rates/${rate.id}`}
+                    action={ExchangeRateController.update.url(rate.id)}
                     method="post"
                     className="max-w-2xl space-y-6"
                     children={({ processing, errors }) => (

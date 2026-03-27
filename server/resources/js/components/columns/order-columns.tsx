@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon } from 'lucide-react';
+import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
@@ -119,7 +120,7 @@ export function useOrderColumns(): ColumnDef<OrderRow>[] {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/ecommerce/orders/${row.original.id}`}
+                            href={OrderController.show.url(row.original.id)}
                             prefetch
                             cacheFor={60}
                         >

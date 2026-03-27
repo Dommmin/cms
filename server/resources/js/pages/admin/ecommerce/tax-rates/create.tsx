@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as TaxRateController from '@/actions/App/Http/Controllers/Admin/Ecommerce/TaxRateController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -41,21 +42,21 @@ export default function Create({
         ? [
               {
                   title: 'Tax Rates',
-                  href: '/admin/ecommerce/tax-rates',
+                  href: TaxRateController.index.url(),
               },
               {
                   title: 'Edit Tax Rate',
-                  href: `/admin/ecommerce/tax-rates/${taxRate.id}/edit`,
+                  href: TaxRateController.edit.url(taxRate.id),
               },
           ]
         : [
               {
                   title: 'Tax Rates',
-                  href: '/admin/ecommerce/tax-rates',
+                  href: TaxRateController.index.url(),
               },
               {
                   title: 'Create Tax Rate',
-                  href: '/admin/ecommerce/tax-rates/create',
+                  href: TaxRateController.create.url(),
               },
           ];
 
@@ -82,7 +83,7 @@ export default function Create({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/tax-rates"
+                                href={TaxRateController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -96,8 +97,8 @@ export default function Create({
                 <Form
                     action={
                         isEditing
-                            ? `/admin/ecommerce/tax-rates/${taxRate.id}`
-                            : '/admin/ecommerce/tax-rates'
+                            ? TaxRateController.update.url(taxRate.id)
+                            : TaxRateController.store.url()
                     }
                     method={isEditing ? 'put' : 'post'}
                     id={formId}

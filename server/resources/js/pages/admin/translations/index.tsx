@@ -1,4 +1,5 @@
 import { Head, router } from '@inertiajs/react';
+import * as TranslationController from '@/actions/App/Http/Controllers/Admin/TranslationController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { CheckIcon, RefreshCwIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -23,7 +24,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { Translation, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Translations', href: '/admin/translations' },
+    { title: 'Translations', href: TranslationController.index.url() },
 ];
 const ALL_GROUPS_VALUE = 'all-groups';
 
@@ -41,7 +42,7 @@ export default function TranslationsIndex({
     const handleSync = () => {
         setSyncing(true);
         router.post(
-            '/admin/translations/sync',
+            TranslationController.store.url(),
             {},
             {
                 onSuccess: () => toast.success('Translations synced'),
@@ -54,7 +55,7 @@ export default function TranslationsIndex({
 
     const handleFilterChange = (key: string, value: string | boolean) => {
         router.get(
-            '/admin/translations',
+            TranslationController.index.url(),
             { ...filters, [key]: value || undefined, page: undefined },
             { preserveState: true, replace: true },
         );
@@ -75,7 +76,7 @@ export default function TranslationsIndex({
             return;
         }
         router.put(
-            `/admin/translations/${translation.id}`,
+            TranslationController.update.url(translation.id),
             { value: editValue },
             {
                 onSuccess: () => {
@@ -171,7 +172,7 @@ export default function TranslationsIndex({
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
                             router.delete(
-                                `/admin/translations/${row.original.id}`,
+                                TranslationController.destroy.url(row.original.id),
                                 {
                                     onSuccess: () =>
                                         toast.success('Translation deleted'),
@@ -283,7 +284,7 @@ export default function TranslationsIndex({
                         'Search by key or value...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/translations"
+                    baseUrl={TranslationController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

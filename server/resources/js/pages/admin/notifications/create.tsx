@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -11,8 +12,8 @@ import type { BreadcrumbItem } from '@/types';
 import type { CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Notifications', href: '/admin/notifications' },
-    { title: 'Create', href: '/admin/notifications/create' },
+    { title: 'Notifications', href: AppNotificationController.index.url() },
+    { title: 'Create', href: AppNotificationController.create.url() },
 ];
 
 export default function CreateNotification({
@@ -32,7 +33,7 @@ export default function CreateNotification({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/notifications"
+                                href={AppNotificationController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -44,7 +45,7 @@ export default function CreateNotification({
                 </PageHeader>
 
                 <Form
-                    action="/admin/notifications"
+                    action={AppNotificationController.store.url()}
                     method="post"
                     id={formId}
                     className="max-w-2xl space-y-6"

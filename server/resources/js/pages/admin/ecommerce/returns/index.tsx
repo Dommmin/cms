@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import * as ReturnRequestController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ReturnRequestController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon } from 'lucide-react';
 import DataTable from '@/components/data-table';
@@ -12,7 +13,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { ReturnRequest, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Returns', href: '/admin/ecommerce/returns' },
+    { title: 'Returns', href: ReturnRequestController.index.url() },
 ];
 
 const statusColors: Record<string, string> = {
@@ -106,7 +107,7 @@ export default function ReturnsIndex({ returns, filters }: IndexProps) {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/ecommerce/returns/${row.original.id}`}
+                            href={ReturnRequestController.show.url(row.original.id)}
                             prefetch
                             cacheFor={60}
                         >
@@ -148,7 +149,7 @@ export default function ReturnsIndex({ returns, filters }: IndexProps) {
                         'Search returns...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/ecommerce/returns"
+                    baseUrl={ReturnRequestController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

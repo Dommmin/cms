@@ -1,4 +1,5 @@
 import { Link, Head, router, usePage } from '@inertiajs/react';
+import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -30,8 +31,8 @@ import type { SharedLocale } from '@/types/global';
 import type { CreateProps, FormData } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Blog Posts', href: '/admin/blog/posts' },
-    { title: 'Create Post', href: '/admin/blog/posts/create' },
+    { title: 'Blog Posts', href: BlogPostController.index.url() },
+    { title: 'Create Post', href: BlogPostController.create.url() },
 ];
 
 export default function CreateBlogPost({ categories }: CreateProps) {
@@ -104,7 +105,7 @@ export default function CreateBlogPost({ categories }: CreateProps) {
             featured_image: data.featured_image || null,
         };
 
-        router.post('/admin/blog/posts', payload, {
+        router.post(BlogPostController.store.url(), payload, {
             onSuccess: () => toast.success('Post created successfully'),
             onError: (errs) => {
                 setErrors(errs);
@@ -125,7 +126,7 @@ export default function CreateBlogPost({ categories }: CreateProps) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/blog/posts"
+                                href={BlogPostController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >

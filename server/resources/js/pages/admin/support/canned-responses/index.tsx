@@ -1,4 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as SupportConversationController from '@/actions/App/Http/Controllers/Admin/SupportConversationController';
+import * as SupportCannedResponseController from '@/actions/App/Http/Controllers/Admin/SupportCannedResponseController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -11,11 +13,11 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { IndexProps } from './index.types';
+import type { CannedResponse, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Support', href: '/admin/support' },
-    { title: 'Canned Responses', href: '/admin/support/canned-responses' },
+    { title: 'Support', href: SupportConversationController.index.url() },
+    { title: 'Canned Responses', href: SupportCannedResponseController.index.url() },
 ];
 
 export default function CannedResponsesIndex({ canned_responses }: IndexProps) {
@@ -53,7 +55,7 @@ export default function CannedResponsesIndex({ canned_responses }: IndexProps) {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/support/canned-responses/${row.original.id}/edit`}
+                            href={SupportCannedResponseController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -71,7 +73,7 @@ export default function CannedResponsesIndex({ canned_responses }: IndexProps) {
                         )}
                         onConfirm={() => {
                             router.delete(
-                                `/admin/support/canned-responses/${row.original.id}`,
+                                SupportCannedResponseController.destroy.url(row.original.id),
                                 {
                                     onSuccess: () =>
                                         toast.success(
@@ -102,7 +104,7 @@ export default function CannedResponsesIndex({ canned_responses }: IndexProps) {
                     <PageHeaderActions>
                         <Button asChild>
                             <Link
-                                href="/admin/support/canned-responses/create"
+                                href={SupportCannedResponseController.create.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -124,7 +126,7 @@ export default function CannedResponsesIndex({ canned_responses }: IndexProps) {
                         prev_page_url: canned_responses.prev_page_url ?? null,
                         next_page_url: canned_responses.next_page_url ?? null,
                     }}
-                    baseUrl="/admin/support/canned-responses"
+                    baseUrl={SupportCannedResponseController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

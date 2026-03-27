@@ -1,4 +1,6 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
+import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
 import { ArrowLeftIcon, ExternalLink, EyeIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -39,10 +41,10 @@ export default function EditBlogPost({ post, categories }: EditProps) {
     const [activeLocale, setActiveLocale] = useAdminLocale(defaultLocale);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Blog Posts', href: '/admin/blog/posts' },
+        { title: 'Blog Posts', href: BlogPostController.index.url() },
         {
             title: post.title?.[defaultLocale] ?? 'Edit Post',
-            href: `/admin/blog/posts/${post.id}/edit`,
+            href: BlogPostController.edit.url(post.id),
         },
     ];
 
@@ -119,7 +121,7 @@ export default function EditBlogPost({ post, categories }: EditProps) {
             _method: 'PUT',
         };
 
-        router.post(`/admin/blog/posts/${post.id}`, payload, {
+        router.post(BlogPostController.update.url(post.id), payload, {
             onSuccess: () =>
                 toast.success(
                     __('misc.post_updated', 'Post updated successfully'),
@@ -157,7 +159,7 @@ export default function EditBlogPost({ post, categories }: EditProps) {
                         )}
                         <Button variant="outline" asChild>
                             <a
-                                href={`/admin/preview?${new URLSearchParams({ url: `${frontendUrl}/blog/${post.slug}`, entity_type: 'blog_post', entity_id: String(post.id), entity_name: data.title[defaultLocale] ?? post.slug, admin_url: `/admin/blog/posts/${post.id}/edit` }).toString()}`}
+                                href={PreviewController.url({ query: { url: `${frontendUrl}/blog/${post.slug}`, entity_type: 'blog_post', entity_id: String(post.id), entity_name: data.title[defaultLocale] ?? post.slug, admin_url: BlogPostController.edit.url(post.id) } })}
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
@@ -167,7 +169,7 @@ export default function EditBlogPost({ post, categories }: EditProps) {
                         </Button>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/blog/posts"
+                                href={BlogPostController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >

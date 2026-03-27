@@ -1,6 +1,7 @@
 import { Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilIcon, TrashIcon, Folder } from 'lucide-react';
+import * as CategoryController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CategoryController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -91,7 +92,7 @@ export function useCategoryColumns(): ColumnDef<CategoryRow>[] {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/ecommerce/categories/${row.original.id}/edit`}
+                            href={CategoryController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -106,7 +107,9 @@ export function useCategoryColumns(): ColumnDef<CategoryRow>[] {
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
                             router.delete(
-                                `/admin/ecommerce/categories/${row.original.id}`,
+                                CategoryController.destroy.url(
+                                    row.original.id,
+                                ),
                             );
                         }}
                     >

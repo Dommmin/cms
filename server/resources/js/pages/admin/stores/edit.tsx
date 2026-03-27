@@ -1,4 +1,5 @@
 import { Link, Head, router } from '@inertiajs/react';
+import * as StoreController from '@/actions/App/Http/Controllers/Admin/StoreController';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -15,7 +16,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Stores', href: '/admin/stores' },
+    { title: 'Stores', href: StoreController.index.url() },
     { title: 'Edit', href: '' },
 ];
 
@@ -43,7 +44,7 @@ export default function EditStore({ store }: EditProps) {
         setProcessing(true);
         setErrors({});
 
-        router.put(`/admin/stores/${store.id}`, data, {
+        router.put(StoreController.update.url(store.id), data, {
             onSuccess: () => toast.success('Store updated'),
             onError: (errs) => {
                 setErrors(errs);
@@ -63,7 +64,7 @@ export default function EditStore({ store }: EditProps) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/stores" prefetch cacheFor={30}>
+                            <Link href={StoreController.index.url()} prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 Back
                             </Link>

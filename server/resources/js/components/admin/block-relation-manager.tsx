@@ -1,3 +1,4 @@
+import axios from 'axios';
 import {
     PlusIcon,
     GripVerticalIcon,
@@ -11,6 +12,7 @@ import {
     CheckIcon,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import * as BlockRelationController from '@/actions/App/Http/Controllers/Admin/BlockRelationController';
 import {
     MediaPickerModal,
     type MediaItem,
@@ -104,12 +106,14 @@ function ModelPickerModal({
 
             setLoading(true);
 
-            fetch(
-                `/admin/block-relations/search?type=${encodeURIComponent(relationType)}&q=${encodeURIComponent(q)}`,
-                { signal: controller.signal },
-            )
-                .then((r) => r.json())
-                .then((data: SearchResult[]) => {
+            axios
+                .get<SearchResult[]>(
+                    BlockRelationController.search.url({
+                        query: { type: relationType, q },
+                    }),
+                    { signal: controller.signal },
+                )
+                .then(({ data }) => {
                     setResults(data);
                     setLoading(false);
                 })

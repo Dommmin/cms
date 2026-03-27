@@ -1,4 +1,5 @@
 import { Link, Head } from '@inertiajs/react';
+import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
 import { PlusIcon, DownloadIcon } from 'lucide-react';
 import { useProductColumns } from '@/components/columns/product-columns';
 
@@ -12,7 +13,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { ProductData } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Products', href: '/admin/ecommerce/products' },
+    { title: 'Products', href: ProductController.index.url() },
 ];
 
 export default function ProductsIndex({
@@ -38,14 +39,14 @@ export default function ProductsIndex({
                 >
                     <PageHeaderActions>
                         <Button variant="outline" asChild>
-                            <a href="/admin/ecommerce/products/export">
+                            <a href={ProductController.exportMethod.url()}>
                                 <DownloadIcon className="mr-2 h-4 w-4" />
                                 {__('action.export_csv', 'Export CSV')}
                             </a>
                         </Button>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/products/create"
+                                href={ProductController.create.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -73,7 +74,7 @@ export default function ProductsIndex({
                         'Search products...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/ecommerce/products"
+                    baseUrl={ProductController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

@@ -1,4 +1,5 @@
 import { Link, Head, useForm } from '@inertiajs/react';
+import * as PromotionController from '@/actions/App/Http/Controllers/Admin/Ecommerce/PromotionController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -35,7 +36,7 @@ export default function Edit({
     products: Product[];
 }) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Promotions', href: '/admin/ecommerce/promotions' },
+        { title: 'Promotions', href: PromotionController.index.url() },
         { title: promotion.name, href: '' },
     ];
 
@@ -93,7 +94,7 @@ export default function Edit({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/admin/ecommerce/promotions/${promotion.id}`);
+        put(PromotionController.update.url(promotion.id));
     };
 
     const handleNameChange = (value: string) => {
@@ -166,7 +167,7 @@ export default function Edit({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/promotions"
+                                href={PromotionController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >

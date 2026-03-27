@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as DiscountController from '@/actions/App/Http/Controllers/Admin/Ecommerce/DiscountController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -38,21 +39,21 @@ export default function Create({
         ? [
               {
                   title: 'Discounts',
-                  href: '/admin/ecommerce/discounts',
+                  href: DiscountController.index.url(),
               },
               {
                   title: 'Edit Discount',
-                  href: `/admin/ecommerce/discounts/${discount.id}/edit`,
+                  href: DiscountController.edit.url(discount.id),
               },
           ]
         : [
               {
                   title: 'Discounts',
-                  href: '/admin/ecommerce/discounts',
+                  href: DiscountController.index.url(),
               },
               {
                   title: 'Create Discount',
-                  href: '/admin/ecommerce/discounts/create',
+                  href: DiscountController.create.url(),
               },
           ];
 
@@ -72,7 +73,7 @@ export default function Create({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/discounts"
+                                href={DiscountController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -86,8 +87,8 @@ export default function Create({
                 <Form
                     action={
                         isEditing
-                            ? `/admin/ecommerce/discounts/${discount.id}`
-                            : '/admin/ecommerce/discounts'
+                            ? DiscountController.update.url(discount.id)
+                            : DiscountController.store.url()
                     }
                     method={isEditing ? 'put' : 'post'}
                     id={formId}

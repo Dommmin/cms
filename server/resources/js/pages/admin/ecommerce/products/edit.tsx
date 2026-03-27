@@ -1,4 +1,7 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
+import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
+import * as ProductVariantController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductVariantController';
+import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
 import {
     ArrowLeftIcon,
     Clock,
@@ -354,7 +357,7 @@ export default function Edit({
                         </Button>
                         <Button variant="outline" asChild>
                             <a
-                                href={`/admin/preview?${new URLSearchParams({ url: `${frontendUrl}/products/${product.slug}`, entity_type: 'product', entity_id: String(product.id), entity_name: product.name?.[defaultLocale] ?? product.slug, admin_url: `/admin/ecommerce/products/${product.id}/edit` }).toString()}`}
+                                href={PreviewController.url({ query: { url: `${frontendUrl}/products/${product.slug}`, entity_type: 'product', entity_id: String(product.id), entity_name: product.name?.[defaultLocale] ?? product.slug, admin_url: ProductController.edit.url(product.id) } })}
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
@@ -364,7 +367,7 @@ export default function Edit({
                         </Button>
                         <Button asChild variant="outline">
                             <Link
-                                href={`/admin/ecommerce/products/${product.id}/variants`}
+                                href={ProductVariantController.index.url(product.id)}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -373,7 +376,7 @@ export default function Edit({
                         </Button>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/products"
+                                href={ProductController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -385,7 +388,7 @@ export default function Edit({
                 </PageHeader>
 
                 <Form
-                    action={`/admin/ecommerce/products/${product.id}`}
+                    action={ProductController.update.url(product.id)}
                     method="put"
                     id={formId}
                     className="space-y-6"
@@ -1815,9 +1818,9 @@ export default function Edit({
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Products', href: '/admin/ecommerce/products' },
+    { title: 'Products', href: ProductController.index.url() },
     {
         title: 'Edit Product',
-        href: '/admin/ecommerce/products/:id/edit',
+        href: '',
     },
 ];

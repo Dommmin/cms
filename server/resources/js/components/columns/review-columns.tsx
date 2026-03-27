@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Eye, Star } from 'lucide-react';
+import * as ReviewController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ReviewController';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
@@ -124,7 +125,7 @@ export function useReviewColumns(): ColumnDef<ReviewRow>[] {
             cell: ({ row }) => (
                 <Button asChild variant="outline" size="sm">
                     <Link
-                        href={`/admin/ecommerce/reviews/${row.original.id}`}
+                        href={ReviewController.show.url(row.original.id)}
                         prefetch
                         cacheFor={60}
                     >

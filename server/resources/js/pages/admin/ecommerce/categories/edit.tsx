@@ -1,4 +1,6 @@
 import { Link, Head, router, usePage } from '@inertiajs/react';
+import * as CategoryController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CategoryController';
+import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
 import { ArrowLeftIcon, EyeIcon } from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
@@ -85,7 +87,7 @@ export default function Edit({
         )?.checked;
 
         router.put(
-            `/admin/ecommerce/categories/${category.id}`,
+            CategoryController.update.url(category.id),
             {
                 name: nameValues,
                 description: descValues,
@@ -95,7 +97,7 @@ export default function Edit({
                 ...seoData,
             },
             {
-                onSuccess: () => router.visit('/admin/ecommerce/categories'),
+                onSuccess: () => router.visit(CategoryController.index.url()),
                 onError: (errs) => {
                     setErrors(errs);
                     setProcessing(false);
@@ -106,10 +108,10 @@ export default function Edit({
     };
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Categories', href: '/admin/ecommerce/categories' },
+        { title: 'Categories', href: CategoryController.index.url() },
         {
             title: 'Edit Category',
-            href: `/admin/ecommerce/categories/${category.id}/edit`,
+            href: CategoryController.edit.url(category.id),
         },
     ];
 
@@ -125,7 +127,7 @@ export default function Edit({
                     <PageHeaderActions>
                         <Button variant="outline" asChild>
                             <a
-                                href={`/admin/preview?${new URLSearchParams({ url: `${frontendUrl}/products?category=${category.slug}`, entity_type: 'category', entity_id: String(category.id), entity_name: nameValues[defaultLocale] ?? category.slug, admin_url: `/admin/ecommerce/categories/${category.id}/edit` }).toString()}`}
+                                href={PreviewController.url({ query: { url: `${frontendUrl}/products?category=${category.slug}`, entity_type: 'category', entity_id: String(category.id), entity_name: nameValues[defaultLocale] ?? category.slug, admin_url: CategoryController.edit.url(category.id) } })}
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
@@ -135,7 +137,7 @@ export default function Edit({
                         </Button>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/categories"
+                                href={CategoryController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >

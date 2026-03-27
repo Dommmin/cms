@@ -1,4 +1,5 @@
 import { Link, Head, useForm } from '@inertiajs/react';
+import * as PromotionController from '@/actions/App/Http/Controllers/Admin/Ecommerce/PromotionController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -24,8 +25,8 @@ import type { BreadcrumbItem } from '@/types';
 import type { Category, Product, FormData } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Promotions', href: '/admin/ecommerce/promotions' },
-    { title: 'Create', href: '/admin/ecommerce/promotions/create' },
+    { title: 'Promotions', href: PromotionController.index.url() },
+    { title: 'Create', href: PromotionController.create.url() },
 ];
 
 const formId = 'promotion-create-form';
@@ -59,7 +60,7 @@ export default function Create({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/admin/ecommerce/promotions');
+        post(PromotionController.store.url());
     };
 
     const handleNameChange = (value: string) => {
@@ -135,7 +136,7 @@ export default function Create({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/promotions"
+                                href={PromotionController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >

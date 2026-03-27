@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import * as DiscountController from '@/actions/App/Http/Controllers/Admin/Ecommerce/DiscountController';
 import { Plus, Percent } from 'lucide-react';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -12,7 +13,7 @@ import type { IndexProps } from './index.types';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Discounts',
-        href: '/admin/ecommerce/discounts',
+        href: DiscountController.index.url(),
     },
 ];
 
@@ -36,7 +37,7 @@ export default function DiscountsIndex({ discounts, filters }: IndexProps) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/discounts/create"
+                                href={DiscountController.create.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -117,7 +118,7 @@ export default function DiscountsIndex({ discounts, filters }: IndexProps) {
                         'Search discounts...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/ecommerce/discounts"
+                    baseUrl={DiscountController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

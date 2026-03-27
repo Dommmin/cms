@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as NewsletterCampaignController from '@/actions/App/Http/Controllers/Admin/NewsletterCampaignController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -12,9 +13,9 @@ import type { BreadcrumbItem } from '@/types';
 import type { CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Newsletter', href: '/admin/newsletter' },
-    { title: 'Campaigns', href: '/admin/newsletter/campaigns' },
-    { title: 'Create', href: '/admin/newsletter/campaigns/create' },
+    { title: 'Newsletter', href: NewsletterCampaignController.index.url() },
+    { title: 'Campaigns', href: NewsletterCampaignController.index.url() },
+    { title: 'Create', href: NewsletterCampaignController.create.url() },
 ];
 
 export default function Create({ segments }: CreateProps) {
@@ -29,7 +30,7 @@ export default function Create({ segments }: CreateProps) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/newsletter/campaigns"
+                                href={NewsletterCampaignController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -41,7 +42,7 @@ export default function Create({ segments }: CreateProps) {
                 </PageHeader>
 
                 <Form
-                    action="/admin/newsletter/campaigns"
+                    action={NewsletterCampaignController.store.url()}
                     method="post"
                     className="max-w-2xl space-y-6"
                 >

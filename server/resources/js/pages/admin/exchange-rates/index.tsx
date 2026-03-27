@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as ExchangeRateController from '@/actions/App/Http/Controllers/Admin/ExchangeRateController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PlusIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -14,7 +15,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { ExchangeRate, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Exchange Rates', href: '/admin/exchange-rates' },
+    { title: 'Exchange Rates', href: ExchangeRateController.index.url() },
 ];
 
 export default function ExchangeRatesIndex({
@@ -70,7 +71,7 @@ export default function ExchangeRatesIndex({
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/exchange-rates/${row.original.id}/edit`}
+                            href={ExchangeRateController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -85,7 +86,7 @@ export default function ExchangeRatesIndex({
                         description={`Are you sure you want to delete this exchange rate?`}
                         onConfirm={() => {
                             router.delete(
-                                `/admin/exchange-rates/${row.original.id}`,
+                                ExchangeRateController.destroy.url(row.original.id),
                                 {
                                     onSuccess: () =>
                                         toast.success('Exchange rate deleted'),
@@ -112,7 +113,7 @@ export default function ExchangeRatesIndex({
                     )}
                 >
                     <PageHeaderActions>
-                        <Link href="/admin/exchange-rates/create">
+                        <Link href={ExchangeRateController.create.url()}>
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.add', 'Add Rate')}
@@ -132,7 +133,7 @@ export default function ExchangeRatesIndex({
                         prev_page_url: rates.prev_page_url ?? null,
                         next_page_url: rates.next_page_url ?? null,
                     }}
-                    baseUrl="/admin/exchange-rates"
+                    baseUrl={ExchangeRateController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as ProductFlagController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductFlagController';
 import { Flag, PencilIcon, Plus, TrashIcon } from 'lucide-react';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -12,7 +13,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Product Flags', href: '/admin/ecommerce/product-flags' },
+    { title: 'Product Flags', href: ProductFlagController.index.url() },
 ];
 
 export default function ProductFlagsIndex({ flags, filters }: IndexProps) {
@@ -30,7 +31,7 @@ export default function ProductFlagsIndex({ flags, filters }: IndexProps) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/product-flags/create"
+                                href={ProductFlagController.create.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -124,7 +125,7 @@ export default function ProductFlagsIndex({ flags, filters }: IndexProps) {
                                 <div className="flex items-center gap-2">
                                     <Button asChild variant="outline" size="sm">
                                         <Link
-                                            href={`/admin/ecommerce/product-flags/${row.original.id}/edit`}
+                                            href={ProductFlagController.edit.url(row.original.id)}
                                             prefetch
                                             cacheFor={30}
                                         >
@@ -142,7 +143,7 @@ export default function ProductFlagsIndex({ flags, filters }: IndexProps) {
                                         description={`Are you sure you want to delete "${row.original.name}"?`}
                                         onConfirm={() => {
                                             router.delete(
-                                                `/admin/ecommerce/product-flags/${row.original.id}`,
+                                                ProductFlagController.destroy.url(row.original.id),
                                             );
                                         }}
                                     >
@@ -167,7 +168,7 @@ export default function ProductFlagsIndex({ flags, filters }: IndexProps) {
                         'Search flags...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/ecommerce/product-flags"
+                    baseUrl={ProductFlagController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

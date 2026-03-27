@@ -1,4 +1,5 @@
 import { Head, router } from '@inertiajs/react';
+import * as ReusableBlockController from '@/actions/App/Http/Controllers/Admin/Cms/ReusableBlockController';
 import { Globe2Icon, LibraryBig, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -22,7 +23,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { GlobalBlock, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'CMS', href: '/admin/cms' },
+    { title: 'CMS', href: ReusableBlockController.index.url() },
     { title: 'Global Block Library', href: '' },
 ];
 
@@ -48,7 +49,7 @@ export default function ReusableBlocksIndex({
     const handleUpdate = () => {
         if (!editBlock) return;
         router.put(
-            `/admin/cms/reusable-blocks/${editBlock.id}`,
+            ReusableBlockController.update.url(editBlock.id),
             { name: editName, description: editDesc, is_active: editActive },
             {
                 onSuccess: () => {
@@ -65,7 +66,7 @@ export default function ReusableBlocksIndex({
 
     const handleDelete = () => {
         if (!deleteBlock) return;
-        router.delete(`/admin/cms/reusable-blocks/${deleteBlock.id}`, {
+        router.delete(ReusableBlockController.destroy.url(deleteBlock.id), {
             onSuccess: () => {
                 toast.success(
                     __(

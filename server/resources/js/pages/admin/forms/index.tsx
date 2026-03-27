@@ -1,4 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as FormController from '@/actions/App/Http/Controllers/Admin/FormController';
+import * as FormSubmissionController from '@/actions/App/Http/Controllers/Admin/FormSubmissionController';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
     ClipboardListIcon,
@@ -19,7 +21,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { FormsData } from '@/types/forms';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Forms', href: '/admin/forms' },
+    { title: 'Forms', href: FormController.index.url() },
 ];
 
 export default function Index({
@@ -87,7 +89,7 @@ export default function Index({
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/forms/${row.original.id}/submissions`}
+                            href={FormSubmissionController.index.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -97,7 +99,7 @@ export default function Index({
                     </Button>
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/forms/${row.original.id}/edit`}
+                            href={FormController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -111,7 +113,7 @@ export default function Index({
                         title={__('dialog.delete_title', 'Delete Form')}
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
-                            router.delete(`/admin/forms/${row.original.id}`, {
+                            router.delete(FormController.destroy.url(row.original.id), {
                                 onSuccess: () => toast.success('Form deleted'),
                             });
                         }}
@@ -139,7 +141,7 @@ export default function Index({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/forms/create"
+                                href={FormController.create.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -164,7 +166,7 @@ export default function Index({
                     searchable
                     searchPlaceholder="Search forms..."
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/forms"
+                    baseUrl={FormController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

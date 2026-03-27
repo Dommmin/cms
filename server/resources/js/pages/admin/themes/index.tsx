@@ -1,4 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import * as ThemeController from '@/actions/App/Http/Controllers/Admin/ThemeController';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
     PlusIcon,
@@ -17,10 +18,10 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { IndexProps } from './index.types';
+import type { Theme, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Themes', href: '/admin/themes' },
+    { title: 'Themes', href: ThemeController.index.url() },
 ];
 
 export default function ThemesIndex({ themes, filters }: IndexProps) {
@@ -82,7 +83,7 @@ export default function ThemesIndex({ themes, filters }: IndexProps) {
                             size="sm"
                             onClick={() => {
                                 router.post(
-                                    `/admin/themes/${row.original.id}/activate`,
+                                    ThemeController.activate.url(row.original.id),
                                     {},
                                     {
                                         onSuccess: () =>
@@ -96,7 +97,7 @@ export default function ThemesIndex({ themes, filters }: IndexProps) {
                     )}
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/themes/${row.original.id}/edit`}
+                            href={ThemeController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -109,7 +110,7 @@ export default function ThemesIndex({ themes, filters }: IndexProps) {
                         size="sm"
                         onClick={() => {
                             router.post(
-                                `/admin/themes/${row.original.id}/duplicate`,
+                                ThemeController.duplicate.url(row.original.id),
                                 {},
                                 {
                                     onSuccess: () =>
@@ -127,7 +128,7 @@ export default function ThemesIndex({ themes, filters }: IndexProps) {
                         title={__('dialog.delete_title', 'Delete Theme')}
                         description={`Are you sure you want to delete "${row.original.name}"?`}
                         onConfirm={() => {
-                            router.delete(`/admin/themes/${row.original.id}`, {
+                            router.delete(ThemeController.destroy.url(row.original.id), {
                                 onSuccess: () => toast.success('Theme deleted'),
                             });
                         }}
@@ -153,7 +154,7 @@ export default function ThemesIndex({ themes, filters }: IndexProps) {
                             variant="outline"
                             onClick={() => {
                                 router.post(
-                                    '/admin/themes/disable',
+                                    ThemeController.disable.url(),
                                     {},
                                     {
                                         onSuccess: () =>
@@ -169,7 +170,7 @@ export default function ThemesIndex({ themes, filters }: IndexProps) {
                         </Button>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/themes/create"
+                                href={ThemeController.create.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -197,7 +198,7 @@ export default function ThemesIndex({ themes, filters }: IndexProps) {
                         'Search themes...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/themes"
+                    baseUrl={ThemeController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

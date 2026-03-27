@@ -1,4 +1,5 @@
 import { Link, Head, router, usePage } from '@inertiajs/react';
+import * as ShippingMethodController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ShippingMethodController';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
@@ -25,8 +26,8 @@ import type { SharedLocale } from '@/types/global';
 import type { Carrier } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Shipping Methods', href: '/admin/ecommerce/shipping-methods' },
-    { title: 'Create', href: '/admin/ecommerce/shipping-methods/create' },
+    { title: 'Shipping Methods', href: ShippingMethodController.index.url() },
+    { title: 'Create', href: ShippingMethodController.create.url() },
 ];
 
 const formId = 'shipping-method-create-form';
@@ -80,7 +81,7 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
                 descValues[locale.code] ?? '';
         });
 
-        router.post('/admin/ecommerce/shipping-methods', formData, {
+        router.post(ShippingMethodController.store.url(), formData, {
             onError: (errs) => {
                 setErrors(errs as Record<string, string>);
                 setProcessing(false);
@@ -112,7 +113,7 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/shipping-methods"
+                                href={ShippingMethodController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >

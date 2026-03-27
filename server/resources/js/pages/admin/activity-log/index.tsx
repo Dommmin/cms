@@ -1,4 +1,5 @@
 import { Head, router } from '@inertiajs/react';
+import * as ActivityLogController from '@/actions/App/Http/Controllers/Admin/ActivityLogController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useState } from 'react';
 import DataTable from '@/components/data-table';
@@ -20,7 +21,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { ActivityLog, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Activity Log', href: '/admin/activity-log' },
+    { title: 'Activity Log', href: ActivityLogController.index.url() },
 ];
 
 const EVENT_COLORS: Record<string, 'default' | 'secondary' | 'destructive'> = {
@@ -71,7 +72,7 @@ export default function ActivityLogIndex({
 
     const applyFilters = () => {
         router.get(
-            '/admin/activity-log',
+            ActivityLogController.index.url(),
             localFilters as Record<string, string>,
             {
                 preserveState: true,
@@ -83,7 +84,7 @@ export default function ActivityLogIndex({
     const resetFilters = () => {
         setLocalFilters({});
         router.get(
-            '/admin/activity-log',
+            ActivityLogController.index.url(),
             {},
             { preserveState: true, replace: true },
         );

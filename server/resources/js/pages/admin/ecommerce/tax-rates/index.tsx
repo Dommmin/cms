@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as TaxRateController from '@/actions/App/Http/Controllers/Admin/Ecommerce/TaxRateController';
 import { Plus, Receipt, Star, PencilIcon, TrashIcon } from 'lucide-react';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -14,7 +15,7 @@ import type { IndexProps } from './index.types';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Tax Rates',
-        href: '/admin/ecommerce/tax-rates',
+        href: TaxRateController.index.url(),
     },
 ];
 
@@ -33,7 +34,7 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/tax-rates/create"
+                                href={TaxRateController.create.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -113,7 +114,7 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                                 <div className="flex items-center gap-2">
                                     <Button asChild variant="outline" size="sm">
                                         <Link
-                                            href={`/admin/ecommerce/tax-rates/${row.original.id}/edit`}
+                                            href={TaxRateController.edit.url(row.original.id)}
                                             prefetch
                                             cacheFor={30}
                                         >
@@ -131,7 +132,7 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                                         description={`Are you sure you want to delete "${row.original.name}"?`}
                                         onConfirm={() => {
                                             router.delete(
-                                                `/admin/ecommerce/tax-rates/${row.original.id}`,
+                                                TaxRateController.destroy.url(row.original.id),
                                             );
                                         }}
                                     >
@@ -156,7 +157,7 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                         'Search tax rates...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/ecommerce/tax-rates"
+                    baseUrl={TaxRateController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

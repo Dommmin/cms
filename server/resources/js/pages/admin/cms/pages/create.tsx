@@ -1,4 +1,5 @@
 import { Link, Form, Head, usePage } from '@inertiajs/react';
+import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import InputError from '@/components/input-error';
@@ -25,8 +26,8 @@ import type { SharedLocale } from '@/types/global';
 import type { CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Pages', href: '/admin/cms/pages' },
-    { title: 'Create', href: '/admin/cms/pages/create' },
+    { title: 'Pages', href: PageController.index.url() },
+    { title: 'Create', href: PageController.create.url() },
 ];
 
 export default function Create({ modules, pages }: CreateProps) {
@@ -69,7 +70,7 @@ export default function Create({ modules, pages }: CreateProps) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/cms/pages"
+                                href={PageController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -81,7 +82,7 @@ export default function Create({ modules, pages }: CreateProps) {
                 </PageHeader>
 
                 <Form
-                    action="/admin/cms/pages"
+                    action={PageController.store.url()}
                     method="post"
                     className="max-w-2xl"
                 >

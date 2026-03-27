@@ -1,4 +1,6 @@
 import { Head, router } from '@inertiajs/react';
+import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
+import * as PageBuilderController from '@/actions/App/Http/Controllers/Admin/Cms/PageBuilderController';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { PageBuilder } from '@/features/page-builder';
@@ -23,9 +25,9 @@ export default function BuilderPage({
     const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'CMS', href: '/admin/cms' },
-        { title: 'Pages', href: '/admin/cms/pages' },
-        { title: page.title, href: `/admin/cms/pages/${page.id}` },
+        { title: 'CMS', href: PageController.index.url() },
+        { title: 'Pages', href: PageController.index.url() },
+        { title: page.title, href: PageController.edit.url(page.id) },
         { title: 'Builder', href: '' },
     ];
 
@@ -74,7 +76,7 @@ export default function BuilderPage({
         autoSaveTimerRef.current = setTimeout(() => {
             setIsAutoSaving(true);
             router.put(
-                `/admin/cms/pages/${page.id}/builder`,
+                PageBuilderController.update.url(page.id),
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 { sections: localSections as any },
                 {
@@ -105,7 +107,7 @@ export default function BuilderPage({
         setIsSaving(true);
 
         router.put(
-            `/admin/cms/pages/${page.id}/builder`,
+            PageBuilderController.update.url(page.id),
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             { sections: updatedSections as any },
             {
@@ -130,7 +132,7 @@ export default function BuilderPage({
     };
 
     const handlePreview = () => {
-        window.open(`/admin/cms/pages/${page.id}/preview`, '_blank');
+        window.open(PageBuilderController.preview.url(page.id), '_blank');
     };
 
     const handleToggleSplitView = () => {
@@ -199,7 +201,7 @@ export default function BuilderPage({
                         >
                             <iframe
                                 ref={iframeRef}
-                                src={`/admin/cms/pages/${page.id}/preview`}
+                                src={PageBuilderController.preview.url(page.id)}
                                 className="h-full w-full border-0"
                                 title="Page Preview"
                             />

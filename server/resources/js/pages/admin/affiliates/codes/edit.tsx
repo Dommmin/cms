@@ -1,4 +1,5 @@
 import { Link, Head, useForm } from '@inertiajs/react';
+import * as AffiliateCodeController from '@/actions/App/Http/Controllers/Admin/AffiliateCodeController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -19,8 +20,8 @@ import type { BreadcrumbItem } from '@/types';
 import type { EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Affiliates', href: '/admin/affiliates/codes' },
-    { title: 'Codes', href: '/admin/affiliates/codes' },
+    { title: 'Affiliates', href: AffiliateCodeController.index.url() },
+    { title: 'Codes', href: AffiliateCodeController.index.url() },
     { title: 'Edit', href: '' },
 ];
 
@@ -39,7 +40,7 @@ export default function EditCode({ code, users }: EditProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/admin/affiliates/codes/${code.id}`);
+        put(AffiliateCodeController.update.url(code.id));
     };
 
     return (
@@ -53,7 +54,7 @@ export default function EditCode({ code, users }: EditProps) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/affiliates/codes"
+                                href={AffiliateCodeController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >

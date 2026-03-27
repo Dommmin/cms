@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as ProductFlagController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductFlagController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -17,10 +18,10 @@ export default function Edit({ flag }: { flag: ProductFlag }) {
     const formId = 'product-flag-edit-form';
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Product Flags', href: '/admin/ecommerce/product-flags' },
+        { title: 'Product Flags', href: ProductFlagController.index.url() },
         {
             title: 'Edit Flag',
-            href: `/admin/ecommerce/product-flags/${flag.id}/edit`,
+            href: ProductFlagController.edit.url(flag.id),
         },
     ];
 
@@ -36,7 +37,7 @@ export default function Edit({ flag }: { flag: ProductFlag }) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/product-flags"
+                                href={ProductFlagController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -48,7 +49,7 @@ export default function Edit({ flag }: { flag: ProductFlag }) {
                 </PageHeader>
 
                 <Form
-                    action={`/admin/ecommerce/product-flags/${flag.id}`}
+                    action={ProductFlagController.update.url(flag.id)}
                     method="put"
                     id={formId}
                     className="max-w-xl space-y-6"

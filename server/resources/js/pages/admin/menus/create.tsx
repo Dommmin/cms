@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as MenuController from '@/actions/App/Http/Controllers/Admin/MenuController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -19,8 +20,8 @@ import type { BreadcrumbItem } from '@/types';
 import type { CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Menus', href: '/admin/menus' },
-    { title: 'Create', href: '/admin/menus/create' },
+    { title: 'Menus', href: MenuController.index.url() },
+    { title: 'Create', href: MenuController.create.url() },
 ];
 
 export default function Create({ locations }: CreateProps) {
@@ -39,7 +40,7 @@ export default function Create({ locations }: CreateProps) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/menus" prefetch cacheFor={30}>
+                            <Link href={MenuController.index.url()} prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>
@@ -48,7 +49,7 @@ export default function Create({ locations }: CreateProps) {
                 </PageHeader>
 
                 <Form
-                    action="/admin/menus"
+                    action={MenuController.store.url()}
                     method="post"
                     className="max-w-2xl space-y-6"
                 >

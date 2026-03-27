@@ -1,4 +1,7 @@
 import { Head, Link, router, useForm, usePoll } from '@inertiajs/react';
+import * as SupportConversationController from '@/actions/App/Http/Controllers/Admin/SupportConversationController';
+import * as CustomerController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CustomerController';
+import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
 import {
     ArrowLeftIcon,
     SendIcon,
@@ -20,7 +23,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { ShowProps } from './show.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Support', href: '/admin/support' },
+    { title: 'Support', href: SupportConversationController.index.url() },
     { title: 'Conversation', href: '#' },
 ];
 
@@ -47,7 +50,7 @@ export default function SupportShow({
     function submitReply(e: React.FormEvent) {
         e.preventDefault();
         replyForm.transform((data) => ({ ...data, is_internal: isInternal }));
-        replyForm.post(`/admin/support/${conversation.id}/reply`, {
+        replyForm.post(SupportConversationController.reply.url(conversation.id), {
             onSuccess: () => {
                 replyForm.reset();
                 toast.success(
@@ -59,7 +62,7 @@ export default function SupportShow({
 
     function handleStatusChange(status: string) {
         router.post(
-            `/admin/support/${conversation.id}/status`,
+            SupportConversationController.changeStatus.url(conversation.id),
             { status },
             {
                 onSuccess: () => toast.success('Status updated.'),
@@ -69,7 +72,7 @@ export default function SupportShow({
 
     function handleAssign(userId: string) {
         router.post(
-            `/admin/support/${conversation.id}/assign`,
+            SupportConversationController.assign.url(conversation.id),
             { assigned_to: userId || null },
             {
                 onSuccess: () => toast.success('Assigned.'),
@@ -100,7 +103,7 @@ export default function SupportShow({
                             )?.label ?? conversation.status}
                         </Badge>
                         <Button asChild variant="outline" size="sm">
-                            <Link href="/admin/support" prefetch cacheFor={30}>
+                            <Link href={SupportConversationController.index.url()} prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-1 h-4 w-4" />
                                 Back
                             </Link>
@@ -294,7 +297,7 @@ export default function SupportShow({
                                         className="mt-2 w-full"
                                     >
                                         <Link
-                                            href={`/admin/ecommerce/customers/${conversation.customer!.id}`}
+                                            href={CustomerController.show.url(conversation.customer!.id)}
                                             prefetch
                                             cacheFor={60}
                                         >
@@ -320,7 +323,7 @@ export default function SupportShow({
                                             (order) => (
                                                 <li key={order.id}>
                                                     <Link
-                                                        href={`/admin/ecommerce/orders/${order.id}`}
+                                                        href={OrderController.show.url(order.id)}
                                                         prefetch
                                                         cacheFor={60}
                                                         className="block w-full rounded-md border bg-muted/30 px-3 py-2 text-left text-sm transition-colors hover:bg-muted"

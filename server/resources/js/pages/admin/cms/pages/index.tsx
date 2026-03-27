@@ -1,4 +1,5 @@
 import { Link, Head, router, usePage, useForm } from '@inertiajs/react';
+import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import { FileTextIcon, CopyIcon } from 'lucide-react';
 import { useState } from 'react';
 import { usePageColumns } from '@/components/columns/page-columns';
@@ -35,7 +36,7 @@ import type { PagesData } from './index.types';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Pages',
-        href: '/admin/cms/pages',
+        href: PageController.index.url(),
     },
 ];
 
@@ -58,7 +59,7 @@ function CloneSiteDialog({ locales }: { locales: SharedLocale[] }) {
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        post('/admin/cms/pages/clone-site', {
+        post(PageController.cloneSite.url(), {
             onSuccess: () => {
                 setOpen(false);
                 reset();
@@ -182,7 +183,7 @@ export default function Index({
         const params: Record<string, string> = {};
         if (filters.search) params.search = filters.search;
         if (locale !== 'all') params.locale = locale;
-        router.get('/admin/cms/pages', params, { preserveState: false });
+        router.get(PageController.index.url(), params, { preserveState: false });
     }
 
     const localeTabs = [
@@ -212,7 +213,7 @@ export default function Index({
                         )}
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/cms/pages/create"
+                                href={PageController.create.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -257,7 +258,7 @@ export default function Index({
                         'Search by title or slug...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/cms/pages"
+                    baseUrl={PageController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

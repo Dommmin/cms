@@ -1,4 +1,7 @@
 import { Form, Head, Link, router, usePage } from '@inertiajs/react';
+import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
+import * as PageBuilderController from '@/actions/App/Http/Controllers/Admin/Cms/PageBuilderController';
+import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
 import {
     ArrowLeftIcon,
     EyeIcon,
@@ -77,8 +80,8 @@ export default function Edit({ page, modules, pages }: EditProps) {
         titleValues[defaultLocale] ?? Object.values(titleValues)[0] ?? '';
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Pages', href: '/admin/cms/pages' },
-        { title: displayTitle, href: `/admin/cms/pages/${page.id}/edit` },
+        { title: 'Pages', href: PageController.index.url() },
+        { title: displayTitle, href: PageController.edit.url(page.id) },
     ];
 
     return (
@@ -97,7 +100,7 @@ export default function Edit({ page, modules, pages }: EditProps) {
                         <PageHeaderActions>
                             <Button asChild variant="outline">
                                 <a
-                                    href={`/admin/preview?${new URLSearchParams({ url: `${frontendUrl}/${page.slug}`, entity_type: 'page', entity_id: String(page.id), entity_name: displayTitle, admin_url: `/admin/cms/pages/${page.id}/edit` }).toString()}`}
+                                    href={PreviewController.url({ query: { url: `${frontendUrl}/${page.slug}`, entity_type: 'page', entity_id: String(page.id), entity_name: displayTitle, admin_url: PageController.edit.url(page.id) } })}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
@@ -107,7 +110,7 @@ export default function Edit({ page, modules, pages }: EditProps) {
                             </Button>
                             <Button asChild variant="outline">
                                 <Link
-                                    href="/admin/cms/pages"
+                                    href={PageController.index.url()}
                                     prefetch
                                     cacheFor={30}
                                 >
@@ -118,7 +121,7 @@ export default function Edit({ page, modules, pages }: EditProps) {
                             {pageType === 'blocks' && (
                                 <Button asChild variant="outline">
                                     <Link
-                                        href={`/admin/cms/pages/${page.id}/builder`}
+                                        href={PageBuilderController.show.url(page.id)}
                                         prefetch
                                         cacheFor={30}
                                     >
@@ -135,7 +138,7 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                     variant="outline"
                                     onClick={() => {
                                         router.post(
-                                            `/admin/cms/pages/${page.id}/unpublish`,
+                                            PageController.unpublish.url(page.id),
                                             undefined,
                                             {
                                                 onSuccess: () =>
@@ -152,7 +155,7 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                     variant="outline"
                                     onClick={() => {
                                         router.post(
-                                            `/admin/cms/pages/${page.id}/publish`,
+                                            PageController.publish.url(page.id),
                                             undefined,
                                             {
                                                 onSuccess: () =>
@@ -195,7 +198,7 @@ export default function Edit({ page, modules, pages }: EditProps) {
                     </div>
 
                     <Form
-                        action={`/admin/cms/pages/${page.id}`}
+                        action={PageController.update.url(page.id)}
                         method="put"
                         options={{ preserveScroll: true }}
                         className="max-w-2xl"

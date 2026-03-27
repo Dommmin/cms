@@ -67,6 +67,48 @@ import { useTranslation } from '@/hooks/use-translation';
 import { dashboard } from '@/routes/admin';
 import type { NavItem } from '@/types';
 import AppLogo from './app-logo';
+import * as MediaController from '@/actions/App/Http/Controllers/Admin/MediaController';
+import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
+import * as ReusableBlockController from '@/actions/App/Http/Controllers/Admin/Cms/ReusableBlockController';
+import * as MenuController from '@/actions/App/Http/Controllers/Admin/MenuController';
+import * as ThemeController from '@/actions/App/Http/Controllers/Admin/ThemeController';
+import * as FormController from '@/actions/App/Http/Controllers/Admin/FormController';
+import * as FaqController from '@/actions/App/Http/Controllers/Admin/FaqController';
+import * as SectionTemplateController from '@/actions/App/Http/Controllers/Admin/SectionTemplateController';
+import * as StoreController from '@/actions/App/Http/Controllers/Admin/StoreController';
+import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
+import * as BlogCategoryController from '@/actions/App/Http/Controllers/Admin/BlogCategoryController';
+import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
+import * as CategoryController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CategoryController';
+import * as BrandController from '@/actions/App/Http/Controllers/Admin/Ecommerce/BrandController';
+import * as ProductTypeController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductTypeController';
+import * as AttributeController from '@/actions/App/Http/Controllers/Admin/Ecommerce/AttributeController';
+import * as ProductFlagController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductFlagController';
+import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
+import * as CustomerController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CustomerController';
+import * as DiscountController from '@/actions/App/Http/Controllers/Admin/Ecommerce/DiscountController';
+import * as PromotionController from '@/actions/App/Http/Controllers/Admin/Ecommerce/PromotionController';
+import * as TaxRateController from '@/actions/App/Http/Controllers/Admin/Ecommerce/TaxRateController';
+import * as ShippingMethodController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ShippingMethodController';
+import * as ReturnRequestController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ReturnRequestController';
+import * as ReviewController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ReviewController';
+import * as NewsletterSubscriberController from '@/actions/App/Http/Controllers/Admin/NewsletterSubscriberController';
+import * as NewsletterSegmentController from '@/actions/App/Http/Controllers/Admin/NewsletterSegmentController';
+import * as NewsletterCampaignController from '@/actions/App/Http/Controllers/Admin/NewsletterCampaignController';
+import * as CurrencyController from '@/actions/App/Http/Controllers/Admin/CurrencyController';
+import * as ExchangeRateController from '@/actions/App/Http/Controllers/Admin/ExchangeRateController';
+import * as UserController from '@/actions/App/Http/Controllers/Admin/UserController';
+import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
+import * as ActivityLogController from '@/actions/App/Http/Controllers/Admin/ActivityLogController';
+import * as CookieConsentController from '@/actions/App/Http/Controllers/Admin/CookieConsentController';
+import * as LocaleController from '@/actions/App/Http/Controllers/Admin/LocaleController';
+import * as TranslationController from '@/actions/App/Http/Controllers/Admin/TranslationController';
+import * as AffiliateCodeController from '@/actions/App/Http/Controllers/Admin/AffiliateCodeController';
+import * as ReferralController from '@/actions/App/Http/Controllers/Admin/ReferralController';
+import * as SupportConversationController from '@/actions/App/Http/Controllers/Admin/SupportConversationController';
+import * as SupportCannedResponseController from '@/actions/App/Http/Controllers/Admin/SupportCannedResponseController';
+import * as SettingsController from '@/actions/App/Http/Controllers/Admin/SettingsController';
+import * as DashboardWidgetController from '@/actions/App/Http/Controllers/Admin/DashboardWidgetController';
 
 const footerNavItems: NavItem[] = [];
 
@@ -81,7 +123,7 @@ export function AppSidebar() {
         },
         {
             title: __('nav.media', 'Media'),
-            href: '/admin/media',
+            href: MediaController.index.url(),
             icon: Image,
         },
         {
@@ -90,52 +132,52 @@ export function AppSidebar() {
             children: [
                 {
                     title: __('nav.pages', 'Pages'),
-                    href: '/admin/cms/pages',
+                    href: PageController.index.url(),
                     icon: LayoutGrid,
                 },
                 {
                     title: __('nav.global_blocks', 'Global Blocks'),
-                    href: '/admin/cms/reusable-blocks',
+                    href: ReusableBlockController.index.url(),
                     icon: LibraryBig,
                 },
                 {
                     title: __('nav.menus', 'Menus'),
-                    href: '/admin/menus',
+                    href: MenuController.index.url(),
                     icon: Menu,
                 },
                 {
                     title: __('nav.themes', 'Themes'),
-                    href: '/admin/themes',
+                    href: ThemeController.index.url(),
                     icon: Palette,
                 },
                 {
                     title: __('nav.forms', 'Forms'),
-                    href: '/admin/forms',
+                    href: FormController.index.url(),
                     icon: ClipboardList,
                 },
                 {
                     title: __('nav.faq', 'FAQ'),
-                    href: '/admin/faqs',
+                    href: FaqController.index.url(),
                     icon: HelpCircle,
                 },
                 {
                     title: __('nav.section_templates', 'Section Templates'),
-                    href: '/admin/section-templates',
+                    href: SectionTemplateController.index.url(),
                     icon: LibraryBig,
                 },
                 {
                     title: __('nav.stores', 'Stores'),
-                    href: '/admin/stores',
+                    href: StoreController.index.url(),
                     icon: MapPin,
                 },
                 {
                     title: __('nav.blog_posts', 'Blog Posts'),
-                    href: '/admin/blog/posts',
+                    href: BlogPostController.index.url(),
                     icon: BookOpen,
                 },
                 {
                     title: __('nav.blog_categories', 'Blog Categories'),
-                    href: '/admin/blog/categories',
+                    href: BlogCategoryController.index.url(),
                     icon: FolderOpen,
                 },
             ],
@@ -146,72 +188,72 @@ export function AppSidebar() {
             children: [
                 {
                     title: __('nav.products', 'Products'),
-                    href: '/admin/ecommerce/products',
+                    href: ProductController.index.url(),
                     icon: Package,
                 },
                 {
                     title: __('nav.categories', 'Categories'),
-                    href: '/admin/ecommerce/categories',
+                    href: CategoryController.index.url(),
                     icon: List,
                 },
                 {
                     title: __('nav.brands', 'Brands'),
-                    href: '/admin/ecommerce/brands',
+                    href: BrandController.index.url(),
                     icon: Tag,
                 },
                 {
                     title: __('nav.product_types', 'Product Types'),
-                    href: '/admin/ecommerce/product-types',
+                    href: ProductTypeController.index.url(),
                     icon: Box,
                 },
                 {
                     title: __('nav.attributes', 'Attributes'),
-                    href: '/admin/ecommerce/attributes',
+                    href: AttributeController.index.url(),
                     icon: List,
                 },
                 {
                     title: __('nav.product_flags', 'Product Flags'),
-                    href: '/admin/ecommerce/product-flags',
+                    href: ProductFlagController.index.url(),
                     icon: Flag,
                 },
                 {
                     title: __('nav.orders', 'Orders'),
-                    href: '/admin/ecommerce/orders',
+                    href: OrderController.index.url(),
                     icon: ShoppingCart,
                 },
                 {
                     title: __('nav.customers', 'Customers'),
-                    href: '/admin/ecommerce/customers',
+                    href: CustomerController.index.url(),
                     icon: UserCircle,
                 },
                 {
                     title: __('nav.discounts', 'Discounts'),
-                    href: '/admin/ecommerce/discounts',
+                    href: DiscountController.index.url(),
                     icon: Percent,
                 },
                 {
                     title: __('nav.promotions', 'Promotions'),
-                    href: '/admin/ecommerce/promotions',
+                    href: PromotionController.index.url(),
                     icon: Tag,
                 },
                 {
                     title: __('nav.tax_rates', 'Tax Rates'),
-                    href: '/admin/ecommerce/tax-rates',
+                    href: TaxRateController.index.url(),
                     icon: Receipt,
                 },
                 {
                     title: __('nav.shipping', 'Shipping'),
-                    href: '/admin/ecommerce/shipping-methods',
+                    href: ShippingMethodController.index.url(),
                     icon: Truck,
                 },
                 {
                     title: __('nav.returns', 'Returns'),
-                    href: '/admin/ecommerce/returns',
+                    href: ReturnRequestController.index.url(),
                     icon: RotateCcw,
                 },
                 {
                     title: __('nav.reviews', 'Reviews'),
-                    href: '/admin/ecommerce/reviews',
+                    href: ReviewController.index.url(),
                     icon: Star,
                 },
             ],
@@ -222,17 +264,17 @@ export function AppSidebar() {
             children: [
                 {
                     title: __('nav.subscribers', 'Subscribers'),
-                    href: '/admin/newsletter/subscribers',
+                    href: NewsletterSubscriberController.index.url(),
                     icon: Users2,
                 },
                 {
                     title: __('nav.segments', 'Segments'),
-                    href: '/admin/newsletter/segments',
+                    href: NewsletterSegmentController.index.url(),
                     icon: List,
                 },
                 {
                     title: __('nav.campaigns', 'Campaigns'),
-                    href: '/admin/newsletter/campaigns',
+                    href: NewsletterCampaignController.index.url(),
                     icon: Megaphone,
                 },
             ],
@@ -243,34 +285,34 @@ export function AppSidebar() {
             children: [
                 {
                     title: __('nav.currencies', 'Currencies'),
-                    href: '/admin/currencies',
+                    href: CurrencyController.index.url(),
                     icon: Coins,
                 },
                 {
                     title: __('nav.exchange_rates', 'Exchange Rates'),
-                    href: '/admin/exchange-rates',
+                    href: ExchangeRateController.index.url(),
                     icon: ArrowRightLeft,
                 },
             ],
         },
         {
             title: __('nav.users', 'Users'),
-            href: '/admin/users',
+            href: UserController.index.url(),
             icon: Users,
         },
         {
             title: __('nav.notifications', 'Notifications'),
-            href: '/admin/notifications',
+            href: AppNotificationController.index.url(),
             icon: Bell,
         },
         {
             title: __('nav.activity_log', 'Activity Log'),
-            href: '/admin/activity-log',
+            href: ActivityLogController.index.url(),
             icon: Activity,
         },
         {
             title: __('nav.cookie_consents', 'Cookie Consents'),
-            href: '/admin/cookie-consents',
+            href: CookieConsentController.index.url(),
             icon: Cookie,
         },
         {
@@ -279,12 +321,12 @@ export function AppSidebar() {
             children: [
                 {
                     title: __('nav.locales', 'Locales'),
-                    href: '/admin/locales',
+                    href: LocaleController.index.url(),
                     icon: Flag,
                 },
                 {
                     title: __('nav.translations', 'Translations'),
-                    href: '/admin/translations',
+                    href: TranslationController.index.url(),
                     icon: Languages,
                 },
             ],
@@ -295,12 +337,12 @@ export function AppSidebar() {
             children: [
                 {
                     title: __('nav.affiliate_codes', 'Codes'),
-                    href: '/admin/affiliates/codes',
+                    href: AffiliateCodeController.index.url(),
                     icon: GitBranch,
                 },
                 {
                     title: __('nav.referrals', 'Referrals'),
-                    href: '/admin/affiliates/referrals',
+                    href: ReferralController.index.url(),
                     icon: Users2,
                 },
             ],
@@ -311,19 +353,19 @@ export function AppSidebar() {
             children: [
                 {
                     title: __('nav.conversations', 'Conversations'),
-                    href: '/admin/support',
+                    href: SupportConversationController.index.url(),
                     icon: MessageSquare,
                 },
                 {
                     title: __('nav.canned_responses', 'Canned Responses'),
-                    href: '/admin/support/canned-responses',
+                    href: SupportCannedResponseController.index.url(),
                     icon: ClipboardList,
                 },
             ],
         },
         {
             title: __('nav.settings', 'Settings'),
-            href: '/admin/settings',
+            href: SettingsController.index.url(),
             icon: Settings,
         },
     ];

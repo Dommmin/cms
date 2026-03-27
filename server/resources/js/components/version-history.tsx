@@ -1,4 +1,6 @@
+import axios from 'axios';
 import { router } from '@inertiajs/react';
+import * as ModelVersionController from '@/actions/App/Http/Controllers/Admin/ModelVersionController';
 import { ClockIcon, RotateCcwIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -87,9 +89,14 @@ export function VersionHistory({ modelType, modelId }: VersionHistoryProps) {
         if (!open) return;
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true);
-        fetch(`/admin/versions/${modelType}/${modelId}`)
-            .then((r) => r.json())
-            .then((data) => setVersions(data.versions ?? []))
+        axios
+            .get<{ versions?: VersionEntry[] }>(
+                ModelVersionController.index.url({
+                    type: modelType,
+                    id: modelId,
+                }),
+            )
+            .then(({ data }) => setVersions(data.versions ?? []))
             .finally(() => setLoading(false));
     }, [open, modelType, modelId]);
 
@@ -97,7 +104,7 @@ export function VersionHistory({ modelType, modelId }: VersionHistoryProps) {
         if (!confirm(`Restore to version ${versionNumber}?`)) return;
         setRestoring(versionNumber);
         router.post(
-            `/admin/versions/${modelType}/${modelId}/${versionNumber}/restore`,
+            ModelVersionController.restore.url({ type: modelType, id: modelId, versionNumber }),
             {},
             {
                 onFinish: () => {

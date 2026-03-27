@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PlusIcon, EyeIcon, TrashIcon, RefreshCwIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -14,7 +15,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { AppNotification, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Notifications', href: '/admin/notifications' },
+    { title: 'Notifications', href: AppNotificationController.index.url() },
 ];
 
 const statusColors: Record<string, string> = {
@@ -115,7 +116,7 @@ export default function NotificationsIndex({
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/notifications/${row.original.id}`}
+                            href={AppNotificationController.show.url(row.original.id)}
                             prefetch
                             cacheFor={60}
                         >
@@ -129,7 +130,7 @@ export default function NotificationsIndex({
                             size="sm"
                             onClick={() => {
                                 router.post(
-                                    `/admin/notifications/${row.original.id}/resend`,
+                                    AppNotificationController.resend.url(row.original.id),
                                     {},
                                     {
                                         onSuccess: () =>
@@ -154,7 +155,7 @@ export default function NotificationsIndex({
                         )}
                         onConfirm={() => {
                             router.delete(
-                                `/admin/notifications/${row.original.id}`,
+                                AppNotificationController.destroy.url(row.original.id),
                                 {
                                     onSuccess: () =>
                                         toast.success('Notification deleted'),
@@ -183,7 +184,7 @@ export default function NotificationsIndex({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/notifications/create"
+                                href={AppNotificationController.create.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -211,7 +212,7 @@ export default function NotificationsIndex({
                         'Search notifications...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/notifications"
+                    baseUrl={AppNotificationController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

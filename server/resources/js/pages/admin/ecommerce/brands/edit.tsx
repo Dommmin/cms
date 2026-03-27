@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as BrandController from '@/actions/App/Http/Controllers/Admin/Ecommerce/BrandController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -28,11 +29,11 @@ export default function Edit({
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Brands',
-            href: '/admin/ecommerce/brands',
+            href: BrandController.index.url(),
         },
         {
             title: 'Edit Brand',
-            href: `/admin/ecommerce/brands/${brand.id}/edit`,
+            href: BrandController.edit.url(brand.id),
         },
     ];
 
@@ -48,7 +49,7 @@ export default function Edit({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/brands"
+                                href={BrandController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -60,7 +61,7 @@ export default function Edit({
                 </PageHeader>
 
                 <Form
-                    action={`/admin/ecommerce/brands/${brand.id}`}
+                    action={BrandController.update.url(brand.id)}
                     method="put"
                     id={formId}
                     className="max-w-xl space-y-6"

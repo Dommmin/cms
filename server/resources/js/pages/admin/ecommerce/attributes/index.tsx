@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as AttributeController from '@/actions/App/Http/Controllers/Admin/Ecommerce/AttributeController';
 import { Plus, List, PencilIcon, TrashIcon } from 'lucide-react';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -13,7 +14,7 @@ import type { IndexProps } from './index.types';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Attributes',
-        href: '/admin/ecommerce/attributes',
+        href: AttributeController.index.url(),
     },
 ];
 
@@ -32,7 +33,7 @@ export default function AttributesIndex({ attributes, filters }: IndexProps) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/attributes/create"
+                                href={AttributeController.create.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -102,7 +103,7 @@ export default function AttributesIndex({ attributes, filters }: IndexProps) {
                                 <div className="flex items-center gap-2">
                                     <Button asChild variant="outline" size="sm">
                                         <Link
-                                            href={`/admin/ecommerce/attributes/${row.original.id}/edit`}
+                                            href={AttributeController.edit.url(row.original.id)}
                                             prefetch
                                             cacheFor={30}
                                         >
@@ -120,7 +121,7 @@ export default function AttributesIndex({ attributes, filters }: IndexProps) {
                                         description={`${__('dialog.are_you_sure', 'Are you sure you want to delete')} "${row.original.name}"?`}
                                         onConfirm={() => {
                                             router.delete(
-                                                `/admin/ecommerce/attributes/${row.original.id}`,
+                                                AttributeController.destroy.url(row.original.id),
                                             );
                                         }}
                                     >
@@ -145,7 +146,7 @@ export default function AttributesIndex({ attributes, filters }: IndexProps) {
                         'Search attributes...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/ecommerce/attributes"
+                    baseUrl={AttributeController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

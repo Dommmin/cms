@@ -1,4 +1,5 @@
 import { Link, Head, router, usePage } from '@inertiajs/react';
+import * as ShippingMethodController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ShippingMethodController';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
@@ -73,7 +74,7 @@ export default function Edit({
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Shipping Methods',
-            href: '/admin/ecommerce/shipping-methods',
+            href: ShippingMethodController.index.url(),
         },
         {
             title: nameValues[defaultLocale] ?? nameValues['en'] ?? 'Edit',
@@ -107,7 +108,7 @@ export default function Edit({
                 descValues[locale.code] ?? '';
         });
 
-        router.put(`/admin/ecommerce/shipping-methods/${method.id}`, formData, {
+        router.put(ShippingMethodController.update.url(method.id), formData, {
             onError: (errs) => {
                 setErrors(errs as Record<string, string>);
                 setProcessing(false);
@@ -133,7 +134,7 @@ export default function Edit({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/shipping-methods"
+                                href={ShippingMethodController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >

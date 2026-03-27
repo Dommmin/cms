@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as SectionTemplateController from '@/actions/App/Http/Controllers/Admin/SectionTemplateController';
 import { ArrowLeftIcon } from 'lucide-react';
 
 import InputError from '@/components/input-error';
@@ -20,7 +21,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Section Templates', href: '/admin/section-templates' },
+    { title: 'Section Templates', href: SectionTemplateController.index.url() },
     { title: 'Edit', href: '#' },
 ];
 
@@ -39,7 +40,7 @@ export default function EditSectionTemplate({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/section-templates"
+                                href={SectionTemplateController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -51,7 +52,7 @@ export default function EditSectionTemplate({
                 </PageHeader>
 
                 <Form
-                    action={`/admin/section-templates/${template.id}`}
+                    action={SectionTemplateController.update.url(template.id)}
                     method="put"
                     className="max-w-2xl space-y-6"
                 >

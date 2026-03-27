@@ -1,6 +1,7 @@
 import { Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilIcon, TrashIcon, Package } from 'lucide-react';
+import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -95,7 +96,7 @@ export function useProductColumns(): ColumnDef<ProductRow>[] {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/ecommerce/products/${row.original.id}/edit`}
+                            href={ProductController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -110,7 +111,7 @@ export function useProductColumns(): ColumnDef<ProductRow>[] {
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
                             router.delete(
-                                `/admin/ecommerce/products/${row.original.id}`,
+                                ProductController.destroy.url(row.original.id),
                             );
                         }}
                     >

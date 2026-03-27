@@ -1,4 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as ReturnRequestController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ReturnRequestController';
+import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
 import { ArrowLeftIcon, CheckCircle, Clock, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ConfirmButton } from '@/components/confirm-dialog';
@@ -39,7 +41,7 @@ export default function Show({
     const __ = useTranslation();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Returns', href: '/admin/ecommerce/returns' },
+        { title: 'Returns', href: ReturnRequestController.index.url() },
         { title: returnRequest.reference_number, href: '' },
     ];
 
@@ -51,7 +53,7 @@ export default function Show({
 
     const handleApprove = () => {
         router.post(
-            `/admin/ecommerce/returns/${returnRequest.id}/approve`,
+            ReturnRequestController.approve.url(returnRequest.id),
             {},
             { onSuccess: () => toast.success('Return approved') },
         );
@@ -59,7 +61,7 @@ export default function Show({
 
     const handleReject = () => {
         router.post(
-            `/admin/ecommerce/returns/${returnRequest.id}/reject`,
+            ReturnRequestController.reject.url(returnRequest.id),
             {},
             { onSuccess: () => toast.success('Return rejected') },
         );
@@ -67,7 +69,7 @@ export default function Show({
 
     const handleProcessRefund = () => {
         router.post(
-            `/admin/ecommerce/returns/${returnRequest.id}/process-refund`,
+            ReturnRequestController.processRefund.url(returnRequest.id),
             {},
             { onSuccess: () => toast.success('Refund processed') },
         );
@@ -135,7 +137,7 @@ export default function Show({
                         )}
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/returns"
+                                href={ReturnRequestController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -361,7 +363,7 @@ export default function Show({
                                     </dt>
                                     <dd className="mt-0.5">
                                         <Link
-                                            href={`/admin/ecommerce/orders/${returnRequest.order.id}`}
+                                            href={OrderController.show.url(returnRequest.order.id)}
                                             prefetch
                                             cacheFor={60}
                                             className="font-mono text-primary hover:underline"

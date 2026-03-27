@@ -1,4 +1,6 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
+import * as ProductVariantController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductVariantController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -27,18 +29,18 @@ export default function CreateVariant({
     const productName = resolveLocalizedText(product.name);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Products', href: '/admin/ecommerce/products' },
+        { title: 'Products', href: ProductController.index.url() },
         {
             title: productName,
-            href: `/admin/ecommerce/products/${product.id}/edit`,
+            href: ProductController.edit.url(product.id),
         },
         {
             title: 'Variants',
-            href: `/admin/ecommerce/products/${product.id}/variants`,
+            href: ProductVariantController.index.url(product.id),
         },
         {
             title: 'Create',
-            href: `/admin/ecommerce/products/${product.id}/variants/create`,
+            href: ProductVariantController.create.url(product.id),
         },
     ];
 
@@ -56,7 +58,9 @@ export default function CreateVariant({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href={`/admin/ecommerce/products/${product.id}/variants`}
+                                href={ProductVariantController.index.url(
+                                    product.id,
+                                )}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -68,7 +72,7 @@ export default function CreateVariant({
                 </PageHeader>
 
                 <Form
-                    action={`/admin/ecommerce/products/${product.id}/variants`}
+                    action={ProductVariantController.store.url(product.id)}
                     method="post"
                     id={formId}
                     className="space-y-6"

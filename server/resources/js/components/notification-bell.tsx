@@ -1,4 +1,6 @@
+import axios from 'axios';
 import { Link } from '@inertiajs/react';
+import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
 import {
     Bell,
     BellOff,
@@ -94,14 +96,15 @@ export function NotificationBell() {
 
     const fetchNotifications = useCallback(async () => {
         try {
-            const res = await fetch('/admin/notifications', {
+            const { data } = await axios.get<{
+                data: AdminNotification[];
+                unread_count: number;
+            }>(AppNotificationController.index.url(), {
                 headers: {
                     Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
                 },
             });
-            if (!res.ok) return;
-            applyUpdate(await res.json());
+            applyUpdate(data);
         } catch {
             // ignore network errors
         }

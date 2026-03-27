@@ -1,4 +1,5 @@
 import { Head, router } from '@inertiajs/react';
+import * as MediaController from '@/actions/App/Http/Controllers/Admin/MediaController';
 import {
     EyeIcon,
     TrashIcon,
@@ -31,7 +32,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { MediaItem, MediaData, MetaForm } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Media', href: '/admin/media' },
+    { title: 'Media', href: MediaController.index.url() },
 ];
 
 function getFileIcon(mimeType: string) {
@@ -81,7 +82,7 @@ export default function Index({
         const params = new URLSearchParams();
         if (value) params.set('search', value);
         if (extension) params.set('extension', extension);
-        router.get(`/admin/media?${params.toString()}`, undefined, {
+        router.get(`${MediaController.index.url()}?${params.toString()}`, undefined, {
             preserveState: true,
         });
     };
@@ -91,7 +92,7 @@ export default function Index({
         const params = new URLSearchParams();
         if (search) params.set('search', search);
         if (value) params.set('extension', value);
-        router.get(`/admin/media?${params.toString()}`, undefined, {
+        router.get(`${MediaController.index.url()}?${params.toString()}`, undefined, {
             preserveState: true,
         });
     };
@@ -102,7 +103,7 @@ export default function Index({
         params.set('page', page.toString());
         if (search) params.set('search', search);
         if (extension) params.set('extension', extension);
-        router.get(`/admin/media?${params.toString()}`, undefined, {
+        router.get(`${MediaController.index.url()}?${params.toString()}`, undefined, {
             preserveState: true,
         });
     };
@@ -114,7 +115,7 @@ export default function Index({
         const formData = new FormData();
         files.forEach((file) => formData.append('files[]', file));
 
-        router.post('/admin/media', formData, {
+        router.post(MediaController.upload.url(), formData, {
             onSuccess: () => {
                 toast.success(
                     __(
@@ -140,7 +141,7 @@ export default function Index({
     const handleSaveMeta = () => {
         if (!selectedItem) return;
         setIsSavingMeta(true);
-        router.patch(`/admin/media/${selectedItem.id}`, metaForm, {
+        router.patch(MediaController.update.url(selectedItem.id), metaForm, {
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => {
@@ -625,7 +626,7 @@ export default function Index({
                                         description={`Are you sure you want to delete "${selectedItem.name}"? This action cannot be undone.`}
                                         onConfirm={() => {
                                             router.delete(
-                                                `/admin/media/${selectedItem.id}`,
+                                                MediaController.destroy.url(selectedItem.id),
                                                 {
                                                     onSuccess: () => {
                                                         toast.success(

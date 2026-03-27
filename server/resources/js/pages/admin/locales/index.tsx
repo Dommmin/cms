@@ -1,4 +1,5 @@
 import { Head, router } from '@inertiajs/react';
+import * as LocaleController from '@/actions/App/Http/Controllers/Admin/LocaleController';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
     PlusIcon,
@@ -37,7 +38,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { Locale, IndexProps, LocaleForm } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Locales', href: '/admin/locales' },
+    { title: 'Locales', href: LocaleController.index.url() },
 ];
 
 const defaultForm: LocaleForm = {
@@ -85,7 +86,7 @@ export default function LocalesIndex({
         setProcessing(true);
         const payload = { ...form };
         if (editLocale) {
-            router.put(`/admin/locales/${editLocale.id}`, payload, {
+            router.put(LocaleController.update.url(editLocale.id), payload, {
                 onSuccess: () => {
                     setOpen(false);
                     toast.success('Locale updated');
@@ -94,7 +95,7 @@ export default function LocalesIndex({
                 onFinish: () => setProcessing(false),
             });
         } else {
-            router.post('/admin/locales', payload, {
+            router.post(LocaleController.store.url(), payload, {
                 onSuccess: () => {
                     setOpen(false);
                     toast.success('Locale created');
@@ -159,7 +160,7 @@ export default function LocalesIndex({
                         size="sm"
                         onClick={() => {
                             router.post(
-                                `/admin/locales/${row.original.id}/set-default`,
+                                LocaleController.setDefault.url(row.original.id),
                                 {},
                                 {
                                     onSuccess: () =>
@@ -207,7 +208,7 @@ export default function LocalesIndex({
                             'This will delete the locale and all its translations. This action cannot be undone.',
                         )}
                         onConfirm={() => {
-                            router.delete(`/admin/locales/${row.original.id}`, {
+                            router.delete(LocaleController.destroy.url(row.original.id), {
                                 onSuccess: () =>
                                     toast.success('Locale deleted'),
                                 onError: () =>
@@ -260,7 +261,7 @@ export default function LocalesIndex({
                         'Search locales...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/locales"
+                    baseUrl={LocaleController.index.url()}
                 />
             </Wrapper>
 

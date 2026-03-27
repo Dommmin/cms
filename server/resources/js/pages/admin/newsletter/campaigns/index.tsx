@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as NewsletterCampaignController from '@/actions/App/Http/Controllers/Admin/NewsletterCampaignController';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
     PlusIcon,
@@ -21,8 +22,8 @@ import type { BreadcrumbItem } from '@/types';
 import type { Campaign, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Newsletter', href: '/admin/newsletter' },
-    { title: 'Campaigns', href: '/admin/newsletter/campaigns' },
+    { title: 'Newsletter', href: NewsletterCampaignController.index.url() },
+    { title: 'Campaigns', href: NewsletterCampaignController.index.url() },
 ];
 
 const statusColors: Record<string, string> = {
@@ -109,7 +110,7 @@ export default function CampaignsIndex({ campaigns, filters }: IndexProps) {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/newsletter/campaigns/${row.original.id}`}
+                            href={NewsletterCampaignController.show.url(row.original.id)}
                             prefetch
                             cacheFor={60}
                         >
@@ -121,7 +122,7 @@ export default function CampaignsIndex({ campaigns, filters }: IndexProps) {
                         <>
                             <Button asChild variant="outline" size="sm">
                                 <Link
-                                    href={`/admin/newsletter/campaigns/${row.original.id}/edit`}
+                                    href={NewsletterCampaignController.edit.url(row.original.id)}
                                     prefetch
                                     cacheFor={30}
                                 >
@@ -134,7 +135,7 @@ export default function CampaignsIndex({ campaigns, filters }: IndexProps) {
                                 size="sm"
                                 onClick={() => {
                                     router.post(
-                                        `/admin/newsletter/campaigns/${row.original.id}/send`,
+                                        NewsletterCampaignController.send.url(row.original.id),
                                         {},
                                         {
                                             onSuccess: () =>
@@ -154,7 +155,7 @@ export default function CampaignsIndex({ campaigns, filters }: IndexProps) {
                         size="sm"
                         onClick={() => {
                             router.post(
-                                `/admin/newsletter/campaigns/${row.original.id}/duplicate`,
+                                NewsletterCampaignController.duplicate.url(row.original.id),
                                 {},
                                 {
                                     onSuccess: () =>
@@ -172,7 +173,7 @@ export default function CampaignsIndex({ campaigns, filters }: IndexProps) {
                         description={`Are you sure you want to delete "${row.original.name}"?`}
                         onConfirm={() => {
                             router.delete(
-                                `/admin/newsletter/campaigns/${row.original.id}`,
+                                NewsletterCampaignController.destroy.url(row.original.id),
                                 {
                                     onSuccess: () =>
                                         toast.success('Campaign deleted'),
@@ -199,7 +200,7 @@ export default function CampaignsIndex({ campaigns, filters }: IndexProps) {
                     )}
                 >
                     <PageHeaderActions>
-                        <Link href="/admin/newsletter/campaigns/create">
+                        <Link href={NewsletterCampaignController.create.url()}>
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.create', 'Create Campaign')}
@@ -225,7 +226,7 @@ export default function CampaignsIndex({ campaigns, filters }: IndexProps) {
                         'Search campaigns...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/newsletter/campaigns"
+                    baseUrl={NewsletterCampaignController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

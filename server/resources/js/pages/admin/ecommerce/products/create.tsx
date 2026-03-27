@@ -1,4 +1,5 @@
 import { Link, Form, Head, usePage } from '@inertiajs/react';
+import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
 import { ArrowLeftIcon, ImageIcon, Settings, Search } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -43,8 +44,8 @@ import type {
 const formId = 'product-create-form';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Products', href: '/admin/ecommerce/products' },
-    { title: 'Create Product', href: '/admin/ecommerce/products/create' },
+    { title: 'Products', href: ProductController.index.url() },
+    { title: 'Create Product', href: ProductController.create.url() },
 ];
 
 const defaultFormData = (defaultLocale: string): FormData => ({
@@ -257,7 +258,7 @@ export default function Create({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/products"
+                                href={ProductController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -269,7 +270,7 @@ export default function Create({
                 </PageHeader>
 
                 <Form
-                    action="/admin/ecommerce/products"
+                    action={ProductController.store.url()}
                     method="post"
                     id={formId}
                     className="space-y-6"

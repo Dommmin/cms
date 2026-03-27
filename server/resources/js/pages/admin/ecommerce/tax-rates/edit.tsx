@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as TaxRateController from '@/actions/App/Http/Controllers/Admin/Ecommerce/TaxRateController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -40,11 +41,11 @@ export default function Edit({
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Tax Rates',
-            href: '/admin/ecommerce/tax-rates',
+            href: TaxRateController.index.url(),
         },
         {
             title: 'Edit Tax Rate',
-            href: `/admin/ecommerce/tax-rates/${taxRate.id}/edit`,
+            href: TaxRateController.edit.url(taxRate.id),
         },
     ];
 
@@ -60,7 +61,7 @@ export default function Edit({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/tax-rates"
+                                href={TaxRateController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -72,7 +73,7 @@ export default function Edit({
                 </PageHeader>
 
                 <Form
-                    action={`/admin/ecommerce/tax-rates/${taxRate.id}`}
+                    action={TaxRateController.update.url(taxRate.id)}
                     method="put"
                     id={formId}
                     className="max-w-xl space-y-6"

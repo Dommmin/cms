@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilIcon, PlusIcon, StarIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -15,7 +16,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { BlogPost, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Blog Posts', href: '/admin/blog/posts' },
+    { title: 'Blog Posts', href: BlogPostController.index.url() },
 ];
 
 const STATUS_BADGE: Record<
@@ -112,7 +113,7 @@ export default function BlogPostsIndex({
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/blog/posts/${row.original.id}/edit`}
+                            href={BlogPostController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -126,7 +127,7 @@ export default function BlogPostsIndex({
                             size="sm"
                             onClick={() => {
                                 router.post(
-                                    `/admin/blog/posts/${row.original.id}/publish`,
+                                    BlogPostController.publish.url(row.original.id),
                                     {},
                                     {
                                         onSuccess: () =>
@@ -143,7 +144,7 @@ export default function BlogPostsIndex({
                             size="sm"
                             onClick={() => {
                                 router.post(
-                                    `/admin/blog/posts/${row.original.id}/unpublish`,
+                                    BlogPostController.unpublish.url(row.original.id),
                                     {},
                                     {
                                         onSuccess: () =>
@@ -162,7 +163,7 @@ export default function BlogPostsIndex({
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
                             router.delete(
-                                `/admin/blog/posts/${row.original.id}`,
+                                BlogPostController.destroy.url(row.original.id),
                                 {
                                     onSuccess: () =>
                                         toast.success('Post deleted'),
@@ -190,7 +191,7 @@ export default function BlogPostsIndex({
                     )}
                 >
                     <PageHeaderActions>
-                        <Link href="/admin/blog/posts/create">
+                        <Link href={BlogPostController.create.url()}>
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('page.create_post', 'New Post')}
@@ -216,7 +217,7 @@ export default function BlogPostsIndex({
                         'Search posts...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/blog/posts"
+                    baseUrl={BlogPostController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

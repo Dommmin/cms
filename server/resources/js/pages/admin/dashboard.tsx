@@ -17,6 +17,7 @@ import { StatCard } from '@/components/widgets/stat-card';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes/admin';
+import * as DashboardWidgetController from '@/actions/App/Http/Controllers/Admin/DashboardWidgetController';
 import type { BreadcrumbItem } from '@/types';
 import type { Widget, WidgetSize } from '@/types/widgets';
 import type { DashboardProps } from './dashboard.types';
@@ -68,7 +69,7 @@ export default function Dashboard({
 
     function toggleWidget(widgetId: number, currentActive: boolean) {
         router.patch(
-            `/admin/dashboard/widgets/${widgetId}`,
+            DashboardWidgetController.update.url(widgetId),
             { is_active: !currentActive },
             {
                 preserveScroll: true,
@@ -86,7 +87,7 @@ export default function Dashboard({
     }
 
     function deleteWidget(widgetId: number) {
-        router.delete(`/admin/dashboard/widgets/${widgetId}`, {
+        router.delete(DashboardWidgetController.destroy.url(widgetId), {
             preserveScroll: true,
             onSuccess: () => {
                 setWidgets((prev) => prev.filter((w) => w.id !== widgetId));
@@ -97,7 +98,7 @@ export default function Dashboard({
     function restoreDefaults() {
         setResetting(true);
         router.post(
-            '/admin/dashboard/widgets/reset',
+            DashboardWidgetController.reset.url(),
             {},
             {
                 preserveScroll: true,

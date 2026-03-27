@@ -1,4 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
+import * as ProductVariantController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductVariantController';
 import { ArrowLeftIcon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -20,14 +22,14 @@ export default function ProductVariantsIndex({
     const productName = resolveLocalizedText(product.name);
     const __ = useTranslation();
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Products', href: '/admin/ecommerce/products' },
+        { title: 'Products', href: ProductController.index.url() },
         {
             title: productName,
-            href: `/admin/ecommerce/products/${product.id}/edit`,
+            href: ProductController.edit.url(product.id),
         },
         {
             title: 'Variants',
-            href: `/admin/ecommerce/products/${product.id}/variants`,
+            href: ProductVariantController.index.url(product.id),
         },
     ];
 
@@ -47,7 +49,7 @@ export default function ProductVariantsIndex({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href={`/admin/ecommerce/products/${product.id}/edit`}
+                                href={ProductController.edit.url(product.id)}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -60,7 +62,9 @@ export default function ProductVariantsIndex({
                         </Button>
                         <Button asChild>
                             <Link
-                                href={`/admin/ecommerce/products/${product.id}/variants/create`}
+                                href={ProductVariantController.create.url(
+                                    product.id,
+                                )}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -152,7 +156,10 @@ export default function ProductVariantsIndex({
                                                     size="sm"
                                                 >
                                                     <Link
-                                                        href={`/admin/ecommerce/products/${product.id}/variants/${variant.id}/edit`}
+                                                        href={ProductVariantController.edit.url([
+                                                            product.id,
+                                                            variant.id,
+                                                        ])}
                                                         prefetch
                                                         cacheFor={30}
                                                     >
@@ -173,7 +180,10 @@ export default function ProductVariantsIndex({
                                                     description={`${__('dialog.delete_variant_desc', 'Delete variant')} "${variant.name}"?`}
                                                     onConfirm={() => {
                                                         router.delete(
-                                                            `/admin/ecommerce/products/${product.id}/variants/${variant.id}`,
+                                                            ProductVariantController.destroy.url([
+                                                                product.id,
+                                                                variant.id,
+                                                            ]),
                                                         );
                                                     }}
                                                 >

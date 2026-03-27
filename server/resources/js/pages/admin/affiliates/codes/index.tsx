@@ -1,4 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as AffiliateCodeController from '@/actions/App/Http/Controllers/Admin/AffiliateCodeController';
+import * as ReferralController from '@/actions/App/Http/Controllers/Admin/ReferralController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -14,8 +16,8 @@ import type { BreadcrumbItem } from '@/types';
 import type { AffiliateCode, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Affiliates', href: '/admin/affiliates/codes' },
-    { title: 'Codes', href: '/admin/affiliates/codes' },
+    { title: 'Affiliates', href: AffiliateCodeController.index.url() },
+    { title: 'Codes', href: AffiliateCodeController.index.url() },
 ];
 
 function formatDiscount(code: AffiliateCode): string {
@@ -98,7 +100,7 @@ export default function CodesIndex({ codes, filters }: IndexProps) {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/affiliates/codes/${row.original.id}/edit`}
+                            href={AffiliateCodeController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -116,7 +118,7 @@ export default function CodesIndex({ codes, filters }: IndexProps) {
                         )}
                         onConfirm={() =>
                             router.delete(
-                                `/admin/affiliates/codes/${row.original.id}`,
+                                AffiliateCodeController.destroy.url(row.original.id),
                                 {
                                     onSuccess: () =>
                                         toast.success('Code deleted'),
@@ -144,12 +146,12 @@ export default function CodesIndex({ codes, filters }: IndexProps) {
                     )}
                 >
                     <PageHeaderActions>
-                        <Link href="/admin/affiliates/referrals">
+                        <Link href={ReferralController.index.url()}>
                             <Button variant="outline">
                                 {__('action.show', 'View Referrals')}
                             </Button>
                         </Link>
-                        <Link href="/admin/affiliates/codes/create">
+                        <Link href={AffiliateCodeController.create.url()}>
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.create', 'New Code')}
@@ -175,7 +177,7 @@ export default function CodesIndex({ codes, filters }: IndexProps) {
                         'Search codes or affiliates...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/affiliates/codes"
+                    baseUrl={AffiliateCodeController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

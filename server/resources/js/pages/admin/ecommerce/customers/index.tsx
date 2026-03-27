@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import * as CustomerController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CustomerController';
 import { UserCircle, DownloadIcon } from 'lucide-react';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -12,7 +13,7 @@ import type { IndexProps } from './index.types';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Customers',
-        href: '/admin/ecommerce/customers',
+        href: CustomerController.index.url(),
     },
 ];
 
@@ -30,7 +31,7 @@ export default function CustomersIndex({ customers, filters }: IndexProps) {
                 >
                     <PageHeaderActions>
                         <Button variant="outline" asChild>
-                            <a href="/admin/ecommerce/customers/export">
+                            <a href={CustomerController.exportMethod.url()}>
                                 <DownloadIcon className="mr-2 h-4 w-4" />
                                 {__('action.export_csv', 'Export CSV')}
                             </a>
@@ -98,7 +99,7 @@ export default function CustomersIndex({ customers, filters }: IndexProps) {
                         'Search customers...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/ecommerce/customers"
+                    baseUrl={CustomerController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

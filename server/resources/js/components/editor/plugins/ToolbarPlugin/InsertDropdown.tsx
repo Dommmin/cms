@@ -3,6 +3,7 @@ import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontal
 import { INSERT_TABLE_COMMAND } from '@lexical/table';
 import { $insertNodeToNearestRoot } from '@lexical/utils';
 import axios from 'axios';
+import * as MediaController from '@/actions/App/Http/Controllers/Admin/MediaController';
 import {
     Calendar,
     Image as ImageIcon,
@@ -61,7 +62,7 @@ function InsertImageFromMedia({
         try {
             const params = new URLSearchParams({ page: String(p) });
             if (searchRef.current) params.set('search', searchRef.current);
-            const res = await axios.get(`/admin/media/search?${params}`);
+            const res = await axios.get(`${MediaController.search.url()}?${params}`);
             setMedia(res.data);
         } finally {
             setLoading(false);

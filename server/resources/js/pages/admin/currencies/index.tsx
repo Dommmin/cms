@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as CurrencyController from '@/actions/App/Http/Controllers/Admin/CurrencyController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PlusIcon, PencilIcon, TrashIcon, StarIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -11,10 +12,10 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { IndexProps } from './index.types';
+import type { Currency, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Currencies', href: '/admin/currencies' },
+    { title: 'Currencies', href: CurrencyController.index.url() },
 ];
 
 export default function CurrenciesIndex({ currencies, filters }: IndexProps) {
@@ -87,7 +88,7 @@ export default function CurrenciesIndex({ currencies, filters }: IndexProps) {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/currencies/${row.original.id}/edit`}
+                            href={CurrencyController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -102,7 +103,7 @@ export default function CurrenciesIndex({ currencies, filters }: IndexProps) {
                         description={`Are you sure you want to delete "${row.original.code}"?`}
                         onConfirm={() => {
                             router.delete(
-                                `/admin/currencies/${row.original.id}`,
+                                CurrencyController.destroy.url(row.original.id),
                                 {
                                     onSuccess: () =>
                                         toast.success('Currency deleted'),
@@ -130,7 +131,7 @@ export default function CurrenciesIndex({ currencies, filters }: IndexProps) {
                     )}
                 >
                     <PageHeaderActions>
-                        <Link href="/admin/currencies/create">
+                        <Link href={CurrencyController.create.url()}>
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.add', 'Add Currency')}
@@ -156,7 +157,7 @@ export default function CurrenciesIndex({ currencies, filters }: IndexProps) {
                         'Search currencies...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/currencies"
+                    baseUrl={CurrencyController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

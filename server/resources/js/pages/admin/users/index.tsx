@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import * as UserController from '@/actions/App/Http/Controllers/Admin/UserController';
 import { Trash2Icon, UserIcon } from 'lucide-react';
 import { useUserColumns } from '@/components/columns/user-columns';
 import DataTable from '@/components/data-table';
@@ -15,7 +16,7 @@ import type { UserData } from './index.types';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Users',
-        href: '/admin/users',
+        href: UserController.index.url(),
     },
 ];
 
@@ -44,7 +45,7 @@ export default function Index({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/users/trashed"
+                                href={UserController.trashed.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -54,7 +55,7 @@ export default function Index({
                         </Button>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/users/create"
+                                href={UserController.create.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -83,7 +84,7 @@ export default function Index({
                         'Search by name or email...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/users"
+                    baseUrl={UserController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

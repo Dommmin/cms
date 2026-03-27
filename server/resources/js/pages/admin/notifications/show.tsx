@@ -1,4 +1,5 @@
 import { Link, Head } from '@inertiajs/react';
+import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
 import { ArrowLeftIcon } from 'lucide-react';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
@@ -10,10 +11,10 @@ import type { ShowProps } from './show.types';
 
 export default function ShowNotification({ notification }: ShowProps) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Notifications', href: '/admin/notifications' },
+        { title: 'Notifications', href: AppNotificationController.index.url() },
         {
             title: `#${notification.id}`,
-            href: `/admin/notifications/${notification.id}`,
+            href: AppNotificationController.show.url(notification.id),
         },
     ];
 
@@ -28,7 +29,7 @@ export default function ShowNotification({ notification }: ShowProps) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/notifications"
+                                href={AppNotificationController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >

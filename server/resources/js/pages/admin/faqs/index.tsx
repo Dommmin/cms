@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as FaqController from '@/actions/App/Http/Controllers/Admin/FaqController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PlusIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -13,7 +14,7 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { Faq, IndexProps } from './index.types';
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'FAQ', href: '/admin/faqs' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'FAQ', href: FaqController.index.url() }];
 
 export default function FaqsIndex({
     faqs,
@@ -79,7 +80,7 @@ export default function FaqsIndex({
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/faqs/${row.original.id}/edit`}
+                            href={FaqController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -96,7 +97,7 @@ export default function FaqsIndex({
                             'Are you sure you want to delete this FAQ? This action cannot be undone.',
                         )}
                         onConfirm={() => {
-                            router.delete(`/admin/faqs/${row.original.id}`, {
+                            router.delete(FaqController.destroy.url(row.original.id), {
                                 onSuccess: () => toast.success('FAQ deleted'),
                             });
                         }}
@@ -121,7 +122,7 @@ export default function FaqsIndex({
                     )}
                 >
                     <PageHeaderActions>
-                        <Link href="/admin/faqs/create">
+                        <Link href={FaqController.create.url()}>
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.add', 'Add FAQ')}
@@ -147,7 +148,7 @@ export default function FaqsIndex({
                         'Search questions...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/faqs"
+                    baseUrl={FaqController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

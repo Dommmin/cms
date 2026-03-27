@@ -1,4 +1,5 @@
 import axios from 'axios';
+import * as MediaController from '@/actions/App/Http/Controllers/Admin/MediaController';
 import {
     XIcon,
     Search,
@@ -78,7 +79,7 @@ export function MediaPickerModal({
 
         try {
             const response = await axios.get(
-                `/admin/media/search?${params.toString()}`,
+                `${MediaController.search.url()}?${params.toString()}`,
             );
             setMedia(response.data);
         } catch (error) {
@@ -159,7 +160,7 @@ export function MediaPickerModal({
 
         try {
             const response = await axios.post<MediaItem[]>(
-                '/admin/media/upload',
+                MediaController.upload.url(),
                 formData,
                 { headers: { 'Content-Type': 'multipart/form-data' } },
             );

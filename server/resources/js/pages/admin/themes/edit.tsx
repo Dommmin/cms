@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as ThemeController from '@/actions/App/Http/Controllers/Admin/ThemeController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -14,7 +15,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Themes', href: '/admin/themes' },
+    { title: 'Themes', href: ThemeController.index.url() },
     { title: 'Edit', href: '' },
 ];
 
@@ -57,7 +58,7 @@ export default function Edit({ theme }: EditProps) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/themes" prefetch cacheFor={30}>
+                            <Link href={ThemeController.index.url()} prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 Back to Themes
                             </Link>
@@ -75,7 +76,7 @@ export default function Edit({ theme }: EditProps) {
                 </div>
 
                 <Form
-                    action={`/admin/themes/${theme.id}`}
+                    action={ThemeController.update.url(theme.id)}
                     method="post"
                     id={formId}
                     className="max-w-2xl space-y-6"

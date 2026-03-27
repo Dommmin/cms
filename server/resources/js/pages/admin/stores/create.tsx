@@ -1,4 +1,5 @@
 import { Link, Head, router } from '@inertiajs/react';
+import * as StoreController from '@/actions/App/Http/Controllers/Admin/StoreController';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -15,8 +16,8 @@ import type { BreadcrumbItem } from '@/types';
 import type { FormData } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Stores', href: '/admin/stores' },
-    { title: 'Create', href: '/admin/stores/create' },
+    { title: 'Stores', href: StoreController.index.url() },
+    { title: 'Create', href: StoreController.create.url() },
 ];
 
 export default function CreateStore() {
@@ -41,7 +42,7 @@ export default function CreateStore() {
         setProcessing(true);
         setErrors({});
 
-        router.post('/admin/stores', data, {
+        router.post(StoreController.store.url(), data, {
             onSuccess: () => toast.success('Store created'),
             onError: (errs) => {
                 setErrors(errs);
@@ -61,7 +62,7 @@ export default function CreateStore() {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/stores" prefetch cacheFor={30}>
+                            <Link href={StoreController.index.url()} prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 Back
                             </Link>

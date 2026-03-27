@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as BlogCategoryController from '@/actions/App/Http/Controllers/Admin/BlogCategoryController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -15,7 +16,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { BlogCategory, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Blog Categories', href: '/admin/blog/categories' },
+    { title: 'Blog Categories', href: BlogCategoryController.index.url() },
 ];
 
 export default function BlogCategoriesIndex({
@@ -77,7 +78,7 @@ export default function BlogCategoriesIndex({
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/blog/categories/${row.original.id}/edit`}
+                            href={BlogCategoryController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -92,7 +93,7 @@ export default function BlogCategoriesIndex({
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
                             router.delete(
-                                `/admin/blog/categories/${row.original.id}`,
+                                BlogCategoryController.destroy.url(row.original.id),
                                 {
                                     onSuccess: () =>
                                         toast.success('Category deleted'),
@@ -120,7 +121,7 @@ export default function BlogCategoriesIndex({
                     )}
                 >
                     <PageHeaderActions>
-                        <Link href="/admin/blog/categories/create">
+                        <Link href={BlogCategoryController.create.url()}>
                             <Button variant="outline">
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.create', 'New Category')}
@@ -146,7 +147,7 @@ export default function BlogCategoriesIndex({
                         'Search categories...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/blog/categories"
+                    baseUrl={BlogCategoryController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

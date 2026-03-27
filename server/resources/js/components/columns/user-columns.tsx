@@ -1,6 +1,7 @@
 import { Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilIcon, TrashIcon, UserIcon } from 'lucide-react';
+import * as UserController from '@/actions/App/Http/Controllers/Admin/UserController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -75,7 +76,7 @@ export function useUserColumns(): ColumnDef<User>[] {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/users/${row.original.id}/edit`}
+                            href={UserController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -89,7 +90,7 @@ export function useUserColumns(): ColumnDef<User>[] {
                         title={__('dialog.delete_title', 'Delete User')}
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
-                            router.delete(`/admin/users/${row.original.id}`);
+                            router.delete(UserController.destroy.url(row.original.id));
                         }}
                     >
                         <TrashIcon className="mr-1 h-3 w-3" />

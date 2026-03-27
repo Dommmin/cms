@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as ProductTypeController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductTypeController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -30,16 +31,16 @@ export default function Create({
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Product Types',
-            href: '/admin/ecommerce/product-types',
+            href: ProductTypeController.index.url(),
         },
         isEditing
             ? {
                   title: 'Edit Product Type',
-                  href: `/admin/ecommerce/product-types/${productType.id}/edit`,
+                  href: ProductTypeController.edit.url(productType.id),
               }
             : {
                   title: 'Create Product Type',
-                  href: '/admin/ecommerce/product-types/create',
+                  href: ProductTypeController.create.url(),
               },
     ];
 
@@ -71,7 +72,7 @@ export default function Create({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/product-types"
+                                href={ProductTypeController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -85,8 +86,8 @@ export default function Create({
                 <Form
                     action={
                         isEditing
-                            ? `/admin/ecommerce/product-types/${productType.id}`
-                            : '/admin/ecommerce/product-types'
+                            ? ProductTypeController.update.url(productType.id)
+                            : ProductTypeController.store.url()
                     }
                     method={isEditing ? 'put' : 'post'}
                     id={formId}

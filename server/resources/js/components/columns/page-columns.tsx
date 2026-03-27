@@ -7,6 +7,7 @@ import {
     PencilIcon,
     TrashIcon,
 } from 'lucide-react';
+import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -109,7 +110,7 @@ export function usePageColumns(): ColumnDef<PageRow>[] {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/cms/pages/${row.original.id}/edit`}
+                            href={PageController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -122,7 +123,7 @@ export function usePageColumns(): ColumnDef<PageRow>[] {
                         size="sm"
                         onClick={() =>
                             router.post(
-                                `/admin/cms/pages/${row.original.id}/duplicate`,
+                                PageController.duplicate.url(row.original.id),
                             )
                         }
                     >
@@ -135,7 +136,9 @@ export function usePageColumns(): ColumnDef<PageRow>[] {
                             size="sm"
                             onClick={() =>
                                 router.post(
-                                    `/admin/cms/pages/${row.original.id}/unpublish`,
+                                    PageController.unpublish.url(
+                                        row.original.id,
+                                    ),
                                 )
                             }
                         >
@@ -147,7 +150,9 @@ export function usePageColumns(): ColumnDef<PageRow>[] {
                             size="sm"
                             onClick={() =>
                                 router.post(
-                                    `/admin/cms/pages/${row.original.id}/publish`,
+                                    PageController.publish.url(
+                                        row.original.id,
+                                    ),
                                 )
                             }
                         >
@@ -161,7 +166,9 @@ export function usePageColumns(): ColumnDef<PageRow>[] {
                         title={__('dialog.delete_title', 'Delete Page')}
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() =>
-                            router.delete(`/admin/cms/pages/${row.original.id}`)
+                            router.delete(
+                                PageController.destroy.url(row.original.id),
+                            )
                         }
                     >
                         <TrashIcon className="mr-1 h-3 w-3" />

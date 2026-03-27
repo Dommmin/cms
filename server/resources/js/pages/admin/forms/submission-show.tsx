@@ -1,4 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
+import * as FormController from '@/actions/App/Http/Controllers/Admin/FormController';
+import * as FormSubmissionController from '@/actions/App/Http/Controllers/Admin/FormSubmissionController';
 import { ArrowLeftIcon } from 'lucide-react';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -10,7 +12,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { SubmissionData, FormData } from './submission-show.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Forms', href: '/admin/forms' },
+    { title: 'Forms', href: FormController.index.url() },
     { title: 'Submissions', href: '#' },
     { title: 'Details', href: '#' },
 ];
@@ -38,7 +40,9 @@ export default function SubmissionShow({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href={`/admin/forms/${form.id}/submissions`}
+                                href={FormSubmissionController.index.url(
+                                    form.id,
+                                )}
                                 prefetch
                                 cacheFor={30}
                             >

@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as FaqController from '@/actions/App/Http/Controllers/Admin/FaqController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -19,8 +20,8 @@ import type { BreadcrumbItem } from '@/types';
 import type { CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'FAQ', href: '/admin/faqs' },
-    { title: 'Create', href: '/admin/faqs/create' },
+    { title: 'FAQ', href: FaqController.index.url() },
+    { title: 'Create', href: FaqController.create.url() },
 ];
 
 export default function Create({ categories }: CreateProps) {
@@ -34,7 +35,7 @@ export default function Create({ categories }: CreateProps) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/faqs" prefetch cacheFor={30}>
+                            <Link href={FaqController.index.url()} prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 Back
                             </Link>
@@ -43,7 +44,7 @@ export default function Create({ categories }: CreateProps) {
                 </PageHeader>
 
                 <Form
-                    action="/admin/faqs"
+                    action={FaqController.store.url()}
                     method="post"
                     className="max-w-2xl space-y-6"
                 >

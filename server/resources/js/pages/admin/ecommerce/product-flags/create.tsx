@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as ProductFlagController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductFlagController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -12,8 +13,8 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Product Flags', href: '/admin/ecommerce/product-flags' },
-    { title: 'Create Flag', href: '/admin/ecommerce/product-flags/create' },
+    { title: 'Product Flags', href: ProductFlagController.index.url() },
+    { title: 'Create Flag', href: ProductFlagController.create.url() },
 ];
 
 export default function Create() {
@@ -37,7 +38,7 @@ export default function Create() {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/product-flags"
+                                href={ProductFlagController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -49,7 +50,7 @@ export default function Create() {
                 </PageHeader>
 
                 <Form
-                    action="/admin/ecommerce/product-flags"
+                    action={ProductFlagController.store.url()}
                     method="post"
                     id={formId}
                     className="max-w-xl space-y-6"

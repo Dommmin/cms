@@ -1,4 +1,5 @@
 import { Link, Head, router } from '@inertiajs/react';
+import * as MenuController from '@/actions/App/Http/Controllers/Admin/MenuController';
 import {
     ArrowLeftIcon,
     ChevronDownIcon,
@@ -29,7 +30,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { MenuItemData, EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Menus', href: '/admin/menus' },
+    { title: 'Menus', href: MenuController.index.url() },
     { title: 'Edit', href: '' },
 ];
 
@@ -244,7 +245,7 @@ export default function Edit({ menu, locations }: EditProps) {
     const handleSave = () => {
         setProcessing(true);
         router.put(
-            `/admin/menus/${menu.id}`,
+            MenuController.update.url(menu.id),
             {
                 name,
                 location: location === 'none' ? null : location,
@@ -290,7 +291,7 @@ export default function Edit({ menu, locations }: EditProps) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/menus" prefetch cacheFor={30}>
+                            <Link href={MenuController.index.url()} prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>

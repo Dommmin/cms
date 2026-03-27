@@ -1,4 +1,5 @@
 import { Link, Head, router } from '@inertiajs/react';
+import * as BlogCategoryController from '@/actions/App/Http/Controllers/Admin/BlogCategoryController';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -23,8 +24,8 @@ import type { BreadcrumbItem } from '@/types';
 import type { CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Blog Categories', href: '/admin/blog/categories' },
-    { title: 'Create', href: '/admin/blog/categories/create' },
+    { title: 'Blog Categories', href: BlogCategoryController.index.url() },
+    { title: 'Create', href: BlogCategoryController.create.url() },
 ];
 
 export default function CreateBlogCategory({ parentCategories }: CreateProps) {
@@ -60,7 +61,7 @@ export default function CreateBlogCategory({ parentCategories }: CreateProps) {
         setErrors({});
 
         router.post(
-            '/admin/blog/categories',
+            BlogCategoryController.store.url(),
             {
                 ...data,
                 parent_id: data.parent_id || null,
@@ -103,7 +104,7 @@ export default function CreateBlogCategory({ parentCategories }: CreateProps) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/blog/categories"
+                                href={BlogCategoryController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >

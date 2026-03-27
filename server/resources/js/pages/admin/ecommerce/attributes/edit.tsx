@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as AttributeController from '@/actions/App/Http/Controllers/Admin/Ecommerce/AttributeController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -38,11 +39,11 @@ export default function Edit({
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Attributes',
-            href: '/admin/ecommerce/attributes',
+            href: AttributeController.index.url(),
         },
         {
             title: 'Edit Attribute',
-            href: `/admin/ecommerce/attributes/${attribute.id}/edit`,
+            href: AttributeController.edit.url(attribute.id),
         },
     ];
 
@@ -58,7 +59,7 @@ export default function Edit({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/attributes"
+                                href={AttributeController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -70,7 +71,7 @@ export default function Edit({
                 </PageHeader>
 
                 <Form
-                    action={`/admin/ecommerce/attributes/${attribute.id}`}
+                    action={AttributeController.update.url(attribute.id)}
                     method="put"
                     id={formId}
                     className="max-w-xl space-y-6"

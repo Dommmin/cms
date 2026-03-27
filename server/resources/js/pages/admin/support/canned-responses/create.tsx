@@ -1,4 +1,6 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as SupportConversationController from '@/actions/App/Http/Controllers/Admin/SupportConversationController';
+import * as SupportCannedResponseController from '@/actions/App/Http/Controllers/Admin/SupportCannedResponseController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -12,9 +14,9 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Support', href: '/admin/support' },
-    { title: 'Canned Responses', href: '/admin/support/canned-responses' },
-    { title: 'Create', href: '/admin/support/canned-responses/create' },
+    { title: 'Support', href: SupportConversationController.index.url() },
+    { title: 'Canned Responses', href: SupportCannedResponseController.index.url() },
+    { title: 'Create', href: SupportCannedResponseController.create.url() },
 ];
 
 export default function CreateCannedResponse() {
@@ -31,7 +33,7 @@ export default function CreateCannedResponse() {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/support/canned-responses"
+                                href={SupportCannedResponseController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -43,7 +45,7 @@ export default function CreateCannedResponse() {
                 </PageHeader>
 
                 <Form
-                    action="/admin/support/canned-responses"
+                    action={SupportCannedResponseController.store.url()}
                     method="post"
                     id={formId}
                     className="max-w-2xl space-y-6"

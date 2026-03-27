@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import * as CookieConsentController from '@/actions/App/Http/Controllers/Admin/CookieConsentController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon, CheckCircleIcon, XCircleIcon } from 'lucide-react';
 import DataTable from '@/components/data-table';
@@ -12,7 +13,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { CookieConsent, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Cookie Consents', href: '/admin/cookie-consents' },
+    { title: 'Cookie Consents', href: CookieConsentController.index.url() },
 ];
 
 export default function CookieConsentsIndex({
@@ -83,7 +84,7 @@ export default function CookieConsentsIndex({
             id: 'actions',
             header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
-                <Link href={`/admin/cookie-consents/${row.original.id}`}>
+                <Link href={CookieConsentController.show.url(row.original.id)}>
                     <Button variant="outline" size="sm">
                         <EyeIcon className="mr-1 h-3 w-3" />
                         {__('action.show', 'View')}
@@ -150,7 +151,7 @@ export default function CookieConsentsIndex({
                         'Search by session or IP...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/cookie-consents"
+                    baseUrl={CookieConsentController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

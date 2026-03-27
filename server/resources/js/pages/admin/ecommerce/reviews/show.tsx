@@ -1,4 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as ReviewController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ReviewController';
+import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
+import * as CustomerController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CustomerController';
 import {
     ArrowLeft,
     Star,
@@ -26,7 +29,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { ShowProps } from './show.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Reviews', href: '/admin/ecommerce/reviews' },
+    { title: 'Reviews', href: ReviewController.index.url() },
     { title: 'Review Details', href: '#' },
 ];
 
@@ -75,7 +78,7 @@ export default function ReviewShow({ review }: ShowProps) {
         if (status === review.status) return;
         setUpdating(true);
         router.put(
-            `/admin/ecommerce/reviews/${review.id}`,
+            ReviewController.destroy.url(review.id),
             { status },
             { onFinish: () => setUpdating(false) },
         );
@@ -92,7 +95,7 @@ export default function ReviewShow({ review }: ShowProps) {
                     <PageHeaderActions>
                         <Button variant="outline" asChild>
                             <Link
-                                href="/admin/ecommerce/reviews"
+                                href={ReviewController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -135,7 +138,7 @@ export default function ReviewShow({ review }: ShowProps) {
                                             /{review.product.slug}
                                         </div>
                                         <Link
-                                            href={`/admin/ecommerce/products/${review.product.id}/edit`}
+                                            href={ProductController.edit.url(review.product.id)}
                                             prefetch
                                             cacheFor={30}
                                             className="text-sm text-primary hover:underline"
@@ -299,7 +302,7 @@ export default function ReviewShow({ review }: ShowProps) {
                                             {review.customer.email}
                                         </div>
                                         <Link
-                                            href={`/admin/customers/${review.customer.id}/edit`}
+                                            href={CustomerController.edit.url(review.customer.id)}
                                             prefetch
                                             cacheFor={30}
                                             className="text-sm text-primary hover:underline"

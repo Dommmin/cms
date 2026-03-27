@@ -1,4 +1,6 @@
 import { Head, Link, router, usePoll } from '@inertiajs/react';
+import * as SupportConversationController from '@/actions/App/Http/Controllers/Admin/SupportConversationController';
+import * as SupportCannedResponseController from '@/actions/App/Http/Controllers/Admin/SupportCannedResponseController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon, MessageCircleIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -14,7 +16,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { Conversation, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Support', href: '/admin/support' },
+    { title: 'Support', href: SupportConversationController.index.url() },
 ];
 
 const statusColors: Record<string, string> = {
@@ -122,7 +124,7 @@ export default function SupportIndex({
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/support/${row.original.id}`}
+                            href={SupportConversationController.show.url(row.original.id)}
                             prefetch
                             cacheFor={60}
                         >
@@ -139,7 +141,7 @@ export default function SupportIndex({
                             'This will permanently delete the conversation and all its messages.',
                         )}
                         onConfirm={() => {
-                            router.delete(`/admin/support/${row.original.id}`, {
+                            router.delete(SupportConversationController.destroy.url(row.original.id), {
                                 onSuccess: () =>
                                     toast.success('Conversation deleted'),
                             });
@@ -166,7 +168,7 @@ export default function SupportIndex({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/support/canned-responses"
+                                href={SupportCannedResponseController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -193,7 +195,7 @@ export default function SupportIndex({
                         'Search by subject, email or name...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/support"
+                    baseUrl={SupportConversationController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

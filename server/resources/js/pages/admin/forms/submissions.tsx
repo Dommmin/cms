@@ -1,4 +1,6 @@
 import { Link, Head, router } from '@inertiajs/react';
+import * as FormController from '@/actions/App/Http/Controllers/Admin/FormController';
+import * as FormSubmissionController from '@/actions/App/Http/Controllers/Admin/FormSubmissionController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -17,7 +19,7 @@ import type {
 } from './submissions.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Forms', href: '/admin/forms' },
+    { title: 'Forms', href: FormController.index.url() },
     { title: 'Submissions', href: '#' },
 ];
 
@@ -76,7 +78,10 @@ export default function SubmissionsIndex({
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/forms/${form.id}/submissions/${row.original.id}`}
+                            href={FormSubmissionController.show.url([
+                                form.id,
+                                row.original.id,
+                            ])}
                             prefetch
                             cacheFor={60}
                         >
@@ -94,7 +99,10 @@ export default function SubmissionsIndex({
                         )}
                         onConfirm={() => {
                             router.delete(
-                                `/admin/forms/${form.id}/submissions/${row.original.id}`,
+                                FormSubmissionController.destroy.url([
+                                    form.id,
+                                    row.original.id,
+                                ]),
                                 {
                                     onSuccess: () =>
                                         toast.success('Submission deleted'),
@@ -121,7 +129,7 @@ export default function SubmissionsIndex({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href={`/admin/forms/${form.id}/edit`}
+                                href={FormController.edit.url(form.id)}
                                 prefetch
                                 cacheFor={30}
                             >

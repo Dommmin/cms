@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as ProductTypeController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductTypeController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -28,11 +29,11 @@ export default function Edit({
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Product Types',
-            href: '/admin/ecommerce/product-types',
+            href: ProductTypeController.index.url(),
         },
         {
             title: 'Edit Product Type',
-            href: `/admin/ecommerce/product-types/${productType.id}/edit`,
+            href: ProductTypeController.edit.url(productType.id),
         },
     ];
 
@@ -48,7 +49,7 @@ export default function Edit({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/product-types"
+                                href={ProductTypeController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -60,7 +61,7 @@ export default function Edit({
                 </PageHeader>
 
                 <Form
-                    action={`/admin/ecommerce/product-types/${productType.id}`}
+                    action={ProductTypeController.update.url(productType.id)}
                     method="put"
                     id={formId}
                     className="max-w-xl space-y-6"

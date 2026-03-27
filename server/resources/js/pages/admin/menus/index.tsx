@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as MenuController from '@/actions/App/Http/Controllers/Admin/MenuController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PlusIcon, PencilIcon, TrashIcon, CopyIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -14,7 +15,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { Menu, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Menus', href: '/admin/menus' },
+    { title: 'Menus', href: MenuController.index.url() },
 ];
 
 export default function MenusIndex({ menus, filters }: IndexProps) {
@@ -64,7 +65,7 @@ export default function MenusIndex({ menus, filters }: IndexProps) {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/menus/${row.original.id}/edit`}
+                            href={MenuController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -77,7 +78,7 @@ export default function MenusIndex({ menus, filters }: IndexProps) {
                         size="sm"
                         onClick={() => {
                             router.post(
-                                `/admin/menus/${row.original.id}/duplicate`,
+                                MenuController.duplicate.url(row.original.id),
                                 {},
                                 {
                                     onSuccess: () =>
@@ -94,7 +95,7 @@ export default function MenusIndex({ menus, filters }: IndexProps) {
                         title={__('dialog.delete_title', 'Delete Menu')}
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
-                            router.delete(`/admin/menus/${row.original.id}`, {
+                            router.delete(MenuController.destroy.url(row.original.id), {
                                 onSuccess: () => toast.success('Menu deleted'),
                             });
                         }}
@@ -118,7 +119,7 @@ export default function MenusIndex({ menus, filters }: IndexProps) {
                     )}
                 >
                     <PageHeaderActions>
-                        <Link href="/admin/menus/create">
+                        <Link href={MenuController.create.url()}>
                             <Button variant="outline">
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.create', 'Create Menu')}
@@ -144,7 +145,7 @@ export default function MenusIndex({ menus, filters }: IndexProps) {
                         'Search menus...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/menus"
+                    baseUrl={MenuController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

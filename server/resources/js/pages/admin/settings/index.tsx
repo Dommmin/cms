@@ -1,4 +1,6 @@
+import axios from 'axios';
 import { Head, router } from '@inertiajs/react';
+import * as SettingsController from '@/actions/App/Http/Controllers/Admin/SettingsController';
 import {
     CreditCardIcon,
     GlobeIcon,
@@ -25,7 +27,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { Setting, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Settings', href: '/admin/settings' },
+    { title: 'Settings', href: SettingsController.index.url() },
 ];
 
 const GROUP_ICONS: Record<
@@ -165,7 +167,7 @@ export default function Index({ settings, groups, currentGroup }: IndexProps) {
     };
 
     const handleGroupChange = (group: string) => {
-        router.visit(`/admin/settings?group=${group}`, {
+        router.visit(SettingsController.index.url({ query: { group } }), {
             preserveState: false,
         });
     };
@@ -174,31 +176,31 @@ export default function Index({ settings, groups, currentGroup }: IndexProps) {
         e.preventDefault();
         setTestingMail(true);
         try {
-            const xsrf = document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] ?? '';
-            const res = await fetch('/admin/settings/mail/test', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-XSRF-TOKEN': decodeURIComponent(xsrf),
+            const { data } = await axios.post<{ message: string }>(
+                SettingsController.testMail.url(),
+                { email: testEmail },
+                {
+                    headers: { Accept: 'application/json' },
                 },
-                body: JSON.stringify({ email: testEmail }),
-            });
-            const json = (await res.json()) as { message: string };
-            if (res.ok) {
-                toast.success(json.message);
-            } else {
+            );
+            toast.success(data.message);
+        } catch (error) {
+            if (axios.isAxiosError<{ message?: string }>(error)) {
                 toast.error(
-                    json.message ??
+                    error.response?.data?.message ??
                         __(
                             'settings.mail_test_failed',
                             'Failed to send test email.',
                         ),
                 );
+            } else {
+                toast.error(
+                    __(
+                        'settings.mail_test_failed',
+                        'Failed to send test email.',
+                    ),
+                );
             }
-        } catch {
-            toast.error(
-                __('settings.mail_test_failed', 'Failed to send test email.'),
-            );
         } finally {
             setTestingMail(false);
         }
@@ -207,7 +209,7 @@ export default function Index({ settings, groups, currentGroup }: IndexProps) {
     const handleSave = () => {
         setProcessing(true);
         router.put(
-            '/admin/settings',
+            SettingsController.update.url(),
             { settings: values },
             {
                 preserveScroll: true,

@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import * as CategoryController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CategoryController';
 import { PlusIcon } from 'lucide-react';
 import { useCategoryColumns } from '@/components/columns/category-columns';
 
@@ -12,7 +13,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { CategoryData } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Categories', href: '/admin/ecommerce/categories' },
+    { title: 'Categories', href: CategoryController.index.url() },
 ];
 
 export default function CategoriesIndex({
@@ -39,7 +40,7 @@ export default function CategoriesIndex({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/categories/create"
+                                href={CategoryController.create.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -67,7 +68,7 @@ export default function CategoriesIndex({
                         'Search categories...',
                     )}
                     searchValue={filters?.search ?? ''}
-                    baseUrl="/admin/ecommerce/categories"
+                    baseUrl={CategoryController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

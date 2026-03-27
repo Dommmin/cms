@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as StoreController from '@/actions/App/Http/Controllers/Admin/StoreController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { MapPin, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -11,10 +12,10 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { IndexProps } from './index.types';
+import type { Store, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Stores', href: '/admin/stores' },
+    { title: 'Stores', href: StoreController.index.url() },
 ];
 
 export default function StoresIndex({ stores, filters }: IndexProps) {
@@ -62,7 +63,7 @@ export default function StoresIndex({ stores, filters }: IndexProps) {
                     className="cursor-pointer"
                     onClick={() => {
                         router.post(
-                            `/admin/stores/${row.original.id}/toggle-active`,
+                            StoreController.toggleActive.url(row.original.id),
                             {},
                             {
                                 onSuccess: () =>
@@ -84,7 +85,7 @@ export default function StoresIndex({ stores, filters }: IndexProps) {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/stores/${row.original.id}/edit`}
+                            href={StoreController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -101,7 +102,7 @@ export default function StoresIndex({ stores, filters }: IndexProps) {
                             'Are you sure you want to delete this store? This action cannot be undone.',
                         )}
                         onConfirm={() => {
-                            router.delete(`/admin/stores/${row.original.id}`, {
+                            router.delete(StoreController.destroy.url(row.original.id), {
                                 onSuccess: () => toast.success('Store deleted'),
                             });
                         }}
@@ -126,7 +127,7 @@ export default function StoresIndex({ stores, filters }: IndexProps) {
                     )}
                 >
                     <PageHeaderActions>
-                        <Link href="/admin/stores/create">
+                        <Link href={StoreController.create.url()}>
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.add', 'Add Store')}
@@ -147,7 +148,7 @@ export default function StoresIndex({ stores, filters }: IndexProps) {
                                 'Add your first store location to get started.',
                             )}
                         </p>
-                        <Link href="/admin/stores/create" className="mt-4">
+                        <Link href={StoreController.create.url()} className="mt-4">
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.add', 'Add Store')}
@@ -172,7 +173,7 @@ export default function StoresIndex({ stores, filters }: IndexProps) {
                             'Search stores...',
                         )}
                         searchValue={filters.search ?? ''}
-                        baseUrl="/admin/stores"
+                        baseUrl={StoreController.index.url()}
                     />
                 )}
             </Wrapper>

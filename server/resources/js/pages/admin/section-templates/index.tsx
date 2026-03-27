@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as SectionTemplateController from '@/actions/App/Http/Controllers/Admin/SectionTemplateController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Copy, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -15,7 +16,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { SectionTemplate, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Section Templates', href: '/admin/section-templates' },
+    { title: 'Section Templates', href: SectionTemplateController.index.url() },
 ];
 
 export default function SectionTemplatesIndex({
@@ -72,7 +73,7 @@ export default function SectionTemplatesIndex({
                         size="sm"
                         onClick={() =>
                             router.post(
-                                `/admin/section-templates/${row.original.id}/duplicate`,
+                                SectionTemplateController.duplicate.url(row.original.id),
                                 {},
                                 {
                                     onSuccess: () =>
@@ -86,7 +87,7 @@ export default function SectionTemplatesIndex({
                     </Button>
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/section-templates/${row.original.id}/edit`}
+                            href={SectionTemplateController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -104,7 +105,7 @@ export default function SectionTemplatesIndex({
                         )}
                         onConfirm={() =>
                             router.delete(
-                                `/admin/section-templates/${row.original.id}`,
+                                SectionTemplateController.destroy.url(row.original.id),
                                 {
                                     onSuccess: () =>
                                         toast.success('Template deleted'),
@@ -132,7 +133,7 @@ export default function SectionTemplatesIndex({
                     )}
                 >
                     <PageHeaderActions>
-                        <Link href="/admin/section-templates/create">
+                        <Link href={SectionTemplateController.create.url()}>
                             <Button variant="outline">
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.create', 'New Template')}
@@ -158,7 +159,7 @@ export default function SectionTemplatesIndex({
                         'Search templates...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/section-templates"
+                    baseUrl={SectionTemplateController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

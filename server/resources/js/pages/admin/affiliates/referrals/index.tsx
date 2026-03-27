@@ -1,4 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as AffiliateCodeController from '@/actions/App/Http/Controllers/Admin/AffiliateCodeController';
+import * as ReferralController from '@/actions/App/Http/Controllers/Admin/ReferralController';
+import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { CheckCircle, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -15,8 +18,8 @@ import type { BreadcrumbItem } from '@/types';
 import type { Referral, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Affiliates', href: '/admin/affiliates/codes' },
-    { title: 'Referrals', href: '/admin/affiliates/referrals' },
+    { title: 'Affiliates', href: AffiliateCodeController.index.url() },
+    { title: 'Referrals', href: ReferralController.index.url() },
 ];
 
 const STATUS_VARIANT: Record<
@@ -77,7 +80,7 @@ export default function ReferralsIndex({
             cell: ({ row }) =>
                 row.original.order ? (
                     <Link
-                        href={`/admin/ecommerce/orders/${row.original.order.id}`}
+                        href={OrderController.show.url(row.original.order.id)}
                         prefetch
                         cacheFor={60}
                         className="text-sm font-medium text-primary hover:underline"
@@ -136,7 +139,7 @@ export default function ReferralsIndex({
                                 )}
                                 onConfirm={() =>
                                     router.post(
-                                        `/admin/affiliates/referrals/${r.id}/approve`,
+                                        ReferralController.approve.url(r.id),
                                         {},
                                         {
                                             onSuccess: () =>
@@ -159,7 +162,7 @@ export default function ReferralsIndex({
                                 description={`Mark commission of ${fmt(r.commission_amount)} as paid to ${r.affiliate_code.user.name}?`}
                                 onConfirm={() =>
                                     router.post(
-                                        `/admin/affiliates/referrals/${r.id}/mark-paid`,
+                                        ReferralController.markPaid.url(r.id),
                                         {},
                                         {
                                             onSuccess: () =>
@@ -185,7 +188,7 @@ export default function ReferralsIndex({
                                 )}
                                 onConfirm={() =>
                                     router.post(
-                                        `/admin/affiliates/referrals/${r.id}/cancel`,
+                                        ReferralController.cancel.url(r.id),
                                         {},
                                         {
                                             onSuccess: () =>
@@ -218,7 +221,7 @@ export default function ReferralsIndex({
                     )}
                 >
                     <PageHeaderActions>
-                        <Link href="/admin/affiliates/codes">
+                        <Link href={AffiliateCodeController.index.url()}>
                             <Button variant="outline">
                                 {__('action.manage', 'Manage Codes')}
                             </Button>
@@ -301,7 +304,7 @@ export default function ReferralsIndex({
                         'Search by code...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/affiliates/referrals"
+                    baseUrl={ReferralController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

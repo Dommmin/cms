@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as CurrencyController from '@/actions/App/Http/Controllers/Admin/CurrencyController';
 import { ArrowLeftIcon, StarIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -12,7 +13,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Currencies', href: '/admin/currencies' },
+    { title: 'Currencies', href: CurrencyController.index.url() },
     { title: 'Edit', href: '' },
 ];
 
@@ -28,7 +29,7 @@ export default function Edit({ currency }: EditProps) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/currencies"
+                                href={CurrencyController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -54,7 +55,7 @@ export default function Edit({ currency }: EditProps) {
                 </div>
 
                 <Form
-                    action={`/admin/currencies/${currency.id}`}
+                    action={CurrencyController.update.url(currency.id)}
                     method="post"
                     className="max-w-2xl space-y-6"
                     children={({ processing, errors }) => (

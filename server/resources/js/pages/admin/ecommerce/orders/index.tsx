@@ -1,4 +1,6 @@
 import { Head } from '@inertiajs/react';
+import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
+import * as OrderRoutes from '@/routes/admin/ecommerce/orders';
 import { DownloadIcon } from 'lucide-react';
 import { useOrderColumns } from '@/components/columns/order-columns';
 
@@ -12,7 +14,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { OrderData } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Orders', href: '/admin/ecommerce/orders' },
+    { title: 'Orders', href: OrderController.index.url() },
 ];
 
 export default function OrdersIndex({
@@ -38,7 +40,7 @@ export default function OrdersIndex({
                 >
                     <PageHeaderActions>
                         <Button variant="outline" asChild>
-                            <a href="/admin/ecommerce/orders/export">
+                            <a href={OrderRoutes.exportMethod.url()}>
                                 <DownloadIcon className="mr-2 h-4 w-4" />
                                 {__('action.export_csv', 'Export CSV')}
                             </a>
@@ -63,7 +65,7 @@ export default function OrdersIndex({
                         'Search orders...',
                     )}
                     searchValue={filters?.search ?? ''}
-                    baseUrl="/admin/ecommerce/orders"
+                    baseUrl={OrderController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

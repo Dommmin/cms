@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as ShippingMethodController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ShippingMethodController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PlusIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -14,7 +15,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { ShippingMethod, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Shipping Methods', href: '/admin/ecommerce/shipping-methods' },
+    { title: 'Shipping Methods', href: ShippingMethodController.index.url() },
 ];
 
 export default function ShippingMethodsIndex({ methods, filters }: IndexProps) {
@@ -81,7 +82,7 @@ export default function ShippingMethodsIndex({ methods, filters }: IndexProps) {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/ecommerce/shipping-methods/${row.original.id}/edit`}
+                            href={ShippingMethodController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -99,7 +100,7 @@ export default function ShippingMethodsIndex({ methods, filters }: IndexProps) {
                         description={`Are you sure you want to delete "${row.original.name}"?`}
                         onConfirm={() => {
                             router.delete(
-                                `/admin/ecommerce/shipping-methods/${row.original.id}`,
+                                ShippingMethodController.destroy.url(row.original.id),
                                 {
                                     onSuccess: () =>
                                         toast.success(
@@ -129,7 +130,7 @@ export default function ShippingMethodsIndex({ methods, filters }: IndexProps) {
                     )}
                 >
                     <PageHeaderActions>
-                        <Link href="/admin/ecommerce/shipping-methods/create">
+                        <Link href={ShippingMethodController.create.url()}>
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.add_method', 'Add Method')}
@@ -152,7 +153,7 @@ export default function ShippingMethodsIndex({ methods, filters }: IndexProps) {
                     searchable
                     searchPlaceholder="Search methods..."
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/ecommerce/shipping-methods"
+                    baseUrl={ShippingMethodController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

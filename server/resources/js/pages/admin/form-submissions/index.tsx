@@ -1,4 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as FormController from '@/actions/App/Http/Controllers/Admin/FormController';
+import * as FormSubmissionController from '@/actions/App/Http/Controllers/Admin/FormSubmissionController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -14,8 +16,8 @@ import type { BreadcrumbItem } from '@/types';
 import type { Submission, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Forms', href: '/admin/forms' },
-    { title: 'All Submissions', href: '/admin/form-submissions' },
+    { title: 'Forms', href: FormController.index.url() },
+    { title: 'All Submissions', href: FormSubmissionController.index.url(0) },
 ];
 
 function payloadPreview(payload: Record<string, unknown>): string {
@@ -90,7 +92,7 @@ export default function FormSubmissionsIndex({
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/forms/${row.original.form_id}/submissions/${row.original.id}`}
+                            href={FormSubmissionController.show.url({ form: row.original.form_id, submission: row.original.id })}
                             prefetch
                             cacheFor={60}
                         >
@@ -108,7 +110,7 @@ export default function FormSubmissionsIndex({
                         )}
                         onConfirm={() => {
                             router.delete(
-                                `/admin/forms/${row.original.form_id}/submissions/${row.original.id}`,
+                                FormSubmissionController.destroy.url({ form: row.original.form_id, submission: row.original.id }),
                                 {
                                     onSuccess: () =>
                                         toast.success('Submission deleted'),
@@ -150,7 +152,7 @@ export default function FormSubmissionsIndex({
                         'Search submissions...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/form-submissions"
+                    baseUrl={FormSubmissionController.index.url(0)}
                 />
             </Wrapper>
         </AppLayout>

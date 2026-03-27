@@ -1,4 +1,6 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as SupportConversationController from '@/actions/App/Http/Controllers/Admin/SupportConversationController';
+import * as SupportCannedResponseController from '@/actions/App/Http/Controllers/Admin/SupportCannedResponseController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -13,8 +15,8 @@ import type { BreadcrumbItem } from '@/types';
 import type { EditProps } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Support', href: '/admin/support' },
-    { title: 'Canned Responses', href: '/admin/support/canned-responses' },
+    { title: 'Support', href: SupportConversationController.index.url() },
+    { title: 'Canned Responses', href: SupportCannedResponseController.index.url() },
     { title: 'Edit', href: '#' },
 ];
 
@@ -32,7 +34,7 @@ export default function EditCannedResponse({ canned_response }: EditProps) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/support/canned-responses"
+                                href={SupportCannedResponseController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -44,7 +46,7 @@ export default function EditCannedResponse({ canned_response }: EditProps) {
                 </PageHeader>
 
                 <Form
-                    action={`/admin/support/canned-responses/${canned_response.id}`}
+                    action={SupportCannedResponseController.update.url(canned_response.id)}
                     method="put"
                     id={formId}
                     className="max-w-2xl space-y-6"

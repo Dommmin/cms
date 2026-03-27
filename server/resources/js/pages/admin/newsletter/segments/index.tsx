@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as NewsletterSegmentController from '@/actions/App/Http/Controllers/Admin/NewsletterSegmentController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PlusIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -11,11 +12,11 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { IndexProps } from './index.types';
+import type { IndexProps, Segment } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Newsletter', href: '/admin/newsletter' },
-    { title: 'Segments', href: '/admin/newsletter/segments' },
+    { title: 'Newsletter', href: NewsletterSegmentController.index.url() },
+    { title: 'Segments', href: NewsletterSegmentController.index.url() },
 ];
 
 export default function SegmentsIndex({ segments, filters }: IndexProps) {
@@ -67,7 +68,7 @@ export default function SegmentsIndex({ segments, filters }: IndexProps) {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/newsletter/segments/${row.original.id}/edit`}
+                            href={NewsletterSegmentController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -82,7 +83,7 @@ export default function SegmentsIndex({ segments, filters }: IndexProps) {
                         description={`Are you sure you want to delete "${row.original.name}"?`}
                         onConfirm={() => {
                             router.delete(
-                                `/admin/newsletter/segments/${row.original.id}`,
+                                NewsletterSegmentController.destroy.url(row.original.id),
                                 {
                                     onSuccess: () =>
                                         toast.success('Segment deleted'),
@@ -110,7 +111,7 @@ export default function SegmentsIndex({ segments, filters }: IndexProps) {
                     )}
                 >
                     <PageHeaderActions>
-                        <Link href="/admin/newsletter/segments/create">
+                        <Link href={NewsletterSegmentController.create.url()}>
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.create', 'Create Segment')}
@@ -136,7 +137,7 @@ export default function SegmentsIndex({ segments, filters }: IndexProps) {
                         'Search segments...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/newsletter/segments"
+                    baseUrl={NewsletterSegmentController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

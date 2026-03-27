@@ -13,11 +13,12 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
+import { dashboard } from '@/routes/admin';
 import { type BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/admin' },
-    { title: 'Editor', href: '/admin/editor' },
+    { title: 'Dashboard', href: dashboard().url },
+    { title: 'Editor', href: '' },
 ];
 
 export default function EditorPage(): JSX.Element {

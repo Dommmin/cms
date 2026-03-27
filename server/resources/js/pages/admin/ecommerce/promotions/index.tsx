@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as PromotionController from '@/actions/App/Http/Controllers/Admin/Ecommerce/PromotionController';
 import { Search, Plus, Edit, Trash2, Power, PowerOff } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { PaginatedPromotions } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Promotions', href: '/admin/ecommerce/promotions' },
+    { title: 'Promotions', href: PromotionController.index.url() },
 ];
 
 const promotionTypes = {
@@ -50,7 +51,7 @@ export default function Index({
 
     const handleSearch = (value: string) => {
         router.get(
-            '/admin/ecommerce/promotions',
+            PromotionController.index.url(),
             { ...filters, search: value },
             {
                 preserveState: true,
@@ -61,7 +62,7 @@ export default function Index({
 
     const handleFilter = (key: string, value: string) => {
         router.get(
-            '/admin/ecommerce/promotions',
+            PromotionController.index.url(),
             { ...filters, [key]: value },
             {
                 preserveState: true,
@@ -72,7 +73,7 @@ export default function Index({
 
     const togglePromotion = (id: number) => {
         router.post(
-            `/admin/ecommerce/promotions/${id}/toggle`,
+            PromotionController.toggle.url(id),
             {},
             {
                 preserveScroll: true,
@@ -82,7 +83,7 @@ export default function Index({
 
     const deletePromotion = (id: number) => {
         if (confirm('Czy na pewno chcesz usunąć tę promocję?')) {
-            router.delete(`/admin/ecommerce/promotions/${id}`, {
+            router.delete(PromotionController.destroy.url(id), {
                 preserveScroll: true,
             });
         }
@@ -102,7 +103,7 @@ export default function Index({
                             Zarządzaj promocjami na produkty i kategorie
                         </p>
                     </div>
-                    <Link href="/admin/ecommerce/promotions/create">
+                    <Link href={PromotionController.create.url()}>
                         <Button>
                             <Plus className="mr-2 h-4 w-4" />
                             Dodaj Promocję
@@ -337,7 +338,7 @@ export default function Index({
                                                         size="sm"
                                                     >
                                                         <Link
-                                                            href={`/admin/ecommerce/promotions/${promotion.id}/edit`}
+                                                            href={PromotionController.edit.url(promotion.id)}
                                                             prefetch
                                                             cacheFor={30}
                                                         >

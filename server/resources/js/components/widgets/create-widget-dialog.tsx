@@ -1,4 +1,5 @@
 import { useForm } from '@inertiajs/react';
+import * as DashboardWidgetController from '@/actions/App/Http/Controllers/Admin/DashboardWidgetController';
 import { Plus, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -72,7 +73,7 @@ export function CreateWidgetDialog({ onCreated }: { onCreated?: () => void }) {
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        post('/admin/dashboard/widgets', {
+        post(DashboardWidgetController.store.url(), {
             preserveScroll: true,
             onSuccess: () => {
                 close();

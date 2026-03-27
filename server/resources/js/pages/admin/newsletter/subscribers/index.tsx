@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as NewsletterSubscriberController from '@/actions/App/Http/Controllers/Admin/NewsletterSubscriberController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PlusIcon, PencilIcon, TrashIcon, EyeIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -14,8 +15,8 @@ import type { BreadcrumbItem } from '@/types';
 import type { Subscriber, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Newsletter', href: '/admin/newsletter' },
-    { title: 'Subscribers', href: '/admin/newsletter/subscribers' },
+    { title: 'Newsletter', href: NewsletterSubscriberController.index.url() },
+    { title: 'Subscribers', href: NewsletterSubscriberController.index.url() },
 ];
 
 export default function SubscribersIndex({ subscribers, filters }: IndexProps) {
@@ -84,7 +85,7 @@ export default function SubscribersIndex({ subscribers, filters }: IndexProps) {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/newsletter/subscribers/${row.original.id}`}
+                            href={NewsletterSubscriberController.show.url(row.original.id)}
                             prefetch
                             cacheFor={60}
                         >
@@ -94,7 +95,7 @@ export default function SubscribersIndex({ subscribers, filters }: IndexProps) {
                     </Button>
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={`/admin/newsletter/subscribers/${row.original.id}/edit`}
+                            href={NewsletterSubscriberController.edit.url(row.original.id)}
                             prefetch
                             cacheFor={30}
                         >
@@ -109,7 +110,7 @@ export default function SubscribersIndex({ subscribers, filters }: IndexProps) {
                         description={`Are you sure you want to delete "${row.original.email}"?`}
                         onConfirm={() => {
                             router.delete(
-                                `/admin/newsletter/subscribers/${row.original.id}`,
+                                NewsletterSubscriberController.destroy.url(row.original.id),
                                 {
                                     onSuccess: () =>
                                         toast.success('Subscriber deleted'),
@@ -136,7 +137,7 @@ export default function SubscribersIndex({ subscribers, filters }: IndexProps) {
                     )}
                 >
                     <PageHeaderActions>
-                        <Link href="/admin/newsletter/subscribers/create">
+                        <Link href={NewsletterSubscriberController.create.url()}>
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.add', 'Add Subscriber')}
@@ -162,7 +163,7 @@ export default function SubscribersIndex({ subscribers, filters }: IndexProps) {
                         'Search subscribers...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/newsletter/subscribers"
+                    baseUrl={NewsletterSubscriberController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

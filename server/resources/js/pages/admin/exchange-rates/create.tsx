@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as ExchangeRateController from '@/actions/App/Http/Controllers/Admin/ExchangeRateController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -18,8 +19,8 @@ import type { BreadcrumbItem } from '@/types';
 import type { CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Exchange Rates', href: '/admin/exchange-rates' },
-    { title: 'Add', href: '/admin/exchange-rates/create' },
+    { title: 'Exchange Rates', href: ExchangeRateController.index.url() },
+    { title: 'Add', href: ExchangeRateController.create.url() },
 ];
 
 export default function Create({ currencies }: CreateProps) {
@@ -34,7 +35,7 @@ export default function Create({ currencies }: CreateProps) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/exchange-rates"
+                                href={ExchangeRateController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -46,7 +47,7 @@ export default function Create({ currencies }: CreateProps) {
                 </PageHeader>
 
                 <Form
-                    action="/admin/exchange-rates"
+                    action={ExchangeRateController.store.url()}
                     method="post"
                     className="max-w-2xl space-y-6"
                 >

@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as NewsletterSegmentController from '@/actions/App/Http/Controllers/Admin/NewsletterSegmentController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -11,9 +12,9 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Newsletter', href: '/admin/newsletter' },
-    { title: 'Segments', href: '/admin/newsletter/segments' },
-    { title: 'Create', href: '/admin/newsletter/segments/create' },
+    { title: 'Newsletter', href: NewsletterSegmentController.index.url() },
+    { title: 'Segments', href: NewsletterSegmentController.index.url() },
+    { title: 'Create', href: NewsletterSegmentController.create.url() },
 ];
 
 export default function Create() {
@@ -28,7 +29,7 @@ export default function Create() {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/newsletter/segments"
+                                href={NewsletterSegmentController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -40,7 +41,7 @@ export default function Create() {
                 </PageHeader>
 
                 <Form
-                    action="/admin/newsletter/segments"
+                    action={NewsletterSegmentController.store.url()}
                     method="post"
                     className="max-w-2xl space-y-6"
                 >

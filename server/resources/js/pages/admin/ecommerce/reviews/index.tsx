@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import * as ReviewController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ReviewController';
 import { useReviewColumns } from '@/components/columns/review-columns';
 
 import DataTable from '@/components/data-table';
@@ -10,7 +11,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Reviews', href: '/admin/ecommerce/reviews' },
+    { title: 'Reviews', href: ReviewController.index.url() },
 ];
 
 export default function ReviewsIndex({ reviews, filters }: IndexProps) {
@@ -40,7 +41,7 @@ export default function ReviewsIndex({ reviews, filters }: IndexProps) {
                     searchable
                     searchPlaceholder="Search reviews..."
                     searchValue={filters?.search ?? ''}
-                    baseUrl="/admin/ecommerce/reviews"
+                    baseUrl={ReviewController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

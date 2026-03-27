@@ -1,4 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
+import * as OrderRoutes from '@/routes/admin/ecommerce/ecommerce/orders';
 import {
     ArrowLeft,
     CheckCircle2,
@@ -82,7 +84,7 @@ function StatusModal({
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        patch(`/admin/ecommerce/orders/${order.id}/status`, {
+        patch(OrderRoutes.updateStatus.url(order.id), {
             onSuccess: onClose,
         });
     }
@@ -173,10 +175,10 @@ export default function OrderShow({
     const __ = useTranslation();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: __('page.orders', 'Orders'), href: '/admin/ecommerce/orders' },
+        { title: __('page.orders', 'Orders'), href: OrderController.index.url() },
         {
             title: `#${order.reference_number}`,
-            href: `/admin/ecommerce/orders/${order.id}`,
+            href: OrderController.show.url(order.id),
         },
     ];
 
@@ -235,7 +237,7 @@ export default function OrderShow({
                 >
                     <PageHeaderActions>
                         <Link
-                            href="/admin/ecommerce/orders"
+                            href={OrderController.index.url()}
                             prefetch
                             cacheFor={30}
                             className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm hover:bg-accent"

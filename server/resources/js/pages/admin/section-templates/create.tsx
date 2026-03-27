@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as SectionTemplateController from '@/actions/App/Http/Controllers/Admin/SectionTemplateController';
 import { ArrowLeftIcon } from 'lucide-react';
 
 import InputError from '@/components/input-error';
@@ -20,8 +21,8 @@ import type { BreadcrumbItem } from '@/types';
 import type { CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Section Templates', href: '/admin/section-templates' },
-    { title: 'Create', href: '/admin/section-templates/create' },
+    { title: 'Section Templates', href: SectionTemplateController.index.url() },
+    { title: 'Create', href: SectionTemplateController.create.url() },
 ];
 
 export default function CreateSectionTemplate({ categories }: CreateProps) {
@@ -36,7 +37,7 @@ export default function CreateSectionTemplate({ categories }: CreateProps) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/section-templates"
+                                href={SectionTemplateController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -48,7 +49,7 @@ export default function CreateSectionTemplate({ categories }: CreateProps) {
                 </PageHeader>
 
                 <Form
-                    action="/admin/section-templates"
+                    action={SectionTemplateController.store.url()}
                     method="post"
                     className="max-w-2xl space-y-6"
                 >

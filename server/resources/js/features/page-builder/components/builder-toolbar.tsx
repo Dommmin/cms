@@ -5,6 +5,7 @@
  */
 
 import { Link } from '@inertiajs/react';
+import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import {
     ArrowLeft,
     Columns2,
@@ -45,7 +46,7 @@ export function BuilderToolbar({
                 {/* Left: Back button and title */}
                 <div className="flex items-center gap-4">
                     <Button variant="ghost" size="sm" asChild>
-                        <Link href="/admin/cms/pages">
+                        <Link href={PageController.index.url()}>
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Back
                         </Link>

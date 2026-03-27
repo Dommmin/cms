@@ -1,4 +1,5 @@
 import { Link, Head, router, usePage } from '@inertiajs/react';
+import * as CategoryController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CategoryController';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
@@ -18,8 +19,8 @@ import type { SharedLocale } from '@/types/global';
 import type { Category } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Categories', href: '/admin/ecommerce/categories' },
-    { title: 'Create Category', href: '/admin/ecommerce/categories/create' },
+    { title: 'Categories', href: CategoryController.index.url() },
+    { title: 'Create Category', href: CategoryController.create.url() },
 ];
 
 export default function Create({
@@ -69,7 +70,7 @@ export default function Create({
         )?.checked;
 
         router.post(
-            '/admin/ecommerce/categories',
+            CategoryController.store.url(),
             {
                 name: nameValues,
                 description: descValues,
@@ -78,7 +79,7 @@ export default function Create({
                 is_active: isActive,
             },
             {
-                onSuccess: () => router.visit('/admin/ecommerce/categories'),
+                onSuccess: () => router.visit(CategoryController.index.url()),
                 onError: (errs) => {
                     setErrors(errs);
                     setProcessing(false);
@@ -103,7 +104,7 @@ export default function Create({
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/categories"
+                                href={CategoryController.index.url()}
                                 prefetch
                                 cacheFor={30}
                             >

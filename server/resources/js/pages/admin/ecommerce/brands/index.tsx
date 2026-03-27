@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import * as BrandController from '@/actions/App/Http/Controllers/Admin/Ecommerce/BrandController';
 import { Plus, Tag, PencilIcon, TrashIcon } from 'lucide-react';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -14,7 +15,7 @@ import type { IndexProps } from './index.types';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Brands',
-        href: '/admin/ecommerce/brands',
+        href: BrandController.index.url(),
     },
 ];
 
@@ -33,7 +34,7 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link
-                                href="/admin/ecommerce/brands/create"
+                                href={BrandController.create.url()}
                                 prefetch
                                 cacheFor={30}
                             >
@@ -104,7 +105,7 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                                 <div className="flex items-center gap-2">
                                     <Button asChild variant="outline" size="sm">
                                         <Link
-                                            href={`/admin/ecommerce/brands/${row.original.id}/edit`}
+                                            href={BrandController.edit.url(row.original.id)}
                                             prefetch
                                             cacheFor={30}
                                         >
@@ -122,7 +123,7 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                                         description={`${__('dialog.are_you_sure', 'Are you sure you want to delete')} "${row.original.name}"?`}
                                         onConfirm={() => {
                                             router.delete(
-                                                `/admin/ecommerce/brands/${row.original.id}`,
+                                                BrandController.destroy.url(row.original.id),
                                             );
                                         }}
                                     >
@@ -147,7 +148,7 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                         'Search brands...',
                     )}
                     searchValue={filters.search ?? ''}
-                    baseUrl="/admin/ecommerce/brands"
+                    baseUrl={BrandController.index.url()}
                 />
             </Wrapper>
         </AppLayout>

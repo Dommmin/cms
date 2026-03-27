@@ -1,4 +1,5 @@
 import { Link, router } from '@inertiajs/react';
+import * as FormController from '@/actions/App/Http/Controllers/Admin/FormController';
 import { Head } from '@inertiajs/react';
 import {
     ArrowLeftIcon,
@@ -44,7 +45,7 @@ const FIELD_TYPES = [
 const HAS_OPTIONS = ['select', 'radio'];
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Forms', href: '/admin/forms' },
+    { title: 'Forms', href: FormController.index.url() },
     { title: 'Edit', href: '#' },
 ];
 
@@ -300,7 +301,7 @@ export default function Edit({ form }: { form: FormData }) {
     const handleSave = () => {
         setProcessing(true);
         router.put(
-            `/admin/forms/${form.id}`,
+            FormController.update.url(form.id),
             {
                 name,
                 slug,
@@ -350,7 +351,7 @@ export default function Edit({ form }: { form: FormData }) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/forms" prefetch cacheFor={30}>
+                            <Link href={FormController.index.url()} prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>

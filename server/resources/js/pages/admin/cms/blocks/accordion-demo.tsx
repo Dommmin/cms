@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import * as ReusableBlockController from '@/actions/App/Http/Controllers/Admin/Cms/ReusableBlockController';
 import AccordionBlock from '@/components/blocks/accordion';
 import { PageHeader } from '@/components/page-header';
 import Wrapper from '@/components/wrapper';
@@ -6,8 +7,8 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'CMS', href: '/admin/cms' },
-    { title: 'Blocks', href: '/admin/cms/blocks' },
+    { title: 'CMS', href: ReusableBlockController.index.url() },
+    { title: 'Blocks', href: ReusableBlockController.index.url() },
     { title: 'Accordion Demo', href: '' },
 ];
 

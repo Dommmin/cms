@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { router } from '@inertiajs/react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import {
@@ -13,6 +14,15 @@ import {
     Users,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import AdminSearchController from '@/actions/App/Http/Controllers/Admin/AdminSearchController';
+import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
+import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
+import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
+import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
+import * as UserController from '@/actions/App/Http/Controllers/Admin/UserController';
+import * as NewsletterCampaignController from '@/actions/App/Http/Controllers/Admin/NewsletterCampaignController';
+import * as SettingsController from '@/actions/App/Http/Controllers/Admin/SettingsController';
+import { dashboard } from '@/routes/admin';
 
 import { cn } from '@/lib/utils';
 import type { SearchResult, NavShortcut } from './command-palette.types';
@@ -25,49 +35,49 @@ const NAV_SHORTCUTS: NavShortcut[] = [
     {
         group: 'Navigate',
         label: 'Dashboard',
-        url: '/admin',
+        url: dashboard().url,
         icon: <LayoutDashboard className="h-4 w-4" />,
     },
     {
         group: 'Navigate',
         label: 'Products',
-        url: '/admin/ecommerce/products',
+        url: ProductController.index.url(),
         icon: <Package className="h-4 w-4" />,
     },
     {
         group: 'Navigate',
         label: 'Orders',
-        url: '/admin/ecommerce/orders',
+        url: OrderController.index.url(),
         icon: <ShoppingCart className="h-4 w-4" />,
     },
     {
         group: 'Navigate',
         label: 'Blog Posts',
-        url: '/admin/blog/posts',
+        url: BlogPostController.index.url(),
         icon: <FileText className="h-4 w-4" />,
     },
     {
         group: 'Navigate',
         label: 'Pages',
-        url: '/admin/cms/pages',
+        url: PageController.index.url(),
         icon: <Folders className="h-4 w-4" />,
     },
     {
         group: 'Navigate',
         label: 'Users',
-        url: '/admin/users',
+        url: UserController.index.url(),
         icon: <Users className="h-4 w-4" />,
     },
     {
         group: 'Navigate',
         label: 'Newsletter',
-        url: '/admin/newsletter/campaigns',
+        url: NewsletterCampaignController.index.url(),
         icon: <BarChart3 className="h-4 w-4" />,
     },
     {
         group: 'Navigate',
         label: 'Settings',
-        url: '/settings',
+        url: SettingsController.index.url(),
         icon: <Settings className="h-4 w-4" />,
     },
 ];
@@ -154,14 +164,12 @@ export function CommandPalette() {
         }
         setLoading(true);
         try {
-            const res = await fetch(
-                `/admin/search?q=${encodeURIComponent(q)}`,
+            const { data } = await axios.get<SearchResult[]>(
+                AdminSearchController.url({ query: { q } }),
                 {
                     headers: { Accept: 'application/json' },
-                    credentials: 'same-origin',
                 },
             );
-            const data: SearchResult[] = await res.json();
             setResults(data);
             setActiveIndex(0);
         } catch {

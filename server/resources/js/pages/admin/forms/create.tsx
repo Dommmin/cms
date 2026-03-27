@@ -1,4 +1,5 @@
 import { Link, Form, Head } from '@inertiajs/react';
+import * as FormController from '@/actions/App/Http/Controllers/Admin/FormController';
 import { ArrowLeftIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -12,8 +13,8 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Forms', href: '/admin/forms' },
-    { title: 'Create', href: '/admin/forms/create' },
+    { title: 'Forms', href: FormController.index.url() },
+    { title: 'Create', href: FormController.create.url() },
 ];
 
 export default function Create() {
@@ -30,7 +31,7 @@ export default function Create() {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href="/admin/forms" prefetch cacheFor={30}>
+                            <Link href={FormController.index.url()} prefetch cacheFor={30}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>
@@ -40,7 +41,7 @@ export default function Create() {
 
                 <Form
                     method="post"
-                    action="/admin/forms"
+                    action={FormController.store.url()}
                     className="max-w-xl space-y-6"
                 >
                     {({ errors }) => (
