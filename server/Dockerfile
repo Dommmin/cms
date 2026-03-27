@@ -33,8 +33,9 @@ COPY --from=vendor /app/vendor ./vendor
 RUN if [ -n "$SERVER_ENV" ]; then \
         printf '%s' "$SERVER_ENV" > .env; \
     else \
-        cp .env.example .env && php artisan key:generate --force; \
+        cp .env.example .env; \
     fi \
+    && php artisan key:generate --force \
     && npm run build
 
 # =============================================================================
