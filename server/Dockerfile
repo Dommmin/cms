@@ -35,6 +35,12 @@ RUN if [ -n "$SERVER_ENV" ]; then \
     else \
         cp .env.example .env; \
     fi \
+    && mkdir -p \
+        storage/framework/views \
+        storage/framework/cache \
+        storage/framework/sessions \
+        storage/logs \
+        bootstrap/cache \
     && php artisan key:generate --force \
     && npm run build
 
