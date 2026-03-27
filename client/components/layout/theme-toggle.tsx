@@ -1,7 +1,7 @@
 'use client';
 
 import { Moon, Sun } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import type { Theme } from './theme-toggle.types';
 
 function applyTheme(theme: Theme) {
@@ -12,40 +12,36 @@ function applyTheme(theme: Theme) {
   }
 }
 
-function resolveTheme(): Theme {
+function getThemeSnapshot(): Theme {
   const stored = localStorage.getItem('theme');
   if (stored === 'dark' || stored === 'light') return stored;
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
+function subscribeToTheme(callback: () => void): () => void {
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  mq.addEventListener('change', callback);
+  window.addEventListener('storage', callback);
+  return () => {
+    mq.removeEventListener('change', callback);
+    window.removeEventListener('storage', callback);
+  };
+}
+
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme | null>(null);
+  const theme = useSyncExternalStore<Theme | null>(subscribeToTheme, getThemeSnapshot, () => null);
 
   useEffect(() => {
-    const initial = resolveTheme();
-    setTheme(initial);
-    applyTheme(initial);
-
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = () => {
-      if (!localStorage.getItem('theme')) {
-        const next = mq.matches ? 'dark' : 'light';
-        setTheme(next);
-        applyTheme(next);
-      }
-    };
-    mq.addEventListener('change', handleChange);
-    return () => mq.removeEventListener('change', handleChange);
-  }, []);
+    if (theme) applyTheme(theme);
+  }, [theme]);
 
   function toggle() {
     const next: Theme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
     localStorage.setItem('theme', next);
     applyTheme(next);
+    window.dispatchEvent(new StorageEvent('storage'));
   }
 
-  // Render a stable placeholder until mounted — avoids hydration mismatch
   if (theme === null) {
     return (
       <span
