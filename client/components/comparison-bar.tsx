@@ -4,7 +4,7 @@ import { X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 
 import {
   clearComparison,
@@ -20,9 +20,11 @@ export function ComparisonBar() {
   const lp = useLocalePath();
   const ids = useComparisonIds();
   const { data: products = [] } = useComparisonProducts();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   if (!mounted || ids.length === 0) return null;
 
