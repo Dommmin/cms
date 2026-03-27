@@ -8,7 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { AdminBar } from '@/components/admin/admin-bar';
 import type { AdminBarProps } from '@/components/admin/admin-bar.types';
 import { ChatWidgetLoader } from '@/components/chat/chat-widget-loader';
-import { ComparisonBar } from '@/components/comparison-bar';
+import { ComparisonBarLoader } from '@/components/comparison-bar-loader';
 import { CookieConsent } from '@/components/cookie-consent';
 import { JsonLd } from '@/components/json-ld';
 import { AnnouncementBar } from '@/components/layout/announcement-bar';
@@ -159,7 +159,7 @@ export default async function RootLayout({
             </div>
             <CookieConsent settings={cookieSettings} />
             <ChatWidgetLoader />
-            <ComparisonBar />
+            <ComparisonBarLoader />
             <ToastContainer position="bottom-right" autoClose={2000} />
             {gtmId && <GoogleTagManager gtmId={gtmId} />}
           </TranslationProvider>
