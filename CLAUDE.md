@@ -55,6 +55,9 @@ REST API: `/api/v1/*` · Admin: `/admin/*` (Inertia SPA)
 - Client components → `api` from `lib/axios.ts`
 - All internal links must use `useLocalePath()` / `lp()` (locale-prefixed URLs)
 
+**Admin SPA (`server/resources/js/`):**
+- Standalone HTTP requests → use `axios` (dependency), **never `fetch()`**
+
 **Always:**
 - Write Pest tests for every feature — `php artisan make:test --pest Name`
 - All tests must pass before commit: `php artisan test --compact`
