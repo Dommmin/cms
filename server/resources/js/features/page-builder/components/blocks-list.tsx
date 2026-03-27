@@ -10,10 +10,10 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import axios from 'axios';
-import * as ReusableBlockController from '@/actions/App/Http/Controllers/Admin/Cms/ReusableBlockController';
 import { BookOpen, ClipboardPaste, Plus, SearchIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import * as ReusableBlockController from '@/actions/App/Http/Controllers/Admin/Cms/ReusableBlockController';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -220,13 +220,16 @@ export function BlocksList({
         const block = blocks[blockIndex];
 
         try {
-            const { data } = await axios.post(ReusableBlockController.store.url(), {
-                name,
-                description,
-                type: block.type,
-                configuration: block.configuration,
-                relations_config: block.relations ?? [],
-            });
+            const { data } = await axios.post(
+                ReusableBlockController.store.url(),
+                {
+                    name,
+                    description,
+                    type: block.type,
+                    configuration: block.configuration,
+                    relations_config: block.relations ?? [],
+                },
+            );
 
             // Link this block to the newly-created global block
             onUpdateBlock(blockIndex, {

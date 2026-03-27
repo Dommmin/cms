@@ -1,7 +1,7 @@
 import { Link, Head, router, usePage } from '@inertiajs/react';
-import * as CategoryController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CategoryController';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
+import * as CategoryController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CategoryController';
 import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';

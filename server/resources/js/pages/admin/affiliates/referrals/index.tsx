@@ -1,10 +1,10 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as AffiliateCodeController from '@/actions/App/Http/Controllers/Admin/AffiliateCodeController';
-import * as ReferralController from '@/actions/App/Http/Controllers/Admin/ReferralController';
-import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { CheckCircle, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as AffiliateCodeController from '@/actions/App/Http/Controllers/Admin/AffiliateCodeController';
+import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
+import * as ReferralController from '@/actions/App/Http/Controllers/Admin/ReferralController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';

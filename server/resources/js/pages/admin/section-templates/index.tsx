@@ -1,8 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as SectionTemplateController from '@/actions/App/Http/Controllers/Admin/SectionTemplateController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Copy, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as SectionTemplateController from '@/actions/App/Http/Controllers/Admin/SectionTemplateController';
 
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -73,7 +73,9 @@ export default function SectionTemplatesIndex({
                         size="sm"
                         onClick={() =>
                             router.post(
-                                SectionTemplateController.duplicate.url(row.original.id),
+                                SectionTemplateController.duplicate.url(
+                                    row.original.id,
+                                ),
                                 {},
                                 {
                                     onSuccess: () =>
@@ -87,7 +89,9 @@ export default function SectionTemplatesIndex({
                     </Button>
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={SectionTemplateController.edit.url(row.original.id)}
+                            href={SectionTemplateController.edit.url(
+                                row.original.id,
+                            )}
                             prefetch
                             cacheFor={30}
                         >
@@ -105,7 +109,9 @@ export default function SectionTemplatesIndex({
                         )}
                         onConfirm={() =>
                             router.delete(
-                                SectionTemplateController.destroy.url(row.original.id),
+                                SectionTemplateController.destroy.url(
+                                    row.original.id,
+                                ),
                                 {
                                     onSuccess: () =>
                                         toast.success('Template deleted'),

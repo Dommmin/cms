@@ -1,8 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as ReturnRequestController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ReturnRequestController';
-import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
 import { ArrowLeftIcon, CheckCircle, Clock, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
+import * as ReturnRequestController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ReturnRequestController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
@@ -363,7 +363,9 @@ export default function Show({
                                     </dt>
                                     <dd className="mt-0.5">
                                         <Link
-                                            href={OrderController.show.url(returnRequest.order.id)}
+                                            href={OrderController.show.url(
+                                                returnRequest.order.id,
+                                            )}
                                             prefetch
                                             cacheFor={60}
                                             className="font-mono text-primary hover:underline"

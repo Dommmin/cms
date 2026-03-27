@@ -1,5 +1,4 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as NewsletterCampaignController from '@/actions/App/Http/Controllers/Admin/NewsletterCampaignController';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
     PlusIcon,
@@ -10,6 +9,7 @@ import {
     SendIcon,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as NewsletterCampaignController from '@/actions/App/Http/Controllers/Admin/NewsletterCampaignController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -110,7 +110,9 @@ export default function CampaignsIndex({ campaigns, filters }: IndexProps) {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={NewsletterCampaignController.show.url(row.original.id)}
+                            href={NewsletterCampaignController.show.url(
+                                row.original.id,
+                            )}
                             prefetch
                             cacheFor={60}
                         >
@@ -122,7 +124,9 @@ export default function CampaignsIndex({ campaigns, filters }: IndexProps) {
                         <>
                             <Button asChild variant="outline" size="sm">
                                 <Link
-                                    href={NewsletterCampaignController.edit.url(row.original.id)}
+                                    href={NewsletterCampaignController.edit.url(
+                                        row.original.id,
+                                    )}
                                     prefetch
                                     cacheFor={30}
                                 >
@@ -135,7 +139,9 @@ export default function CampaignsIndex({ campaigns, filters }: IndexProps) {
                                 size="sm"
                                 onClick={() => {
                                     router.post(
-                                        NewsletterCampaignController.send.url(row.original.id),
+                                        NewsletterCampaignController.send.url(
+                                            row.original.id,
+                                        ),
                                         {},
                                         {
                                             onSuccess: () =>
@@ -155,7 +161,9 @@ export default function CampaignsIndex({ campaigns, filters }: IndexProps) {
                         size="sm"
                         onClick={() => {
                             router.post(
-                                NewsletterCampaignController.duplicate.url(row.original.id),
+                                NewsletterCampaignController.duplicate.url(
+                                    row.original.id,
+                                ),
                                 {},
                                 {
                                     onSuccess: () =>
@@ -173,7 +181,9 @@ export default function CampaignsIndex({ campaigns, filters }: IndexProps) {
                         description={`Are you sure you want to delete "${row.original.name}"?`}
                         onConfirm={() => {
                             router.delete(
-                                NewsletterCampaignController.destroy.url(row.original.id),
+                                NewsletterCampaignController.destroy.url(
+                                    row.original.id,
+                                ),
                                 {
                                     onSuccess: () =>
                                         toast.success('Campaign deleted'),

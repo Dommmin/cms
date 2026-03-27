@@ -107,9 +107,7 @@ export function useCategoryColumns(): ColumnDef<CategoryRow>[] {
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
                             router.delete(
-                                CategoryController.destroy.url(
-                                    row.original.id,
-                                ),
+                                CategoryController.destroy.url(row.original.id),
                             );
                         }}
                     >

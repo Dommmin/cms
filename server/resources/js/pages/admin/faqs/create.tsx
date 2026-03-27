@@ -1,6 +1,6 @@
 import { Link, Form, Head } from '@inertiajs/react';
-import * as FaqController from '@/actions/App/Http/Controllers/Admin/FaqController';
 import { ArrowLeftIcon } from 'lucide-react';
+import * as FaqController from '@/actions/App/Http/Controllers/Admin/FaqController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -35,7 +35,11 @@ export default function Create({ categories }: CreateProps) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href={FaqController.index.url()} prefetch cacheFor={30}>
+                            <Link
+                                href={FaqController.index.url()}
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 Back
                             </Link>

@@ -1,8 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as CurrencyController from '@/actions/App/Http/Controllers/Admin/CurrencyController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PlusIcon, PencilIcon, TrashIcon, StarIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as CurrencyController from '@/actions/App/Http/Controllers/Admin/CurrencyController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';

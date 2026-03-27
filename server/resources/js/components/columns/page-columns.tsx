@@ -150,9 +150,7 @@ export function usePageColumns(): ColumnDef<PageRow>[] {
                             size="sm"
                             onClick={() =>
                                 router.post(
-                                    PageController.publish.url(
-                                        row.original.id,
-                                    ),
+                                    PageController.publish.url(row.original.id),
                                 )
                             }
                         >

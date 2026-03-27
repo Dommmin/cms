@@ -1,8 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as BlogCategoryController from '@/actions/App/Http/Controllers/Admin/BlogCategoryController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as BlogCategoryController from '@/actions/App/Http/Controllers/Admin/BlogCategoryController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -78,7 +78,9 @@ export default function BlogCategoriesIndex({
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={BlogCategoryController.edit.url(row.original.id)}
+                            href={BlogCategoryController.edit.url(
+                                row.original.id,
+                            )}
                             prefetch
                             cacheFor={30}
                         >
@@ -93,7 +95,9 @@ export default function BlogCategoriesIndex({
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
                             router.delete(
-                                BlogCategoryController.destroy.url(row.original.id),
+                                BlogCategoryController.destroy.url(
+                                    row.original.id,
+                                ),
                                 {
                                     onSuccess: () =>
                                         toast.success('Category deleted'),

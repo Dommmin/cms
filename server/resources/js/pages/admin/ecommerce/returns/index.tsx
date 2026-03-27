@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
-import * as ReturnRequestController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ReturnRequestController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon } from 'lucide-react';
+import * as ReturnRequestController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ReturnRequestController';
 import DataTable from '@/components/data-table';
 import { PageHeader } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
@@ -107,7 +107,9 @@ export default function ReturnsIndex({ returns, filters }: IndexProps) {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={ReturnRequestController.show.url(row.original.id)}
+                            href={ReturnRequestController.show.url(
+                                row.original.id,
+                            )}
                             prefetch
                             cacheFor={60}
                         >

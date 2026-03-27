@@ -1,6 +1,5 @@
-import axios from 'axios';
 import { Head, router } from '@inertiajs/react';
-import * as SettingsController from '@/actions/App/Http/Controllers/Admin/SettingsController';
+import axios from 'axios';
 import {
     CreditCardIcon,
     GlobeIcon,
@@ -15,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import * as SettingsController from '@/actions/App/Http/Controllers/Admin/SettingsController';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

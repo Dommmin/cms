@@ -3,7 +3,6 @@ import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontal
 import { INSERT_TABLE_COMMAND } from '@lexical/table';
 import { $insertNodeToNearestRoot } from '@lexical/utils';
 import axios from 'axios';
-import * as MediaController from '@/actions/App/Http/Controllers/Admin/MediaController';
 import {
     Calendar,
     Image as ImageIcon,
@@ -20,6 +19,7 @@ import {
 } from 'lucide-react';
 import { type JSX } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import * as MediaController from '@/actions/App/Http/Controllers/Admin/MediaController';
 import { $createImageNode } from '../../nodes/ImageNode';
 import { $createYouTubeNode } from '../../nodes/YouTubeNode';
 import DropDown, { DropDownItem } from '../../ui/DropDown';
@@ -62,7 +62,9 @@ function InsertImageFromMedia({
         try {
             const params = new URLSearchParams({ page: String(p) });
             if (searchRef.current) params.set('search', searchRef.current);
-            const res = await axios.get(`${MediaController.search.url()}?${params}`);
+            const res = await axios.get(
+                `${MediaController.search.url()}?${params}`,
+            );
             setMedia(res.data);
         } finally {
             setLoading(false);

@@ -1,6 +1,4 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as FormController from '@/actions/App/Http/Controllers/Admin/FormController';
-import * as FormSubmissionController from '@/actions/App/Http/Controllers/Admin/FormSubmissionController';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
     ClipboardListIcon,
@@ -9,6 +7,8 @@ import {
     TrashIcon,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as FormController from '@/actions/App/Http/Controllers/Admin/FormController';
+import * as FormSubmissionController from '@/actions/App/Http/Controllers/Admin/FormSubmissionController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -89,7 +89,9 @@ export default function Index({
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={FormSubmissionController.index.url(row.original.id)}
+                            href={FormSubmissionController.index.url(
+                                row.original.id,
+                            )}
                             prefetch
                             cacheFor={30}
                         >
@@ -113,9 +115,13 @@ export default function Index({
                         title={__('dialog.delete_title', 'Delete Form')}
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
-                            router.delete(FormController.destroy.url(row.original.id), {
-                                onSuccess: () => toast.success('Form deleted'),
-                            });
+                            router.delete(
+                                FormController.destroy.url(row.original.id),
+                                {
+                                    onSuccess: () =>
+                                        toast.success('Form deleted'),
+                                },
+                            );
                         }}
                     >
                         <TrashIcon className="mr-1 h-3 w-3" />

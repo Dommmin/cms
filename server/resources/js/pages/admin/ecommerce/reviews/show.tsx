@@ -1,7 +1,4 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as ReviewController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ReviewController';
-import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
-import * as CustomerController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CustomerController';
 import {
     ArrowLeft,
     Star,
@@ -11,6 +8,9 @@ import {
     Package,
 } from 'lucide-react';
 import { useState } from 'react';
+import * as CustomerController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CustomerController';
+import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
+import * as ReviewController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ReviewController';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -138,7 +138,9 @@ export default function ReviewShow({ review }: ShowProps) {
                                             /{review.product.slug}
                                         </div>
                                         <Link
-                                            href={ProductController.edit.url(review.product.id)}
+                                            href={ProductController.edit.url(
+                                                review.product.id,
+                                            )}
                                             prefetch
                                             cacheFor={30}
                                             className="text-sm text-primary hover:underline"
@@ -302,7 +304,9 @@ export default function ReviewShow({ review }: ShowProps) {
                                             {review.customer.email}
                                         </div>
                                         <Link
-                                            href={CustomerController.edit.url(review.customer.id)}
+                                            href={CustomerController.edit.url(
+                                                review.customer.id,
+                                            )}
                                             prefetch
                                             cacheFor={30}
                                             className="text-sm text-primary hover:underline"

@@ -1,5 +1,4 @@
 import axios from 'axios';
-import * as MediaController from '@/actions/App/Http/Controllers/Admin/MediaController';
 import {
     XIcon,
     Search,
@@ -16,6 +15,7 @@ import {
     LoaderCircleIcon,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import * as MediaController from '@/actions/App/Http/Controllers/Admin/MediaController';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type {

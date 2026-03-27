@@ -1,6 +1,5 @@
-import axios from 'axios';
 import { Link } from '@inertiajs/react';
-import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
+import axios from 'axios';
 import {
     Bell,
     BellOff,
@@ -13,6 +12,7 @@ import {
     CheckCheck,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
 import { cn } from '@/lib/utils';
 import type { AdminNotification } from './notification-bell.types';
 

@@ -1,5 +1,4 @@
 import { Head, router } from '@inertiajs/react';
-import * as LocaleController from '@/actions/App/Http/Controllers/Admin/LocaleController';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
     PlusIcon,
@@ -10,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import * as LocaleController from '@/actions/App/Http/Controllers/Admin/LocaleController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -160,7 +160,9 @@ export default function LocalesIndex({
                         size="sm"
                         onClick={() => {
                             router.post(
-                                LocaleController.setDefault.url(row.original.id),
+                                LocaleController.setDefault.url(
+                                    row.original.id,
+                                ),
                                 {},
                                 {
                                     onSuccess: () =>
@@ -208,12 +210,17 @@ export default function LocalesIndex({
                             'This will delete the locale and all its translations. This action cannot be undone.',
                         )}
                         onConfirm={() => {
-                            router.delete(LocaleController.destroy.url(row.original.id), {
-                                onSuccess: () =>
-                                    toast.success('Locale deleted'),
-                                onError: () =>
-                                    toast.error('Cannot delete default locale'),
-                            });
+                            router.delete(
+                                LocaleController.destroy.url(row.original.id),
+                                {
+                                    onSuccess: () =>
+                                        toast.success('Locale deleted'),
+                                    onError: () =>
+                                        toast.error(
+                                            'Cannot delete default locale',
+                                        ),
+                                },
+                            );
                         }}
                         disabled={row.original.is_default}
                     >

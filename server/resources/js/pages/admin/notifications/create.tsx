@@ -1,6 +1,6 @@
 import { Link, Form, Head } from '@inertiajs/react';
-import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
 import { ArrowLeftIcon } from 'lucide-react';
+import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import StickyFormActions from '@/components/sticky-form-actions';

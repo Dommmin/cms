@@ -1,9 +1,9 @@
 import { Link, Head, router } from '@inertiajs/react';
-import * as FormController from '@/actions/App/Http/Controllers/Admin/FormController';
-import * as FormSubmissionController from '@/actions/App/Http/Controllers/Admin/FormSubmissionController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as FormController from '@/actions/App/Http/Controllers/Admin/FormController';
+import * as FormSubmissionController from '@/actions/App/Http/Controllers/Admin/FormSubmissionController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';

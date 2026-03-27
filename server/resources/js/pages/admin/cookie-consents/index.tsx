@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
-import * as CookieConsentController from '@/actions/App/Http/Controllers/Admin/CookieConsentController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon, CheckCircleIcon, XCircleIcon } from 'lucide-react';
+import * as CookieConsentController from '@/actions/App/Http/Controllers/Admin/CookieConsentController';
 import DataTable from '@/components/data-table';
 import { PageHeader } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';

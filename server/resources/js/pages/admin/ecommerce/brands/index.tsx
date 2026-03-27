@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as BrandController from '@/actions/App/Http/Controllers/Admin/Ecommerce/BrandController';
 import { Plus, Tag, PencilIcon, TrashIcon } from 'lucide-react';
+import * as BrandController from '@/actions/App/Http/Controllers/Admin/Ecommerce/BrandController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -105,7 +105,9 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                                 <div className="flex items-center gap-2">
                                     <Button asChild variant="outline" size="sm">
                                         <Link
-                                            href={BrandController.edit.url(row.original.id)}
+                                            href={BrandController.edit.url(
+                                                row.original.id,
+                                            )}
                                             prefetch
                                             cacheFor={30}
                                         >
@@ -123,7 +125,9 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                                         description={`${__('dialog.are_you_sure', 'Are you sure you want to delete')} "${row.original.name}"?`}
                                         onConfirm={() => {
                                             router.delete(
-                                                BrandController.destroy.url(row.original.id),
+                                                BrandController.destroy.url(
+                                                    row.original.id,
+                                                ),
                                             );
                                         }}
                                     >

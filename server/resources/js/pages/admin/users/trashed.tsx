@@ -1,7 +1,7 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
-import * as UserController from '@/actions/App/Http/Controllers/Admin/UserController';
 import { ArrowLeftIcon, RotateCcwIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
+import * as UserController from '@/actions/App/Http/Controllers/Admin/UserController';
 import {
     forceDelete,
     restore,
@@ -47,7 +47,11 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href={UserController.index.url()} prefetch cacheFor={30}>
+                            <Link
+                                href={UserController.index.url()}
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>

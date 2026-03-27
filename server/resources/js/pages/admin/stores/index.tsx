@@ -1,8 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as StoreController from '@/actions/App/Http/Controllers/Admin/StoreController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { MapPin, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as StoreController from '@/actions/App/Http/Controllers/Admin/StoreController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -102,9 +102,13 @@ export default function StoresIndex({ stores, filters }: IndexProps) {
                             'Are you sure you want to delete this store? This action cannot be undone.',
                         )}
                         onConfirm={() => {
-                            router.delete(StoreController.destroy.url(row.original.id), {
-                                onSuccess: () => toast.success('Store deleted'),
-                            });
+                            router.delete(
+                                StoreController.destroy.url(row.original.id),
+                                {
+                                    onSuccess: () =>
+                                        toast.success('Store deleted'),
+                                },
+                            );
                         }}
                     >
                         <TrashIcon className="mr-1 h-3 w-3" />
@@ -148,7 +152,10 @@ export default function StoresIndex({ stores, filters }: IndexProps) {
                                 'Add your first store location to get started.',
                             )}
                         </p>
-                        <Link href={StoreController.create.url()} className="mt-4">
+                        <Link
+                            href={StoreController.create.url()}
+                            className="mt-4"
+                        >
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {__('action.add', 'Add Store')}

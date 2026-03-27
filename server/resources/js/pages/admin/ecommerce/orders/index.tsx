@@ -1,7 +1,6 @@
 import { Head } from '@inertiajs/react';
-import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
-import * as OrderRoutes from '@/routes/admin/ecommerce/orders';
 import { DownloadIcon } from 'lucide-react';
+import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
 import { useOrderColumns } from '@/components/columns/order-columns';
 
 import DataTable from '@/components/data-table';
@@ -10,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
+import * as OrderRoutes from '@/routes/admin/ecommerce/orders';
 import type { BreadcrumbItem } from '@/types';
 import type { OrderData } from './index.types';
 

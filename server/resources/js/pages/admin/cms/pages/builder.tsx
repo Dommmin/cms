@@ -1,8 +1,8 @@
 import { Head, router } from '@inertiajs/react';
-import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
-import * as PageBuilderController from '@/actions/App/Http/Controllers/Admin/Cms/PageBuilderController';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import * as PageBuilderController from '@/actions/App/Http/Controllers/Admin/Cms/PageBuilderController';
+import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import { PageBuilder } from '@/features/page-builder';
 import type { PreviewDevice, Section } from '@/features/page-builder';
 import AppLayout from '@/layouts/app-layout';

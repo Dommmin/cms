@@ -1,7 +1,7 @@
 import { Link, Head, router, usePage, useForm } from '@inertiajs/react';
-import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import { FileTextIcon, CopyIcon } from 'lucide-react';
 import { useState } from 'react';
+import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import { usePageColumns } from '@/components/columns/page-columns';
 
 import DataTable from '@/components/data-table';
@@ -183,7 +183,9 @@ export default function Index({
         const params: Record<string, string> = {};
         if (filters.search) params.search = filters.search;
         if (locale !== 'all') params.locale = locale;
-        router.get(PageController.index.url(), params, { preserveState: false });
+        router.get(PageController.index.url(), params, {
+            preserveState: false,
+        });
     }
 
     const localeTabs = [

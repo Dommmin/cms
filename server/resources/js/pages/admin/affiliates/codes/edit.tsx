@@ -1,6 +1,6 @@
 import { Link, Head, useForm } from '@inertiajs/react';
-import * as AffiliateCodeController from '@/actions/App/Http/Controllers/Admin/AffiliateCodeController';
 import { ArrowLeftIcon } from 'lucide-react';
+import * as AffiliateCodeController from '@/actions/App/Http/Controllers/Admin/AffiliateCodeController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';

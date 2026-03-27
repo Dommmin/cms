@@ -1,9 +1,9 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as FormController from '@/actions/App/Http/Controllers/Admin/FormController';
-import * as FormSubmissionController from '@/actions/App/Http/Controllers/Admin/FormSubmissionController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as FormController from '@/actions/App/Http/Controllers/Admin/FormController';
+import * as FormSubmissionController from '@/actions/App/Http/Controllers/Admin/FormSubmissionController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader } from '@/components/page-header';
@@ -92,7 +92,10 @@ export default function FormSubmissionsIndex({
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={FormSubmissionController.show.url({ form: row.original.form_id, submission: row.original.id })}
+                            href={FormSubmissionController.show.url({
+                                form: row.original.form_id,
+                                submission: row.original.id,
+                            })}
                             prefetch
                             cacheFor={60}
                         >
@@ -110,7 +113,10 @@ export default function FormSubmissionsIndex({
                         )}
                         onConfirm={() => {
                             router.delete(
-                                FormSubmissionController.destroy.url({ form: row.original.form_id, submission: row.original.id }),
+                                FormSubmissionController.destroy.url({
+                                    form: row.original.form_id,
+                                    submission: row.original.id,
+                                }),
                                 {
                                     onSuccess: () =>
                                         toast.success('Submission deleted'),

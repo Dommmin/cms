@@ -1,7 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
+import { ArrowLeftIcon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
 import * as ProductVariantController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductVariantController';
-import { ArrowLeftIcon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -156,10 +156,12 @@ export default function ProductVariantsIndex({
                                                     size="sm"
                                                 >
                                                     <Link
-                                                        href={ProductVariantController.edit.url([
-                                                            product.id,
-                                                            variant.id,
-                                                        ])}
+                                                        href={ProductVariantController.edit.url(
+                                                            [
+                                                                product.id,
+                                                                variant.id,
+                                                            ],
+                                                        )}
                                                         prefetch
                                                         cacheFor={30}
                                                     >
@@ -180,10 +182,12 @@ export default function ProductVariantsIndex({
                                                     description={`${__('dialog.delete_variant_desc', 'Delete variant')} "${variant.name}"?`}
                                                     onConfirm={() => {
                                                         router.delete(
-                                                            ProductVariantController.destroy.url([
-                                                                product.id,
-                                                                variant.id,
-                                                            ]),
+                                                            ProductVariantController.destroy.url(
+                                                                [
+                                                                    product.id,
+                                                                    variant.id,
+                                                                ],
+                                                            ),
                                                         );
                                                     }}
                                                 >

@@ -1,8 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as FaqController from '@/actions/App/Http/Controllers/Admin/FaqController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PlusIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as FaqController from '@/actions/App/Http/Controllers/Admin/FaqController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -14,7 +14,9 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { Faq, IndexProps } from './index.types';
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'FAQ', href: FaqController.index.url() }];
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'FAQ', href: FaqController.index.url() },
+];
 
 export default function FaqsIndex({
     faqs,
@@ -97,9 +99,13 @@ export default function FaqsIndex({
                             'Are you sure you want to delete this FAQ? This action cannot be undone.',
                         )}
                         onConfirm={() => {
-                            router.delete(FaqController.destroy.url(row.original.id), {
-                                onSuccess: () => toast.success('FAQ deleted'),
-                            });
+                            router.delete(
+                                FaqController.destroy.url(row.original.id),
+                                {
+                                    onSuccess: () =>
+                                        toast.success('FAQ deleted'),
+                                },
+                            );
                         }}
                     >
                         <TrashIcon className="mr-1 h-3 w-3" />

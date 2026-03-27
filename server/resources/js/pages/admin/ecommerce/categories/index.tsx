@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
-import * as CategoryController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CategoryController';
 import { PlusIcon } from 'lucide-react';
+import * as CategoryController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CategoryController';
 import { useCategoryColumns } from '@/components/columns/category-columns';
 
 import DataTable from '@/components/data-table';

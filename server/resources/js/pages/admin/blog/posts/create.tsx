@@ -1,8 +1,8 @@
 import { Link, Head, router, usePage } from '@inertiajs/react';
-import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
 
 import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';

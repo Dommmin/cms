@@ -1,7 +1,7 @@
 import { Link, Form, Head, usePage } from '@inertiajs/react';
-import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';

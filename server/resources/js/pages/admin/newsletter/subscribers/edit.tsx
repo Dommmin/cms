@@ -1,6 +1,6 @@
 import { Link, Form, Head } from '@inertiajs/react';
-import * as NewsletterSubscriberController from '@/actions/App/Http/Controllers/Admin/NewsletterSubscriberController';
 import { ArrowLeftIcon } from 'lucide-react';
+import * as NewsletterSubscriberController from '@/actions/App/Http/Controllers/Admin/NewsletterSubscriberController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -41,7 +41,9 @@ export default function Edit({ subscriber }: { subscriber: Subscriber }) {
                 </PageHeader>
 
                 <Form
-                    action={NewsletterSubscriberController.update.url(subscriber.id)}
+                    action={NewsletterSubscriberController.update.url(
+                        subscriber.id,
+                    )}
                     method="put"
                     options={{ preserveScroll: true }}
                     className="max-w-2xl space-y-6"

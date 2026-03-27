@@ -1,8 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PlusIcon, EyeIcon, TrashIcon, RefreshCwIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -116,7 +116,9 @@ export default function NotificationsIndex({
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={AppNotificationController.show.url(row.original.id)}
+                            href={AppNotificationController.show.url(
+                                row.original.id,
+                            )}
                             prefetch
                             cacheFor={60}
                         >
@@ -130,7 +132,9 @@ export default function NotificationsIndex({
                             size="sm"
                             onClick={() => {
                                 router.post(
-                                    AppNotificationController.resend.url(row.original.id),
+                                    AppNotificationController.resend.url(
+                                        row.original.id,
+                                    ),
                                     {},
                                     {
                                         onSuccess: () =>
@@ -155,7 +159,9 @@ export default function NotificationsIndex({
                         )}
                         onConfirm={() => {
                             router.delete(
-                                AppNotificationController.destroy.url(row.original.id),
+                                AppNotificationController.destroy.url(
+                                    row.original.id,
+                                ),
                                 {
                                     onSuccess: () =>
                                         toast.success('Notification deleted'),

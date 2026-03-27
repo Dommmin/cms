@@ -1,7 +1,7 @@
 import { Link, Form, Head } from '@inertiajs/react';
-import * as SupportConversationController from '@/actions/App/Http/Controllers/Admin/SupportConversationController';
-import * as SupportCannedResponseController from '@/actions/App/Http/Controllers/Admin/SupportCannedResponseController';
 import { ArrowLeftIcon } from 'lucide-react';
+import * as SupportCannedResponseController from '@/actions/App/Http/Controllers/Admin/SupportCannedResponseController';
+import * as SupportConversationController from '@/actions/App/Http/Controllers/Admin/SupportConversationController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import StickyFormActions from '@/components/sticky-form-actions';
@@ -15,7 +15,10 @@ import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Support', href: SupportConversationController.index.url() },
-    { title: 'Canned Responses', href: SupportCannedResponseController.index.url() },
+    {
+        title: 'Canned Responses',
+        href: SupportCannedResponseController.index.url(),
+    },
     { title: 'Create', href: SupportCannedResponseController.create.url() },
 ];
 

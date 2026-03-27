@@ -5,7 +5,6 @@
  */
 
 import { Link } from '@inertiajs/react';
-import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import {
     ArrowLeft,
     Columns2,
@@ -19,6 +18,7 @@ import {
     Tablet,
     Undo2,
 } from 'lucide-react';
+import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import { Button } from '@/components/ui/button';
 import type { BuilderToolbarProps } from './builder-toolbar.types';
 

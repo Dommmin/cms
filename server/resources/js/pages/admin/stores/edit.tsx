@@ -1,8 +1,8 @@
 import { Link, Head, router } from '@inertiajs/react';
-import * as StoreController from '@/actions/App/Http/Controllers/Admin/StoreController';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import * as StoreController from '@/actions/App/Http/Controllers/Admin/StoreController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -64,7 +64,11 @@ export default function EditStore({ store }: EditProps) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href={StoreController.index.url()} prefetch cacheFor={30}>
+                            <Link
+                                href={StoreController.index.url()}
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 Back
                             </Link>

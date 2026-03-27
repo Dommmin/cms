@@ -1,6 +1,6 @@
 import { Link, Form, Head } from '@inertiajs/react';
-import * as UserController from '@/actions/App/Http/Controllers/Admin/UserController';
 import { ArrowLeftIcon } from 'lucide-react';
+import * as UserController from '@/actions/App/Http/Controllers/Admin/UserController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import StickyFormActions from '@/components/sticky-form-actions';
@@ -44,7 +44,11 @@ export default function Edit({
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href={UserController.index.url()} prefetch cacheFor={30}>
+                            <Link
+                                href={UserController.index.url()}
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>

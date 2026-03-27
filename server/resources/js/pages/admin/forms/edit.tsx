@@ -1,5 +1,4 @@
 import { Link, router } from '@inertiajs/react';
-import * as FormController from '@/actions/App/Http/Controllers/Admin/FormController';
 import { Head } from '@inertiajs/react';
 import {
     ArrowLeftIcon,
@@ -9,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import * as FormController from '@/actions/App/Http/Controllers/Admin/FormController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -351,7 +351,11 @@ export default function Edit({ form }: { form: FormData }) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href={FormController.index.url()} prefetch cacheFor={30}>
+                            <Link
+                                href={FormController.index.url()}
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>

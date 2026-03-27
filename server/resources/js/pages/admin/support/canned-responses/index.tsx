@@ -1,9 +1,9 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as SupportConversationController from '@/actions/App/Http/Controllers/Admin/SupportConversationController';
-import * as SupportCannedResponseController from '@/actions/App/Http/Controllers/Admin/SupportCannedResponseController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as SupportCannedResponseController from '@/actions/App/Http/Controllers/Admin/SupportCannedResponseController';
+import * as SupportConversationController from '@/actions/App/Http/Controllers/Admin/SupportConversationController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -17,7 +17,10 @@ import type { CannedResponse, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Support', href: SupportConversationController.index.url() },
-    { title: 'Canned Responses', href: SupportCannedResponseController.index.url() },
+    {
+        title: 'Canned Responses',
+        href: SupportCannedResponseController.index.url(),
+    },
 ];
 
 export default function CannedResponsesIndex({ canned_responses }: IndexProps) {
@@ -55,7 +58,9 @@ export default function CannedResponsesIndex({ canned_responses }: IndexProps) {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={SupportCannedResponseController.edit.url(row.original.id)}
+                            href={SupportCannedResponseController.edit.url(
+                                row.original.id,
+                            )}
                             prefetch
                             cacheFor={30}
                         >
@@ -73,7 +78,9 @@ export default function CannedResponsesIndex({ canned_responses }: IndexProps) {
                         )}
                         onConfirm={() => {
                             router.delete(
-                                SupportCannedResponseController.destroy.url(row.original.id),
+                                SupportCannedResponseController.destroy.url(
+                                    row.original.id,
+                                ),
                                 {
                                     onSuccess: () =>
                                         toast.success(

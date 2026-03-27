@@ -1,9 +1,9 @@
 import { Head, router } from '@inertiajs/react';
-import * as TranslationController from '@/actions/App/Http/Controllers/Admin/TranslationController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { CheckIcon, RefreshCwIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import * as TranslationController from '@/actions/App/Http/Controllers/Admin/TranslationController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -172,7 +172,9 @@ export default function TranslationsIndex({
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
                             router.delete(
-                                TranslationController.destroy.url(row.original.id),
+                                TranslationController.destroy.url(
+                                    row.original.id,
+                                ),
                                 {
                                     onSuccess: () =>
                                         toast.success('Translation deleted'),

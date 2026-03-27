@@ -1,6 +1,4 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
-import * as OrderRoutes from '@/routes/admin/ecommerce/ecommerce/orders';
 import {
     ArrowLeft,
     CheckCircle2,
@@ -12,12 +10,14 @@ import {
     RefreshCcw,
 } from 'lucide-react';
 import { useState } from 'react';
+import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
 
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
+import * as OrderRoutes from '@/routes/admin/ecommerce/ecommerce/orders';
 import type { BreadcrumbItem } from '@/types';
 import type { Address, StatusOption, OrderView } from './show.types';
 
@@ -175,7 +175,10 @@ export default function OrderShow({
     const __ = useTranslation();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: __('page.orders', 'Orders'), href: OrderController.index.url() },
+        {
+            title: __('page.orders', 'Orders'),
+            href: OrderController.index.url(),
+        },
         {
             title: `#${order.reference_number}`,
             href: OrderController.show.url(order.id),

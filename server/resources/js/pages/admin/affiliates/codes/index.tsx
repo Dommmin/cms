@@ -1,9 +1,9 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as AffiliateCodeController from '@/actions/App/Http/Controllers/Admin/AffiliateCodeController';
-import * as ReferralController from '@/actions/App/Http/Controllers/Admin/ReferralController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as AffiliateCodeController from '@/actions/App/Http/Controllers/Admin/AffiliateCodeController';
+import * as ReferralController from '@/actions/App/Http/Controllers/Admin/ReferralController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -100,7 +100,9 @@ export default function CodesIndex({ codes, filters }: IndexProps) {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={AffiliateCodeController.edit.url(row.original.id)}
+                            href={AffiliateCodeController.edit.url(
+                                row.original.id,
+                            )}
                             prefetch
                             cacheFor={30}
                         >
@@ -118,7 +120,9 @@ export default function CodesIndex({ codes, filters }: IndexProps) {
                         )}
                         onConfirm={() =>
                             router.delete(
-                                AffiliateCodeController.destroy.url(row.original.id),
+                                AffiliateCodeController.destroy.url(
+                                    row.original.id,
+                                ),
                                 {
                                     onSuccess: () =>
                                         toast.success('Code deleted'),

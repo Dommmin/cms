@@ -1,5 +1,4 @@
 import { Head, router } from '@inertiajs/react';
-import * as MediaController from '@/actions/App/Http/Controllers/Admin/MediaController';
 import {
     EyeIcon,
     TrashIcon,
@@ -16,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import * as MediaController from '@/actions/App/Http/Controllers/Admin/MediaController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
@@ -82,9 +82,13 @@ export default function Index({
         const params = new URLSearchParams();
         if (value) params.set('search', value);
         if (extension) params.set('extension', extension);
-        router.get(`${MediaController.index.url()}?${params.toString()}`, undefined, {
-            preserveState: true,
-        });
+        router.get(
+            `${MediaController.index.url()}?${params.toString()}`,
+            undefined,
+            {
+                preserveState: true,
+            },
+        );
     };
 
     const handleExtensionFilter = (value: string) => {
@@ -92,9 +96,13 @@ export default function Index({
         const params = new URLSearchParams();
         if (search) params.set('search', search);
         if (value) params.set('extension', value);
-        router.get(`${MediaController.index.url()}?${params.toString()}`, undefined, {
-            preserveState: true,
-        });
+        router.get(
+            `${MediaController.index.url()}?${params.toString()}`,
+            undefined,
+            {
+                preserveState: true,
+            },
+        );
     };
 
     const handlePageChange = (page: number) => {
@@ -103,9 +111,13 @@ export default function Index({
         params.set('page', page.toString());
         if (search) params.set('search', search);
         if (extension) params.set('extension', extension);
-        router.get(`${MediaController.index.url()}?${params.toString()}`, undefined, {
-            preserveState: true,
-        });
+        router.get(
+            `${MediaController.index.url()}?${params.toString()}`,
+            undefined,
+            {
+                preserveState: true,
+            },
+        );
     };
 
     const handleDropzoneUpload = async (files: File[]) => {
@@ -626,7 +638,9 @@ export default function Index({
                                         description={`Are you sure you want to delete "${selectedItem.name}"? This action cannot be undone.`}
                                         onConfirm={() => {
                                             router.delete(
-                                                MediaController.destroy.url(selectedItem.id),
+                                                MediaController.destroy.url(
+                                                    selectedItem.id,
+                                                ),
                                                 {
                                                     onSuccess: () => {
                                                         toast.success(

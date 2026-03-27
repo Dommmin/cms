@@ -1,6 +1,6 @@
 import { Link, Form, Head } from '@inertiajs/react';
-import * as SectionTemplateController from '@/actions/App/Http/Controllers/Admin/SectionTemplateController';
 import { ArrowLeftIcon } from 'lucide-react';
+import * as SectionTemplateController from '@/actions/App/Http/Controllers/Admin/SectionTemplateController';
 
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';

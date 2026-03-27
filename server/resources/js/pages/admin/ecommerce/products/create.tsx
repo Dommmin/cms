@@ -1,8 +1,8 @@
 import { Link, Form, Head, usePage } from '@inertiajs/react';
-import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
 import { ArrowLeftIcon, ImageIcon, Settings, Search } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
 import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import {

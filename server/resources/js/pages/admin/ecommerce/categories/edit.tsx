@@ -1,8 +1,8 @@
 import { Link, Head, router, usePage } from '@inertiajs/react';
-import * as CategoryController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CategoryController';
-import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
 import { ArrowLeftIcon, EyeIcon } from 'lucide-react';
 import { useState } from 'react';
+import * as CategoryController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CategoryController';
+import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
 import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -127,7 +127,19 @@ export default function Edit({
                     <PageHeaderActions>
                         <Button variant="outline" asChild>
                             <a
-                                href={PreviewController.url({ query: { url: `${frontendUrl}/products?category=${category.slug}`, entity_type: 'category', entity_id: String(category.id), entity_name: nameValues[defaultLocale] ?? category.slug, admin_url: CategoryController.edit.url(category.id) } })}
+                                href={PreviewController.url({
+                                    query: {
+                                        url: `${frontendUrl}/products?category=${category.slug}`,
+                                        entity_type: 'category',
+                                        entity_id: String(category.id),
+                                        entity_name:
+                                            nameValues[defaultLocale] ??
+                                            category.slug,
+                                        admin_url: CategoryController.edit.url(
+                                            category.id,
+                                        ),
+                                    },
+                                })}
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >

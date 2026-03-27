@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
-import * as UserController from '@/actions/App/Http/Controllers/Admin/UserController';
 import { Trash2Icon, UserIcon } from 'lucide-react';
+import * as UserController from '@/actions/App/Http/Controllers/Admin/UserController';
 import { useUserColumns } from '@/components/columns/user-columns';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';

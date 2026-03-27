@@ -1,7 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as ProductTypeController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductTypeController';
 import { Box, PencilIcon, Plus, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as ProductTypeController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductTypeController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -95,7 +95,9 @@ export default function ProductTypesIndex({ types, filters }: IndexProps) {
                                 <div className="flex items-center gap-2">
                                     <Button asChild variant="outline" size="sm">
                                         <Link
-                                            href={ProductTypeController.edit.url(row.original.id)}
+                                            href={ProductTypeController.edit.url(
+                                                row.original.id,
+                                            )}
                                             prefetch
                                             cacheFor={30}
                                         >
@@ -113,7 +115,9 @@ export default function ProductTypesIndex({ types, filters }: IndexProps) {
                                         description={`Delete product type "${row.original.name}"?`}
                                         onConfirm={() => {
                                             router.delete(
-                                                ProductTypeController.destroy.url(row.original.id),
+                                                ProductTypeController.destroy.url(
+                                                    row.original.id,
+                                                ),
                                                 {
                                                     onSuccess: () =>
                                                         toast.success(

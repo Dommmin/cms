@@ -90,7 +90,9 @@ export function useUserColumns(): ColumnDef<User>[] {
                         title={__('dialog.delete_title', 'Delete User')}
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
-                            router.delete(UserController.destroy.url(row.original.id));
+                            router.delete(
+                                UserController.destroy.url(row.original.id),
+                            );
                         }}
                     >
                         <TrashIcon className="mr-1 h-3 w-3" />

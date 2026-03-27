@@ -1,8 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as MenuController from '@/actions/App/Http/Controllers/Admin/MenuController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PlusIcon, PencilIcon, TrashIcon, CopyIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as MenuController from '@/actions/App/Http/Controllers/Admin/MenuController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -95,9 +95,13 @@ export default function MenusIndex({ menus, filters }: IndexProps) {
                         title={__('dialog.delete_title', 'Delete Menu')}
                         description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
                         onConfirm={() => {
-                            router.delete(MenuController.destroy.url(row.original.id), {
-                                onSuccess: () => toast.success('Menu deleted'),
-                            });
+                            router.delete(
+                                MenuController.destroy.url(row.original.id),
+                                {
+                                    onSuccess: () =>
+                                        toast.success('Menu deleted'),
+                                },
+                            );
                         }}
                     >
                         <TrashIcon className="mr-1 h-3 w-3" />

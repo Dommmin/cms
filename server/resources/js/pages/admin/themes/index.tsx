@@ -1,5 +1,4 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import * as ThemeController from '@/actions/App/Http/Controllers/Admin/ThemeController';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
     PlusIcon,
@@ -9,6 +8,7 @@ import {
     CheckIcon,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as ThemeController from '@/actions/App/Http/Controllers/Admin/ThemeController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -83,7 +83,9 @@ export default function ThemesIndex({ themes, filters }: IndexProps) {
                             size="sm"
                             onClick={() => {
                                 router.post(
-                                    ThemeController.activate.url(row.original.id),
+                                    ThemeController.activate.url(
+                                        row.original.id,
+                                    ),
                                     {},
                                     {
                                         onSuccess: () =>
@@ -128,9 +130,13 @@ export default function ThemesIndex({ themes, filters }: IndexProps) {
                         title={__('dialog.delete_title', 'Delete Theme')}
                         description={`Are you sure you want to delete "${row.original.name}"?`}
                         onConfirm={() => {
-                            router.delete(ThemeController.destroy.url(row.original.id), {
-                                onSuccess: () => toast.success('Theme deleted'),
-                            });
+                            router.delete(
+                                ThemeController.destroy.url(row.original.id),
+                                {
+                                    onSuccess: () =>
+                                        toast.success('Theme deleted'),
+                                },
+                            );
                         }}
                         disabled={row.original.pages_count > 0}
                     >

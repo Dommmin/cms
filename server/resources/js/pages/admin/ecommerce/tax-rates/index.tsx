@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as TaxRateController from '@/actions/App/Http/Controllers/Admin/Ecommerce/TaxRateController';
 import { Plus, Receipt, Star, PencilIcon, TrashIcon } from 'lucide-react';
+import * as TaxRateController from '@/actions/App/Http/Controllers/Admin/Ecommerce/TaxRateController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -114,7 +114,9 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                                 <div className="flex items-center gap-2">
                                     <Button asChild variant="outline" size="sm">
                                         <Link
-                                            href={TaxRateController.edit.url(row.original.id)}
+                                            href={TaxRateController.edit.url(
+                                                row.original.id,
+                                            )}
                                             prefetch
                                             cacheFor={30}
                                         >
@@ -132,7 +134,9 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                                         description={`Are you sure you want to delete "${row.original.name}"?`}
                                         onConfirm={() => {
                                             router.delete(
-                                                TaxRateController.destroy.url(row.original.id),
+                                                TaxRateController.destroy.url(
+                                                    row.original.id,
+                                                ),
                                             );
                                         }}
                                     >

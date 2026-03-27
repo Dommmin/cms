@@ -9,6 +9,7 @@ import {
     Trash2,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import * as DashboardWidgetController from '@/actions/App/Http/Controllers/Admin/DashboardWidgetController';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ChartWidget } from '@/components/widgets/chart-widget';
@@ -17,7 +18,6 @@ import { StatCard } from '@/components/widgets/stat-card';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes/admin';
-import * as DashboardWidgetController from '@/actions/App/Http/Controllers/Admin/DashboardWidgetController';
 import type { BreadcrumbItem } from '@/types';
 import type { Widget, WidgetSize } from '@/types/widgets';
 import type { DashboardProps } from './dashboard.types';

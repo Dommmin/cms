@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { router } from '@inertiajs/react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+import axios from 'axios';
 import {
     BarChart3,
     FileText,
@@ -15,16 +15,16 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import AdminSearchController from '@/actions/App/Http/Controllers/Admin/AdminSearchController';
-import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
-import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
 import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
 import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
-import * as UserController from '@/actions/App/Http/Controllers/Admin/UserController';
+import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
+import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
 import * as NewsletterCampaignController from '@/actions/App/Http/Controllers/Admin/NewsletterCampaignController';
 import * as SettingsController from '@/actions/App/Http/Controllers/Admin/SettingsController';
-import { dashboard } from '@/routes/admin';
+import * as UserController from '@/actions/App/Http/Controllers/Admin/UserController';
 
 import { cn } from '@/lib/utils';
+import { dashboard } from '@/routes/admin';
 import type { SearchResult, NavShortcut } from './command-palette.types';
 
 // ── Types ──────────────────────────────────────────────────────────────────

@@ -1,8 +1,8 @@
-import axios from 'axios';
 import { router } from '@inertiajs/react';
-import * as ModelVersionController from '@/actions/App/Http/Controllers/Admin/ModelVersionController';
+import axios from 'axios';
 import { ClockIcon, RotateCcwIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import * as ModelVersionController from '@/actions/App/Http/Controllers/Admin/ModelVersionController';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -104,7 +104,11 @@ export function VersionHistory({ modelType, modelId }: VersionHistoryProps) {
         if (!confirm(`Restore to version ${versionNumber}?`)) return;
         setRestoring(versionNumber);
         router.post(
-            ModelVersionController.restore.url({ type: modelType, id: modelId, versionNumber }),
+            ModelVersionController.restore.url({
+                type: modelType,
+                id: modelId,
+                versionNumber,
+            }),
             {},
             {
                 onFinish: () => {

@@ -1,9 +1,9 @@
 import { Head, Link, router, usePoll } from '@inertiajs/react';
-import * as SupportConversationController from '@/actions/App/Http/Controllers/Admin/SupportConversationController';
-import * as SupportCannedResponseController from '@/actions/App/Http/Controllers/Admin/SupportCannedResponseController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon, MessageCircleIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as SupportCannedResponseController from '@/actions/App/Http/Controllers/Admin/SupportCannedResponseController';
+import * as SupportConversationController from '@/actions/App/Http/Controllers/Admin/SupportConversationController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -124,7 +124,9 @@ export default function SupportIndex({
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={SupportConversationController.show.url(row.original.id)}
+                            href={SupportConversationController.show.url(
+                                row.original.id,
+                            )}
                             prefetch
                             cacheFor={60}
                         >
@@ -141,10 +143,15 @@ export default function SupportIndex({
                             'This will permanently delete the conversation and all its messages.',
                         )}
                         onConfirm={() => {
-                            router.delete(SupportConversationController.destroy.url(row.original.id), {
-                                onSuccess: () =>
-                                    toast.success('Conversation deleted'),
-                            });
+                            router.delete(
+                                SupportConversationController.destroy.url(
+                                    row.original.id,
+                                ),
+                                {
+                                    onSuccess: () =>
+                                        toast.success('Conversation deleted'),
+                                },
+                            );
                         }}
                     >
                         <TrashIcon className="h-3 w-3" />

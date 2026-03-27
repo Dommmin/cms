@@ -1,8 +1,8 @@
 import { Link, Head, router } from '@inertiajs/react';
-import * as BlogCategoryController from '@/actions/App/Http/Controllers/Admin/BlogCategoryController';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import * as BlogCategoryController from '@/actions/App/Http/Controllers/Admin/BlogCategoryController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';

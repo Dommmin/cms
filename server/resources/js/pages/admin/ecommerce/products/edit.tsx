@@ -1,7 +1,4 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
-import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
-import * as ProductVariantController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductVariantController';
-import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
 import {
     ArrowLeftIcon,
     Clock,
@@ -13,6 +10,9 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
+import * as ProductVariantController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductVariantController';
+import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
 import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import {
@@ -357,7 +357,19 @@ export default function Edit({
                         </Button>
                         <Button variant="outline" asChild>
                             <a
-                                href={PreviewController.url({ query: { url: `${frontendUrl}/products/${product.slug}`, entity_type: 'product', entity_id: String(product.id), entity_name: product.name?.[defaultLocale] ?? product.slug, admin_url: ProductController.edit.url(product.id) } })}
+                                href={PreviewController.url({
+                                    query: {
+                                        url: `${frontendUrl}/products/${product.slug}`,
+                                        entity_type: 'product',
+                                        entity_id: String(product.id),
+                                        entity_name:
+                                            product.name?.[defaultLocale] ??
+                                            product.slug,
+                                        admin_url: ProductController.edit.url(
+                                            product.id,
+                                        ),
+                                    },
+                                })}
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
@@ -367,7 +379,9 @@ export default function Edit({
                         </Button>
                         <Button asChild variant="outline">
                             <Link
-                                href={ProductVariantController.index.url(product.id)}
+                                href={ProductVariantController.index.url(
+                                    product.id,
+                                )}
                                 prefetch
                                 cacheFor={30}
                             >

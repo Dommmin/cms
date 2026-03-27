@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as PromotionController from '@/actions/App/Http/Controllers/Admin/Ecommerce/PromotionController';
 import { Search, Plus, Edit, Trash2, Power, PowerOff } from 'lucide-react';
+import * as PromotionController from '@/actions/App/Http/Controllers/Admin/Ecommerce/PromotionController';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -338,7 +338,9 @@ export default function Index({
                                                         size="sm"
                                                     >
                                                         <Link
-                                                            href={PromotionController.edit.url(promotion.id)}
+                                                            href={PromotionController.edit.url(
+                                                                promotion.id,
+                                                            )}
                                                             prefetch
                                                             cacheFor={30}
                                                         >

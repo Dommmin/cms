@@ -1,6 +1,6 @@
 import { Link, Form, Head } from '@inertiajs/react';
-import * as ThemeController from '@/actions/App/Http/Controllers/Admin/ThemeController';
 import { ArrowLeftIcon } from 'lucide-react';
+import * as ThemeController from '@/actions/App/Http/Controllers/Admin/ThemeController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import StickyFormActions from '@/components/sticky-form-actions';
@@ -56,7 +56,11 @@ export default function Create() {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href={ThemeController.index.url()} prefetch cacheFor={30}>
+                            <Link
+                                href={ThemeController.index.url()}
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 Back to Themes
                             </Link>

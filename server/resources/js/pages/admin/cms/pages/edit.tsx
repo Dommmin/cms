@@ -1,7 +1,4 @@
 import { Form, Head, Link, router, usePage } from '@inertiajs/react';
-import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
-import * as PageBuilderController from '@/actions/App/Http/Controllers/Admin/Cms/PageBuilderController';
-import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
 import {
     ArrowLeftIcon,
     EyeIcon,
@@ -10,6 +7,9 @@ import {
     PencilIcon,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import * as PageBuilderController from '@/actions/App/Http/Controllers/Admin/Cms/PageBuilderController';
+import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
+import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
 import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -100,7 +100,17 @@ export default function Edit({ page, modules, pages }: EditProps) {
                         <PageHeaderActions>
                             <Button asChild variant="outline">
                                 <a
-                                    href={PreviewController.url({ query: { url: `${frontendUrl}/${page.slug}`, entity_type: 'page', entity_id: String(page.id), entity_name: displayTitle, admin_url: PageController.edit.url(page.id) } })}
+                                    href={PreviewController.url({
+                                        query: {
+                                            url: `${frontendUrl}/${page.slug}`,
+                                            entity_type: 'page',
+                                            entity_id: String(page.id),
+                                            entity_name: displayTitle,
+                                            admin_url: PageController.edit.url(
+                                                page.id,
+                                            ),
+                                        },
+                                    })}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
@@ -121,7 +131,9 @@ export default function Edit({ page, modules, pages }: EditProps) {
                             {pageType === 'blocks' && (
                                 <Button asChild variant="outline">
                                     <Link
-                                        href={PageBuilderController.show.url(page.id)}
+                                        href={PageBuilderController.show.url(
+                                            page.id,
+                                        )}
                                         prefetch
                                         cacheFor={30}
                                     >
@@ -138,7 +150,9 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                     variant="outline"
                                     onClick={() => {
                                         router.post(
-                                            PageController.unpublish.url(page.id),
+                                            PageController.unpublish.url(
+                                                page.id,
+                                            ),
                                             undefined,
                                             {
                                                 onSuccess: () =>

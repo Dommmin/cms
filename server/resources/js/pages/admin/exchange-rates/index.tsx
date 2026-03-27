@@ -1,8 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as ExchangeRateController from '@/actions/App/Http/Controllers/Admin/ExchangeRateController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PlusIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as ExchangeRateController from '@/actions/App/Http/Controllers/Admin/ExchangeRateController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -71,7 +71,9 @@ export default function ExchangeRatesIndex({
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={ExchangeRateController.edit.url(row.original.id)}
+                            href={ExchangeRateController.edit.url(
+                                row.original.id,
+                            )}
                             prefetch
                             cacheFor={30}
                         >
@@ -86,7 +88,9 @@ export default function ExchangeRatesIndex({
                         description={`Are you sure you want to delete this exchange rate?`}
                         onConfirm={() => {
                             router.delete(
-                                ExchangeRateController.destroy.url(row.original.id),
+                                ExchangeRateController.destroy.url(
+                                    row.original.id,
+                                ),
                                 {
                                     onSuccess: () =>
                                         toast.success('Exchange rate deleted'),

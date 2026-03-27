@@ -1,8 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
-import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilIcon, PlusIcon, StarIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -127,7 +127,9 @@ export default function BlogPostsIndex({
                             size="sm"
                             onClick={() => {
                                 router.post(
-                                    BlogPostController.publish.url(row.original.id),
+                                    BlogPostController.publish.url(
+                                        row.original.id,
+                                    ),
                                     {},
                                     {
                                         onSuccess: () =>
@@ -144,7 +146,9 @@ export default function BlogPostsIndex({
                             size="sm"
                             onClick={() => {
                                 router.post(
-                                    BlogPostController.unpublish.url(row.original.id),
+                                    BlogPostController.unpublish.url(
+                                        row.original.id,
+                                    ),
                                     {},
                                     {
                                         onSuccess: () =>

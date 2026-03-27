@@ -1,7 +1,7 @@
 import { Head, router } from '@inertiajs/react';
-import * as ActivityLogController from '@/actions/App/Http/Controllers/Admin/ActivityLogController';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useState } from 'react';
+import * as ActivityLogController from '@/actions/App/Http/Controllers/Admin/ActivityLogController';
 import DataTable from '@/components/data-table';
 import { PageHeader } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';

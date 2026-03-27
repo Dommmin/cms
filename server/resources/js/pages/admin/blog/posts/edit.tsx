@@ -1,9 +1,9 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
-import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
 import { ArrowLeftIcon, ExternalLink, EyeIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
+import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
 import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -159,7 +159,19 @@ export default function EditBlogPost({ post, categories }: EditProps) {
                         )}
                         <Button variant="outline" asChild>
                             <a
-                                href={PreviewController.url({ query: { url: `${frontendUrl}/blog/${post.slug}`, entity_type: 'blog_post', entity_id: String(post.id), entity_name: data.title[defaultLocale] ?? post.slug, admin_url: BlogPostController.edit.url(post.id) } })}
+                                href={PreviewController.url({
+                                    query: {
+                                        url: `${frontendUrl}/blog/${post.slug}`,
+                                        entity_type: 'blog_post',
+                                        entity_id: String(post.id),
+                                        entity_name:
+                                            data.title[defaultLocale] ??
+                                            post.slug,
+                                        admin_url: BlogPostController.edit.url(
+                                            post.id,
+                                        ),
+                                    },
+                                })}
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
