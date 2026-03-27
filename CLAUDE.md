@@ -57,6 +57,7 @@ REST API: `/api/v1/*` · Admin: `/admin/*` (Inertia SPA)
 
 **Admin SPA (`server/resources/js/`):**
 - Standalone HTTP requests → use `axios` (dependency), **never `fetch()`**
+- Route URLs → always use **Wayfinder** functions from `@/actions/` or `@/routes/`, **never hardcode strings** like `"/admin/products"`
 
 **Always:**
 - Write Pest tests for every feature — `php artisan make:test --pest Name`
