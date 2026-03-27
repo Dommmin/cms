@@ -73,7 +73,7 @@ export function ProductCard({ product }: ProductCardProps) {
             <button
               onClick={handleWishlistToggle}
               aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-              className="bg-background/80 hover:bg-background absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full shadow backdrop-blur-sm transition-colors"
+              className="bg-background/80 hover:bg-background absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full shadow backdrop-blur-sm transition-colors cursor-pointer"
             >
               <Heart
                 className={`h-4 w-4 transition-colors ${
@@ -111,7 +111,7 @@ export function ProductCard({ product }: ProductCardProps) {
             );
           }}
           disabled={!product.is_active || !firstVariantId || isAddingToCart}
-          className="bg-primary text-primary-foreground flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="bg-primary text-primary-foreground flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-50 cursor-pointer"
         >
           <ShoppingCart className="h-4 w-4" />
           {isAddingToCart
