@@ -1,6 +1,6 @@
 # Features Backlog
 
-> Last updated: 2026-03-17
+> Last updated: 2026-03-30
 
 ---
 
@@ -699,3 +699,42 @@
   ```
 - Set up Slack/mail notifications for backup failures
 - Document required env vars: `BACKUP_DISK`, `AWS_BACKUP_BUCKET`, etc.
+
+---
+
+## 🐛 Audit 2026-03-30 — Bugs & UX Fixes
+
+> Wyniki pełnego audytu aplikacji. Implementowane kolejno.
+
+### 🔴 Krytyczne (błędy)
+
+- [x] **`terms_accepted` hardcoded `true`** — naprawione 2026-03-30
+- [x] **Search nie używa `lp()`** — naprawione 2026-03-30
+- [x] **Brak globalnego `app/error.tsx`** — dodane `app/error.tsx` + `app/account/error.tsx` 2026-03-30
+
+### 🟠 Wysokie
+
+- [x] **Brak selekcji ilości na stronie produktu** — dodany quantity selector 2026-03-30
+- [x] **Brak breadcrumbs** — `Breadcrumb` komponent + wpięty w product, blog, CMS pages 2026-03-30
+- [x] **Brak "Related Products"** — backend `GET /products/{slug}/related` + sekcja na stronie produktu 2026-03-30
+- [x] **Wishlist nie redirectuje niezalogowanych** — `AccountLayout` już redirectuje przez `getToken()` check 2026-03-30
+
+### 🟡 Średnie / UX
+
+- [x] **Brak skeleton loaderów** — product list: card-shaped skeleton; blog: `loading.tsx` 2026-03-30
+- [x] **Checkout — brak progress indicator** — visual 4-step progress bar added 2026-03-30
+- [x] **Empty state dla recenzji** — `t('product.no_reviews', 'No reviews yet. Be the first!')` already in place
+- [x] **Brak share buttons na produkcie** — Web Share API + copy-link fallback 2026-03-30
+- [x] **Hardcoded strings** — search page fully translated with `t()` 2026-03-30
+- [x] **Paginacja nie scrolluje do góry** — `window.scrollTo` on page change (products + search) 2026-03-30
+- [x] **Brak "Back to top" button** — `BackToTop` komponent wpięty w products + blog 2026-03-30
+- [ ] **Wishlist — brak undo przy usuwaniu** — toast z opcją cofnięcia
+
+### 🔵 Ulepszenia / Nowoczesne standardy
+
+- [x] **Filtr „tylko dostępne"** — backend `InStockFilter` + frontend checkbox 2026-03-30
+- [x] **Sort po ocenach** — backend `RatingSort` subquery + frontend option `-rating` 2026-03-30
+- [ ] **Share URL dla porównania** — copy-link w comparison bar
+- [ ] **Newsletter — info o double opt-in** — tekst pod formularzem w footerze
+- [ ] **Canonical na stronach paginacji** — `<link rel="canonical">` bez `?page=` parametru
+- [ ] **Cookie consent weryfikacja** — sprawdzić czy banner poprawnie blokuje GTM przed akceptacją

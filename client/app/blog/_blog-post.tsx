@@ -1,9 +1,9 @@
-import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { getBlogPost } from '@/api/cms';
+import { Breadcrumb } from '@/components/breadcrumb';
 import { JsonLd } from '@/components/json-ld';
 import { localePath } from '@/lib/i18n';
 import { buildBlogPosting, buildBreadcrumbList } from '@/lib/schema';
@@ -43,13 +43,15 @@ export async function BlogPostView({ slug, locale }: { slug: string; locale: str
         ])}
       />
 
-      <Link
-        href={localePath(locale, '/blog')}
-        className="text-muted-foreground hover:text-foreground mb-8 inline-flex items-center gap-1 text-sm"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Blog
-      </Link>
+      <Breadcrumb
+        items={[
+          { label: 'Blog', href: localePath(locale, '/blog') },
+          ...(post.category
+            ? [{ label: post.category.name, href: localePath(locale, `/blog?category=${post.category.slug}`) }]
+            : []),
+          { label: post.title },
+        ]}
+      />
 
       {post.category && (
         <div className="mb-3">

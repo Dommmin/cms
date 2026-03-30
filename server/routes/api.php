@@ -89,6 +89,7 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
             Route::get('/', [ProductController::class, 'index'])->name('index');
             Route::get('compare', [ProductController::class, 'compare'])->name('compare');
             Route::get('{slug}', [ProductController::class, 'show'])->name('show');
+            Route::get('{slug}/related', [ProductController::class, 'related'])->name('related');
             Route::get('{slug}/reviews', [ReviewController::class, 'index'])->name('reviews.index');
         });
 

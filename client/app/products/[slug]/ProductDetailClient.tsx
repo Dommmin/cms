@@ -1,13 +1,15 @@
 'use client';
 
-import { ShoppingCart, Star, ThumbsUp } from 'lucide-react';
+import { Share2, ShoppingCart, Star, ThumbsUp } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
+import { Breadcrumb } from '@/components/breadcrumb';
 import { CompareButton } from '@/components/compare-button';
 import { JsonLd } from '@/components/json-ld';
+import { ProductCard } from '@/components/product-card';
 import { RecentlyViewed } from '@/components/recently-viewed';
 import { useMe } from '@/hooks/use-auth';
 import { useAddToCart } from '@/hooks/use-cart';
@@ -17,6 +19,7 @@ import {
   useMarkReviewHelpful,
   useProduct,
   useProductReviews,
+  useRelatedProducts,
   useSubmitReview,
 } from '@/hooks/use-products';
 import { addRecentlyViewed } from '@/hooks/use-recently-viewed';
@@ -52,6 +55,7 @@ function StarRating({ value, onChange }: { value: number; onChange?: (v: number)
 export default function ProductDetailClient({ slug }: { slug: string }) {
   const { data: product, isLoading } = useProduct(slug);
   const { data: reviewsData } = useProductReviews(slug);
+  const { data: relatedProducts } = useRelatedProducts(slug);
   const { mutate: addToCart, isPending } = useAddToCart();
   const {
     mutate: submitReview,
@@ -65,6 +69,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const { formatPrice } = useCurrency();
 
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
+  const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'description' | 'reviews'>('description');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
@@ -120,7 +125,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
       return;
     }
     addToCart(
-      { variant_id: variant.id, quantity: 1 },
+      { variant_id: variant.id, quantity },
       { onSuccess: () => toast.success(t('product.added_to_cart', 'Added to cart!')) },
     );
   }
@@ -153,8 +158,17 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
   const productUrl = generateCanonical(`/products/${product.slug}`);
 
+  const breadcrumbs = [
+    { label: t('nav.products', 'Products'), href: lp('/products') },
+    ...(product.category
+      ? [{ label: product.category.name, href: lp(`/products?category=${product.category.slug}`) }]
+      : []),
+    { label: product.name },
+  ];
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <Breadcrumb items={breadcrumbs} />
       <JsonLd data={buildProduct(product, { url: productUrl, reviews })} />
       <JsonLd
         data={buildBreadcrumbList([
@@ -286,16 +300,59 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
             </div>
           )}
 
+          {/* Quantity selector */}
+          <div className="mt-6 flex items-center gap-3">
+            <span className="text-sm font-medium">{t('product.quantity', 'Quantity')}</span>
+            <div className="border-border flex items-center rounded-lg border">
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                className="text-muted-foreground hover:text-foreground px-3 py-2 text-lg leading-none"
+                aria-label="Decrease quantity"
+              >
+                −
+              </button>
+              <span className="min-w-[2.5rem] text-center text-sm font-semibold">{quantity}</span>
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => q + 1)}
+                className="text-muted-foreground hover:text-foreground px-3 py-2 text-lg leading-none"
+                aria-label="Increase quantity"
+              >
+                +
+              </button>
+            </div>
+          </div>
+
           {/* Add to cart */}
           <button
             onClick={handleAddToCart}
             disabled={isPending || !product.is_active}
-            className="bg-primary text-primary-foreground mt-6 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="bg-primary text-primary-foreground mt-4 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             <ShoppingCart className="h-5 w-5" />
             {isPending ? t('product.adding', 'Adding…') : t('product.add_to_cart', 'Add to Cart')}
           </button>
-          <CompareButton productId={product.id} className="mt-3 w-full justify-center" />
+          <div className="mt-3 flex gap-2">
+            <CompareButton productId={product.id} className="flex-1 justify-center" />
+            <button
+              type="button"
+              onClick={async () => {
+                const url = window.location.href;
+                if (navigator.share) {
+                  await navigator.share({ title: product.name, url });
+                } else {
+                  await navigator.clipboard.writeText(url);
+                  toast.success(t('product.link_copied', 'Link copied!'));
+                }
+              }}
+              className="border-input hover:bg-accent inline-flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium"
+              aria-label={t('product.share', 'Share product')}
+            >
+              <Share2 className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">{t('product.share', 'Share')}</span>
+            </button>
+          </div>
 
           {/* Short description */}
           {product.short_description && (
@@ -447,6 +504,18 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
           )}
         </div>
       </div>
+
+      {/* Related products */}
+      {relatedProducts && relatedProducts.length > 0 && (
+        <section className="mt-16">
+          <h2 className="mb-6 text-2xl font-bold">{t('product.related_products', 'You may also like')}</h2>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {relatedProducts.slice(0, 4).map((related) => (
+              <ProductCard key={related.id} product={related} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <RecentlyViewed excludeId={product.id} />
     </div>

@@ -187,7 +187,7 @@ export default function CheckoutPage() {
         billing_address: billing,
         shipping_address: shippingAddr,
         notes: notes || undefined,
-        terms_accepted: true,
+        terms_accepted: termsAccepted,
       },
       {
         onSuccess: (response) => {
@@ -253,9 +253,35 @@ export default function CheckoutPage() {
     );
   }
 
+  const CHECKOUT_STEPS = [
+    { label: t('checkout.step_address', 'Address') },
+    { label: t('checkout.step_shipping', 'Shipping') },
+    { label: t('checkout.step_payment', 'Payment') },
+    { label: t('checkout.step_review', 'Review') },
+  ];
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-      <h1 className="mb-8 text-3xl font-bold">{t('checkout.title', 'Checkout')}</h1>
+      <h1 className="mb-6 text-3xl font-bold">{t('checkout.title', 'Checkout')}</h1>
+
+      {/* Step progress */}
+      <nav aria-label={t('checkout.progress', 'Checkout progress')} className="mb-8">
+        <ol className="flex items-center gap-0">
+          {CHECKOUT_STEPS.map((step, i) => (
+            <li key={step.label} className="flex flex-1 items-center">
+              <span className="flex items-center gap-2">
+                <span className="bg-primary text-primary-foreground flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold">
+                  {i + 1}
+                </span>
+                <span className="hidden text-sm font-medium sm:inline">{step.label}</span>
+              </span>
+              {i < CHECKOUT_STEPS.length - 1 && (
+                <span className="bg-border mx-2 h-px flex-1" aria-hidden="true" />
+              )}
+            </li>
+          ))}
+        </ol>
+      </nav>
 
       <form onSubmit={handleSubmit} noValidate>
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">

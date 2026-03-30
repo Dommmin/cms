@@ -10,6 +10,7 @@ export interface ProductFilters {
   sort?: string;
   min_price?: number;
   max_price?: number;
+  in_stock?: boolean;
 }
 
 function buildProductParams(filters: ProductFilters): Record<string, unknown> {
@@ -23,6 +24,7 @@ function buildProductParams(filters: ProductFilters): Record<string, unknown> {
   if (filters.max_price != null) params['filter[max_price]'] = filters.max_price;
   if (filters.category) params['filter[category]'] = filters.category;
   if (filters.brand) params['filter[brand_id]'] = filters.brand;
+  if (filters.in_stock) params['filter[in_stock]'] = 1;
   return params;
 }
 

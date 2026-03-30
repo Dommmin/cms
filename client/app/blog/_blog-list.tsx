@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { getBlogCategories, getBlogPosts } from '@/api/cms';
+import { BackToTop } from '@/components/back-to-top';
 import { localePath } from '@/lib/i18n';
 
 export async function BlogListView({
@@ -132,6 +133,7 @@ export async function BlogListView({
           )}
         </>
       )}
+      <BackToTop />
     </div>
   );
 }

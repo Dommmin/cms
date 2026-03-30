@@ -7,16 +7,11 @@ import { useEffect, useState } from 'react';
 import type { ProductFilters } from '@/api/products';
 import { ProductCard } from '@/components/product-card';
 import { useBrands, useCategories } from '@/hooks/use-cms';
+import { useLocalePath } from '@/hooks/use-locale';
 import { useProducts } from '@/hooks/use-products';
+import { useTranslation } from '@/hooks/use-translation';
 import { trackSearch } from '@/lib/datalayer';
 import type { Brand } from '@/types/api';
-
-const SORT_OPTIONS = [
-  { value: '', label: 'Default' },
-  { value: 'price', label: 'Price: Low to High' },
-  { value: '-price', label: 'Price: High to Low' },
-  { value: '-created_at', label: 'Newest' },
-];
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
@@ -34,9 +29,18 @@ export default function SearchPage() {
     page: Number(searchParams.get('page') ?? 1),
   };
 
+  const lp = useLocalePath();
+  const { t } = useTranslation();
   const { data, isLoading } = useProducts(filters);
   const { data: categories } = useCategories();
   const { data: brands } = useBrands();
+
+  const SORT_OPTIONS = [
+    { value: '', label: t('shop.sort_default', 'Default') },
+    { value: 'price', label: t('shop.sort_price_asc', 'Price: Low to High') },
+    { value: '-price', label: t('shop.sort_price_desc', 'Price: High to Low') },
+    { value: '-created_at', label: t('shop.sort_newest', 'Newest') },
+  ];
 
   useEffect(() => {
     if (q) {
@@ -51,12 +55,13 @@ export default function SearchPage() {
     } else {
       params.delete(key);
     }
-    params.delete('page');
-    router.push(`/search?${params.toString()}`);
+    if (key !== 'page') params.delete('page');
+    router.push(lp(`/search?${params.toString()}`));
+    if (key === 'page') window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function clearAll() {
-    router.push(q ? `/search?q=${encodeURIComponent(q)}` : '/search');
+    router.push(q ? lp(`/search?q=${encodeURIComponent(q)}`) : lp('/search'));
   }
 
   // Active filter chips (excluding q and page)
@@ -95,7 +100,7 @@ export default function SearchPage() {
             <input
               name="q"
               defaultValue={q}
-              placeholder="Search products…"
+              placeholder={t('shop.search_placeholder', 'Search products…')}
               className="border-input bg-background focus:ring-ring w-full rounded-xl border py-2.5 pr-4 pl-9 text-sm focus:ring-2 focus:outline-none"
             />
           </div>
@@ -103,7 +108,7 @@ export default function SearchPage() {
             type="submit"
             className="bg-primary text-primary-foreground rounded-xl px-4 py-2.5 text-sm font-medium hover:opacity-90"
           >
-            Search
+            {t('search.button', 'Search')}
           </button>
         </form>
 
@@ -124,7 +129,7 @@ export default function SearchPage() {
             className="border-input bg-background hover:bg-accent inline-flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm lg:hidden"
           >
             <SlidersHorizontal className="h-4 w-4" />
-            Filters
+            {t('shop.filters', 'Filters')}
             {activeFilters.length > 0 && (
               <span className="bg-primary text-primary-foreground flex h-5 w-5 items-center justify-center rounded-full text-xs">
                 {activeFilters.length}
@@ -137,7 +142,7 @@ export default function SearchPage() {
       {/* Active filter chips */}
       {activeFilters.length > 0 && (
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          <span className="text-muted-foreground text-xs">Active:</span>
+          <span className="text-muted-foreground text-xs">{t('search.active_filters', 'Active:')}</span>
           {activeFilters.map((f) => (
             <button
               key={f.key}
@@ -152,7 +157,7 @@ export default function SearchPage() {
             onClick={clearAll}
             className="text-muted-foreground hover:text-foreground text-xs underline"
           >
-            Clear all
+            {t('shop.clear_filters_link', 'Clear all')}
           </button>
         </div>
       )}
@@ -165,7 +170,7 @@ export default function SearchPage() {
             {categories && categories.length > 0 && (
               <div>
                 <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
-                  Categories
+                  {t('search.categories', 'Categories')}
                 </p>
                 <div className="space-y-1">
                   <button
@@ -176,7 +181,7 @@ export default function SearchPage() {
                         : 'text-foreground/70 hover:bg-accent hover:text-foreground'
                     }`}
                   >
-                    All categories
+                    {t('search.all_categories', 'All categories')}
                   </button>
                   {categories.map((cat) => (
                     <button
@@ -199,7 +204,7 @@ export default function SearchPage() {
             {brands && brands.length > 0 && (
               <div>
                 <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
-                  Brand
+                  {t('search.brands', 'Brand')}
                 </p>
                 <div className="space-y-1">
                   <button
@@ -210,7 +215,7 @@ export default function SearchPage() {
                         : 'text-foreground/70 hover:bg-accent hover:text-foreground'
                     }`}
                   >
-                    All brands
+                    {t('search.all_brands', 'All brands')}
                   </button>
                   {brands.map((brand: Brand) => (
                     <button
@@ -232,7 +237,7 @@ export default function SearchPage() {
             {/* Price range */}
             <div>
               <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
-                Price range
+                {t('search.price_range', 'Price range')}
               </p>
               <div className="flex items-center gap-2">
                 <input
@@ -262,13 +267,15 @@ export default function SearchPage() {
           {/* Result count */}
           <p className="text-muted-foreground mb-4 text-sm">
             {isLoading ? (
-              'Searching…'
+              t('search.searching', 'Searching…')
             ) : (
               <>
                 <span className="text-foreground font-medium">
                   {data?.meta?.total ?? data?.data?.length ?? 0}
                 </span>{' '}
-                {q ? <>results for &ldquo;{q}&rdquo;</> : 'products found'}
+                {q
+                  ? t('search.results_for', `results for "${q}"`, { q })
+                  : t('search.products_found', 'products found')}
               </>
             )}
           </p>
@@ -277,7 +284,14 @@ export default function SearchPage() {
           {isLoading && (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="bg-muted aspect-square animate-pulse rounded-xl" />
+                <div key={i} className="border-border bg-card overflow-hidden rounded-xl border">
+                  <div className="bg-muted aspect-square animate-pulse" />
+                  <div className="space-y-2 p-4">
+                    <div className="bg-muted h-3 w-1/3 animate-pulse rounded" />
+                    <div className="bg-muted h-4 w-3/4 animate-pulse rounded" />
+                    <div className="bg-muted mt-2 h-8 animate-pulse rounded-lg" />
+                  </div>
+                </div>
               ))}
             </div>
           )}
@@ -285,22 +299,22 @@ export default function SearchPage() {
           {/* Empty */}
           {!isLoading && data?.data?.length === 0 && (
             <div className="py-20 text-center">
-              <p className="text-foreground text-lg font-medium">No results found</p>
+              <p className="text-foreground text-lg font-medium">{t('search.no_results', 'No results found')}</p>
               {q && (
                 <p className="text-muted-foreground mt-1 text-sm">
-                  Try a different search or remove filters
+                  {t('search.try_different', 'Try a different search or remove filters')}
                 </p>
               )}
               {activeFilters.length > 0 && (
                 <button onClick={clearAll} className="text-primary mt-4 text-sm underline">
-                  Clear all filters
+                  {t('shop.clear_filters', 'Clear all filters')}
                 </button>
               )}
               {/* Suggested categories */}
               {categories && categories.length > 0 && (
                 <div className="mt-8">
                   <p className="text-muted-foreground mb-3 text-sm font-medium">
-                    Browse categories
+                    {t('search.browse_categories', 'Browse categories')}
                   </p>
                   <div className="flex flex-wrap justify-center gap-2">
                     {categories.slice(0, 6).map((cat) => (

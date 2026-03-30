@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Filters\CategoryFilter;
+use App\Filters\InStockFilter;
 use App\Filters\MaxPriceFilter;
 use App\Filters\MinPriceFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\ProductCollection;
 use App\Models\Category;
 use App\Models\Product;
+use App\Sorts\RatingSort;
 use App\Sorts\VariantPriceSort;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -36,11 +38,13 @@ class ProductController extends Controller
                 AllowedFilter::custom('category', new CategoryFilter),
                 AllowedFilter::custom('min_price', new MinPriceFilter),
                 AllowedFilter::custom('max_price', new MaxPriceFilter),
+                AllowedFilter::custom('in_stock', new InStockFilter),
             ])
             ->allowedSorts([
                 'name',
                 'created_at',
                 AllowedSort::custom('price', new VariantPriceSort),
+                AllowedSort::custom('rating', new RatingSort),
             ])
             ->defaultSort('name')
             ->with(['thumbnail', 'category', 'brand', 'activeVariants:id,product_id,price,compare_at_price', 'activeVariants.priceHistory'])
@@ -206,6 +210,25 @@ class ProductController extends Controller
         ]);
 
         return response()->json(['data' => $data]);
+    }
+
+    public function related(string $slug): JsonResponse
+    {
+        $product = Product::query()->available()->where('slug', $slug)->firstOrFail();
+
+        $related = Product::query()
+            ->available()
+            ->where('id', '!=', $product->id)
+            ->where(function ($q) use ($product): void {
+                $q->where('category_id', $product->category_id)
+                    ->orWhere('brand_id', $product->brand_id);
+            })
+            ->with(['thumbnail', 'brand', 'activeVariants:id,product_id,price,compare_at_price'])
+            ->inRandomOrder()
+            ->limit(8)
+            ->get();
+
+        return new ProductCollection($related)->response();
     }
 
     public function byCategory(string $slug): JsonResponse

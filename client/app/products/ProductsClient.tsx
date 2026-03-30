@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 import type { ProductFilters } from '@/api/products';
+import { BackToTop } from '@/components/back-to-top';
 import { ProductCard } from '@/components/product-card';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useProducts } from '@/hooks/use-products';
@@ -21,6 +22,7 @@ export default function ProductsClient() {
     { value: 'price', label: t('shop.sort_price_asc', 'Price: Low to High') },
     { value: '-price', label: t('shop.sort_price_desc', 'Price: High to Low') },
     { value: '-created_at', label: t('shop.sort_newest', 'Newest') },
+    { value: '-rating', label: t('shop.sort_rating', 'Top Rated') },
   ];
 
   const [showFilters, setShowFilters] = useState(false);
@@ -33,6 +35,7 @@ export default function ProductsClient() {
     sort: searchParams.get('sort') ?? undefined,
     min_price: searchParams.get('min_price') ? Number(searchParams.get('min_price')) : undefined,
     max_price: searchParams.get('max_price') ? Number(searchParams.get('max_price')) : undefined,
+    in_stock: searchParams.get('in_stock') === '1' ? true : undefined,
   };
 
   const { data, isLoading } = useProducts(filters);
@@ -44,8 +47,9 @@ export default function ProductsClient() {
     } else {
       params.delete(key);
     }
-    params.delete('page');
+    if (key !== 'page') params.delete('page');
     router.push(lp(`/products?${params.toString()}`));
+    if (key === 'page') window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   return (
@@ -133,7 +137,16 @@ export default function ProductsClient() {
               className="border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
             />
           </div>
-          <div className="col-span-2 flex items-end">
+          <div className="col-span-2 flex items-center gap-6">
+            <label className="flex cursor-pointer items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={!!filters.in_stock}
+                onChange={(e) => setParam('in_stock', e.target.checked ? '1' : '')}
+                className="accent-primary h-4 w-4 rounded"
+              />
+              {t('shop.in_stock_only', 'In stock only')}
+            </label>
             <button
               onClick={() => router.push(lp('/products'))}
               className="border-input bg-background hover:bg-accent rounded-md border px-3 py-1.5 text-sm"
@@ -148,7 +161,15 @@ export default function ProductsClient() {
       {isLoading ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="bg-muted aspect-square animate-pulse rounded-xl" />
+            <div key={i} className="border-border bg-card overflow-hidden rounded-xl border">
+              <div className="bg-muted aspect-square animate-pulse" />
+              <div className="space-y-2 p-4">
+                <div className="bg-muted h-3 w-1/3 animate-pulse rounded" />
+                <div className="bg-muted h-4 w-3/4 animate-pulse rounded" />
+                <div className="bg-muted h-4 w-1/2 animate-pulse rounded" />
+                <div className="bg-muted mt-3 h-9 animate-pulse rounded-lg" />
+              </div>
+            </div>
           ))}
         </div>
       ) : data?.data?.length === 0 ? (
@@ -191,6 +212,7 @@ export default function ProductsClient() {
           )}
         </>
       )}
+      <BackToTop />
     </div>
   );
 }
