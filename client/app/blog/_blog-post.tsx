@@ -47,7 +47,12 @@ export async function BlogPostView({ slug, locale }: { slug: string; locale: str
         items={[
           { label: 'Blog', href: localePath(locale, '/blog') },
           ...(post.category
-            ? [{ label: post.category.name, href: localePath(locale, `/blog?category=${post.category.slug}`) }]
+            ? [
+                {
+                  label: post.category.name,
+                  href: localePath(locale, `/blog?category=${post.category.slug}`),
+                },
+              ]
             : []),
           { label: post.title },
         ]}

@@ -508,7 +508,9 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
       {/* Related products */}
       {relatedProducts && relatedProducts.length > 0 && (
         <section className="mt-16">
-          <h2 className="mb-6 text-2xl font-bold">{t('product.related_products', 'You may also like')}</h2>
+          <h2 className="mb-6 text-2xl font-bold">
+            {t('product.related_products', 'You may also like')}
+          </h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {relatedProducts.slice(0, 4).map((related) => (
               <ProductCard key={related.id} product={related} />

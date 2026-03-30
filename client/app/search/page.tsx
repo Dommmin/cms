@@ -142,7 +142,9 @@ export default function SearchPage() {
       {/* Active filter chips */}
       {activeFilters.length > 0 && (
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          <span className="text-muted-foreground text-xs">{t('search.active_filters', 'Active:')}</span>
+          <span className="text-muted-foreground text-xs">
+            {t('search.active_filters', 'Active:')}
+          </span>
           {activeFilters.map((f) => (
             <button
               key={f.key}
@@ -299,7 +301,9 @@ export default function SearchPage() {
           {/* Empty */}
           {!isLoading && data?.data?.length === 0 && (
             <div className="py-20 text-center">
-              <p className="text-foreground text-lg font-medium">{t('search.no_results', 'No results found')}</p>
+              <p className="text-foreground text-lg font-medium">
+                {t('search.no_results', 'No results found')}
+              </p>
               {q && (
                 <p className="text-muted-foreground mt-1 text-sm">
                   {t('search.try_different', 'Try a different search or remove filters')}

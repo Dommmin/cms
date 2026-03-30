@@ -35,7 +35,7 @@ export default function AccountError({
         </button>
         <Link
           href={lp('/login')}
-          className="border-border rounded-xl border px-5 py-2 text-sm font-semibold hover:bg-accent"
+          className="border-border hover:bg-accent rounded-xl border px-5 py-2 text-sm font-semibold"
         >
           Sign in again
         </Link>
