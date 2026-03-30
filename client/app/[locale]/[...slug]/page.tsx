@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { getPage } from '@/api/cms';
 import { JsonLd } from '@/components/json-ld';
 import { PageRenderer } from '@/components/page-builder/page-renderer';
-import { DEFAULT_LOCALE } from '@/lib/i18n';
+import { DEFAULT_LOCALE, isValidLocale } from '@/lib/i18n';
 import { buildFaqPage, buildWebPage } from '@/lib/schema';
 import { generateCanonical } from '@/lib/seo';
 import type { PageData, PageProps } from './page.types';
@@ -13,8 +13,11 @@ export const revalidate = 3600;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   try {
-    const { slug } = await params;
-    const page = await getPage(slug.join('/'), DEFAULT_LOCALE);
+    const { locale, slug: rawSlug } = await params;
+    const [resolvedLocale, slug] = isValidLocale(locale)
+      ? [locale, rawSlug]
+      : [DEFAULT_LOCALE, [locale, ...rawSlug]];
+    const page = await getPage(slug.join('/'), resolvedLocale);
     return {
       title: page.seo_title ?? page.title,
       description: page.seo_description ?? undefined,
@@ -33,17 +36,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function DynamicPage({ params }: PageProps) {
-  const { slug } = await params;
-  const page = await getPage(slug.join('/'), DEFAULT_LOCALE).catch(() => null);
-  return <PageContent page={page} slug={slug} />;
+  const { locale, slug: rawSlug } = await params;
+  const [resolvedLocale, slug] = isValidLocale(locale)
+    ? [locale, rawSlug]
+    : [DEFAULT_LOCALE, [locale, ...rawSlug]];
+  const page = await getPage(slug.join('/'), resolvedLocale).catch(() => null);
+  return <PageContent page={page} slug={slug} locale={resolvedLocale} />;
 }
 
-function PageContent({ page, slug }: { page: PageData | null; slug: string[] }) {
+function PageContent({
+  page,
+  slug,
+  locale,
+}: {
+  page: PageData | null;
+  slug: string[];
+  locale: string;
+}) {
   if (!page || !page.is_published) {
     notFound();
   }
 
-  const path = `/${slug.join('/')}`;
+  const path = `/${locale}/${slug.join('/')}`;
 
   const schemaData =
     page.module_name === 'faq' &&

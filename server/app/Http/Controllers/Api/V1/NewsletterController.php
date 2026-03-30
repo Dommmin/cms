@@ -24,6 +24,7 @@ class NewsletterController extends Controller
             ['email' => $data['email']],
             [
                 'first_name' => $data['first_name'] ?? null,
+                'locale' => app()->getLocale(),
                 'token' => Str::uuid()->toString(),
                 'is_active' => false,
                 'consent_given' => false,
@@ -32,7 +33,7 @@ class NewsletterController extends Controller
         );
 
         Notification::route('mail', $subscriber->email)
-            ->notify(new NewsletterConfirmationNotification($subscriber));
+            ->notify((new NewsletterConfirmationNotification($subscriber))->locale($subscriber->locale));
 
         return response()->json([
             'message' => 'Please check your email to confirm your subscription.',
@@ -50,7 +51,7 @@ class NewsletterController extends Controller
         ]);
 
         Notification::route('mail', $subscriber->email)
-            ->notify(new NewsletterWelcomeNotification($subscriber));
+            ->notify((new NewsletterWelcomeNotification($subscriber))->locale($subscriber->locale));
 
         return response()->json([
             'message' => 'Your subscription has been confirmed. Welcome!',

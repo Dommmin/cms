@@ -94,10 +94,11 @@ export function FormEmbedBlock({ block }: FormEmbedProps) {
     e.preventDefault();
     setLoading(true);
     const formData = new FormData(e.currentTarget);
-    const payload: Record<string, unknown> = {};
+    const fields: Record<string, unknown> = {};
     formData.forEach((value, key) => {
-      payload[key] = value;
+      fields[key] = value;
     });
+    const payload: Record<string, unknown> = { fields };
     if (turnstileToken) {
       payload.cf_turnstile_response = turnstileToken;
     }

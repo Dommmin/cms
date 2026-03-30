@@ -70,8 +70,13 @@ export function useComparisonProducts() {
         acc[`ids[${i}]`] = id;
         return acc;
       }, {});
-      const { data } = await api.get<{ data: Product[] }>('/products/compare', { params });
-      return data.data;
+      try {
+        const { data } = await api.get<{ data: Product[] }>('/products/compare', { params });
+        return data.data;
+      } catch {
+        clearComparison();
+        return [];
+      }
     },
     enabled: ids.length >= 2,
     staleTime: 60 * 1000,

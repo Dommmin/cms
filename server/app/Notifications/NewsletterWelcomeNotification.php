@@ -26,14 +26,18 @@ class NewsletterWelcomeNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $unsubscribeUrl = config('app.frontend_url', config('app.url')).'/newsletter/unsubscribe?token='.$this->subscriber->token;
+        $locale = $this->subscriber->locale ?? 'en';
+        $prefix = $locale !== 'en' ? "/{$locale}" : '';
+        $unsubscribeUrl = config('app.frontend_url', config('app.url')).$prefix.'/newsletter/unsubscribe?token='.$this->subscriber->token;
+
+        $name = $this->subscriber->first_name ? ', '.$this->subscriber->first_name : '';
 
         return (new MailMessage)
-            ->subject('Welcome to our newsletter!')
-            ->greeting('Welcome'.($this->subscriber->first_name ? ', '.$this->subscriber->first_name : '').'!')
-            ->line("Your subscription has been confirmed. You're now on our list!")
-            ->line("You'll receive updates about new products, promotions, and news from us.")
-            ->line('If you ever want to unsubscribe, click the link below.')
-            ->action('Unsubscribe', $unsubscribeUrl);
+            ->subject(__('notifications.newsletter_welcome.subject'))
+            ->greeting(str_replace(':name', $name, __('notifications.newsletter_welcome.greeting')))
+            ->line(__('notifications.newsletter_welcome.line1'))
+            ->line(__('notifications.newsletter_welcome.line2'))
+            ->line(__('notifications.newsletter_welcome.line3'))
+            ->action(__('notifications.newsletter_welcome.action'), $unsubscribeUrl);
     }
 }

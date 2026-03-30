@@ -26,14 +26,18 @@ class NewsletterConfirmationNotification extends Notification implements ShouldQ
 
     public function toMail(object $notifiable): MailMessage
     {
-        $confirmUrl = config('app.frontend_url', config('app.url')).'/newsletter/confirm?token='.$this->subscriber->token;
+        $locale = $this->subscriber->locale ?? 'en';
+        $prefix = $locale !== 'en' ? "/{$locale}" : '';
+        $confirmUrl = config('app.frontend_url', config('app.url')).$prefix.'/newsletter/confirm?token='.$this->subscriber->token;
+
+        $name = $this->subscriber->first_name ? ', '.$this->subscriber->first_name : '';
 
         return (new MailMessage)
-            ->subject('Please confirm your newsletter subscription')
-            ->greeting('Hello'.($this->subscriber->first_name ? ', '.$this->subscriber->first_name : '').'!')
-            ->line('Thank you for subscribing to our newsletter.')
-            ->line('Please click the button below to confirm your subscription.')
-            ->action('Confirm Subscription', $confirmUrl)
-            ->line('If you did not sign up for this newsletter, you can safely ignore this email.');
+            ->subject(__('notifications.newsletter_confirmation.subject'))
+            ->greeting(str_replace(':name', $name, __('notifications.newsletter_confirmation.greeting')))
+            ->line(__('notifications.newsletter_confirmation.line1'))
+            ->line(__('notifications.newsletter_confirmation.line2'))
+            ->action(__('notifications.newsletter_confirmation.action'), $confirmUrl)
+            ->line(__('notifications.newsletter_confirmation.line3'));
     }
 }

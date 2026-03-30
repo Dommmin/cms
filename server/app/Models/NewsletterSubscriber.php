@@ -17,7 +17,7 @@ class NewsletterSubscriber extends Model
     protected $table = 'newsletter_subscribers';
 
     protected $fillable = [
-        'customer_id', 'email', 'first_name', 'token', 'tags',
+        'customer_id', 'email', 'first_name', 'locale', 'token', 'tags',
         'consent_given', 'consent_given_at', 'consent_ip', 'consent_source',
         'is_active', 'unsubscribed_at', 'unsubscribe_reason',
         'is_bounced', 'bounced_at',

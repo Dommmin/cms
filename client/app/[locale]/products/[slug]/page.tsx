@@ -1,11 +1,15 @@
+import type { Metadata } from 'next';
+
+import ProductDetailClient from '@/app/products/[slug]/ProductDetailClient';
 import { generateAlternates } from '@/lib/seo';
 import { serverFetch } from '@/lib/server-fetch';
 import type { Product } from '@/types/api';
-import type { Metadata } from 'next';
-import ProductDetailClient from './ProductDetailClient';
-import type { PageProps } from './page.types';
 
 export const revalidate = 3600;
+
+interface PageProps {
+  params: Promise<{ locale: string; slug: string }>;
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   try {

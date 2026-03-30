@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
+export const revalidate = 300;
+
 import { getPage } from '@/api/cms';
 import { PageRenderer } from '@/components/page-builder/page-renderer';
 import { RecentlyViewed } from '@/components/recently-viewed';
