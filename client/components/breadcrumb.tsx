@@ -1,21 +1,17 @@
 import { ChevronRight, Home } from 'lucide-react';
 import Link from 'next/link';
 
-export interface BreadcrumbItem {
-  label: string;
-  href?: string;
-}
+import type { BreadcrumbProps } from './breadcrumb.types';
 
-interface BreadcrumbProps {
-  items: BreadcrumbItem[];
-}
-
-export function Breadcrumb({ items }: BreadcrumbProps) {
+export function Breadcrumb({ items, homeHref = '/' }: BreadcrumbProps) {
   return (
     <nav aria-label="Breadcrumb" className="mb-6">
       <ol className="text-muted-foreground flex flex-wrap items-center gap-1 text-sm">
         <li>
-          <Link href="/" className="hover:text-foreground flex items-center transition-colors">
+          <Link
+            href={homeHref}
+            className="hover:text-foreground flex items-center transition-colors"
+          >
             <Home className="h-3.5 w-3.5" aria-hidden="true" />
             <span className="sr-only">Home</span>
           </Link>

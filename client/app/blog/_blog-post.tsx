@@ -44,6 +44,7 @@ export async function BlogPostView({ slug, locale }: { slug: string; locale: str
       />
 
       <Breadcrumb
+        homeHref={localePath(locale, '/')}
         items={[
           { label: 'Blog', href: localePath(locale, '/blog') },
           ...(post.category

@@ -168,7 +168,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-      <Breadcrumb items={breadcrumbs} />
+      <Breadcrumb items={breadcrumbs} homeHref={lp('/')} />
       <JsonLd data={buildProduct(product, { url: productUrl, reviews })} />
       <JsonLd
         data={buildBreadcrumbList([

@@ -220,8 +220,12 @@ class ProductController extends Controller
             ->available()
             ->where('id', '!=', $product->id)
             ->where(function ($q) use ($product): void {
-                $q->where('category_id', $product->category_id)
-                    ->orWhere('brand_id', $product->brand_id);
+                if ($product->category_id !== null) {
+                    $q->orWhere('category_id', $product->category_id);
+                }
+                if ($product->brand_id !== null) {
+                    $q->orWhere('brand_id', $product->brand_id);
+                }
             })
             ->with(['thumbnail', 'brand', 'activeVariants:id,product_id,price,compare_at_price'])
             ->inRandomOrder()
