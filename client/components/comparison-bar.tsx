@@ -3,6 +3,7 @@
 import { X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 import {
   clearComparison,
@@ -16,10 +17,17 @@ import { useTranslation } from '@/hooks/use-translation';
 export function ComparisonBar() {
   const { t } = useTranslation();
   const lp = useLocalePath();
-  const ids = useComparisonIds();
-  const { data: products = [] } = useComparisonProducts();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  if (ids.length === 0) return null;
+  const ids = useComparisonIds();
+  const { data } = useComparisonProducts();
+  const products = data?.products ?? [];
+
+  // Never render on SSR — localStorage not available, would cause hydration mismatch
+  if (!mounted || ids.length === 0) return null;
 
   return (
     <div className="border-border bg-background/95 fixed right-0 bottom-0 left-0 z-40 border-t shadow-lg backdrop-blur-sm">

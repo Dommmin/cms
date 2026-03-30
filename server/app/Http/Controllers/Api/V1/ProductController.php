@@ -167,13 +167,19 @@ class ProductController extends Controller
             return response()->json(['message' => 'No products found.'], 404);
         }
 
-        $productTypeIds = $products->pluck('product_type_id')->unique();
+        // Collect attribute keys shared by ALL products so the table only shows meaningful rows
+        $allAttributeKeys = $products->map(function (Product $product): array {
+            return $product->activeVariants->flatMap(
+                fn ($v) => $v->attributeValues->map(fn ($av) => $av->attribute->name)
+            )->unique()->values()->all();
+        });
 
-        if ($productTypeIds->count() > 1) {
-            return response()->json([
-                'message' => 'All products must be of the same product type for comparison.',
-            ], 422);
-        }
+        $sharedAttributeKeys = $allAttributeKeys->reduce(
+            fn ($carry, $keys) => $carry === null
+                ? collect($keys)
+                : $carry->intersect($keys),
+            null
+        )?->values()->all() ?? [];
 
         $data = $products->map(fn (Product $product): array => [
             'id' => $product->id,
@@ -209,7 +215,10 @@ class ProductController extends Controller
             ]),
         ]);
 
-        return response()->json(['data' => $data]);
+        return response()->json([
+            'data' => $data,
+            'meta' => ['shared_attribute_keys' => $sharedAttributeKeys],
+        ]);
     }
 
     public function related(string $slug): JsonResponse

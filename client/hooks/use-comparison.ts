@@ -25,9 +25,12 @@ function saveIds(ids: number[]): void {
 }
 
 export function useComparisonIds() {
-  const [ids, setIds] = useState<number[]>(() => getIds());
+  // Always start with [] to match SSR output — hydrate from localStorage after mount
+  const [ids, setIds] = useState<number[]>([]);
 
   useEffect(() => {
+    // Sync on mount and on every comparison-change event
+    setIds(getIds());
     const handler = () => setIds(getIds());
     window.addEventListener('comparison-change', handler);
     return () => window.removeEventListener('comparison-change', handler);
@@ -59,23 +62,34 @@ export function useIsInComparison(id: number) {
   return ids.includes(id);
 }
 
+interface CompareResponse {
+  products: Product[];
+  sharedAttributeKeys: string[];
+}
+
 export function useComparisonProducts() {
   const ids = useComparisonIds();
 
   return useQuery({
     queryKey: ['comparison', ids.join(',')],
-    queryFn: async (): Promise<Product[]> => {
-      if (ids.length === 0) return [];
+    queryFn: async (): Promise<CompareResponse> => {
+      if (ids.length === 0) return { products: [], sharedAttributeKeys: [] };
       const params = ids.reduce<Record<string, number>>((acc, id, i) => {
         acc[`ids[${i}]`] = id;
         return acc;
       }, {});
       try {
-        const { data } = await api.get<{ data: Product[] }>('/products/compare', { params });
-        return data.data;
+        const { data } = await api.get<{
+          data: Product[];
+          meta: { shared_attribute_keys: string[] };
+        }>('/products/compare', { params });
+        return {
+          products: data.data,
+          sharedAttributeKeys: data.meta?.shared_attribute_keys ?? [],
+        };
       } catch {
         clearComparison();
-        return [];
+        return { products: [], sharedAttributeKeys: [] };
       }
     },
     enabled: ids.length >= 2,
