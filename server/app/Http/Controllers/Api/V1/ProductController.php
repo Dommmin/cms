@@ -167,57 +167,75 @@ class ProductController extends Controller
             return response()->json(['message' => 'No products found.'], 404);
         }
 
-        // Collect attribute keys shared by ALL products so the table only shows meaningful rows
-        $allAttributeKeys = $products->map(function (Product $product): array {
-            return $product->activeVariants->flatMap(
-                fn ($v) => $v->attributeValues->map(fn ($av) => $av->attribute->name)
-            )->unique()->values()->all();
+        // Build per-product attribute map: { "RAM" => ["16 GB", "32 GB"], "Storage" => ["512 GB"] }
+        // Values are aggregated (unique) across all active variants of each product.
+        $productAttributeMaps = $products->map(function (Product $product): array {
+            $map = [];
+            foreach ($product->activeVariants as $variant) {
+                foreach ($variant->attributeValues as $av) {
+                    $key = $av->attribute->name;
+                    $val = $av->attributeValue->value;
+                    if (! isset($map[$key])) {
+                        $map[$key] = [];
+                    }
+                    if (! in_array($val, $map[$key], true)) {
+                        $map[$key][] = $val;
+                    }
+                }
+            }
+
+            return $map;
         });
 
-        $sharedAttributeKeys = $allAttributeKeys->reduce(
-            fn ($carry, $keys) => $carry === null
-                ? collect($keys)
-                : $carry->intersect($keys),
-            null
-        )?->values()->all() ?? [];
+        // Union of all attribute keys across all products — preserves insertion order
+        $allAttributeKeys = $productAttributeMaps
+            ->flatMap(fn (array $map): array => array_keys($map))
+            ->unique()
+            ->values()
+            ->all();
 
-        $data = $products->map(fn (Product $product): array => [
-            'id' => $product->id,
-            'name' => $product->name,
-            'slug' => $product->slug,
-            'is_active' => $product->is_active,
-            'short_description' => $product->short_description,
-            'price_min' => $product->priceRange()['min'],
-            'price_max' => $product->priceRange()['max'],
-            'thumbnail' => $product->thumbnail ? [
-                'url' => $product->thumbnail->getUrl(),
-                'alt' => $product->thumbnail->name,
-            ] : null,
-            'category' => $product->category ? [
-                'id' => $product->category->id,
-                'name' => $product->category->name,
-                'slug' => $product->category->slug,
-            ] : null,
-            'brand' => $product->brand ? [
-                'id' => $product->brand->id,
-                'name' => $product->brand->name,
-            ] : null,
-            'variants' => $product->activeVariants->map(fn ($variant): array => [
-                'id' => $variant->id,
-                'sku' => $variant->sku,
-                'price' => $variant->price,
-                'stock_quantity' => $variant->stock_quantity,
-                'is_available' => $variant->isInStock(),
-                'is_default' => $variant->is_default,
-                'attributes' => $variant->attributeValues->mapWithKeys(
-                    fn ($av): array => [$av->attribute->name => $av->attributeValue->value]
-                )->all(),
-            ]),
-        ]);
+        $data = $products->mapWithKeys(function (Product $product, int $index) use ($productAttributeMaps): array {
+            return [$index => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'is_active' => $product->is_active,
+                'short_description' => $product->short_description,
+                'price_min' => $product->priceRange()['min'],
+                'price_max' => $product->priceRange()['max'],
+                'thumbnail' => $product->thumbnail ? [
+                    'url' => $product->thumbnail->getUrl(),
+                    'alt' => $product->thumbnail->name,
+                ] : null,
+                'category' => $product->category ? [
+                    'id' => $product->category->id,
+                    'name' => $product->category->name,
+                    'slug' => $product->category->slug,
+                ] : null,
+                'brand' => $product->brand ? [
+                    'id' => $product->brand->id,
+                    'name' => $product->brand->name,
+                ] : null,
+                // Aggregated attribute map for this product
+                'attribute_map' => $productAttributeMaps[$index],
+                // Keep variants for add-to-cart
+                'variants' => $product->activeVariants->map(fn ($variant): array => [
+                    'id' => $variant->id,
+                    'sku' => $variant->sku,
+                    'price' => $variant->price,
+                    'stock_quantity' => $variant->stock_quantity,
+                    'is_available' => $variant->isInStock(),
+                    'is_default' => $variant->is_default,
+                    'attributes' => $variant->attributeValues->mapWithKeys(
+                        fn ($av): array => [$av->attribute->name => $av->attributeValue->value]
+                    )->all(),
+                ]),
+            ]];
+        })->values();
 
         return response()->json([
             'data' => $data,
-            'meta' => ['shared_attribute_keys' => $sharedAttributeKeys],
+            'meta' => ['attribute_keys' => $allAttributeKeys],
         ]);
     }
 

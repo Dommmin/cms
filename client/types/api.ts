@@ -130,6 +130,9 @@ export interface Product {
   category: Category | null;
   brand: Brand | null;
   attributes: Attribute[];
+  /** Aggregated attribute values per key, present only in compare endpoint response */
+  attribute_map?: Record<string, string[]>;
+  product_type_id?: number | null;
   created_at: string;
   seo_title: string | null;
   seo_description: string | null;

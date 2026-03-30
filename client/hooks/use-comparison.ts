@@ -64,7 +64,7 @@ export function useIsInComparison(id: number) {
 
 interface CompareResponse {
   products: Product[];
-  sharedAttributeKeys: string[];
+  attributeKeys: string[];
 }
 
 export function useComparisonProducts() {
@@ -73,7 +73,7 @@ export function useComparisonProducts() {
   return useQuery({
     queryKey: ['comparison', ids.join(',')],
     queryFn: async (): Promise<CompareResponse> => {
-      if (ids.length === 0) return { products: [], sharedAttributeKeys: [] };
+      if (ids.length === 0) return { products: [], attributeKeys: [] };
       const params = ids.reduce<Record<string, number>>((acc, id, i) => {
         acc[`ids[${i}]`] = id;
         return acc;
@@ -81,15 +81,15 @@ export function useComparisonProducts() {
       try {
         const { data } = await api.get<{
           data: Product[];
-          meta: { shared_attribute_keys: string[] };
+          meta: { attribute_keys: string[] };
         }>('/products/compare', { params });
         return {
           products: data.data,
-          sharedAttributeKeys: data.meta?.shared_attribute_keys ?? [],
+          attributeKeys: data.meta?.attribute_keys ?? [],
         };
       } catch {
         clearComparison();
-        return { products: [], sharedAttributeKeys: [] };
+        return { products: [], attributeKeys: [] };
       }
     },
     enabled: ids.length >= 2,
