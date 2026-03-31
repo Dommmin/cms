@@ -24,7 +24,7 @@ export function ComparisonBar() {
 
   const ids = useComparisonIds();
   const { data } = useComparisonProducts();
-  const products = data?.products ?? [];
+  const products = Array.isArray(data?.products) ? data.products : [];
 
   // Never render on SSR — localStorage not available, would cause hydration mismatch
   if (!mounted || ids.length === 0) return null;

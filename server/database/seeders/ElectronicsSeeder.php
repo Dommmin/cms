@@ -27,6 +27,43 @@ class ElectronicsSeeder extends Seeder
     private array $attributeValues = [];
     private array $generatedSkus = [];
 
+    /** @var array<string, string> Polish → English variant name translations */
+    private array $variantNameEn = [
+        'Wersja podstawowa'        => 'Basic',
+        'Wersja z montazem'        => 'With Installation',
+        'Zestaw z subwooferem'     => 'With Subwoofer',
+        'Zestaw 5.1'               => '5.1 System',
+        'Wersja XL'                => 'XL Edition',
+        'Z Windows 11'             => 'With Windows 11',
+        'Z regulacja wysokosci'    => 'Height Adjustable',
+        'Z dodatkowym kontrolerem' => 'With Extra Controller',
+        'Z instalacja'             => 'With Installation',
+        'Z obiektywem kit'         => 'With Kit Lens',
+        'Czarny'                   => 'Black',
+        'Bialy'                    => 'White',
+        'Zielony'                  => 'Green',
+        'Zolty'                    => 'Yellow',
+        'Niebieski'                => 'Blue',
+        'Czerwony'                 => 'Red',
+        // unchanged in both languages
+        'Standard'        => 'Standard',
+        'Soundbar'        => 'Soundbar',
+        'RGB'             => 'RGB',
+        'Digital Edition' => 'Digital Edition',
+        'Deluxe Edition'  => 'Deluxe Edition',
+        'Body'            => 'Body',
+        'Box'             => 'Box',
+        'Tray'            => 'Tray',
+        'Starter Kit'     => 'Starter Kit',
+        'Single'          => 'Single',
+    ];
+
+    /** @return array{pl: string, en: string} */
+    private function vn(string $pl): array
+    {
+        return ['pl' => $pl, 'en' => $this->variantNameEn[$pl] ?? $pl];
+    }
+
     public function run(): void
     {
         if (Product::query()->whereHas('category', fn ($q) => $q->where('slug', 'like', 'rtv%')->orWhere('slug', 'like', 'komputery%'))->exists()) {
@@ -877,8 +914,8 @@ class ElectronicsSeeder extends Seeder
                     'productType' => 'Telewizor',
                     'price' => $price,
                     'variants' => [
-                        ['name' => 'Wersja podstawowa', 'price' => $price, 'sku' => $this->generateSku($brand, (string) $size)],
-                        ['name' => 'Wersja z montazem', 'price' => $price + 300, 'sku' => $this->generateSku($brand, (string) $size) . '-M'],
+                        ['name' => $this->vn('Wersja podstawowa'), 'price' => $price, 'sku' => $this->generateSku($brand, (string) $size)],
+                        ['name' => $this->vn('Wersja z montazem'), 'price' => $price + 300, 'sku' => $this->generateSku($brand, (string) $size) . '-M'],
                     ],
                 ];
             }
@@ -915,9 +952,9 @@ class ElectronicsSeeder extends Seeder
                     'productType' => 'Soundbar',
                     'price' => $price,
                     'variants' => [
-                        ['name' => 'Soundbar', 'price' => $price, 'sku' => $this->generateSku($brand, 'SB')],
-                        ['name' => 'Zestaw z subwooferem', 'price' => $price + 500, 'sku' => $this->generateSku($brand, 'SB') . '-SW'],
-                        ['name' => 'Zestaw 5.1', 'price' => $price + 1500, 'sku' => $this->generateSku($brand, 'SB') . '-51'],
+                        ['name' => $this->vn('Soundbar'), 'price' => $price, 'sku' => $this->generateSku($brand, 'SB')],
+                        ['name' => $this->vn('Zestaw z subwooferem'), 'price' => $price + 500, 'sku' => $this->generateSku($brand, 'SB') . '-SW'],
+                        ['name' => $this->vn('Zestaw 5.1'), 'price' => $price + 1500, 'sku' => $this->generateSku($brand, 'SB') . '-51'],
                     ],
                 ];
             }
@@ -950,8 +987,8 @@ class ElectronicsSeeder extends Seeder
                     'productType' => 'Sluchawki',
                     'price' => $price,
                     'variants' => [
-                        ['name' => 'Czarny', 'price' => $price, 'sku' => $this->generateSku($brand, 'HP') . '-BK'],
-                        ['name' => 'Bialy', 'price' => $price, 'sku' => $this->generateSku($brand, 'HP') . '-WH'],
+                        ['name' => $this->vn('Czarny'), 'price' => $price, 'sku' => $this->generateSku($brand, 'HP') . '-BK'],
+                        ['name' => $this->vn('Bialy'), 'price' => $price, 'sku' => $this->generateSku($brand, 'HP') . '-WH'],
                     ],
                 ];
             }
@@ -981,8 +1018,8 @@ class ElectronicsSeeder extends Seeder
                     'productType' => 'Glownik Bluetooth',
                     'price' => $price,
                     'variants' => [
-                        ['name' => 'Standard', 'price' => $price, 'sku' => $this->generateSku($brand, 'SP')],
-                        ['name' => 'Wersja XL', 'price' => $price + 300, 'sku' => $this->generateSku($brand, 'SP') . '-XL'],
+                        ['name' => $this->vn('Standard'), 'price' => $price, 'sku' => $this->generateSku($brand, 'SP')],
+                        ['name' => $this->vn('Wersja XL'), 'price' => $price + 300, 'sku' => $this->generateSku($brand, 'SP') . '-XL'],
                     ],
                 ];
             }
@@ -1072,7 +1109,11 @@ class ElectronicsSeeder extends Seeder
                 $model = $this->generateWatchModel();
                 $price = rand($priceMin, $priceMax);
                 
-                $watchColors = ['Czarny', 'Bialy', 'Zielony'];
+                $watchColors = [
+                    ['pl' => 'Czarny', 'en' => 'Black'],
+                    ['pl' => 'Bialy',  'en' => 'White'],
+                    ['pl' => 'Zielony', 'en' => 'Green'],
+                ];
 
                 $configs[] = [
                     'name' => $brand . ' ' . $model,
@@ -1126,8 +1167,8 @@ class ElectronicsSeeder extends Seeder
                     'productType' => 'Laptop',
                     'price' => $price,
                     'variants' => [
-                        ['name' => 'Standard', 'price' => $price, 'sku' => $this->generateSku($brand, 'LT')],
-                        ['name' => 'Z Windows 11', 'price' => $price + 400, 'sku' => $this->generateSku($brand, 'LT') . '-WIN'],
+                        ['name' => $this->vn('Standard'), 'price' => $price, 'sku' => $this->generateSku($brand, 'LT')],
+                        ['name' => $this->vn('Z Windows 11'), 'price' => $price + 400, 'sku' => $this->generateSku($brand, 'LT') . '-WIN'],
                     ],
                 ];
             }
@@ -1158,8 +1199,8 @@ class ElectronicsSeeder extends Seeder
                     'productType' => 'Monitor',
                     'price' => $price,
                     'variants' => [
-                        ['name' => 'Standard', 'price' => $price, 'sku' => $this->generateSku($brand, 'MN')],
-                        ['name' => 'Z regulacja wysokosci', 'price' => $price + 300, 'sku' => $this->generateSku($brand, 'MN') . '-ARM'],
+                        ['name' => $this->vn('Standard'), 'price' => $price, 'sku' => $this->generateSku($brand, 'MN')],
+                        ['name' => $this->vn('Z regulacja wysokosci'), 'price' => $price + 300, 'sku' => $this->generateSku($brand, 'MN') . '-ARM'],
                     ],
                 ];
             }
@@ -1204,8 +1245,8 @@ class ElectronicsSeeder extends Seeder
                                         ($componentType === 'Dyski SSD' ? 'Dysk SSD' : 'Pamiec RAM')),
                         'price' => $price,
                         'variants' => [
-                            ['name' => 'Box', 'price' => $price, 'sku' => $this->generateSku($brand, 'COMP')],
-                            ['name' => 'Tray', 'price' => $price - 50, 'sku' => $this->generateSku($brand, 'COMP') . '-T'],
+                            ['name' => $this->vn('Box'), 'price' => $price, 'sku' => $this->generateSku($brand, 'COMP')],
+                            ['name' => $this->vn('Tray'), 'price' => $price - 50, 'sku' => $this->generateSku($brand, 'COMP') . '-T'],
                         ],
                     ];
                 }
@@ -1237,8 +1278,8 @@ class ElectronicsSeeder extends Seeder
                     'productType' => str_contains($category, 'Klawiatur') ? 'Klawiatura' : 'Mysz',
                     'price' => $price,
                     'variants' => [
-                        ['name' => 'Standard', 'price' => $price, 'sku' => $this->generateSku($brand, 'PER')],
-                        ['name' => 'RGB', 'price' => $price + 100, 'sku' => $this->generateSku($brand, 'PER') . '-RGB'],
+                        ['name' => $this->vn('Standard'), 'price' => $price, 'sku' => $this->generateSku($brand, 'PER')],
+                        ['name' => $this->vn('RGB'), 'price' => $price + 100, 'sku' => $this->generateSku($brand, 'PER') . '-RGB'],
                     ],
                 ];
             }
@@ -1270,9 +1311,9 @@ class ElectronicsSeeder extends Seeder
                     'productType' => 'Konsole do gier',
                     'price' => $price,
                     'variants' => [
-                        ['name' => 'Standard', 'price' => $price, 'sku' => $this->generateSku($brand, 'CON')],
-                        ['name' => 'Digital Edition', 'price' => $price - 500, 'sku' => $this->generateSku($brand, 'CON') . '-DL'],
-                        ['name' => 'Z dodatkowym kontrolerem', 'price' => $price + 300, 'sku' => $this->generateSku($brand, 'CON') . '-BUN'],
+                        ['name' => $this->vn('Standard'), 'price' => $price, 'sku' => $this->generateSku($brand, 'CON')],
+                        ['name' => $this->vn('Digital Edition'), 'price' => $price - 500, 'sku' => $this->generateSku($brand, 'CON') . '-DL'],
+                        ['name' => $this->vn('Z dodatkowym kontrolerem'), 'price' => $price + 300, 'sku' => $this->generateSku($brand, 'CON') . '-BUN'],
                     ],
                 ];
             }
@@ -1300,8 +1341,8 @@ class ElectronicsSeeder extends Seeder
                     'productType' => 'Gra',
                     'price' => $price,
                     'variants' => [
-                        ['name' => 'Standard', 'price' => $price, 'sku' => $this->generateSku($brand, 'GAM')],
-                        ['name' => 'Deluxe Edition', 'price' => $price + 100, 'sku' => $this->generateSku($brand, 'GAM') . '-DLX'],
+                        ['name' => $this->vn('Standard'), 'price' => $price, 'sku' => $this->generateSku($brand, 'GAM')],
+                        ['name' => $this->vn('Deluxe Edition'), 'price' => $price + 100, 'sku' => $this->generateSku($brand, 'GAM') . '-DLX'],
                     ],
                 ];
             }
@@ -1346,8 +1387,8 @@ class ElectronicsSeeder extends Seeder
                                     ($category === 'Plyty grzewcze' ? 'Plyta grzewcza' : 'Kuchenka mikrofalowa'))),
                     'price' => $price,
                     'variants' => [
-                        ['name' => 'Standard', 'price' => $price, 'sku' => $this->generateSku($brand, 'AGD')],
-                        ['name' => 'Z instalacja', 'price' => $price + 200, 'sku' => $this->generateSku($brand, 'AGD') . '-INST'],
+                        ['name' => $this->vn('Standard'), 'price' => $price, 'sku' => $this->generateSku($brand, 'AGD')],
+                        ['name' => $this->vn('Z instalacja'), 'price' => $price + 200, 'sku' => $this->generateSku($brand, 'AGD') . '-INST'],
                     ],
                 ];
             }
@@ -1398,7 +1439,7 @@ class ElectronicsSeeder extends Seeder
                     'productType' => $productType,
                     'price' => $price,
                     'variants' => [
-                        ['name' => 'Standard', 'price' => $price, 'sku' => $this->generateSku($brand, 'SAGD')],
+                        ['name' => $this->vn('Standard'), 'price' => $price, 'sku' => $this->generateSku($brand, 'SAGD')],
                     ],
                 ];
             }
@@ -1443,8 +1484,8 @@ class ElectronicsSeeder extends Seeder
                     'productType' => $productType,
                     'price' => $price,
                     'variants' => [
-                        ['name' => 'Body', 'price' => $price, 'sku' => $this->generateSku($brand, 'CAM')],
-                        ['name' => 'Z obiektywem kit', 'price' => $price + 500, 'sku' => $this->generateSku($brand, 'CAM') . '-KIT'],
+                        ['name' => $this->vn('Body'), 'price' => $price, 'sku' => $this->generateSku($brand, 'CAM')],
+                        ['name' => $this->vn('Z obiektywem kit'), 'price' => $price + 500, 'sku' => $this->generateSku($brand, 'CAM') . '-KIT'],
                     ],
                 ];
             }
@@ -1473,7 +1514,7 @@ class ElectronicsSeeder extends Seeder
                     'productType' => 'Obiektyw',
                     'price' => $price,
                     'variants' => [
-                        ['name' => 'Standard', 'price' => $price, 'sku' => $this->generateSku($brand, 'LEN')],
+                        ['name' => $this->vn('Standard'), 'price' => $price, 'sku' => $this->generateSku($brand, 'LEN')],
                     ],
                 ];
             }
@@ -1502,7 +1543,7 @@ class ElectronicsSeeder extends Seeder
                     'productType' => 'Akcesoria fotograficzne',
                     'price' => $price,
                     'variants' => [
-                        ['name' => 'Standard', 'price' => $price, 'sku' => $this->generateSku($brand, 'ACC')],
+                        ['name' => $this->vn('Standard'), 'price' => $price, 'sku' => $this->generateSku($brand, 'ACC')],
                     ],
                 ];
             }
@@ -1553,8 +1594,8 @@ class ElectronicsSeeder extends Seeder
                     'productType' => $productType,
                     'price' => $price,
                     'variants' => [
-                        ['name' => 'Starter Kit', 'price' => $price + 100, 'sku' => $this->generateSku($brand, 'KIT')],
-                        ['name' => 'Single', 'price' => $price, 'sku' => $this->generateSku($brand, 'SGL')],
+                        ['name' => $this->vn('Starter Kit'), 'price' => $price + 100, 'sku' => $this->generateSku($brand, 'KIT')],
+                        ['name' => $this->vn('Single'), 'price' => $price, 'sku' => $this->generateSku($brand, 'SGL')],
                     ],
                 ];
             }
@@ -1678,9 +1719,14 @@ class ElectronicsSeeder extends Seeder
 
     private function attachVariantAttributes(string $productType, ProductVariant $variant, array $variantConfig): void
     {
+        // Extract PL name for attribute resolution (name may now be a bilingual array)
+        $variantName = is_array($variantConfig['name'])
+            ? ($variantConfig['name']['pl'] ?? '')
+            : (string) $variantConfig['name'];
+
         $assignments = isset($variantConfig['attributes']) && is_array($variantConfig['attributes'])
             ? $variantConfig['attributes']
-            : $this->resolveVariantAttributeAssignments($productType, (string) $variantConfig['name']);
+            : $this->resolveVariantAttributeAssignments($productType, $variantName);
 
         foreach ($assignments as $attributeSlug => $valueLabel) {
             $attributeId = $this->attributes[$attributeSlug] ?? null;
@@ -1770,13 +1816,20 @@ class ElectronicsSeeder extends Seeder
 
         foreach ($storageOptions as $storage) {
             foreach ($colorOptions as $color) {
+                // $color may be a bilingual array ['pl' => ..., 'en' => ...] or a plain string
+                $colorPl = is_array($color) ? $color['pl'] : $color;
+                $colorEn = is_array($color) ? $color['en'] : $color;
+
                 $variants[] = [
-                    'name' => sprintf('%dGB / %s', $storage, $color),
+                    'name' => [
+                        'pl' => sprintf('%dGB / %s', $storage, $colorPl),
+                        'en' => sprintf('%dGB / %s', $storage, $colorEn),
+                    ],
                     'price' => $basePrice + $this->storagePriceDelta($storage),
                     'sku' => $this->generateSku($brand, $skuType),
                     'attributes' => [
                         'storage' => sprintf('%dGB', $storage),
-                        'color' => $color,
+                        'color' => $colorPl,
                     ],
                 ];
             }
@@ -1791,8 +1844,10 @@ class ElectronicsSeeder extends Seeder
 
         foreach ($storageOptions as $storage) {
             foreach (['Wi-Fi', 'Wi-Fi + 5G'] as $connectivity) {
+                $label = sprintf('%dGB / %s', $storage, $connectivity);
+
                 $variants[] = [
-                    'name' => sprintf('%dGB / %s', $storage, $connectivity),
+                    'name' => ['pl' => $label, 'en' => $label],
                     'price' => $basePrice + $this->storagePriceDelta($storage) + ($connectivity === 'Wi-Fi + 5G' ? 500 : 0),
                     'sku' => $this->generateSku($brand, 'TB'),
                     'attributes' => [
@@ -1812,13 +1867,20 @@ class ElectronicsSeeder extends Seeder
 
         foreach ([41, 45] as $size) {
             foreach ($colors as $color) {
+                // $color may be a bilingual array ['pl' => ..., 'en' => ...] or a plain string
+                $colorPl = is_array($color) ? $color['pl'] : $color;
+                $colorEn = is_array($color) ? $color['en'] : $color;
+
                 $variants[] = [
-                    'name' => sprintf('%dmm / %s', $size, $color),
+                    'name' => [
+                        'pl' => sprintf('%dmm / %s', $size, $colorPl),
+                        'en' => sprintf('%dmm / %s', $size, $colorEn),
+                    ],
                     'price' => $basePrice + ($size === 45 ? 200 : 0),
                     'sku' => $this->generateSku($brand, 'WT'),
                     'attributes' => [
                         'case-size' => sprintf('%dmm', $size),
-                        'color' => $color,
+                        'color' => $colorPl,
                     ],
                 ];
             }
@@ -1827,13 +1889,14 @@ class ElectronicsSeeder extends Seeder
         return $variants;
     }
 
+    /** @return array<array{pl: string, en: string}> */
     private function getPhoneColors(string $brand): array
     {
         return match (Str::lower($brand)) {
-            'apple' => ['Czarny', 'Bialy', 'Czerwony'],
-            'samsung' => ['Czarny', 'Zielony', 'Zolty'],
-            'xiaomi', 'oppo', 'realme' => ['Czarny', 'Niebieski', 'Zielony'],
-            default => ['Czarny', 'Bialy', 'Niebieski'],
+            'apple'                   => [['pl' => 'Czarny', 'en' => 'Black'], ['pl' => 'Bialy', 'en' => 'White'], ['pl' => 'Czerwony', 'en' => 'Red']],
+            'samsung'                 => [['pl' => 'Czarny', 'en' => 'Black'], ['pl' => 'Zielony', 'en' => 'Green'], ['pl' => 'Zolty', 'en' => 'Yellow']],
+            'xiaomi', 'oppo', 'realme' => [['pl' => 'Czarny', 'en' => 'Black'], ['pl' => 'Niebieski', 'en' => 'Blue'], ['pl' => 'Zielony', 'en' => 'Green']],
+            default                   => [['pl' => 'Czarny', 'en' => 'Black'], ['pl' => 'Bialy', 'en' => 'White'], ['pl' => 'Niebieski', 'en' => 'Blue']],
         };
     }
 

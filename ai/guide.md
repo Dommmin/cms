@@ -157,7 +157,7 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 ### Database
 - Docker: `docker compose exec php php artisan migrate`
 - Soft deletes: User, Customer (+ Brand) use `SoftDeletes`
-- Translatable: Product, Category, BlogPost, Page (spatie/laravel-translatable)
+- Translatable: Product, Category, BlogPost, Page, **ProductVariant** (spatie/laravel-translatable) — ProductVariant translates `name` column (json)
 
 ---
 

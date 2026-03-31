@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Translatable\HasTranslations;
 
 /**
  * Product Variant Model
@@ -21,7 +22,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property int $product_id
  * @property int|null $tax_rate_id
  * @property string $sku
- * @property string $name
+ * @property array<string, string>|string $name
  * @property int $price
  * @property int $cost_price
  * @property int|null $compare_at_price
@@ -40,7 +41,11 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class ProductVariant extends Model
 {
     use HasFactory;
+    use HasTranslations;
     use LogsActivity;
+
+    /** @var array<string> */
+    public array $translatable = ['name'];
 
     protected $table = 'product_variants';
 

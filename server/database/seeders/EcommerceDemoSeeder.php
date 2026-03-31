@@ -215,39 +215,39 @@ class EcommerceDemoSeeder extends Seeder
         $result = collect();
 
         $parents = [
-            ['name' => 'Fashion',           'slug' => 'fashion',            'position' => 1],
-            ['name' => 'Home & Living',     'slug' => 'home-living',        'position' => 2],
-            ['name' => 'Beauty & Wellness', 'slug' => 'beauty-wellness',    'position' => 3],
-            ['name' => 'Sport & Outdoor',   'slug' => 'sport-outdoor',      'position' => 4],
+            ['slug' => 'fashion',         'en' => 'Fashion',           'pl' => 'Moda',                  'position' => 1],
+            ['slug' => 'home-living',     'en' => 'Home & Living',     'pl' => 'Dom i Życie',            'position' => 2],
+            ['slug' => 'beauty-wellness', 'en' => 'Beauty & Wellness', 'pl' => 'Uroda i Wellness',       'position' => 3],
+            ['slug' => 'sport-outdoor',   'en' => 'Sport & Outdoor',   'pl' => 'Sport i Outdoor',        'position' => 4],
         ];
 
         foreach ($parents as $p) {
             $model = Category::query()->updateOrCreate(
                 ['slug' => $p['slug']],
-                ['name' => $p['name'], 'parent_id' => null, 'is_active' => true, 'position' => $p['position']],
+                ['name' => ['en' => $p['en'], 'pl' => $p['pl']], 'parent_id' => null, 'is_active' => true, 'position' => $p['position']],
             );
             $result[$p['slug']] = $model;
         }
 
         $children = [
             // Fashion children
-            ['name' => "Men's Clothing",    'slug' => 'mens-clothing',       'parent' => 'fashion', 'type' => 'clothing',    'pos' => 1],
-            ['name' => "Women's Clothing",  'slug' => 'womens-clothing',     'parent' => 'fashion', 'type' => 'clothing',    'pos' => 2],
-            ['name' => "Kids' Clothing",    'slug' => 'kids-clothing',       'parent' => 'fashion', 'type' => 'clothing',    'pos' => 3],
-            ['name' => 'Footwear',          'slug' => 'footwear',            'parent' => 'fashion', 'type' => 'footwear',    'pos' => 4],
-            ['name' => 'Bags & Accessories', 'slug' => 'bags-accessories',    'parent' => 'fashion', 'type' => 'accessories', 'pos' => 5],
+            ['slug' => 'mens-clothing',    'en' => "Men's Clothing",     'pl' => 'Odzież Męska',           'parent' => 'fashion',         'type' => 'clothing',    'pos' => 1],
+            ['slug' => 'womens-clothing',  'en' => "Women's Clothing",   'pl' => 'Odzież Damska',          'parent' => 'fashion',         'type' => 'clothing',    'pos' => 2],
+            ['slug' => 'kids-clothing',    'en' => "Kids' Clothing",     'pl' => 'Odzież Dziecięca',       'parent' => 'fashion',         'type' => 'clothing',    'pos' => 3],
+            ['slug' => 'footwear',         'en' => 'Footwear',           'pl' => 'Obuwie',                 'parent' => 'fashion',         'type' => 'footwear',    'pos' => 4],
+            ['slug' => 'bags-accessories', 'en' => 'Bags & Accessories', 'pl' => 'Torebki i Akcesoria',   'parent' => 'fashion',         'type' => 'accessories', 'pos' => 5],
             // Home & Living children
-            ['name' => 'Living Room',       'slug' => 'living-room',         'parent' => 'home-living',   'type' => 'home-decor',   'pos' => 1],
-            ['name' => 'Bedroom',           'slug' => 'bedroom',             'parent' => 'home-living',   'type' => 'home-decor',   'pos' => 2],
-            ['name' => 'Kitchen & Dining',  'slug' => 'kitchen-dining',      'parent' => 'home-living',   'type' => 'kitchenware',  'pos' => 3],
-            ['name' => 'Bathroom',          'slug' => 'bathroom',            'parent' => 'home-living',   'type' => 'home-decor',   'pos' => 4],
+            ['slug' => 'living-room',      'en' => 'Living Room',        'pl' => 'Salon',                  'parent' => 'home-living',     'type' => 'home-decor',  'pos' => 1],
+            ['slug' => 'bedroom',          'en' => 'Bedroom',            'pl' => 'Sypialnia',              'parent' => 'home-living',     'type' => 'home-decor',  'pos' => 2],
+            ['slug' => 'kitchen-dining',   'en' => 'Kitchen & Dining',   'pl' => 'Kuchnia i Jadalnia',     'parent' => 'home-living',     'type' => 'kitchenware', 'pos' => 3],
+            ['slug' => 'bathroom',         'en' => 'Bathroom',           'pl' => 'Łazienka',               'parent' => 'home-living',     'type' => 'home-decor',  'pos' => 4],
             // Beauty children
-            ['name' => 'Skincare',          'slug' => 'skincare',            'parent' => 'beauty-wellness', 'type' => 'beauty',      'pos' => 1],
-            ['name' => 'Body Care',         'slug' => 'body-care',           'parent' => 'beauty-wellness', 'type' => 'beauty',      'pos' => 2],
-            ['name' => 'Hair Care',         'slug' => 'hair-care',           'parent' => 'beauty-wellness', 'type' => 'beauty',      'pos' => 3],
+            ['slug' => 'skincare',         'en' => 'Skincare',           'pl' => 'Pielęgnacja Skóry',      'parent' => 'beauty-wellness', 'type' => 'beauty',      'pos' => 1],
+            ['slug' => 'body-care',        'en' => 'Body Care',          'pl' => 'Pielęgnacja Ciała',      'parent' => 'beauty-wellness', 'type' => 'beauty',      'pos' => 2],
+            ['slug' => 'hair-care',        'en' => 'Hair Care',          'pl' => 'Pielęgnacja Włosów',     'parent' => 'beauty-wellness', 'type' => 'beauty',      'pos' => 3],
             // Sport children
-            ['name' => 'Activewear',        'slug' => 'activewear',          'parent' => 'sport-outdoor', 'type' => 'clothing',    'pos' => 1],
-            ['name' => 'Equipment',         'slug' => 'sport-equipment',     'parent' => 'sport-outdoor', 'type' => 'sport',       'pos' => 2],
+            ['slug' => 'activewear',       'en' => 'Activewear',         'pl' => 'Odzież Sportowa',        'parent' => 'sport-outdoor',   'type' => 'clothing',    'pos' => 1],
+            ['slug' => 'sport-equipment',  'en' => 'Equipment',          'pl' => 'Sprzęt Sportowy',        'parent' => 'sport-outdoor',   'type' => 'sport',       'pos' => 2],
         ];
 
         foreach ($children as $c) {
@@ -256,7 +256,7 @@ class EcommerceDemoSeeder extends Seeder
             $model = Category::query()->updateOrCreate(
                 ['slug' => $c['slug']],
                 [
-                    'name' => $c['name'],
+                    'name' => ['en' => $c['en'], 'pl' => $c['pl']],
                     'parent_id' => $parent->id,
                     'product_type_id' => $type?->id,
                     'is_active' => true,
@@ -361,7 +361,10 @@ class EcommerceDemoSeeder extends Seeder
                 'product_id' => $product->id,
                 'tax_rate_id' => $taxRate->id,
                 'sku' => sprintf('%s-%04d-%d', mb_strtoupper($product->sku_prefix ?? 'SKU'), $product->id, $pos + 1),
-                'name' => sprintf('%s %s', $product->name, $def['label']),
+                'name' => [
+                    'en' => sprintf('%s %s', $product->getTranslation('name', 'en'), $def['label']),
+                    'pl' => sprintf('%s %s', $product->getTranslation('name', 'pl'), $def['label']),
+                ],
                 'price' => $basePrice + ($def['price_delta'] ?? 0),
                 'cost_price' => (int) round(($basePrice + ($def['price_delta'] ?? 0)) * 0.55),
                 'compare_at_price' => isset($item['has_compare']) && $item['has_compare']
