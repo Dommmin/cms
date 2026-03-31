@@ -59,6 +59,31 @@ class ProductResource extends JsonResource
                 $data['omnibus_price_min'] = null;
             }
 
+            // Build attribute_map: { "RAM" => ["16 GB","32 GB"], "Color" => ["Black"] }
+            // Only populated when attributeValues are eager-loaded.
+            $attributeMap = [];
+            if ($product->relationLoaded('activeVariants')) {
+                foreach ($product->activeVariants as $variant) {
+                    if (! $variant->relationLoaded('attributeValues')) {
+                        continue;
+                    }
+                    foreach ($variant->attributeValues as $av) {
+                        if (! $av->relationLoaded('attribute') || ! $av->relationLoaded('attributeValue')) {
+                            continue;
+                        }
+                        $key = $av->attribute->name;
+                        $val = $av->attributeValue->value;
+                        if (! isset($attributeMap[$key])) {
+                            $attributeMap[$key] = [];
+                        }
+                        if (! in_array($val, $attributeMap[$key], true)) {
+                            $attributeMap[$key][] = $val;
+                        }
+                    }
+                }
+            }
+            $data['attribute_map'] = $attributeMap;
+
             return $data;
         }
 

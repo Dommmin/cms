@@ -7,6 +7,7 @@ export interface ProductFilters {
   search?: string;
   category?: string;
   brand?: string;
+  attributes?: Record<string, string[]>;
   sort?: string;
   min_price?: number;
   max_price?: number;
@@ -24,6 +25,13 @@ function buildProductParams(filters: ProductFilters): Record<string, unknown> {
   if (filters.max_price != null) params['filter[max_price]'] = filters.max_price;
   if (filters.category) params['filter[category]'] = filters.category;
   if (filters.brand) params['filter[brand_id]'] = filters.brand;
+  if (filters.attributes) {
+    Object.entries(filters.attributes).forEach(([attributeSlug, values]) => {
+      if (values.length > 0) {
+        params[`filter[attributes][${attributeSlug}]`] = values.join(',');
+      }
+    });
+  }
   if (filters.in_stock) params['filter[in_stock]'] = 1;
   return params;
 }

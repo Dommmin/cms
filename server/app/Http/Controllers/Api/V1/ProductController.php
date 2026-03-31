@@ -10,10 +10,12 @@ use App\Filters\MaxPriceFilter;
 use App\Filters\MinPriceFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\ProductCollection;
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Sorts\RatingSort;
 use App\Sorts\VariantPriceSort;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -22,11 +24,11 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class ProductController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $locale = app()->getLocale();
 
-        $products = QueryBuilder::for(Product::available())
+        $query = QueryBuilder::for(Product::available())
             ->allowedFilters([
                 AllowedFilter::callback('name', function ($query, string $value) use ($locale): void {
                     $query->whereJsonContainsLocale('name', $locale, '%'.$value.'%', 'like');
@@ -46,12 +48,28 @@ class ProductController extends Controller
                 AllowedSort::custom('price', new VariantPriceSort),
                 AllowedSort::custom('rating', new RatingSort),
             ])
-            ->defaultSort('name')
-            ->with(['thumbnail', 'category', 'brand', 'activeVariants:id,product_id,price,compare_at_price', 'activeVariants.priceHistory'])
+            ->defaultSort('name');
+
+        $this->applyAttributeFilters($query, $request->input('filter.attributes', []));
+
+        $availableFilters = $this->buildAvailableFilters(clone $query);
+
+        $products = $query
+            ->with([
+                'thumbnail',
+                'category',
+                'brand',
+                'activeVariants:id,product_id,price,compare_at_price,stock_quantity,is_active',
+                'activeVariants.priceHistory',
+                'activeVariants.attributeValues.attribute',
+                'activeVariants.attributeValues.attributeValue',
+            ])
             ->paginate(24)
             ->withQueryString();
 
-        return new ProductCollection($products)->response();
+        return (new ProductCollection($products))
+            ->additional(['available_filters' => $availableFilters])
+            ->response();
     }
 
     public function show(string $slug): JsonResponse
@@ -283,5 +301,144 @@ class ProductController extends Controller
             ->withQueryString();
 
         return new ProductCollection($products)->response();
+    }
+
+    private function applyAttributeFilters(QueryBuilder $query, mixed $attributeFilters): void
+    {
+        if (! is_array($attributeFilters)) {
+            return;
+        }
+
+        foreach ($attributeFilters as $attributeSlug => $rawValues) {
+            if (! is_string($attributeSlug)) {
+                continue;
+            }
+
+            $values = collect(is_array($rawValues) ? $rawValues : explode(',', (string) $rawValues))
+                ->map(fn (mixed $value): string => trim((string) $value))
+                ->filter()
+                ->values()
+                ->all();
+
+            if ($values === []) {
+                continue;
+            }
+
+            $query->whereHas('activeVariants.attributeValues', function (Builder $builder) use ($attributeSlug, $values): void {
+                $builder
+                    ->whereHas('attribute', fn (Builder $attributeQuery): Builder => $attributeQuery->where('slug', $attributeSlug))
+                    ->whereHas('attributeValue', fn (Builder $valueQuery): Builder => $valueQuery->whereIn('slug', $values));
+            });
+        }
+    }
+
+    private function buildAvailableFilters(QueryBuilder $query): array
+    {
+        $products = $query
+            ->with([
+                'brand:id,name,slug',
+                'activeVariants.attributeValues.attribute:id,name,slug,is_filterable,position',
+                'activeVariants.attributeValues.attributeValue:id,attribute_id,value,slug,position',
+            ])
+            ->get(['products.id', 'products.brand_id']);
+
+        $brandBuckets = [];
+        $attributeBuckets = [];
+
+        foreach ($products as $product) {
+            if ($product->brand instanceof Brand) {
+                $brandId = $product->brand->id;
+
+                if (! isset($brandBuckets[$brandId])) {
+                    $brandBuckets[$brandId] = [
+                        'id' => $brandId,
+                        'slug' => $product->brand->slug,
+                        'label' => $product->brand->name,
+                        'count' => 0,
+                        'product_ids' => [],
+                    ];
+                }
+
+                if (! in_array($product->id, $brandBuckets[$brandId]['product_ids'], true)) {
+                    $brandBuckets[$brandId]['product_ids'][] = $product->id;
+                    $brandBuckets[$brandId]['count']++;
+                }
+            }
+
+            foreach ($product->activeVariants as $variant) {
+                foreach ($variant->attributeValues as $attributeValuePivot) {
+                    $attribute = $attributeValuePivot->attribute;
+                    $attributeValue = $attributeValuePivot->attributeValue;
+
+                    if (! $attribute || ! $attributeValue || ! $attribute->is_filterable) {
+                        continue;
+                    }
+
+                    $attributeSlug = $attribute->slug;
+                    $valueSlug = $attributeValue->slug;
+
+                    if (! isset($attributeBuckets[$attributeSlug])) {
+                        $attributeBuckets[$attributeSlug] = [
+                            'slug' => $attributeSlug,
+                            'label' => $attribute->name,
+                            'position' => $attribute->position,
+                            'values' => [],
+                        ];
+                    }
+
+                    if (! isset($attributeBuckets[$attributeSlug]['values'][$valueSlug])) {
+                        $attributeBuckets[$attributeSlug]['values'][$valueSlug] = [
+                            'slug' => $valueSlug,
+                            'label' => $attributeValue->value,
+                            'position' => $attributeValue->position,
+                            'count' => 0,
+                            'product_ids' => [],
+                        ];
+                    }
+
+                    if (! in_array($product->id, $attributeBuckets[$attributeSlug]['values'][$valueSlug]['product_ids'], true)) {
+                        $attributeBuckets[$attributeSlug]['values'][$valueSlug]['product_ids'][] = $product->id;
+                        $attributeBuckets[$attributeSlug]['values'][$valueSlug]['count']++;
+                    }
+                }
+            }
+        }
+
+        usort($brandBuckets, function (array $left, array $right): int {
+            $countComparison = $right['count'] <=> $left['count'];
+
+            if ($countComparison !== 0) {
+                return $countComparison;
+            }
+
+            return $left['label'] <=> $right['label'];
+        });
+        $brands = array_map(fn (array $brand): array => [
+            'id' => $brand['id'],
+            'slug' => $brand['slug'],
+            'label' => $brand['label'],
+            'count' => $brand['count'],
+        ], $brandBuckets);
+
+        usort($attributeBuckets, fn (array $left, array $right): int => [$left['position'], $left['label']] <=> [$right['position'], $right['label']]);
+        $attributes = array_map(function (array $attribute): array {
+            $values = array_values($attribute['values']);
+            usort($values, fn (array $left, array $right): int => [$left['position'], $left['label']] <=> [$right['position'], $right['label']]);
+
+            return [
+                'slug' => $attribute['slug'],
+                'label' => $attribute['label'],
+                'values' => array_map(fn (array $value): array => [
+                    'slug' => $value['slug'],
+                    'label' => $value['label'],
+                    'count' => $value['count'],
+                ], $values),
+            ];
+        }, $attributeBuckets);
+
+        return [
+            'brands' => $brands,
+            'attributes' => $attributes,
+        ];
     }
 }

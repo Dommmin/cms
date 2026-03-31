@@ -15,7 +15,32 @@ export interface PaginatedResponse<T> {
     per_page: number;
     to: number | null;
     total: number;
+    available_filters?: ProductAvailableFilters;
   };
+}
+
+export interface ProductFilterValue {
+  slug: string;
+  label: string;
+  count: number;
+}
+
+export interface ProductBrandFilterValue {
+  id: number;
+  slug: string;
+  label: string;
+  count: number;
+}
+
+export interface ProductAttributeFilter {
+  slug: string;
+  label: string;
+  values: ProductFilterValue[];
+}
+
+export interface ProductAvailableFilters {
+  brands: ProductBrandFilterValue[];
+  attributes: ProductAttributeFilter[];
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────

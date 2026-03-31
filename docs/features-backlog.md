@@ -1,6 +1,6 @@
 # Features Backlog
 
-> Last updated: 2026-03-30
+> Last updated: 2026-03-31
 
 ---
 
@@ -738,3 +738,52 @@
 - [ ] **Newsletter — info o double opt-in** — tekst pod formularzem w footerze
 - [ ] **Canonical na stronach paginacji** — `<link rel="canonical">` bez `?page=` parametru
 - [ ] **Cookie consent weryfikacja** — sprawdzić czy banner poprawnie blokuje GTM przed akceptacją
+
+---
+
+## 💬 Blog — Komentarze, Oceny i Licznik Odwiedzin
+
+**Status:** ⬜ Nierozpoczęte
+
+### Komentarze
+
+- [ ] Model `BlogComment` — pola: `blog_post_id`, `user_id`, `parent_id` (nullable, dla odpowiedzi), `body`, `is_approved` (domyślnie `true`, opcjonalna moderacja)
+- [ ] API: `GET /api/v1/blog/{slug}/comments` — lista komentarzy z zagnieżdżonymi odpowiedziami (max 1 poziom głębokości), stronicowana
+- [ ] API: `POST /api/v1/blog/{slug}/comments` — dodanie komentarza (auth required)
+- [ ] API: `POST /api/v1/blog/{slug}/comments/{id}/reply` — odpowiedź na komentarz (auth required)
+- [ ] Walidacja: `body` min 3, max 2000 znaków; `parent_id` musi należeć do tego samego posta i nie może być sam odpowiedzią (tylko 1 poziom)
+- [ ] Powiadomienie mailowe — gdy ktoś odpowie na komentarz użytkownika, ten dostaje e-mail (`BlogCommentReplyNotification` via queue); nie wysyłać jeśli autor odpowiada sam sobie
+- [ ] Frontend (Next.js): sekcja komentarzy pod treścią posta — lista wątków z odpowiedziami, formularz dodawania (tylko zalogowani), przycisk "Odpowiedz" przy każdym komentarzu
+- [ ] Dla niezalogowanych: formularz schowany, zamiast niego CTA "Zaloguj się, aby skomentować"
+- [ ] Admin panel: lista komentarzy per post z możliwością usunięcia / moderacji (opcjonalnie toggle `is_approved`)
+
+### Oceny posta (upvote / downvote)
+
+- [ ] Model `BlogPostVote` — pola: `blog_post_id`, `user_id`, `vote` (enum: `up`, `down`); unique(`blog_post_id`, `user_id`) — jeden głos na użytkownika na post
+- [ ] API: `POST /api/v1/blog/{slug}/vote` — body: `{ vote: "up"|"down" }` (auth required); ponowne wysłanie tego samego głosu cofa go (toggle), zmiana głosu nadpisuje
+- [ ] `BlogPost` resource zwraca: `votes_up` (int), `votes_down` (int), `user_vote` ("`up`"|"`down`"|`null` — tylko gdy auth)
+- [ ] Frontend: przyciski `▲ N` i `▼ N` widoczne dla wszystkich, aktywne tylko dla zalogowanych; wizualne podświetlenie aktywnego głosu
+
+### Licznik odwiedzin (unikalny)
+
+- [ ] Model `BlogPostView` — pola: `blog_post_id`, `ip_hash` (SHA-256 z IP + user-agent, bez możliwości odwrócenia), `viewed_at`; unikalność per `(blog_post_id, ip_hash)` per dzień (lub deduplikacja przez 24h okno)
+- [ ] Rejestracja wizyty: `POST /api/v1/blog/{slug}/view` — wywołanie przez frontend przy wejściu na post (fire-and-forget); po stronie backendu sprawdza czy ten `ip_hash` już odwiedził post w ostatnich 24h — jeśli tak, ignoruje
+- [ ] Alternatywa: middleware server-side w Next.js (Route Handler) który wywołuje backend — unika fałszywych zliczań przy botach
+- [ ] `BlogPost` resource zwraca `views_count` (int)
+- [ ] Frontend: wyświetlić `👁 1 234` przy metadanych posta
+
+### Sortowanie postów
+
+- [ ] API: `GET /api/v1/blog?sort=` — nowe opcje sortowania:
+  - `popular` — według `views_count` DESC
+  - `top_rated` — według `(votes_up - votes_down)` DESC
+  - domyślne: `-created_at` (najnowsze)
+- [ ] Frontend: dropdown sortowania na liście bloga (analogicznie do produktów)
+
+### Uwagi techniczne
+
+- Komentarze — tylko zalogowani (`auth:sanctum` middleware), anonimowe odrzucać 401
+- Głosowanie — tylko zalogowani; próba głosowania przez niezalogowanego → 401
+- Licznik odwiedzin — publiczny, bez auth; hash IP zapewnia prywatność RODO (brak PII)
+- Kolejka dla powiadomień mailowych — `BlogCommentReplyNotification` przez `ShouldQueue`
+- Testy: Feature testy dla każdego endpointu (komentarze, głosowanie, licznik, sortowanie)

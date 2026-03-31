@@ -1,6 +1,16 @@
 'use client';
 
-import { Heart, LogOut, Menu, Package, Search, ShoppingBag, User, X } from 'lucide-react';
+import {
+  ChevronDown,
+  Heart,
+  LogOut,
+  Menu,
+  Package,
+  Search,
+  ShoppingBag,
+  User,
+  X,
+} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -23,6 +33,7 @@ function localiseUrl(url: string | null | undefined, lp: (path: string) => strin
 export function MobileMenu({ items, categories }: MobileMenuProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [expandedCatId, setExpandedCatId] = useState<number | null>(null);
   const [mounted] = useState(() => typeof window !== 'undefined');
   const searchRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -109,53 +120,128 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
 
             {/* ── Categories ─────────────────────────────────── */}
             {categories.length > 0 && (
-              <div className="border-border border-b px-4 py-4">
-                <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
-                  {t('nav.categories', 'Categories')}
-                </p>
-                <div className="scrollbar-hide flex gap-3 overflow-x-auto pb-1">
-                  {/* "All products" tile */}
-                  <Link
-                    href={lp('/products')}
-                    onClick={close}
-                    className="flex shrink-0 flex-col items-center gap-1.5"
-                  >
-                    <div className="border-border bg-muted flex h-14 w-14 items-center justify-center rounded-2xl border">
-                      <ShoppingBag className="text-muted-foreground h-6 w-6" />
-                    </div>
-                    <span className="text-foreground/80 max-w-[56px] text-center text-[11px] leading-tight">
-                      {t('nav.all', 'All')}
-                    </span>
-                  </Link>
+              <div className="border-border border-b">
+                {/* "All products" row */}
+                <Link
+                  href={lp('/products')}
+                  onClick={close}
+                  className="border-border flex items-center gap-3 border-b px-4 py-3.5"
+                >
+                  <div className="bg-muted flex h-9 w-9 items-center justify-center rounded-lg">
+                    <ShoppingBag className="text-muted-foreground h-4 w-4" />
+                  </div>
+                  <span className="text-sm font-medium">
+                    {t('nav.all_products', 'All Products')}
+                  </span>
+                </Link>
 
-                  {categories.map((cat) => (
-                    <Link
-                      key={cat.id}
-                      href={lp(`/products?category=${cat.slug}`)}
-                      onClick={close}
-                      className="flex shrink-0 flex-col items-center gap-1.5"
-                    >
-                      <div className="border-border bg-muted h-14 w-14 overflow-hidden rounded-2xl border">
-                        {cat.image_url ? (
-                          <Image
-                            src={cat.image_url}
-                            alt={cat.name}
-                            width={56}
-                            height={56}
-                            className="h-14 w-14 object-cover"
-                          />
-                        ) : (
-                          <div className="text-muted-foreground flex h-14 w-14 items-center justify-center text-lg font-semibold">
-                            {cat.name[0]}
+                {/* Accordion per parent category */}
+                {categories.map((cat) => {
+                  const hasChildren = (cat.children?.length ?? 0) > 0;
+                  const isExpanded = expandedCatId === cat.id;
+
+                  return (
+                    <div key={cat.id} className="border-border border-b last:border-0">
+                      {hasChildren ? (
+                        /* Toggle button for category with children */
+                        <button
+                          type="button"
+                          onClick={() => setExpandedCatId(isExpanded ? null : cat.id)}
+                          aria-expanded={isExpanded}
+                          className="flex w-full items-center gap-3 px-4 py-3.5 text-left"
+                        >
+                          <div className="bg-muted flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg">
+                            {cat.image_url ? (
+                              <Image
+                                src={cat.image_url}
+                                alt={cat.name}
+                                width={36}
+                                height={36}
+                                className="h-9 w-9 object-cover"
+                              />
+                            ) : (
+                              <span className="text-muted-foreground text-sm font-semibold">
+                                {cat.name[0]}
+                              </span>
+                            )}
                           </div>
-                        )}
-                      </div>
-                      <span className="text-foreground/80 max-w-[56px] text-center text-[11px] leading-tight">
-                        {cat.name}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
+                          <span className="flex-1 text-sm font-medium">{cat.name}</span>
+                          <ChevronDown
+                            className={`text-muted-foreground h-4 w-4 shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                            aria-hidden="true"
+                          />
+                        </button>
+                      ) : (
+                        /* Direct link for category without children */
+                        <Link
+                          href={lp(`/products?category=${cat.slug}`)}
+                          onClick={close}
+                          className="flex items-center gap-3 px-4 py-3.5"
+                        >
+                          <div className="bg-muted flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg">
+                            {cat.image_url ? (
+                              <Image
+                                src={cat.image_url}
+                                alt={cat.name}
+                                width={36}
+                                height={36}
+                                className="h-9 w-9 object-cover"
+                              />
+                            ) : (
+                              <span className="text-muted-foreground text-sm font-semibold">
+                                {cat.name[0]}
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-sm font-medium">{cat.name}</span>
+                        </Link>
+                      )}
+
+                      {/* Expanded subcategories */}
+                      {hasChildren && isExpanded && (
+                        <div className="bg-muted/30 px-4 pb-3">
+                          {/* Link to parent category */}
+                          <Link
+                            href={lp(`/products?category=${cat.slug}`)}
+                            onClick={close}
+                            className="text-primary mb-2 block py-1.5 text-xs font-medium"
+                          >
+                            {t('nav.view_all_in', `All in ${cat.name} →`)}
+                          </Link>
+                          <div className="grid grid-cols-2 gap-1">
+                            {cat.children!.map((child) => (
+                              <Link
+                                key={child.id}
+                                href={lp(`/products?category=${child.slug}`)}
+                                onClick={close}
+                                className="hover:bg-accent flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm"
+                              >
+                                <div className="bg-background flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md">
+                                  {child.image_url ? (
+                                    <Image
+                                      src={child.image_url}
+                                      alt={child.name}
+                                      width={28}
+                                      height={28}
+                                      className="h-7 w-7 object-cover"
+                                    />
+                                  ) : (
+                                    <span className="text-muted-foreground text-[10px] font-semibold">
+                                      {child.name[0]}
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-foreground/80 text-xs leading-tight">
+                                  {child.name}
+                                </span>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
 

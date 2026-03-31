@@ -114,6 +114,21 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const selectedVariant = product.variants?.find(
     (v) => v.id === (selectedVariantId ?? product.variants?.[0]?.id),
   );
+  const variantAttributeGroups = Object.entries(
+    (product.variants ?? []).reduce<Record<string, string[]>>((accumulator, variant) => {
+      Object.entries(variant.attributes).forEach(([attributeName, value]) => {
+        if (!accumulator[attributeName]) {
+          accumulator[attributeName] = [];
+        }
+
+        if (!accumulator[attributeName].includes(value)) {
+          accumulator[attributeName].push(value);
+        }
+      });
+
+      return accumulator;
+    }, {}),
+  );
   const price = formatPrice(selectedVariant?.price ?? product.price_min);
   const images = product.images ?? [];
   const activeImage = images[activeImageIndex] ?? null;
@@ -165,6 +180,49 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
       : []),
     { label: product.name },
   ];
+
+  function selectVariantAttribute(attributeName: string, value: string) {
+    const currentAttributes =
+      selectedVariant?.attributes ?? product.variants?.[0]?.attributes ?? {};
+    const nextAttributes = {
+      ...currentAttributes,
+      [attributeName]: value,
+    };
+
+    const matchingVariant = product.variants?.find((variant) =>
+      Object.entries(nextAttributes).every(
+        ([name, selectedValue]) => variant.attributes[name] === selectedValue,
+      ),
+    );
+
+    if (matchingVariant) {
+      setSelectedVariantId(matchingVariant.id);
+      return;
+    }
+
+    const fallbackVariant = product.variants?.find(
+      (variant) => variant.attributes[attributeName] === value,
+    );
+
+    if (fallbackVariant) {
+      setSelectedVariantId(fallbackVariant.id);
+    }
+  }
+
+  function isAttributeValueSelectable(attributeName: string, value: string): boolean {
+    const currentAttributes =
+      selectedVariant?.attributes ?? product.variants?.[0]?.attributes ?? {};
+
+    return (
+      product.variants?.some(
+        (variant) =>
+          Object.entries(currentAttributes).every(
+            ([currentName, currentValue]) =>
+              currentName === attributeName || variant.attributes[currentName] === currentValue,
+          ) && variant.attributes[attributeName] === value,
+      ) ?? false
+    );
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -269,33 +327,41 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
           </div>
 
           {/* Variants */}
-          {product.variants && product.variants.length > 1 && (
+          {variantAttributeGroups.length > 0 && (
             <div className="mt-6">
-              <p className="mb-2 text-sm font-medium">
+              <p className="mb-3 text-sm font-medium">
                 {t('product.select_variant', 'Select variant')}
               </p>
-              <div className="flex flex-wrap gap-2">
-                {product.variants.map((variant) => {
-                  const label =
-                    Object.values(variant.attributes).join(' / ') ||
-                    `${t('product.select_variant', 'Variant')} ${variant.id}`;
-                  const isSelected =
-                    (selectedVariantId ?? product.variants?.[0]?.id) === variant.id;
-                  return (
-                    <button
-                      key={variant.id}
-                      onClick={() => setSelectedVariantId(variant.id)}
-                      disabled={!variant.is_available}
-                      className={`rounded-md border px-3 py-1.5 text-sm disabled:opacity-40 ${
-                        isSelected
-                          ? 'border-primary bg-primary text-primary-foreground'
-                          : 'border-input hover:bg-accent'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
+              <div className="space-y-4">
+                {variantAttributeGroups.map(([attributeName, values]) => (
+                  <div key={attributeName}>
+                    <p className="text-muted-foreground mb-2 text-sm font-medium">
+                      {attributeName}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {values.map((value) => {
+                        const isSelected = selectedVariant?.attributes?.[attributeName] === value;
+                        const isSelectable = isAttributeValueSelectable(attributeName, value);
+
+                        return (
+                          <button
+                            key={`${attributeName}-${value}`}
+                            type="button"
+                            onClick={() => selectVariantAttribute(attributeName, value)}
+                            disabled={!isSelectable}
+                            className={`rounded-md border px-3 py-1.5 text-sm disabled:opacity-40 ${
+                              isSelected
+                                ? 'border-primary bg-primary text-primary-foreground'
+                                : 'border-input hover:bg-accent'
+                            }`}
+                          >
+                            {value}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
