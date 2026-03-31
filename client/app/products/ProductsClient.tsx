@@ -23,6 +23,36 @@ import { useTranslation } from '@/hooks/use-translation';
 
 type ViewMode = 'grid' | 'list';
 
+interface PendingFilters {
+  brand: string;
+  min_price: string;
+  max_price: string;
+  in_stock: boolean;
+  attributes: Record<string, string[]>;
+}
+
+function pendingFromSearchParams(searchParams: URLSearchParams): PendingFilters {
+  const attributes = Array.from(searchParams.entries()).reduce<Record<string, string[]>>(
+    (acc, [key, value]) => {
+      if (!key.startsWith('attr_') || value.trim() === '') return acc;
+      acc[key.replace('attr_', '')] = value
+        .split(',')
+        .map((v) => v.trim())
+        .filter(Boolean);
+      return acc;
+    },
+    {},
+  );
+
+  return {
+    brand: searchParams.get('brand') ?? '',
+    min_price: searchParams.get('min_price') ?? '',
+    max_price: searchParams.get('max_price') ?? '',
+    in_stock: searchParams.get('in_stock') === '1',
+    attributes,
+  };
+}
+
 export default function ProductsClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -39,105 +69,146 @@ export default function ProductsClient() {
 
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [pending, setPending] = useState<PendingFilters>(() =>
+    pendingFromSearchParams(searchParams),
+  );
 
   useEffect(() => {
     const stored = localStorage.getItem('products_view_mode');
-    if (stored === 'list' || stored === 'grid') {
-      setViewMode(stored);
-    }
+    if (stored === 'list' || stored === 'grid') setViewMode(stored);
   }, []);
+
+  // Sync pending state when URL changes (browser back/forward, external navigation)
+  useEffect(() => {
+    setPending(pendingFromSearchParams(searchParams));
+  }, [searchParams]);
 
   function changeViewMode(mode: ViewMode) {
     setViewMode(mode);
     localStorage.setItem('products_view_mode', mode);
   }
 
-  const attributeFilters = Array.from(searchParams.entries()).reduce<Record<string, string[]>>(
-    (accumulator, [key, value]) => {
-      if (!key.startsWith('attr_') || value.trim() === '') {
-        return accumulator;
-      }
-
-      accumulator[key.replace('attr_', '')] = value
-        .split(',')
-        .map((item) => item.trim())
-        .filter(Boolean);
-
-      return accumulator;
-    },
-    {},
-  );
-
-  const filters: ProductFilters = {
+  // Applied filters — always derived from URL (source of truth for the API call)
+  const appliedFilters: ProductFilters = {
     page: Number(searchParams.get('page') ?? 1),
     search: searchParams.get('search') ?? undefined,
     category: searchParams.get('category') ?? undefined,
     brand: searchParams.get('brand') ?? undefined,
-    attributes: attributeFilters,
     sort: searchParams.get('sort') ?? undefined,
     min_price: searchParams.get('min_price') ? Number(searchParams.get('min_price')) : undefined,
     max_price: searchParams.get('max_price') ? Number(searchParams.get('max_price')) : undefined,
     in_stock: searchParams.get('in_stock') === '1' ? true : undefined,
+    attributes: Array.from(searchParams.entries()).reduce<Record<string, string[]>>(
+      (acc, [key, value]) => {
+        if (!key.startsWith('attr_') || value.trim() === '') return acc;
+        acc[key.replace('attr_', '')] = value
+          .split(',')
+          .map((v) => v.trim())
+          .filter(Boolean);
+        return acc;
+      },
+      {},
+    ),
   };
 
-  const { data, isLoading, isFetching } = useProducts(filters);
+  const { data, isLoading, isFetching } = useProducts(appliedFilters);
   const availableFilters = data?.meta?.available_filters;
+
+  // Whether pending state differs from what's currently applied in the URL
+  const hasChanges =
+    pending.brand !== (searchParams.get('brand') ?? '') ||
+    pending.min_price !== (searchParams.get('min_price') ?? '') ||
+    pending.max_price !== (searchParams.get('max_price') ?? '') ||
+    pending.in_stock !== (searchParams.get('in_stock') === '1') ||
+    JSON.stringify(pending.attributes) !==
+      JSON.stringify(
+        Array.from(searchParams.entries()).reduce<Record<string, string[]>>((acc, [key, value]) => {
+          if (!key.startsWith('attr_') || value.trim() === '') return acc;
+          acc[key.replace('attr_', '')] = value
+            .split(',')
+            .map((v) => v.trim())
+            .filter(Boolean);
+          return acc;
+        }, {}),
+      );
+
+  function applyFilters() {
+    const params = new URLSearchParams(searchParams.toString());
+
+    // Apply pending filter values to URL params
+    if (pending.brand) params.set('brand', pending.brand);
+    else params.delete('brand');
+
+    if (pending.min_price) params.set('min_price', pending.min_price);
+    else params.delete('min_price');
+
+    if (pending.max_price) params.set('max_price', pending.max_price);
+    else params.delete('max_price');
+
+    if (pending.in_stock) params.set('in_stock', '1');
+    else params.delete('in_stock');
+
+    // Clear old attribute params, then set new ones
+    Array.from(params.keys())
+      .filter((k) => k.startsWith('attr_'))
+      .forEach((k) => params.delete(k));
+
+    Object.entries(pending.attributes).forEach(([slug, values]) => {
+      if (values.length > 0) params.set(`attr_${slug}`, values.join(','));
+    });
+
+    params.delete('page');
+    router.push(lp(`/products?${params.toString()}`));
+  }
+
+  function clearFilters() {
+    const params = new URLSearchParams();
+    if (searchParams.get('search')) params.set('search', searchParams.get('search')!);
+    if (searchParams.get('sort')) params.set('sort', searchParams.get('sort')!);
+    if (searchParams.get('category')) params.set('category', searchParams.get('category')!);
+    router.push(lp(`/products?${params.toString()}`));
+  }
+
+  function togglePendingAttribute(attributeSlug: string, valueSlug: string) {
+    setPending((prev) => {
+      const current = prev.attributes[attributeSlug] ?? [];
+      const next = current.includes(valueSlug)
+        ? current.filter((v) => v !== valueSlug)
+        : [...current, valueSlug];
+
+      const attributes = { ...prev.attributes };
+      if (next.length > 0) attributes[attributeSlug] = next;
+      else delete attributes[attributeSlug];
+
+      return { ...prev, attributes };
+    });
+  }
+
+  // Sort and search apply immediately — outside the filter panel
+  function setParam(key: string, value: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) params.set(key, value);
+    else params.delete(key);
+    if (key !== 'page') params.delete('page');
+    router.push(lp(`/products?${params.toString()}`));
+  }
 
   function buildPaginationItems(currentPage: number, lastPage: number): Array<number | 'ellipsis'> {
     const pages = new Set<number>([1, lastPage]);
 
     for (let page = currentPage - 1; page <= currentPage + 1; page += 1) {
-      if (page > 1 && page < lastPage) {
-        pages.add(page);
-      }
+      if (page > 1 && page < lastPage) pages.add(page);
     }
 
-    const sortedPages = Array.from(pages).sort((left, right) => left - right);
+    const sortedPages = Array.from(pages).sort((a, b) => a - b);
     const items: Array<number | 'ellipsis'> = [];
 
     sortedPages.forEach((page, index) => {
-      if (index > 0 && page - sortedPages[index - 1] > 1) {
-        items.push('ellipsis');
-      }
+      if (index > 0 && page - sortedPages[index - 1] > 1) items.push('ellipsis');
       items.push(page);
     });
 
     return items;
-  }
-
-  function setParam(key: string, value: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (value) {
-      params.set(key, value);
-    } else {
-      params.delete(key);
-    }
-    if (key !== 'page') params.delete('page');
-    router.push(lp(`/products?${params.toString()}`));
-  }
-
-  function toggleAttributeParam(attributeSlug: string, valueSlug: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    const key = `attr_${attributeSlug}`;
-    const current =
-      params
-        .get(key)
-        ?.split(',')
-        .map((item) => item.trim())
-        .filter(Boolean) ?? [];
-
-    const next = current.includes(valueSlug)
-      ? current.filter((item) => item !== valueSlug)
-      : [...current, valueSlug];
-
-    if (next.length > 0) {
-      params.set(key, next.join(','));
-    } else {
-      params.delete(key);
-    }
-
-    params.delete('page');
-    router.push(lp(`/products?${params.toString()}`));
   }
 
   return (
@@ -161,7 +232,7 @@ export default function ProductsClient() {
             id="products-search"
             type="search"
             placeholder={t('shop.search_placeholder', 'Search products…')}
-            defaultValue={filters.search ?? ''}
+            defaultValue={appliedFilters.search ?? ''}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 setParam('search', (e.target as HTMLInputElement).value);
@@ -175,7 +246,7 @@ export default function ProductsClient() {
           </label>
           <select
             id="products-sort"
-            value={filters.sort ?? ''}
+            value={appliedFilters.sort ?? ''}
             onChange={(e) => setParam('sort', e.target.value)}
             className="border-input bg-background focus:ring-ring rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
           >
@@ -247,8 +318,8 @@ export default function ProductsClient() {
                 </label>
                 <select
                   id="products-brand"
-                  value={filters.brand ?? ''}
-                  onChange={(e) => setParam('brand', e.target.value)}
+                  value={pending.brand}
+                  onChange={(e) => setPending((prev) => ({ ...prev, brand: e.target.value }))}
                   className="border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
                 >
                   <option value="">{t('shop.all_brands', 'All brands')}</option>
@@ -261,25 +332,33 @@ export default function ProductsClient() {
               </div>
 
               <div>
-                <label className="text-muted-foreground mb-1 block text-xs font-medium">
+                <label
+                  htmlFor="products-min-price"
+                  className="text-muted-foreground mb-1 block text-xs font-medium"
+                >
                   {t('shop.min_price', 'Min Price')} (€)
                 </label>
                 <input
+                  id="products-min-price"
                   type="number"
-                  defaultValue={filters.min_price ?? ''}
-                  onBlur={(e) => setParam('min_price', e.target.value)}
+                  value={pending.min_price}
+                  onChange={(e) => setPending((prev) => ({ ...prev, min_price: e.target.value }))}
                   className="border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-muted-foreground mb-1 block text-xs font-medium">
+                <label
+                  htmlFor="products-max-price"
+                  className="text-muted-foreground mb-1 block text-xs font-medium"
+                >
                   {t('shop.max_price', 'Max Price')} (€)
                 </label>
                 <input
+                  id="products-max-price"
                   type="number"
-                  defaultValue={filters.max_price ?? ''}
-                  onBlur={(e) => setParam('max_price', e.target.value)}
+                  value={pending.max_price}
+                  onChange={(e) => setPending((prev) => ({ ...prev, max_price: e.target.value }))}
                   className="border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </div>
@@ -296,13 +375,13 @@ export default function ProductsClient() {
                   <div className="flex flex-wrap gap-2">
                     {attribute.values.map((value) => {
                       const isSelected =
-                        filters.attributes?.[attribute.slug]?.includes(value.slug) ?? false;
+                        pending.attributes[attribute.slug]?.includes(value.slug) ?? false;
 
                       return (
                         <button
                           key={`${attribute.slug}-${value.slug}`}
                           type="button"
-                          onClick={() => toggleAttributeParam(attribute.slug, value.slug)}
+                          onClick={() => togglePendingAttribute(attribute.slug, value.slug)}
                           className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
                             isSelected
                               ? 'border-primary bg-primary text-primary-foreground'
@@ -319,21 +398,38 @@ export default function ProductsClient() {
             </div>
           )}
 
-          <div className="flex flex-wrap items-center gap-6">
-            <label className="flex cursor-pointer items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={!!filters.in_stock}
-                onChange={(e) => setParam('in_stock', e.target.checked ? '1' : '')}
-                className="accent-primary h-4 w-4 rounded"
-              />
-              {t('shop.in_stock_only', 'In stock only')}
-            </label>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-6">
+              <label className="flex cursor-pointer items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={pending.in_stock}
+                  onChange={(e) => setPending((prev) => ({ ...prev, in_stock: e.target.checked }))}
+                  className="accent-primary h-4 w-4 rounded"
+                />
+                {t('shop.in_stock_only', 'In stock only')}
+              </label>
+              <button
+                onClick={clearFilters}
+                className="border-input bg-background hover:bg-accent rounded-md border px-3 py-1.5 text-sm"
+              >
+                {t('shop.clear_filters', 'Clear all filters')}
+              </button>
+            </div>
+
             <button
-              onClick={() => router.push(lp('/products'))}
-              className="border-input bg-background hover:bg-accent rounded-md border px-3 py-1.5 text-sm"
+              onClick={applyFilters}
+              className={`rounded-md px-5 py-1.5 text-sm font-medium transition-colors ${
+                hasChanges
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                  : 'border-input bg-background text-muted-foreground cursor-default border'
+              }`}
+              disabled={!hasChanges}
             >
-              {t('shop.clear_filters', 'Clear all filters')}
+              {t('shop.apply_filters', 'Apply filters')}
+              {hasChanges && (
+                <span className="bg-primary-foreground/20 ml-2 inline-block h-2 w-2 rounded-full" />
+              )}
             </button>
           </div>
         </div>
@@ -383,7 +479,7 @@ export default function ProductsClient() {
       ) : data?.data?.length === 0 ? (
         <div className="text-muted-foreground py-24 text-center">
           {t('shop.no_products', 'No products found.')}{' '}
-          <button onClick={() => router.push(lp('/products'))} className="underline">
+          <button onClick={clearFilters} className="underline">
             {t('shop.clear_filters_link', 'Clear filters')}
           </button>
         </div>
