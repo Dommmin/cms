@@ -1,15 +1,27 @@
 'use client';
 
-import { SlidersHorizontal } from 'lucide-react';
+import { LayoutGrid, LayoutList, SlidersHorizontal } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { ProductFilters } from '@/api/products';
 import { BackToTop } from '@/components/back-to-top';
 import { ProductCard } from '@/components/product-card';
+import { ProductListItem } from '@/components/product-list-item';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useProducts } from '@/hooks/use-products';
 import { useTranslation } from '@/hooks/use-translation';
+
+type ViewMode = 'grid' | 'list';
 
 export default function ProductsClient() {
   const searchParams = useSearchParams();
@@ -26,19 +38,72 @@ export default function ProductsClient() {
   ];
 
   const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+
+  useEffect(() => {
+    const stored = localStorage.getItem('products_view_mode');
+    if (stored === 'list' || stored === 'grid') {
+      setViewMode(stored);
+    }
+  }, []);
+
+  function changeViewMode(mode: ViewMode) {
+    setViewMode(mode);
+    localStorage.setItem('products_view_mode', mode);
+  }
+
+  const attributeFilters = Array.from(searchParams.entries()).reduce<Record<string, string[]>>(
+    (accumulator, [key, value]) => {
+      if (!key.startsWith('attr_') || value.trim() === '') {
+        return accumulator;
+      }
+
+      accumulator[key.replace('attr_', '')] = value
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean);
+
+      return accumulator;
+    },
+    {},
+  );
 
   const filters: ProductFilters = {
     page: Number(searchParams.get('page') ?? 1),
     search: searchParams.get('search') ?? undefined,
     category: searchParams.get('category') ?? undefined,
     brand: searchParams.get('brand') ?? undefined,
+    attributes: attributeFilters,
     sort: searchParams.get('sort') ?? undefined,
     min_price: searchParams.get('min_price') ? Number(searchParams.get('min_price')) : undefined,
     max_price: searchParams.get('max_price') ? Number(searchParams.get('max_price')) : undefined,
     in_stock: searchParams.get('in_stock') === '1' ? true : undefined,
   };
 
-  const { data, isLoading } = useProducts(filters);
+  const { data, isLoading, isFetching } = useProducts(filters);
+  const availableFilters = data?.meta?.available_filters;
+
+  function buildPaginationItems(currentPage: number, lastPage: number): Array<number | 'ellipsis'> {
+    const pages = new Set<number>([1, lastPage]);
+
+    for (let page = currentPage - 1; page <= currentPage + 1; page += 1) {
+      if (page > 1 && page < lastPage) {
+        pages.add(page);
+      }
+    }
+
+    const sortedPages = Array.from(pages).sort((left, right) => left - right);
+    const items: Array<number | 'ellipsis'> = [];
+
+    sortedPages.forEach((page, index) => {
+      if (index > 0 && page - sortedPages[index - 1] > 1) {
+        items.push('ellipsis');
+      }
+      items.push(page);
+    });
+
+    return items;
+  }
 
   function setParam(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -49,7 +114,30 @@ export default function ProductsClient() {
     }
     if (key !== 'page') params.delete('page');
     router.push(lp(`/products?${params.toString()}`));
-    if (key === 'page') window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleAttributeParam(attributeSlug: string, valueSlug: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    const key = `attr_${attributeSlug}`;
+    const current =
+      params
+        .get(key)
+        ?.split(',')
+        .map((item) => item.trim())
+        .filter(Boolean) ?? [];
+
+    const next = current.includes(valueSlug)
+      ? current.filter((item) => item !== valueSlug)
+      : [...current, valueSlug];
+
+    if (next.length > 0) {
+      params.set(key, next.join(','));
+    } else {
+      params.delete(key);
+    }
+
+    params.delete('page');
+    router.push(lp(`/products?${params.toString()}`));
   }
 
   return (
@@ -97,6 +185,39 @@ export default function ProductsClient() {
               </option>
             ))}
           </select>
+
+          {/* View mode toggle */}
+          <div
+            role="group"
+            aria-label={t('shop.view_mode', 'View mode')}
+            className="border-input flex overflow-hidden rounded-md border"
+          >
+            <button
+              onClick={() => changeViewMode('grid')}
+              aria-label={t('shop.view_grid', 'Grid view')}
+              aria-pressed={viewMode === 'grid'}
+              className={`inline-flex items-center px-2.5 py-1.5 transition-colors ${
+                viewMode === 'grid'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-background hover:bg-accent'
+              }`}
+            >
+              <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+            </button>
+            <button
+              onClick={() => changeViewMode('list')}
+              aria-label={t('shop.view_list', 'List view')}
+              aria-pressed={viewMode === 'list'}
+              className={`border-input inline-flex items-center border-l px-2.5 py-1.5 transition-colors ${
+                viewMode === 'list'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-background hover:bg-accent'
+              }`}
+            >
+              <LayoutList className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </div>
+
           <button
             onClick={() => setShowFilters(!showFilters)}
             aria-expanded={showFilters}
@@ -113,31 +234,92 @@ export default function ProductsClient() {
       {showFilters && (
         <div
           id="products-filters-panel"
-          className="border-border bg-card mb-6 grid grid-cols-2 gap-4 rounded-xl border p-4 sm:grid-cols-4"
+          className="border-border bg-card mb-6 space-y-5 rounded-xl border p-4"
         >
-          <div>
-            <label className="text-muted-foreground mb-1 block text-xs font-medium">
-              {t('shop.min_price', 'Min Price')} (€)
-            </label>
-            <input
-              type="number"
-              defaultValue={filters.min_price ?? ''}
-              onBlur={(e) => setParam('min_price', e.target.value)}
-              className="border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
-            />
-          </div>
-          <div>
-            <label className="text-muted-foreground mb-1 block text-xs font-medium">
-              {t('shop.max_price', 'Max Price')} (€)
-            </label>
-            <input
-              type="number"
-              defaultValue={filters.max_price ?? ''}
-              onBlur={(e) => setParam('max_price', e.target.value)}
-              className="border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
-            />
-          </div>
-          <div className="col-span-2 flex items-center gap-6">
+          {availableFilters && (
+            <div className="grid gap-5 lg:grid-cols-3">
+              <div>
+                <label
+                  htmlFor="products-brand"
+                  className="text-muted-foreground mb-1 block text-xs font-medium"
+                >
+                  {t('shop.brand', 'Brand')}
+                </label>
+                <select
+                  id="products-brand"
+                  value={filters.brand ?? ''}
+                  onChange={(e) => setParam('brand', e.target.value)}
+                  className="border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
+                >
+                  <option value="">{t('shop.all_brands', 'All brands')}</option>
+                  {availableFilters.brands.map((brand) => (
+                    <option key={brand.id} value={String(brand.id)}>
+                      {brand.label} ({brand.count})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-muted-foreground mb-1 block text-xs font-medium">
+                  {t('shop.min_price', 'Min Price')} (€)
+                </label>
+                <input
+                  type="number"
+                  defaultValue={filters.min_price ?? ''}
+                  onBlur={(e) => setParam('min_price', e.target.value)}
+                  className="border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-muted-foreground mb-1 block text-xs font-medium">
+                  {t('shop.max_price', 'Max Price')} (€)
+                </label>
+                <input
+                  type="number"
+                  defaultValue={filters.max_price ?? ''}
+                  onBlur={(e) => setParam('max_price', e.target.value)}
+                  className="border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
+                />
+              </div>
+            </div>
+          )}
+
+          {availableFilters && availableFilters.attributes.length > 0 && (
+            <div className="grid gap-4 lg:grid-cols-2">
+              {availableFilters.attributes.map((attribute) => (
+                <div key={attribute.slug}>
+                  <p className="text-muted-foreground mb-2 text-xs font-medium">
+                    {attribute.label}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {attribute.values.map((value) => {
+                      const isSelected =
+                        filters.attributes?.[attribute.slug]?.includes(value.slug) ?? false;
+
+                      return (
+                        <button
+                          key={`${attribute.slug}-${value.slug}`}
+                          type="button"
+                          onClick={() => toggleAttributeParam(attribute.slug, value.slug)}
+                          className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
+                            isSelected
+                              ? 'border-primary bg-primary text-primary-foreground'
+                              : 'border-input bg-background hover:bg-accent'
+                          }`}
+                        >
+                          {value.label} ({value.count})
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="flex flex-wrap items-center gap-6">
             <label className="flex cursor-pointer items-center gap-2 text-sm">
               <input
                 type="checkbox"
@@ -157,21 +339,47 @@ export default function ProductsClient() {
         </div>
       )}
 
-      {/* Grid */}
+      {/* Product list */}
       {isLoading ? (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="border-border bg-card overflow-hidden rounded-xl border">
-              <div className="bg-muted aspect-square animate-pulse" />
-              <div className="space-y-2 p-4">
-                <div className="bg-muted h-3 w-1/3 animate-pulse rounded" />
-                <div className="bg-muted h-4 w-3/4 animate-pulse rounded" />
-                <div className="bg-muted h-4 w-1/2 animate-pulse rounded" />
-                <div className="bg-muted mt-3 h-9 animate-pulse rounded-lg" />
+        viewMode === 'grid' ? (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="border-border bg-card overflow-hidden rounded-xl border">
+                <div className="bg-muted aspect-square animate-pulse" />
+                <div className="space-y-2 p-4">
+                  <div className="bg-muted h-3 w-1/3 animate-pulse rounded" />
+                  <div className="bg-muted h-4 w-3/4 animate-pulse rounded" />
+                  <div className="bg-muted h-4 w-1/2 animate-pulse rounded" />
+                  <div className="bg-muted mt-3 h-9 animate-pulse rounded-lg" />
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="border-border bg-card flex gap-4 rounded-xl border p-4 sm:gap-6"
+              >
+                <div className="bg-muted h-32 w-32 shrink-0 animate-pulse rounded-lg sm:h-40 sm:w-40" />
+                <div className="flex flex-1 flex-col gap-3 py-1">
+                  <div className="bg-muted h-3 w-24 animate-pulse rounded" />
+                  <div className="bg-muted h-5 w-2/3 animate-pulse rounded" />
+                  <div className="bg-muted h-5 w-1/4 animate-pulse rounded" />
+                  <div className="flex gap-2">
+                    <div className="bg-muted h-6 w-20 animate-pulse rounded-md" />
+                    <div className="bg-muted h-6 w-20 animate-pulse rounded-md" />
+                  </div>
+                  <div className="mt-auto flex gap-2">
+                    <div className="bg-muted h-8 w-28 animate-pulse rounded-lg" />
+                    <div className="bg-muted h-8 w-8 animate-pulse rounded-lg" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
       ) : data?.data?.length === 0 ? (
         <div className="text-muted-foreground py-24 text-center">
           {t('shop.no_products', 'No products found.')}{' '}
@@ -181,34 +389,63 @@ export default function ProductsClient() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {data?.data?.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+          <div
+            className="transition-opacity duration-200"
+            style={{ opacity: isFetching ? 0.4 : 1 }}
+          >
+            {viewMode === 'grid' ? (
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                {data?.data?.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {data?.data?.map((product) => (
+                  <ProductListItem key={product.id} product={product} />
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Pagination */}
           {data?.meta && data.meta.last_page > 1 && (
-            <nav
-              aria-label={t('shop.pagination', 'Pagination')}
-              className="mt-8 flex items-center justify-center gap-2"
-            >
-              {Array.from({ length: data.meta.last_page }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => setParam('page', String(page))}
-                  aria-label={t('shop.go_to_page', `Go to page ${page}`)}
-                  aria-current={page === data.meta!.current_page ? 'page' : undefined}
-                  className={`h-9 w-9 rounded-md text-sm font-medium ${
-                    page === data.meta!.current_page
-                      ? 'bg-primary text-primary-foreground'
-                      : 'border-input hover:bg-accent border'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-            </nav>
+            <Pagination className="mt-8">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => setParam('page', String(data.meta!.current_page - 1))}
+                    disabled={data.meta.current_page <= 1}
+                  />
+                </PaginationItem>
+
+                {buildPaginationItems(data.meta.current_page, data.meta.last_page).map(
+                  (item, index) =>
+                    item === 'ellipsis' ? (
+                      <PaginationItem key={`ellipsis-${index}`}>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    ) : (
+                      <PaginationItem key={item}>
+                        <PaginationLink
+                          isActive={item === data.meta!.current_page}
+                          onClick={() => setParam('page', String(item))}
+                          aria-label={t('shop.go_to_page', `Go to page ${item}`)}
+                        >
+                          {item}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ),
+                )}
+
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => setParam('page', String(data.meta!.current_page + 1))}
+                    disabled={data.meta.current_page >= data.meta.last_page}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           )}
         </>
       )}

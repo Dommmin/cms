@@ -1,6 +1,6 @@
 'use client';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type { ProductFilters } from '@/api/products';
 import { getProduct, getProductReviews, getProducts, getProductsByCategory } from '@/api/products';
@@ -21,6 +21,7 @@ export function useProducts(filters: ProductFilters = {}) {
   return useQuery({
     queryKey: productKeys.list(filters),
     queryFn: () => getProducts(filters),
+    placeholderData: keepPreviousData,
   });
 }
 

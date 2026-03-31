@@ -116,6 +116,13 @@ To see why a container is failing: `docker compose logs <service> --tail=30`
 - `.tsx` files are clean — no type/interface definitions inside them
 - Types in separate `.ts` files: component-specific → `Name.types.ts` (colocated), shared → `types.ts`, API → `types/api.ts`
 
+### Logic belongs in the API, not the view
+- **Business logic, filtering, sorting, aggregation, and data transformations go in the backend** (Controllers, Services, Resources, QueryBuilders). The frontend receives ready-to-display data.
+- `.tsx` view files must be thin: render data, handle user events, call API functions. If you find yourself writing array transforms, math, or conditional data reshaping inside a component, move it to the backend or at minimum to a dedicated hook/helper.
+- Custom hooks in `hooks/` are the right place for client-side state logic — keep components focused on JSX.
+- Never derive display data from raw API fields inside a component (e.g. computing totals, building label strings from codes). Ask: *can the backend return this directly?* If yes, do it there.
+- API functions live in `api/`, hooks in `hooks/`, components in `components/` — respect this separation.
+
 ---
 
 ## Testing Rules
