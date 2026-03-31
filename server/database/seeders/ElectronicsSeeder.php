@@ -29,6 +29,12 @@ class ElectronicsSeeder extends Seeder
 
     public function run(): void
     {
+        if (Product::query()->whereHas('category', fn ($q) => $q->where('slug', 'like', 'rtv%')->orWhere('slug', 'like', 'komputery%'))->exists()) {
+            $this->command->info('Electronics already seeded, skipping.');
+
+            return;
+        }
+
         $this->command->info('Creating electronics categories...');
         $this->createCategories();
 
@@ -248,9 +254,7 @@ class ElectronicsSeeder extends Seeder
                 ],
                 'PC Gaming' => [
                     'Komputery gamingowe',
-                    'Monitory gamingowe',
                     'Klawiatury gamingowe',
-                    'Myszy gamingowe',
                     'Sluchawki gamingowe',
                 ],
                 'Gry' => [
@@ -465,9 +469,12 @@ class ElectronicsSeeder extends Seeder
                 ],
             );
 
-            $this->categories[$name] = $category->id;
+            // First occurrence of a name wins — prevents Gaming duplicates from overwriting Komputery entries
+            if (! isset($this->categories[$name])) {
+                $this->categories[$name] = $category->id;
+            }
 
-            if (!empty($children)) {
+            if (! empty($children)) {
                 $this->createCategoryTree($children, $category->id, $slug);
             }
         }
@@ -1599,15 +1606,19 @@ class ElectronicsSeeder extends Seeder
 
     private function findCategoryId(string $categoryName): ?int
     {
+        // Exact match first
         if (isset($this->categories[$categoryName])) {
             return $this->categories[$categoryName];
         }
 
+        // Partial match: category name contains the search term (not the other way — avoids 'Gry' matching 'Gry na PC')
         foreach ($this->categories as $name => $id) {
-            if (stripos($name, $categoryName) !== false || stripos($categoryName, $name) !== false) {
+            if (stripos($name, $categoryName) !== false) {
                 return $id;
             }
         }
+
+        $this->command->warn("Category not found: '{$categoryName}'");
 
         return null;
     }

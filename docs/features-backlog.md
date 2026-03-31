@@ -787,3 +787,72 @@
 - Licznik odwiedzin — publiczny, bez auth; hash IP zapewnia prywatność RODO (brak PII)
 - Kolejka dla powiadomień mailowych — `BlogCommentReplyNotification` przez `ShouldQueue`
 - Testy: Feature testy dla każdego endpointu (komentarze, głosowanie, licznik, sortowanie)
+
+---
+
+## 🏷️ Atrybuty kategorii — Category Attribute Sets
+
+**Status:** ⬜ Nierozpoczęte
+
+### Kontekst i problem
+
+Aktualny system powiązuje atrybuty z `ProductType`, nie z `Category`. Kategoria może mieć opcjonalne `product_type_id`, ale nie ma bezpośredniego szablonu atrybutów. Powoduje to:
+- Wszystkie filtrowalne atrybuty (`is_filterable=true`) pokazują się w filtrach niezależnie od kategorii — na stronie TV wyświetla się filtr "Pamięć (GB)" (sensowny dla telefonów, nie dla TV)
+- Przy tworzeniu produktu admin widzi wszystkie atrybuty ze wszystkich ProductTypes, nie te właściwe dla danej kategorii
+- Nowe produkty trzeba ręcznie przypisać do ProductType mimo że kategoria już to sugeruje
+
+Duże platformy ecommerce rozwiązują to następująco:
+- **Magento**: "Attribute Sets" — zestaw atrybutów przypisany do kategorii/typu produktu; produkt dziedziczy atrybuty z Attribute Set kategorii
+- **Shopify Plus**: "Metafield definitions" z zakresem `product` przypisane do kategorii
+- **WooCommerce**: Globalne atrybuty przypisywane do kategorii jako filtry; produkt widzi tylko atrybuty swojej kategorii
+
+### Docelowa architektura
+
+**Nowa tabela: `category_attribute_groups`**
+```
+category_id (FK categories)
+attribute_id (FK attributes)
+is_filterable_for_category (bool) — nadpisuje globalny is_filterable
+position (int)
+is_required (bool) — czy wymagane przy tworzeniu produktu w tej kategorii
+```
+
+Relacja: `Category hasMany Attribute` via `category_attribute_groups`
+
+### Co zmienić
+
+- [ ] Migracja: tabela `category_attribute_groups` (category_id, attribute_id, is_filterable_for_category, position, is_required); unique(category_id, attribute_id)
+- [ ] Model: `Category::attributes()` → `belongsToMany(Attribute, 'category_attribute_groups')`
+- [ ] Admin: panel "Atrybuty" przy edycji kategorii — lista checkboxów z dostępnymi atrybutami + toggle filtrowalności per kategoria
+- [ ] Admin: przy tworzeniu/edycji produktu — gdy wybrana kategoria ma `category_attribute_groups`, pokaż sekcję "Specyfikacja" z polami tych atrybutów (zamiast losowych wszystkich)
+- [ ] API filters: `GET /api/v1/products?category=<slug>` zwraca w `available_filters.attributes` tylko atrybuty z `category_attribute_groups` dla tej kategorii (a nie wszystkie `is_filterable=true`)
+- [ ] Fallback: jeśli kategoria nie ma przypisanych `category_attribute_groups`, pokaż atrybuty z ProductType produktów w tej kategorii (aktualne zachowanie)
+- [ ] ProductType pozostaje jako mechanizm wariantów (`has_variants`, `variant_selection_attributes`) — category_attribute_groups to osobna warstwa specyfikacji/filtrów
+
+### Atrybuty do dodania w seederze (filterable specs)
+
+Aktualnie atrybuty to głównie wariantowe (color, storage, connectivity). Brakuje atrybutów specyfikacyjnych:
+
+| Atrybut | Slug | Kategorie |
+|---------|------|-----------|
+| Przekątna ekranu | `screen-size` | TV, Monitory, Laptopy |
+| Technologia wyświetlacza | `display-tech` | TV, Monitory (OLED, QLED, IPS, VA) |
+| Rozdzielczość | `resolution` | TV, Monitory (4K, Full HD, 2K) |
+| RAM | `ram` | Laptopy, Smartfony, Tablety (8GB, 16GB, 32GB) |
+| Marka procesora | `cpu-brand` | Laptopy, Komputery (Intel, AMD, Apple M) |
+| Częstotliwość odświeżania | `refresh-rate` | Monitory, TV (60Hz, 120Hz, 144Hz, 165Hz, 240Hz) |
+| Łączność Bluetooth | `bluetooth` | Słuchawki, Smartwatche |
+| Czas pracy baterii | `battery-life` | Laptopy, Smartfony (h) |
+| Pojemność | `capacity` | Lodówki, Pralki (l/kg) |
+| Kolor obudowy | `body-color` | Duże AGD |
+
+- [ ] Dodać powyższe atrybuty (type: SELECT, is_filterable: true, is_variant_selection: false) do seedera
+- [ ] Przypisać je do odpowiednich kategorii przez `category_attribute_groups`
+- [ ] Zaktualizować ElectronicsSeeder tak żeby produkty miały wypełnione te atrybuty
+
+### Uwagi techniczne
+
+- `category_attribute_groups.is_filterable_for_category` pozwala włączyć filtr na poziomie kategorii nawet gdy globalny `attributes.is_filterable=false` (i vice versa)
+- Przy filtracji: jeśli `?category=telewizory`, API zwraca filtry tylko z `category_attribute_groups` dla tej kategorii i jej dzieci
+- Bez `?category=`: fallback do aktualnego zachowania (wszystkie `is_filterable=true`)
+- Testy: Feature test `GET /api/v1/products?category=telewizory` → available_filters.attributes zawiera tylko atrybuty TV
