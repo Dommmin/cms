@@ -13,7 +13,8 @@ function getIds(): number[] {
   if (typeof window === 'undefined') return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as number[]) : [];
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((id) => typeof id === 'number') : [];
   } catch {
     return [];
   }
@@ -84,7 +85,7 @@ export function useComparisonProducts() {
           meta: { attribute_keys: string[] };
         }>('/products/compare', { params });
         return {
-          products: data.data,
+          products: Array.isArray(data.data) ? data.data : [],
           attributeKeys: data.meta?.attribute_keys ?? [],
         };
       } catch {
