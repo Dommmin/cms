@@ -8,8 +8,9 @@ use App\Filters\CategoryFilter;
 use App\Filters\InStockFilter;
 use App\Filters\MaxPriceFilter;
 use App\Filters\MinPriceFilter;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Api\V1\ProductCollection;
+use App\Http\Resources\Api\V1\ProductResource;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
@@ -18,11 +19,13 @@ use App\Sorts\VariantPriceSort;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Validation\ValidationException;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class ProductController extends Controller
+class ProductController extends ApiController
 {
     public function index(Request $request): JsonResponse
     {
@@ -63,6 +66,7 @@ class ProductController extends Controller
                 'activeVariants.priceHistory',
                 'activeVariants.attributeValues.attribute',
                 'activeVariants.attributeValues.attributeValue',
+                'promotions' => fn ($q) => $q->active()->select('promotions.id', 'promotions.name', 'promotions.type'),
             ])
             ->paginate(24)
             ->withQueryString();
@@ -86,6 +90,7 @@ class ProductController extends Controller
                 'activeVariants.attributeValues.attributeValue',
                 'activeVariants.priceHistory',
                 'reviews' => fn ($q) => $q->where('status', 'approved')->with('customer')->limit(10),
+                'promotions' => fn ($q) => $q->active()->select('promotions.id', 'promotions.name', 'promotions.type'),
             ])
             ->firstOrFail();
 
@@ -93,67 +98,65 @@ class ProductController extends Controller
         $product->setAttribute('price_min', $range['min']);
         $product->setAttribute('price_max', $range['max']);
 
-        return response()->json([
-            'data' => [
-                'id' => $product->id,
-                'name' => $product->name,
-                'slug' => $product->slug,
-                'is_active' => (bool) $product->is_active,
-                'description' => $product->description,
-                'short_description' => $product->short_description,
-                'price_min' => $range['min'],
-                'price_max' => $range['max'],
-                'thumbnail' => $product->thumbnail ? [
-                    'id' => $product->thumbnail->id,
-                    'url' => $product->thumbnail->media?->getUrl() ?? '',
-                    'thumb_url' => $product->thumbnail->media?->getUrl() ?? '',
-                    'alt' => $product->thumbnail->media?->name ?? $product->name,
-                    'position' => $product->thumbnail->position,
-                ] : null,
-                'images' => $product->images->map(fn ($img): array => [
-                    'id' => $img->id,
-                    'url' => $img->media?->getUrl() ?? '',
-                    'thumb_url' => $img->media?->getUrl() ?? '',
-                    'alt' => $img->media?->name ?? $product->name,
-                    'position' => $img->position,
-                ])->values()->all(),
-                'average_rating' => $product->averageRating(),
-                'reviews_count' => $product->reviews->count(),
-                'category' => $product->category ? [
-                    'id' => $product->category->id,
-                    'name' => $product->category->name,
-                    'slug' => $product->category->slug,
-                    'description' => null,
-                    'image_url' => null,
-                    'parent_id' => $product->category->parent_id,
-                ] : null,
-                'brand' => $product->brand ? [
-                    'id' => $product->brand->id,
-                    'name' => $product->brand->name,
-                    'slug' => $product->brand->slug,
-                    'logo_url' => null,
-                ] : null,
-                'attributes' => [],
-                'created_at' => $product->created_at?->toIso8601String(),
-                'seo_title' => $product->seo_title,
-                'seo_description' => $product->seo_description,
-                'meta_robots' => $product->meta_robots ?? 'index, follow',
-                'og_image' => $product->og_image,
-                'sitemap_exclude' => (bool) $product->sitemap_exclude,
-                'variants' => $product->activeVariants->map(fn ($variant): array => [
-                    'id' => $variant->id,
-                    'sku' => $variant->sku,
-                    'price' => $variant->price,
-                    'compare_at_price' => $variant->compare_at_price,
-                    'stock_quantity' => $variant->stock_quantity,
-                    'is_available' => $variant->isInStock(),
-                    'is_default' => $variant->is_default,
-                    'attributes' => $variant->attributeValues->mapWithKeys(
-                        fn ($av): array => [$av->attribute->name => $av->attributeValue->value]
-                    )->all(),
-                    'omnibus_price' => $variant->lowestPriceInLast30Days(),
-                ]),
-            ],
+        return $this->ok([
+            'id' => $product->id,
+            'name' => $product->name,
+            'slug' => $product->slug,
+            'is_active' => (bool) $product->is_active,
+            'description' => $product->description,
+            'short_description' => $product->short_description,
+            'price_min' => $range['min'],
+            'price_max' => $range['max'],
+            'thumbnail' => $product->thumbnail ? [
+                'id' => $product->thumbnail->id,
+                'url' => $product->thumbnail->media?->getUrl() ?? '',
+                'thumb_url' => $product->thumbnail->media?->getUrl() ?? '',
+                'alt' => $product->thumbnail->media?->name ?? $product->name,
+                'position' => $product->thumbnail->position,
+            ] : null,
+            'images' => $product->images->map(fn ($img): array => [
+                'id' => $img->id,
+                'url' => $img->media?->getUrl() ?? '',
+                'thumb_url' => $img->media?->getUrl() ?? '',
+                'alt' => $img->media?->name ?? $product->name,
+                'position' => $img->position,
+            ])->values()->all(),
+            'average_rating' => $product->averageRating(),
+            'reviews_count' => $product->reviews->count(),
+            'category' => $product->category ? [
+                'id' => $product->category->id,
+                'name' => $product->category->name,
+                'slug' => $product->category->slug,
+                'description' => null,
+                'image_url' => null,
+                'parent_id' => $product->category->parent_id,
+            ] : null,
+            'brand' => $product->brand ? [
+                'id' => $product->brand->id,
+                'name' => $product->brand->name,
+                'slug' => $product->brand->slug,
+                'logo_url' => null,
+            ] : null,
+            'attributes' => [],
+            'created_at' => $product->created_at?->toIso8601String(),
+            'seo_title' => $product->seo_title,
+            'seo_description' => $product->seo_description,
+            'meta_robots' => $product->meta_robots ?? 'index, follow',
+            'og_image' => $product->og_image,
+            'sitemap_exclude' => (bool) $product->sitemap_exclude,
+            'variants' => $product->activeVariants->map(fn ($variant): array => [
+                'id' => $variant->id,
+                'sku' => $variant->sku,
+                'price' => $variant->price,
+                'compare_at_price' => $variant->compare_at_price,
+                'stock_quantity' => $variant->stock_quantity,
+                'is_available' => $variant->isInStock(),
+                'is_default' => $variant->is_default,
+                'attributes' => $variant->attributeValues->mapWithKeys(
+                    fn ($av): array => [$av->attribute->name => $av->attributeValue->value]
+                )->all(),
+                'omnibus_price' => $variant->lowestPriceInLast30Days(),
+            ]),
         ]);
     }
 
@@ -162,9 +165,9 @@ class ProductController extends Controller
         $ids = $request->query('ids', []);
 
         if (! is_array($ids) || count($ids) < 2 || count($ids) > 4) {
-            return response()->json([
-                'message' => 'You must provide between 2 and 4 product IDs to compare.',
-            ], 422);
+            throw ValidationException::withMessages([
+                'ids' => ['You must provide between 2 and 4 product IDs to compare.'],
+            ]);
         }
 
         $ids = array_map(intval(...), $ids);
@@ -182,7 +185,7 @@ class ProductController extends Controller
             ->get();
 
         if ($products->count() < 2) {
-            return response()->json(['message' => 'No products found.'], 404);
+            abort(404, 'No products found.');
         }
 
         // Build per-product attribute map: { "RAM" => ["16 GB", "32 GB"], "Storage" => ["512 GB"] }
@@ -251,7 +254,7 @@ class ProductController extends Controller
             ]];
         })->values();
 
-        return response()->json([
+        return $this->ok([
             'data' => $data,
             'meta' => ['attribute_keys' => $allAttributeKeys],
         ]);
@@ -277,10 +280,10 @@ class ProductController extends Controller
             ->limit(8)
             ->get();
 
-        return new ProductCollection($related)->response();
+        return $this->ok(ProductResource::collection($related));
     }
 
-    public function byCategory(string $slug): JsonResponse
+    public function byCategory(string $slug): AnonymousResourceCollection
     {
         $category = Category::query()->where('slug', $slug)->where('is_active', true)->firstOrFail();
 
@@ -300,7 +303,7 @@ class ProductController extends Controller
             ->paginate(24)
             ->withQueryString();
 
-        return new ProductCollection($products)->response();
+        return $this->collection(ProductResource::collection($products));
     }
 
     private function applyAttributeFilters(QueryBuilder $query, mixed $attributeFilters): void
@@ -315,7 +318,7 @@ class ProductController extends Controller
             }
 
             $values = collect(is_array($rawValues) ? $rawValues : explode(',', (string) $rawValues))
-                ->map(fn (mixed $value): string => trim((string) $value))
+                ->map(fn (mixed $value): string => mb_trim((string) $value))
                 ->filter()
                 ->values()
                 ->all();

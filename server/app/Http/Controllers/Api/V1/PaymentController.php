@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
+use App\Http\Requests\Api\V1\ValidateApplePayMerchantRequest;
 use App\Infrastructure\Payments\PayU\PayUGateway;
 use App\Models\Payment;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-class PaymentController extends Controller
+class PaymentController extends ApiController
 {
     /**
      * GET /api/v1/payments/{payment}/status
@@ -20,7 +20,7 @@ class PaymentController extends Controller
     {
         Gate::authorize('view', $payment);
 
-        return response()->json([
+        return $this->ok([
             'status' => $payment->status->value,
             'order_reference' => $payment->order?->reference_number,
         ]);
@@ -29,15 +29,12 @@ class PaymentController extends Controller
     /**
      * POST /api/v1/payments/apple-pay/validate-merchant
      */
-    public function validateApplePayMerchant(Request $request, PayUGateway $gateway): JsonResponse
+    public function validateApplePayMerchant(ValidateApplePayMerchantRequest $request, PayUGateway $gateway): JsonResponse
     {
-        $validated = $request->validate([
-            'validation_url' => ['required', 'url'],
-            'domain' => ['required', 'string', 'max:255'],
-        ]);
+        $data = $request->validated();
 
-        $session = $gateway->validateApplePayMerchant($validated['validation_url'], $validated['domain']);
+        $session = $gateway->validateApplePayMerchant($data['validation_url'], $data['domain']);
 
-        return response()->json($session);
+        return $this->ok($session);
     }
 }

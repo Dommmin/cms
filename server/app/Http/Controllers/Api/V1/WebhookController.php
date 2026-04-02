@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Infrastructure\Payments\PayU\PayUWebhookVerifier;
 use App\Jobs\ProcessPaymentWebhook;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class WebhookController extends Controller
+class WebhookController extends ApiController
 {
     public function payu(Request $request, PayUWebhookVerifier $verifier): JsonResponse
     {
@@ -19,14 +19,14 @@ class WebhookController extends Controller
 
         // Quick signature verification before queuing (PayU requires 200 within 10s)
         if (! $verifier->verify($body, (string) $signatureHeader)) {
-            return response()->json(['message' => 'Invalid signature'], 400);
+            abort(400, 'Invalid signature');
         }
 
         $payload = json_decode($body, true) ?? [];
 
         dispatch(new ProcessPaymentWebhook('payu', $payload, $body, (string) $signatureHeader));
 
-        return response()->json(['message' => 'OK']);
+        return $this->ok(['message' => 'OK']);
     }
 
     public function p24(Request $request): JsonResponse
@@ -37,6 +37,6 @@ class WebhookController extends Controller
 
         dispatch(new ProcessPaymentWebhook('p24', $payload, $body, $signature));
 
-        return response()->json(['message' => 'OK']);
+        return $this->ok(['message' => 'OK']);
     }
 }

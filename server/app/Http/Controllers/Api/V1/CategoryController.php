@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Api\V1\CategoryCollection;
 use App\Http\Resources\Api\V1\CategoryShowResource;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller
+class CategoryController extends ApiController
 {
     public function index(Request $request): JsonResponse
     {
@@ -28,7 +28,7 @@ class CategoryController extends Controller
                 || $cat->children->sum('products_count') > 0)
             ->values();
 
-        return response()->json(new CategoryCollection($categories));
+        return $this->ok(new CategoryCollection($categories));
     }
 
     public function show(string $slug): JsonResponse
@@ -41,7 +41,7 @@ class CategoryController extends Controller
 
         $breadcrumb = $category->breadcrumb();
 
-        return response()->json(new CategoryShowResource([
+        return $this->ok(new CategoryShowResource([
             'category' => $category,
             'breadcrumb' => $breadcrumb,
         ]));

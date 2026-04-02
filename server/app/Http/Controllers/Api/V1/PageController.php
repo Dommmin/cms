@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Api\V1\PageResource;
 use App\Models\Page;
 use Illuminate\Http\JsonResponse;
 
-class PageController extends Controller
+class PageController extends ApiController
 {
     public function show(string $slug): JsonResponse
     {
@@ -26,6 +26,6 @@ class PageController extends Controller
             'sections.blocks.relations',
         ]);
 
-        return response()->json(['data' => new PageResource($page)]);
+        return $this->ok(new PageResource($page));
     }
 }

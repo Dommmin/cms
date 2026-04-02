@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Models\Currency;
 use App\Models\Locale;
 use Illuminate\Http\JsonResponse;
 
-class LocaleController extends Controller
+class LocaleController extends ApiController
 {
     public function index(): JsonResponse
     {
@@ -54,6 +54,6 @@ class LocaleController extends Controller
             return $data;
         }, $locales);
 
-        return response()->json($result);
+        return $this->ok($result);
     }
 }

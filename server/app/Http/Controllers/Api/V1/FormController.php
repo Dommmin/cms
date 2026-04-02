@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Models\Form;
 use App\Models\FormSubmission;
 use App\Notifications\FormSubmissionNotification;
@@ -13,7 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 
-class FormController extends Controller
+class FormController extends ApiController
 {
     public function submit(Request $request, int $id): JsonResponse
     {
@@ -26,9 +26,7 @@ class FormController extends Controller
                 ->exists();
 
             if ($previousSubmission) {
-                return response()->json([
-                    'message' => 'You have already submitted this form.',
-                ], 422);
+                abort(422, 'You have already submitted this form.');
             }
         }
 
@@ -65,8 +63,8 @@ class FormController extends Controller
                 ->notify(new FormSubmissionNotification($submission, $form));
         }
 
-        return response()->json([
+        return $this->created([
             'message' => $form->success_message ?? 'Form submitted successfully',
-        ], 201);
+        ]);
     }
 }

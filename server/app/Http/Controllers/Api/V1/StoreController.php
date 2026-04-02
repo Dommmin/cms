@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Api\StoreResource;
 use App\Models\Store;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-class StoreController extends Controller
+class StoreController extends ApiController
 {
     public function index(): AnonymousResourceCollection
     {
@@ -19,12 +19,12 @@ class StoreController extends Controller
         return StoreResource::collection($stores);
     }
 
-    public function show(Store $store): StoreResource|JsonResponse
+    public function show(Store $store): JsonResponse
     {
         if (! $store->is_active) {
-            return response()->json(['message' => 'Not found'], 404);
+            abort(404);
         }
 
-        return new StoreResource($store);
+        return $this->ok(new StoreResource($store));
     }
 }

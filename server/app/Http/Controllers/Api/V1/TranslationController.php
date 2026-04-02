@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Models\Translation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
-class TranslationController extends Controller
+class TranslationController extends ApiController
 {
     public function show(string $locale): JsonResponse
     {
@@ -29,6 +29,6 @@ class TranslationController extends Controller
             return $rows->mapWithKeys(fn ($row): array => [sprintf('%s.%s', $row->group, $row->key) => $row->value])->all();
         });
 
-        return response()->json($translations);
+        return $this->ok($translations);
     }
 }

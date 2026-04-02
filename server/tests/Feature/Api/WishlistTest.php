@@ -74,8 +74,8 @@ describe('Wishlist – CRUD', function (): void {
         $this->actingAs($user, 'sanctum')
             ->getJson('/api/v1/wishlist')
             ->assertOk()
-            ->assertJsonStructure(['data' => ['id', 'items']])
-            ->assertJsonPath('data.items', []);
+            ->assertJsonStructure(['id', 'items'])
+            ->assertJsonPath('items', []);
     });
 
     it('adds a product variant to the wishlist', function (): void {
@@ -85,7 +85,7 @@ describe('Wishlist – CRUD', function (): void {
         $this->actingAs($user, 'sanctum')
             ->postJson('/api/v1/wishlist/items', ['variant_id' => $variant->id])
             ->assertOk()
-            ->assertJsonCount(1, 'data.items');
+            ->assertJsonCount(1, 'items');
     });
 
     it('adding the same variant twice is idempotent — no duplicate items', function (): void {
@@ -99,7 +99,7 @@ describe('Wishlist – CRUD', function (): void {
         $this->actingAs($user->fresh(), 'sanctum')
             ->postJson('/api/v1/wishlist/items', ['variant_id' => $variant->id])
             ->assertOk()
-            ->assertJsonCount(1, 'data.items');
+            ->assertJsonCount(1, 'items');
     });
 
     it('removes a variant from the wishlist', function (): void {
@@ -112,7 +112,7 @@ describe('Wishlist – CRUD', function (): void {
         $this->actingAs($user->fresh(), 'sanctum')
             ->deleteJson('/api/v1/wishlist/items/'.$variant->id)
             ->assertOk()
-            ->assertJsonPath('data.items', []);
+            ->assertJsonPath('items', []);
     });
 
     it('removing a variant that is not in the wishlist is a no-op', function (): void {
@@ -152,6 +152,6 @@ describe('Wishlist – isolation', function (): void {
         $this->actingAs($userB, 'sanctum')
             ->getJson('/api/v1/wishlist')
             ->assertOk()
-            ->assertJsonPath('data.items', []);
+            ->assertJsonPath('items', []);
     });
 });

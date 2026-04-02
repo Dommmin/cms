@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Actions\AnonymizeUserData;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
+use App\Http\Requests\Api\V1\DestroyAccountRequest;
+use App\Http\Requests\Api\V1\UpdatePasswordRequest;
 use App\Http\Requests\Api\V1\UpdateProfileRequest;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Models\Order;
@@ -15,13 +17,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
-class ProfileController extends Controller
+class ProfileController extends ApiController
 {
     public function show(Request $request): JsonResponse
     {
-        return response()->json([
-            'user' => new UserResource($request->user()->load('customer.addresses')),
-        ]);
+        return $this->ok(new UserResource($request->user()->load('customer.addresses')));
     }
 
     public function update(UpdateProfileRequest $request): JsonResponse
@@ -43,18 +43,11 @@ class ProfileController extends Controller
             ]);
         }
 
-        return response()->json([
-            'user' => new UserResource($user->fresh()->load('customer')),
-        ]);
+        return $this->ok(new UserResource($user->fresh()->load('customer')));
     }
 
-    public function updatePassword(Request $request): JsonResponse
+    public function updatePassword(UpdatePasswordRequest $request): JsonResponse
     {
-        $request->validate([
-            'current_password' => ['required', 'string'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
-
         $user = $request->user();
 
         if (! Hash::check($request->current_password, $user->password)) {
@@ -65,19 +58,15 @@ class ProfileController extends Controller
 
         $user->update(['password' => Hash::make($request->password)]);
 
-        return response()->json(['message' => 'Password updated successfully']);
+        return $this->ok(['message' => 'Password updated successfully']);
     }
 
     /**
      * GDPR Art. 17 — Right to erasure ("right to be forgotten").
      * Soft-deletes the account and revokes all tokens.
      */
-    public function destroy(Request $request): JsonResponse
+    public function destroy(DestroyAccountRequest $request): JsonResponse
     {
-        $request->validate([
-            'password' => ['required', 'string'],
-        ]);
-
         $user = $request->user();
 
         if (! Hash::check($request->password, $user->password)) {
@@ -88,7 +77,7 @@ class ProfileController extends Controller
 
         (new AnonymizeUserData)->handle($user);
 
-        return response()->json(['message' => 'Account deleted successfully']);
+        return $this->ok(['message' => 'Account deleted successfully']);
     }
 
     /**
@@ -132,7 +121,7 @@ class ProfileController extends Controller
             'subscribed_at' => $customer->newsletterSubscriber->subscribed_at,
         ] : null;
 
-        return response()->json([
+        return $this->ok([
             'exported_at' => now()->toIso8601String(),
             'account' => [
                 'name' => $user->name,
@@ -166,6 +155,6 @@ class ProfileController extends Controller
             $setting->key => $setting->value,
         ]));
 
-        return response()->json(['settings' => $grouped]);
+        return $this->ok(['settings' => $grouped]);
     }
 }

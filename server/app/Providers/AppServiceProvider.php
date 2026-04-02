@@ -44,6 +44,7 @@ use Dedoc\Scramble\Support\Generator\SecurityScheme;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Date;
@@ -456,6 +457,8 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function configureDefaults(): void
     {
+        JsonResource::withoutWrapping();
+
         Date::use(CarbonImmutable::class);
 
         DB::prohibitDestructiveCommands(

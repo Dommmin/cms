@@ -99,8 +99,8 @@ describe('Order detail', function (): void {
         $this->actingAs($user, 'sanctum')
             ->getJson('/api/v1/orders/'.$order->reference_number)
             ->assertOk()
-            ->assertJsonPath('data.reference_number', $order->reference_number)
-            ->assertJsonPath('data.status', 'pending');
+            ->assertJsonPath('reference_number', $order->reference_number)
+            ->assertJsonPath('status', 'pending');
     });
 
     it('user cannot view another user order — gets 404 not 403', function (): void {
@@ -146,7 +146,7 @@ describe('Order cancellation', function (): void {
         $this->actingAs($user, 'sanctum')
             ->postJson(sprintf('/api/v1/orders/%s/cancel', $order->reference_number))
             ->assertOk()
-            ->assertJsonPath('data.status', OrderStatusEnum::CANCELLED->value);
+            ->assertJsonPath('status', OrderStatusEnum::CANCELLED->value);
 
         expect($order->fresh()->getRawOriginal('status'))->toBe(OrderStatusEnum::CANCELLED->value);
     });
@@ -159,7 +159,7 @@ describe('Order cancellation', function (): void {
         $this->actingAs($user, 'sanctum')
             ->postJson(sprintf('/api/v1/orders/%s/cancel', $order->reference_number))
             ->assertOk()
-            ->assertJsonPath('data.status', OrderStatusEnum::CANCELLED->value);
+            ->assertJsonPath('status', OrderStatusEnum::CANCELLED->value);
 
         expect($order->fresh()->getRawOriginal('status'))->toBe(OrderStatusEnum::CANCELLED->value);
     });

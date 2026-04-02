@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Services\GusService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 use RuntimeException;
 
-class GusController extends Controller
+class GusController extends ApiController
 {
     public function __construct(private readonly GusService $gusService) {}
 
@@ -23,9 +24,11 @@ class GusController extends Controller
         try {
             $data = $this->gusService->lookupByNip($nip);
         } catch (RuntimeException $runtimeException) {
-            return response()->json(['message' => $runtimeException->getMessage()], 422);
+            throw ValidationException::withMessages([
+                'nip' => [$runtimeException->getMessage()],
+            ]);
         }
 
-        return response()->json($data);
+        return $this->ok($data);
     }
 }

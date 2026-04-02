@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\ShippingCarrierEnum;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Infrastructure\Shipping\Furgonetka\FurgonetkaClient;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Throwable;
 
-class PickupPointsController extends Controller
+class PickupPointsController extends ApiController
 {
     public function __construct(private readonly FurgonetkaClient $client) {}
 
@@ -28,17 +28,17 @@ class PickupPointsController extends Controller
         // Only Furgonetka-based pickup carriers are handled here.
         // INPOST_LOCKER uses the native InPost geowidget — no backend call needed.
         if (! $carrier || ! $carrier->requiresPickupPoint() || $carrier->usesNativeWidget()) {
-            return response()->json(['data' => []]);
+            return $this->ok(['data' => []]);
         }
 
         $serviceCode = $carrier->furgonetkaServiceCode();
         if ($serviceCode === null) {
-            return response()->json(['data' => []]);
+            return $this->ok(['data' => []]);
         }
 
         // Guard: Furgonetka credentials must be set in server/.env
         if (empty(config('services.furgonetka.client_id')) || empty(config('services.furgonetka.client_secret'))) {
-            return response()->json([
+            return $this->ok([
                 'data' => [],
                 'configured' => false,
                 'missing_env' => ['FURGONETKA_CLIENT_ID', 'FURGONETKA_CLIENT_SECRET'],
@@ -51,7 +51,7 @@ class PickupPointsController extends Controller
 
         // Need at least postal code or coordinates
         if (! $postalCode && ($lat === null || $lng === null)) {
-            return response()->json(['data' => []]);
+            return $this->ok(['data' => []]);
         }
 
         try {
@@ -62,10 +62,10 @@ class PickupPointsController extends Controller
                 lng: $lng,
             );
         } catch (Throwable) {
-            return response()->json(['data' => []]);
+            return $this->ok(['data' => []]);
         }
 
-        return response()->json(['data' => $this->normalize($raw), 'configured' => true, 'missing_env' => []]);
+        return $this->ok(['data' => $this->normalize($raw), 'configured' => true, 'missing_env' => []]);
     }
 
     /**

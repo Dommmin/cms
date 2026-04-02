@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\PaymentProviderEnum;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\CheckoutRequest;
 use App\Http\Resources\Api\V1\OrderResource;
 use App\Http\Resources\Api\V1\ShippingMethodResource;
@@ -13,8 +13,9 @@ use App\Models\ShippingMethod;
 use App\Services\CheckoutService;
 use App\Services\PaymentGatewayManager;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-class CheckoutController extends Controller
+class CheckoutController extends ApiController
 {
     public function __construct(
         private readonly CheckoutService $checkoutService,
@@ -92,19 +93,17 @@ class CheckoutController extends Controller
             ],
         ];
 
-        return response()->json(['data' => $methods]);
+        return $this->ok($methods);
     }
 
-    public function shippingMethods(): JsonResponse
+    public function shippingMethods(): AnonymousResourceCollection
     {
         $methods = ShippingMethod::query()
             ->where('is_active', true)
             ->orderBy('base_price')
             ->get();
 
-        return response()->json([
-            'data' => ShippingMethodResource::collection($methods),
-        ]);
+        return ShippingMethodResource::collection($methods);
     }
 
     public function checkout(CheckoutRequest $request): JsonResponse
@@ -143,7 +142,7 @@ class CheckoutController extends Controller
             ]);
         }
 
-        return response()->json([
+        return $this->created([
             'order' => new OrderResource($order),
             'payment' => [
                 'id' => $payment?->id,
@@ -151,6 +150,6 @@ class CheckoutController extends Controller
                 'redirect_url' => $result['redirect_url'] ?? null,
                 'bank_details' => $result['bank_details'] ?? null,
             ],
-        ], 201);
+        ]);
     }
 }

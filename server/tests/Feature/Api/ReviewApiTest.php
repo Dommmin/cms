@@ -112,7 +112,7 @@ describe('Reviews – submission', function (): void {
             ]);
 
         $response->assertStatus(201)
-            ->assertJsonPath('data.rating', 5);
+            ->assertJsonPath('rating', 5);
 
         // ReviewResource does not expose status; verify via DB
         $this->assertDatabaseHas('product_reviews', [

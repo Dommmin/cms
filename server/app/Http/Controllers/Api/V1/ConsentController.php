@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreConsentRequest;
 use App\Models\CookieConsent;
 use Illuminate\Http\JsonResponse;
 
-class ConsentController extends Controller
+class ConsentController extends ApiController
 {
     public function store(StoreConsentRequest $request): JsonResponse
     {
@@ -39,6 +39,6 @@ class ConsentController extends Controller
             ]);
         }
 
-        return response()->json(['message' => 'Consent recorded.'], 201);
+        return $this->created(['message' => 'Consent recorded.']);
     }
 }

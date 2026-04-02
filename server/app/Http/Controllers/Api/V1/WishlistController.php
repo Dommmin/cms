@@ -4,29 +4,26 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
+use App\Http\Requests\Api\V1\StoreWishlistItemRequest;
 use App\Http\Resources\Api\V1\WishlistResource;
 use App\Models\Customer;
 use App\Models\Wishlist;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class WishlistController extends Controller
+class WishlistController extends ApiController
 {
     public function show(Request $request): JsonResponse
     {
         $wishlist = $this->getOrCreateWishlist($request);
         $wishlist->load('items.variant.product');
 
-        return response()->json(['data' => new WishlistResource($wishlist)]);
+        return $this->ok(new WishlistResource($wishlist));
     }
 
-    public function addItem(Request $request): JsonResponse
+    public function addItem(StoreWishlistItemRequest $request): JsonResponse
     {
-        $request->validate([
-            'variant_id' => ['required', 'integer', 'exists:product_variants,id'],
-        ]);
-
         $wishlist = $this->getOrCreateWishlist($request);
 
         $alreadyExists = $wishlist->items()->where('product_variant_id', $request->variant_id)->exists();
@@ -39,7 +36,7 @@ class WishlistController extends Controller
 
         $wishlist->load('items.variant.product');
 
-        return response()->json(['data' => new WishlistResource($wishlist)]);
+        return $this->ok(new WishlistResource($wishlist));
     }
 
     public function removeItem(Request $request, int $variantId): JsonResponse
@@ -48,7 +45,7 @@ class WishlistController extends Controller
         $wishlist->items()->where('product_variant_id', $variantId)->delete();
         $wishlist->load('items.variant.product');
 
-        return response()->json(['data' => new WishlistResource($wishlist)]);
+        return $this->ok(new WishlistResource($wishlist));
     }
 
     private function getOrCreateWishlist(Request $request): Wishlist

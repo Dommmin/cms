@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\ReviewStatusEnum;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreReviewRequest;
 use App\Http\Resources\Api\V1\ReviewResource;
 use App\Models\Product;
@@ -13,8 +13,9 @@ use App\Models\ProductReview;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Validation\ValidationException;
 
-class ReviewController extends Controller
+class ReviewController extends ApiController
 {
     public function index(Request $request, string $slug): AnonymousResourceCollection
     {
@@ -37,7 +38,9 @@ class ReviewController extends Controller
         $customer = $request->user()->customer;
 
         if (! $customer) {
-            return response()->json(['message' => 'Customer profile required to leave a review'], 422);
+            throw ValidationException::withMessages([
+                'customer' => ['Customer profile required to leave a review'],
+            ]);
         }
 
         $existing = ProductReview::query()
@@ -46,7 +49,9 @@ class ReviewController extends Controller
             ->exists();
 
         if ($existing) {
-            return response()->json(['message' => 'You have already reviewed this product'], 422);
+            throw ValidationException::withMessages([
+                'product' => ['You have already reviewed this product'],
+            ]);
         }
 
         $data = $request->validated();
@@ -62,7 +67,7 @@ class ReviewController extends Controller
             'helpful_count' => 0,
         ]);
 
-        return response()->json(['data' => new ReviewResource($review->load('customer'))], 201);
+        return $this->created(new ReviewResource($review->load('customer')));
     }
 
     public function markHelpful(Request $request, ProductReview $review): JsonResponse
@@ -71,7 +76,7 @@ class ReviewController extends Controller
         $customer = $user?->customer;
 
         if (! $customer) {
-            return response()->json(['message' => 'Login required'], 401);
+            abort(401, 'Login required');
         }
 
         $alreadyVoted = $review->helpfulVotes()->where('customer_id', $customer->id)->exists();
@@ -84,7 +89,7 @@ class ReviewController extends Controller
 
         $review->recalculateHelpfulCount();
 
-        return response()->json([
+        return $this->ok([
             'helpful_count' => $review->fresh()->helpful_count,
             'voted' => ! $alreadyVoted,
         ]);

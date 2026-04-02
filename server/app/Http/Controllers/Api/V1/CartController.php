@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\ApplyDiscountRequest;
 use App\Http\Requests\Api\V1\StoreCartItemRequest;
 use App\Http\Requests\Api\V1\UpdateCartItemRequest;
@@ -15,8 +15,9 @@ use App\Models\ProductVariant;
 use App\Services\CartService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
-class CartController extends Controller
+class CartController extends ApiController
 {
     public function __construct(
         private readonly CartService $cartService
@@ -27,7 +28,7 @@ class CartController extends Controller
         $cart = $this->cartService->getOrCreateCart($request->user(), $request->header('X-Cart-Token'));
         $cart->load('items.variant.product');
 
-        return response()->json(new CartResource($cart));
+        return $this->ok(new CartResource($cart));
     }
 
     public function addItem(StoreCartItemRequest $request): JsonResponse
@@ -36,10 +37,9 @@ class CartController extends Controller
         $variant = ProductVariant::query()->findOrFail($data['variant_id']);
 
         if ($variant->stock_quantity < $data['quantity']) {
-            return response()->json([
-                'message' => 'Not enough stock available',
-                'available' => $variant->stock_quantity,
-            ], 422);
+            throw ValidationException::withMessages([
+                'quantity' => [sprintf('Not enough stock available. Available: %d', $variant->stock_quantity)],
+            ]);
         }
 
         $cart = $this->cartService->getOrCreateCart($request->user(), $request->header('X-Cart-Token'));
@@ -48,10 +48,9 @@ class CartController extends Controller
         if ($existing) {
             $newQty = $existing->quantity + $data['quantity'];
             if ($newQty > $variant->stock_quantity) {
-                return response()->json([
-                    'message' => 'Not enough stock available',
-                    'available' => $variant->stock_quantity,
-                ], 422);
+                throw ValidationException::withMessages([
+                    'quantity' => [sprintf('Not enough stock available. Available: %d', $variant->stock_quantity)],
+                ]);
             }
 
             $existing->update(['quantity' => $newQty]);
@@ -64,7 +63,7 @@ class CartController extends Controller
 
         $cart->load('items.variant.product');
 
-        return response()->json(new CartResource($cart));
+        return $this->ok(new CartResource($cart));
     }
 
     public function updateItem(UpdateCartItemRequest $request, CartItem $cartItem): JsonResponse
@@ -77,16 +76,15 @@ class CartController extends Controller
         $variant = $cartItem->variant;
 
         if ($variant && $data['quantity'] > $variant->stock_quantity) {
-            return response()->json([
-                'message' => 'Not enough stock available',
-                'available' => $variant->stock_quantity,
-            ], 422);
+            throw ValidationException::withMessages([
+                'quantity' => [sprintf('Not enough stock available. Available: %d', $variant->stock_quantity)],
+            ]);
         }
 
         $cartItem->update(['quantity' => $data['quantity']]);
         $cart->load('items.variant.product');
 
-        return response()->json(new CartResource($cart));
+        return $this->ok(new CartResource($cart));
     }
 
     public function removeItem(Request $request, CartItem $cartItem): JsonResponse
@@ -98,7 +96,7 @@ class CartController extends Controller
         $cartItem->delete();
         $cart->load('items.variant.product');
 
-        return response()->json(new CartResource($cart));
+        return $this->ok(new CartResource($cart));
     }
 
     public function clear(Request $request): JsonResponse
@@ -108,7 +106,7 @@ class CartController extends Controller
         $cart->update(['discount_code' => null]);
         $cart->load('items.variant.product');
 
-        return response()->json(new CartResource($cart));
+        return $this->ok(new CartResource($cart));
     }
 
     public function applyDiscount(ApplyDiscountRequest $request): JsonResponse
@@ -122,14 +120,16 @@ class CartController extends Controller
             ->first();
 
         if (! $discount || ! $discount->isValid()) {
-            return response()->json(['message' => 'Invalid or expired discount code'], 422);
+            throw ValidationException::withMessages([
+                'code' => ['Invalid or expired discount code'],
+            ]);
         }
 
         $subtotal = $cart->subtotal();
         if ($discount->min_order_value && $subtotal < $discount->min_order_value) {
-            return response()->json([
-                'message' => sprintf('Minimum order value of %s cents required', $discount->min_order_value),
-            ], 422);
+            throw ValidationException::withMessages([
+                'code' => [sprintf('Minimum order value of %s cents required', $discount->min_order_value)],
+            ]);
         }
 
         $cart->getConnection()
@@ -140,7 +140,7 @@ class CartController extends Controller
         $discountAmount = $discount->calculateDiscount($subtotal);
         $cart->load('items.variant.product');
 
-        return response()->json([
+        return $this->ok([
             'cart' => new CartResource($cart),
             'discount' => [
                 'code' => $discount->code,
@@ -162,6 +162,6 @@ class CartController extends Controller
 
         $cart->load('items.variant.product');
 
-        return response()->json(new CartResource($cart));
+        return $this->ok(new CartResource($cart));
     }
 }

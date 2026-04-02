@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1\Blog;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Api\V1\BlogCategoryResource;
 use App\Models\BlogCategory;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-class BlogCategoryController extends Controller
+class BlogCategoryController extends ApiController
 {
-    public function index(): JsonResponse
+    public function index(): AnonymousResourceCollection
     {
         $categories = BlogCategory::query()->active()
             ->roots()
@@ -19,6 +19,6 @@ class BlogCategoryController extends Controller
             ->orderBy('position')
             ->get();
 
-        return response()->json(['data' => BlogCategoryResource::collection($categories)]);
+        return BlogCategoryResource::collection($categories);
     }
 }

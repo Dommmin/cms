@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Api\V1\FaqResource;
 use App\Models\Faq;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-class FaqController extends Controller
+class FaqController extends ApiController
 {
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
         $faqs = Faq::query()
             ->where('is_active', true)
@@ -20,8 +20,6 @@ class FaqController extends Controller
             ->orderBy('position')
             ->get();
 
-        return response()->json([
-            'data' => FaqResource::collection($faqs),
-        ]);
+        return $this->collection(FaqResource::collection($faqs));
     }
 }

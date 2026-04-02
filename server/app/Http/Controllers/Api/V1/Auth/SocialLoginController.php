@@ -4,40 +4,47 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
 use Throwable;
 
-class SocialLoginController extends Controller
+class SocialLoginController extends ApiController
 {
     private const array ALLOWED_PROVIDERS = ['google', 'github'];
 
     public function redirect(string $provider): JsonResponse
     {
         if (! in_array($provider, self::ALLOWED_PROVIDERS, true)) {
-            return response()->json(['message' => 'Unsupported provider.'], 422);
+            throw ValidationException::withMessages([
+                'provider' => ['Unsupported provider.'],
+            ]);
         }
 
         $url = Socialite::driver($provider)->stateless()->redirect()->getTargetUrl();
 
-        return response()->json(['url' => $url]);
+        return $this->ok(['url' => $url]);
     }
 
     public function callback(string $provider): JsonResponse
     {
         if (! in_array($provider, self::ALLOWED_PROVIDERS, true)) {
-            return response()->json(['message' => 'Unsupported provider.'], 422);
+            throw ValidationException::withMessages([
+                'provider' => ['Unsupported provider.'],
+            ]);
         }
 
         try {
             $socialUser = Socialite::driver($provider)->stateless()->user();
         } catch (Throwable) {
-            return response()->json(['message' => 'Social authentication failed.'], 422);
+            throw ValidationException::withMessages([
+                'provider' => ['Social authentication failed.'],
+            ]);
         }
 
         $providerIdField = $provider.'_id';
@@ -67,7 +74,7 @@ class SocialLoginController extends Controller
 
         $token = $user->createToken('api')->plainTextToken;
 
-        return response()->json([
+        return $this->ok([
             'user' => new UserResource($user),
             'token' => $token,
         ]);

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Api\V1\MenuResource;
 use App\Models\Menu;
 use Illuminate\Http\JsonResponse;
 
-class MenuController extends Controller
+class MenuController extends ApiController
 {
     public function show(string $location): JsonResponse
     {
@@ -19,9 +19,9 @@ class MenuController extends Controller
             ->first();
 
         if (! $menu) {
-            return response()->json(['data' => null], 404);
+            abort(404);
         }
 
-        return response()->json(['data' => new MenuResource($menu)]);
+        return $this->ok(new MenuResource($menu));
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\AddSupportMessageRequest;
 use App\Http\Requests\Api\V1\StartSupportConversationRequest;
 use App\Http\Resources\Api\V1\SupportConversationResource;
@@ -13,7 +13,7 @@ use App\Models\SupportConversation;
 use App\Models\SupportMessage;
 use Illuminate\Http\JsonResponse;
 
-class SupportController extends Controller
+class SupportController extends ApiController
 {
     public function store(StartSupportConversationRequest $request): JsonResponse
     {
@@ -45,7 +45,7 @@ class SupportController extends Controller
 
         $conversation->load('messages');
 
-        return response()->json(new SupportConversationResource($conversation), 201);
+        return $this->created(new SupportConversationResource($conversation));
     }
 
     public function show(string $token): JsonResponse
@@ -57,7 +57,7 @@ class SupportController extends Controller
 
         $this->markAgentMessagesRead($conversation);
 
-        return response()->json(new SupportConversationResource($conversation));
+        return $this->ok(new SupportConversationResource($conversation));
     }
 
     public function addMessage(AddSupportMessageRequest $request, string $token): JsonResponse
@@ -81,7 +81,7 @@ class SupportController extends Controller
 
         $conversation->update(['last_reply_at' => now(), 'status' => 'open']);
 
-        return response()->json(new SupportMessageResource($message), 201);
+        return $this->created(new SupportMessageResource($message));
     }
 
     private function markAgentMessagesRead(SupportConversation $conversation): void

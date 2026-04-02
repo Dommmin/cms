@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreAddressRequest;
 use App\Http\Resources\Api\V1\AddressResource;
 use App\Models\Address;
@@ -13,7 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-class AddressController extends Controller
+class AddressController extends ApiController
 {
     public function index(Request $request): AnonymousResourceCollection
     {
@@ -33,14 +33,14 @@ class AddressController extends Controller
 
         $address = $customer->addresses()->create($data);
 
-        return response()->json(new AddressResource($address), 201);
+        return $this->created(new AddressResource($address));
     }
 
     public function show(Request $request, Address $address): JsonResponse
     {
         $this->authorizeAddress($request, $address);
 
-        return response()->json(new AddressResource($address));
+        return $this->ok(new AddressResource($address));
     }
 
     public function update(StoreAddressRequest $request, Address $address): JsonResponse
@@ -54,7 +54,7 @@ class AddressController extends Controller
 
         $address->update($data);
 
-        return response()->json(new AddressResource($address->fresh()));
+        return $this->ok(new AddressResource($address->fresh()));
     }
 
     public function destroy(Request $request, Address $address): JsonResponse
@@ -62,7 +62,7 @@ class AddressController extends Controller
         $this->authorizeAddress($request, $address);
         $address->delete();
 
-        return response()->json(null, 204);
+        return $this->noContent();
     }
 
     public function setDefault(Request $request, Address $address): JsonResponse
@@ -71,7 +71,7 @@ class AddressController extends Controller
         $address->customer->addresses()->update(['is_default' => false]);
         $address->update(['is_default' => true]);
 
-        return response()->json(new AddressResource($address->fresh()));
+        return $this->ok(new AddressResource($address->fresh()));
     }
 
     private function ensureCustomer(Request $request): Customer

@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\NewsletterSubscribeRequest;
+use App\Http\Requests\Api\V1\NewsletterUnsubscribeRequest;
 use App\Models\NewsletterSubscriber;
 use App\Notifications\NewsletterConfirmationNotification;
 use App\Notifications\NewsletterWelcomeNotification;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
-class NewsletterController extends Controller
+class NewsletterController extends ApiController
 {
     public function subscribe(NewsletterSubscribeRequest $request): JsonResponse
     {
@@ -35,9 +35,9 @@ class NewsletterController extends Controller
         Notification::route('mail', $subscriber->email)
             ->notify((new NewsletterConfirmationNotification($subscriber))->locale($subscriber->locale));
 
-        return response()->json([
+        return $this->created([
             'message' => 'Please check your email to confirm your subscription.',
-        ], 201);
+        ]);
     }
 
     public function confirmSubscription(string $token): JsonResponse
@@ -53,24 +53,20 @@ class NewsletterController extends Controller
         Notification::route('mail', $subscriber->email)
             ->notify((new NewsletterWelcomeNotification($subscriber))->locale($subscriber->locale));
 
-        return response()->json([
+        return $this->ok([
             'message' => 'Your subscription has been confirmed. Welcome!',
         ]);
     }
 
-    public function unsubscribe(Request $request): JsonResponse
+    public function unsubscribe(NewsletterUnsubscribeRequest $request): JsonResponse
     {
-        $request->validate([
-            'email' => ['required', 'email'],
-        ]);
-
         $subscriber = NewsletterSubscriber::query()->where('email', $request->email)->first();
 
         if ($subscriber) {
             $subscriber->unsubscribe();
         }
 
-        return response()->json(['message' => 'Successfully unsubscribed from the newsletter']);
+        return $this->ok(['message' => 'Successfully unsubscribed from the newsletter']);
     }
 
     public function unsubscribeByToken(string $token): JsonResponse
@@ -81,6 +77,6 @@ class NewsletterController extends Controller
             $subscriber->unsubscribe();
         }
 
-        return response()->json(['message' => 'Successfully unsubscribed from the newsletter']);
+        return $this->ok(['message' => 'Successfully unsubscribed from the newsletter']);
     }
 }

@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\OrderStatusEnum;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
+use App\Http\Requests\Api\V1\StoreReturnRequestRequest;
 use App\Http\Resources\Api\V1\OrderResource;
 use App\Models\Order;
 use App\Models\ReturnRequest;
@@ -13,16 +14,17 @@ use App\Services\InvoiceService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
-class OrderController extends Controller
+class OrderController extends ApiController
 {
     public function index(Request $request): AnonymousResourceCollection
     {
         $customer = $request->user()->customer;
 
         if (! $customer) {
-            return OrderResource::collection(collect());
+            return OrderResource::collection(Order::query()->whereNull('id')->paginate(10));
         }
 
         $orders = Order::query()
@@ -44,7 +46,7 @@ class OrderController extends Controller
             ->with(['items', 'billingAddress', 'shippingAddress', 'payment', 'shipment', 'statusHistory'])
             ->firstOrFail();
 
-        return response()->json(['data' => new OrderResource($order)]);
+        return $this->ok(new OrderResource($order));
     }
 
     public function cancel(Request $request, string $reference): JsonResponse
@@ -58,12 +60,14 @@ class OrderController extends Controller
 
         $currentStatus = OrderStatusEnum::from((string) $order->status);
         if (! in_array($currentStatus, [OrderStatusEnum::PENDING, OrderStatusEnum::AWAITING])) {
-            return response()->json(['message' => 'Order cannot be cancelled in its current status'], 422);
+            throw ValidationException::withMessages([
+                'status' => ['Order cannot be cancelled in its current status'],
+            ]);
         }
 
         $order->changeStatus(OrderStatusEnum::CANCELLED, 'customer', 'Cancelled by customer');
 
-        return response()->json(['data' => new OrderResource($order->fresh())]);
+        return $this->ok(new OrderResource($order->fresh()));
     }
 
     public function invoice(Request $request, string $reference, InvoiceService $invoiceService): Response
@@ -78,18 +82,8 @@ class OrderController extends Controller
         return $invoiceService->download($order);
     }
 
-    public function requestReturn(Request $request, string $reference): JsonResponse
+    public function requestReturn(StoreReturnRequestRequest $request, string $reference): JsonResponse
     {
-        $request->validate([
-            'reason' => ['required', 'string', 'max:1000'],
-            'notes' => ['nullable', 'string', 'max:2000'],
-            'type' => ['required', 'string', 'in:return,complaint,exchange'],
-            'items' => ['required', 'array', 'min:1'],
-            'items.*.order_item_id' => ['required', 'integer'],
-            'items.*.quantity' => ['required', 'integer', 'min:1'],
-            'items.*.notes' => ['nullable', 'string'],
-        ]);
-
         $customer = $request->user()->customer;
 
         $order = Order::query()
@@ -99,19 +93,23 @@ class OrderController extends Controller
             ->firstOrFail();
 
         if (OrderStatusEnum::from((string) $order->status) !== OrderStatusEnum::DELIVERED) {
-            return response()->json(['message' => 'Returns can only be requested for delivered orders'], 422);
+            throw ValidationException::withMessages([
+                'status' => ['Returns can only be requested for delivered orders'],
+            ]);
         }
+
+        $data = $request->validated();
 
         $returnRequest = ReturnRequest::query()->create([
             'order_id' => $order->id,
             'reference_number' => ReturnRequest::generateReferenceNumber(),
-            'return_type' => $request->type,
+            'return_type' => $data['type'],
             'status' => 'pending',
-            'reason' => $request->reason,
-            'customer_notes' => $request->notes,
+            'reason' => $data['reason'],
+            'customer_notes' => $data['notes'] ?? null,
         ]);
 
-        foreach ($request->items as $itemData) {
+        foreach ($data['items'] as $itemData) {
             $orderItem = $order->items->where('id', $itemData['order_item_id'])->first();
             if ($orderItem) {
                 $returnRequest->items()->create([
@@ -122,9 +120,9 @@ class OrderController extends Controller
             }
         }
 
-        return response()->json([
+        return $this->created([
             'message' => 'Return request submitted successfully',
             'reference_number' => $returnRequest->reference_number,
-        ], 201);
+        ]);
     }
 }

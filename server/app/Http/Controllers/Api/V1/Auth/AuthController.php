@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\ForgotPasswordRequest;
 use App\Http\Requests\Api\V1\LoginRequest;
 use App\Http\Requests\Api\V1\RegisterRequest;
@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 
-class AuthController extends Controller
+class AuthController extends ApiController
 {
     public function __construct(
         private readonly CartService $cartService,
@@ -39,10 +39,10 @@ class AuthController extends Controller
 
         $token = $user->createToken('api')->plainTextToken;
 
-        return response()->json([
+        return $this->created([
             'user' => new UserResource($user),
             'token' => $token,
-        ], 201);
+        ]);
     }
 
     public function login(LoginRequest $request): JsonResponse
@@ -59,7 +59,7 @@ class AuthController extends Controller
 
         $token = $user->createToken('api')->plainTextToken;
 
-        return response()->json([
+        return $this->ok([
             'user' => new UserResource($user),
             'token' => $token,
         ]);
@@ -69,14 +69,12 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'Logged out successfully']);
+        return $this->ok(['message' => 'Logged out successfully']);
     }
 
     public function me(Request $request): JsonResponse
     {
-        return response()->json([
-            'user' => new UserResource($request->user()->load('customer')),
-        ]);
+        return $this->ok(new UserResource($request->user()->load('customer')));
     }
 
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
@@ -89,7 +87,7 @@ class AuthController extends Controller
             ]);
         }
 
-        return response()->json(['message' => __($status)]);
+        return $this->ok(['message' => __($status)]);
     }
 
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
@@ -108,6 +106,6 @@ class AuthController extends Controller
             ]);
         }
 
-        return response()->json(['message' => __($status)]);
+        return $this->ok(['message' => __($status)]);
     }
 }

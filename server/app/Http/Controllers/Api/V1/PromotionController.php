@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Models\Promotion;
 use Illuminate\Http\JsonResponse;
 
-class PromotionController extends Controller
+class PromotionController extends ApiController
 {
     public function index(): JsonResponse
     {
@@ -27,6 +27,6 @@ class PromotionController extends Controller
                 'ends_at' => $p->ends_at?->toISOString(),
             ]);
 
-        return response()->json(['data' => $promotions]);
+        return $this->ok($promotions->values()->toArray());
     }
 }
