@@ -2,7 +2,10 @@
 
 import { api } from '@/lib/axios';
 import { useEffect, useState } from 'react';
-import type { ApplePayButtonProps } from './apple-pay-button.types';
+import type {
+    ApplePayButtonProps,
+    ApplePaySessionInstance,
+} from './apple-pay-button.types';
 
 export function ApplePayButton({
     amount,
@@ -39,7 +42,9 @@ export function ApplePayButton({
             request,
         ) as ApplePaySessionInstance;
 
-        session.onvalidatemerchant = async (event) => {
+        session.onvalidatemerchant = async (event: {
+            validationURL: string;
+        }) => {
             try {
                 const { data } = await api.post(
                     '/payments/apple-pay/validate-merchant',
@@ -54,7 +59,9 @@ export function ApplePayButton({
             }
         };
 
-        session.onpaymentauthorized = (event) => {
+        session.onpaymentauthorized = (event: {
+            payment: { token: { paymentData: object } };
+        }) => {
             const tokenData = JSON.stringify(event.payment.token.paymentData);
             onToken(tokenData);
             session.completePayment(0); // STATUS_SUCCESS = 0

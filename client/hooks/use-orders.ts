@@ -40,6 +40,7 @@ export function useCancelOrder() {
     return useMutation({
         mutationFn: (reference: string) => cancelOrder(reference),
         onSuccess: (order) => {
+            if (!order) return;
             queryClient.setQueryData(
                 orderKeys.detail(order.reference_number),
                 order,
@@ -63,6 +64,7 @@ export function useCheckout() {
     return useMutation({
         mutationFn: (payload: CheckoutPayload) => checkout(payload),
         onSuccess: (order) => {
+            if (!order) return;
             queryClient.invalidateQueries({ queryKey: orderKeys.all });
             queryClient.invalidateQueries({ queryKey: ['cart'] });
             trackPurchase({

@@ -6,36 +6,43 @@ import type { Cfg, PagePreviewProps, PreviewBlock } from './page-preview.types';
 // ─── Block preview components ─────────────────────────────────────────────────
 
 function HeroBannerPreview({ cfg }: { cfg: Cfg }) {
+    const title = cfg.title as string | undefined;
+    const subtitle = cfg.subtitle as string | undefined;
+    const ctaText = cfg.cta_text as string | undefined;
+    const ctaUrl = (cfg.cta_url as string) || '#';
+    const minHeight = cfg.min_height as number | undefined;
+    const textAlign = ((cfg.text_alignment as string) ||
+        'center') as React.CSSProperties['textAlign'];
+
     return (
         <div
             className="relative flex min-h-[420px] items-center justify-center bg-gradient-to-br from-slate-800 to-slate-600 px-8 py-16 text-white"
             style={{
-                minHeight: cfg.min_height ? `${cfg.min_height}px` : undefined,
+                minHeight: minHeight ? `${minHeight}px` : undefined,
             }}
         >
             <div
                 className="relative z-10"
                 style={{
-                    textAlign: ((cfg.text_alignment as string) ||
-                        'center') as React.CSSProperties['textAlign'],
+                    textAlign: textAlign,
                 }}
             >
-                {cfg.title && (
+                {title && (
                     <h1 className="mb-4 text-4xl leading-tight font-bold">
-                        {cfg.title as string}
+                        {title}
                     </h1>
                 )}
-                {cfg.subtitle && (
+                {subtitle && (
                     <p className="mb-8 max-w-2xl text-xl opacity-90">
-                        {cfg.subtitle as string}
+                        {subtitle}
                     </p>
                 )}
-                {cfg.cta_text && (
+                {ctaText && (
                     <a
-                        href={(cfg.cta_url as string) || '#'}
+                        href={ctaUrl}
                         className="inline-block rounded-md bg-white px-7 py-3 text-sm font-semibold text-slate-800 hover:bg-white/90"
                     >
-                        {cfg.cta_text as string}
+                        {ctaText}
                     </a>
                 )}
             </div>
@@ -44,20 +51,22 @@ function HeroBannerPreview({ cfg }: { cfg: Cfg }) {
 }
 
 function RichTextPreview({ cfg }: { cfg: Cfg }) {
+    const maxWidth = cfg.max_width as string | undefined;
+    const content = cfg.content as string | undefined;
     const widthClass =
-        cfg.max_width === 'narrow'
+        maxWidth === 'narrow'
             ? 'max-w-xl'
-            : cfg.max_width === 'wide'
+            : maxWidth === 'wide'
               ? 'max-w-5xl'
-              : cfg.max_width === 'full'
+              : maxWidth === 'full'
                 ? 'max-w-none'
                 : 'max-w-3xl';
     return (
         <div className={`mx-auto px-8 py-10 ${widthClass}`}>
-            {cfg.content ? (
+            {content ? (
                 <div
                     className="prose prose-slate max-w-none"
-                    dangerouslySetInnerHTML={{ __html: cfg.content as string }}
+                    dangerouslySetInnerHTML={{ __html: content }}
                 />
             ) : (
                 <p className="text-muted-foreground italic">
@@ -69,6 +78,9 @@ function RichTextPreview({ cfg }: { cfg: Cfg }) {
 }
 
 function TwoColumnsPreview({ cfg }: { cfg: Cfg }) {
+    const ratio = (cfg.ratio as string) || '50-50';
+    const leftContent = cfg.left_content as string | undefined;
+    const rightContent = cfg.right_content as string | undefined;
     const ratioMap: Record<string, string> = {
         '60-40': 'grid-cols-[3fr_2fr]',
         '40-60': 'grid-cols-[2fr_3fr]',
@@ -76,16 +88,15 @@ function TwoColumnsPreview({ cfg }: { cfg: Cfg }) {
         '30-70': 'grid-cols-[3fr_7fr]',
         '50-50': 'grid-cols-2',
     };
-    const gridClass =
-        ratioMap[(cfg.ratio as string) || '50-50'] || 'grid-cols-2';
+    const gridClass = ratioMap[ratio] || 'grid-cols-2';
 
     return (
         <div className={`grid gap-8 px-8 py-10 ${gridClass}`}>
             <div className="prose prose-slate max-w-none">
-                {cfg.left_content ? (
+                {leftContent ? (
                     <div
                         dangerouslySetInnerHTML={{
-                            __html: cfg.left_content as string,
+                            __html: leftContent,
                         }}
                     />
                 ) : (
@@ -93,10 +104,10 @@ function TwoColumnsPreview({ cfg }: { cfg: Cfg }) {
                 )}
             </div>
             <div className="prose prose-slate max-w-none">
-                {cfg.right_content ? (
+                {rightContent ? (
                     <div
                         dangerouslySetInnerHTML={{
-                            __html: cfg.right_content as string,
+                            __html: rightContent,
                         }}
                     />
                 ) : (
@@ -108,23 +119,29 @@ function TwoColumnsPreview({ cfg }: { cfg: Cfg }) {
 }
 
 function ThreeColumnsPreview({ cfg }: { cfg: Cfg }) {
+    const col1Title = cfg.column_1_title as string | undefined;
+    const col1Content = cfg.column_1_content as string | undefined;
+    const col2Title = cfg.column_2_title as string | undefined;
+    const col2Content = cfg.column_2_content as string | undefined;
+    const col3Title = cfg.column_3_title as string | undefined;
+    const col3Content = cfg.column_3_content as string | undefined;
     const cols = [
-        { title: cfg.column_1_title, content: cfg.column_1_content },
-        { title: cfg.column_2_title, content: cfg.column_2_content },
-        { title: cfg.column_3_title, content: cfg.column_3_content },
+        { title: col1Title, content: col1Content },
+        { title: col2Title, content: col2Content },
+        { title: col3Title, content: col3Content },
     ];
     return (
         <div className="grid grid-cols-3 gap-6 px-8 py-10">
             {cols.map((col, i) => (
                 <div key={i} className="space-y-3">
                     {col.title && (
-                        <h3 className="font-semibold">{col.title as string}</h3>
+                        <h3 className="font-semibold">{col.title}</h3>
                     )}
                     {col.content ? (
                         <div
                             className="prose prose-slate max-w-none text-sm"
                             dangerouslySetInnerHTML={{
-                                __html: col.content as string,
+                                __html: col.content,
                             }}
                         />
                     ) : (
@@ -137,17 +154,14 @@ function ThreeColumnsPreview({ cfg }: { cfg: Cfg }) {
 }
 
 function AccordionPreview({ cfg }: { cfg: Cfg }) {
+    const title = cfg.title as string | undefined;
     const items =
         (cfg.items as
             | Array<{ title?: string; content?: string }>
             | undefined) ?? [];
     return (
         <div className="mx-auto max-w-3xl px-8 py-10">
-            {cfg.title && (
-                <h2 className="mb-6 text-2xl font-bold">
-                    {cfg.title as string}
-                </h2>
-            )}
+            {title && <h2 className="mb-6 text-2xl font-bold">{title}</h2>}
             <div className="divide-y rounded-lg border">
                 {items.length > 0 ? (
                     items.map((item, i) => (
@@ -179,7 +193,6 @@ function TabsPreview({ cfg }: { cfg: Cfg }) {
         [];
     return (
         <div className="px-8 py-10">
-            {/* Tab headers */}
             <div className="mb-6 flex gap-1 border-b">
                 {tabs.map((tab, i) => (
                     <div
@@ -195,7 +208,6 @@ function TabsPreview({ cfg }: { cfg: Cfg }) {
                     </div>
                 )}
             </div>
-            {/* First tab content */}
             {tabs[0]?.content ? (
                 <div
                     className="prose prose-slate max-w-none"
@@ -209,6 +221,8 @@ function TabsPreview({ cfg }: { cfg: Cfg }) {
 }
 
 function TestimonialsPreview({ cfg }: { cfg: Cfg }) {
+    const title = cfg.title as string | undefined;
+    const showRating = cfg.show_rating !== false;
     const items =
         (cfg.items as
             | Array<{
@@ -218,14 +232,11 @@ function TestimonialsPreview({ cfg }: { cfg: Cfg }) {
                   rating?: number;
               }>
             | undefined) ?? [];
-    const showRating = cfg.show_rating !== false;
 
     return (
         <div className="px-8 py-12">
-            {cfg.title && (
-                <h2 className="mb-8 text-center text-2xl font-bold">
-                    {cfg.title as string}
-                </h2>
+            {title && (
+                <h2 className="mb-8 text-center text-2xl font-bold">{title}</h2>
             )}
             {items.length > 0 ? (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -275,15 +286,15 @@ function TestimonialsPreview({ cfg }: { cfg: Cfg }) {
 }
 
 function FeaturedProductsPreview({ cfg }: { cfg: Cfg }) {
-    const count = Math.min(Number(cfg.max_items) || 4, 8);
-    const cols = Number(cfg.items_per_row) || 4;
+    const title = cfg.title as string | undefined;
+    const maxItems = cfg.max_items as number | undefined;
+    const itemsPerRow = cfg.items_per_row as number | undefined;
+    const showPrice = cfg.show_price !== false;
+    const count = Math.min(Number(maxItems) || 4, 8);
+    const cols = Number(itemsPerRow) || 4;
     return (
         <div className="px-8 py-10">
-            {cfg.title && (
-                <h2 className="mb-6 text-2xl font-bold">
-                    {cfg.title as string}
-                </h2>
-            )}
+            {title && <h2 className="mb-6 text-2xl font-bold">{title}</h2>}
             <div
                 className={`grid gap-4`}
                 style={{
@@ -294,7 +305,7 @@ function FeaturedProductsPreview({ cfg }: { cfg: Cfg }) {
                     <div key={i} className="rounded-lg border bg-card p-4">
                         <div className="mb-3 aspect-square rounded-md bg-muted" />
                         <div className="mb-2 h-3 w-3/4 rounded bg-muted" />
-                        {cfg.show_price !== false && (
+                        {showPrice && (
                             <div className="h-3 w-1/3 rounded bg-muted" />
                         )}
                     </div>
@@ -305,14 +316,13 @@ function FeaturedProductsPreview({ cfg }: { cfg: Cfg }) {
 }
 
 function CategoriesGridPreview({ cfg }: { cfg: Cfg }) {
-    const cols = Number(cfg.columns) || 4;
+    const title = cfg.title as string | undefined;
+    const columns = cfg.columns as number | undefined;
+    const showLabels = cfg.show_labels !== false;
+    const cols = Number(columns) || 4;
     return (
         <div className="px-8 py-10">
-            {cfg.title && (
-                <h2 className="mb-6 text-2xl font-bold">
-                    {cfg.title as string}
-                </h2>
-            )}
+            {title && <h2 className="mb-6 text-2xl font-bold">{title}</h2>}
             <div
                 className="grid gap-4"
                 style={{
@@ -325,7 +335,7 @@ function CategoriesGridPreview({ cfg }: { cfg: Cfg }) {
                         className="flex flex-col items-center gap-2 rounded-lg border bg-card p-4"
                     >
                         <div className="aspect-square w-full rounded-md bg-muted" />
-                        {cfg.show_labels !== false && (
+                        {showLabels && (
                             <div className="h-3 w-2/3 rounded bg-muted" />
                         )}
                     </div>
@@ -336,32 +346,28 @@ function CategoriesGridPreview({ cfg }: { cfg: Cfg }) {
 }
 
 function PromotionalBannerPreview({ cfg }: { cfg: Cfg }) {
-    const bg = (cfg.background_color as string) || '#1e293b';
-    const fg = (cfg.text_color as string) || '#ffffff';
+    const title = cfg.title as string | undefined;
+    const subtitle = cfg.subtitle as string | undefined;
+    const badgeText = cfg.badge_text as string | undefined;
+    const linkText = cfg.link_text as string | undefined;
+    const bgColor = (cfg.background_color as string) || '#1e293b';
+    const fgColor = (cfg.text_color as string) || '#ffffff';
     return (
         <div
             className="px-8 py-14 text-center"
-            style={{ backgroundColor: bg, color: fg }}
+            style={{ backgroundColor: bgColor, color: fgColor }}
         >
-            {cfg.title && (
-                <h2 className="mb-2 text-3xl font-bold">
-                    {cfg.title as string}
-                </h2>
-            )}
-            {cfg.subtitle && (
-                <p className="mb-2 text-lg opacity-90">
-                    {cfg.subtitle as string}
-                </p>
-            )}
-            {cfg.badge_text && (
+            {title && <h2 className="mb-2 text-3xl font-bold">{title}</h2>}
+            {subtitle && <p className="mb-2 text-lg opacity-90">{subtitle}</p>}
+            {badgeText && (
                 <span className="mb-4 inline-block rounded-full border border-current px-3 py-1 text-xs font-medium opacity-80">
-                    {cfg.badge_text as string}
+                    {badgeText}
                 </span>
             )}
-            {cfg.link_text && (
+            {linkText && (
                 <div className="mt-5">
                     <span className="inline-block rounded-md border border-current px-6 py-2.5 text-sm font-medium">
-                        {cfg.link_text as string}
+                        {linkText}
                     </span>
                 </div>
             )}
@@ -370,24 +376,27 @@ function PromotionalBannerPreview({ cfg }: { cfg: Cfg }) {
 }
 
 function NewsletterSignupPreview({ cfg }: { cfg: Cfg }) {
-    const bg = (cfg.background_color as string) || undefined;
+    const title = cfg.title as string | undefined;
+    const description = cfg.description as string | undefined;
+    const placeholderText =
+        (cfg.placeholder_text as string) || 'Enter your email address';
+    const buttonText = (cfg.button_text as string) || 'Subscribe';
+    const bgColor = cfg.background_color as string | undefined;
     return (
-        <div className="px-8 py-12 text-center" style={{ backgroundColor: bg }}>
-            {cfg.title && (
-                <h2 className="mb-2 text-2xl font-bold">
-                    {cfg.title as string}
-                </h2>
-            )}
-            {typeof cfg.description === 'string' && cfg.description && (
-                <p className="mb-6 text-muted-foreground">{cfg.description}</p>
+        <div
+            className="px-8 py-12 text-center"
+            style={{ backgroundColor: bgColor }}
+        >
+            {title && <h2 className="mb-2 text-2xl font-bold">{title}</h2>}
+            {typeof description === 'string' && description && (
+                <p className="mb-6 text-muted-foreground">{description}</p>
             )}
             <div className="mx-auto flex max-w-md gap-2">
                 <div className="flex-1 rounded-md border bg-background px-3 py-2 text-sm text-muted-foreground">
-                    {(cfg.placeholder_text as string) ||
-                        'Enter your email address'}
+                    {placeholderText}
                 </div>
                 <span className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
-                    {(cfg.button_text as string) || 'Subscribe'}
+                    {buttonText}
                 </span>
             </div>
         </div>
@@ -395,31 +404,29 @@ function NewsletterSignupPreview({ cfg }: { cfg: Cfg }) {
 }
 
 function VideoEmbedPreview({ cfg }: { cfg: Cfg }) {
+    const title = cfg.title as string | undefined;
+    const videoUrl = cfg.video_url as string | undefined;
+    const aspectRatio = (cfg.aspect_ratio as string) || '16:9';
     const ratioMap: Record<string, string> = {
         '16:9': 'aspect-video',
         '4:3': 'aspect-[4/3]',
         '1:1': 'aspect-square',
         '9:16': 'aspect-[9/16]',
     };
-    const aspectClass =
-        ratioMap[(cfg.aspect_ratio as string) || '16:9'] || 'aspect-video';
+    const aspectClass = ratioMap[aspectRatio] || 'aspect-video';
 
     return (
         <div className="px-8 py-10">
-            {cfg.title && (
-                <h2 className="mb-4 text-xl font-semibold">
-                    {cfg.title as string}
-                </h2>
-            )}
+            {title && <h2 className="mb-4 text-xl font-semibold">{title}</h2>}
             <div
                 className={`relative ${aspectClass} flex items-center justify-center overflow-hidden rounded-lg border bg-slate-900`}
             >
-                {cfg.video_url ? (
+                {videoUrl ? (
                     <iframe
-                        src={cfg.video_url as string}
+                        src={videoUrl}
                         className="h-full w-full"
                         allow="fullscreen"
-                        title={(cfg.title as string) || 'Video'}
+                        title={title || 'Video'}
                     />
                 ) : (
                     <div className="flex flex-col items-center gap-2 text-white/60">
@@ -435,14 +442,12 @@ function VideoEmbedPreview({ cfg }: { cfg: Cfg }) {
 }
 
 function ImageGalleryPreview({ cfg }: { cfg: Cfg }) {
-    const cols = Number(cfg.columns) || 3;
+    const title = cfg.title as string | undefined;
+    const columns = cfg.columns as number | undefined;
+    const cols = Number(columns) || 3;
     return (
         <div className="px-8 py-10">
-            {cfg.title && (
-                <h2 className="mb-6 text-2xl font-bold">
-                    {cfg.title as string}
-                </h2>
-            )}
+            {title && <h2 className="mb-6 text-2xl font-bold">{title}</h2>}
             <div
                 className="grid gap-3"
                 style={{
@@ -465,10 +470,11 @@ function ImageGalleryPreview({ cfg }: { cfg: Cfg }) {
 }
 
 function CustomHtmlPreview({ cfg }: { cfg: Cfg }) {
+    const html = cfg.html as string | undefined;
     return (
         <div className="px-8 py-10">
-            {cfg.html ? (
-                <div dangerouslySetInnerHTML={{ __html: cfg.html as string }} />
+            {html ? (
+                <div dangerouslySetInnerHTML={{ __html: html }} />
             ) : (
                 <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
                     Custom HTML block (empty)
@@ -479,15 +485,13 @@ function CustomHtmlPreview({ cfg }: { cfg: Cfg }) {
 }
 
 function FormEmbedPreview({ cfg }: { cfg: Cfg }) {
+    const title = cfg.title as string | undefined;
+    const description = cfg.description as string | undefined;
     return (
         <div className="mx-auto max-w-2xl px-8 py-12">
-            {cfg.title && (
-                <h2 className="mb-2 text-2xl font-bold">
-                    {cfg.title as string}
-                </h2>
-            )}
-            {typeof cfg.description === 'string' && cfg.description && (
-                <p className="mb-6 text-muted-foreground">{cfg.description}</p>
+            {title && <h2 className="mb-2 text-2xl font-bold">{title}</h2>}
+            {typeof description === 'string' && description && (
+                <p className="mb-6 text-muted-foreground">{description}</p>
             )}
             <div className="rounded-xl border bg-muted/30 p-8 text-center">
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">

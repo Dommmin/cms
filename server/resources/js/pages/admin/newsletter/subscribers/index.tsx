@@ -85,7 +85,7 @@ export default function SubscribersIndex({ subscribers, filters }: IndexProps) {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={NewsletterSubscriberController.show.url(
+                            href={NewsletterSubscriberController.edit.url(
                                 row.original.id,
                             )}
                             prefetch

@@ -110,7 +110,7 @@ export default function CampaignsIndex({ campaigns, filters }: IndexProps) {
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
                         <Link
-                            href={NewsletterCampaignController.show.url(
+                            href={NewsletterCampaignController.edit.url(
                                 row.original.id,
                             )}
                             prefetch

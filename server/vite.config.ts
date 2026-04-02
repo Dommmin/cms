@@ -1,3 +1,4 @@
+import inertia from '@inertiajs/vite';
 import { wayfinder } from '@laravel/vite-plugin-wayfinder';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
@@ -8,9 +9,9 @@ export default defineConfig({
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],
-            ssr: 'resources/js/ssr.tsx',
             refresh: true,
         }),
+        inertia(),
         react({
             babel: {
                 plugins: ['babel-plugin-react-compiler'],
@@ -19,12 +20,8 @@ export default defineConfig({
         tailwindcss(),
         wayfinder({
             formVariants: true,
-            command: 'php -d memory_limit=512M artisan wayfinder:generate',
         }),
     ],
-    esbuild: {
-        jsx: 'automatic',
-    },
     server: {
         host: '0.0.0.0',
         port: 5173,

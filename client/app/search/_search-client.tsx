@@ -331,8 +331,7 @@ export function SearchClient() {
                                     ? t(
                                           'search.results_for',
                                           `results for "${q}"`,
-                                          { q },
-                                      )
+                                      ).replace('{q}', q)
                                     : t(
                                           'search.products_found',
                                           'products found',

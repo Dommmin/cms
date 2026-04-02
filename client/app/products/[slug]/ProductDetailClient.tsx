@@ -130,11 +130,12 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
         );
     }
 
-    const selectedVariant = product.variants?.find(
-        (v) => v.id === (selectedVariantId ?? product.variants?.[0]?.id),
+    const currentProduct = product;
+    const selectedVariant = currentProduct.variants?.find(
+        (v) => v.id === (selectedVariantId ?? currentProduct.variants?.[0]?.id),
     );
     const variantAttributeGroups = Object.entries(
-        (product.variants ?? []).reduce<Record<string, string[]>>(
+        (currentProduct.variants ?? []).reduce<Record<string, string[]>>(
             (accumulator, variant) => {
                 Object.entries(variant.attributes).forEach(
                     ([attributeName, value]) => {
@@ -222,14 +223,14 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
     function selectVariantAttribute(attributeName: string, value: string) {
         const currentAttributes =
             selectedVariant?.attributes ??
-            product.variants?.[0]?.attributes ??
+            currentProduct.variants?.[0]?.attributes ??
             {};
         const nextAttributes = {
             ...currentAttributes,
             [attributeName]: value,
         };
 
-        const matchingVariant = product.variants?.find((variant) =>
+        const matchingVariant = currentProduct.variants?.find((variant) =>
             Object.entries(nextAttributes).every(
                 ([name, selectedValue]) =>
                     variant.attributes[name] === selectedValue,
@@ -241,7 +242,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
             return;
         }
 
-        const fallbackVariant = product.variants?.find(
+        const fallbackVariant = currentProduct.variants?.find(
             (variant) => variant.attributes[attributeName] === value,
         );
 
@@ -256,11 +257,11 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
     ): boolean {
         const currentAttributes =
             selectedVariant?.attributes ??
-            product.variants?.[0]?.attributes ??
+            currentProduct.variants?.[0]?.attributes ??
             {};
 
         return (
-            product.variants?.some(
+            currentProduct.variants?.some(
                 (variant) =>
                     Object.entries(currentAttributes).every(
                         ([currentName, currentValue]) =>

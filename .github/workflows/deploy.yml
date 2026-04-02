@@ -21,7 +21,7 @@ jobs:
   # ============================================================================
   lint-server:
   # ============================================================================
-    name: Lint — server (Pint + Rector + Larastan + ESLint + Prettier)
+    name: Lint — server (Pint + Rector + Larastan + ESLint + Prettier + Types)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -58,6 +58,9 @@ jobs:
       - name: PHP static analysis (Larastan)
         run: php -d memory_limit=1G vendor/bin/phpstan analyse --no-progress
 
+      - name: Frontend types
+        run: npm run types
+
       - name: Frontend lint (ESLint)
         run: npx eslint . --max-warnings=0
 
@@ -67,7 +70,7 @@ jobs:
   # ============================================================================
   lint-client:
   # ============================================================================
-    name: Lint — client (Next.js ESLint + Prettier)
+    name: Lint — client (Next.js ESLint + Prettier + Types)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -85,6 +88,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Types (TS)
+        run: npm run types
 
       - name: ESLint
         run: npm run lint

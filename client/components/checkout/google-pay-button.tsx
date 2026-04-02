@@ -1,7 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import type { GooglePayButtonProps } from './google-pay-button.types';
+import type {
+    GooglePayButtonProps,
+    GooglePayClient,
+} from './google-pay-button.types';
 
 export function GooglePayButton({
     amount,

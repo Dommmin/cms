@@ -90,11 +90,13 @@ fix:
 	docker compose exec php php -d memory_limit=1G vendor/bin/rector process
 	@echo ">>> PHP: Pint (post-rector normalisation)"
 	docker compose exec php vendor/bin/pint
-	@echo ">>> Server TS: ESLint --fix + Prettier"
+	@echo ">>> Server TS: ESLint --fix + Prettier + Types (TS)"
 	docker compose exec php npm run lint
+	docker compose exec php npm run types
 	docker compose exec php npm run format
 	@echo ">>> Client TS: ESLint --fix + Prettier"
 	docker compose exec node npx eslint . --fix
+	docker compose exec node npm run types
 	docker compose exec node npm run format
 	@echo ">>> Done. Run 'make check' to verify nothing remains."
 
