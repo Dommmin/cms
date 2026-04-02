@@ -1,1 +1,1 @@
-export { default, metadata, revalidate } from '@/app/stores/page';
+export { default, metadata } from '@/app/stores/page';
