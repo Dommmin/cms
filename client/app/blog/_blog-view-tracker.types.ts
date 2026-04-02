@@ -1,4 +1,4 @@
 export interface BlogViewTrackerProps {
-  slug: string;
-  initialCount: number;
+    slug: string;
+    initialCount: number;
 }

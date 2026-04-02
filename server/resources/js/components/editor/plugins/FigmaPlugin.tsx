@@ -5,9 +5,8 @@ import {
     createCommand,
     type LexicalCommand,
 } from 'lexical';
-import { type JSX } from 'react';
-import { useEffect } from 'react';
-import { FigmaNode, $createFigmaNode } from '../nodes/FigmaNode';
+import { useEffect, type JSX } from 'react';
+import { $createFigmaNode, FigmaNode } from '../nodes/FigmaNode';
 
 export const INSERT_FIGMA_COMMAND: LexicalCommand<string> = createCommand(
     'INSERT_FIGMA_COMMAND',

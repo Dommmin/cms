@@ -1,11 +1,11 @@
 import { Head, Link, router } from '@inertiajs/react';
 import {
     ArrowLeft,
-    Star,
     MessageSquare,
-    ThumbsUp,
-    Save,
     Package,
+    Save,
+    Star,
+    ThumbsUp,
 } from 'lucide-react';
 import { useState } from 'react';
 import * as CustomerController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CustomerController';

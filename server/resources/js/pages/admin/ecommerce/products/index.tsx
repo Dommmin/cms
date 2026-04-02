@@ -1,5 +1,5 @@
-import { Link, Head } from '@inertiajs/react';
-import { PlusIcon, DownloadIcon } from 'lucide-react';
+import { Head, Link } from '@inertiajs/react';
+import { DownloadIcon, PlusIcon } from 'lucide-react';
 import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
 import { useProductColumns } from '@/components/columns/product-columns';
 

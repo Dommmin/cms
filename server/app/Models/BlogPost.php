@@ -78,7 +78,10 @@ class BlogPost extends Model
     /** @return HasMany<BlogComment, $this> */
     public function comments(): HasMany
     {
-        return $this->hasMany(BlogComment::class)->whereNull('parent_id')->where('is_approved', true);
+        /** @var HasMany<BlogComment, $this> $relation */
+        $relation = $this->hasMany(BlogComment::class)->whereNull('parent_id')->where('is_approved', true);
+
+        return $relation;
     }
 
     /** @return HasMany<BlogPostVote, $this> */

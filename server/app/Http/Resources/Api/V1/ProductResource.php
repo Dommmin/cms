@@ -67,21 +67,29 @@ class ProductResource extends JsonResource
                     if (! $variant->relationLoaded('attributeValues')) {
                         continue;
                     }
+
                     foreach ($variant->attributeValues as $av) {
-                        if (! $av->relationLoaded('attribute') || ! $av->relationLoaded('attributeValue')) {
+                        if (! $av->relationLoaded('attribute')) {
                             continue;
                         }
+
+                        if (! $av->relationLoaded('attributeValue')) {
+                            continue;
+                        }
+
                         $key = $av->attribute->name;
                         $val = $av->attributeValue->value;
                         if (! isset($attributeMap[$key])) {
                             $attributeMap[$key] = [];
                         }
+
                         if (! in_array($val, $attributeMap[$key], true)) {
                             $attributeMap[$key][] = $val;
                         }
                     }
                 }
             }
+
             $data['attribute_map'] = $attributeMap;
 
             // Active promotions (only when loaded)

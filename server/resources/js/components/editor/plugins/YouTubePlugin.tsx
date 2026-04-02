@@ -5,9 +5,8 @@ import {
     createCommand,
     type LexicalCommand,
 } from 'lexical';
-import { type JSX } from 'react';
-import { useEffect } from 'react';
-import { YouTubeNode, $createYouTubeNode } from '../nodes/YouTubeNode';
+import { useEffect, type JSX } from 'react';
+import { $createYouTubeNode, YouTubeNode } from '../nodes/YouTubeNode';
 
 export const INSERT_YOUTUBE_COMMAND: LexicalCommand<string> = createCommand(
     'INSERT_YOUTUBE_COMMAND',

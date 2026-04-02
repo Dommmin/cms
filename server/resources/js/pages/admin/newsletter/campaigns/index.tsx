@@ -1,12 +1,12 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
-    PlusIcon,
+    CopyIcon,
     EyeIcon,
     PencilIcon,
-    TrashIcon,
-    CopyIcon,
+    PlusIcon,
     SendIcon,
+    TrashIcon,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import * as NewsletterCampaignController from '@/actions/App/Http/Controllers/Admin/NewsletterCampaignController';

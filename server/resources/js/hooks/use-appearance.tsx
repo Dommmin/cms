@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useSyncExternalStore } from 'react';
 import type {
-    ResolvedAppearance,
     Appearance,
+    ResolvedAppearance,
     UseAppearanceReturn,
 } from './use-appearance.types';
 

@@ -128,7 +128,7 @@ class BlogPostController extends ApiController
             $post->increment('views_count');
         }
 
-        return $this->ok(['views_count' => $post->fresh()?->views_count ?? $post->views_count]);
+        return $this->ok(['views_count' => $post->views_count]);
     }
 
     public function byCategory(Request $request, string $slug): JsonResponse

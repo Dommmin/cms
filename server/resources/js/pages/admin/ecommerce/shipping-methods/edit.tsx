@@ -1,4 +1,4 @@
-import { Link, Head, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import * as ShippingMethodController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ShippingMethodController';

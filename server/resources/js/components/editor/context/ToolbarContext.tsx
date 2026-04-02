@@ -1,5 +1,4 @@
-import { type JSX } from 'react';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, type JSX } from 'react';
 
 export type BlockType =
     | 'bullet'

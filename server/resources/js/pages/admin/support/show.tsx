@@ -1,10 +1,10 @@
 import { Head, Link, router, useForm, usePoll } from '@inertiajs/react';
 import {
     ArrowLeftIcon,
-    SendIcon,
     LockIcon,
-    UserIcon,
+    SendIcon,
     ShoppingBagIcon,
+    UserIcon,
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';

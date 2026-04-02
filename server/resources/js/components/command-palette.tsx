@@ -25,7 +25,7 @@ import * as UserController from '@/actions/App/Http/Controllers/Admin/UserContro
 
 import { cn } from '@/lib/utils';
 import { dashboard } from '@/routes/admin';
-import type { SearchResult, NavShortcut } from './command-palette.types';
+import type { NavShortcut, SearchResult } from './command-palette.types';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 

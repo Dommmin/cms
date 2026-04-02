@@ -15,33 +15,34 @@ import { SectionRenderer } from './section-renderer';
  * Interactive child blocks (newsletter, forms, accordion, tabs) are 'use client'.
  */
 export async function PageRenderer({ page }: PageRendererProps) {
-  if (!page.is_published) {
-    return null;
-  }
+    if (!page.is_published) {
+        return null;
+    }
 
-  if (page.page_type === 'module') {
-    return <ModuleRenderer page={page} />;
-  }
+    if (page.page_type === 'module') {
+        return <ModuleRenderer page={page} />;
+    }
 
-  const cookieStore = await cookies();
-  const isPreview = !!cookieStore.get('admin_preview')?.value;
-  const adminBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') ?? '';
+    const cookieStore = await cookies();
+    const isPreview = !!cookieStore.get('admin_preview')?.value;
+    const adminBaseUrl =
+        process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') ?? '';
 
-  const activeSections = page.sections
-    .filter((s) => s.is_active)
-    .sort((a, b) => a.position - b.position);
+    const activeSections = page.sections
+        .filter((s) => s.is_active)
+        .sort((a, b) => a.position - b.position);
 
-  return (
-    <main>
-      {activeSections.map((section) => (
-        <SectionRenderer
-          key={section.id}
-          section={section}
-          isPreview={isPreview}
-          pageId={page.id}
-          adminBaseUrl={adminBaseUrl}
-        />
-      ))}
-    </main>
-  );
+    return (
+        <main>
+            {activeSections.map((section) => (
+                <SectionRenderer
+                    key={section.id}
+                    section={section}
+                    isPreview={isPreview}
+                    pageId={page.id}
+                    adminBaseUrl={adminBaseUrl}
+                />
+            ))}
+        </main>
+    );
 }

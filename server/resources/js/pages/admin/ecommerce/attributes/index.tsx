@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Plus, List, PencilIcon, TrashIcon } from 'lucide-react';
+import { List, PencilIcon, Plus, TrashIcon } from 'lucide-react';
 import * as AttributeController from '@/actions/App/Http/Controllers/Admin/Ecommerce/AttributeController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';

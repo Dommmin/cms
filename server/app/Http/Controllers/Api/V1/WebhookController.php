@@ -18,9 +18,7 @@ class WebhookController extends ApiController
         $signatureHeader = $request->header('OpenPayu-Signature', '');
 
         // Quick signature verification before queuing (PayU requires 200 within 10s)
-        if (! $verifier->verify($body, (string) $signatureHeader)) {
-            abort(400, 'Invalid signature');
-        }
+        abort_unless($verifier->verify($body, (string) $signatureHeader), 400, 'Invalid signature');
 
         $payload = json_decode($body, true) ?? [];
 

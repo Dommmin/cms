@@ -71,7 +71,7 @@ class ProductController extends ApiController
             ->paginate(24)
             ->withQueryString();
 
-        return (new ProductCollection($products))
+        return new ProductCollection($products)
             ->additional(['available_filters' => $availableFilters])
             ->response();
     }
@@ -184,9 +184,7 @@ class ProductController extends ApiController
             ])
             ->get();
 
-        if ($products->count() < 2) {
-            abort(404, 'No products found.');
-        }
+        abort_if($products->count() < 2, 404, 'No products found.');
 
         // Build per-product attribute map: { "RAM" => ["16 GB", "32 GB"], "Storage" => ["512 GB"] }
         // Values are aggregated (unique) across all active variants of each product.
@@ -199,6 +197,7 @@ class ProductController extends ApiController
                     if (! isset($map[$key])) {
                         $map[$key] = [];
                     }
+
                     if (! in_array($val, $map[$key], true)) {
                         $map[$key][] = $val;
                     }
@@ -215,44 +214,42 @@ class ProductController extends ApiController
             ->values()
             ->all();
 
-        $data = $products->mapWithKeys(function (Product $product, int $index) use ($productAttributeMaps): array {
-            return [$index => [
-                'id' => $product->id,
-                'name' => $product->name,
-                'slug' => $product->slug,
-                'is_active' => $product->is_active,
-                'short_description' => $product->short_description,
-                'price_min' => $product->priceRange()['min'],
-                'price_max' => $product->priceRange()['max'],
-                'thumbnail' => $product->thumbnail ? [
-                    'url' => $product->thumbnail->getUrl(),
-                    'alt' => $product->thumbnail->name,
-                ] : null,
-                'category' => $product->category ? [
-                    'id' => $product->category->id,
-                    'name' => $product->category->name,
-                    'slug' => $product->category->slug,
-                ] : null,
-                'brand' => $product->brand ? [
-                    'id' => $product->brand->id,
-                    'name' => $product->brand->name,
-                ] : null,
-                // Aggregated attribute map for this product
-                'attribute_map' => $productAttributeMaps[$index],
-                // Keep variants for add-to-cart
-                'variants' => $product->activeVariants->map(fn ($variant): array => [
-                    'id' => $variant->id,
-                    'sku' => $variant->sku,
-                    'price' => $variant->price,
-                    'stock_quantity' => $variant->stock_quantity,
-                    'is_available' => $variant->isInStock(),
-                    'is_default' => $variant->is_default,
-                    'attributes' => $variant->attributeValues->mapWithKeys(
-                        fn ($av): array => [$av->attribute->name => $av->attributeValue->value]
-                    )->all(),
-                ]),
-            ]];
-        })->values();
+        $data = $products->mapWithKeys(fn (Product $product, int $index): array => [$index => [
+            'id' => $product->id,
+            'name' => $product->name,
+            'slug' => $product->slug,
+            'is_active' => $product->is_active,
+            'short_description' => $product->short_description,
+            'price_min' => $product->priceRange()['min'],
+            'price_max' => $product->priceRange()['max'],
+            'thumbnail' => $product->thumbnail ? [
+                'url' => $product->thumbnail->getUrl(),
+                'alt' => $product->thumbnail->name,
+            ] : null,
+            'category' => $product->category ? [
+                'id' => $product->category->id,
+                'name' => $product->category->name,
+                'slug' => $product->category->slug,
+            ] : null,
+            'brand' => $product->brand ? [
+                'id' => $product->brand->id,
+                'name' => $product->brand->name,
+            ] : null,
+            // Aggregated attribute map for this product
+            'attribute_map' => $productAttributeMaps[$index],
+            // Keep variants for add-to-cart
+            'variants' => $product->activeVariants->map(fn ($variant): array => [
+                'id' => $variant->id,
+                'sku' => $variant->sku,
+                'price' => $variant->price,
+                'stock_quantity' => $variant->stock_quantity,
+                'is_available' => $variant->isInStock(),
+                'is_default' => $variant->is_default,
+                'attributes' => $variant->attributeValues->mapWithKeys(
+                    fn ($av): array => [$av->attribute->name => $av->attributeValue->value]
+                )->all(),
+            ]),
+        ]])->values();
 
         return $this->ok([
             'data' => $data,
@@ -271,6 +268,7 @@ class ProductController extends ApiController
                 if ($product->category_id !== null) {
                     $q->orWhere('category_id', $product->category_id);
                 }
+
                 if ($product->brand_id !== null) {
                     $q->orWhere('brand_id', $product->brand_id);
                 }
@@ -372,8 +370,15 @@ class ProductController extends ApiController
                 foreach ($variant->attributeValues as $attributeValuePivot) {
                     $attribute = $attributeValuePivot->attribute;
                     $attributeValue = $attributeValuePivot->attributeValue;
+                    if (! $attribute) {
+                        continue;
+                    }
 
-                    if (! $attribute || ! $attributeValue || ! $attribute->is_filterable) {
+                    if (! $attributeValue) {
+                        continue;
+                    }
+
+                    if (! $attribute->is_filterable) {
                         continue;
                     }
 

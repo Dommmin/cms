@@ -1,6 +1,6 @@
 import { router } from '@inertiajs/react';
-import { useCallback, useState } from 'react';
 import type { MouseEvent } from 'react';
+import { useCallback, useState } from 'react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -13,8 +13,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import type {
-    ConfirmDialogProps,
     ConfirmButtonProps,
+    ConfirmDialogProps,
 } from './confirm-dialog.types';
 
 export function ConfirmDialog({

@@ -6,6 +6,9 @@ namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property string $email
+ */
 class NewsletterUnsubscribeRequest extends FormRequest
 {
     public function authorize(): bool

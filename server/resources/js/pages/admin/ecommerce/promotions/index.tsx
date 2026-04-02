@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Search, Plus, Edit, Trash2, Power, PowerOff } from 'lucide-react';
+import { Edit, Plus, Power, PowerOff, Search, Trash2 } from 'lucide-react';
 import * as PromotionController from '@/actions/App/Http/Controllers/Admin/Ecommerce/PromotionController';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

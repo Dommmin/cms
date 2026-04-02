@@ -10,12 +10,12 @@ export { PageBuilder } from './components/page-builder';
 export type * from './types';
 
 // Individual components (if needed elsewhere)
-export { SectionCard } from './components/section-card';
 export { BlockCard } from './components/block-card';
-export { SectionForm } from './components/section-form';
 export { BlockForm } from './components/block-form';
 export { BuilderToolbar } from './components/builder-toolbar';
 export type { PreviewDevice } from './components/builder-toolbar.types';
+export { SectionCard } from './components/section-card';
+export { SectionForm } from './components/section-form';
 
 // Hooks
 export { useBuilderState } from './hooks/use-builder-state';

@@ -1,3 +1,3 @@
 export interface PageProps {
-  searchParams: Promise<{ page?: string; category?: string; sort?: string }>;
+    searchParams: Promise<{ page?: string; category?: string; sort?: string }>;
 }

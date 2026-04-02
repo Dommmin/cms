@@ -21,9 +21,7 @@ class StoreController extends ApiController
 
     public function show(Store $store): JsonResponse
     {
-        if (! $store->is_active) {
-            abort(404);
-        }
+        abort_unless($store->is_active, 404);
 
         return $this->ok(new StoreResource($store));
     }

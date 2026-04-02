@@ -10,7 +10,7 @@ class ProductCollection extends ResourceCollection
 {
     public $collects = ProductResource::class;
 
-    public function paginationInformation($request, $paginated, $default): array
+    public function paginationInformation($request, $paginated, array $default): array
     {
         if (isset($this->additional['available_filters'])) {
             $default['meta']['available_filters'] = $this->additional['available_filters'];

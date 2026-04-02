@@ -4,17 +4,17 @@ import { Suspense } from 'react';
 import ProductsClient from './ProductsClient';
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: 'Shop',
-    description: 'Browse our products',
-    alternates: generateAlternates('/products'),
-  };
+    return {
+        title: 'Shop',
+        description: 'Browse our products',
+        alternates: generateAlternates('/products'),
+    };
 }
 
 export default function ProductsPage() {
-  return (
-    <Suspense>
-      <ProductsClient />
-    </Suspense>
-  );
+    return (
+        <Suspense>
+            <ProductsClient />
+        </Suspense>
+    );
 }

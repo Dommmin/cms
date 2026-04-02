@@ -1,4 +1,4 @@
-import { Link, Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import * as PromotionController from '@/actions/App/Http/Controllers/Admin/Ecommerce/PromotionController';
 import InputError from '@/components/input-error';
@@ -22,7 +22,7 @@ import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
-import type { Category, Product, FormData } from './create.types';
+import type { Category, FormData, Product } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Promotions', href: PromotionController.index.url() },

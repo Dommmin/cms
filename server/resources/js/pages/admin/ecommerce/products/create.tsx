@@ -1,5 +1,5 @@
-import { Link, Form, Head, usePage } from '@inertiajs/react';
-import { ArrowLeftIcon, ImageIcon, Settings, Search } from 'lucide-react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
+import { ArrowLeftIcon, ImageIcon, Search, Settings } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
@@ -32,13 +32,13 @@ import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
 import type {
-    Category,
-    ProductType,
     Brand,
-    ProductFlag,
-    FormErrors,
-    TabKey,
+    Category,
     FormData,
+    FormErrors,
+    ProductFlag,
+    ProductType,
+    TabKey,
 } from './create.types';
 
 const formId = 'product-create-form';

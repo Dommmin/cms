@@ -1,5 +1,4 @@
-import { type JSX } from 'react';
-import { useRef } from 'react';
+import { useRef, type JSX } from 'react';
 import type { ImageResizerProps } from './ImageResizer.types';
 
 function clamp(value: number, min: number, max: number): number {

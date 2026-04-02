@@ -33,7 +33,7 @@ class NewsletterController extends ApiController
         );
 
         Notification::route('mail', $subscriber->email)
-            ->notify((new NewsletterConfirmationNotification($subscriber))->locale($subscriber->locale));
+            ->notify(new NewsletterConfirmationNotification($subscriber)->locale($subscriber->locale));
 
         return $this->created([
             'message' => 'Please check your email to confirm your subscription.',
@@ -51,7 +51,7 @@ class NewsletterController extends ApiController
         ]);
 
         Notification::route('mail', $subscriber->email)
-            ->notify((new NewsletterWelcomeNotification($subscriber))->locale($subscriber->locale));
+            ->notify(new NewsletterWelcomeNotification($subscriber)->locale($subscriber->locale));
 
         return $this->ok([
             'message' => 'Your subscription has been confirmed. Welcome!',

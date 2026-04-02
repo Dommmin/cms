@@ -18,9 +18,7 @@ class MenuController extends ApiController
             ->with(['items' => fn ($q) => $q->orderBy('position'), 'items.children' => fn ($q) => $q->orderBy('position')])
             ->first();
 
-        if (! $menu) {
-            abort(404);
-        }
+        abort_unless($menu !== null, 404);
 
         return $this->ok(new MenuResource($menu));
     }

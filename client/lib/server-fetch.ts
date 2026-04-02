@@ -8,43 +8,45 @@
  */
 
 const BASE_URL =
-  process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1';
+    process.env.API_URL ??
+    process.env.NEXT_PUBLIC_API_URL ??
+    'http://localhost:8000/api/v1';
 
 export async function serverFetch<T>(
-  path: string,
-  options?: {
-    locale?: string;
-    /** Seconds to cache via ISR, or false for no-store. Default: 60 */
-    revalidate?: number | false;
-    tags?: string[];
-  },
-): Promise<T> {
-  const locale = options?.locale;
-  const separator = path.includes('?') ? '&' : '?';
-  const url = `${BASE_URL}${path}${locale ? `${separator}locale=${locale}` : ''}`;
-
-  const nextOpts: { revalidate?: number; tags?: string[] } = {};
-  let cacheDirective: RequestInit['cache'] | undefined;
-
-  if (options?.revalidate === false) {
-    cacheDirective = 'no-store';
-  } else {
-    nextOpts.revalidate = options?.revalidate ?? 60;
-    if (options?.tags?.length) nextOpts.tags = options.tags;
-  }
-
-  const res = await fetch(url, {
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
+    path: string,
+    options?: {
+        locale?: string;
+        /** Seconds to cache via ISR, or false for no-store. Default: 60 */
+        revalidate?: number | false;
+        tags?: string[];
     },
-    signal: AbortSignal.timeout(5000),
-    ...(cacheDirective ? { cache: cacheDirective } : { next: nextOpts }),
-  });
+): Promise<T> {
+    const locale = options?.locale;
+    const separator = path.includes('?') ? '&' : '?';
+    const url = `${BASE_URL}${path}${locale ? `${separator}locale=${locale}` : ''}`;
 
-  if (!res.ok) {
-    throw new Error(`API error ${res.status} for ${path}`);
-  }
+    const nextOpts: { revalidate?: number; tags?: string[] } = {};
+    let cacheDirective: RequestInit['cache'] | undefined;
 
-  return res.json() as Promise<T>;
+    if (options?.revalidate === false) {
+        cacheDirective = 'no-store';
+    } else {
+        nextOpts.revalidate = options?.revalidate ?? 60;
+        if (options?.tags?.length) nextOpts.tags = options.tags;
+    }
+
+    const res = await fetch(url, {
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+        signal: AbortSignal.timeout(5000),
+        ...(cacheDirective ? { cache: cacheDirective } : { next: nextOpts }),
+    });
+
+    if (!res.ok) {
+        throw new Error(`API error ${res.status} for ${path}`);
+    }
+
+    return res.json() as Promise<T>;
 }

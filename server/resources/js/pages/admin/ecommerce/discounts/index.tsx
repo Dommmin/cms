@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import { Plus, Percent } from 'lucide-react';
+import { Percent, Plus } from 'lucide-react';
 import * as DiscountController from '@/actions/App/Http/Controllers/Admin/Ecommerce/DiscountController';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';

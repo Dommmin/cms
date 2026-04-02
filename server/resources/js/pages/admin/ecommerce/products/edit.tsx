@@ -45,16 +45,16 @@ import { formatDateTime } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
 import type {
-    Category,
-    ProductType,
     Brand,
-    ProductFlag,
-    FormErrors,
-    TabKey,
-    ProductVariant,
-    ProductImage,
-    PriceHistoryEntry,
+    Category,
     FormData,
+    FormErrors,
+    PriceHistoryEntry,
+    ProductFlag,
+    ProductImage,
+    ProductType,
+    ProductVariant,
+    TabKey,
 } from './edit.types';
 
 const defaultVariant: ProductVariant = {

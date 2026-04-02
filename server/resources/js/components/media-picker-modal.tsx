@@ -1,28 +1,28 @@
 import axios from 'axios';
 import {
-    XIcon,
-    Search,
-    ImageIcon,
-    FileIcon,
-    FileTextIcon,
     CheckIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
+    FileIcon,
+    FileTextIcon,
     GripVerticalIcon,
+    ImageIcon,
+    LoaderCircleIcon,
+    Search,
     StarIcon,
     TrashIcon,
     UploadIcon,
-    LoaderCircleIcon,
+    XIcon,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as MediaController from '@/actions/App/Http/Controllers/Admin/MediaController';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type {
-    MediaItem,
-    SelectedImage,
     MediaData,
+    MediaItem,
     MediaPickerModalProps,
+    SelectedImage,
 } from './media-picker-modal.types';
 
 const MIME_TYPE_ICONS: Record<string, React.ElementType> = {

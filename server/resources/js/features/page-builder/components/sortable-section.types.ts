@@ -1,9 +1,9 @@
 import type {
-    Section,
-    Block,
     AvailableSection,
+    Block,
     BlockTypeConfig,
     ReusableBlock,
+    Section,
 } from '../types';
 
 export type SortableSectionProps = {

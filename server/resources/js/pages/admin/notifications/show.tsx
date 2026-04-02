@@ -1,4 +1,4 @@
-import { Link, Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';

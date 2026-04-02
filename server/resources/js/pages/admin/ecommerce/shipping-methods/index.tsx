@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { PlusIcon, PencilIcon, TrashIcon } from 'lucide-react';
+import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import * as ShippingMethodController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ShippingMethodController';
 import { ConfirmButton } from '@/components/confirm-dialog';
@@ -12,7 +12,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { ShippingMethod, IndexProps } from './index.types';
+import type { IndexProps, ShippingMethod } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Shipping Methods', href: ShippingMethodController.index.url() },

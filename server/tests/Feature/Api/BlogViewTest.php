@@ -3,13 +3,12 @@
 declare(strict_types=1);
 
 use App\Models\BlogPost;
-use App\Models\BlogPostView;
 
 describe('Blog Views', function (): void {
     it('records a view and increments views_count', function (): void {
         $post = BlogPost::factory()->published()->create(['views_count' => 0]);
 
-        $this->postJson("/api/v1/blog/posts/{$post->slug}/view")
+        $this->postJson(sprintf('/api/v1/blog/posts/%s/view', $post->slug))
             ->assertOk()
             ->assertJsonPath('views_count', 1);
 
@@ -20,10 +19,10 @@ describe('Blog Views', function (): void {
         $post = BlogPost::factory()->published()->create(['views_count' => 0]);
 
         // First view
-        $this->postJson("/api/v1/blog/posts/{$post->slug}/view")->assertOk();
+        $this->postJson(sprintf('/api/v1/blog/posts/%s/view', $post->slug))->assertOk();
 
         // Second view from same IP within 24h
-        $this->postJson("/api/v1/blog/posts/{$post->slug}/view")->assertOk();
+        $this->postJson(sprintf('/api/v1/blog/posts/%s/view', $post->slug))->assertOk();
 
         expect($post->fresh()->views_count)->toBe(1);
     });
@@ -31,7 +30,7 @@ describe('Blog Views', function (): void {
     it('returns views_count in post show response', function (): void {
         $post = BlogPost::factory()->published()->create(['views_count' => 42]);
 
-        $this->getJson("/api/v1/blog/posts/{$post->slug}")
+        $this->getJson('/api/v1/blog/posts/'.$post->slug)
             ->assertOk()
             ->assertJsonPath('views_count', 42);
     });

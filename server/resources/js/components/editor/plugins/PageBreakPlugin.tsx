@@ -5,9 +5,8 @@ import {
     createCommand,
     type LexicalCommand,
 } from 'lexical';
-import { type JSX } from 'react';
-import { useEffect } from 'react';
-import { PageBreakNode, $createPageBreakNode } from '../nodes/PageBreakNode';
+import { useEffect, type JSX } from 'react';
+import { $createPageBreakNode, PageBreakNode } from '../nodes/PageBreakNode';
 
 export const INSERT_PAGE_BREAK_COMMAND: LexicalCommand<undefined> =
     createCommand('INSERT_PAGE_BREAK_COMMAND');

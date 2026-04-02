@@ -7,6 +7,10 @@ namespace App\Http\Requests\Api\V1;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property string $current_password
+ * @property string $password
+ */
 class UpdatePasswordRequest extends FormRequest
 {
     public function authorize(): bool

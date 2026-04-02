@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
 import type React from 'react';
 import { resolveLocalizedText } from '@/lib/localized-text';
-import type { Cfg, PreviewBlock, PagePreviewProps } from './page-preview.types';
+import type { Cfg, PagePreviewProps, PreviewBlock } from './page-preview.types';
 
 // ─── Block preview components ─────────────────────────────────────────────────
 

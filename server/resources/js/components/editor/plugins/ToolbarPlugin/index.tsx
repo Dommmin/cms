@@ -32,15 +32,14 @@ import {
     type NodeKey,
 } from 'lexical';
 import {
-    Redo2,
-    Undo2,
-    Link,
-    Unlink,
     Baseline,
     Highlighter,
+    Link,
+    Redo2,
+    Undo2,
+    Unlink,
 } from 'lucide-react';
-import { type JSX } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import { Toggle } from '@/components/ui/toggle';
 import {
     Tooltip,

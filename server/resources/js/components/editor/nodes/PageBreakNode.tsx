@@ -6,16 +6,16 @@ import type {
     EditorConfig,
     SerializedLexicalNode,
 } from 'lexical';
-import { $applyNodeReplacement, DecoratorNode } from 'lexical';
 import {
+    $applyNodeReplacement,
     $getNodeByKey,
     CLICK_COMMAND,
     COMMAND_PRIORITY_LOW,
+    DecoratorNode,
     KEY_BACKSPACE_COMMAND,
     KEY_DELETE_COMMAND,
 } from 'lexical';
-import { type JSX } from 'react';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, type JSX } from 'react';
 import { cn } from '@/lib/utils';
 // $isPageBreakNode defined below in this file
 

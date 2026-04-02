@@ -27,7 +27,7 @@ class NewsletterConfirmationNotification extends Notification implements ShouldQ
     public function toMail(object $notifiable): MailMessage
     {
         $locale = $this->subscriber->locale ?? 'en';
-        $prefix = $locale !== 'en' ? "/{$locale}" : '';
+        $prefix = $locale !== 'en' ? '/'.$locale : '';
         $confirmUrl = config('app.frontend_url', config('app.url')).$prefix.'/newsletter/confirm?token='.$this->subscriber->token;
 
         $name = $this->subscriber->first_name ? ', '.$this->subscriber->first_name : '';

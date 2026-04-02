@@ -1,7 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { FileText, Save } from 'lucide-react';
-import { type JSX } from 'react';
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import Editor from '@/components/editor/editor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

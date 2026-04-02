@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { PlusIcon, PencilIcon, TrashIcon } from 'lucide-react';
+import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import * as NewsletterSegmentController from '@/actions/App/Http/Controllers/Admin/NewsletterSegmentController';
 import { ConfirmButton } from '@/components/confirm-dialog';

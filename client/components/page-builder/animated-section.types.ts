@@ -1,11 +1,11 @@
 export type AnimationPreset = {
-  initial: Record<string, number>;
-  animate: Record<string, number>;
+    initial: Record<string, number>;
+    animate: Record<string, number>;
 };
 export interface AnimatedSectionProps {
-  animation: string;
-  className?: string;
-  'data-section-type'?: string;
-  'data-section-id'?: number;
-  children: React.ReactNode;
+    animation: string;
+    className?: string;
+    'data-section-type'?: string;
+    'data-section-id'?: number;
+    children: React.ReactNode;
 }

@@ -13,8 +13,8 @@ import {
 } from 'recharts';
 import { Card } from '@/components/ui/card';
 import type {
-    DataPoint,
     ChartWidgetProps,
+    DataPoint,
     Granularity,
 } from './chart-widget.types';
 

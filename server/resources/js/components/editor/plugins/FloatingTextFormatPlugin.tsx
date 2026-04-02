@@ -21,8 +21,7 @@ import {
     Superscript,
     Underline as UnderlineIcon,
 } from 'lucide-react';
-import { type JSX } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import { createPortal } from 'react-dom';
 import { Toggle } from '@/components/ui/toggle';
 import { getSelectedNode } from '../utils/getSelectedNode';

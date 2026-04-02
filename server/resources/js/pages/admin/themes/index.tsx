@@ -1,11 +1,11 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
-    PlusIcon,
-    PencilIcon,
-    TrashIcon,
-    CopyIcon,
     CheckIcon,
+    CopyIcon,
+    PencilIcon,
+    PlusIcon,
+    TrashIcon,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import * as ThemeController from '@/actions/App/Http/Controllers/Admin/ThemeController';
@@ -18,7 +18,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { Theme, IndexProps } from './index.types';
+import type { IndexProps, Theme } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Themes', href: ThemeController.index.url() },

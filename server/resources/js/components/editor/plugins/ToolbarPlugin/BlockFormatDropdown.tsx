@@ -15,6 +15,7 @@ import {
     type LexicalEditor,
 } from 'lexical';
 import {
+    Code2,
     Heading1,
     Heading2,
     Heading3,
@@ -24,7 +25,6 @@ import {
     ListChecks,
     ListOrdered,
     Quote,
-    Code2,
     Type,
 } from 'lucide-react';
 import { type JSX } from 'react';

@@ -2,8 +2,7 @@ import { $generateHtmlFromNodes } from '@lexical/html';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { CLEAR_EDITOR_COMMAND } from 'lexical';
 import { FileJson, FileText, Trash2, Upload } from 'lucide-react';
-import { type JSX } from 'react';
-import { useRef } from 'react';
+import { useRef, type JSX } from 'react';
 import {
     Tooltip,
     TooltipContent,

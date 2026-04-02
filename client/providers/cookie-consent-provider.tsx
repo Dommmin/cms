@@ -10,7 +10,7 @@
 export const COOKIE_CONSENT_OPEN_EVENT = 'cookie-consent:open';
 
 export function openCookiePreferences(): void {
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_OPEN_EVENT));
-  }
+    if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_OPEN_EVENT));
+    }
 }

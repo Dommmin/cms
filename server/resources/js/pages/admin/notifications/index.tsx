@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { PlusIcon, EyeIcon, TrashIcon, RefreshCwIcon } from 'lucide-react';
+import { EyeIcon, PlusIcon, RefreshCwIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
 import { ConfirmButton } from '@/components/confirm-dialog';

@@ -7,8 +7,8 @@
 import { PlusIcon, TrashIcon } from 'lucide-react';
 import {
     BlockRelationManager,
-    type Relation,
     type RelationConfig as BRMRelationConfig,
+    type Relation,
 } from '@/components/admin/block-relation-manager';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

@@ -1,6 +1,6 @@
 export type LocaleOption = {
-  code: string;
-  name: string;
-  native_name: string;
-  flag_emoji: string | null;
+    code: string;
+    name: string;
+    native_name: string;
+    flag_emoji: string | null;
 };

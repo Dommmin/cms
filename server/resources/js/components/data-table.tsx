@@ -1,8 +1,8 @@
 import { Link, router } from '@inertiajs/react';
 import {
-    useReactTable,
-    getCoreRowModel,
     flexRender,
+    getCoreRowModel,
+    useReactTable,
 } from '@tanstack/react-table';
 import { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';

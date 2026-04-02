@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { PlusIcon, PencilIcon, TrashIcon, StarIcon } from 'lucide-react';
+import { PencilIcon, PlusIcon, StarIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import * as CurrencyController from '@/actions/App/Http/Controllers/Admin/CurrencyController';
 import { ConfirmButton } from '@/components/confirm-dialog';

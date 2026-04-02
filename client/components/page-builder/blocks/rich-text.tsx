@@ -1,21 +1,21 @@
 import type { RichTextConfig, RichTextProps } from './rich-text.types';
 
 export function RichTextBlock({ block }: RichTextProps) {
-  const cfg = block.configuration as RichTextConfig;
+    const cfg = block.configuration as RichTextConfig;
 
-  const proseSize = {
-    sm: 'prose-sm',
-    base: '',
-    lg: 'prose-lg',
-    xl: 'prose-xl',
-  }[cfg.text_size ?? 'base'];
+    const proseSize = {
+        sm: 'prose-sm',
+        base: '',
+        lg: 'prose-lg',
+        xl: 'prose-xl',
+    }[cfg.text_size ?? 'base'];
 
-  if (!cfg.content) return null;
+    if (!cfg.content) return null;
 
-  return (
-    <div
-      className={`prose dark:prose-invert max-w-none ${proseSize}`}
-      dangerouslySetInnerHTML={{ __html: cfg.content }}
-    />
-  );
+    return (
+        <div
+            className={`prose dark:prose-invert max-w-none ${proseSize}`}
+            dangerouslySetInnerHTML={{ __html: cfg.content }}
+        />
+    );
 }

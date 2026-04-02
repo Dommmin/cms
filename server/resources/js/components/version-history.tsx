@@ -14,8 +14,8 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import type {
-    VersionEntry,
     DiffEntry,
+    VersionEntry,
     VersionHistoryProps,
 } from './version-history.types';
 

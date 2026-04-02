@@ -14,55 +14,53 @@ use App\Models\ProductType;
 use App\Models\ProductTypeAttribute;
 use App\Models\ProductVariant;
 use App\Models\VariantAttributeValue;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 class ElectronicsSeeder extends Seeder
 {
     private array $categories = [];
+
     private array $brands = [];
+
     private array $productTypes = [];
+
     private array $attributes = [];
+
     private array $attributeValues = [];
+
     private array $generatedSkus = [];
 
     /** @var array<string, string> Polish → English variant name translations */
     private array $variantNameEn = [
-        'Wersja podstawowa'        => 'Basic',
-        'Wersja z montazem'        => 'With Installation',
-        'Zestaw z subwooferem'     => 'With Subwoofer',
-        'Zestaw 5.1'               => '5.1 System',
-        'Wersja XL'                => 'XL Edition',
-        'Z Windows 11'             => 'With Windows 11',
-        'Z regulacja wysokosci'    => 'Height Adjustable',
+        'Wersja podstawowa' => 'Basic',
+        'Wersja z montazem' => 'With Installation',
+        'Zestaw z subwooferem' => 'With Subwoofer',
+        'Zestaw 5.1' => '5.1 System',
+        'Wersja XL' => 'XL Edition',
+        'Z Windows 11' => 'With Windows 11',
+        'Z regulacja wysokosci' => 'Height Adjustable',
         'Z dodatkowym kontrolerem' => 'With Extra Controller',
-        'Z instalacja'             => 'With Installation',
-        'Z obiektywem kit'         => 'With Kit Lens',
-        'Czarny'                   => 'Black',
-        'Bialy'                    => 'White',
-        'Zielony'                  => 'Green',
-        'Zolty'                    => 'Yellow',
-        'Niebieski'                => 'Blue',
-        'Czerwony'                 => 'Red',
+        'Z instalacja' => 'With Installation',
+        'Z obiektywem kit' => 'With Kit Lens',
+        'Czarny' => 'Black',
+        'Bialy' => 'White',
+        'Zielony' => 'Green',
+        'Zolty' => 'Yellow',
+        'Niebieski' => 'Blue',
+        'Czerwony' => 'Red',
         // unchanged in both languages
-        'Standard'        => 'Standard',
-        'Soundbar'        => 'Soundbar',
-        'RGB'             => 'RGB',
+        'Standard' => 'Standard',
+        'Soundbar' => 'Soundbar',
+        'RGB' => 'RGB',
         'Digital Edition' => 'Digital Edition',
-        'Deluxe Edition'  => 'Deluxe Edition',
-        'Body'            => 'Body',
-        'Box'             => 'Box',
-        'Tray'            => 'Tray',
-        'Starter Kit'     => 'Starter Kit',
-        'Single'          => 'Single',
+        'Deluxe Edition' => 'Deluxe Edition',
+        'Body' => 'Body',
+        'Box' => 'Box',
+        'Tray' => 'Tray',
+        'Starter Kit' => 'Starter Kit',
+        'Single' => 'Single',
     ];
-
-    /** @return array{pl: string, en: string} */
-    private function vn(string $pl): array
-    {
-        return ['pl' => $pl, 'en' => $this->variantNameEn[$pl] ?? $pl];
-    }
 
     public function run(): void
     {
@@ -88,6 +86,12 @@ class ElectronicsSeeder extends Seeder
         $this->createProducts();
 
         $this->command->info('Electronics seeding completed!');
+    }
+
+    /** @return array{pl: string, en: string} */
+    private function vn(string $pl): array
+    {
+        return ['pl' => $pl, 'en' => $this->variantNameEn[$pl] ?? $pl];
     }
 
     private function createCategories(): void
@@ -491,15 +495,15 @@ class ElectronicsSeeder extends Seeder
                 $name = $value;
                 $children = [];
             }
-            
+
             $slugBase = Str::slug($name);
-            $slug = $prefix ? $prefix . '-' . $slugBase : $slugBase;
-            
+            $slug = $prefix !== '' && $prefix !== '0' ? $prefix.'-'.$slugBase : $slugBase;
+
             $category = Category::query()->updateOrCreate(
                 ['slug' => $slug],
                 [
                     'name' => ['pl' => $name, 'en' => $name],
-                    'description' => ['pl' => 'Kategoria ' . $name, 'en' => $name . ' category'],
+                    'description' => ['pl' => 'Kategoria '.$name, 'en' => $name.' category'],
                     'is_active' => true,
                     'parent_id' => $parentId,
                     'position' => $position++,
@@ -511,7 +515,7 @@ class ElectronicsSeeder extends Seeder
                 $this->categories[$name] = $category->id;
             }
 
-            if (! empty($children)) {
+            if ($children !== []) {
                 $this->createCategoryTree($children, $category->id, $slug);
             }
         }
@@ -569,13 +573,13 @@ class ElectronicsSeeder extends Seeder
         $position = 1;
         foreach ($brandsData as $category => $brandList) {
             foreach ($brandList as $brandName) {
-                $key = $category . '::' . $brandName;
-                
+                $key = $category.'::'.$brandName;
+
                 $brand = Brand::query()->updateOrCreate(
                     ['slug' => Str::slug($brandName)],
                     [
                         'name' => $brandName,
-                        'description' => 'Marka ' . $brandName,
+                        'description' => 'Marka '.$brandName,
                         'is_active' => true,
                         'position' => $position++,
                     ],
@@ -831,7 +835,7 @@ class ElectronicsSeeder extends Seeder
     private function createProducts(): void
     {
         $productConfigs = $this->getProductConfigurations();
-        
+
         $bar = $this->command->getOutput()->createProgressBar(count($productConfigs));
         $bar->start();
 
@@ -847,7 +851,7 @@ class ElectronicsSeeder extends Seeder
     private function getProductConfigurations(): array
     {
         $configs = [];
-        
+
         $configs = array_merge($configs, $this->getTVConfigurations());
         $configs = array_merge($configs, $this->getAudioConfigurations());
         $configs = array_merge($configs, $this->getMobileConfigurations());
@@ -855,9 +859,8 @@ class ElectronicsSeeder extends Seeder
         $configs = array_merge($configs, $this->getGamingConfigurations());
         $configs = array_merge($configs, $this->getAGDConfigurations());
         $configs = array_merge($configs, $this->getPhotoVideoConfigurations());
-        $configs = array_merge($configs, $this->getSmartHomeConfigurations());
-        
-        return $configs;
+
+        return array_merge($configs, $this->getSmartHomeConfigurations());
     }
 
     private function getTVConfigurations(): array
@@ -901,21 +904,21 @@ class ElectronicsSeeder extends Seeder
 
         foreach ($tvs as [$brand, $size, $tech, $priceMin, $priceMax]) {
             $category = $categoryMap[$size] ?? 'Telewizory 55 cali';
-            $brandKey = 'TV Audio::' . $brand;
-            
+            $brandKey = 'TV Audio::'.$brand;
+
             for ($i = 0; $i < 4; $i++) {
                 $modelSuffix = $this->generateModelSuffix();
-                $price = rand($priceMin, $priceMax);
-                
+                $price = random_int($priceMin, $priceMax);
+
                 $configs[] = [
-                    'name' => $brand . ' ' . $size . '" ' . $tech . ' Smart TV ' . $modelSuffix,
+                    'name' => $brand.' '.$size.'" '.$tech.' Smart TV '.$modelSuffix,
                     'brand' => $brandKey,
                     'category' => $category,
                     'productType' => 'Telewizor',
                     'price' => $price,
                     'variants' => [
                         ['name' => $this->vn('Wersja podstawowa'), 'price' => $price, 'sku' => $this->generateSku($brand, (string) $size)],
-                        ['name' => $this->vn('Wersja z montazem'), 'price' => $price + 300, 'sku' => $this->generateSku($brand, (string) $size) . '-M'],
+                        ['name' => $this->vn('Wersja z montazem'), 'price' => $price + 300, 'sku' => $this->generateSku($brand, (string) $size).'-M'],
                     ],
                 ];
             }
@@ -927,7 +930,7 @@ class ElectronicsSeeder extends Seeder
     private function getAudioConfigurations(): array
     {
         $configs = [];
-        
+
         $soundbars = [
             ['Samsung', 1299, 3999],
             ['LG', 999, 3499],
@@ -939,22 +942,22 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($soundbars as [$brand, $priceMin, $priceMax]) {
-            $brandKey = 'TV Audio::' . $brand;
-            
+            $brandKey = 'TV Audio::'.$brand;
+
             for ($i = 0; $i < 6; $i++) {
                 $model = $this->generateSoundbarModel();
-                $price = rand($priceMin, $priceMax);
-                
+                $price = random_int($priceMin, $priceMax);
+
                 $configs[] = [
-                    'name' => $brand . ' Soundbar ' . $model,
+                    'name' => $brand.' Soundbar '.$model,
                     'brand' => $brandKey,
                     'category' => 'Soundbary',
                     'productType' => 'Soundbar',
                     'price' => $price,
                     'variants' => [
                         ['name' => $this->vn('Soundbar'), 'price' => $price, 'sku' => $this->generateSku($brand, 'SB')],
-                        ['name' => $this->vn('Zestaw z subwooferem'), 'price' => $price + 500, 'sku' => $this->generateSku($brand, 'SB') . '-SW'],
-                        ['name' => $this->vn('Zestaw 5.1'), 'price' => $price + 1500, 'sku' => $this->generateSku($brand, 'SB') . '-51'],
+                        ['name' => $this->vn('Zestaw z subwooferem'), 'price' => $price + 500, 'sku' => $this->generateSku($brand, 'SB').'-SW'],
+                        ['name' => $this->vn('Zestaw 5.1'), 'price' => $price + 1500, 'sku' => $this->generateSku($brand, 'SB').'-51'],
                     ],
                 ];
             }
@@ -974,21 +977,21 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($headphones as [$brand, $priceMin, $priceMax, $category]) {
-            $brandKey = 'TV Audio::' . $brand;
-            
+            $brandKey = 'TV Audio::'.$brand;
+
             for ($i = 0; $i < 8; $i++) {
                 $model = $this->generateHeadphoneModel();
-                $price = rand($priceMin, $priceMax);
-                
+                $price = random_int($priceMin, $priceMax);
+
                 $configs[] = [
-                    'name' => $brand . ' ' . $model,
+                    'name' => $brand.' '.$model,
                     'brand' => $brandKey,
                     'category' => $category,
                     'productType' => 'Sluchawki',
                     'price' => $price,
                     'variants' => [
-                        ['name' => $this->vn('Czarny'), 'price' => $price, 'sku' => $this->generateSku($brand, 'HP') . '-BK'],
-                        ['name' => $this->vn('Bialy'), 'price' => $price, 'sku' => $this->generateSku($brand, 'HP') . '-WH'],
+                        ['name' => $this->vn('Czarny'), 'price' => $price, 'sku' => $this->generateSku($brand, 'HP').'-BK'],
+                        ['name' => $this->vn('Bialy'), 'price' => $price, 'sku' => $this->generateSku($brand, 'HP').'-WH'],
                     ],
                 ];
             }
@@ -1005,21 +1008,21 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($speakers as [$brand, $priceMin, $priceMax]) {
-            $brandKey = 'TV Audio::' . $brand;
-            
+            $brandKey = 'TV Audio::'.$brand;
+
             for ($i = 0; $i < 6; $i++) {
                 $model = $this->generateSpeakerModel();
-                $price = rand($priceMin, $priceMax);
-                
+                $price = random_int($priceMin, $priceMax);
+
                 $configs[] = [
-                    'name' => $brand . ' ' . $model,
+                    'name' => $brand.' '.$model,
                     'brand' => $brandKey,
                     'category' => 'Glosniki Bluetooth',
                     'productType' => 'Glownik Bluetooth',
                     'price' => $price,
                     'variants' => [
                         ['name' => $this->vn('Standard'), 'price' => $price, 'sku' => $this->generateSku($brand, 'SP')],
-                        ['name' => $this->vn('Wersja XL'), 'price' => $price + 300, 'sku' => $this->generateSku($brand, 'SP') . '-XL'],
+                        ['name' => $this->vn('Wersja XL'), 'price' => $price + 300, 'sku' => $this->generateSku($brand, 'SP').'-XL'],
                     ],
                 ];
             }
@@ -1031,7 +1034,7 @@ class ElectronicsSeeder extends Seeder
     private function getMobileConfigurations(): array
     {
         $configs = [];
-        
+
         $smartphones = [
             ['Apple', 3999, 9999, 'iPhone'],
             ['Samsung', 1999, 8999, 'Smartfony Samsung'],
@@ -1047,16 +1050,16 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($smartphones as [$brand, $priceMin, $priceMax, $category]) {
-            $brandKey = 'Mobile::' . $brand;
-            
+            $brandKey = 'Mobile::'.$brand;
+
             for ($i = 0; $i < 10; $i++) {
                 $model = $this->generateSmartphoneModel($brand);
-                $price = rand($priceMin, $priceMax);
+                $price = random_int($priceMin, $priceMax);
                 $storageOptions = [128, 256, 512];
                 $colorOptions = $this->getPhoneColors($brand);
 
                 $configs[] = [
-                    'name' => $brand . ' ' . $model,
+                    'name' => $brand.' '.$model,
                     'brand' => $brandKey,
                     'category' => $category,
                     'productType' => 'Smartphone',
@@ -1075,15 +1078,15 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($tablets as [$brand, $priceMin, $priceMax, $category]) {
-            $brandKey = 'Mobile::' . $brand;
-            
+            $brandKey = 'Mobile::'.$brand;
+
             for ($i = 0; $i < 8; $i++) {
-                $model = $this->generateTabletModel($brand);
-                $price = rand($priceMin, $priceMax);
+                $model = $this->generateTabletModel();
+                $price = random_int($priceMin, $priceMax);
                 $storageOptions = [128, 256, 512];
-                
+
                 $configs[] = [
-                    'name' => $brand . ' ' . $model,
+                    'name' => $brand.' '.$model,
                     'brand' => $brandKey,
                     'category' => $category,
                     'productType' => 'Tablet',
@@ -1103,12 +1106,12 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($watches as [$brand, $priceMin, $priceMax, $category]) {
-            $brandKey = 'Mobile::' . $brand;
-            
+            $brandKey = 'Mobile::'.$brand;
+
             for ($i = 0; $i < 8; $i++) {
                 $model = $this->generateWatchModel();
-                $price = rand($priceMin, $priceMax);
-                
+                $price = random_int($priceMin, $priceMax);
+
                 $watchColors = [
                     ['pl' => 'Czarny', 'en' => 'Black'],
                     ['pl' => 'Bialy',  'en' => 'White'],
@@ -1116,7 +1119,7 @@ class ElectronicsSeeder extends Seeder
                 ];
 
                 $configs[] = [
-                    'name' => $brand . ' ' . $model,
+                    'name' => $brand.' '.$model,
                     'brand' => $brandKey,
                     'category' => $category,
                     'productType' => 'Smartwatch',
@@ -1132,7 +1135,7 @@ class ElectronicsSeeder extends Seeder
     private function getComputingConfigurations(): array
     {
         $configs = [];
-        
+
         $laptops = [
             ['Apple', 4999, 24999, 'MacBook Air', 'Laptopy'],
             ['Apple', 7999, 29999, 'MacBook Pro', 'Laptopy'],
@@ -1153,22 +1156,22 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($laptops as [$brand, $priceMin, $priceMax, $modelName, $category]) {
-            $brandKey = 'Computing::' . $brand;
-            
+            $brandKey = 'Computing::'.$brand;
+
             for ($i = 0; $i < 8; $i++) {
                 $ram = $this->getRandomRam();
                 $storage = $this->getRandomStorage();
-                $price = rand($priceMin, $priceMax);
-                
+                $price = random_int($priceMin, $priceMax);
+
                 $configs[] = [
-                    'name' => $brand . ' ' . $modelName . ' ' . $ram . 'GB/' . $storage . 'GB',
+                    'name' => $brand.' '.$modelName.' '.$ram.'GB/'.$storage.'GB',
                     'brand' => $brandKey,
                     'category' => $category,
                     'productType' => 'Laptop',
                     'price' => $price,
                     'variants' => [
                         ['name' => $this->vn('Standard'), 'price' => $price, 'sku' => $this->generateSku($brand, 'LT')],
-                        ['name' => $this->vn('Z Windows 11'), 'price' => $price + 400, 'sku' => $this->generateSku($brand, 'LT') . '-WIN'],
+                        ['name' => $this->vn('Z Windows 11'), 'price' => $price + 400, 'sku' => $this->generateSku($brand, 'LT').'-WIN'],
                     ],
                 ];
             }
@@ -1186,21 +1189,21 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($monitors as [$brand, $priceMin, $priceMax, $category]) {
-            $brandKey = 'Computing::' . $brand;
-            
+            $brandKey = 'Computing::'.$brand;
+
             for ($i = 0; $i < 8; $i++) {
                 $model = $this->generateMonitorModel();
-                $price = rand($priceMin, $priceMax);
-                
+                $price = random_int($priceMin, $priceMax);
+
                 $configs[] = [
-                    'name' => $brand . ' ' . $model,
+                    'name' => $brand.' '.$model,
                     'brand' => $brandKey,
                     'category' => $category,
                     'productType' => 'Monitor',
                     'price' => $price,
                     'variants' => [
                         ['name' => $this->vn('Standard'), 'price' => $price, 'sku' => $this->generateSku($brand, 'MN')],
-                        ['name' => $this->vn('Z regulacja wysokosci'), 'price' => $price + 300, 'sku' => $this->generateSku($brand, 'MN') . '-ARM'],
+                        ['name' => $this->vn('Z regulacja wysokosci'), 'price' => $price + 300, 'sku' => $this->generateSku($brand, 'MN').'-ARM'],
                     ],
                 ];
             }
@@ -1230,23 +1233,23 @@ class ElectronicsSeeder extends Seeder
 
         foreach ($components as $componentType => $brands) {
             foreach ($brands as [$brand, $priceMin, $priceMax, $category]) {
-                $brandKey = 'Computing::' . $brand;
-                
+                $brandKey = 'Computing::'.$brand;
+
                 for ($i = 0; $i < 10; $i++) {
                     $model = $this->generateComponentModel($componentType);
-                    $price = rand($priceMin, $priceMax);
-                    
+                    $price = random_int($priceMin, $priceMax);
+
                     $configs[] = [
-                        'name' => $brand . ' ' . $model,
+                        'name' => $brand.' '.$model,
                         'brand' => $brandKey,
                         'category' => $category,
-                        'productType' => $componentType === 'Karty graficzne' ? 'Karta graficzna' : 
-                                        ($componentType === 'Procesory' ? 'Procesor' : 
+                        'productType' => $componentType === 'Karty graficzne' ? 'Karta graficzna' :
+                                        ($componentType === 'Procesory' ? 'Procesor' :
                                         ($componentType === 'Dyski SSD' ? 'Dysk SSD' : 'Pamiec RAM')),
                         'price' => $price,
                         'variants' => [
                             ['name' => $this->vn('Box'), 'price' => $price, 'sku' => $this->generateSku($brand, 'COMP')],
-                            ['name' => $this->vn('Tray'), 'price' => $price - 50, 'sku' => $this->generateSku($brand, 'COMP') . '-T'],
+                            ['name' => $this->vn('Tray'), 'price' => $price - 50, 'sku' => $this->generateSku($brand, 'COMP').'-T'],
                         ],
                     ];
                 }
@@ -1265,21 +1268,21 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($peripherals as [$brand, $priceMin, $priceMax, $category]) {
-            $brandKey = 'Computing::' . $brand;
-            
+            $brandKey = 'Computing::'.$brand;
+
             for ($i = 0; $i < 10; $i++) {
                 $model = $this->generatePeripheralModel();
-                $price = rand($priceMin, $priceMax);
-                
+                $price = random_int($priceMin, $priceMax);
+
                 $configs[] = [
-                    'name' => $brand . ' ' . $model,
+                    'name' => $brand.' '.$model,
                     'brand' => $brandKey,
                     'category' => $category,
                     'productType' => str_contains($category, 'Klawiatur') ? 'Klawiatura' : 'Mysz',
                     'price' => $price,
                     'variants' => [
                         ['name' => $this->vn('Standard'), 'price' => $price, 'sku' => $this->generateSku($brand, 'PER')],
-                        ['name' => $this->vn('RGB'), 'price' => $price + 100, 'sku' => $this->generateSku($brand, 'PER') . '-RGB'],
+                        ['name' => $this->vn('RGB'), 'price' => $price + 100, 'sku' => $this->generateSku($brand, 'PER').'-RGB'],
                     ],
                 ];
             }
@@ -1291,7 +1294,7 @@ class ElectronicsSeeder extends Seeder
     private function getGamingConfigurations(): array
     {
         $configs = [];
-        
+
         $consoles = [
             ['Sony', 2499, 4999, 'PlayStation 5'],
             ['Microsoft', 1999, 4999, 'Xbox Series X'],
@@ -1299,21 +1302,21 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($consoles as [$brand, $priceMin, $priceMax, $category]) {
-            $brandKey = 'Gaming::' . $brand;
-            
+            $brandKey = 'Gaming::'.$brand;
+
             for ($i = 0; $i < 5; $i++) {
-                $price = rand($priceMin, $priceMax);
-                
+                $price = random_int($priceMin, $priceMax);
+
                 $configs[] = [
-                    'name' => $brand . ' ' . $category,
+                    'name' => $brand.' '.$category,
                     'brand' => $brandKey,
                     'category' => $category,
                     'productType' => 'Konsole do gier',
                     'price' => $price,
                     'variants' => [
                         ['name' => $this->vn('Standard'), 'price' => $price, 'sku' => $this->generateSku($brand, 'CON')],
-                        ['name' => $this->vn('Digital Edition'), 'price' => $price - 500, 'sku' => $this->generateSku($brand, 'CON') . '-DL'],
-                        ['name' => $this->vn('Z dodatkowym kontrolerem'), 'price' => $price + 300, 'sku' => $this->generateSku($brand, 'CON') . '-BUN'],
+                        ['name' => $this->vn('Digital Edition'), 'price' => $price - 500, 'sku' => $this->generateSku($brand, 'CON').'-DL'],
+                        ['name' => $this->vn('Z dodatkowym kontrolerem'), 'price' => $price + 300, 'sku' => $this->generateSku($brand, 'CON').'-BUN'],
                     ],
                 ];
             }
@@ -1328,21 +1331,21 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($games as [$brand, $priceMin, $priceMax, $category]) {
-            $brandKey = 'Gaming::' . $brand;
-            
+            $brandKey = 'Gaming::'.$brand;
+
             for ($i = 0; $i < 15; $i++) {
                 $gameTitle = $this->generateGameTitle();
-                $price = rand($priceMin, $priceMax);
-                
+                $price = random_int($priceMin, $priceMax);
+
                 $configs[] = [
-                    'name' => $gameTitle . ' - ' . $brand,
+                    'name' => $gameTitle.' - '.$brand,
                     'brand' => $brandKey,
                     'category' => $category,
                     'productType' => 'Gra',
                     'price' => $price,
                     'variants' => [
                         ['name' => $this->vn('Standard'), 'price' => $price, 'sku' => $this->generateSku($brand, 'GAM')],
-                        ['name' => $this->vn('Deluxe Edition'), 'price' => $price + 100, 'sku' => $this->generateSku($brand, 'GAM') . '-DLX'],
+                        ['name' => $this->vn('Deluxe Edition'), 'price' => $price + 100, 'sku' => $this->generateSku($brand, 'GAM').'-DLX'],
                     ],
                 ];
             }
@@ -1354,7 +1357,7 @@ class ElectronicsSeeder extends Seeder
     private function getAGDConfigurations(): array
     {
         $configs = [];
-        
+
         $largeAppliances = [
             ['Samsung', 2499, 9999, 'Pralki', 'Pralki przednie'],
             ['LG', 2499, 9999, 'Pralki', 'Pralki przednie'],
@@ -1371,24 +1374,24 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($largeAppliances as [$brand, $priceMin, $priceMax, $category, $subcategory]) {
-            $brandKey = 'AGD::' . $brand;
-            
+            $brandKey = 'AGD::'.$brand;
+
             for ($i = 0; $i < 6; $i++) {
                 $model = $this->generateApplianceModel();
-                $price = rand($priceMin, $priceMax);
-                
+                $price = random_int($priceMin, $priceMax);
+
                 $configs[] = [
-                    'name' => $brand . ' ' . $model,
+                    'name' => $brand.' '.$model,
                     'brand' => $brandKey,
                     'category' => $subcategory,
-                    'productType' => $category === 'Lodowki' ? 'Lodowka' : 
-                                    ($category === 'Pralki' ? 'Pralka' : 
-                                    ($category === 'Zmywarki' ? 'Zmywarka' : 
+                    'productType' => $category === 'Lodowki' ? 'Lodowka' :
+                                    ($category === 'Pralki' ? 'Pralka' :
+                                    ($category === 'Zmywarki' ? 'Zmywarka' :
                                     ($category === 'Plyty grzewcze' ? 'Plyta grzewcza' : 'Kuchenka mikrofalowa'))),
                     'price' => $price,
                     'variants' => [
                         ['name' => $this->vn('Standard'), 'price' => $price, 'sku' => $this->generateSku($brand, 'AGD')],
-                        ['name' => $this->vn('Z instalacja'), 'price' => $price + 200, 'sku' => $this->generateSku($brand, 'AGD') . '-INST'],
+                        ['name' => $this->vn('Z instalacja'), 'price' => $price + 200, 'sku' => $this->generateSku($brand, 'AGD').'-INST'],
                     ],
                 ];
             }
@@ -1413,12 +1416,12 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($smallAppliances as [$brand, $priceMin, $priceMax, $category]) {
-            $brandKey = 'AGD::' . $brand;
-            
+            $brandKey = 'AGD::'.$brand;
+
             for ($i = 0; $i < 6; $i++) {
                 $model = $this->generateSmallApplianceModel();
-                $price = rand($priceMin, $priceMax);
-                
+                $price = random_int($priceMin, $priceMax);
+
                 $productType = 'Ekspres do kawy';
                 if (str_contains($category, 'Roboty odkurzajace') || str_contains($category, 'Odkurzacze')) {
                     $productType = 'Odkurzac';
@@ -1431,9 +1434,9 @@ class ElectronicsSeeder extends Seeder
                 } elseif (str_contains($category, 'Szczoteczki do zebow')) {
                     $productType = 'Szczoteczka do zebow';
                 }
-                
+
                 $configs[] = [
-                    'name' => $brand . ' ' . $model,
+                    'name' => $brand.' '.$model,
                     'brand' => $brandKey,
                     'category' => $category,
                     'productType' => $productType,
@@ -1451,7 +1454,7 @@ class ElectronicsSeeder extends Seeder
     private function getPhotoVideoConfigurations(): array
     {
         $configs = [];
-        
+
         $cameras = [
             ['Canon', 2999, 19999, 'Aparaty bezlusterkowe'],
             ['Nikon', 3999, 24999, 'Aparaty bezlusterkowe'],
@@ -1464,28 +1467,28 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($cameras as [$brand, $priceMin, $priceMax, $category]) {
-            $brandKey = 'Photo Video::' . $brand;
-            
+            $brandKey = 'Photo Video::'.$brand;
+
             for ($i = 0; $i < 6; $i++) {
                 $model = $this->generateCameraModel();
-                $price = rand($priceMin, $priceMax);
-                
+                $price = random_int($priceMin, $priceMax);
+
                 $productType = 'Aparat fotograficzny';
                 if (str_contains($category, 'Dron')) {
                     $productType = 'Drone';
                 } elseif (str_contains($category, 'Kamera')) {
                     $productType = 'Kamera';
                 }
-                
+
                 $configs[] = [
-                    'name' => $brand . ' ' . $model,
+                    'name' => $brand.' '.$model,
                     'brand' => $brandKey,
                     'category' => $category,
                     'productType' => $productType,
                     'price' => $price,
                     'variants' => [
                         ['name' => $this->vn('Body'), 'price' => $price, 'sku' => $this->generateSku($brand, 'CAM')],
-                        ['name' => $this->vn('Z obiektywem kit'), 'price' => $price + 500, 'sku' => $this->generateSku($brand, 'CAM') . '-KIT'],
+                        ['name' => $this->vn('Z obiektywem kit'), 'price' => $price + 500, 'sku' => $this->generateSku($brand, 'CAM').'-KIT'],
                     ],
                 ];
             }
@@ -1501,14 +1504,14 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($lenses as [$brand, $priceMin, $priceMax, $category]) {
-            $brandKey = 'Photo Video::' . $brand;
-            
+            $brandKey = 'Photo Video::'.$brand;
+
             for ($i = 0; $i < 8; $i++) {
                 $model = $this->generateLensModel();
-                $price = rand($priceMin, $priceMax);
-                
+                $price = random_int($priceMin, $priceMax);
+
                 $configs[] = [
-                    'name' => $brand . ' ' . $model,
+                    'name' => $brand.' '.$model,
                     'brand' => $brandKey,
                     'category' => $category,
                     'productType' => 'Obiektyw',
@@ -1530,14 +1533,14 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($accessories as [$brand, $priceMin, $priceMax, $category]) {
-            $brandKey = 'Photo Video::' . $brand;
-            
+            $brandKey = 'Photo Video::'.$brand;
+
             for ($i = 0; $i < 8; $i++) {
                 $model = $this->generateAccessoryModel();
-                $price = rand($priceMin, $priceMax);
-                
+                $price = random_int($priceMin, $priceMax);
+
                 $configs[] = [
-                    'name' => $brand . ' ' . $model,
+                    'name' => $brand.' '.$model,
                     'brand' => $brandKey,
                     'category' => $category,
                     'productType' => 'Akcesoria fotograficzne',
@@ -1555,7 +1558,7 @@ class ElectronicsSeeder extends Seeder
     private function getSmartHomeConfigurations(): array
     {
         $configs = [];
-        
+
         $smartDevices = [
             ['Google', 199, 1999, 'Centrale smart home'],
             ['Amazon', 199, 1999, 'Centrale smart home'],
@@ -1570,12 +1573,12 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($smartDevices as [$brand, $priceMin, $priceMax, $category]) {
-            $brandKey = 'Smart Home::' . $brand;
-            
+            $brandKey = 'Smart Home::'.$brand;
+
             for ($i = 0; $i < 8; $i++) {
                 $model = $this->generateSmartHomeModel();
-                $price = rand($priceMin, $priceMax);
-                
+                $price = random_int($priceMin, $priceMax);
+
                 $productType = 'Centrale smart home';
                 if (str_contains($category, 'Czujniki')) {
                     $productType = 'Czujniki';
@@ -1586,9 +1589,9 @@ class ElectronicsSeeder extends Seeder
                 } elseif (str_contains($category, 'Oswietlenie')) {
                     $productType = 'Oswietlenie';
                 }
-                
+
                 $configs[] = [
-                    'name' => $brand . ' ' . $model,
+                    'name' => $brand.' '.$model,
                     'brand' => $brandKey,
                     'category' => $category,
                     'productType' => $productType,
@@ -1614,27 +1617,27 @@ class ElectronicsSeeder extends Seeder
             return;
         }
 
-        $product = Product::create([
+        $product = Product::query()->create([
             'product_type_id' => $productTypeId,
             'category_id' => $categoryId,
             'brand_id' => $brandId,
             'name' => ['pl' => $config['name'], 'en' => $config['name']],
-            'slug' => Str::slug($config['name']) . '-' . Str::random(5),
+            'slug' => Str::slug($config['name']).'-'.Str::random(5),
             'description' => ['pl' => $this->generateDescription($config['name']), 'en' => $this->generateDescription($config['name'])],
-            'short_description' => ['pl' => 'Wysokiej jakosci produkt ' . $config['name'], 'en' => 'High quality product ' . $config['name']],
+            'short_description' => ['pl' => 'Wysokiej jakosci produkt '.$config['name'], 'en' => 'High quality product '.$config['name']],
             'is_active' => true,
             'is_saleable' => true,
         ]);
 
         $variantPosition = 1;
         foreach ($config['variants'] as $variant) {
-            $productVariant = ProductVariant::create([
+            $productVariant = ProductVariant::query()->create([
                 'product_id' => $product->id,
                 'sku' => $this->ensureUniqueSku($variant['sku'] ?? $this->generateSkuFromName($config['name'])),
                 'name' => $variant['name'],
                 'price' => $variant['price'] * 100,
                 'cost_price' => (int) ($variant['price'] * 0.7 * 100),
-                'stock_quantity' => rand(0, 100),
+                'stock_quantity' => random_int(0, 100),
                 'stock_threshold' => 5,
                 'is_active' => true,
                 'is_default' => $variantPosition === 1,
@@ -1654,12 +1657,12 @@ class ElectronicsSeeder extends Seeder
 
         // Partial match: category name contains the search term (not the other way — avoids 'Gry' matching 'Gry na PC')
         foreach ($this->categories as $name => $id) {
-            if (stripos($name, $categoryName) !== false) {
+            if (mb_stripos((string) $name, $categoryName) !== false) {
                 return $id;
             }
         }
 
-        $this->command->warn("Category not found: '{$categoryName}'");
+        $this->command->warn(sprintf("Category not found: '%s'", $categoryName));
 
         return null;
     }
@@ -1667,14 +1670,15 @@ class ElectronicsSeeder extends Seeder
     private function generateModelSuffix(): string
     {
         $suffixes = ['Pro', 'Ultra', 'Plus', 'Max', 'Neo', 'QLED', 'OLED', 'Premium', 'Elite', 'Signature', 'Crystal', 'Vision'];
+
         return $suffixes[array_rand($suffixes)];
     }
 
     private function generateSku(string $brand, string $type): string
     {
-        $brandPrefix = Str::upper(substr(preg_replace('/[^A-Za-z0-9]/', '', $brand) ?: 'BRD', 0, 3));
-        $typePrefix = Str::upper(substr(preg_replace('/[^A-Za-z0-9]/', '', $type) ?: 'TP', 0, 2));
-        $prefix = sprintf('%s-%s', str_pad($brandPrefix, 3, 'X'), str_pad($typePrefix, 2, 'X'));
+        $brandPrefix = Str::upper(mb_substr(preg_replace('/[^A-Za-z0-9]/', '', $brand) ?: 'BRD', 0, 3));
+        $typePrefix = Str::upper(mb_substr(preg_replace('/[^A-Za-z0-9]/', '', $type) ?: 'TP', 0, 2));
+        $prefix = sprintf('%s-%s', mb_str_pad($brandPrefix, 3, 'X'), mb_str_pad($typePrefix, 2, 'X'));
 
         $nextNumber = ($this->generatedSkus[$prefix] ?? 0) + 1;
         $this->generatedSkus[$prefix] = $nextNumber;
@@ -1687,13 +1691,13 @@ class ElectronicsSeeder extends Seeder
         $words = explode(' ', $name);
         $prefix = '';
         foreach ($words as $word) {
-            $prefix .= strtoupper(substr($word, 0, 1));
-            if (strlen($prefix) >= 3) {
+            $prefix .= mb_strtoupper(mb_substr($word, 0, 1));
+            if (mb_strlen($prefix) >= 3) {
                 break;
             }
         }
 
-        $prefix = str_pad($prefix, 3, 'X');
+        $prefix = mb_str_pad($prefix, 3, 'X');
         $nextNumber = ($this->generatedSkus[$prefix] ?? 0) + 1;
         $this->generatedSkus[$prefix] = $nextNumber;
 
@@ -1731,8 +1735,11 @@ class ElectronicsSeeder extends Seeder
         foreach ($assignments as $attributeSlug => $valueLabel) {
             $attributeId = $this->attributes[$attributeSlug] ?? null;
             $attributeValueId = $this->attributeValues[$attributeSlug][$this->normalizeAttributeValueKey($valueLabel)] ?? null;
+            if (! $attributeId) {
+                continue;
+            }
 
-            if (! $attributeId || ! $attributeValueId) {
+            if (! $attributeValueId) {
                 continue;
             }
 
@@ -1802,7 +1809,7 @@ class ElectronicsSeeder extends Seeder
 
     private function normalizeAttributeValueKey(string $value): string
     {
-        return Str::lower(trim($value));
+        return Str::lower(mb_trim($value));
     }
 
     private function buildStorageColorVariants(
@@ -1893,10 +1900,10 @@ class ElectronicsSeeder extends Seeder
     private function getPhoneColors(string $brand): array
     {
         return match (Str::lower($brand)) {
-            'apple'                   => [['pl' => 'Czarny', 'en' => 'Black'], ['pl' => 'Bialy', 'en' => 'White'], ['pl' => 'Czerwony', 'en' => 'Red']],
-            'samsung'                 => [['pl' => 'Czarny', 'en' => 'Black'], ['pl' => 'Zielony', 'en' => 'Green'], ['pl' => 'Zolty', 'en' => 'Yellow']],
+            'apple' => [['pl' => 'Czarny', 'en' => 'Black'], ['pl' => 'Bialy', 'en' => 'White'], ['pl' => 'Czerwony', 'en' => 'Red']],
+            'samsung' => [['pl' => 'Czarny', 'en' => 'Black'], ['pl' => 'Zielony', 'en' => 'Green'], ['pl' => 'Zolty', 'en' => 'Yellow']],
             'xiaomi', 'oppo', 'realme' => [['pl' => 'Czarny', 'en' => 'Black'], ['pl' => 'Niebieski', 'en' => 'Blue'], ['pl' => 'Zielony', 'en' => 'Green']],
-            default                   => [['pl' => 'Czarny', 'en' => 'Black'], ['pl' => 'Bialy', 'en' => 'White'], ['pl' => 'Niebieski', 'en' => 'Blue']],
+            default => [['pl' => 'Czarny', 'en' => 'Black'], ['pl' => 'Bialy', 'en' => 'White'], ['pl' => 'Niebieski', 'en' => 'Blue']],
         };
     }
 
@@ -1913,18 +1920,21 @@ class ElectronicsSeeder extends Seeder
     private function generateSoundbarModel(): string
     {
         $models = ['S1', 'S2', 'S3', 'B550', 'B650', 'B750', 'C450', 'C550', 'C650', 'Arc', 'Beam', 'Compact'];
+
         return $models[array_rand($models)];
     }
 
     private function generateHeadphoneModel(): string
     {
         $models = ['WH-1000XM5', 'WF-1000XM5', 'WH-CH720N', 'Momentum 4', 'HD 560S', 'AirPods Max', 'AirPods Pro 2', 'Galaxy Buds2 Pro', 'QuietComfort Ultra', 'Major V'];
+
         return $models[array_rand($models)];
     }
 
     private function generateSpeakerModel(): string
     {
         $models = ['X2', 'X3', 'Flip 5', 'Flip 6', 'Boom 3', 'Megaboom 3', 'Charge 5', 'Pulse 5', 'SoundLink Flex', 'HomePod mini', 'Era 100', 'Era 300'];
+
         return $models[array_rand($models)];
     }
 
@@ -1947,21 +1957,24 @@ class ElectronicsSeeder extends Seeder
         return $models[array_rand($models)];
     }
 
-    private function generateTabletModel(string $brand): string
+    private function generateTabletModel(): string
     {
         $models = ['Pro 11"', 'Air 11"', '10.9"', 'Tab S9', 'Tab S8', 'Pad 6', 'MatePad 11', 'iPad 10.9"'];
+
         return $models[array_rand($models)];
     }
 
     private function generateWatchModel(): string
     {
         $models = ['Series 9', 'Ultra 2', 'Galaxy Watch 6', 'Galaxy Watch 5', 'Watch GT 4', 'Fenix 7', 'Versa 4', 'Band 8', 'Galaxy Watch 6 Classic'];
+
         return $models[array_rand($models)];
     }
 
     private function generateMonitorModel(): string
     {
         $models = ['Odyssey G7', 'Odyssey G9', 'UltraGear 27"', 'UltraGear 34"', 'ProArt PA278QV', 'TUF Gaming VG279QM', 'Predator XB273U', 'AOC 27G2'];
+
         return $models[array_rand($models)];
     }
 
@@ -1975,11 +1988,11 @@ class ElectronicsSeeder extends Seeder
         $ram = ['Vengeance DDR5 32GB', 'Trident Z5 RGB 32GB', 'Fury Beast 32GB', 'Dominator Platinum 32GB'];
 
         return match ($type) {
-            'Procesory' => (rand(0, 1) ? $cpuIntel : $cpuAmd)[array_rand($cpuIntel)],
-            'Karty graficzne' => (rand(0, 1) ? $gpuNvidia : $gpuAmd)[array_rand($gpuNvidia)],
+            'Procesory' => (random_int(0, 1) !== 0 ? $cpuIntel : $cpuAmd)[array_rand($cpuIntel)],
+            'Karty graficzne' => (random_int(0, 1) !== 0 ? $gpuNvidia : $gpuAmd)[array_rand($gpuNvidia)],
             'Dyski SSD' => $ssd[array_rand($ssd)],
             'Pamiec RAM' => $ram[array_rand($ram)],
-            default => 'Model ' . rand(100, 999),
+            default => 'Model '.random_int(100, 999),
         };
     }
 
@@ -1988,7 +2001,8 @@ class ElectronicsSeeder extends Seeder
         $keyboards = ['MX Keys', 'MX Mechanical', 'K380', 'K860', 'G915', 'BlackWidow V4', 'Apex Pro', 'Spectre K780'];
         $mice = ['MX Master 3S', 'G Pro X Superlight', 'DeathAdder V3', 'G502 X', 'Model O', 'Razer Viper', 'IntelliMouse'];
 
-        $list = rand(0, 1) ? $keyboards : $mice;
+        $list = random_int(0, 1) !== 0 ? $keyboards : $mice;
+
         return $list[array_rand($list)];
     }
 
@@ -2003,59 +2017,68 @@ class ElectronicsSeeder extends Seeder
             'Forza Horizon 5', 'Flight Simulator 2024', 'Halo Infinite',
             'Diablo IV', 'Destiny 2', 'Apex Legends', 'Fortnite', 'Minecraft',
         ];
+
         return $titles[array_rand($titles)];
     }
 
     private function generateApplianceModel(): string
     {
         $models = ['WW80T', 'WW70T', 'WW60T', 'WW50T', 'F3', 'F5', 'F7', 'SERIE 6', 'SERIE 8', 'iQ300', 'iQ500', 'iQ700'];
+
         return $models[array_rand($models)];
     }
 
     private function generateSmallApplianceModel(): string
     {
         $models = ['EP2224', 'EP3241', 'ECAM', 'ES8', 'X903', 'X683', 'V11', 'V15', 'S8', 'Pro 3', 'LatteGo', 'GranBarista'];
+
         return $models[array_rand($models)];
     }
 
     private function generateCameraModel(): string
     {
         $models = ['EOS R5', 'EOS R6 Mark II', 'EOS R8', 'Z8', 'Z6 III', 'A7 IV', 'A7C II', 'A6700', 'X-T5', 'X-H2S', 'GH5 II', 'Hero 12 Black', 'Osmo Pocket 3', 'Pocket 3', 'Action 4'];
+
         return $models[array_rand($models)];
     }
 
     private function generateLensModel(): string
     {
         $models = ['24-70mm f/2.8', '70-200mm f/2.8', '50mm f/1.4', '85mm f/1.4', '35mm f/1.4', '24-105mm f/4', '100-400mm f/4.5-5.6', '16-35mm f/2.8', '50mm f/1.2', '135mm f/1.8'];
+
         return $models[array_rand($models)];
     }
 
     private function generateAccessoryModel(): string
     {
         $models = ['055', '055XPRO3', 'MT055CXPRO4', 'Peak Design 30L', 'ProTactic 450', 'Lowepro ProTactic', 'Extreme Pro 256GB', 'Extreme 512GB', 'AD600', 'V1', 'Master Hoya 77mm', 'Kenko 67mm'];
+
         return $models[array_rand($models)];
     }
 
     private function generateSmartHomeModel(): string
     {
         $models = ['Nest Hub', 'Echo Show', 'HomePod', 'Hub M2', 'Motion P2', 'Mini Switch', 'Hue Bridge', 'Hue Play', 'Video Doorbell', 'Pro S350', 'Roborock S8', 'Deebot T20'];
+
         return $models[array_rand($models)];
     }
 
     private function generateDescription(string $productName): string
     {
-        return 'Wysokiej jakosci ' . $productName . '. Najnowsza technologia, innowacyjne rozwiazania i niezrownana wydajnosc. Idealny wybor dla wymagajacych uzytkownikow. Gwarancja jakosci i niezawodnosci przez dlugie lata uzytkowania.';
+        return 'Wysokiej jakosci '.$productName.'. Najnowsza technologia, innowacyjne rozwiazania i niezrownana wydajnosc. Idealny wybor dla wymagajacych uzytkownikow. Gwarancja jakosci i niezawodnosci przez dlugie lata uzytkowania.';
     }
 
     private function getRandomStorage(): int
     {
         $storages = [64, 128, 256, 512, 1024];
+
         return $storages[array_rand($storages)];
     }
 
     private function getRandomRam(): int
     {
         $rams = [8, 16, 32, 64];
+
         return $rams[array_rand($rams)];
     }
 }

@@ -1,4 +1,4 @@
-import { Link, Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';

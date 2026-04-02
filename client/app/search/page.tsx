@@ -5,16 +5,16 @@ import { generateAlternates } from '@/lib/seo';
 import { SearchClient } from './_search-client';
 
 export const metadata: Metadata = {
-  title: 'Search',
-  description: 'Search our product catalogue.',
-  alternates: generateAlternates('/search'),
-  robots: 'noindex',
+    title: 'Search',
+    description: 'Search our product catalogue.',
+    alternates: generateAlternates('/search'),
+    robots: 'noindex',
 };
 
 export default function SearchPage() {
-  return (
-    <Suspense>
-      <SearchClient />
-    </Suspense>
-  );
+    return (
+        <Suspense>
+            <SearchClient />
+        </Suspense>
+    );
 }

@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { PlusIcon, PencilIcon, TrashIcon, EyeIcon } from 'lucide-react';
+import { EyeIcon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import * as NewsletterSubscriberController from '@/actions/App/Http/Controllers/Admin/NewsletterSubscriberController';
 import { ConfirmButton } from '@/components/confirm-dialog';
@@ -12,7 +12,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { Subscriber, IndexProps } from './index.types';
+import type { IndexProps, Subscriber } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Newsletter', href: NewsletterSubscriberController.index.url() },

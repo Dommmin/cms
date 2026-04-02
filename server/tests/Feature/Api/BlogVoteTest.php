@@ -12,7 +12,7 @@ describe('Blog Votes', function (): void {
         $user = User::factory()->create();
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/blog/posts/{$post->slug}/vote", ['vote' => 'up'])
+            ->postJson(sprintf('/api/v1/blog/posts/%s/vote', $post->slug), ['vote' => 'up'])
             ->assertOk()
             ->assertJsonPath('votes_up', 1)
             ->assertJsonPath('votes_down', 0)
@@ -30,7 +30,7 @@ describe('Blog Votes', function (): void {
         ]);
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/blog/posts/{$post->slug}/vote", ['vote' => 'up'])
+            ->postJson(sprintf('/api/v1/blog/posts/%s/vote', $post->slug), ['vote' => 'up'])
             ->assertOk()
             ->assertJsonPath('votes_up', 0)
             ->assertJsonPath('user_vote', null);
@@ -47,7 +47,7 @@ describe('Blog Votes', function (): void {
         ]);
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/blog/posts/{$post->slug}/vote", ['vote' => 'down'])
+            ->postJson(sprintf('/api/v1/blog/posts/%s/vote', $post->slug), ['vote' => 'down'])
             ->assertOk()
             ->assertJsonPath('votes_up', 0)
             ->assertJsonPath('votes_down', 1)
@@ -57,7 +57,7 @@ describe('Blog Votes', function (): void {
     it('guest cannot vote', function (): void {
         $post = BlogPost::factory()->published()->create();
 
-        $this->postJson("/api/v1/blog/posts/{$post->slug}/vote", ['vote' => 'up'])
+        $this->postJson(sprintf('/api/v1/blog/posts/%s/vote', $post->slug), ['vote' => 'up'])
             ->assertUnauthorized();
     });
 
@@ -66,7 +66,7 @@ describe('Blog Votes', function (): void {
         $user = User::factory()->create();
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/blog/posts/{$post->slug}/vote", ['vote' => 'neutral'])
+            ->postJson(sprintf('/api/v1/blog/posts/%s/vote', $post->slug), ['vote' => 'neutral'])
             ->assertUnprocessable();
     });
 });

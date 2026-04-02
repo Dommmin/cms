@@ -39,9 +39,12 @@ class BlogComment extends Model
     /** @return HasMany<BlogComment, $this> */
     public function replies(): HasMany
     {
-        return $this->hasMany(self::class, 'parent_id')
+        /** @var HasMany<BlogComment, $this> $relation */
+        $relation = $this->hasMany(self::class, 'parent_id')
             ->where('is_approved', true)
             ->with('user');
+
+        return $relation;
     }
 
     protected function casts(): array

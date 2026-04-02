@@ -3,9 +3,9 @@ import type { ColumnDef } from '@tanstack/react-table';
 import {
     PlusIcon,
     StarIcon,
-    TrashIcon,
     ToggleLeftIcon,
     ToggleRightIcon,
+    TrashIcon,
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -35,7 +35,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { Locale, IndexProps, LocaleForm } from './index.types';
+import type { IndexProps, Locale, LocaleForm } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Locales', href: LocaleController.index.url() },

@@ -10,7 +10,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
-import type { Variant, Product } from './index.types';
+import type { Product, Variant } from './index.types';
 
 export default function ProductVariantsIndex({
     product,

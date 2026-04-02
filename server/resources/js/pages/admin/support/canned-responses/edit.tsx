@@ -1,4 +1,4 @@
-import { Link, Form, Head } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import * as SupportCannedResponseController from '@/actions/App/Http/Controllers/Admin/SupportCannedResponseController';
 import * as SupportConversationController from '@/actions/App/Http/Controllers/Admin/SupportConversationController';

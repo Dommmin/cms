@@ -1,4 +1,3 @@
-import React from 'react';
 import type { AccordionProps } from './accordion.types';
 
 // Simple accessible accordion block

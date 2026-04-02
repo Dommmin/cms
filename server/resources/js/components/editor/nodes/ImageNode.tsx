@@ -8,8 +8,7 @@ import type {
     Spread,
 } from 'lexical';
 import { $applyNodeReplacement, createEditor, DecoratorNode } from 'lexical';
-import { type JSX } from 'react';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, type JSX } from 'react';
 
 const ImageComponent = lazy(() => import('./ImageComponent'));
 

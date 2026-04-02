@@ -1,5 +1,5 @@
 import type { Product } from '@/types/api';
 
 export interface ProductListItemProps {
-  product: Product;
+    product: Product;
 }

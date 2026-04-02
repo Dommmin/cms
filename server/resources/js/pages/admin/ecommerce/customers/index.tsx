@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { UserCircle, DownloadIcon } from 'lucide-react';
+import { DownloadIcon, UserCircle } from 'lucide-react';
 import * as CustomerController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CustomerController';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';

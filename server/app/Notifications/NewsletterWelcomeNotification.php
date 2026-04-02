@@ -27,7 +27,7 @@ class NewsletterWelcomeNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $locale = $this->subscriber->locale ?? 'en';
-        $prefix = $locale !== 'en' ? "/{$locale}" : '';
+        $prefix = $locale !== 'en' ? '/'.$locale : '';
         $unsubscribeUrl = config('app.frontend_url', config('app.url')).$prefix.'/newsletter/unsubscribe?token='.$this->subscriber->token;
 
         $name = $this->subscriber->first_name ? ', '.$this->subscriber->first_name : '';

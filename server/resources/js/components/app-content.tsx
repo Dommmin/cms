@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { SidebarInset } from '@/components/ui/sidebar';
 import type { AppContentProps } from './app-content.types';
 

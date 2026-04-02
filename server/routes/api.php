@@ -111,7 +111,7 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
             Route::get('posts', new ApiBlogPostController()->index(...))->name('posts.index');
             Route::get('posts/{slug}', new ApiBlogPostController()->show(...))->name('posts.show');
             Route::post('posts/{slug}/view', new ApiBlogPostController()->recordView(...))->name('posts.view');
-            Route::get('posts/{slug}/comments', [ApiBlogCommentController::class, 'index'])->name('posts.comments.index');
+            Route::get('posts/{slug}/comments', new ApiBlogCommentController()->index(...))->name('posts.comments.index');
             Route::get('categories', new ApiBlogCategoryController()->index(...))->name('categories.index');
             Route::get('categories/{slug}/posts', new ApiBlogPostController()->byCategory(...))->name('categories.posts');
         });
@@ -181,7 +181,7 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::post('reviews/{review}/helpful', [ReviewController::class, 'markHelpful'])->name('reviews.helpful');
 
         // Blog comments + votes (auth required)
-        Route::post('blog/posts/{slug}/comments', [ApiBlogCommentController::class, 'store'])->name('blog.posts.comments.store');
+        Route::post('blog/posts/{slug}/comments', new ApiBlogCommentController()->store(...))->name('blog.posts.comments.store');
         Route::post('blog/posts/{slug}/vote', new ApiBlogPostController()->vote(...))->name('blog.posts.vote');
 
         // GUS / REGON company lookup

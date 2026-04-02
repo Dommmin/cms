@@ -13,102 +13,130 @@ import { generateCanonical } from '@/lib/seo';
 import { BlogViewTracker } from './_blog-view-tracker';
 
 export async function getBlogPostMetadata(slug: string, locale: string) {
-  const post = await getBlogPost(slug, locale);
-  return {
-    title: post.seo_title ?? post.title,
-    description: post.seo_description ?? post.excerpt ?? undefined,
-    robots: post.meta_robots ?? 'index, follow',
-    openGraph: {
-      title: post.seo_title ?? post.title,
-      description: post.seo_description ?? post.excerpt ?? undefined,
-      images: post.og_image ? [post.og_image] : post.featured_image ? [post.featured_image] : [],
-      type: 'article' as const,
-    },
-    twitter: { card: 'summary_large_image' as const },
-  };
+    const post = await getBlogPost(slug, locale);
+    return {
+        title: post.seo_title ?? post.title,
+        description: post.seo_description ?? post.excerpt ?? undefined,
+        robots: post.meta_robots ?? 'index, follow',
+        openGraph: {
+            title: post.seo_title ?? post.title,
+            description: post.seo_description ?? post.excerpt ?? undefined,
+            images: post.og_image
+                ? [post.og_image]
+                : post.featured_image
+                  ? [post.featured_image]
+                  : [],
+            type: 'article' as const,
+        },
+        twitter: { card: 'summary_large_image' as const },
+    };
 }
 
-export async function BlogPostView({ slug, locale }: { slug: string; locale: string }) {
-  let post;
-  try {
-    post = await getBlogPost(slug, locale);
-  } catch {
-    redirect(localePath(locale, '/blog'));
-  }
+export async function BlogPostView({
+    slug,
+    locale,
+}: {
+    slug: string;
+    locale: string;
+}) {
+    let post;
+    try {
+        post = await getBlogPost(slug, locale);
+    } catch {
+        redirect(localePath(locale, '/blog'));
+    }
 
-  return (
-    <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-      <JsonLd data={buildBlogPosting(post)} />
-      <JsonLd
-        data={buildBreadcrumbList([
-          { name: 'Blog', url: generateCanonical('/blog') },
-          { name: post.title, url: generateCanonical(`/blog/${post.slug}`) },
-        ])}
-      />
+    return (
+        <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+            <JsonLd data={buildBlogPosting(post)} />
+            <JsonLd
+                data={buildBreadcrumbList([
+                    { name: 'Blog', url: generateCanonical('/blog') },
+                    {
+                        name: post.title,
+                        url: generateCanonical(`/blog/${post.slug}`),
+                    },
+                ])}
+            />
 
-      <Breadcrumb
-        homeHref={localePath(locale, '/')}
-        items={[
-          { label: 'Blog', href: localePath(locale, '/blog') },
-          ...(post.category
-            ? [
-                {
-                  label: post.category.name,
-                  href: localePath(locale, `/blog?category=${post.category.slug}`),
-                },
-              ]
-            : []),
-          { label: post.title },
-        ]}
-      />
+            <Breadcrumb
+                homeHref={localePath(locale, '/')}
+                items={[
+                    { label: 'Blog', href: localePath(locale, '/blog') },
+                    ...(post.category
+                        ? [
+                              {
+                                  label: post.category.name,
+                                  href: localePath(
+                                      locale,
+                                      `/blog?category=${post.category.slug}`,
+                                  ),
+                              },
+                          ]
+                        : []),
+                    { label: post.title },
+                ]}
+            />
 
-      {post.category && (
-        <div className="mb-3">
-          <Link
-            href={localePath(locale, `/blog?category=${post.category.slug}`)}
-            className="border-input text-muted-foreground hover:bg-accent rounded-full border px-3 py-0.5 text-xs font-medium"
-          >
-            {post.category.name}
-          </Link>
-        </div>
-      )}
+            {post.category && (
+                <div className="mb-3">
+                    <Link
+                        href={localePath(
+                            locale,
+                            `/blog?category=${post.category.slug}`,
+                        )}
+                        className="border-input text-muted-foreground hover:bg-accent rounded-full border px-3 py-0.5 text-xs font-medium"
+                    >
+                        {post.category.name}
+                    </Link>
+                </div>
+            )}
 
-      <h1 className="text-4xl leading-tight font-bold">{post.title}</h1>
+            <h1 className="text-4xl leading-tight font-bold">{post.title}</h1>
 
-      <div className="text-muted-foreground mt-3 flex items-center gap-4 text-sm">
-        {post.author && <span>By {post.author.name}</span>}
-        {post.published_at && (
-          <span>
-            {new Date(post.published_at).toLocaleDateString(locale === 'pl' ? 'pl-PL' : 'en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </span>
-        )}
-        {post.reading_time && <span>{post.reading_time} min read</span>}
-      </div>
+            <div className="text-muted-foreground mt-3 flex items-center gap-4 text-sm">
+                {post.author && <span>By {post.author.name}</span>}
+                {post.published_at && (
+                    <span>
+                        {new Date(post.published_at).toLocaleDateString(
+                            locale === 'pl' ? 'pl-PL' : 'en-US',
+                            {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                            },
+                        )}
+                    </span>
+                )}
+                {post.reading_time && <span>{post.reading_time} min read</span>}
+            </div>
 
-      {post.featured_image && (
-        <div className="relative mt-8 aspect-video overflow-hidden rounded-xl">
-          <Image
-            src={post.featured_image}
-            alt={post.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 768px"
-            priority
-          />
-        </div>
-      )}
+            {post.featured_image && (
+                <div className="relative mt-8 aspect-video overflow-hidden rounded-xl">
+                    <Image
+                        src={post.featured_image}
+                        alt={post.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 768px"
+                        priority
+                    />
+                </div>
+            )}
 
-      <div className="prose prose-lg mt-8" dangerouslySetInnerHTML={{ __html: post.content }} />
+            <div
+                className="prose prose-lg mt-8"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+            />
 
-      <div className="mt-8 flex items-center justify-between">
-        <BlogVotes post={post} />
-        <BlogViewTracker slug={post.slug} initialCount={post.views_count ?? 0} />
-      </div>
-      <BlogComments slug={post.slug} locale={locale} />
-    </article>
-  );
+            <div className="mt-8 flex items-center justify-between">
+                <BlogVotes post={post} />
+                <BlogViewTracker
+                    slug={post.slug}
+                    initialCount={post.views_count ?? 0}
+                />
+            </div>
+            <BlogComments slug={post.slug} locale={locale} />
+        </article>
+    );
 }

@@ -1,4 +1,3 @@
-import React from 'react';
 import AccordionBlock from '@/components/blocks/accordion';
 import type { Block } from './block-renderer.types';
 

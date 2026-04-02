@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Plus, Receipt, Star, PencilIcon, TrashIcon } from 'lucide-react';
+import { PencilIcon, Plus, Receipt, Star, TrashIcon } from 'lucide-react';
 import * as TaxRateController from '@/actions/App/Http/Controllers/Admin/Ecommerce/TaxRateController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';

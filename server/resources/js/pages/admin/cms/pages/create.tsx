@@ -1,4 +1,4 @@
-import { Link, Form, Head, usePage } from '@inertiajs/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';

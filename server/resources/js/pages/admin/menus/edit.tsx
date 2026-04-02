@@ -1,4 +1,4 @@
-import { Link, Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     ArrowLeftIcon,
     ChevronDownIcon,
@@ -27,7 +27,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { MenuItemData, EditProps } from './edit.types';
+import type { EditProps, MenuItemData } from './edit.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Menus', href: MenuController.index.url() },

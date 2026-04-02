@@ -1,5 +1,5 @@
 export interface TurnstileWidgetProps {
-  onVerify: (token: string) => void;
-  onExpire?: () => void;
-  className?: string;
+    onVerify: (token: string) => void;
+    onExpire?: () => void;
+    className?: string;
 }

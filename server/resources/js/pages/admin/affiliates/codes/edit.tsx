@@ -1,4 +1,4 @@
-import { Link, Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import * as AffiliateCodeController from '@/actions/App/Http/Controllers/Admin/AffiliateCodeController';
 import InputError from '@/components/input-error';

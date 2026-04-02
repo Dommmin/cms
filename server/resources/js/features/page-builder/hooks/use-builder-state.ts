@@ -4,7 +4,7 @@
  */
 
 import { useCallback, useReducer, useState } from 'react';
-import type { Section, Block } from '../types';
+import type { Block, Section } from '../types';
 
 const MAX_HISTORY = 20;
 

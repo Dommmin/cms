@@ -1,4 +1,4 @@
-import { Link, Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -13,9 +13,9 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type {
+    FormData,
     Submission,
     SubmissionsData,
-    FormData,
 } from './submissions.types';
 
 const breadcrumbs: BreadcrumbItem[] = [

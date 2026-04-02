@@ -24,147 +24,167 @@ import './globals.css';
 import type { PublicSettingsResponse } from './layout.types';
 
 const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-  display: 'swap',
+    variable: '--font-geist-sans',
+    subsets: ['latin'],
+    display: 'swap',
 });
 
 const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-  display: 'swap',
+    variable: '--font-geist-mono',
+    subsets: ['latin'],
+    display: 'swap',
 });
 
 // Cached per-request: both generateMetadata and RootLayout share one fetch
 
 const getPublicSettings = cache(async () =>
-  serverFetch<PublicSettingsResponse>('/settings/public', {
-    revalidate: 300,
-    tags: ['settings'],
-  }).catch(() => null),
+    serverFetch<PublicSettingsResponse>('/settings/public', {
+        revalidate: 300,
+        tags: ['settings'],
+    }).catch(() => null),
 );
 
 export async function generateMetadata(): Promise<Metadata> {
-  const publicSettings = await getPublicSettings();
+    const publicSettings = await getPublicSettings();
 
-  const siteName = publicSettings?.settings.general?.site_name ?? 'Store';
-  const siteDescription = publicSettings?.settings.general?.site_description;
-  const disableIndexing =
-    publicSettings?.settings.seo?.disable_indexing === 'true' ||
-    publicSettings?.settings.seo?.disable_indexing === true;
+    const siteName = publicSettings?.settings.general?.site_name ?? 'Store';
+    const siteDescription = publicSettings?.settings.general?.site_description;
+    const disableIndexing =
+        publicSettings?.settings.seo?.disable_indexing === 'true' ||
+        publicSettings?.settings.seo?.disable_indexing === true;
 
-  return {
-    title: {
-      default: siteName,
-      template: `%s | ${siteName}`,
-    },
-    description: siteDescription ?? 'Your online store',
-    robots: disableIndexing ? { index: false, follow: false } : undefined,
-    verification: {
-      google: publicSettings?.settings.seo?.google_site_verification ?? undefined,
-    },
-    other: publicSettings?.settings.seo?.bing_site_verification
-      ? { 'msvalidate.01': publicSettings.settings.seo.bing_site_verification }
-      : undefined,
-  };
+    return {
+        title: {
+            default: siteName,
+            template: `%s | ${siteName}`,
+        },
+        description: siteDescription ?? 'Your online store',
+        robots: disableIndexing ? { index: false, follow: false } : undefined,
+        verification: {
+            google:
+                publicSettings?.settings.seo?.google_site_verification ??
+                undefined,
+        },
+        other: publicSettings?.settings.seo?.bing_site_verification
+            ? {
+                  'msvalidate.01':
+                      publicSettings.settings.seo.bing_site_verification,
+              }
+            : undefined,
+    };
 }
 
 export default async function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-  const locale = cookieStore.get('locale')?.value ?? 'en';
-  const adminPreviewRaw = cookieStore.get('admin_preview')?.value;
-  const isAdminPreview = !!adminPreviewRaw;
-  let adminPreviewEntity: AdminBarProps['entity'] = null;
-  if (adminPreviewRaw) {
-    try {
-      const parsed = JSON.parse(decodeURIComponent(adminPreviewRaw)) as {
-        entity?: typeof adminPreviewEntity;
-      };
-      adminPreviewEntity = parsed.entity ?? null;
-    } catch {
-      // malformed cookie — ignore
+    const cookieStore = await cookies();
+    const locale = cookieStore.get('locale')?.value ?? 'en';
+    const adminPreviewRaw = cookieStore.get('admin_preview')?.value;
+    const isAdminPreview = !!adminPreviewRaw;
+    let adminPreviewEntity: AdminBarProps['entity'] = null;
+    if (adminPreviewRaw) {
+        try {
+            const parsed = JSON.parse(decodeURIComponent(adminPreviewRaw)) as {
+                entity?: typeof adminPreviewEntity;
+            };
+            adminPreviewEntity = parsed.entity ?? null;
+        } catch {
+            // malformed cookie — ignore
+        }
     }
-  }
 
-  const publicSettings = await getPublicSettings();
-  const gtmId = publicSettings?.settings.seo?.google_tag_manager ?? null;
-  const siteName = publicSettings?.settings.general?.site_name ?? 'Store';
-  const siteUrl = publicSettings?.settings.general?.site_url;
-  const siteDescription = publicSettings?.settings.general?.site_description;
-  const contactEmail = publicSettings?.settings.general?.contact_email;
-  const contactPhone = publicSettings?.settings.general?.contact_phone;
-  const socialLinks = publicSettings?.settings.social;
-  const sameAs = socialLinks ? Object.values(socialLinks).filter(Boolean) : [];
-  const cookieSettings = publicSettings?.settings.cookie ?? {};
+    const publicSettings = await getPublicSettings();
+    const gtmId = publicSettings?.settings.seo?.google_tag_manager ?? null;
+    const siteName = publicSettings?.settings.general?.site_name ?? 'Store';
+    const siteUrl = publicSettings?.settings.general?.site_url;
+    const siteDescription = publicSettings?.settings.general?.site_description;
+    const contactEmail = publicSettings?.settings.general?.contact_email;
+    const contactPhone = publicSettings?.settings.general?.contact_phone;
+    const socialLinks = publicSettings?.settings.social;
+    const sameAs = socialLinks
+        ? Object.values(socialLinks).filter(Boolean)
+        : [];
+    const cookieSettings = publicSettings?.settings.cookie ?? {};
 
-  return (
-    <html lang={locale} suppressHydrationWarning>
-      <head>
-        {/* Preconnect to API origin for faster TTFB on client-side fetches */}
-        {process.env.NEXT_PUBLIC_API_URL && (
-          <link rel="preconnect" href={new URL(process.env.NEXT_PUBLIC_API_URL).origin} />
-        )}
-        {/* Preconnect to Cloudflare Turnstile if key is configured */}
-        {process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY && (
-          <link rel="preconnect" href="https://challenges.cloudflare.com" />
-        )}
-        {/* Theme: prevent flash */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var t=localStorage.getItem('theme')||'system';if(t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}})();`,
-          }}
-        />
-        {/* Consent Mode v2: default DENIED — must run synchronously before GTM */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:"consent_default",analytics_storage:"denied",ad_storage:"denied",ad_user_data:"denied",ad_personalization:"denied",functionality_storage:"denied",security_storage:"granted"});`,
-          }}
-        />
-        <JsonLd
-          data={buildWebSite({ name: siteName, url: siteUrl, description: siteDescription })}
-        />
-        <JsonLd
-          data={buildOrganization({
-            name: siteName,
-            url: siteUrl,
-            email: contactEmail,
-            phone: contactPhone,
-            sameAs,
-          })}
-        />
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased${isAdminPreview ? 'pt-10' : ''}`}
-      >
-        <a
-          href="#main-content"
-          className="focus:bg-primary focus:text-primary-foreground sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:rounded-md focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:outline-none"
-        >
-          Skip to main content
-        </a>
-        <QueryProvider>
-          <TranslationProvider initialLocale={locale}>
-            <AdminBar entity={adminPreviewEntity} />
-            <div className="flex min-h-screen flex-col">
-              <AnnouncementBar />
-              <Header />
-              <main id="main-content" className="flex-1">
-                {children}
-              </main>
-              <Footer />
-            </div>
-            <CookieConsent settings={cookieSettings} />
-            <ChatWidgetLoader />
-            <ComparisonBarLoader />
-            <ToastContainer position="bottom-right" autoClose={2000} />
-            {gtmId && <GoogleTagManager gtmId={gtmId} />}
-          </TranslationProvider>
-        </QueryProvider>
-      </body>
-    </html>
-  );
+    return (
+        <html lang={locale} suppressHydrationWarning>
+            <head>
+                {/* Preconnect to API origin for faster TTFB on client-side fetches */}
+                {process.env.NEXT_PUBLIC_API_URL && (
+                    <link
+                        rel="preconnect"
+                        href={new URL(process.env.NEXT_PUBLIC_API_URL).origin}
+                    />
+                )}
+                {/* Preconnect to Cloudflare Turnstile if key is configured */}
+                {process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY && (
+                    <link
+                        rel="preconnect"
+                        href="https://challenges.cloudflare.com"
+                    />
+                )}
+                {/* Theme: prevent flash */}
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `(function(){var t=localStorage.getItem('theme')||'system';if(t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}})();`,
+                    }}
+                />
+                {/* Consent Mode v2: default DENIED — must run synchronously before GTM */}
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:"consent_default",analytics_storage:"denied",ad_storage:"denied",ad_user_data:"denied",ad_personalization:"denied",functionality_storage:"denied",security_storage:"granted"});`,
+                    }}
+                />
+                <JsonLd
+                    data={buildWebSite({
+                        name: siteName,
+                        url: siteUrl,
+                        description: siteDescription,
+                    })}
+                />
+                <JsonLd
+                    data={buildOrganization({
+                        name: siteName,
+                        url: siteUrl,
+                        email: contactEmail,
+                        phone: contactPhone,
+                        sameAs,
+                    })}
+                />
+            </head>
+            <body
+                className={`${geistSans.variable} ${geistMono.variable} antialiased${isAdminPreview ? 'pt-10' : ''}`}
+            >
+                <a
+                    href="#main-content"
+                    className="focus:bg-primary focus:text-primary-foreground sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:rounded-md focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:outline-none"
+                >
+                    Skip to main content
+                </a>
+                <QueryProvider>
+                    <TranslationProvider initialLocale={locale}>
+                        <AdminBar entity={adminPreviewEntity} />
+                        <div className="flex min-h-screen flex-col">
+                            <AnnouncementBar />
+                            <Header />
+                            <main id="main-content" className="flex-1">
+                                {children}
+                            </main>
+                            <Footer />
+                        </div>
+                        <CookieConsent settings={cookieSettings} />
+                        <ChatWidgetLoader />
+                        <ComparisonBarLoader />
+                        <ToastContainer
+                            position="bottom-right"
+                            autoClose={2000}
+                        />
+                        {gtmId && <GoogleTagManager gtmId={gtmId} />}
+                    </TranslationProvider>
+                </QueryProvider>
+            </body>
+        </html>
+    );
 }

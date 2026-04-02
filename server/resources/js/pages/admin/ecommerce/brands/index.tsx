@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Plus, Tag, PencilIcon, TrashIcon } from 'lucide-react';
+import { PencilIcon, Plus, Tag, TrashIcon } from 'lucide-react';
 import * as BrandController from '@/actions/App/Http/Controllers/Admin/Ecommerce/BrandController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';

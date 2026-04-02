@@ -29,10 +29,10 @@ class BlogCommentReplyNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('New reply to your comment on "' . $this->post->title . '"')
-            ->line($this->reply->user->name . ' replied to your comment:')
-            ->line('"' . mb_substr($this->reply->body, 0, 200) . '"')
-            ->action('View Post', config('app.frontend_url') . '/blog/' . $this->post->slug);
+            ->subject('New reply to your comment on "'.$this->post->title.'"')
+            ->line($this->reply->user->name.' replied to your comment:')
+            ->line('"'.mb_substr($this->reply->body, 0, 200).'"')
+            ->action('View Post', config('app.frontend_url').'/blog/'.$this->post->slug);
     }
 
     /** @return array<string, mixed> */

@@ -24,7 +24,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { Setting, IndexProps } from './index.types';
+import type { IndexProps, Setting } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Settings', href: SettingsController.index.url() },

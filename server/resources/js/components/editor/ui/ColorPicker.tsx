@@ -1,12 +1,18 @@
-import { type JSX } from 'react';
 import * as React from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+    type JSX,
+} from 'react';
 import { cn } from '@/lib/utils';
 import type {
-    Position,
-    MoveWrapperProps,
-    HSV,
     ColorPickerProps,
+    HSV,
+    MoveWrapperProps,
+    Position,
 } from './ColorPicker.types';
 
 const WIDTH = 214;

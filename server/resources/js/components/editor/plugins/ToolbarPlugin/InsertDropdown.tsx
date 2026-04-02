@@ -5,20 +5,19 @@ import { $insertNodeToNearestRoot } from '@lexical/utils';
 import axios from 'axios';
 import {
     Calendar,
+    ChevronRight,
+    Columns,
+    Figma,
+    FileText,
     Image as ImageIcon,
     Minus,
-    Table as TableIcon,
-    Youtube,
     Plus,
-    FileText,
-    Columns,
-    ChevronRight,
-    Twitter,
-    Figma,
     Search,
+    Table as TableIcon,
+    Twitter,
+    Youtube,
 } from 'lucide-react';
-import { type JSX } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import * as MediaController from '@/actions/App/Http/Controllers/Admin/MediaController';
 import { $createImageNode } from '../../nodes/ImageNode';
 import { $createYouTubeNode } from '../../nodes/YouTubeNode';
@@ -32,10 +31,10 @@ import { INSERT_LAYOUT_COMMAND } from '../LayoutPlugin/LayoutPlugin';
 import { INSERT_PAGE_BREAK_COMMAND } from '../PageBreakPlugin';
 import { INSERT_TWEET_COMMAND } from '../TwitterPlugin';
 import type {
+    InsertDropdownProps,
     MediaItem,
     MediaResponse,
     ModalType,
-    InsertDropdownProps,
 } from './InsertDropdown.types';
 
 // ─── Media picker for image insertion ─────────────────────────────────────────

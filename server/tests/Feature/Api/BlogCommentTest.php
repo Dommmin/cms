@@ -26,7 +26,7 @@ describe('Blog Comments – listing', function (): void {
             'is_approved' => true,
         ]);
 
-        $this->getJson("/api/v1/blog/posts/{$post->slug}/comments")
+        $this->getJson(sprintf('/api/v1/blog/posts/%s/comments', $post->slug))
             ->assertOk()
             ->assertJsonPath('data.0.id', $comment->id)
             ->assertJsonPath('data.0.replies.0.id', $reply->id);
@@ -43,7 +43,7 @@ describe('Blog Comments – listing', function (): void {
             'is_approved' => false,
         ]);
 
-        $this->getJson("/api/v1/blog/posts/{$post->slug}/comments")
+        $this->getJson(sprintf('/api/v1/blog/posts/%s/comments', $post->slug))
             ->assertOk()
             ->assertJsonPath('data', []);
     });
@@ -55,7 +55,7 @@ describe('Blog Comments – posting', function (): void {
         $user = User::factory()->create();
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/blog/posts/{$post->slug}/comments", ['body' => 'Great post!'])
+            ->postJson(sprintf('/api/v1/blog/posts/%s/comments', $post->slug), ['body' => 'Great post!'])
             ->assertCreated()
             ->assertJsonPath('body', 'Great post!');
 
@@ -65,7 +65,7 @@ describe('Blog Comments – posting', function (): void {
     it('guest cannot post a comment', function (): void {
         $post = BlogPost::factory()->published()->create();
 
-        $this->postJson("/api/v1/blog/posts/{$post->slug}/comments", ['body' => 'Hello'])
+        $this->postJson(sprintf('/api/v1/blog/posts/%s/comments', $post->slug), ['body' => 'Hello'])
             ->assertUnauthorized();
     });
 
@@ -79,7 +79,7 @@ describe('Blog Comments – posting', function (): void {
         ]);
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/blog/posts/{$post->slug}/comments", [
+            ->postJson(sprintf('/api/v1/blog/posts/%s/comments', $post->slug), [
                 'body' => 'Reply!',
                 'parent_id' => $parent->id,
             ])
@@ -103,7 +103,7 @@ describe('Blog Comments – posting', function (): void {
         ]);
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/blog/posts/{$post->slug}/comments", [
+            ->postJson(sprintf('/api/v1/blog/posts/%s/comments', $post->slug), [
                 'body' => 'Nested reply',
                 'parent_id' => $reply->id,
             ])
@@ -115,7 +115,7 @@ describe('Blog Comments – posting', function (): void {
         $user = User::factory()->create();
 
         $this->actingAs($user, 'sanctum')
-            ->postJson("/api/v1/blog/posts/{$post->slug}/comments", ['body' => 'Hi'])
+            ->postJson(sprintf('/api/v1/blog/posts/%s/comments', $post->slug), ['body' => 'Hi'])
             ->assertUnprocessable();
     });
 });

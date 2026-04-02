@@ -1,3 +1,3 @@
 export interface PageProps {
-  searchParams: Promise<{ token?: string }>;
+    searchParams: Promise<{ token?: string }>;
 }

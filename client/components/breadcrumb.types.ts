@@ -1,9 +1,9 @@
 export interface BreadcrumbItem {
-  label: string;
-  href?: string;
+    label: string;
+    href?: string;
 }
 
 export interface BreadcrumbProps {
-  items: BreadcrumbItem[];
-  homeHref?: string;
+    items: BreadcrumbItem[];
+    homeHref?: string;
 }

@@ -1357,6 +1357,42 @@ parameters:
 			path: app/Http/Controllers/Api/V1/Blog/BlogCategoryController.php
 
 		-
+			message: '#^Access to an undefined property App\\Models\\BlogComment\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\BlogComment\>\:\:\$blog_post_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/Blog/BlogCommentController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\BlogComment\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\BlogComment\>\:\:\$parent_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/Blog/BlogCommentController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\BlogComment\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\BlogComment\>\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/Blog/BlogCommentController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\BlogComment\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\BlogComment\>\:\:\$user_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/Blog/BlogCommentController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\BlogPost\>\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Http/Controllers/Api/V1/Blog/BlogCommentController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\BlogPostVote\:\:\$vote\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/Blog/BlogPostController.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$category\.$#'
 			identifier: property.notFound
 			count: 1
@@ -1383,7 +1419,7 @@ parameters:
 		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\BlogPost\>\:\:published\(\)\.$#'
 			identifier: method.notFound
-			count: 3
+			count: 5
 			path: app/Http/Controllers/Api/V1/Blog/BlogPostController.php
 
 		-
@@ -1525,9 +1561,9 @@ parameters:
 			path: app/Http/Controllers/Api/V1/NewsletterController.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$email\.$#'
+			message: '#^Access to an undefined property App\\Models\\NewsletterSubscriber\:\:\$locale\.$#'
 			identifier: property.notFound
-			count: 1
+			count: 2
 			path: app/Http/Controllers/Api/V1/NewsletterController.php
 
 		-
@@ -1555,30 +1591,6 @@ parameters:
 			path: app/Http/Controllers/Api/V1/OrderController.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$items\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/OrderController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$notes\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/OrderController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$reason\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/OrderController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$type\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/OrderController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Payment\:\:\$order\.$#'
 			identifier: property.notFound
 			count: 1
@@ -1591,6 +1603,24 @@ parameters:
 			path: app/Http/Controllers/Api/V1/PaymentController.php
 
 		-
+			message: '#^Access to an undefined property App\\Models\\Brand\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/ProductController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Brand\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/ProductController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Brand\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/ProductController.php
+
+		-
 			message: '#^Access to an undefined property App\\Models\\Category\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
@@ -1599,7 +1629,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property App\\Models\\Product\:\:\$activeVariants\.$#'
 			identifier: property.notFound
-			count: 1
+			count: 2
 			path: app/Http/Controllers/Api/V1/ProductController.php
 
 		-
@@ -1651,15 +1681,57 @@ parameters:
 			path: app/Http/Controllers/Api/V1/ProductController.php
 
 		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$activeVariants\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/ProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$brand\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/ProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Controllers/Api/V1/ProductController.php
+
+		-
+			message: '#^Anonymous function should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Http/Controllers/Api/V1/ProductController.php
+
+		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Product\>\:\:available\(\)\.$#'
 			identifier: method.notFound
-			count: 2
+			count: 4
 			path: app/Http/Controllers/Api/V1/ProductController.php
 
 		-
 			message: '#^Method App\\Models\\Product\:\:available\(\) invoked with 0 parameters, 1 required\.$#'
 			identifier: arguments.count
 			count: 2
+			path: app/Http/Controllers/Api/V1/ProductController.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_values contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Http/Controllers/Api/V1/ProductController.php
+
+		-
+			message: '#^Parameter \#1 \$array of function usort contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 3
+			path: app/Http/Controllers/Api/V1/ProductController.php
+
+		-
+			message: '#^Parameter \#2 \$callback of function usort contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 3
 			path: app/Http/Controllers/Api/V1/ProductController.php
 
 		-
@@ -1714,18 +1786,6 @@ parameters:
 			message: '#^Access to an undefined property App\\Models\\Setting\:\:\$value\.$#'
 			identifier: property.notFound
 			count: 1
-			path: app/Http/Controllers/Api/V1/ProfileController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$current_password\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/ProfileController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$password\.$#'
-			identifier: property.notFound
-			count: 2
 			path: app/Http/Controllers/Api/V1/ProfileController.php
 
 		-
@@ -1787,12 +1847,6 @@ parameters:
 			identifier: nullsafe.neverNull
 			count: 1
 			path: app/Http/Controllers/Api/V1/SupportController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$variant_id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Http/Controllers/Api/V1/WishlistController.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$published_at\.$#'
@@ -2227,6 +2281,36 @@ parameters:
 			path: app/Http/Resources/Api/V1/BlogCategoryResource.php
 
 		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogCommentResource\:\:\$body\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogCommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogCommentResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogCommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogCommentResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogCommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogCommentResource\:\:\$parent_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogCommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogCommentResource\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/Api/V1/BlogCommentResource.php
+
+		-
 			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$author\.$#'
 			identifier: property.notFound
 			count: 2
@@ -2344,6 +2428,12 @@ parameters:
 			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$views_count\.$#'
 			identifier: property.notFound
 			count: 1
+			path: app/Http/Resources/Api/V1/BlogPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$votes\.$#'
+			identifier: property.notFound
+			count: 3
 			path: app/Http/Resources/Api/V1/BlogPostResource.php
 
 		-
@@ -2715,7 +2805,13 @@ parameters:
 		-
 			message: '#^Access to an undefined property App\\Models\\Product\:\:\$activeVariants\.$#'
 			identifier: property.notFound
-			count: 3
+			count: 4
+			path: app/Http/Resources/Api/V1/ProductResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$promotions\.$#'
+			identifier: property.notFound
+			count: 1
 			path: app/Http/Resources/Api/V1/ProductResource.php
 
 		-
@@ -4501,6 +4597,36 @@ parameters:
 			path: app/Notifications/AbandonedCartNotification.php
 
 		-
+			message: '#^Access to an undefined property App\\Models\\BlogComment\:\:\$body\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Notifications/BlogCommentReplyNotification.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\BlogComment\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Notifications/BlogCommentReplyNotification.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\BlogComment\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Notifications/BlogCommentReplyNotification.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Notifications/BlogCommentReplyNotification.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Notifications/BlogCommentReplyNotification.php
+
+		-
 			message: '#^Access to an undefined property App\\Models\\Form\:\:\$fields\.$#'
 			identifier: property.notFound
 			count: 1
@@ -5797,12 +5923,6 @@ parameters:
 			path: database/seeders/EcommerceDemoSeeder.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: database/seeders/EcommerceDemoSeeder.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Product\:\:\$slug\.$#'
 			identifier: property.notFound
 			count: 1
@@ -5849,6 +5969,48 @@ parameters:
 			identifier: nullsafe.neverNull
 			count: 1
 			path: database/seeders/EcommerceDemoSeeder.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Attribute\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: database/seeders/ElectronicsSeeder.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AttributeValue\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: database/seeders/ElectronicsSeeder.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Brand\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: database/seeders/ElectronicsSeeder.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Category\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: database/seeders/ElectronicsSeeder.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: database/seeders/ElectronicsSeeder.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\ProductType\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: database/seeders/ElectronicsSeeder.php
+
+		-
+			message: '#^Offset 32\|43\|50\|55\|65\|75\|85\|86 on array\{55\: ''Telewizory 55 cali'', 65\: ''Telewizory 65 cali'', 75\: ''Telewizory 75 cali'', 43\: ''Telewizory 43 cale'', 50\: ''Telewizory 50 cali'', 32\: ''Telewizory 32 cale'', 85\: ''Telewizory 85 cali…'', 86\: ''Telewizory 85 cali…''\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: database/seeders/ElectronicsSeeder.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Form\:\:\$id\.$#'

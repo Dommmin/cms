@@ -1,6 +1,6 @@
 import { Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { PencilIcon, TrashIcon, Package } from 'lucide-react';
+import { Package, PencilIcon, TrashIcon } from 'lucide-react';
 import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import { Badge } from '@/components/ui/badge';

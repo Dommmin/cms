@@ -17,8 +17,7 @@ import {
     type LexicalEditor,
 } from 'lexical';
 import { Check, ExternalLink, Pencil, Trash2, X } from 'lucide-react';
-import { type JSX } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import { createPortal } from 'react-dom';
 import { getSelectedNode } from '../utils/getSelectedNode';
 import { sanitizeUrl } from '../utils/url';

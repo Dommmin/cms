@@ -12,8 +12,7 @@ import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPl
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
-import { type JSX } from 'react';
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { cn } from '@/lib/utils';
 import { useSharedHistoryContext } from './context/SharedHistoryContext';
 import type { EditorShellProps } from './EditorShell.types';

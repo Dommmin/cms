@@ -4,6 +4,8 @@
     "singleAttributePerLine": false,
     "htmlWhitespaceSensitivity": "css",
     "printWidth": 80,
+    "tabWidth": 4,
+    "trailingComma": "all",
     "plugins": [
         "prettier-plugin-tailwindcss"
     ],
@@ -13,7 +15,6 @@
         "cva"
     ],
     "tailwindStylesheet": "resources/css/app.css",
-    "tabWidth": 4,
     "overrides": [
         {
             "files": "**/*.yml",

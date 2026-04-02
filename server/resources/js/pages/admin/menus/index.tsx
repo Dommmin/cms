@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { PlusIcon, PencilIcon, TrashIcon, CopyIcon } from 'lucide-react';
+import { CopyIcon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import * as MenuController from '@/actions/App/Http/Controllers/Admin/MenuController';
 import { ConfirmButton } from '@/components/confirm-dialog';
@@ -12,7 +12,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { Menu, IndexProps } from './index.types';
+import type { IndexProps, Menu } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Menus', href: MenuController.index.url() },

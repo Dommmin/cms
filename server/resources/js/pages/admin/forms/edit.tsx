@@ -1,5 +1,4 @@
-import { Link, router } from '@inertiajs/react';
-import { Head } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     ArrowLeftIcon,
     GripVerticalIcon,

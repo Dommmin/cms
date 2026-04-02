@@ -1,5 +1,5 @@
-import { Link, Head, router, usePage, useForm } from '@inertiajs/react';
-import { FileTextIcon, CopyIcon } from 'lucide-react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { CopyIcon, FileTextIcon } from 'lucide-react';
 import { useState } from 'react';
 import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import { usePageColumns } from '@/components/columns/page-columns';

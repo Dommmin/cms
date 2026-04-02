@@ -1,15 +1,15 @@
 import { Link } from '@inertiajs/react';
 import axios from 'axios';
 import {
+    AlertTriangle,
     Bell,
     BellOff,
     BellRing,
+    CheckCheck,
     Circle,
+    MessageCircle,
     Package,
     Star,
-    AlertTriangle,
-    MessageCircle,
-    CheckCheck,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';

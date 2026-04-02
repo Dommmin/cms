@@ -24,10 +24,7 @@ class FormController extends ApiController
                 ->where('form_id', $form->id)
                 ->where('ip', $request->ip())
                 ->exists();
-
-            if ($previousSubmission) {
-                abort(422, 'You have already submitted this form.');
-            }
+            abort_if($previousSubmission, 422, 'You have already submitted this form.');
         }
 
         $request->validate([

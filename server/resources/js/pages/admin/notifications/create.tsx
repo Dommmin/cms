@@ -1,4 +1,4 @@
-import { Link, Form, Head } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
 import InputError from '@/components/input-error';

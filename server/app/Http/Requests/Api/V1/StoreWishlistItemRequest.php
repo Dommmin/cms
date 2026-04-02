@@ -7,6 +7,9 @@ namespace App\Http\Requests\Api\V1;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property int $variant_id
+ */
 class StoreWishlistItemRequest extends FormRequest
 {
     public function authorize(): bool

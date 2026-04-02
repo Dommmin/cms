@@ -10,7 +10,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { ReturnRequest, IndexProps } from './index.types';
+import type { IndexProps, ReturnRequest } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Returns', href: ReturnRequestController.index.url() },

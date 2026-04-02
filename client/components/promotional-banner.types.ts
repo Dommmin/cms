@@ -1,3 +1,3 @@
 export interface CountdownProps {
-  endsAt: string;
+    endsAt: string;
 }

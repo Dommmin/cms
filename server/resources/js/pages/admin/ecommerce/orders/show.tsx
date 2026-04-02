@@ -1,13 +1,13 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import {
     ArrowLeft,
+    Ban,
     CheckCircle2,
     Clock,
     Package,
     PackageCheck,
-    Truck,
-    Ban,
     RefreshCcw,
+    Truck,
 } from 'lucide-react';
 import { useState } from 'react';
 import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
@@ -19,7 +19,7 @@ import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import * as OrderRoutes from '@/routes/admin/ecommerce/ecommerce/orders';
 import type { BreadcrumbItem } from '@/types';
-import type { Address, StatusOption, OrderView } from './show.types';
+import type { Address, OrderView, StatusOption } from './show.types';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 

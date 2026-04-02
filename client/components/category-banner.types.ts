@@ -1,3 +1,3 @@
 export interface CategoryBannerProps {
-  slug: string;
+    slug: string;
 }

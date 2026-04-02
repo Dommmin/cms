@@ -23,11 +23,11 @@ import {
 } from 'lexical';
 import {
     Calendar,
-    Columns,
-    Code2,
     ChevronRight,
-    FileText,
+    Code2,
+    Columns,
     Figma,
+    FileText,
     Heading1,
     Heading2,
     Heading3,
@@ -41,8 +41,7 @@ import {
     Type,
     Youtube,
 } from 'lucide-react';
-import { type JSX } from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type JSX } from 'react';
 import { createPortal } from 'react-dom';
 import { $createYouTubeNode } from '../nodes/YouTubeNode';
 import { INSERT_COLLAPSIBLE_COMMAND } from './CollapsiblePlugin';

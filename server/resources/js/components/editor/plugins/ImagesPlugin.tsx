@@ -5,8 +5,7 @@ import {
     createCommand,
     type LexicalCommand,
 } from 'lexical';
-import { type JSX } from 'react';
-import { useEffect } from 'react';
+import { useEffect, type JSX } from 'react';
 import {
     $createImageNode,
     ImageNode,

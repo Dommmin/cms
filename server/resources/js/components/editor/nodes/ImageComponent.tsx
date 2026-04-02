@@ -15,8 +15,14 @@ import {
     KEY_ESCAPE_COMMAND,
     SELECTION_CHANGE_COMMAND,
 } from 'lexical';
-import { type JSX } from 'react';
-import { useCallback, useEffect, useRef, useState, Suspense } from 'react';
+import {
+    Suspense,
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+    type JSX,
+} from 'react';
 import { cn } from '@/lib/utils';
 import ImageResizer from '../ui/ImageResizer';
 import type { ImageComponentProps } from './ImageComponent.types';

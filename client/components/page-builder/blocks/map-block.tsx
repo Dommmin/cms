@@ -7,79 +7,86 @@ import type { Store } from '@/types/api';
 import type { MapBlockConfig, MapBlockProps } from './map-block.types';
 
 export function MapBlock({ block }: MapBlockProps) {
-  const cfg = block.configuration as MapBlockConfig;
-  const height = cfg.height ?? 400;
-  const zoom = cfg.zoom ?? 14;
+    const cfg = block.configuration as MapBlockConfig;
+    const height = cfg.height ?? 400;
+    const zoom = cfg.zoom ?? 14;
 
-  const [stores, setStores] = useState<Store[]>([]);
-  const [loading, setLoading] = useState(true);
+    const [stores, setStores] = useState<Store[]>([]);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function load() {
-      if (cfg.store_id) {
-        try {
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL ?? '/api/v1'}/stores/${cfg.store_id}`,
-          );
-          if (res.ok) {
-            const json = await res.json();
-            setStores([json.data]);
-          }
-        } catch {
-          // fall through to coordinate fallback
+    useEffect(() => {
+        async function load() {
+            if (cfg.store_id) {
+                try {
+                    const res = await fetch(
+                        `${process.env.NEXT_PUBLIC_API_URL ?? '/api/v1'}/stores/${cfg.store_id}`,
+                    );
+                    if (res.ok) {
+                        const json = await res.json();
+                        setStores([json.data]);
+                    }
+                } catch {
+                    // fall through to coordinate fallback
+                }
+            }
+
+            if (cfg.lat !== undefined && cfg.lng !== undefined) {
+                setStores((prev) =>
+                    prev.length > 0
+                        ? prev
+                        : [
+                              {
+                                  id: 0,
+                                  name: cfg.title ?? 'Location',
+                                  slug: '',
+                                  address: '',
+                                  city: '',
+                                  country: '',
+                                  phone: null,
+                                  email: null,
+                                  opening_hours: null,
+                                  lat: cfg.lat!,
+                                  lng: cfg.lng!,
+                              },
+                          ],
+                );
+            }
+
+            setLoading(false);
         }
-      }
 
-      if (cfg.lat !== undefined && cfg.lng !== undefined) {
-        setStores((prev) =>
-          prev.length > 0
-            ? prev
-            : [
-                {
-                  id: 0,
-                  name: cfg.title ?? 'Location',
-                  slug: '',
-                  address: '',
-                  city: '',
-                  country: '',
-                  phone: null,
-                  email: null,
-                  opening_hours: null,
-                  lat: cfg.lat!,
-                  lng: cfg.lng!,
-                },
-              ],
+        load();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    if (loading) {
+        return (
+            <div
+                className="bg-muted animate-pulse rounded-lg"
+                style={{ height }}
+            />
         );
-      }
-
-      setLoading(false);
     }
 
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (stores.length === 0) {
+        return (
+            <div
+                className="border-border bg-muted text-muted-foreground flex items-center justify-center rounded-lg border border-dashed text-sm"
+                style={{ height }}
+            >
+                No location configured.
+            </div>
+        );
+    }
 
-  if (loading) {
-    return <div className="bg-muted animate-pulse rounded-lg" style={{ height }} />;
-  }
-
-  if (stores.length === 0) {
     return (
-      <div
-        className="border-border bg-muted text-muted-foreground flex items-center justify-center rounded-lg border border-dashed text-sm"
-        style={{ height }}
-      >
-        No location configured.
-      </div>
+        <div>
+            {cfg.title && (
+                <h2 className="mb-4 text-2xl font-bold">{cfg.title}</h2>
+            )}
+            <div className="border-border overflow-hidden rounded-xl border">
+                <StoreMap stores={stores} height={height} zoom={zoom} />
+            </div>
+        </div>
     );
-  }
-
-  return (
-    <div>
-      {cfg.title && <h2 className="mb-4 text-2xl font-bold">{cfg.title}</h2>}
-      <div className="border-border overflow-hidden rounded-xl border">
-        <StoreMap stores={stores} height={height} zoom={zoom} />
-      </div>
-    </div>
-  );
 }

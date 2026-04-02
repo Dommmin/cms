@@ -29,72 +29,72 @@ import { TwoColumnsBlock } from './blocks/two-columns';
 import { VideoEmbedBlock } from './blocks/video-embed';
 
 export function BlockRenderer({ block }: BlockRendererProps) {
-  switch (block.type) {
-    case 'hero_banner':
-      return <HeroBannerBlock block={block} />;
-    case 'rich_text':
-      return <RichTextBlock block={block} />;
-    case 'featured_products':
-      return <FeaturedProductsBlock block={block} />;
-    case 'categories_grid':
-      return <CategoriesGridBlock block={block} />;
-    case 'promotional_banner':
-      return <PromotionalBannerBlock block={block} />;
-    case 'newsletter_signup':
-      return <NewsletterSignupBlock block={block} />;
-    case 'testimonials':
-      return <TestimonialsBlock block={block} />;
-    case 'image_gallery':
-      return <ImageGalleryBlock block={block} />;
-    case 'video_embed':
-      return <VideoEmbedBlock block={block} />;
-    case 'custom_html':
-      return <CustomHtmlBlock block={block} />;
-    case 'two_columns':
-      return <TwoColumnsBlock block={block} />;
-    case 'three_columns':
-      return <ThreeColumnsBlock block={block} />;
-    case 'accordion':
-      return <AccordionBlock block={block} />;
-    case 'tabs':
-      return <TabsBlock block={block} />;
-    case 'form_embed':
-      return <FormEmbedBlock block={block} />;
-    case 'map':
-      return <MapBlock block={block} />;
-    case 'featured_posts':
-      return <FeaturedPostsBlock block={block} />;
-    case 'stats_counter':
-      return <StatsCounterBlock block={block} />;
-    case 'call_to_action':
-      return <CallToActionBlock block={block} />;
-    case 'pricing_table':
-      return <PricingTableBlock block={block} />;
-    case 'brands_slider':
-      return <BrandsSliderBlock block={block} />;
-    case 'logo_cloud':
-      return <LogoCloudBlock block={block} />;
-    case 'countdown_timer':
-      return <CountdownTimerBlock block={block} />;
-    case 'timeline':
-      return <TimelineBlock block={block} />;
-    case 'team_members':
-      return <TeamMembersBlock block={block} />;
-    case 'icon_list':
-      return <IconListBlock block={block} />;
-    case 'steps_process':
-      return <StepsProcessBlock block={block} />;
-    case 'trust_badges':
-      return <TrustBadgesBlock block={block} />;
-    default:
-      // Unknown block type — silent fallback in production
-      if (process.env.NODE_ENV === 'development') {
-        return (
-          <div className="rounded-lg border border-dashed border-amber-400 bg-amber-50 p-4 text-sm text-amber-700">
-            Unknown block type: <strong>{block.type}</strong>
-          </div>
-        );
-      }
-      return null;
-  }
+    switch (block.type) {
+        case 'hero_banner':
+            return <HeroBannerBlock block={block} />;
+        case 'rich_text':
+            return <RichTextBlock block={block} />;
+        case 'featured_products':
+            return <FeaturedProductsBlock block={block} />;
+        case 'categories_grid':
+            return <CategoriesGridBlock block={block} />;
+        case 'promotional_banner':
+            return <PromotionalBannerBlock block={block} />;
+        case 'newsletter_signup':
+            return <NewsletterSignupBlock block={block} />;
+        case 'testimonials':
+            return <TestimonialsBlock block={block} />;
+        case 'image_gallery':
+            return <ImageGalleryBlock block={block} />;
+        case 'video_embed':
+            return <VideoEmbedBlock block={block} />;
+        case 'custom_html':
+            return <CustomHtmlBlock block={block} />;
+        case 'two_columns':
+            return <TwoColumnsBlock block={block} />;
+        case 'three_columns':
+            return <ThreeColumnsBlock block={block} />;
+        case 'accordion':
+            return <AccordionBlock block={block} />;
+        case 'tabs':
+            return <TabsBlock block={block} />;
+        case 'form_embed':
+            return <FormEmbedBlock block={block} />;
+        case 'map':
+            return <MapBlock block={block} />;
+        case 'featured_posts':
+            return <FeaturedPostsBlock block={block} />;
+        case 'stats_counter':
+            return <StatsCounterBlock block={block} />;
+        case 'call_to_action':
+            return <CallToActionBlock block={block} />;
+        case 'pricing_table':
+            return <PricingTableBlock block={block} />;
+        case 'brands_slider':
+            return <BrandsSliderBlock block={block} />;
+        case 'logo_cloud':
+            return <LogoCloudBlock block={block} />;
+        case 'countdown_timer':
+            return <CountdownTimerBlock block={block} />;
+        case 'timeline':
+            return <TimelineBlock block={block} />;
+        case 'team_members':
+            return <TeamMembersBlock block={block} />;
+        case 'icon_list':
+            return <IconListBlock block={block} />;
+        case 'steps_process':
+            return <StepsProcessBlock block={block} />;
+        case 'trust_badges':
+            return <TrustBadgesBlock block={block} />;
+        default:
+            // Unknown block type — silent fallback in production
+            if (process.env.NODE_ENV === 'development') {
+                return (
+                    <div className="rounded-lg border border-dashed border-amber-400 bg-amber-50 p-4 text-sm text-amber-700">
+                        Unknown block type: <strong>{block.type}</strong>
+                    </div>
+                );
+            }
+            return null;
+    }
 }

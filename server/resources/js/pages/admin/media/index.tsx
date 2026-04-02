@@ -1,17 +1,17 @@
 import { Head, router } from '@inertiajs/react';
 import {
-    EyeIcon,
-    TrashIcon,
-    UploadIcon,
-    ImageIcon,
-    FileIcon,
-    FileTextIcon,
-    Search,
     CheckIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
-    XIcon,
+    EyeIcon,
+    FileIcon,
+    FileTextIcon,
+    ImageIcon,
     SaveIcon,
+    Search,
+    TrashIcon,
+    UploadIcon,
+    XIcon,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -29,7 +29,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { formatFileSize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
-import type { MediaItem, MediaData, MetaForm } from './index.types';
+import type { MediaData, MediaItem, MetaForm } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Media', href: MediaController.index.url() },
