@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
@@ -72,6 +73,18 @@ class BlogPost extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(BlogCategory::class, 'blog_category_id');
+    }
+
+    /** @return HasMany<BlogComment, $this> */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(BlogComment::class)->whereNull('parent_id')->where('is_approved', true);
+    }
+
+    /** @return HasMany<BlogPostVote, $this> */
+    public function votes(): HasMany
+    {
+        return $this->hasMany(BlogPostVote::class);
     }
 
     public function incrementViews(): void

@@ -34,6 +34,12 @@ class BlogPostResource extends JsonResource
             'meta_robots' => $this->meta_robots ?? 'index, follow',
             'og_image' => $this->og_image,
             'sitemap_exclude' => (bool) $this->sitemap_exclude,
+            'votes_up' => $this->whenLoaded('votes', fn (): int => $this->votes->where('vote', 'up')->count()),
+            'votes_down' => $this->whenLoaded('votes', fn (): int => $this->votes->where('vote', 'down')->count()),
+            'user_vote' => $this->when(
+                $this->relationLoaded('votes') && $request->user(),
+                fn (): ?string => $this->votes->firstWhere('user_id', $request->user()?->id)?->vote
+            ),
             'author' => $this->whenLoaded('author', fn (): array => [
                 'id' => $this->author->id,
                 'name' => $this->author->name,
