@@ -13,6 +13,10 @@ Monorepo: **Laravel backend + admin SPA** (`server/`) · **Next.js public fronte
 # Makefile shortcuts (from repo root)
 make up / make down / make shell / make migrate / make fresh / make test / make quality
 
+# Pre-commit workflow — always run before committing
+make fix    # auto-fix: pint → rector → pint → eslint --fix → prettier (server + client)
+make check  # CI mirror: read-only, fails if anything is wrong — same checks as GitHub Actions
+
 # Direct — when you need specific args
 docker compose exec php php artisan <cmd>
 docker compose exec php php artisan test --compact tests/Feature/SomeTest.php
@@ -21,6 +25,7 @@ docker compose exec node npm run build
 ```
 
 > **Never run `php artisan` or `pint` directly** — host has no DB/Redis access.
+> **Before every commit:** `make fix && make check` — if `check` passes, the code is safe to push.
 
 ---
 

@@ -1,4 +1,4 @@
-.PHONY: up stop down build install shell migrate fresh test setup-test-db logs pail seed fresh-seed clear sync-translations npm-build pint e2e e2e-ui help
+.PHONY: up stop down build install shell migrate fresh test setup-test-db logs pail seed fresh-seed clear sync-translations npm-build pint fix check e2e e2e-report help
 
 # Set environment variables
 export UID = $(shell id -u)
@@ -23,6 +23,8 @@ help:
 	@echo "  sync-translations  - Sync admin translation keys from TSX files"
 	@echo "  npm-build          - Build frontend assets (node container)"
 	@echo "  pint               - Format PHP files with Pint"
+	@echo "  fix                - Auto-fix all code style issues (pint, rector, eslint --fix, prettier)"
+	@echo "  check              - Run all CI checks read-only — fails if anything is wrong (mirrors GitHub Actions)"
 	@echo "  quality            - Run all quality checks (Pint, PHPStan, ESLint)"
 	@echo "  logs               - Show logs"
 	@echo "  pail               - Inspect php logs in live mode"
@@ -78,6 +80,43 @@ setup-test-db:
 # Run tests
 test: setup-test-db
 	docker compose exec php php artisan test --env=testing
+
+# Auto-fix all code style issues (run before committing)
+# Applies pint, rector, eslint --fix, prettier --write in the correct order
+fix:
+	@echo ">>> PHP: Pint (format)"
+	docker compose exec php vendor/bin/pint
+	@echo ">>> PHP: Rector (apply refactors)"
+	docker compose exec php php -d memory_limit=1G vendor/bin/rector process
+	@echo ">>> PHP: Pint (post-rector normalisation)"
+	docker compose exec php vendor/bin/pint
+	@echo ">>> Server TS: ESLint --fix + Prettier"
+	docker compose exec php npm run lint
+	docker compose exec php npm run format
+	@echo ">>> Client TS: ESLint --fix + Prettier"
+	docker compose exec node npx eslint . --fix
+	docker compose exec node npm run format
+	@echo ">>> Done. Run 'make check' to verify nothing remains."
+
+# Read-only CI check — mirrors GitHub Actions exactly (fails if anything is wrong)
+# Run this before pushing: make fix && make check
+check:
+	@echo ">>> [1/7] PHP: Pint (check)"
+	docker compose exec php vendor/bin/pint --test
+	@echo ">>> [2/7] PHP: Rector (dry-run)"
+	docker compose exec php php -d memory_limit=1G vendor/bin/rector process --dry-run
+	@echo ">>> [3/7] PHP: Larastan"
+	docker compose exec php php -d memory_limit=1G vendor/bin/phpstan analyse --no-progress
+	@echo ">>> [4/7] Server TS: ESLint (--max-warnings=0)"
+	docker compose exec php npx eslint . --max-warnings=0
+	@echo ">>> [5/7] Server TS: Prettier (check)"
+	docker compose exec php npm run format:check
+	@echo ">>> [6/7] Client TS: ESLint + Prettier (check)"
+	docker compose exec node npm run lint
+	docker compose exec node npm run format:check
+	@echo ">>> [7/7] Tests (Pest parallel)"
+	docker compose exec php php -d memory_limit=512M vendor/bin/pest --parallel
+	@echo ">>> All checks passed. Safe to push."
 
 # Run quality tools
 quality:

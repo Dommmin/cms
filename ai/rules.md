@@ -66,23 +66,22 @@ To see why a container is failing: `docker compose logs <service> --tail=30`
 
 ### Before every commit (local)
 
-**PHP (`server/`):**
-- Run `docker compose exec php vendor/bin/pint` (no `--dirty` — fixes **all** PHP files, not just git-modified ones)
-- Run `docker compose exec php php -d memory_limit=1G vendor/bin/rector process` — applies automated refactors (rector.php uses `withoutParallel()` to avoid Docker OOM)
-- Run `docker compose exec php vendor/bin/pint` again after rector (rector output may need style normalisation)
-- Run `docker compose exec php php -d memory_limit=1G vendor/bin/phpstan analyse --no-progress` — must report "No errors" (baseline in `phpstan-baseline.neon` suppresses pre-existing issues)
-- If phpstan reports stale baseline entries after code changes, regenerate: `vendor/bin/phpstan analyse --generate-baseline`
-- Run `docker compose exec php php artisan test --compact` — all tests must pass
-- Why: `--dirty` only processes uncommitted changes; pint + rector + larastan must all be clean before CI
+Use the two Makefile commands — they are the canonical pre-commit workflow:
 
-**TypeScript (`client/`):**
-- Run `docker compose exec node npm run lint` — ESLint must pass with 0 warnings (`--max-warnings=0` in CI)
-- Run `docker compose exec node npx prettier --write .` — format all TS/TSX files
-- Why: CI runs `eslint --max-warnings=0` and `prettier --check` and will fail on any violation
+```bash
+make fix    # auto-fixes everything: pint → rector → pint → eslint --fix → prettier
+make check  # read-only CI mirror: fails if anything is wrong (same checks as GitHub Actions)
+```
 
-**TypeScript (`server/resources/js/`):**
-- Run `docker compose exec node npx eslint resources/js --max-warnings=0`
-- Run `docker compose exec node npx prettier --write resources/js`
+**Workflow for AI:**
+1. After writing code, run `make fix` — this auto-corrects style/refactor issues without human review
+2. Then run `make check` — if it passes, the code is safe to commit and push
+3. If `make check` fails with issues that `make fix` cannot resolve (e.g. Larastan type errors, failing tests), fix them manually and repeat
+
+**Details:**
+- `make fix` runs: `pint` → `rector process` → `pint` (again, to re-format rector output) → `npm run lint` (eslint --fix, server) → `npm run format` (prettier, server) → `eslint --fix` (client) → `npm run format` (prettier, client)
+- `make check` mirrors CI exactly: `pint --test` / `rector --dry-run` / `phpstan analyse` / `eslint --max-warnings=0` / `prettier --check` (server + client) / `pest --parallel`
+- If phpstan reports stale baseline entries after refactors, regenerate: `docker compose exec php php -d memory_limit=1G vendor/bin/phpstan analyse --generate-baseline`
 
 ### Write lint-compliant code from the start
 - **PHP**: follow Pint/PSR-12 style — no unused imports, correct spacing, trailing commas in arrays/params, `declare(strict_types=1)` at top
