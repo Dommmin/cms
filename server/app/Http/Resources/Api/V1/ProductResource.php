@@ -84,6 +84,14 @@ class ProductResource extends JsonResource
             }
             $data['attribute_map'] = $attributeMap;
 
+            // Active promotions (only when loaded)
+            if ($product->relationLoaded('promotions')) {
+                $data['active_promotions'] = $product->promotions
+                    ->map(fn ($p): array => ['id' => $p->id, 'name' => $p->name, 'type' => $p->type])
+                    ->values()
+                    ->all();
+            }
+
             return $data;
         }
 

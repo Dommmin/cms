@@ -9,11 +9,12 @@ import { PriceDisplay } from '@/components/price-display';
 import { useAddToCart } from '@/hooks/use-cart';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
-import { useRemoveFromWishlist, useWishlist } from '@/hooks/use-wishlist';
+import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from '@/hooks/use-wishlist';
 
 export default function WishlistPage() {
   const { data: wishlist, isLoading } = useWishlist();
   const { mutate: removeFromWishlist } = useRemoveFromWishlist();
+  const { mutate: addToWishlist } = useAddToWishlist();
   const { mutate: addToCart } = useAddToCart();
   const lp = useLocalePath();
   const { t } = useTranslation();
@@ -79,9 +80,27 @@ export default function WishlistPage() {
               </div>
             </Link>
 
-            {/* Remove */}
+            {/* Remove with undo */}
             <button
-              onClick={() => removeFromWishlist(item.variant_id)}
+              onClick={() => {
+                const variantId = item.variant_id;
+                removeFromWishlist(variantId, {
+                  onSuccess: () => {
+                    toast.success(
+                      <span>
+                        {t('wishlist.removed', 'Removed from wishlist')}{' '}
+                        <button
+                          onClick={() => addToWishlist(variantId)}
+                          className="font-semibold underline"
+                        >
+                          {t('common.undo', 'Undo')}
+                        </button>
+                      </span>,
+                      { autoClose: 5000 },
+                    );
+                  },
+                });
+              }}
               aria-label="Remove from wishlist"
               className="bg-background/80 hover:bg-background absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full shadow backdrop-blur-sm"
             >

@@ -1,9 +1,9 @@
 'use client';
 
-import { X } from 'lucide-react';
+import { Copy, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import {
   clearComparison,
@@ -17,17 +17,22 @@ import { useTranslation } from '@/hooks/use-translation';
 export function ComparisonBar() {
   const { t } = useTranslation();
   const lp = useLocalePath();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+
+  function handleShareUrl() {
+    const url = `${window.location.origin}${lp('/compare')}`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => {
+        toast.success(t('compare.link_copied', 'Link copied!'));
+      });
+    }
+  }
 
   const ids = useComparisonIds();
   const { data } = useComparisonProducts();
   const products = Array.isArray(data?.products) ? data.products : [];
 
-  // Never render on SSR — localStorage not available, would cause hydration mismatch
-  if (!mounted || ids.length === 0) return null;
+  // Loaded via dynamic({ ssr: false }) — safe to read localStorage immediately
+  if (ids.length === 0) return null;
 
   return (
     <div className="border-border bg-background/95 fixed right-0 bottom-0 left-0 z-40 border-t shadow-lg backdrop-blur-sm">
@@ -64,6 +69,14 @@ export function ComparisonBar() {
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
+          <button
+            onClick={handleShareUrl}
+            className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs underline"
+            title={t('compare.copy_link', 'Copy comparison link')}
+          >
+            <Copy className="h-3 w-3" />
+            {t('compare.share', 'Share')}
+          </button>
           <button
             onClick={clearComparison}
             className="text-muted-foreground hover:text-foreground text-xs underline"

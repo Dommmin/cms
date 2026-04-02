@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart, ShoppingCart } from 'lucide-react';
+import { GitCompareArrows, Heart, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
@@ -8,6 +8,12 @@ import { toast } from 'react-toastify';
 import { PriceDisplay } from '@/components/price-display';
 import { useMe } from '@/hooks/use-auth';
 import { useAddToCart } from '@/hooks/use-cart';
+import {
+  addToCompare,
+  removeFromCompare,
+  useComparisonIds,
+  useIsInComparison,
+} from '@/hooks/use-comparison';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
 import { useAddToWishlist, useIsInWishlist, useRemoveFromWishlist } from '@/hooks/use-wishlist';
@@ -20,6 +26,8 @@ export function ProductCard({ product }: ProductCardProps) {
   const { data: user } = useMe();
   const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
   const inWishlist = useIsInWishlist(firstVariantId);
+  const inComparison = useIsInComparison(product.id);
+  const comparisonIds = useComparisonIds();
   const { mutate: addToWishlist } = useAddToWishlist();
   const { mutate: removeFromWishlist } = useRemoveFromWishlist();
 
@@ -66,6 +74,10 @@ export function ProductCard({ product }: ProductCardProps) {
                 ? `-${product.discount_percentage}%`
                 : t('product.sale', 'Sale')}
             </span>
+          ) : product.active_promotions && product.active_promotions.length > 0 ? (
+            <span className="absolute top-2 left-2 rounded bg-orange-500 px-2 py-0.5 text-xs font-semibold text-white">
+              {product.active_promotions[0].name}
+            </span>
           ) : null}
 
           {/* Wishlist toggle */}
@@ -82,6 +94,34 @@ export function ProductCard({ product }: ProductCardProps) {
               />
             </button>
           )}
+
+          {/* Compare toggle */}
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              if (inComparison) {
+                removeFromCompare(product.id);
+              } else if (comparisonIds.length < 4) {
+                addToCompare(product.id);
+              }
+            }}
+            disabled={!inComparison && comparisonIds.length >= 4}
+            aria-label={inComparison ? 'Remove from compare' : 'Add to compare'}
+            title={
+              inComparison
+                ? t('compare.remove', 'Remove from compare')
+                : comparisonIds.length >= 4
+                  ? t('compare.max_reached', 'Max 4 products')
+                  : t('compare.add', 'Compare')
+            }
+            className={`bg-background/80 hover:bg-background absolute top-12 right-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full shadow backdrop-blur-sm transition-colors disabled:opacity-40 ${
+              inComparison ? 'ring-primary ring-2' : ''
+            }`}
+          >
+            <GitCompareArrows
+              className={`h-4 w-4 transition-colors ${inComparison ? 'text-primary' : 'text-foreground/60'}`}
+            />
+          </button>
         </div>
 
         <div className="flex flex-col gap-1 p-4">

@@ -32,27 +32,33 @@ export function NewsletterForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
-      <input
-        type="email"
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder={t('newsletter.placeholder', 'Your email')}
-        className="border-input bg-background focus:ring-ring flex-1 rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
-      />
-      <button
-        type="submit"
-        disabled={status === 'loading'}
-        className="bg-primary text-primary-foreground rounded-md px-3 py-1.5 text-xs font-medium hover:opacity-90 disabled:opacity-50"
-      >
-        {status === 'loading' ? '…' : t('newsletter.subscribe', 'Subscribe')}
-      </button>
+    <div className="flex flex-col gap-1.5">
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder={t('newsletter.placeholder', 'Your email')}
+          className="border-input bg-background focus:ring-ring flex-1 rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
+        />
+        <button
+          type="submit"
+          disabled={status === 'loading'}
+          className="bg-primary text-primary-foreground rounded-md px-3 py-1.5 text-xs font-medium hover:opacity-90 disabled:opacity-50"
+        >
+          {status === 'loading' ? '…' : t('newsletter.subscribe', 'Subscribe')}
+        </button>
+      </form>
+      <p className="text-muted-foreground text-xs">
+        {t(
+          'newsletter.double_optin_info',
+          'You will receive a confirmation email. We respect your privacy — unsubscribe at any time.',
+        )}
+      </p>
       {status === 'error' && (
-        <p className="text-destructive mt-1 text-xs">
-          {t('newsletter.error', 'Something went wrong.')}
-        </p>
+        <p className="text-destructive text-xs">{t('newsletter.error', 'Something went wrong.')}</p>
       )}
-    </form>
+    </div>
   );
 }

@@ -5,11 +5,9 @@ import { generateAlternates } from '@/lib/seo';
 import { serverFetch } from '@/lib/server-fetch';
 import type { Product } from '@/types/api';
 
-export const revalidate = 3600;
+import type { PageProps } from './page.types';
 
-interface PageProps {
-  params: Promise<{ locale: string; slug: string }>;
-}
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   try {

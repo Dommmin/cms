@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 import type { ProductFilters } from '@/api/products';
 import { BackToTop } from '@/components/back-to-top';
+import { CategoryBanner } from '@/components/category-banner';
 import { ProductCard } from '@/components/product-card';
 import { ProductListItem } from '@/components/product-list-item';
 import {
@@ -20,16 +21,7 @@ import {
 import { useLocalePath } from '@/hooks/use-locale';
 import { useProducts } from '@/hooks/use-products';
 import { useTranslation } from '@/hooks/use-translation';
-
-type ViewMode = 'grid' | 'list';
-
-interface PendingFilters {
-  brand: string;
-  min_price: string;
-  max_price: string;
-  in_stock: boolean;
-  attributes: Record<string, string[]>;
-}
+import type { PendingFilters, ViewMode } from './ProductsClient.types';
 
 function pendingFromSearchParams(searchParams: URLSearchParams): PendingFilters {
   const attributes = Array.from(searchParams.entries()).reduce<Record<string, string[]>>(
@@ -213,6 +205,7 @@ export default function ProductsClient() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {appliedFilters.category && <CategoryBanner slug={appliedFilters.category} />}
       {/* Header row */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>

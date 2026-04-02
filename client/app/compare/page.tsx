@@ -18,13 +18,7 @@ import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
 import type { Product } from '@/types/api';
 
-// A row in the comparison table
-interface CompareRow {
-  label: string;
-  group?: string;
-  render: (p: Product) => React.ReactNode;
-  rawValue?: (p: Product) => string;
-}
+import type { CompareRow } from './page.types';
 
 export default function ComparePage() {
   const { t } = useTranslation();
