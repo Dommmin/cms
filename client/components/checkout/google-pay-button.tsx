@@ -1,19 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import type { GooglePayButtonProps, GooglePayClient } from './google-pay-button.types';
-
-declare global {
-  interface Window {
-    google?: {
-      payments: {
-        api: {
-          PaymentsClient: new (config: object) => GooglePayClient;
-        };
-      };
-    };
-  }
-}
+import type { GooglePayButtonProps } from './google-pay-button.types';
 
 export function GooglePayButton({ amount, currency, onToken }: GooglePayButtonProps) {
   const [isReady, setIsReady] = useState(false);

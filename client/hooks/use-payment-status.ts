@@ -1,17 +1,14 @@
 'use client';
 
-import { api } from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query';
 
-interface PaymentStatus {
-  status: 'pending' | 'completed' | 'failed' | 'authorized' | 'refunded' | 'partially_refunded';
-  order_reference: string | null;
-}
+import { apiGet } from '@/lib/api';
+import type { PaymentStatus } from './use-payment-status.types';
 
 export function usePaymentStatus(paymentId: number | null) {
-  return useQuery<PaymentStatus>({
+  return useQuery<PaymentStatus | null>({
     queryKey: ['payment-status', paymentId],
-    queryFn: () => api.get<PaymentStatus>(`/payments/${paymentId}/status`).then((r) => r.data),
+    queryFn: () => apiGet<PaymentStatus>(`/payments/${paymentId}/status`),
     refetchInterval: (query) => (query.state.data?.status === 'pending' ? 3000 : false),
     enabled: paymentId !== null,
     staleTime: 0,

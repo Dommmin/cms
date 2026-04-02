@@ -1,3 +1,4 @@
+import { apiGetMany } from '@/lib/api';
 import { api } from '@/lib/axios';
 
 export interface ShippingMethod {
@@ -87,13 +88,11 @@ export interface CheckoutResponse {
 }
 
 export async function getPaymentMethods(): Promise<PaymentMethodConfig[]> {
-  const { data } = await api.get<{ data: PaymentMethodConfig[] }>('/checkout/payment-methods');
-  return data.data ?? [];
+  return apiGetMany<PaymentMethodConfig>('/checkout/payment-methods');
 }
 
 export async function getShippingMethods(): Promise<ShippingMethod[]> {
-  const { data } = await api.get<{ data: ShippingMethod[] }>('/checkout/shipping-methods');
-  return data.data ?? data;
+  return apiGetMany<ShippingMethod>('/checkout/shipping-methods');
 }
 
 export async function submitCheckout(payload: CheckoutPayload): Promise<CheckoutResponse> {

@@ -5,8 +5,8 @@ import { X } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-import { api } from '@/lib/axios';
-import type { BannerPromotion } from './announcement-bar.types';
+import { apiGetMany } from '@/lib/api';
+import type { BannerPromotion, CountdownProps } from './announcement-bar.types';
 
 function useCountdown(endsAt: string | null) {
   const [timeLeft, setTimeLeft] = useState<{ h: number; m: number; s: number } | null>(null);
@@ -32,7 +32,7 @@ function useCountdown(endsAt: string | null) {
   return timeLeft;
 }
 
-function Countdown({ endsAt }: { endsAt: string }) {
+function Countdown({ endsAt }: CountdownProps) {
   const t = useCountdown(endsAt);
   if (!t) return null;
 
@@ -52,7 +52,7 @@ export function AnnouncementBar() {
 
   const { data } = useQuery({
     queryKey: ['promotions', 'banners'],
-    queryFn: () => api.get<{ data: BannerPromotion[] }>('/promotions').then((r) => r.data.data),
+    queryFn: () => apiGetMany<BannerPromotion>('/promotions'),
     staleTime: 5 * 60 * 1_000,
   });
 

@@ -2,22 +2,22 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import {
-  getBlogCategories,
-  getBlogPost,
-  getBlogPosts,
-  getBrands,
-  getCategories,
-  getCategory,
-  getFaqs,
-  getMenu,
-  getPage,
-} from '@/api/cms';
+import { apiGet, apiGetMany, apiGetPage } from '@/lib/api';
+import type {
+  BlogCategory,
+  BlogPost,
+  Brand,
+  Category,
+  Faq,
+  Menu,
+  Page,
+  PaginatedResponse,
+} from '@/types/api';
 
 export function usePage(slug: string) {
   return useQuery({
     queryKey: ['pages', slug],
-    queryFn: () => getPage(slug),
+    queryFn: () => apiGet<Page>(`/pages/${slug}`),
     enabled: !!slug,
     staleTime: 5 * 60 * 1000,
   });
@@ -26,7 +26,7 @@ export function usePage(slug: string) {
 export function useMenu(location: string) {
   return useQuery({
     queryKey: ['menus', location],
-    queryFn: () => getMenu(location),
+    queryFn: () => apiGet<Menu>(`/menus/${location}`),
     staleTime: 5 * 60 * 1000,
   });
 }
@@ -34,7 +34,7 @@ export function useMenu(location: string) {
 export function useCategories() {
   return useQuery({
     queryKey: ['categories'],
-    queryFn: getCategories,
+    queryFn: () => apiGetMany<Category>('/categories'),
     staleTime: 5 * 60 * 1000,
   });
 }
@@ -42,30 +42,33 @@ export function useCategories() {
 export function useCategory(slug: string) {
   return useQuery({
     queryKey: ['categories', slug],
-    queryFn: () => getCategory(slug),
+    queryFn: () => apiGet<Category>(`/categories/${slug}`),
     enabled: !!slug,
+    staleTime: 5 * 60 * 1000,
   });
 }
 
 export function useBlogPosts(params: { page?: number; category?: string } = {}) {
   return useQuery({
     queryKey: ['blog', 'posts', params],
-    queryFn: () => getBlogPosts(params),
+    queryFn: (): Promise<PaginatedResponse<BlogPost>> =>
+      apiGetPage<BlogPost>('/blog/posts', { params }),
   });
 }
 
 export function useBlogPost(slug: string) {
   return useQuery({
     queryKey: ['blog', 'posts', slug],
-    queryFn: () => getBlogPost(slug),
+    queryFn: () => apiGet<BlogPost>(`/blog/posts/${slug}`),
     enabled: !!slug,
+    staleTime: 5 * 60 * 1000,
   });
 }
 
 export function useBlogCategories() {
   return useQuery({
     queryKey: ['blog', 'categories'],
-    queryFn: getBlogCategories,
+    queryFn: () => apiGetMany<BlogCategory>('/blog/categories'),
     staleTime: 10 * 60 * 1000,
   });
 }
@@ -73,7 +76,7 @@ export function useBlogCategories() {
 export function useBrands() {
   return useQuery({
     queryKey: ['brands'],
-    queryFn: getBrands,
+    queryFn: () => apiGetMany<Brand>('/brands'),
     staleTime: 10 * 60 * 1000,
   });
 }
@@ -81,7 +84,7 @@ export function useBrands() {
 export function useFaqs() {
   return useQuery({
     queryKey: ['faqs'],
-    queryFn: getFaqs,
+    queryFn: () => apiGetMany<Faq>('/faqs'),
     staleTime: 10 * 60 * 1000,
   });
 }

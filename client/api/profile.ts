@@ -1,16 +1,15 @@
+import { apiDelete, apiGet, apiGetMany, apiPost, apiPut } from '@/lib/api';
 import { api } from '@/lib/axios';
 import type { Address, UpdatePasswordPayload, UpdateProfilePayload, User } from '@/types/api';
 
 // ── Profile ───────────────────────────────────────────────────────────────────
 
-export async function getProfile(): Promise<User> {
-  const { data } = await api.get<{ user: User }>('/profile');
-  return data.user;
+export async function getProfile(): Promise<User | null> {
+  return apiGet<User>('/profile');
 }
 
-export async function updateProfile(payload: UpdateProfilePayload): Promise<User> {
-  const { data } = await api.put<{ user: User }>('/profile', payload);
-  return data.user;
+export async function updateProfile(payload: UpdateProfilePayload): Promise<User | null> {
+  return apiPut<User>('/profile', payload);
 }
 
 export async function updatePassword(payload: UpdatePasswordPayload): Promise<void> {
@@ -29,30 +28,26 @@ export async function exportData(): Promise<Blob> {
 // ── Addresses ─────────────────────────────────────────────────────────────────
 
 export async function getAddresses(): Promise<Address[]> {
-  // Collection returned directly → {data: [...]} wrapper
-  const { data } = await api.get<{ data: Address[] }>('/addresses');
-  return data.data;
+  return apiGetMany<Address>('/addresses');
 }
 
-export async function createAddress(payload: Omit<Address, 'id' | 'is_default'>): Promise<Address> {
-  // Single resource via response()->json() → flat
-  const { data } = await api.post<Address>('/addresses', payload);
-  return data;
+export async function createAddress(
+  payload: Omit<Address, 'id' | 'is_default'>,
+): Promise<Address | null> {
+  return apiPost<Address>('/addresses', payload);
 }
 
 export async function updateAddress(
   id: number,
   payload: Partial<Omit<Address, 'id'>>,
-): Promise<Address> {
-  const { data } = await api.put<Address>(`/addresses/${id}`, payload);
-  return data;
+): Promise<Address | null> {
+  return apiPut<Address>(`/addresses/${id}`, payload);
 }
 
 export async function deleteAddress(id: number): Promise<void> {
-  await api.delete(`/addresses/${id}`);
+  await apiDelete(`/addresses/${id}`);
 }
 
-export async function setDefaultAddress(id: number): Promise<Address> {
-  const { data } = await api.post<Address>(`/addresses/${id}/default`);
-  return data;
+export async function setDefaultAddress(id: number): Promise<Address | null> {
+  return apiPost<Address>(`/addresses/${id}/default`);
 }

@@ -1,4 +1,5 @@
 import { getCartToken } from '@/api/cart';
+import { apiGet } from '@/lib/api';
 import { api } from '@/lib/axios';
 import type { AuthResponse, LoginPayload, RegisterPayload, User } from '@/types/api';
 
@@ -24,9 +25,8 @@ export async function logout(): Promise<void> {
   await api.post('/auth/logout');
 }
 
-export async function getMe(): Promise<User> {
-  const { data } = await api.get<{ user: User }>('/auth/me');
-  return data.user;
+export async function getMe(): Promise<User | null> {
+  return apiGet<User>('/auth/me');
 }
 
 export async function forgotPassword(email: string): Promise<{ message: string }> {

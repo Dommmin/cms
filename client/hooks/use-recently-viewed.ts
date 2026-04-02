@@ -3,8 +3,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
-import { api } from '@/lib/axios';
-import type { PaginatedResponse, Product } from '@/types/api';
+import { apiGetPage } from '@/lib/api';
+import type { Product } from '@/types/api';
 
 const STORAGE_KEY = 'recently_viewed';
 const MAX_ITEMS = 10;
@@ -53,9 +53,9 @@ export function useRecentlyViewedProducts(excludeId?: number) {
         acc[`ids[${i}]`] = id;
         return acc;
       }, {});
-      const { data } = await api.get<PaginatedResponse<Product>>('/products', { params });
+      const result = await apiGetPage<Product>('/products', { params });
       // Preserve recently viewed order
-      const map = new Map(data.data.map((p) => [p.id, p]));
+      const map = new Map(result.data.map((p) => [p.id, p]));
       return ids.map((id) => map.get(id)).filter(Boolean) as Product[];
     },
     enabled: ids.length > 0,

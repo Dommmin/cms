@@ -6,22 +6,14 @@ import { useQuery } from '@tanstack/react-query';
 import { usePathname } from 'next/navigation';
 import { createContext, useCallback, useState } from 'react';
 
-type TranslationContextType = {
-  t: (key: string, fallback?: string) => string;
-  locale: string;
-  setLocale: (locale: string) => void;
-  isLoading: boolean;
-};
+import type {
+  TranslationContextType,
+  TranslationProviderProps,
+} from './translation-provider.types';
 
 export const TranslationContext = createContext<TranslationContextType | null>(null);
 
-export function TranslationProvider({
-  children,
-  initialLocale,
-}: {
-  children: React.ReactNode;
-  initialLocale?: string;
-}) {
+export function TranslationProvider({ children, initialLocale }: TranslationProviderProps) {
   const pathname = usePathname();
 
   // Derive locale from URL (source of truth). Fall back to prop on initial SSR render.

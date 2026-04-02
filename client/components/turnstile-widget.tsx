@@ -6,23 +6,6 @@ import type { TurnstileWidgetProps } from './turnstile-widget.types';
 
 const SITE_KEY = process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY ?? '';
 
-declare global {
-  interface Window {
-    turnstile?: {
-      render: (
-        container: HTMLElement,
-        options: {
-          sitekey: string;
-          callback?: (token: string) => void;
-          'expired-callback'?: () => void;
-          theme?: 'auto' | 'light' | 'dark';
-        },
-      ) => string;
-      reset: (widgetId: string) => void;
-    };
-  }
-}
-
 /**
  * Cloudflare Turnstile CAPTCHA widget.
  *

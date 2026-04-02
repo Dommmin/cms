@@ -6,3 +6,7 @@ export interface BannerPromotion {
   banner_url: string | null;
   ends_at: string | null;
 }
+
+export interface CountdownProps {
+  endsAt: string;
+}

@@ -2,16 +2,7 @@
 
 import { api } from '@/lib/axios';
 import { useEffect, useState } from 'react';
-import type { ApplePayButtonProps, ApplePaySessionInstance } from './apple-pay-button.types';
-
-declare global {
-  interface Window {
-    ApplePaySession?: {
-      canMakePayments(): boolean;
-      new (version: number, request: object): ApplePaySessionInstance;
-    };
-  }
-}
+import type { ApplePayButtonProps } from './apple-pay-button.types';
 
 export function ApplePayButton({ amount, currency, onToken }: ApplePayButtonProps) {
   const [isAvailable, setIsAvailable] = useState(false);

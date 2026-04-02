@@ -4,7 +4,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 
 import type { ProductFilters } from '@/api/products';
 import { getProduct, getProductReviews, getProducts, getProductsByCategory } from '@/api/products';
-import { api } from '@/lib/axios';
+import { apiGetMany, apiPost } from '@/lib/api';
 import type { Product } from '@/types/api';
 
 export const productKeys = {
@@ -48,8 +48,9 @@ export function useRelatedProducts(slug: string) {
   return useQuery({
     queryKey: productKeys.related(slug),
     queryFn: async () => {
-      const { data } = await api.get<{ data: Product[] }>(`/products/${slug}/related`);
-      return data.data;
+      const products = await apiGetMany<Product>(`/products/${slug}/related`);
+
+      return Array.isArray(products) ? products : [];
     },
     enabled: !!slug,
     staleTime: 5 * 60 * 1000,
@@ -69,7 +70,7 @@ export function useSubmitReview(slug: string) {
 
   return useMutation({
     mutationFn: (payload: { rating: number; title?: string; body: string }) =>
-      api.post(`/products/${slug}/reviews`, payload).then((r) => r.data),
+      apiPost(`/products/${slug}/reviews`, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: productKeys.reviews(slug) });
     },
@@ -80,7 +81,7 @@ export function useMarkReviewHelpful(slug: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (reviewId: number) => api.post(`/reviews/${reviewId}/helpful`).then((r) => r.data),
+    mutationFn: (reviewId: number) => apiPost(`/reviews/${reviewId}/helpful`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: productKeys.reviews(slug) });
     },
