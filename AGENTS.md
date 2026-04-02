@@ -1,53 +1,46 @@
-# AGENTS.md — CMS Project
+# AGENTS.md — CMS Monorepo
 
-Monorepo: **Laravel 12 backend + admin SPA** (`server/`) · **Next.js 16 public frontend** (`client/`)
+Monorepo: `server/` (Laravel backend + Inertia admin SPA) · `client/` (Next.js public frontend)
 
-Extended context: `ai/guide.md` (feature map) · `ai/context.md` (deep technical) · `ai/rules.md` (quality gates)
+> **Full context:** `ai/guide.md` (feature map) · `ai/context.md` (deep technical) · `ai/rules.md` (quality gates)
 
 ---
 
-## All Commands Run in Docker
+## Commands (always via Docker)
 
 ```bash
-# PHP / Laravel
 docker compose exec php php artisan <cmd>
 docker compose exec php php artisan test --compact
 docker compose exec php php artisan test --compact tests/Feature/SomeTest.php
 docker compose exec php vendor/bin/pint --dirty
-
-# Node / Next.js
 docker compose exec node npm run build
-
-# Makefile shortcuts
 make up / make down / make shell / make migrate / make fresh / make test / make quality
 ```
 
-> **Never run `php artisan` or `pint` directly on host** — no DB/Redis access outside Docker.
+> **Never run `php artisan` or `pint` directly on host** — no DB/Redis outside Docker.
 
 ---
 
 ## Project Structure
 
 ```
-server/          Laravel 12 backend + Inertia/React admin SPA
-  app/Models/          Eloquent models
-  app/Http/Controllers/Api/V1/   REST API controllers
-  app/Http/Controllers/Admin/    Admin SPA controllers (Inertia)
-  app/Services/        Business logic
-  app/Actions/         One-off operations
-  app/Enums/           PHP enums (TitleCase keys)
-  app/Http/Requests/   Form Request validation classes
-  app/Http/Resources/  API Resources
-  app/Policies/        Authorization policies
-  database/migrations/ Database migrations
-  database/factories/  Model factories (use in tests)
-  routes/api.php       REST API routes (/api/v1/*)
-  routes/admin.php     Admin routes (/admin/*)
-  resources/js/pages/  Inertia React pages
-  tests/Feature/       Feature tests (Pest)
-  tests/Unit/          Unit tests (Pest)
+server/          Laravel backend + Inertia/React admin SPA
+  app/Models/                  Eloquent models
+  app/Http/Controllers/Api/V1/ REST API controllers (extend ApiController)
+  app/Http/Controllers/Admin/  Admin SPA controllers (Inertia)
+  app/Services/                Business logic
+  app/Actions/                 One-off operations
+  app/Enums/                   PHP enums (TitleCase keys)
+  app/Http/Requests/           Form Request validation classes
+  app/Http/Resources/          API Resources
+  app/Policies/                Authorization policies
+  database/migrations/         Database migrations
+  database/factories/          Model factories (use in tests)
+  routes/api.php               REST API routes (/api/v1/*)
+  routes/admin.php             Admin routes (/admin/*)
+  resources/js/pages/          Inertia React pages
 
-client/          Next.js 16 public storefront
+client/          Next.js public storefront
   app/             App Router pages
   api/             API call functions
   hooks/           React hooks
@@ -55,41 +48,35 @@ client/          Next.js 16 public storefront
   types/api.ts     API response types (CHECK BEFORE USE)
   lib/server-fetch.ts  Server component data fetching
   lib/axios.ts         Client component data fetching
-  lib/i18n.ts          Locale helpers
-  middleware.ts        Locale URL rewriting
 ```
 
 ---
 
 ## Non-Negotiable Rules
 
-### PHP
-- `declare(strict_types=1)` on every file
-- Explicit return types on all methods
+**PHP:**
+- `declare(strict_types=1)` on every file; explicit return types everywhere
 - Constructor property promotion: `public function __construct(private readonly CartService $cs) {}`
-- `Model::query()` — never `DB::` for standard queries
-- Eager-load relations (no N+1 in loops)
+- `Model::query()` — never `DB::` for standard queries; eager-load relations (no N+1)
 - Form Requests for all validation — never inline in controllers
-- `env()` only inside `config/` files
-- `casts()` method on models (not `$casts` property) — Laravel 12
+- `env()` only inside `config/` files; `casts()` method on models (not `$casts` property)
+- API controllers extend `App\Http\Controllers\Api\ApiController`; use `$this->ok()` / `$this->created()` / `$this->noContent()` / `$this->collection()`
+- `JsonResource::withoutWrapping()` is global — no `{ data: T }` wrapper on single resources
 - After any PHP change: `docker compose exec php vendor/bin/pint --dirty`
 
-### TypeScript (client/ and server/resources/js/)
-- **`.tsx` files are clean** — no `interface` or `type` definitions inside `.tsx` files
-- Types live in separate `.ts` files:
-  - Component-specific → `ComponentName.types.ts` (colocated)
-  - Directory-shared → `types.ts` in the same directory
-  - API response types → `client/types/api.ts` (check before writing any API call)
+**TypeScript:**
+- `.tsx` files are clean — no `interface` or `type` definitions inside them
+- Types: `Name.types.ts` (component), `types.ts` (shared), `client/types/api.ts` (API — check before every API call)
 - Server components → `serverFetch()` from `lib/server-fetch.ts`
 - Client components (`"use client"`) → `api` from `lib/axios.ts`
-- All links use `useLocalePath()` or `lp()` — URLs are locale-prefixed (`/en/`, `/pl/`)
-- Wayfinder for admin SPA routes: import from `@/actions/` or `@/routes/`
+- Admin SPA routes → Wayfinder (`@/actions/`, `@/routes/`) — never hardcode strings
+- All client links → `useLocalePath()` / `lp()` (locale-prefixed URLs)
 
-### Always
+**Always:**
 - Pest tests for every feature: `docker compose exec php php artisan make:test --pest Name`
 - All tests must pass: `docker compose exec php php artisan test --compact`
 - Use factories in tests — never `Model::create()` manually
-- Update `ai/guide.md` when adding/changing features
+- Update `ai/guide.md` when adding or changing features
 
 ---
 
@@ -109,9 +96,9 @@ client/          Next.js 16 public storefront
 
 - Prices stored as **integer cents/grosze** (PLN base currency) — never floats
 - All mutations use **idempotency keys** on checkout/cart endpoints
-- Order state machine: `spatie/laravel-model-states` (AwaitingPayment → Shipped/Delivered/Cancelled)
+- Order state machine: `spatie/laravel-model-states`
 - Translatable models (spatie/laravel-translatable): Product, Category, BlogPost, Page
-- Soft deletes on User, Customer — always use `AnonymizeUserData` action for deletion
+- Soft deletes on User, Customer — always use `AnonymizeUserData` action for deletion (GDPR)
 - Locale-prefixed URLs: `/en/products`, `/pl/blog` — middleware rewrites at Next.js edge
 
 ---
@@ -127,14 +114,6 @@ API test auth: `$this->actingAs($user, 'sanctum')`
 
 ---
 
-## i18n
-
-- Backend: `?locale=en` query param → `SetLocale` middleware
-- Frontend: locale from URL path + cookie; `useLocalePath()` hook for links
-- DB queries for translatable: `where('title->en', 'value')`
-
----
-
 ## Testing Conventions (Pest)
 
 ```php
@@ -147,7 +126,6 @@ it('does something', function () {
         ->assertOk();
 });
 
-// Roles in beforeEach:
 beforeEach(function () {
     Role::firstOrCreate(['name' => 'admin']);
 });
@@ -155,7 +133,6 @@ beforeEach(function () {
 
 - `assertSoftDeleted()` for soft-delete models
 - `assertOk()` / `assertCreated()` / `assertUnprocessable()` — not `assertStatus(200)`
-- Run specific: `php artisan test --compact --filter=TestName`
 
 ---
 

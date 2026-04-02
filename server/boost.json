@@ -4,7 +4,8 @@
         "codex",
         "claude_code",
         "junie",
-        "opencode"
+        "opencode",
+        "gemini"
     ],
     "guidelines": true,
     "mcp": true,
