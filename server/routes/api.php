@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\SocialLoginController;
 use App\Http\Controllers\Api\V1\Blog\BlogCategoryController as ApiBlogCategoryController;
+use App\Http\Controllers\Api\V1\Blog\BlogCommentController as ApiBlogCommentController;
 use App\Http\Controllers\Api\V1\Blog\BlogPostController as ApiBlogPostController;
 use App\Http\Controllers\Api\V1\BrandController;
 use App\Http\Controllers\Api\V1\CartController;
@@ -109,6 +110,8 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::prefix('blog')->name('blog.')->group(function (): void {
             Route::get('posts', new ApiBlogPostController()->index(...))->name('posts.index');
             Route::get('posts/{slug}', new ApiBlogPostController()->show(...))->name('posts.show');
+            Route::post('posts/{slug}/view', new ApiBlogPostController()->recordView(...))->name('posts.view');
+            Route::get('posts/{slug}/comments', [ApiBlogCommentController::class, 'index'])->name('posts.comments.index');
             Route::get('categories', new ApiBlogCategoryController()->index(...))->name('categories.index');
             Route::get('categories/{slug}/posts', new ApiBlogPostController()->byCategory(...))->name('categories.posts');
         });
@@ -176,6 +179,10 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         // Reviews
         Route::post('products/{slug}/reviews', [ReviewController::class, 'store'])->name('products.reviews.store');
         Route::post('reviews/{review}/helpful', [ReviewController::class, 'markHelpful'])->name('reviews.helpful');
+
+        // Blog comments + votes (auth required)
+        Route::post('blog/posts/{slug}/comments', [ApiBlogCommentController::class, 'store'])->name('blog.posts.comments.store');
+        Route::post('blog/posts/{slug}/vote', new ApiBlogPostController()->vote(...))->name('blog.posts.vote');
 
         // GUS / REGON company lookup
         Route::get('gus/nip/{nip}', [GusController::class, 'lookupByNip'])

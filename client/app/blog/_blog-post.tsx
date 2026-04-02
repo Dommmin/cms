@@ -3,11 +3,14 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { getBlogPost } from '@/api/cms';
+import { BlogComments } from '@/components/blog-comments';
+import { BlogVotes } from '@/components/blog-votes';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { JsonLd } from '@/components/json-ld';
 import { localePath } from '@/lib/i18n';
 import { buildBlogPosting, buildBreadcrumbList } from '@/lib/schema';
 import { generateCanonical } from '@/lib/seo';
+import { BlogViewTracker } from './_blog-view-tracker';
 
 export async function getBlogPostMetadata(slug: string, locale: string) {
   const post = await getBlogPost(slug, locale);
@@ -100,6 +103,12 @@ export async function BlogPostView({ slug, locale }: { slug: string; locale: str
       )}
 
       <div className="prose prose-lg mt-8" dangerouslySetInnerHTML={{ __html: post.content }} />
+
+      <div className="mt-8 flex items-center justify-between">
+        <BlogVotes post={post} />
+        <BlogViewTracker slug={post.slug} initialCount={post.views_count ?? 0} />
+      </div>
+      <BlogComments slug={post.slug} locale={locale} />
     </article>
   );
 }

@@ -157,6 +157,8 @@ export interface Product {
   attributes: Attribute[];
   /** Aggregated attribute values per key, present only in compare endpoint response */
   attribute_map?: Record<string, string[]>;
+  /** Active promotions attached to this product (when loaded) */
+  active_promotions?: Array<{ id: number; name: string; type: string }>;
   product_type_id?: number | null;
   created_at: string;
   seo_title: string | null;
@@ -434,7 +436,10 @@ export interface BlogPost {
   featured_image: string | null;
   tags: string[];
   is_featured: boolean;
-  views_count: number;
+  views_count: number | null;
+  votes_up?: number;
+  votes_down?: number;
+  user_vote?: 'up' | 'down' | null;
   category: BlogCategory | null;
   author: { id: number; name: string } | null;
   status: string;
@@ -447,6 +452,15 @@ export interface BlogPost {
   sitemap_exclude: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface BlogComment {
+  id: number;
+  body: string;
+  parent_id: number | null;
+  user: { id: number; name: string };
+  replies: BlogComment[];
+  created_at: string;
 }
 
 // ── CMS – Menus ───────────────────────────────────────────────────────────────
@@ -601,6 +615,17 @@ export interface PublicSettings {
 export interface ApiError {
   message: string;
   errors?: Record<string, string[]>;
+}
+
+// ── Promotions ────────────────────────────────────────────────────────────────
+
+export interface ActivePromotion {
+  id: number;
+  name: string;
+  banner_text: string;
+  banner_color: string | null;
+  banner_url: string | null;
+  ends_at: string | null;
 }
 
 // ── Support Chat ──────────────────────────────────────────────────────────────

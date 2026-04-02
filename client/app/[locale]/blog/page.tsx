@@ -16,6 +16,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function BlogPage({ params, searchParams }: PageProps) {
   const { locale } = await params;
-  const { page = '1', category } = await searchParams;
-  return <BlogListView locale={locale} page={page} category={category} />;
+  const { page = '1', category, sort } = await searchParams;
+  return <BlogListView locale={locale} page={page} category={category} sort={sort} />;
 }

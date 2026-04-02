@@ -14,6 +14,6 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogPage({ searchParams }: PageProps) {
-  const { page = '1', category } = await searchParams;
-  return <BlogListView locale={DEFAULT_LOCALE} page={page} category={category} />;
+  const { page = '1', category, sort } = await searchParams;
+  return <BlogListView locale={DEFAULT_LOCALE} page={page} category={category} sort={sort} />;
 }
