@@ -45,6 +45,17 @@ REST API: `/api/v1/*` · Admin: `/admin/*` (Inertia SPA)
 - `env()` only inside `config/` files
 - After any PHP change: `docker compose exec php vendor/bin/pint --dirty`
 
+**API Controllers (`server/app/Http/Controllers/Api/`):**
+- All API controllers extend `App\Http\Controllers\Api\ApiController` (not base `Controller`)
+- **Never call `response()->json()` directly** — use base class helpers:
+  - `$this->ok(new SomeResource($model))` → 200 (GET, PUT, PATCH, DELETE)
+  - `$this->created(new SomeResource($model))` → 201 (POST that creates a resource)
+  - `$this->noContent()` → 204 (DELETE with no body)
+  - `$this->collection(Resource::collection($paginator))` → paginated response
+- `JsonResource::withoutWrapping()` is set globally — responses have **no `{ data: T }` wrapper**
+- Paginated responses (`->paginate()`) still return `{ data: [], meta: {}, links: {} }` — that's the paginator, not the resource wrapper
+- **Client-side** (`client/`): use `apiGet<T>()`, `apiGetMany<T>()`, `apiGetPage<T>()`, `apiPost<T>()` etc. from `lib/api.ts` — never `api.get().then(r => r.data.data)`
+
 **TypeScript (`client/` and `server/resources/js/`):**
 - `.tsx` files are clean — component logic + JSX only, **no type/interface definitions**
 - Types live in separate `.ts` files:
