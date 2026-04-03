@@ -9,6 +9,7 @@ use App\Exports\CustomersExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Ecommerce\UpdateCustomerRequest;
 use App\Models\Customer;
+use App\Models\User;
 use App\Queries\Admin\CustomerIndexQuery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -83,5 +84,40 @@ class CustomerController extends Controller
         $customer->delete();
 
         return back()->with('success', 'Klient został usunięty');
+    }
+
+    public function impersonate(Customer $customer): RedirectResponse
+    {
+        $user = auth()->user();
+
+        abort_unless($user->can('customers.impersonate'), 403, 'Unauthorized to impersonate customers');
+
+        $customerUser = $customer->user;
+
+        if (! $customerUser) {
+            return back()->with('error', 'Customer has no associated user account');
+        }
+
+        session()->put('impersonator_id', $user->id);
+        session()->put('impersonating_customer', true);
+
+        auth()->login($customerUser);
+
+        return to_route('account.index')
+            ->with('success', 'You are now impersonating '.$customer->name);
+    }
+
+    public function stopImpersonating(): RedirectResponse
+    {
+        $impersonatorId = session()->pull('impersonator_id');
+        session()->forget('impersonating_customer');
+
+        if ($impersonatorId) {
+            $admin = User::query()->find($impersonatorId);
+            auth()->login($admin);
+        }
+
+        return to_route('admin.ecommerce.customers.index')
+            ->with('success', 'Stopped impersonating');
     }
 }
