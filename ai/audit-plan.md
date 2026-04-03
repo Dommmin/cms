@@ -31,24 +31,24 @@
 
 ### 1.2 Średnie (do naprawy przed publicznym wdrożeniem)
 
-| #   | Problem                                             | Lokalizacja                                                                             | Ryzyko                                                       | Rozwiązanie                                                                               |
-|-----|-----------------------------------------------------|-----------------------------------------------------------------------------------------|--------------------------------------------------------------|-------------------------------------------------------------------------------------------|
-| S5  | **Słaba walidacja hasła przy zmianie**              | `UpdatePasswordRequest` — tylko `min:8`                                                 | Średnie — użytkownicy mogą ustawiać słabe hasła              | Użyć tych samych reguł co `RegisterRequest` (mixed case, numbers, symbols, uncompromised) |
+| #   | Problem                                                   | Lokalizacja                                                                                                        | Ryzyko                                                  | Rozwiązanie                                                                               |
+|-----|-----------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------|-------------------------------------------------------------------------------------------|
+| S5  | **Słaba walidacja hasła przy zmianie**                    | `UpdatePasswordRequest` — tylko `min:8`                                                                            | Średnie — użytkownicy mogą ustawiać słabe hasła         | Użyć tych samych reguł co `RegisterRequest` (mixed case, numbers, symbols, uncompromised) |
 | S6  | **~~P24 webhook bez weryfikacji przed kolejkowaniem~~** ✅ | **NAPRAWIONE:** Dodano `P24SignatureService::verifyWebhook()` z synchroniczną weryfikacją sygnatury przed dispatch |
-| S7  | **Brak CSRF tokenów na frontendzie**                | `client/lib/axios.ts` — POST requesty bez explicit CSRF                                 | Średnie — polega wyłącznie na cookies + withCredentials      | Dodać CSRF token w headerze dla state-changing requestów                                  |
-| S8  | **Dane bankowe w sessionStorage**                   | `client/app/checkout/success/page.tsx`                                                  | Średnie — widoczne w DevTools                                | Użyć memory-only state zamiast sessionStorage                                             |
-| S9  | **Cookie admina bez walidacji**                     | `client/app/layout.tsx` — `admin_preview` cookie parsowane bez walidacji struktury JSON | Średnie — potencjalny injection                              | Walidować strukturę cookie przez Zod schema                                               |
-| S10 | **~~Brak rotacji tokenów API~~** ✅                  | **NAPRAWIONE:** Skonfigurowano `expiration` w `config/sanctum.php` (domyślnie 43200 min = 30 dni) |
+| S7  | **Brak CSRF tokenów na frontendzie**                      | `client/lib/axios.ts` — POST requesty bez explicit CSRF                                                            | Średnie — polega wyłącznie na cookies + withCredentials | Dodać CSRF token w headerze dla state-changing requestów                                  |
+| S8  | **Dane bankowe w sessionStorage**                         | `client/app/checkout/success/page.tsx`                                                                             | Średnie — widoczne w DevTools                           | Użyć memory-only state zamiast sessionStorage                                             |
+| S9  | **Cookie admina bez walidacji**                           | `client/app/layout.tsx` — `admin_preview` cookie parsowane bez walidacji struktury JSON                            | Średnie — potencjalny injection                         | Walidować strukturę cookie przez Zod schema                                               |
+| S10 | **~~Brak rotacji tokenów API~~** ✅                        | **NAPRAWIONE:** Skonfigurowano `expiration` w `config/sanctum.php` (domyślnie 43200 min = 30 dni)                  |
 
 ### 1.3 Niskie (rekomendacje)
 
-| #   | Problem                             | Rozwiązanie                                                          |
-|-----|-------------------------------------|----------------------------------------------------------------------|
-| S11 | Parsowanie cookies przez regex      | Użyć biblioteki `js-cookie` zamiast regex w `axios.ts`               |
-| S12 | Brak IP whitelistingu dla admina    | Dodać middleware ograniczający dostęp do `/admin` po IP              |
-| S13 | Brak session timeout dla admina     | Skonfigurować krótszy czas wygaśnięcia sesji dla admina              |
+| #       | Problem                                  | Rozwiązanie                                                                             |
+|---------|------------------------------------------|-----------------------------------------------------------------------------------------|
+| S11     | Parsowanie cookies przez regex           | Użyć biblioteki `js-cookie` zamiast regex w `axios.ts`                                  |
+| S12     | Brak IP whitelistingu dla admina         | Dodać middleware ograniczający dostęp do `/admin` po IP                                 |
+| S13     | Brak session timeout dla admina          | Skonfigurować krótszy czas wygaśnięcia sesji dla admina                                 |
 | ~~S14~~ | **~~Brak security scanning w CI/CD~~** ✅ | **NAPRAWIONE:** Dodano job `security` w GitHub Actions z `composer audit` + `npm audit` |
-| S15 | Brak szyfrowania danych w spoczynku | Dokumentacja strategii encryption at rest dla DB + S3                |
+| S15     | Brak szyfrowania danych w spoczynku      | Dokumentacja strategii encryption at rest dla DB + S3                                   |
 
 ---
 
@@ -85,7 +85,7 @@
 |----|------------------------------------------|--------------------------------------------------------------------------------------------------------|
 | N1 | **2 type casty `as any` / `as unknown`** | `featured-products.tsx`: `as unknown as Product`, `store-map-inner.tsx`: `as any` — naprawić typowanie |
 | N2 | **Brak aktualizacji `ai/guide.md`**      | Kilka nowych feature'ów (blog comments/votes/views, promotions) nie zaktualizowanych w guide           |
-| N3 | **~~38 failing testów w CI~~** ✅         | **NAPRAWIONE:** Wszystkie 138 testów przechodzi, CI stabilne                                          |
+| N3 | **~~38 failing testów w CI~~** ✅         | **NAPRAWIONE:** Wszystkie 138 testów przechodzi, CI stabilne                                           |
 | N4 | **Brak label na polach formularzy**      | `newsletter-form.tsx`, `_search-client.tsx` — brak `<label htmlFor>`                                   |
 
 ---
@@ -95,7 +95,7 @@
 ### 3.1 Produkty (8/10)
 
 **Brakuje:**
-- [ ] Produkty bundlowane / zestawy (kup 3 w cenie 2)
+- [ ] Produkty bundlowane / zestawy (kup 3 w cenie 2) (mamy wdrożone coś podobnego w Promotion, ale być może nie o to chodzi)
 - [x] Produkty cyfrowe / pliki do pobrania
 - [x] Zdjęcia per wariant (nie tylko na poziomie produktu)
 - [ ] Pre-order / backorder status
@@ -257,41 +257,41 @@
 
 ### 4.1 Monitoring i Alerting (5/10) — ✅ POPRAWA W TOKU
 
-| Element                                 | Status                                      | Priorytet |
-|-----------------------------------------|---------------------------------------------|-----------|
-| Error tracking (Sentry)                 | ✅ **SKONFIGUROWANE** — backend + frontend  | P0 |
-| APM / distributed tracing               | ⏳ Opcjonalnie (Datadog/NewRelic)          | P1 |
-| Log aggregation (ELK/Loki)              | ⏳ Opcjonalnie                               | P1 |
-| Uptime monitoring                       | ✅ **UDOKUMENTOWANE** — `docs/UPTIME_MONITORING.md` | P0 |
-| Real-time alerting (PagerDuty/Opsgenie) | ⏳ Integrate via Sentry alerts            | P1 |
-| Core Web Vitals dashboard               | ⏳ Opcjonalnie (Lighthouse CI)             | P2 |
-| Database slow query monitoring          | ⏳ Opcjonalnie                               | P2 |
-| Health checks endpoint                  | ✅ spatie/laravel-health                     | OK |
+| Element                                 | Status                                             | Priorytet |
+|-----------------------------------------|----------------------------------------------------|-----------|
+| Error tracking (Sentry)                 | ✅ **SKONFIGUROWANE** — backend + frontend          | P0        |
+| APM / distributed tracing               | ⏳ Opcjonalnie (Datadog/NewRelic)                   | P1        |
+| Log aggregation (ELK/Loki)              | ⏳ Opcjonalnie                                      | P1        |
+| Uptime monitoring                       | ✅ **UDOKUMENTOWANE** — `docs/UPTIME_MONITORING.md` | P0        |
+| Real-time alerting (PagerDuty/Opsgenie) | ⏳ Integrate via Sentry alerts                      | P1        |
+| Core Web Vitals dashboard               | ⏳ Opcjonalnie (Lighthouse CI)                      | P2        |
+| Database slow query monitoring          | ⏳ Opcjonalnie                                      | P2        |
+| Health checks endpoint                  | ✅ spatie/laravel-health                            | OK        |
 
 ### 4.2 Backup i Disaster Recovery (6/10) — ✅ UDOKUMENTOWANE
 
-| Element                          | Status                                  | Priorytet |
-|----------------------------------|-----------------------------------------|-----------|
-| Strategia backupów DB            | ✅ **DOKUMENTACJA:** `docs/BACKUP_STRATEGY.md`, skrypty automatyzujące | P0 |
-| Backup mediów (S3)               | ✅ **DOKUMENTACJA:** wersjonowanie S3 + incremental sync | P1 |
-| Point-in-time recovery (PITR)    | ⏳ Wdrożenie wymagane (PostgreSQL WAL)  | P1 |
-| Testy przywracania backupów      | ✅ Skrypt `verify-backup.sh`             | P1 |
-| Disaster Recovery plan (RTO/RPO) | ✅ Zdefiniowane w BACKUP_STRATEGY.md    | P0 |
-| Cross-region replication         | ⏳ Opcjonalnie (dokumentacja dostępna)  | P2 |
+| Element                          | Status                                                                | Priorytet |
+|----------------------------------|-----------------------------------------------------------------------|-----------|
+| Strategia backupów DB            | ✅ **DOKUMENTACJA:** `docs/BACKUP_STRATEGY.md`, skrypty automatyzujące | P0        |
+| Backup mediów (S3)               | ✅ **DOKUMENTACJA:** wersjonowanie S3 + incremental sync               | P1        |
+| Point-in-time recovery (PITR)    | ⏳ Wdrożenie wymagane (PostgreSQL WAL)                                 | P1        |
+| Testy przywracania backupów      | ✅ Skrypt `verify-backup.sh`                                           | P1        |
+| Disaster Recovery plan (RTO/RPO) | ✅ Zdefiniowane w BACKUP_STRATEGY.md                                   | P0        |
+| Cross-region replication         | ⏳ Opcjonalnie (dokumentacja dostępna)                                 | P2        |
 
 ### 4.3 CI/CD (7/10)
 
-| Element                           | Status                                | Priorytet |
-|-----------------------------------|---------------------------------------|-----------|
-| Lint + test w CI                  | ✅ GitHub Actions                      | OK        |
-| Docker build + push               | ✅ GHCR                                | OK        |
-| K8s deployment                    | ✅ Auto-deploy                         | OK        |
-| **~~38 failing tests~~** ✅          | **NAPRAWIONE:** Wszystkie 138 testów przechodzi | OK |
-| ~~Security scanning (SAST/DAST)~~ ✅    | **NAPRAWIONE:** Dodano `composer audit` + `npm audit` w CI | OK |
-| ~~Dependency vulnerability scan~~ ✅    | **NAPRAWIONE:** `composer audit` + `npm audit` w job `security` | OK |
-| Performance regression testing    | ❌ Brak                                | P2        |
-| Contract testing (API ↔ Frontend) | ❌ Brak                                | P2        |
-| Canary/blue-green deploys         | ❌ Brak                                | P2        |
+| Element                             | Status                                                          | Priorytet |
+|-------------------------------------|-----------------------------------------------------------------|-----------|
+| Lint + test w CI                    | ✅ GitHub Actions                                                | OK        |
+| Docker build + push                 | ✅ GHCR                                                          | OK        |
+| K8s deployment                      | ✅ Auto-deploy                                                   | OK        |
+| **~~38 failing tests~~** ✅          | **NAPRAWIONE:** Wszystkie 138 testów przechodzi                 | OK        |
+| ~~Security scanning (SAST/DAST)~~ ✅ | **NAPRAWIONE:** Dodano `composer audit` + `npm audit` w CI      | OK        |
+| ~~Dependency vulnerability scan~~ ✅ | **NAPRAWIONE:** `composer audit` + `npm audit` w job `security` | OK        |
+| Performance regression testing      | ❌ Brak                                                          | P2        |
+| Contract testing (API ↔ Frontend)   | ❌ Brak                                                          | P2        |
+| Canary/blue-green deploys           | ❌ Brak                                                          | P2        |
 
 ### 4.4 Skalowanie (5/10)
 
@@ -428,15 +428,15 @@
 1. **Produkty cyfrowe** / pliki do pobrania
 2. **Produkty bundlowane** / zestawy
 3. **Program lojalnościowy** (punkty za zakupy)
-4. **Flash sales** z countdown timer
+4. **Flash sales** z countdown timer (czy to jest zaimplementowane w page builder?)
 5. **Marketing automation** (workflows poza abandoned cart)
-6. **Integracja z systemami księgowymi** (wFirma, InFakt)
-7. **Allegro / Amazon marketplace sync**
-8. **Facebook/Instagram Shop**
+6. **Integracja z systemami księgowymi** (wFirma, InFakt), (opcjonalnie)
+7. **Allegro / Amazon marketplace sync** (opcjonalnie)
+8. **Facebook/Instagram Shop** (opcjonalnie)
 9. **Push notifications** (web push)
 10. **Custom report builder**
 11. **Subscription orders** (recurring payments)
-12. **Multi-warehouse inventory**
+12. **Multi-warehouse inventory** (opcjonalnie)
 13. **Content approval workflow** (draft → review → publish)
 14. **Admin impersonation** (logowanie jako klient)
 15. **Canary/blue-green deployments**
