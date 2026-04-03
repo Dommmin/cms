@@ -1,0 +1,46 @@
+glitchtip:
+  env:
+    SECRET_KEY: "CHANGE_ME_TO_A_RANDOM_50_CHAR_SECRET"
+    GLITCHTIP_DOMAIN: "glitchtip.yourdomain.com"
+    DEFAULT_FROM_EMAIL: "alerts@yourdomain.com"
+    EMAIL_URL: "smtp://user:pass@smtp.example.com:587"
+    CELERY_WORKER_AUTOSCALE: "1,3"
+    CELERY_WORKER_MAX_TASKS_PER_CHILD: "10000"
+
+  service:
+    type: ClusterIP
+    port: 8000
+
+  ingress:
+    enabled: true
+    className: nginx
+    hosts:
+      - host: glitchtip.yourdomain.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: glitchtip-tls
+        hosts:
+          - glitchtip.yourdomain.com
+
+postgresql:
+  enabled: true
+  auth:
+    username: glitchtip
+    password: CHANGE_ME
+    database: glitchtip
+  primary:
+    persistence:
+      enabled: true
+      size: 20Gi
+
+redis:
+  enabled: true
+  architecture: standalone
+
+worker:
+  replicaCount: 1
+
+web:
+  replicaCount: 2

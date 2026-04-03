@@ -1,4 +1,8 @@
+import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
+
+const errorTrackingDsn =
+    process.env.NEXT_PUBLIC_GLITCHTIP_DSN ?? process.env.NEXT_PUBLIC_SENTRY_DSN;
 
 const apiHostname = process.env.NEXT_PUBLIC_API_URL
     ? new URL(process.env.NEXT_PUBLIC_API_URL).hostname
@@ -60,4 +64,13 @@ const nextConfig: NextConfig = {
     },
 };
 
-export default nextConfig;
+const sentryConfig = {
+    // Keep the Sentry-compatible build wrapper for GlitchTip, but avoid
+    // requiring Sentry SaaS-specific org/project settings.
+    silent: !errorTrackingDsn,
+    disableLogger: true,
+};
+
+export default errorTrackingDsn
+    ? withSentryConfig(nextConfig, sentryConfig)
+    : nextConfig;

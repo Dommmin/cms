@@ -86,6 +86,7 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - **WCAG 2.1 AA** — skip nav link in root layout (`#main-content`), `aria-label` on icon-only buttons, `aria-live/atomic` on quantity steppers, `aria-current="page"` on active nav links, `aria-expanded/controls` on filter toggles, focus trap in cookie consent dialog (`role="dialog" aria-modal="true"`), labelled form inputs throughout
 - **EU/PL Legal Compliance** — checkout terms checkbox (required/accepted validation in `CheckoutRequest`), 14-day withdrawal notice in checkout, ODR platform link in footer legal menu (`https://ec.europa.eu/consumers/odr`), Omnibus price history (30-day low via `PriceHistory` + `ProductVariantPriceObserver`)
 - **Playwright E2E** — `client/tests/e2e/` (smoke, cart, i18n specs), Docker service under `testing` profile, `make e2e` / `make e2e-report` Makefile targets
+- **GlitchTip (Error Monitoring)** — self-hosted Sentry alternative for clients who don't want to pay for Sentry; 100% Sentry SDK compatible; Docker Compose bootstrap for local/staging lives in `.docker/glitchtip/`, production baseline for Kubernetes lives in `k8s/glitchtip/values.example.yaml`; docs at `docs/GLITCHTIP_DEPLOYMENT.md` + `docs/GLITCHTIP_QUICKSTART.md`; integrate via Sentry SDK (`sentry/sentry-laravel` + `@sentry/nextjs`) but prefer `GLITCHTIP_*` / `NEXT_PUBLIC_GLITCHTIP_DSN` env names, with legacy `SENTRY_*` kept as fallback compatibility
 
 ---
 

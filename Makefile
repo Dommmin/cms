@@ -1,4 +1,4 @@
-.PHONY: up stop down build install shell migrate fresh test setup-test-db logs pail seed fresh-seed clear sync-translations npm-build pint fix check e2e e2e-report help
+.PHONY: up stop down build install shell migrate fresh test setup-test-db logs pail seed fresh-seed clear sync-translations npm-build pint fix check e2e e2e-report glitchtip-up glitchtip-down glitchtip-logs help
 
 # Set environment variables
 export UID = $(shell id -u)
@@ -30,6 +30,9 @@ help:
 	@echo "  pail               - Inspect php logs in live mode"
 	@echo "  shell              - Enter php container"
 	@echo "  node_shell         - Enter node container"
+	@echo "  glitchtip-up       - Start the local GlitchTip stack"
+	@echo "  glitchtip-down     - Stop the local GlitchTip stack"
+	@echo "  glitchtip-logs     - Tail GlitchTip logs"
 	@echo "  help               - Show this help"
 
 # Start the application
@@ -181,3 +184,12 @@ e2e:
 # Run Playwright with UI reporter (generates HTML report in client/playwright-report/)
 e2e-report:
 	docker compose --profile testing run --rm playwright npx playwright test --reporter=html
+
+glitchtip-up:
+	docker compose -f .docker/glitchtip/compose.yml up -d
+
+glitchtip-down:
+	docker compose -f .docker/glitchtip/compose.yml down
+
+glitchtip-logs:
+	docker compose -f .docker/glitchtip/compose.yml logs -f

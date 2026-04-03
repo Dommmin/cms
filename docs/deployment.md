@@ -38,6 +38,12 @@ make fresh          # Fresh migrate + seed
 | MySQL               | localhost:3306              |
 | Redis               | localhost:6379              |
 
+Optional monitoring stack:
+
+| Service             | URL                         |
+|---------------------|-----------------------------|
+| GlitchTip           | http://localhost:8000       |
+
 ### Makefile Commands
 
 ```bash
@@ -69,6 +75,18 @@ redis:   Cache + queue backend
 gotenberg: PDF generation
 mailhog: Dev mail catcher
 ```
+
+### Optional GlitchTip Stack
+
+GlitchTip runs as a separate self-hosted stack, not inside the main CMS compose.
+
+```bash
+cp .docker/glitchtip/.env.example .docker/glitchtip/.env
+$EDITOR .docker/glitchtip/.env
+make glitchtip-up
+```
+
+For production, deploy GlitchTip separately on Kubernetes via the Helm chart and only inject DSNs into the CMS apps.
 
 ### PHP Container
 - Built from `.docker/php/Dockerfile`
@@ -122,6 +140,11 @@ TYPESENSE_API_KEY=secret
 
 # PDF (Gotenberg)
 GOTENBERG_URL=http://gotenberg:3000
+
+# GlitchTip (self-hosted error tracking)
+GLITCHTIP_DSN=
+GLITCHTIP_TRACES_SAMPLE_RATE=0.2
+GLITCHTIP_PROFILES_SAMPLE_RATE=0.2
 ```
 
 ---
@@ -174,6 +197,14 @@ Always use the latest major version of each action. Current pinned versions:
 | `KUBECONFIG_PROD` | secret | base64-encoded kubeconfig for production cluster |
 | `NEXT_PUBLIC_API_URL` | variable (vars) | Baked into Next.js client image at build time |
 | `NEXT_PUBLIC_APP_NAME` | variable (vars) | Baked into Next.js client image at build time |
+| `NEXT_PUBLIC_GLITCHTIP_DSN` | variable (vars) | Baked into Next.js client image at build time |
+
+### GlitchTip Deployment Split
+
+- Local / staging sandbox: run the upstream Docker Compose stack from `.docker/glitchtip/`
+- Production Kubernetes: deploy GlitchTip via the official Helm chart; use [`k8s/glitchtip/values.example.yaml`](/Users/domin/projects/laravel/cms/k8s/glitchtip/values.example.yaml) as the project baseline
+- CMS backend: inject `GLITCHTIP_DSN` into `cms-server-env`
+- CMS frontend: inject `NEXT_PUBLIC_GLITCHTIP_DSN` during client image build, not as a runtime-only Kubernetes secret
 
 ### Lint checks
 
