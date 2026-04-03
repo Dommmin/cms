@@ -891,7 +891,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 3
+			count: 4
 			path: app/Http/Controllers/Admin/Ecommerce/ProductVariantController.php
 
 		-

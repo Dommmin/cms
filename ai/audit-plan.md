@@ -96,11 +96,11 @@
 
 **Brakuje:**
 - [ ] Produkty bundlowane / zestawy (kup 3 w cenie 2)
-- [ ] Produkty cyfrowe / pliki do pobrania
-- [ ] Zdjęcia per wariant (nie tylko na poziomie produktu)
+- [x] Produkty cyfrowe / pliki do pobrania
+- [x] Zdjęcia per wariant (nie tylko na poziomie produktu)
 - [ ] Pre-order / backorder status
 - [ ] Multi-warehouse inventory (wiele magazynów)
-- [ ] Kody kreskowe / EAN / UPC management
+- [x] Kody kreskowe / EAN / UPC management
 
 ### 3.2 Zamówienia (7/10)
 

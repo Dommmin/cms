@@ -113,6 +113,10 @@ export interface Attribute {
 export interface ProductVariant {
     id: number;
     sku: string;
+    barcode?: string | null;
+    ean?: string | null;
+    upc?: string | null;
+    name?: string | null;
     /** price in cents */
     price: number;
     /** compare-at price in cents */
@@ -121,8 +125,13 @@ export interface ProductVariant {
     omnibus_price: number | null;
     stock_quantity: number;
     is_available: boolean;
+    is_digital: boolean;
+    download_limit?: number | null;
+    download_expiry_days?: number | null;
     attributes: Record<string, string>;
     tax_rate?: number | null;
+    /** Variant-specific images (when loaded) */
+    images?: ProductImage[];
 }
 
 export interface Brand {
@@ -662,4 +671,24 @@ export interface SupportConversation {
     last_reply_at: string | null;
     created_at: string;
     messages: SupportMessage[];
+}
+
+// ── Digital Downloads ───────────────────────────────────────────────────────────
+
+export interface ProductDownload {
+    id: number;
+    name: string;
+    file_name: string;
+    file_size: number;
+    mime_type: string | null;
+    url: string;
+}
+
+export interface ProductDownloadLink {
+    id: number;
+    token: string;
+    expires_at: string | null;
+    download_count: number;
+    max_downloads: number | null;
+    can_download: boolean;
 }

@@ -1,9 +1,9 @@
 import inertia from '@inertiajs/vite';
 import { wayfinder } from '@laravel/vite-plugin-wayfinder';
 import tailwindcss from '@tailwindcss/vite';
-import react from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react/dist';
 import laravel from 'laravel-vite-plugin';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite/dist/node';
 
 export default defineConfig({
     plugins: [

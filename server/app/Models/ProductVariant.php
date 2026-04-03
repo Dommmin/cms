@@ -22,6 +22,9 @@ use Spatie\Translatable\HasTranslations;
  * @property int $product_id
  * @property int|null $tax_rate_id
  * @property string $sku
+ * @property string|null $barcode
+ * @property string|null $ean
+ * @property string|null $upc
  * @property array<string, string>|string $name
  * @property int $price
  * @property int $cost_price
@@ -31,11 +34,15 @@ use Spatie\Translatable\HasTranslations;
  * @property int $stock_threshold
  * @property bool $is_active
  * @property bool $is_default
+ * @property bool $is_digital
+ * @property int|null $download_limit
+ * @property int|null $download_expiry_days
  * @property int $position
  * @property-read Product|null $product
  * @property-read TaxRate|null $taxRate
  * @property-read Collection<int, VariantAttributeValue> $attributeValues
  * @property-read Collection<int, ProductImage> $images
+ * @property-read Collection<int, ProductDownload> $downloads
  * @property-read Collection<int, PriceHistory> $priceHistory
  */
 class ProductVariant extends Model
@@ -50,20 +57,23 @@ class ProductVariant extends Model
     protected $table = 'product_variants';
 
     protected $fillable = [
-        'product_id', 'tax_rate_id', 'sku', 'name', 'price', 'cost_price',
+        'product_id', 'tax_rate_id', 'sku', 'barcode', 'ean', 'upc', 'name', 'price', 'cost_price',
         'compare_at_price', 'weight', 'stock_quantity', 'stock_threshold',
-        'is_active', 'is_default', 'position',
+        'is_active', 'is_default', 'is_digital', 'download_limit', 'download_expiry_days', 'position',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'is_default' => 'boolean',
+        'is_digital' => 'boolean',
+        'download_limit' => 'integer',
+        'download_expiry_days' => 'integer',
     ];
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['sku', 'price', 'stock_quantity', 'is_active'])
+            ->logOnly(['sku', 'barcode', 'ean', 'upc', 'price', 'stock_quantity', 'is_active', 'is_digital'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->useLogName('product_variant');
@@ -104,6 +114,11 @@ class ProductVariant extends Model
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class);
+    }
+
+    public function downloads(): HasMany
+    {
+        return $this->hasMany(ProductDownload::class, 'product_variant_id');
     }
 
     public function priceHistory(): HasMany
@@ -175,5 +190,21 @@ class ProductVariant extends Model
         }
 
         return round(($this->margin() / $this->price) * 100, 2);
+    }
+
+    /**
+     * Check if this is a digital product
+     */
+    public function isDigital(): bool
+    {
+        return $this->is_digital;
+    }
+
+    /**
+     * Check if digital product has downloadable files
+     */
+    public function hasDownloads(): bool
+    {
+        return $this->is_digital && $this->downloads()->exists();
     }
 }

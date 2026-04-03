@@ -26,6 +26,9 @@ class StoreProductVariantRequest extends FormRequest
     {
         return [
             'sku' => ['required', 'string', 'max:255', 'unique:product_variants,sku'],
+            'barcode' => ['nullable', 'string', 'max:255'],
+            'ean' => ['nullable', 'string', 'max:13'],
+            'upc' => ['nullable', 'string', 'max:12'],
             'name' => ['required', 'string', 'max:255'],
             'price' => ['required', 'integer', 'min:0'],
             'cost_price' => ['nullable', 'integer', 'min:0'],
@@ -36,9 +39,16 @@ class StoreProductVariantRequest extends FormRequest
             'tax_rate_id' => ['nullable', 'exists:tax_rates,id'],
             'is_active' => ['sometimes', 'boolean'],
             'is_default' => ['sometimes', 'boolean'],
+            'is_digital' => ['sometimes', 'boolean'],
+            'download_limit' => ['nullable', 'integer', 'min:1'],
+            'download_expiry_days' => ['nullable', 'integer', 'min:1'],
             'position' => ['nullable', 'integer'],
             'attribute_values' => ['nullable', 'array'],
             'attribute_values.*' => ['exists:attribute_values,id'],
+            'images' => ['nullable', 'array'],
+            'images.*.media_id' => ['required', 'exists:media,id'],
+            'images.*.is_thumbnail' => ['sometimes', 'boolean'],
+            'images.*.position' => ['sometimes', 'integer'],
         ];
     }
 

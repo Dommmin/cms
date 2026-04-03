@@ -10,6 +10,7 @@ use App\Http\Requests\Admin\Ecommerce\UpdateProductVariantRequest;
 use App\Http\Requests\Admin\Ecommerce\UpdateStockRequest;
 use App\Models\AttributeValue;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Models\VariantAttributeValue;
 use App\Queries\Admin\ProductVariantIndexQuery;
@@ -47,6 +48,7 @@ class ProductVariantController extends Controller
         $data['product_id'] = $product->id;
         $data['is_active'] ??= true;
         $data['is_default'] ??= false;
+        $data['is_digital'] ??= false;
 
         if ($data['is_default']) {
             ProductVariant::query()->where('product_id', $product->id)
@@ -57,8 +59,12 @@ class ProductVariantController extends Controller
         $attributeValueIds = $data['attribute_values'] ?? [];
         unset($data['attribute_values']);
 
+        $images = $data['images'] ?? [];
+        unset($data['images']);
+
         $variant = ProductVariant::query()->create($data);
         $this->syncVariantAttributeValues($variant, $attributeValueIds);
+        $this->syncVariantImages($variant, $product, $images);
 
         return to_route('admin.ecommerce.products.variants.index', $product)
             ->with('success', 'Wariant produktu został utworzony');
@@ -66,7 +72,8 @@ class ProductVariantController extends Controller
 
     public function edit(Product $product, ProductVariant $variant): Response
     {
-        $variant->load(['taxRate', 'attributeValues.attribute']);
+        $variant->load(['taxRate', 'attributeValues.attribute', 'images.media']);
+
         $taxRates = new ProductVariantIndexQuery(request())->getTaxRates();
 
         return inertia('admin/ecommerce/products/variants/edit', [
@@ -90,8 +97,12 @@ class ProductVariantController extends Controller
         $attributeValueIds = $data['attribute_values'] ?? [];
         unset($data['attribute_values']);
 
+        $images = $data['images'] ?? [];
+        unset($data['images']);
+
         $variant->update($data);
         $this->syncVariantAttributeValues($variant, $attributeValueIds);
+        $this->syncVariantImages($variant, $product, $images);
 
         return back()->with('success', 'Wariant produktu został zaktualizowany');
     }
@@ -159,6 +170,35 @@ class ProductVariantController extends Controller
 
         if ($records !== []) {
             VariantAttributeValue::query()->insert($records);
+        }
+    }
+
+    private function syncVariantImages(ProductVariant $variant, Product $product, array $images): void
+    {
+        ProductImage::query()
+            ->where('variant_id', $variant->id)
+            ->delete();
+
+        foreach ($images as $index => $imageData) {
+            $image = is_array($imageData) ? $imageData : json_decode((string) $imageData, true);
+
+            if (! is_array($image)) {
+                continue;
+            }
+
+            $mediaId = $image['media_id'] ?? $image['id'] ?? null;
+
+            if (! is_numeric($mediaId)) {
+                continue;
+            }
+
+            ProductImage::query()->create([
+                'product_id' => $product->id,
+                'variant_id' => $variant->id,
+                'media_id' => (int) $mediaId,
+                'is_thumbnail' => filter_var($image['is_thumbnail'] ?? false, FILTER_VALIDATE_BOOLEAN),
+                'position' => is_numeric($image['position'] ?? null) ? (int) $image['position'] : $index,
+            ]);
         }
     }
 }

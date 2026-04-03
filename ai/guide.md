@@ -33,6 +33,8 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 
 ### E-commerce
 - **Products** — variants, attributes, product types, categories, flags, images (spatie/medialibrary), price history
+- **Product Variants** — barcode/EAN/UPC codes, variant-specific images, digital products support (downloadable files)
+- **Digital Products** — `is_digital` flag, download limits, expiry days, `ProductDownload` model for files, `ProductDownloadLink` for secure downloads
 - **Orders** — full lifecycle, status machine, invoices (PDF), export
 - **Cart** — token-based guest cart, abandoned cart cleanup + emails
 - **Checkout** — multi-step, shipping, payment providers, idempotency
