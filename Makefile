@@ -1,4 +1,4 @@
-.PHONY: up stop down build install shell migrate fresh test setup-test-db logs pail seed fresh-seed clear sync-translations npm-build pint fix check e2e e2e-report glitchtip-up glitchtip-down glitchtip-logs help
+.PHONY: up stop down build install shell migrate fresh test setup-test-db logs pail seed fresh-seed scout-import clear sync-translations npm-build pint fix check e2e e2e-report glitchtip-up glitchtip-down glitchtip-logs help
 
 # Set environment variables
 export UID = $(shell id -u)
@@ -17,6 +17,7 @@ help:
 	@echo "  fresh              - Fresh migrations"
 	@echo "  seed               - Seed database"
 	@echo "  fresh-seed         - Fresh migrations and seed database"
+	@echo "  scout-import       - Index products to scout"
 	@echo "  test               - Run tests"
 	@echo "  setup-test-db      - Setup test database"
 	@echo "  clear              - Clear all Laravel caches"
@@ -74,6 +75,10 @@ seed:
 
 fresh-seed:
 	docker compose exec php php artisan migrate:fresh --seed
+
+# Scout import
+scout-import:
+	docker compose exec php artisan scout:import-products
 
 # Setup test database
 setup-test-db:

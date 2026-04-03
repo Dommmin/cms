@@ -136,14 +136,15 @@ services:
     networks:
       - cms-network
 
-  mailhog:
-    image: mailhog/mailhog:latest
-    container_name: ${COMPOSE_PROJECT_NAME}_mailhog
-    restart: on-failure
-    platform: linux/arm64
+  mailpit:
+    image: axllent/mailpit
     ports:
       - "1025:1025"
       - "8025:8025"
+    volumes:
+      - mailpit-data:/data
+    environment:
+      MP_DATABASE: /data/mailpit.db
     networks:
       - cms-network
 
@@ -155,3 +156,4 @@ volumes:
   mysql_data:
   client_node_modules:
   typesense_data:
+  mailpit-data:
