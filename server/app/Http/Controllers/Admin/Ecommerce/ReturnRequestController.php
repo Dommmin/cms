@@ -8,6 +8,7 @@ use App\Enums\ReturnStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Models\ReturnRequest;
 use App\Queries\Admin\ReturnRequestIndexQuery;
+use App\Services\PaymentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Response;
@@ -86,11 +87,41 @@ class ReturnRequestController extends Controller
         return back()->with('success', 'Zwrot został odrzucony');
     }
 
-    public function processRefund(ReturnRequest $return): RedirectResponse
+    public function processRefund(Request $request, ReturnRequest $return): RedirectResponse
     {
-        // TODO: Implementacja zwrotu środków przez bramkę płatności
-        $return->changeStatus(ReturnStatusEnum::Refunded, 'admin', 'Zwrot środków przetworzony');
+        $request->validate([
+            'refund_amount' => ['required', 'integer', 'min:1'],
+        ]);
 
-        return back()->with('success', 'Zwrot środków został przetworzony');
+        $refundAmount = (int) $request->input('refund_amount');
+
+        $order = $return->order;
+
+        if (! $order->payment) {
+            return back()->with('error', 'No payment found for this order');
+        }
+
+        if ($refundAmount > $order->payment->amount) {
+            return back()->with('error', 'Refund amount cannot exceed payment amount');
+        }
+
+        $gateway = resolve(PaymentService::class)->getGateway(
+            $order->payment->provider->value,
+        );
+
+        if (! $gateway) {
+            return back()->with('error', 'Payment gateway not available');
+        }
+
+        $success = $gateway->refundPayment($order->payment, $refundAmount);
+
+        if ($success) {
+            $return->update(['refund_amount' => $refundAmount]);
+            $return->changeStatus(ReturnStatusEnum::Refunded, 'admin', sprintf('Zwrot %d groszy przetworzony', $refundAmount));
+
+            return back()->with('success', 'Zwrot środków został przetworzony');
+        }
+
+        return back()->with('error', 'Wystąpił błąd podczas przetwarzania zwrotu');
     }
 }

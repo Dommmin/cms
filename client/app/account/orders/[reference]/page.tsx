@@ -273,7 +273,18 @@ export default function OrderDetailPage() {
                                     {t('order.tracking', 'Tracking')}
                                 </dt>
                                 <dd className="font-mono font-medium">
-                                    {order.shipment.tracking_number}
+                                    {order.shipment.tracking_url ? (
+                                        <a
+                                            href={order.shipment.tracking_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-primary hover:underline"
+                                        >
+                                            {order.shipment.tracking_number}
+                                        </a>
+                                    ) : (
+                                        order.shipment.tracking_number
+                                    )}
                                 </dd>
                             </>
                         )}

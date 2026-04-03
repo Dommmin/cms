@@ -262,6 +262,7 @@ export interface Shipment {
     id: number;
     carrier: string;
     tracking_number: string | null;
+    tracking_url: string | null;
     status: string;
     shipped_at: string | null;
 }

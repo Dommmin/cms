@@ -47,4 +47,29 @@ class P24SignatureService
     {
         return hash_equals($expected, $computed);
     }
+
+    public function verifyWebhook(array $payload): bool
+    {
+        $sign = $payload['sign'] ?? null;
+
+        if (! $sign) {
+            return false;
+        }
+
+        unset($payload['sign']);
+
+        ksort($payload);
+
+        $parts = [];
+        foreach ($payload as $key => $value) {
+            $parts[] = $key.'='.$value;
+        }
+
+        $parts[] = 'crc='.config('services.p24.crc');
+        $string = implode('&', $parts);
+
+        $computed = hash('sha256', $string);
+
+        return hash_equals($sign, $computed);
+    }
 }

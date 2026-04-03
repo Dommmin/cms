@@ -71,6 +71,11 @@ export async function generateMetadata(): Promise<Metadata> {
                       publicSettings.settings.seo.bing_site_verification,
               }
             : undefined,
+        alternates: {
+            types: {
+                'application/rss+xml': '/feed',
+            },
+        },
     };
 }
 

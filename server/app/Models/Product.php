@@ -157,23 +157,24 @@ class Product extends Model
     public function toSearchableArray(): array
     {
         $priceRange = $this->priceRange();
+        $this->loadMissing(['category', 'brand', 'media']);
 
         return [
-            'id' => $this->id,
+            'id' => (string) $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => strip_tags($this->description ?? ''),
             'short_description' => strip_tags($this->short_description ?? ''),
-            'category' => $this->category->name ?? null,
-            'category_id' => $this->category_id,
-            'brand' => $this->brand?->name,
-            'brand_id' => $this->brand_id,
-            'price_min' => $priceRange['min'],
-            'price_max' => $priceRange['max'],
+            'sku' => $this->variants->first()?->sku,
+            'price' => (int) ($priceRange['min'] ?? 0),
+            'category_id' => (string) $this->category_id,
+            'category_name' => $this->category?->name,
+            'brand_id' => $this->brand_id ? (string) $this->brand_id : null,
+            'brand_name' => $this->brand?->name,
             'is_active' => $this->is_active,
-            'is_saleable' => $this->is_saleable,
-            'average_rating' => $this->averageRating(),
+            'is_featured' => $this->is_featured ?? false,
             'created_at' => $this->created_at?->timestamp,
+            'thumbnail' => $this->getFirstMediaUrl('images', 'thumb') ?: null,
         ];
     }
 

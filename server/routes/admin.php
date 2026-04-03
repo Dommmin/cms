@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\NewsletterSubscriberController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PreviewController;
 use App\Http\Controllers\Admin\ReferralController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SectionTemplateController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\StoreController;
@@ -143,6 +144,8 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
             Route::delete('{user}/force-delete', [UserController::class, 'forceDelete'])
                 ->name('force-delete')->withTrashed();
         });
+
+        Route::resource('roles', RoleController::class)->only(['index', 'edit', 'update']);
     });
     Route::resource('media', MediaController::class)
         ->except(['show', 'edit'])

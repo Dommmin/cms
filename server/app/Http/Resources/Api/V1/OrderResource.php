@@ -43,6 +43,7 @@ class OrderResource extends JsonResource
             'shipment' => $order->relationLoaded('shipment') && $order->shipment ? [
                 'carrier' => $order->shipment->carrier,
                 'tracking_number' => $order->shipment->tracking_number,
+                'tracking_url' => $order->shipment->tracking_url,
                 'status' => $order->shipment->status->value,
             ] : null,
             'status_history' => $order->relationLoaded('statusHistory')

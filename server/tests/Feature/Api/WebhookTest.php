@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Infrastructure\Payments\P24\P24SignatureService;
 use App\Jobs\ProcessPaymentWebhook;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Queue;
@@ -86,8 +87,26 @@ describe('PayU webhook', function (): void {
 // ---------------------------------------------------------------------------
 
 describe('P24 webhook', function (): void {
-    it('accepts any P24 webhook and dispatches ProcessPaymentWebhook job', function (): void {
+    it('rejects request with invalid signature and returns 400', function (): void {
+        $this->mock(P24SignatureService::class)
+            ->shouldReceive('verifyWebhook')
+            ->once()
+            ->andReturn(false);
+
+        $this->postJson('/api/v1/webhooks/p24', [
+            'merchantId' => 12345,
+            'sessionId' => 'sess-abc',
+            'sign' => 'invalidsignature',
+        ])->assertStatus(400);
+    });
+
+    it('accepts valid signature and dispatches ProcessPaymentWebhook job', function (): void {
         Queue::fake();
+
+        $this->mock(P24SignatureService::class)
+            ->shouldReceive('verifyWebhook')
+            ->once()
+            ->andReturn(true);
 
         $this->postJson('/api/v1/webhooks/p24', [
             'merchantId' => 12345,
@@ -110,6 +129,11 @@ describe('P24 webhook', function (): void {
 
     it('P24 webhook is publicly accessible without authentication', function (): void {
         Queue::fake();
+
+        $this->mock(P24SignatureService::class)
+            ->shouldReceive('verifyWebhook')
+            ->once()
+            ->andReturn(true);
 
         // No auth header, no session — must still succeed
         $this->postJson('/api/v1/webhooks/p24', ['sessionId' => 'x', 'sign' => 'y'])

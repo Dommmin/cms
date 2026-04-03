@@ -122,6 +122,20 @@ services:
     networks:
       - cms-network
 
+  typesense:
+    image: typesense/typesense:27.1
+    container_name: ${COMPOSE_PROJECT_NAME}_typesense
+    restart: unless-stopped
+    environment:
+      TYPESENSE_DATA_DIR: /data
+      TYPESENSE_API_KEY: ${TYPESENSE_API_KEY:-typesense_api_key}
+    volumes:
+      - typesense_data:/data
+    ports:
+      - "8108:8108"
+    networks:
+      - cms-network
+
   mailhog:
     image: mailhog/mailhog:latest
     container_name: ${COMPOSE_PROJECT_NAME}_mailhog
@@ -140,3 +154,4 @@ networks:
 volumes:
   mysql_data:
   client_node_modules:
+  typesense_data:

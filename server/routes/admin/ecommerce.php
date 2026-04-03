@@ -35,7 +35,7 @@ Route::prefix('ecommerce')->name('ecommerce.')->group(function (): void {
     Route::resource('orders', AdminOrderController::class)
         ->only(['index', 'show'])
         ->names(['create' => 'ecommerce.orders.create', 'edit' => 'ecommerce.orders.edit']);
-    Route::patch('orders/{order}/status', new AdminOrderController()->updateStatus(...))->name('ecommerce.orders.update-status');
+    Route::patch('orders/{order}/status', new AdminOrderController()->updateStatus(...))->name('orders.update-status');
     Route::get('customers/export', [CustomerController::class, 'export'])->name('customers.export');
     Route::resource('reviews', AdminReviewController::class)
         ->only(['index', 'show', 'update', 'destroy'])

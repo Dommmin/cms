@@ -78,7 +78,7 @@ class UserController extends Controller
 
         $user->update($data);
 
-        if (isset($data['roles'])) {
+        if (! empty($roles)) {
             $user->syncRoles($roles);
         }
 

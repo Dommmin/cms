@@ -126,8 +126,12 @@ export function SearchClient() {
                     className="flex flex-1 items-center gap-2"
                 >
                     <div className="relative flex-1">
+                        <label htmlFor="search-q" className="sr-only">
+                            {t('search.search_label', 'Search products')}
+                        </label>
                         <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                         <input
+                            id="search-q"
                             name="q"
                             defaultValue={q}
                             placeholder={t(
@@ -146,7 +150,11 @@ export function SearchClient() {
                 </form>
 
                 <div className="flex items-center gap-2">
+                    <label htmlFor="search-sort" className="sr-only">
+                        {t('search.sort_label', 'Sort by')}
+                    </label>
                     <select
+                        id="search-sort"
                         value={filters.sort ?? ''}
                         onChange={(e) => setParam('sort', e.target.value)}
                         className="border-input bg-background focus:ring-ring rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
@@ -288,7 +296,14 @@ export function SearchClient() {
                                 {t('search.price_range', 'Price range')}
                             </p>
                             <div className="flex items-center gap-2">
+                                <label htmlFor="price-min" className="sr-only">
+                                    {t(
+                                        'search.min_price_label',
+                                        'Minimum price',
+                                    )}
+                                </label>
                                 <input
+                                    id="price-min"
                                     type="number"
                                     min={0}
                                     placeholder="Min"
@@ -299,7 +314,14 @@ export function SearchClient() {
                                     className="border-input bg-background focus:ring-ring w-full rounded-lg border px-2 py-1.5 text-sm focus:ring-2 focus:outline-none"
                                 />
                                 <span className="text-muted-foreground">–</span>
+                                <label htmlFor="price-max" className="sr-only">
+                                    {t(
+                                        'search.max_price_label',
+                                        'Maximum price',
+                                    )}
+                                </label>
                                 <input
+                                    id="price-max"
                                     type="number"
                                     min={0}
                                     placeholder="Max"

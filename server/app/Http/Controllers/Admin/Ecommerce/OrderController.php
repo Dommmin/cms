@@ -80,10 +80,11 @@ class OrderController extends Controller
         }
 
         // If SHIPPED and tracking number provided — update shipment
-        if ($newStatus === OrderStatusEnum::SHIPPED && ! empty($data['tracking_number'])) {
+        if ($newStatus === OrderStatusEnum::SHIPPED && (! empty($data['tracking_number']) || ! empty($data['tracking_url']))) {
             $order->shipment?->update([
-                'tracking_number' => $data['tracking_number'],
-                'status' => ShipmentStatusEnum::SHIPPED->value,
+                'tracking_number' => $data['tracking_number'] ?? null,
+                'tracking_url' => $data['tracking_url'] ?? null,
+                'status' => ShipmentStatusEnum::IN_TRANSIT,
             ]);
         }
 

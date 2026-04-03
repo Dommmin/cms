@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\CheckoutController;
 use App\Http\Controllers\Api\V1\ConsentController;
+use App\Http\Controllers\Api\V1\Dashboard\DashboardController;
 use App\Http\Controllers\Api\V1\FaqController;
 use App\Http\Controllers\Api\V1\FormController;
 use App\Http\Controllers\Api\V1\GusController;
@@ -28,6 +29,7 @@ use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\PromotionController;
 use App\Http\Controllers\Api\V1\ReviewController;
+use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\StoreController as ApiStoreController;
 use App\Http\Controllers\Api\V1\SupportController;
 use App\Http\Controllers\Api\V1\TranslationController;
@@ -125,6 +127,10 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::get('checkout/payment-methods', [CheckoutController::class, 'paymentMethods'])->name('checkout.payment-methods');
         Route::get('checkout/pickup-points', [PickupPointsController::class, 'index'])->name('checkout.pickup-points');
         Route::post('checkout', [CheckoutController::class, 'checkout'])->middleware('idempotent')->name('checkout');
+
+        // Search
+        Route::get('search', [SearchController::class, '__invoke'])->name('search');
+        Route::get('search/autocomplete', [SearchController::class, 'autocomplete'])->name('search.autocomplete');
     });
 
     // ── Cart (guest + auth) ──────────────────────────────────────────────────
@@ -179,6 +185,9 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         // Reviews
         Route::post('products/{slug}/reviews', [ReviewController::class, 'store'])->name('products.reviews.store');
         Route::post('reviews/{review}/helpful', [ReviewController::class, 'markHelpful'])->name('reviews.helpful');
+
+        // Dashboard
+        Route::get('dashboard', DashboardController::class)->name('dashboard');
 
         // Blog comments + votes (auth required)
         Route::post('blog/posts/{slug}/comments', new ApiBlogCommentController()->store(...))->name('blog.posts.comments.store');

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Models\Product;
+
 return [
 
     /*
@@ -183,28 +185,33 @@ return [
         ],
         // 'max_total_results' => env('TYPESENSE_MAX_TOTAL_RESULTS', 1000),
         'model-settings' => [
-            // User::class => [
-            //     'collection-schema' => [
-            //         'fields' => [
-            //             [
-            //                 'name' => 'id',
-            //                 'type' => 'string',
-            //             ],
-            //             [
-            //                 'name' => 'name',
-            //                 'type' => 'string',
-            //             ],
-            //             [
-            //                 'name' => 'created_at',
-            //                 'type' => 'int64',
-            //             ],
-            //         ],
-            //         'default_sorting_field' => 'created_at',
-            //     ],
-            //     'search-parameters' => [
-            //         'query_by' => 'name'
-            //     ],
-            // ],
+            Product::class => [
+                'collection-schema' => [
+                    'fields' => [
+                        ['name' => 'id', 'type' => 'string'],
+                        ['name' => 'name', 'type' => 'string'],
+                        ['name' => 'description', 'type' => 'string', 'optional' => true],
+                        ['name' => 'short_description', 'type' => 'string', 'optional' => true],
+                        ['name' => 'sku', 'type' => 'string', 'optional' => true],
+                        ['name' => 'price', 'type' => 'int64'],
+                        ['name' => 'category_id', 'type' => 'string'],
+                        ['name' => 'category_name', 'type' => 'string', 'optional' => true],
+                        ['name' => 'brand_id', 'type' => 'string', 'optional' => true],
+                        ['name' => 'brand_name', 'type' => 'string', 'optional' => true],
+                        ['name' => 'is_active', 'type' => 'bool'],
+                        ['name' => 'is_featured', 'type' => 'bool'],
+                        ['name' => 'created_at', 'type' => 'int64'],
+                        ['name' => 'thumbnail', 'type' => 'string', 'optional' => true],
+                    ],
+                    'default_sorting_field' => 'created_at',
+                ],
+                'search-parameters' => [
+                    'query_by' => 'name,description,short_description,sku',
+                    'filter_by' => 'is_active:true',
+                    'facet_by' => 'category_id,brand_id,price',
+                    'sort_by' => 'created_at:desc',
+                ],
+            ],
         ],
         'import_action' => env('TYPESENSE_IMPORT_ACTION', 'upsert'),
     ],

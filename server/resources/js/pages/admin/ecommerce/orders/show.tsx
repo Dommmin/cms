@@ -17,7 +17,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import * as OrderRoutes from '@/routes/admin/ecommerce/ecommerce/orders';
+import * as OrderRoutes from '@/routes/admin/ecommerce/orders';
 import type { BreadcrumbItem } from '@/types';
 import type { Address, OrderView, StatusOption } from './show.types';
 
@@ -80,6 +80,7 @@ function StatusModal({
         status: targetStatus,
         notes: '',
         tracking_number: '',
+        tracking_url: '',
     });
 
     function submit(e: React.FormEvent) {
@@ -102,23 +103,50 @@ function StatusModal({
 
                 <form onSubmit={submit} className="space-y-4">
                     {targetStatus === 'shipped' && (
-                        <div>
-                            <label className="mb-1 block text-sm font-medium">
-                                {__(
-                                    'label.tracking_number_optional',
-                                    'Tracking Number (optional)',
+                        <>
+                            <div>
+                                <label className="mb-1 block text-sm font-medium">
+                                    {__(
+                                        'label.tracking_number_optional',
+                                        'Tracking Number (optional)',
+                                    )}
+                                </label>
+                                <input
+                                    type="text"
+                                    value={data.tracking_number}
+                                    onChange={(e) =>
+                                        setData(
+                                            'tracking_number',
+                                            e.target.value,
+                                        )
+                                    }
+                                    placeholder="np. 1234567890"
+                                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-1 block text-sm font-medium">
+                                    {__(
+                                        'label.tracking_url_optional',
+                                        'Tracking URL (optional)',
+                                    )}
+                                </label>
+                                <input
+                                    type="url"
+                                    value={data.tracking_url}
+                                    onChange={(e) =>
+                                        setData('tracking_url', e.target.value)
+                                    }
+                                    placeholder="https://..."
+                                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
+                                />
+                                {errors.tracking_url && (
+                                    <p className="mt-1 text-xs text-destructive">
+                                        {errors.tracking_url}
+                                    </p>
                                 )}
-                            </label>
-                            <input
-                                type="text"
-                                value={data.tracking_number}
-                                onChange={(e) =>
-                                    setData('tracking_number', e.target.value)
-                                }
-                                placeholder="np. 1234567890"
-                                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
-                            />
-                        </div>
+                            </div>
+                        </>
                     )}
                     <div>
                         <label className="mb-1 block text-sm font-medium">
