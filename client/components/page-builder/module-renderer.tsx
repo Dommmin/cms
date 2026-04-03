@@ -1,3 +1,4 @@
+import { sanitizeHtml } from '@/lib/sanitize';
 import type { Faq, Page } from '@/types/api';
 import type { ModuleRendererProps } from './module-renderer.types';
 
@@ -24,7 +25,7 @@ function ContentModule({ page }: { page: Page }) {
             {html && (
                 <div
                     className="prose prose-lg dark:prose-invert"
-                    dangerouslySetInnerHTML={{ __html: html }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
                 />
             )}
         </div>
@@ -50,7 +51,9 @@ function FaqModule({ page }: { page: Page }) {
                         </summary>
                         <div
                             className="prose prose-sm dark:prose-invert mt-3"
-                            dangerouslySetInnerHTML={{ __html: faq.answer }}
+                            dangerouslySetInnerHTML={{
+                                __html: sanitizeHtml(faq.answer),
+                            }}
                         />
                     </details>
                 ))}

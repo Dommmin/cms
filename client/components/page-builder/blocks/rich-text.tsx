@@ -1,3 +1,4 @@
+import { sanitizeHtml } from '@/lib/sanitize';
 import type { RichTextConfig, RichTextProps } from './rich-text.types';
 
 export function RichTextBlock({ block }: RichTextProps) {
@@ -15,7 +16,7 @@ export function RichTextBlock({ block }: RichTextProps) {
     return (
         <div
             className={`prose dark:prose-invert max-w-none ${proseSize}`}
-            dangerouslySetInnerHTML={{ __html: cfg.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(cfg.content) }}
         />
     );
 }

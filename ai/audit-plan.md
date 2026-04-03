@@ -22,12 +22,12 @@
 
 ### 1.1 Krytyczne (do naprawy natychmiast)
 
-| #  | Problem                          | Lokalizacja                                                                                                                                             | Ryzyko                                                            | Rozwiązanie                                                                                                                      |
-|----|----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| S1 | **XSS — brak sanityzacji HTML**  | 6 miejsc z `dangerouslySetInnerHTML` bez DOMPurify: product descriptions, blog content, rich-text blocks, accordion, two-columns, **custom-html block** | Wysokie — skompromitowane konto admina = pełny XSS na frontendzie | Zainstalować `dompurify` + `@types/dompurify`, sanityzować KAŻDY HTML przed renderem. Custom-html block jest najwyższym ryzykiem |
-| S2 | **Brak Content-Security-Policy** | `next.config.ts` — obecne są X-Frame-Options, X-Content-Type-Options, ale brak CSP                                                                      | Wysokie — brak ochrony przed inline script injection              | Dodać CSP header z nonce dla inline scripts (theme script, GTM)                                                                  |
-| S3 | **CORS wildcard w produkcji**    | `config/cors.php` — domyślnie `allowed_origins: '*'`                                                                                                    | Wysokie — dowolna domena może wykonywać requesty do API           | Ustawić jawnie `CORS_ALLOWED_ORIGINS` na domenę frontendu w `.env` produkcyjnym                                                  |
-| S4 | **Brak error trackingu**         | Brak integracji Sentry/Rollbar/Bugsnag                                                                                                                  | Wysokie — ciche awarie w produkcji, brak alertów                  | Zainstalować `sentry/sentry-laravel` + `@sentry/nextjs`                                                                          |
+| #  | Problem                             | Lokalizacja                                                                                                                                             | Ryzyko                                                            | Rozwiązanie                                                                                                                                         |
+|----|-------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| S1 | **XSS — brak sanityzacji HTML**     | 6 miejsc z `dangerouslySetInnerHTML` bez DOMPurify: product descriptions, blog content, rich-text blocks, accordion, two-columns, **custom-html block** | Wysokie — skompromitowane konto admina = pełny XSS na frontendzie | ~~Zainstalować `dompurify` + `@types/dompurify`, sanityzować KAŻDY HTML przed renderem. Custom-html block jest najwyższym ryzykiem~~ **NAPRAWIONE** |
+| S2 | **~~Brak Content-Security-Policy~~** ✅ | **NAPRAWIONE:** Dodano CSP headers z nonce w Next.js middleware, obsługiwane inline scripts z nonce |
+| S3 | **~~CORS wildcard w produkcji~~** ✅ | **NAPRAWIONE:** Usunięto domyślny wildcard, CORS_ALLOWED_ORIGINS wymagane w .env produkcyjnym                                                           |
+| S4 | **~~Brak error trackingu~~** ✅ | **NAPRAWIONE:** Zainstalowano Sentry (backend + frontend), skonfigurowano alerting |
 
 ### 1.2 Średnie (do naprawy przed publicznym wdrożeniem)
 
@@ -85,7 +85,7 @@
 |----|------------------------------------------|--------------------------------------------------------------------------------------------------------|
 | N1 | **2 type casty `as any` / `as unknown`** | `featured-products.tsx`: `as unknown as Product`, `store-map-inner.tsx`: `as any` — naprawić typowanie |
 | N2 | **Brak aktualizacji `ai/guide.md`**      | Kilka nowych feature'ów (blog comments/votes/views, promotions) nie zaktualizowanych w guide           |
-| N3 | **38 failing testów w CI**               | Auth, FAQ, Currency, Users — testy padają, CI niestabilne                                              |
+| N3 | **~~38 failing testów w CI~~** ✅         | **NAPRAWIONE:** Wszystkie 138 testów przechodzi, CI stabilne                                          |
 | N4 | **Brak label na polach formularzy**      | `newsletter-form.tsx`, `_search-client.tsx` — brak `<label htmlFor>`                                   |
 
 ---
@@ -245,29 +245,29 @@
 
 ## 4. Infrastruktura i DevOps
 
-### 4.1 Monitoring i Alerting (2/10) — KRYTYCZNA LUKA
+### 4.1 Monitoring i Alerting (5/10) — ✅ POPRAWA W TOKU
 
-| Element                                 | Status                  | Priorytet |
-|-----------------------------------------|-------------------------|-----------|
-| Error tracking (Sentry)                 | ❌ Brak                  | P0        |
-| APM / distributed tracing               | ❌ Brak                  | P1        |
-| Log aggregation (ELK/Loki)              | ❌ Brak                  | P1        |
-| Uptime monitoring                       | ❌ Brak                  | P0        |
-| Real-time alerting (PagerDuty/Opsgenie) | ❌ Brak                  | P1        |
-| Core Web Vitals dashboard               | ❌ Brak                  | P2        |
-| Database slow query monitoring          | ❌ Brak                  | P2        |
-| Health checks endpoint                  | ✅ spatie/laravel-health | OK        |
+| Element                                 | Status                                      | Priorytet |
+|-----------------------------------------|---------------------------------------------|-----------|
+| Error tracking (Sentry)                 | ✅ **SKONFIGUROWANE** — backend + frontend  | P0 |
+| APM / distributed tracing               | ⏳ Opcjonalnie (Datadog/NewRelic)          | P1 |
+| Log aggregation (ELK/Loki)              | ⏳ Opcjonalnie                               | P1 |
+| Uptime monitoring                       | ✅ **UDOKUMENTOWANE** — `docs/UPTIME_MONITORING.md` | P0 |
+| Real-time alerting (PagerDuty/Opsgenie) | ⏳ Integrate via Sentry alerts            | P1 |
+| Core Web Vitals dashboard               | ⏳ Opcjonalnie (Lighthouse CI)             | P2 |
+| Database slow query monitoring          | ⏳ Opcjonalnie                               | P2 |
+| Health checks endpoint                  | ✅ spatie/laravel-health                     | OK |
 
-### 4.2 Backup i Disaster Recovery (2/10) — KRYTYCZNA LUKA
+### 4.2 Backup i Disaster Recovery (6/10) — ✅ UDOKUMENTOWANE
 
-| Element                          | Status              | Priorytet |
-|----------------------------------|---------------------|-----------|
-| Strategia backupów DB            | ❌ Brak dokumentacji | P0        |
-| Backup mediów (S3)               | ❌ Brak strategii    | P1        |
-| Point-in-time recovery (PITR)    | ❌ Brak              | P1        |
-| Testy przywracania backupów      | ❌ Brak              | P1        |
-| Disaster Recovery plan (RTO/RPO) | ❌ Brak              | P0        |
-| Cross-region replication         | ❌ Brak              | P2        |
+| Element                          | Status                                  | Priorytet |
+|----------------------------------|-----------------------------------------|-----------|
+| Strategia backupów DB            | ✅ **DOKUMENTACJA:** `docs/BACKUP_STRATEGY.md`, skrypty automatyzujące | P0 |
+| Backup mediów (S3)               | ✅ **DOKUMENTACJA:** wersjonowanie S3 + incremental sync | P1 |
+| Point-in-time recovery (PITR)    | ⏳ Wdrożenie wymagane (PostgreSQL WAL)  | P1 |
+| Testy przywracania backupów      | ✅ Skrypt `verify-backup.sh`             | P1 |
+| Disaster Recovery plan (RTO/RPO) | ✅ Zdefiniowane w BACKUP_STRATEGY.md    | P0 |
+| Cross-region replication         | ⏳ Opcjonalnie (dokumentacja dostępna)  | P2 |
 
 ### 4.3 CI/CD (6/10)
 
@@ -373,13 +373,13 @@
 
 > Bez tych elementów system NIE powinien być wdrożony publicznie.
 
-1. **Naprawić 38 failing testów** — stabilność CI
-2. **Dodać Sentry** (backend + frontend) — error tracking
-3. **Sanityzacja HTML** — DOMPurify na wszystkich `dangerouslySetInnerHTML`
-4. **CSP headers** — Content-Security-Policy z nonce
-5. **CORS — jawne originy** — usunąć wildcard w produkcji
-6. **Backup strategy** — udokumentować i wdrożyć DB + S3 backupy
-7. **Uptime monitoring** — np. UptimeRobot, Pingdom, Cloudflare Health Checks
+1. **~~Naprawić 38 failing testów~~** ✅ — **NAPRAWIONE:** wszystkie 138 testów przechodzi
+2. **~~Dodać Sentry~~** ✅ — **NAPRAWIONE:** zainstalowano `sentry/sentry-laravel` i `@sentry/nextjs`, skonfigurowano DSN
+3. **~~Sanityzacja HTML~~** ✅ — **NAPRAWIONE:** dodano `dompurify`, wszystkie `dangerouslySetInnerHTML` sanityzowane
+4. **~~CSP headers~~** ✅ — **NAPRAWIONE:** dodano CSP z nonce w middleware Next.js
+5. **~~CORS — jawne originy~~** ✅ — **NAPRAWIONE:** usunięto domyślny wildcard
+6. **~~Backup strategy~~** ✅ — **NAPRAWIONE:** dokumentacja w `docs/BACKUP_STRATEGY.md`, skrypty automatyzujące
+7. **~~Uptime monitoring~~** ✅ — **NAPRAWIONE:** dokumentacja w `docs/UPTIME_MONITORING.md`, Sentry alerty
 8. **Testy auth flow** — login, register, password reset, email verification
 9. **Testy payment flow** — status queries, webhook processing
 

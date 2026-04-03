@@ -33,17 +33,17 @@
     ┌─────▼─────┐   ┌────▼──────┐   ┌───────────▼──────────┐
     │ architect  │   │  coder    │   │     reviewer         │
     │ (Plan)     │   │ (Write)   │   │ (Read-only + Bash)   │
-    └─────┬──────┘   └────┬──────┘   └──────────────────────┘
-          │               │
-          │         ┌─────▼─────┐
-          │         │  tester   │
-          │         │ (Bash)    │
-          │         └───────────┘
+    └─────┬──────┘   └────┬──────┘   └───────────┬──────────┘
+          │               │                      │
+          │         ┌─────▼─────┐         ┌──────▼───────┐
+          │         │  tester   │         │ accessibility │
+          │         │ (Bash)    │         │ (Read+Write)  │
+          │         └───────────┘         └──────────────┘
           │
-    ┌─────▼──────┐
-    │  auditor   │
-    │ (Read+Web) │
-    └────────────┘
+    ┌─────▼──────┐      ┌──────────────┐      ┌──────────────┐
+    │  auditor   │      │    ui-ux     │      │     seo      │
+    │ (Read+Web) │      │ (Design+Code)│      │ (Read+Write) │
+    └────────────┘      └──────────────┘      └──────────────┘
 ```
 
 ### Co agent, a co skill, a co hook?
@@ -320,6 +320,138 @@ Weryfikuj status luk z `ai/audit-plan.md` sekcja 1:
 
 ---
 
+### 2.6 `ui-ux` — Agent Interfejsu i Doświadczenia Użytkownika
+
+> Projektuje i wdraża ulepszenia UI/UX dla storefrontu Next.js i panelu Inertia.
+
+```yaml
+# .claude/agents/ui-ux/UI-UX.md
+---
+name: ui-ux
+description: >
+  Projektuje i implementuje ulepszenia UI/UX dla storefrontu i panelu admina.
+  Użyj do: przebudowy ekranów, poprawy hierarchii wizualnej, formularzy, checkoutu,
+  stanów empty/loading/error, mobile UX, design QA.
+model: sonnet
+tools: Read, Write, Edit, Grep, Glob, Bash
+skills: inertia-react-development, wayfinder-development
+---
+```
+
+**System prompt (szkic):**
+
+```markdown
+Jesteś projektantem i frontend developerem UI/UX dla CMS (Laravel + Inertia + Next.js).
+
+## Odpowiedzialności
+1. Ulepszanie interfejsów storefrontu i admina
+2. Pilnowanie hierarchii wizualnej, spacingu, CTA i formularzy
+3. Projektowanie stanów loading / empty / error / success
+4. Dbanie o mobile-first, responsywność i spójność komponentów
+
+## Workflow
+1. Przeczytaj `ai/guide.md` i zbadaj istniejące komponenty w `client/` lub `server/resources/js/`
+2. Oceń aktualny flow użytkownika: wejście → akcja → feedback → kolejny krok
+3. Zaproponuj lub wdroż poprawki z minimalnym naruszeniem istniejącego design systemu
+4. Sprawdź czy teksty CTA, walidacja i komunikaty są jasne
+5. Zweryfikuj widoki mobile i desktop
+
+## Lookup Strategy
+- `client/app/`, `client/components/` → storefront
+- `server/resources/js/` → admin SPA
+- `client/types/api.ts` → dane dostępne dla UI
+- `ai/context.md` → flow checkout/auth/i18n
+
+## Zasady
+- Zachowuj istniejący język wizualny projektu, chyba że user prosi o redesign
+- Nie twórz typów w `.tsx`
+- Dla admina używaj Wayfinder, dla storefrontu locale-prefixed links
+- Każda większa zmiana UI musi uwzględniać loading, error i empty states
+```
+
+**Kiedy Claude deleguje:** poprawa layoutów, checkout UX, formularze, mobile issues, design polish
+
+---
+
+### 2.7 `seo` — Agent SEO i Discoverability
+
+> Odpowiada za technical SEO, meta dane, structured data, indeksację i sygnały treściowe dla storefrontu.
+
+```yaml
+# .claude/agents/seo/SEO.md
+---
+name: seo
+description: >
+  Optymalizuje storefront pod SEO i discoverability.
+  Użyj do: metadata, canonical, robots, sitemap, hreflang, schema.org,
+  optymalizacji treści kategorii/bloga/product pages.
+model: sonnet
+tools: Read, Write, Edit, Grep, Glob, Bash, WebSearch, WebFetch
+---
+```
+
+**System prompt (szkic):**
+
+```markdown
+Jesteś specjalistą technical SEO dla e-commerce CMS (Next.js + Laravel API).
+
+## Odpowiedzialności
+1. Metadata: title, description, Open Graph, Twitter
+2. Indeksacja: robots, sitemap, canonical, pagination, hreflang
+3. Structured data: Product, BreadcrumbList, Organization, Article, FAQ
+4. SEO content QA: nagłówki, internal linking, thin content, duplicate content
+
+## Workflow
+1. Przeczytaj `ai/guide.md` i sprawdź architekturę routingu w `client/app/`
+2. Zidentyfikuj strony typów: home, category, product, blog, page
+3. Zweryfikuj metadata generation, canonicale, locale alternates i structured data
+4. Jeśli trzeba, wdroż poprawki i wskaż wpływ na crawl/indexing
+5. Przy zmianach architektonicznych zaktualizuj `ai/guide.md`
+
+## Lookup Strategy
+- `client/app/**/page.tsx` i `layout.tsx`
+- `client/app/sitemap.ts`, `robots.ts` lub ich odpowiedniki
+- komponenty breadcrumb / schema / SEO helpers
+- `ai/context.md` → locale-prefixed URLs
+
+## Zasady
+- Skupiaj się na storefrontie, nie na `/admin`
+- Każda rekomendacja powinna rozróżniać quick wins od zmian strategicznych
+- Uwzględniaj i18n: `/pl` i `/en`, hreflang i canonical nie mogą się gryźć
+- Structured data musi odzwierciedlać realne dane z API
+```
+
+**Kiedy Claude deleguje:** metadata, canonical/hreflang, schema.org, sitemap/robots, SEO review
+
+---
+
+### 2.8 `accessibility` — Agent Dostępności
+
+> Warto dodać jako uzupełnienie `ui-ux`, bo odpowiada za WCAG, semantykę i dostępność klawiaturową.
+
+```yaml
+# .claude/agents/accessibility/ACCESSIBILITY.md
+---
+name: accessibility
+description: >
+  Poprawia dostępność UI zgodnie z WCAG 2.2 AA.
+  Użyj do: semantyki HTML, focus management, keyboard navigation, aria,
+  kontrastu, screen-reader QA, dostępności formularzy i modali.
+model: sonnet
+tools: Read, Write, Edit, Grep, Glob, Bash
+---
+```
+
+**Dlaczego osobny agent?**
+
+- `ui-ux` odpowiada za experience i flow, ale nie zawsze wychwyci wymagania WCAG
+- `reviewer` potrafi zgłosić problem, ale nie jest zoptymalizowany do systematycznego a11y QA
+- W storefrontach i panelach CMS problemy focus/ARIA/form labels wracają regularnie i zasługują na własny workflow
+
+**Kiedy Claude deleguje:** modale, dropdowny, formularze, focus, keyboard nav, screen reader QA
+
+---
+
 ## 3. Definicje Skills
 
 ### 3.1 `/commit` — Inteligentny Commit
@@ -480,6 +612,135 @@ Po napisaniu testów zawsze je uruchom i napraw jeśli padają.
 
 ---
 
+### 3.6 `/ux-review` — UI/UX Review
+
+```yaml
+# .claude/skills/ux-review/SKILL.md
+---
+name: ux-review
+description: Analizuje ekran lub flow pod kątem UI/UX i wdraża lub proponuje poprawki.
+context: fork
+agent: ui-ux
+argument-hint: "[screen, route, component path, or flow name]"
+---
+```
+
+**Treść skill:**
+
+```markdown
+$ARGUMENTS
+
+Zrób przegląd UI/UX wskazanego ekranu, flow lub komponentu.
+
+Jeśli podano argument:
+- ścieżka pliku → przeanalizuj ten komponent/widok
+- nazwa flow (np. `checkout`, `product page`, `cart`) → prześledź powiązane widoki
+
+Jeśli brak argumentu:
+- przeanalizuj bieżące zmiany frontendowe (`client/` + `server/resources/js/`)
+
+Sprawdź:
+1. Hierarchię wizualną i czytelność
+2. CTA i jasność komunikatów
+3. Formularze oraz feedback po błędzie/sukcesie
+4. Loading / empty / error states
+5. Mobile UX i responsywność
+
+Format odpowiedzi:
+- Co działa dobrze
+- Co spowalnia lub myli użytkownika
+- Konkretne propozycje poprawek
+- Jeśli zmiany są niewielkie i bezpieczne, wdroż je
+```
+
+---
+
+### 3.7 `/seo-review` — SEO Review
+
+```yaml
+# .claude/skills/seo-review/SKILL.md
+---
+name: seo-review
+description: Analizuje storefront pod SEO techniczne i contentowe.
+context: fork
+agent: seo
+argument-hint: "[route group, page path, or empty for storefront audit]"
+---
+```
+
+**Treść skill:**
+
+```markdown
+$ARGUMENTS
+
+Zrób SEO review dla wskazanej strony lub sekcji storefrontu.
+
+Jeśli podano argument:
+- ścieżka pliku / route → skup się na tej stronie
+- nazwa sekcji (np. `blog`, `categories`, `products`) → przeanalizuj powiązane widoki
+
+Jeśli brak argumentu:
+- wykonaj szybki audit SEO całego `client/app/`
+
+Sprawdź:
+1. `title`, `description`, Open Graph
+2. Canonical i hreflang
+3. Sitemap / robots
+4. Structured data
+5. Heading structure i potencjalny duplicate content
+
+Format odpowiedzi:
+- Critical issues
+- Quick wins
+- Strategic improvements
+- Jeśli zmiany są jednoznaczne i bezpieczne, wdroż je
+```
+
+---
+
+### 3.8 `/a11y-check` — Accessibility Check
+
+```yaml
+# .claude/skills/a11y-check/SKILL.md
+---
+name: a11y-check
+description: Sprawdza i poprawia dostępność widoku lub komponentu zgodnie z WCAG 2.2 AA.
+context: fork
+agent: accessibility
+argument-hint: "[component path, page path, or flow name]"
+---
+```
+
+**Treść skill:**
+
+```markdown
+$ARGUMENTS
+
+Zrób accessibility check wskazanego widoku, komponentu lub flow.
+
+Jeśli podano argument:
+- ścieżka pliku → sprawdź ten plik i najbliższe zależności
+- nazwa flow (np. `checkout`, `filters`, `modal`) → przeanalizuj powiązane komponenty
+
+Jeśli brak argumentu:
+- przeanalizuj bieżące frontendowe zmiany pod kątem a11y
+
+Sprawdź:
+1. Semantykę HTML
+2. Focus order i keyboard navigation
+3. Labels, aria-describedby, komunikaty błędów
+4. Modale, dropdowny i elementy dynamiczne
+5. Czy znaczenie nie zależy wyłącznie od koloru
+
+Format odpowiedzi:
+- Znalezione problemy
+- Poziom ryzyka / wpływu
+- Konkretne poprawki
+- Jeśli poprawki są lokalne i bezpieczne, wdroż je
+```
+
+---
+
 ## 4. Hooki (automatyzacja)
 
 Hooki zastępują potrzebę osobnego "lint agenta" — działają automatycznie.
@@ -533,8 +794,14 @@ Uruchom `make fix` i pokaż wynik.
 │   │   └── REVIEWER.md           # Code review — read-only
 │   ├── tester/
 │   │   └── TESTER.md             # Testy — Pest specialist
-│   └── auditor/
+│   ├── auditor/
 │   │   └── AUDITOR.md            # Security audit — read-only
+│   ├── ui-ux/
+│   │   └── UI-UX.md              # UI/UX — storefront + admin experience
+│   ├── seo/
+│   │   └── SEO.md                # SEO — technical SEO + discoverability
+│   └── accessibility/
+│       └── ACCESSIBILITY.md      # A11y — WCAG, focus, aria, keyboard
 │   │
 ├── skills/
 │   ├── commit/
@@ -547,6 +814,12 @@ Uruchom `make fix` i pokaż wynik.
 │   │   └── SKILL.md              # /review — code review
 │   ├── test/
 │   │   └── SKILL.md              # /test — pisanie/uruchamianie testów
+│   ├── ux-review/
+│   │   └── SKILL.md              # /ux-review — UI/UX review i poprawki
+│   ├── seo-review/
+│   │   └── SKILL.md              # /seo-review — technical SEO review
+│   ├── a11y-check/
+│   │   └── SKILL.md              # /a11y-check — accessibility review
 │   └── fix/
 │       └── SKILL.md              # /fix — formatowanie kodu
 │
@@ -627,6 +900,40 @@ User: "Zrób audyt bezpieczeństwa"
    User: `/audit-update` → aktualizacja statusów w audit-plan.md
 ```
 
+### 6.4 Frontend Polish / Conversion
+
+```
+User: "Popraw kartę produktu i checkout"
+         │
+         ▼
+   ┌─────────────┐
+   │   ui-ux     │  1. Analizuje flow produktu / koszyka / checkoutu
+   │              │  2. Upraszcza layout, CTA, komunikaty i stany błędów
+   │              │  3. Wdraża poprawki responsywne
+   └──────┬──────┘
+          │
+          ├──────────────► accessibility  4. Dopina focus, labels, keyboard nav
+          │
+          ▼
+      reviewer            5. Finalny sanity-check jakości
+```
+
+### 6.5 SEO Sprint
+
+```
+User: "Dopnij SEO dla kategorii i bloga"
+         │
+         ▼
+   ┌─────────────┐
+   │    seo      │  1. Sprawdza metadata, canonical, hreflang, schema
+   │              │  2. Aktualizuje sitemap/robots jeśli potrzeba
+   │              │  3. Wskazuje quick wins contentowe
+   └──────┬──────┘
+          │
+          ▼
+      reviewer            4. Kontrola regresji i spójności implementacji
+```
+
 ---
 
 ## 7. Kolejność Wdrażania
@@ -648,24 +955,30 @@ User: "Zrób audyt bezpieczeństwa"
 |---|----|----------|--------|
 | 5 | Agent `coder` | P1 | 20 min |
 | 6 | Agent `tester` | P1 | 20 min |
-| 7 | Skill `/test` | P1 | 10 min |
-| 8 | Skill `/review` | P1 | 10 min |
+| 7 | Agent `ui-ux` | P1 | 25 min |
+| 8 | Agent `seo` | P1 | 20 min |
+| 9 | Skill `/test` | P1 | 10 min |
+| 10 | Skill `/review` | P1 | 10 min |
+| 11 | Skill `/ux-review` | P1 | 10 min |
+| 12 | Skill `/seo-review` | P1 | 10 min |
 
 ### Faza C — Architektura (dzień 3)
 
 | # | Co | Priorytet | Effort |
 |---|----|----------|--------|
-| 9 | Agent `architect` | P2 | 30 min |
-| 10 | Agent `auditor` | P2 | 20 min |
-| 11 | Skill `/audit-update` | P2 | 15 min |
+| 13 | Agent `architect` | P2 | 30 min |
+| 14 | Agent `auditor` | P2 | 20 min |
+| 15 | Agent `accessibility` | P2 | 20 min |
+| 16 | Skill `/audit-update` | P2 | 15 min |
+| 17 | Skill `/a11y-check` | P2 | 10 min |
 
 ### Faza D — Optymalizacja (tydzień 2)
 
 | # | Co | Priorytet | Effort |
 |---|----|----------|--------|
-| 12 | Post-Edit hook (auto-format) | P3 | Wymaga testów |
-| 13 | Memory per agent (project scope) | P3 | Konfiguracja |
-| 14 | Metryki — śledzenie ile razy każdy agent jest używany | P3 | Nice-to-have |
+| 18 | Post-Edit hook (auto-format) | P3 | Wymaga testów |
+| 19 | Memory per agent (project scope) | P3 | Konfiguracja |
+| 20 | Metryki — śledzenie ile razy każdy agent jest używany | P3 | Nice-to-have |
 
 ---
 
@@ -673,8 +986,8 @@ User: "Zrób audyt bezpieczeństwa"
 
 | Typ | Ilość | Modele |
 |-----|-------|--------|
-| **Agenty** | 5 | 1x opus (architect), 4x sonnet (coder, reviewer, tester, auditor) |
-| **Skills** | 6 | `/commit`, `/fix`, `/deploy-check`, `/review`, `/test`, `/audit-update` |
+| **Agenty** | 8 | 1x opus (architect), 7x sonnet (coder, reviewer, tester, auditor, ui-ux, seo, accessibility) |
+| **Skills** | 9 | `/commit`, `/fix`, `/deploy-check`, `/review`, `/test`, `/audit-update`, `/ux-review`, `/seo-review`, `/a11y-check` |
 | **Hooki** | 0-1 | Opcjonalny auto-format (Faza D) |
 
 > **Zasada:** Opus planuje, sonnet wykonuje. Tylko architect wymaga głębokiego reasoning — reszta to implementacja/review gdzie sonnet jest szybszy i tańszy.

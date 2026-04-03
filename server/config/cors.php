@@ -9,15 +9,15 @@ return [
     | Cross-Origin Resource Sharing (CORS) Configuration
     |--------------------------------------------------------------------------
     |
-    | allowed_origins: Use '*' for fully public endpoints, or restrict to your
-    | frontend domain(s) via CORS_ALLOWED_ORIGINS env variable.
+    | allowed_origins: NEVER use '*' in production!
+    |
+    | SECURITY: For production, always set CORS_ALLOWED_ORIGINS explicitly:
+    |   CORS_ALLOWED_ORIGINS=https://myapp.com,https://www.myapp.com
     |
     | Mobile apps (iOS/Android) are not subject to CORS restrictions, so this
     | config applies primarily to web frontends.
     |
-    | Examples:
-    |   CORS_ALLOWED_ORIGINS=https://myapp.com,https://staging.myapp.com
-    |   CORS_ALLOWED_ORIGINS=*   (allow all — fine for fully public APIs)
+    | For development, you can use '*' but this MUST be changed before production.
     |
     */
 
@@ -26,7 +26,7 @@ return [
     'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
     'allowed_origins' => array_filter(
-        explode(',', (string) env('CORS_ALLOWED_ORIGINS', '*'))
+        explode(',', (string) env('CORS_ALLOWED_ORIGINS', ''))
     ),
 
     'allowed_origins_patterns' => [],

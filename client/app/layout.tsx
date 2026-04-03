@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { cache } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -80,6 +80,8 @@ export default async function RootLayout({
     children: React.ReactNode;
 }>) {
     const cookieStore = await cookies();
+    const headersList = await headers();
+    const nonce = headersList.get('x-nonce') ?? undefined;
     const locale = cookieStore.get('locale')?.value ?? 'en';
     const adminPreviewRaw = cookieStore.get('admin_preview')?.value;
     const isAdminPreview = !!adminPreviewRaw;
@@ -127,12 +129,14 @@ export default async function RootLayout({
                 )}
                 {/* Theme: prevent flash */}
                 <script
+                    nonce={nonce}
                     dangerouslySetInnerHTML={{
                         __html: `(function(){var t=localStorage.getItem('theme')||'system';if(t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}})();`,
                     }}
                 />
                 {/* Consent Mode v2: default DENIED — must run synchronously before GTM */}
                 <script
+                    nonce={nonce}
                     dangerouslySetInnerHTML={{
                         __html: `window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:"consent_default",analytics_storage:"denied",ad_storage:"denied",ad_user_data:"denied",ad_personalization:"denied",functionality_storage:"denied",security_storage:"granted"});`,
                     }}

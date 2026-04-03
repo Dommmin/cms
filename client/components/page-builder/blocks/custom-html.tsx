@@ -1,3 +1,4 @@
+import { sanitizeHtml } from '@/lib/sanitize';
 import type { CustomHtmlConfig, CustomHtmlProps } from './custom-html.types';
 
 export function CustomHtmlBlock({ block }: CustomHtmlProps) {
@@ -7,7 +8,7 @@ export function CustomHtmlBlock({ block }: CustomHtmlProps) {
     return (
         <>
             {cfg.css && <style dangerouslySetInnerHTML={{ __html: cfg.css }} />}
-            <div dangerouslySetInnerHTML={{ __html: cfg.html }} />
+            <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(cfg.html) }} />
         </>
     );
 }

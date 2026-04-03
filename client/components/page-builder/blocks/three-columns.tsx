@@ -1,3 +1,4 @@
+import { sanitizeHtml } from '@/lib/sanitize';
 import Image from 'next/image';
 
 import { getRelationByKey } from '@/lib/format';
@@ -60,7 +61,7 @@ export function ThreeColumnsBlock({ block }: ThreeColumnsProps) {
                             <div
                                 className="prose prose-sm dark:prose-invert"
                                 dangerouslySetInnerHTML={{
-                                    __html: col.content,
+                                    __html: sanitizeHtml(col.content),
                                 }}
                             />
                         )}

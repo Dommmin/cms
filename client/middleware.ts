@@ -31,7 +31,38 @@ function setLocaleCookie(response: NextResponse, locale: string): void {
     });
 }
 
+function generateNonce(): string {
+    // Use Web Crypto API (available in Edge Runtime)
+    const array = new Uint8Array(16);
+    crypto.getRandomValues(array);
+    return btoa(String.fromCharCode(...array));
+}
+
+function getCspHeader(nonce: string): string {
+    const isDev = process.env.NODE_ENV === 'development';
+
+    const csp = [
+        `default-src 'self'`,
+        `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://www.googletagmanager.com ${isDev ? "'unsafe-eval'" : ''}`,
+        `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
+        `img-src 'self' data: blob: https:`,
+        `font-src 'self' https://fonts.gstatic.com`,
+        `connect-src 'self' https: ${isDev ? 'http://localhost:*' : ''}`,
+        `frame-src 'self' https://www.google.com`,
+        `object-src 'none'`,
+        `base-uri 'self'`,
+        `form-action 'self'`,
+        `frame-ancestors 'self'`,
+        `upgrade-insecure-requests`,
+    ]
+        .filter(Boolean)
+        .join('; ');
+
+    return csp;
+}
+
 export function middleware(request: NextRequest) {
+    const nonce = generateNonce();
     const { pathname } = request.nextUrl;
     const pathLocale = pathname.split('/')[1] ?? '';
 
@@ -45,6 +76,8 @@ export function middleware(request: NextRequest) {
         redirectUrl.pathname = cleanPath;
         const response = NextResponse.redirect(redirectUrl, 301);
         setLocaleCookie(response, DEFAULT_LOCALE);
+        response.headers.set('Content-Security-Policy', getCspHeader(nonce));
+        response.headers.set('x-nonce', nonce);
         return response;
     }
 
@@ -53,6 +86,7 @@ export function middleware(request: NextRequest) {
         const pathAfterLocale = pathname.slice(pathLocale.length + 1) || '/';
         const requestHeaders = new Headers(request.headers);
         requestHeaders.set('x-locale', pathLocale);
+        requestHeaders.set('x-nonce', nonce);
 
         // Session-only paths (cart, checkout, account…): rewrite to strip locale
         // so they are always served from root routes regardless of locale prefix.
@@ -63,6 +97,10 @@ export function middleware(request: NextRequest) {
                 request: { headers: requestHeaders },
             });
             setLocaleCookie(response, pathLocale);
+            response.headers.set(
+                'Content-Security-Policy',
+                getCspHeader(nonce),
+            );
             return response;
         }
 
@@ -71,6 +109,7 @@ export function middleware(request: NextRequest) {
             request: { headers: requestHeaders },
         });
         setLocaleCookie(response, pathLocale);
+        response.headers.set('Content-Security-Policy', getCspHeader(nonce));
         return response;
     }
 
@@ -83,17 +122,25 @@ export function middleware(request: NextRequest) {
         if (LOCALES.includes(preferred) && preferred !== DEFAULT_LOCALE) {
             const redirectUrl = request.nextUrl.clone();
             redirectUrl.pathname = `/${preferred}${pathname === '/' ? '' : pathname}`;
-            return NextResponse.redirect(redirectUrl);
+            redirectUrl.pathname = `/${preferred}${pathname === '/' ? '' : pathname}`;
+            const response = NextResponse.redirect(redirectUrl);
+            response.headers.set(
+                'Content-Security-Policy',
+                getCspHeader(nonce),
+            );
+            return response;
         }
     }
 
     // Default locale — set x-locale header + cookie.
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-locale', DEFAULT_LOCALE);
+    requestHeaders.set('x-nonce', nonce);
     const response = NextResponse.next({
         request: { headers: requestHeaders },
     });
     setLocaleCookie(response, DEFAULT_LOCALE);
+    response.headers.set('Content-Security-Policy', getCspHeader(nonce));
     return response;
 }
 

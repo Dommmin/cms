@@ -1,5 +1,6 @@
 'use client';
 
+import { sanitizeHtml } from '@/lib/sanitize';
 import { useState } from 'react';
 
 import type { TabsBlockProps, TabsConfig } from './tabs-block.types';
@@ -53,7 +54,7 @@ export function TabsBlock({ block }: TabsBlockProps) {
                 <div
                     className="prose dark:prose-invert"
                     dangerouslySetInnerHTML={{
-                        __html: tabs[activeTab].content!,
+                        __html: sanitizeHtml(tabs[activeTab].content!),
                     }}
                 />
             )}

@@ -1,3 +1,4 @@
+import { sanitizeHtml } from '@/lib/sanitize';
 import Image from 'next/image';
 
 import { getRelationByKey } from '@/lib/format';
@@ -57,7 +58,9 @@ export function TwoColumnsBlock({ block }: TwoColumnsProps) {
                 {cfg.left_content && (
                     <div
                         className="prose dark:prose-invert"
-                        dangerouslySetInnerHTML={{ __html: cfg.left_content }}
+                        dangerouslySetInnerHTML={{
+                            __html: sanitizeHtml(cfg.left_content),
+                        }}
                     />
                 )}
             </div>
@@ -88,7 +91,9 @@ export function TwoColumnsBlock({ block }: TwoColumnsProps) {
                 {cfg.right_content && (
                     <div
                         className="prose dark:prose-invert"
-                        dangerouslySetInnerHTML={{ __html: cfg.right_content }}
+                        dangerouslySetInnerHTML={{
+                            __html: sanitizeHtml(cfg.right_content),
+                        }}
                     />
                 )}
             </div>

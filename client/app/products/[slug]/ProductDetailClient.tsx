@@ -25,6 +25,7 @@ import {
 import { addRecentlyViewed } from '@/hooks/use-recently-viewed';
 import { useTranslation } from '@/hooks/use-translation';
 import { trackViewItem } from '@/lib/datalayer';
+import { sanitizeHtml } from '@/lib/sanitize';
 import { buildBreadcrumbList, buildProduct } from '@/lib/schema';
 import { generateCanonical } from '@/lib/seo';
 
@@ -567,7 +568,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                         <div
                             className="prose prose-lg"
                             dangerouslySetInnerHTML={{
-                                __html: product.description ?? '',
+                                __html: sanitizeHtml(product.description ?? ''),
                             }}
                         />
                     )}

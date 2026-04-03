@@ -1,5 +1,6 @@
 'use client';
 
+import { sanitizeHtml } from '@/lib/sanitize';
 import { useState } from 'react';
 
 import type {
@@ -50,7 +51,7 @@ export function AccordionBlock({ block }: AccordionBlockProps) {
                                     <div
                                         className="prose prose-sm dark:prose-invert"
                                         dangerouslySetInnerHTML={{
-                                            __html: item.answer,
+                                            __html: sanitizeHtml(item.answer),
                                         }}
                                     />
                                 </div>

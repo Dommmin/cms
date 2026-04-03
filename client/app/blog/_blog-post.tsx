@@ -8,6 +8,7 @@ import { BlogVotes } from '@/components/blog-votes';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { JsonLd } from '@/components/json-ld';
 import { localePath } from '@/lib/i18n';
+import { sanitizeHtml } from '@/lib/sanitize';
 import { buildBlogPosting, buildBreadcrumbList } from '@/lib/schema';
 import { generateCanonical } from '@/lib/seo';
 import { BlogViewTracker } from './_blog-view-tracker';
@@ -126,7 +127,7 @@ export async function BlogPostView({
 
             <div
                 className="prose prose-lg mt-8"
-                dangerouslySetInnerHTML={{ __html: post.content }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
             />
 
             <div className="mt-8 flex items-center justify-between">
