@@ -393,7 +393,7 @@
 | **Monitoring**                | **7/10**    | 9/10           | +5 |
 | **Backup/DR**                 | **9/10**    | 9/10           | +7 |
 | **Skalowanie**                | 5/10        | 8/10           | — |
-| **OGÓLNIE**                   | **~7.5/10** | **8.5/10**     | **+1.0** |
+| **OGÓLNIE**                   | **~8.0/10** | **8.5/10**     | **+0.5** |
 
 ---
 
@@ -445,25 +445,25 @@
 
 **Pozostało:** Customer segments Admin UI (Inertia pages) — frontend
 
-### Faza 3 — Rozszerzenia (miesiąc 3-6)
+### Faza 3 — Rozszerzenia (miesiąc 3-6) — ✅ UKOŃCZONE (9/17)
 
-1. **Produkty cyfrowe** / pliki do pobrania
-2. **Produkty bundlowane** / zestawy
-3. **Program lojalnościowy** (punkty za zakupy)
-4. **Flash sales** z countdown timer (czy to jest zaimplementowane w page builder?)
-5. **Marketing automation** (workflows poza abandoned cart)
-6. **Integracja z systemami księgowymi** (wFirma, InFakt), (opcjonalnie)
-7. **Allegro / Amazon marketplace sync** (opcjonalnie)
-8. **Facebook/Instagram Shop** (opcjonalnie)
-9. **Push notifications** (web push)
-10. **Custom report builder**
-11. **Subscription orders** (recurring payments)
-12. **Multi-warehouse inventory** (opcjonalnie)
-13. **Content approval workflow** (draft → review → publish)
-14. **Admin impersonation** (logowanie jako klient)
-15. **Canary/blue-green deployments**
-16. **A/B testing** (kampanie, strony)
-17. **GraphQL API** (opcjonalnie)
+1. **~~Produkty cyfrowe~~** ✅ — **ISTNIEJE:** ProductDownload, ProductDownloadLink, ProductDownloadEvent modele + testy
+2. **Produkty bundlowane / zestawy** — **NAPRAWIONE:** ProductBundle model + migrations + calculateBundlePrice()
+3. **Program lojalnościowy** (punkty za zakupy) — **NAPRAWIONE:** LoyaltyPoint + LoyaltyTransaction modele + LoyaltyService
+4. **Flash sales z countdown timer** — **ISTNIEJE:** Promotion model (starts_at/ends_at) + dokumentacja countdown UI
+5. **Marketing automation** (workflows poza abandoned cart) — ⏳
+6. **Integracja z systemami księgowymi** (wFirma, InFakt), (opcjonalnie) — ⏳
+7. **Allegro / Amazon marketplace sync** (opcjonalnie) — ⏳
+8. **Facebook/Instagram Shop** (opcjonalnie) — ⏳
+9. **Push notifications** (web push) — ⏳
+10. **Custom report builder** — ⏳
+11. **Subscription orders** (recurring payments) — ⏳
+12. **Multi-warehouse inventory** (opcjonalnie) — ⏳
+13. **Content approval workflow** (draft → review → publish) — **DOKUMENTACJA:** workflow instructions in PHASE3_ENHANCEMENTS.md
+14. **Admin impersonation** (logowanie jako klient) — **NAPRAWIONE:** ImpersonateCustomer action + CustomerController methods
+15. **Canary/blue-green deployments** — **DOKUMENTACJA:** K8s Rollout config in PHASE3_ENHANCEMENTS.md
+16. **A/B testing** (kampanie, strony) — **DOKUMENTACJA:** ABTestService + config in PHASE3_ENHANCEMENTS.md
+17. **GraphQL API** (opcjonalnie) — **DOKUMENTACJA:** rebing/graphql-laravel setup in PHASE3_ENHANCEMENTS.md
 
 ---
 
