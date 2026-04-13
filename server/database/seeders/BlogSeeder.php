@@ -237,7 +237,6 @@ class BlogSeeder extends Seeder
                     'is_featured' => $isFeatured,
                     'published_at' => now()->subDays($daysAgo),
                     'reading_time' => $readingTime,
-                    'tags' => null,
                     'available_locales' => $hasPl ? ['en', 'pl'] : null,
                 ]),
             );

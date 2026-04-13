@@ -57,12 +57,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (App::environment('local')) {
-            Model::shouldBeStrict();
-        }
-
-        Vite::prefetch(concurrency: 3);
-
         $this->configureDefaults();
         $this->configureRateLimiting();
         $this->configureScramble();
@@ -259,13 +253,14 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function configureDefaults(): void
     {
+        if (App::environment('local')) {
+            Model::shouldBeStrict();
+        }
+
+        Vite::prefetch(concurrency: 3);
         JsonResource::withoutWrapping();
-
         Date::use(CarbonImmutable::class);
-
-        DB::prohibitDestructiveCommands(
-            app()->isProduction(),
-        );
+        DB::prohibitDestructiveCommands(app()->isProduction());
 
         Password::defaults(fn (): ?Password => app()->isProduction()
             ? Password::min(12)
