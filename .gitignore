@@ -163,3 +163,4 @@ Homestead.json
 # Local dev certificates
 /certs/
 .DS_Store
+!/.claude/worktrees/
