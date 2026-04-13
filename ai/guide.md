@@ -33,8 +33,6 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 
 ### E-commerce
 - **Products** — variants, attributes, product types, categories, flags, images (spatie/medialibrary), price history
-- **Product Variants** — barcode/EAN/UPC codes, variant-specific images, digital products support (downloadable files)
-- **Digital Products** — `is_digital` flag, download limits, expiry days, `ProductDownload` model for files, `ProductDownloadLink` for secure downloads
 - **Orders** — full lifecycle, status machine, invoices (PDF), export
 - **Cart** — token-based guest cart, abandoned cart cleanup + emails
 - **Checkout** — multi-step, shipping, payment providers, idempotency
@@ -52,7 +50,7 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - **Admin auth**: Laravel Fortify (session), 2FA/TOTP
 - **API auth**: Laravel Sanctum (tokens)
 - **Roles**: admin, editor (Spatie Permissions)
-- **GDPR**: soft-delete + PII anonymization (`AnonymizeUserData`), data export (Art. 15), user trash (admin)
+- **GDPR**: soft-delete + PII anonymization (`AnonymizeUserData`), data export (Art. 15), user trash (admin), consent management UI (Art. 7), account deletion notification (Art. 19), processing restriction (Art. 18)
 
 ### Payments
 - **PayU** — BLIK native, Apple Pay, Google Pay, redirect; OAuth2 token caching; MD5 webhook verification; `POST /api/v1/webhooks/payu`
@@ -74,7 +72,10 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - **Sitemap** — auto-generated, respects `sitemap_exclude` per product/post
 - **Enterprise SEO** — `meta_robots`, `og_image`, `sitemap_exclude` on Product/BlogPost/Page/Category; `generateMetadata()` on all public pages; OG + Twitter Card tags; dynamic robots.txt from `seo.robots_txt` setting; `SeoPanel` admin component with SERP preview + character counters
 - **DataLayer / GTM** — view_item, remove_from_cart, begin_checkout, purchase, search events wired (client)
-- **GDPR Data Export** — "Download my data" button in profile page, calls `GET /api/v1/profile/export`
+- **GDPR Data Export** — "Download my data" button in profile page, calls `GET /api/v1/profile/export`; includes `processing_restricted_at` in export JSON
+- **GDPR Consent Management** — `GET /api/v1/consent` (auth or X-Session-ID header), `DELETE /api/v1/consent/{category}` (withdraw); Cookie Preferences section in profile page with toggles
+- **GDPR Processing Restriction** — `POST /api/v1/profile/restrict-processing`, `DELETE /api/v1/profile/restrict-processing`; Data Processing section in profile page; `processing_restricted_at` timestamp on users table
+- **GDPR Account Deletion Notification** — `AccountDeletedNotification` sent synchronously before `AnonymizeUserData` runs
 - **Promo Badge %** — `discount_percentage` field in ProductData/ProductResource, shown on product cards
 - **Recently Viewed** — `use-recently-viewed.ts` hook, `<RecentlyViewed />` component (localStorage, max 10)
 - **Product Comparison** — `use-comparison.ts`, `<CompareButton />`, `<ComparisonBar />`, `/compare` page (max 4)
@@ -86,7 +87,6 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - **WCAG 2.1 AA** — skip nav link in root layout (`#main-content`), `aria-label` on icon-only buttons, `aria-live/atomic` on quantity steppers, `aria-current="page"` on active nav links, `aria-expanded/controls` on filter toggles, focus trap in cookie consent dialog (`role="dialog" aria-modal="true"`), labelled form inputs throughout
 - **EU/PL Legal Compliance** — checkout terms checkbox (required/accepted validation in `CheckoutRequest`), 14-day withdrawal notice in checkout, ODR platform link in footer legal menu (`https://ec.europa.eu/consumers/odr`), Omnibus price history (30-day low via `PriceHistory` + `ProductVariantPriceObserver`)
 - **Playwright E2E** — `client/tests/e2e/` (smoke, cart, i18n specs), Docker service under `testing` profile, `make e2e` / `make e2e-report` Makefile targets
-- **GlitchTip (Error Monitoring)** — self-hosted Sentry alternative for clients who don't want to pay for Sentry; 100% Sentry SDK compatible; Docker Compose bootstrap for local/staging lives in `.docker/glitchtip/`, production baseline for Kubernetes lives in `k8s/glitchtip/values.example.yaml`; docs at `docs/GLITCHTIP_DEPLOYMENT.md` + `docs/GLITCHTIP_QUICKSTART.md`; integrate via Sentry SDK (`sentry/sentry-laravel` + `@sentry/nextjs`) but prefer `GLITCHTIP_*` / `NEXT_PUBLIC_GLITCHTIP_DSN` env names, with legacy `SENTRY_*` kept as fallback compatibility
 
 ---
 

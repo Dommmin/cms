@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
-import { cookies, headers } from 'next/headers';
+import { cookies } from 'next/headers';
 import { cache } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -71,11 +71,6 @@ export async function generateMetadata(): Promise<Metadata> {
                       publicSettings.settings.seo.bing_site_verification,
               }
             : undefined,
-        alternates: {
-            types: {
-                'application/rss+xml': '/feed',
-            },
-        },
     };
 }
 
@@ -85,8 +80,6 @@ export default async function RootLayout({
     children: React.ReactNode;
 }>) {
     const cookieStore = await cookies();
-    const headersList = await headers();
-    const nonce = headersList.get('x-nonce') ?? undefined;
     const locale = cookieStore.get('locale')?.value ?? 'en';
     const adminPreviewRaw = cookieStore.get('admin_preview')?.value;
     const isAdminPreview = !!adminPreviewRaw;
@@ -103,6 +96,7 @@ export default async function RootLayout({
     }
 
     const publicSettings = await getPublicSettings();
+    const modules = publicSettings?.modules;
     const gtmId = publicSettings?.settings.seo?.google_tag_manager ?? null;
     const siteName = publicSettings?.settings.general?.site_name ?? 'Store';
     const siteUrl = publicSettings?.settings.general?.site_url;
@@ -134,14 +128,12 @@ export default async function RootLayout({
                 )}
                 {/* Theme: prevent flash */}
                 <script
-                    nonce={nonce}
                     dangerouslySetInnerHTML={{
                         __html: `(function(){var t=localStorage.getItem('theme')||'system';if(t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}})();`,
                     }}
                 />
                 {/* Consent Mode v2: default DENIED — must run synchronously before GTM */}
                 <script
-                    nonce={nonce}
                     dangerouslySetInnerHTML={{
                         __html: `window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:"consent_default",analytics_storage:"denied",ad_storage:"denied",ad_user_data:"denied",ad_personalization:"denied",functionality_storage:"denied",security_storage:"granted"});`,
                     }}
@@ -177,7 +169,7 @@ export default async function RootLayout({
                         <AdminBar entity={adminPreviewEntity} />
                         <div className="flex min-h-screen flex-col">
                             <AnnouncementBar />
-                            <Header />
+                            <Header modules={modules} />
                             <main id="main-content" className="flex-1">
                                 {children}
                             </main>

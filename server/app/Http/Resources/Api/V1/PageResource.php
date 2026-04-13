@@ -197,7 +197,7 @@ class PageResource extends JsonResource
         foreach ($allRelations->groupBy('relation_type') as $type => $relations) {
             $ids = $relations->pluck('relation_id')->unique()->values()->toArray();
 
-            if ($type === 'product') {
+            if ($type === 'product' && config('modules.ecommerce')) {
                 $products = Product::with(['thumbnail.media', 'brand', 'category', 'activeVariants:id,product_id,price,compare_at_price'])
                     ->whereIn('id', $ids)->get();
 

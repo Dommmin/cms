@@ -1,5 +1,12 @@
 import type { CookieSettings } from '@/components/cookie-consent.types';
 
+export type Modules = {
+    blog: boolean;
+    ecommerce: boolean;
+    newsletter: boolean;
+    marketing: boolean;
+};
+
 export type PublicSettingsResponse = {
     settings: {
         general?: {
@@ -20,4 +27,5 @@ export type PublicSettingsResponse = {
         social?: Record<string, string>;
         cookie?: CookieSettings;
     };
+    modules?: Modules;
 };

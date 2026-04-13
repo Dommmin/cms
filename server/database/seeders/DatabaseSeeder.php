@@ -14,26 +14,37 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // ── Core CMS (always seeded) ─────────────────────────────────────────
         $this->call([
             RolePermissionSeeder::class,
             UserSeeder::class,
-            ProductTypeSeeder::class,
-            // EcommerceDemoSeeder::class,
-            ElectronicsSeeder::class,
-            DiscountSeeder::class,
-            PromotionSeeder::class,
             FormSeeder::class,
             PagesDemoSeeder::class,
             SectionTemplateSeeder::class,
             ThemeSeeder::class,
             SettingsSeeder::class,
-            ShippingMethodSeeder::class,
             MenuSeeder::class,
             BlogSeeder::class,
-            CurrencySeeder::class,
             LocaleSeeder::class,
             TranslationSeeder::class,
             DashboardWidgetSeeder::class,
         ]);
+
+        // ── E-commerce (seeded only when module is active) ───────────────────
+        if (config('modules.ecommerce')) {
+            $this->call([
+                ProductTypeSeeder::class,
+                // EcommerceDemoSeeder::class,
+                ElectronicsSeeder::class,
+                DiscountSeeder::class,
+                PromotionSeeder::class,
+                ShippingMethodSeeder::class,
+                CurrencySeeder::class,
+                EmailTemplateSeeder::class,
+            ]);
+        }
+
+        // ── Newsletter (seeded only when module is active) ───────────────────
+        // (no dedicated newsletter seeder at this time)
     }
 }

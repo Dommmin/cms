@@ -7,11 +7,13 @@ namespace App\Http\Controllers\Api\V1;
 use App\Actions\AnonymizeUserData;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\DestroyAccountRequest;
+use App\Http\Requests\Api\V1\RestrictProcessingRequest;
 use App\Http\Requests\Api\V1\UpdatePasswordRequest;
 use App\Http\Requests\Api\V1\UpdateProfileRequest;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Models\Order;
 use App\Models\Setting;
+use App\Notifications\AccountDeletedNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -75,6 +77,9 @@ class ProfileController extends ApiController
             ]);
         }
 
+        // GDPR Art. 19 — Send confirmation email before anonymization
+        $user->notify(new AccountDeletedNotification);
+
         (new AnonymizeUserData)->handle($user);
 
         return $this->ok(['message' => 'Account deleted successfully']);
@@ -127,6 +132,7 @@ class ProfileController extends ApiController
                 'name' => $user->name,
                 'email' => $user->email,
                 'created_at' => $user->created_at,
+                'processing_restricted_at' => $user->processing_restricted_at,
             ],
             'profile' => $customer ? [
                 'first_name' => $customer->first_name,
@@ -155,6 +161,29 @@ class ProfileController extends ApiController
             $setting->key => $setting->value,
         ]));
 
-        return $this->ok(['settings' => $grouped]);
+        return $this->ok([
+            'settings' => $grouped,
+            'modules' => config('modules'),
+        ]);
+    }
+
+    /**
+     * GDPR Art. 18 — Set processing restriction.
+     */
+    public function restrictProcessing(RestrictProcessingRequest $request): JsonResponse
+    {
+        $request->user()->update(['processing_restricted_at' => now()]);
+
+        return $this->ok(['message' => 'Data processing has been restricted.']);
+    }
+
+    /**
+     * GDPR Art. 18 — Lift processing restriction.
+     */
+    public function liftProcessingRestriction(RestrictProcessingRequest $request): JsonResponse
+    {
+        $request->user()->update(['processing_restricted_at' => null]);
+
+        return $this->noContent();
     }
 }

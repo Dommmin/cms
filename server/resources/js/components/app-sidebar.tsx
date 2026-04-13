@@ -113,6 +113,7 @@ const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
     const __ = useTranslation();
+    const { modules } = usePage().props;
 
     const baseNavItems: NavItem[] = [
         {
@@ -181,7 +182,7 @@ export function AppSidebar() {
                 },
             ],
         },
-        {
+        ...(modules?.ecommerce ? [{
             title: __('nav.shop', 'Shop'),
             icon: ShoppingBag,
             children: [
@@ -256,8 +257,8 @@ export function AppSidebar() {
                     icon: Star,
                 },
             ],
-        },
-        {
+        }] : []),
+        ...(modules?.newsletter ? [{
             title: __('nav.newsletter', 'Newsletter'),
             icon: Mail,
             children: [
@@ -277,8 +278,8 @@ export function AppSidebar() {
                     icon: Megaphone,
                 },
             ],
-        },
-        {
+        }] : []),
+        ...(modules?.ecommerce ? [{
             title: __('nav.finance', 'Finance'),
             icon: Coins,
             children: [
@@ -293,7 +294,7 @@ export function AppSidebar() {
                     icon: ArrowRightLeft,
                 },
             ],
-        },
+        }] : []),
         {
             title: __('nav.users', 'Users'),
             href: UserController.index.url(),
@@ -330,7 +331,7 @@ export function AppSidebar() {
                 },
             ],
         },
-        {
+        ...(modules?.ecommerce && modules?.marketing ? [{
             title: __('nav.affiliates', 'Affiliates'),
             icon: Link2,
             children: [
@@ -345,7 +346,7 @@ export function AppSidebar() {
                     icon: Users2,
                 },
             ],
-        },
+        }] : []),
         {
             title: __('nav.support', 'Support'),
             icon: MessageCircle,

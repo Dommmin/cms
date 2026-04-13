@@ -15,6 +15,13 @@ declare module '@inertiajs/core' {
         tokens?: Record<string, string> | null;
     }
 
+    export interface Modules {
+        blog: boolean;
+        ecommerce: boolean;
+        newsletter: boolean;
+        marketing: boolean;
+    }
+
     export interface InertiaConfig {
         sharedPageProps: {
             name: string;
@@ -23,6 +30,7 @@ declare module '@inertiajs/core' {
             frontendUrl: string;
             activeTheme?: ActiveThemeSharedProp | null;
             locales: SharedLocale[];
+            modules: Modules;
             [key: string]: unknown;
         };
     }

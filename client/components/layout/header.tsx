@@ -6,6 +6,7 @@ import type { Category, MenuItem } from '@/types/api';
 
 import { AuthButton } from './auth-button';
 import { CartButton } from './cart-button';
+import type { HeaderProps } from './header.types';
 import { LocaleSwitcher } from './locale-switcher';
 import { MegaMenu } from './mega-menu';
 import { MobileMenu } from './mobile-menu';
@@ -13,7 +14,7 @@ import { SearchBar } from './search-bar';
 import { ThemeToggle } from './theme-toggle';
 import { WishlistButton } from './wishlist-button';
 
-export async function Header() {
+export async function Header({ modules }: HeaderProps) {
     const [headersList, cookieStore] = await Promise.all([
         headers(),
         cookies(),
@@ -30,13 +31,20 @@ export async function Header() {
         getMenu('header', locale).then((menu) => {
             items = menu.items ?? [];
         }),
-        getCategories().then((cats) => {
-            categories = cats;
-        }),
+        ...(modules?.ecommerce
+            ? [
+                  getCategories().then((cats) => {
+                      categories = cats;
+                  }),
+              ]
+            : []),
     ]);
 
     return (
-        <header className="border-border bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 border-b backdrop-blur">
+        <header
+            aria-label="Site header"
+            className="border-border bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 border-b backdrop-blur"
+        >
             <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 {/* Logo */}
                 <Link
@@ -47,18 +55,24 @@ export async function Header() {
                 </Link>
 
                 {/* Desktop mega menu */}
-                <MegaMenu items={items} categories={categories} />
+                <MegaMenu
+                    items={items}
+                    categories={modules?.ecommerce ? categories : []}
+                />
 
                 {/* Actions */}
                 <div className="flex items-center gap-2">
-                    <SearchBar />
+                    {modules?.ecommerce && <SearchBar />}
                     <LocaleSwitcher />
                     <ThemeToggle />
-                    <WishlistButton />
-                    <CartButton />
+                    {modules?.ecommerce && <WishlistButton />}
+                    {modules?.ecommerce && <CartButton />}
                     <AuthButton />
                     {/* Mobile menu trigger */}
-                    <MobileMenu items={items} categories={categories} />
+                    <MobileMenu
+                        items={items}
+                        categories={modules?.ecommerce ? categories : []}
+                    />
                 </div>
             </div>
         </header>

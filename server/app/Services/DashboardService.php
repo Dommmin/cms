@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\OrderStatusEnum;
+use App\Models\BlogPost;
 use App\Models\Customer;
+use App\Models\Form;
+use App\Models\FormSubmission;
 use App\Models\Order;
-use Carbon\Carbon;
+use App\Models\Page;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 
 class DashboardService
@@ -18,32 +22,55 @@ class DashboardService
      * @param  array{start: Carbon, end: Carbon}  $period
      * @return array<string, mixed>
      */
-    public function getStats(Carbon $start, Carbon $end): array
+    public function getStats(CarbonInterface $start, CarbonInterface $end): array
+    {
+        $stats = [
+            'cms' => $this->getCmsStats($start, $end),
+        ];
+
+        if (config('modules.ecommerce')) {
+            $stats['revenue'] = $this->getRevenue($start, $end);
+            $stats['orders_count'] = $this->getOrdersCount($start, $end);
+            $stats['average_order_value'] = $this->getAverageOrderValue($start, $end);
+            $stats['new_customers_count'] = $this->getNewCustomersCount($start, $end);
+            $stats['top_selling_products'] = $this->getTopSellingProducts($start, $end, 10);
+            $stats['recent_orders'] = $this->getRecentOrders(10);
+            $stats['orders_by_status'] = $this->getOrdersByStatus($start, $end);
+            $stats['revenue_by_day'] = $this->getRevenueByDay($start, $end);
+        }
+
+        return $stats;
+    }
+
+    /**
+     * Get CMS-level statistics (available regardless of ecommerce module).
+     *
+     * @return array<string, int>
+     */
+    private function getCmsStats(CarbonInterface $start, CarbonInterface $end): array
     {
         return [
-            'revenue' => $this->getRevenue($start, $end),
-            'orders_count' => $this->getOrdersCount($start, $end),
-            'average_order_value' => $this->getAverageOrderValue($start, $end),
-            'new_customers_count' => $this->getNewCustomersCount($start, $end),
-            'top_selling_products' => $this->getTopSellingProducts($start, $end, 10),
-            'recent_orders' => $this->getRecentOrders(10),
-            'orders_by_status' => $this->getOrdersByStatus($start, $end),
-            'revenue_by_day' => $this->getRevenueByDay($start, $end),
+            'published_pages' => Page::query()->where('status', 'published')->count(),
+            'published_posts' => BlogPost::query()->where('status', 'published')->count(),
+            'new_form_submissions' => FormSubmission::query()
+                ->whereBetween('created_at', [$start, $end])
+                ->count(),
+            'active_forms' => Form::query()->where('is_active', true)->count(),
         ];
     }
 
     /**
      * Get total revenue for period.
      */
-    private function getRevenue(Carbon $start, Carbon $end): int
+    private function getRevenue(CarbonInterface $start, CarbonInterface $end): int
     {
         return (int) Order::query()
             ->whereBetween('created_at', [$start, $end])
             ->whereIn('status', [
-                OrderStatusEnum::Pending->value,
-                OrderStatusEnum::Processing->value,
-                OrderStatusEnum::Shipped->value,
-                OrderStatusEnum::Delivered->value,
+                OrderStatusEnum::PENDING->value,
+                OrderStatusEnum::PROCESSING->value,
+                OrderStatusEnum::SHIPPED->value,
+                OrderStatusEnum::DELIVERED->value,
             ])
             ->sum('total');
     }
@@ -51,7 +78,7 @@ class DashboardService
     /**
      * Get orders count for period.
      */
-    private function getOrdersCount(Carbon $start, Carbon $end): int
+    private function getOrdersCount(CarbonInterface $start, CarbonInterface $end): int
     {
         return Order::query()
             ->whereBetween('created_at', [$start, $end])
@@ -61,15 +88,15 @@ class DashboardService
     /**
      * Get average order value for period.
      */
-    private function getAverageOrderValue(Carbon $start, Carbon $end): float
+    private function getAverageOrderValue(CarbonInterface $start, CarbonInterface $end): float
     {
         $result = Order::query()
             ->whereBetween('created_at', [$start, $end])
             ->whereIn('status', [
-                OrderStatusEnum::Pending->value,
-                OrderStatusEnum::Processing->value,
-                OrderStatusEnum::Shipped->value,
-                OrderStatusEnum::Delivered->value,
+                OrderStatusEnum::PENDING->value,
+                OrderStatusEnum::PROCESSING->value,
+                OrderStatusEnum::SHIPPED->value,
+                OrderStatusEnum::DELIVERED->value,
             ])
             ->avg('total');
 
@@ -79,7 +106,7 @@ class DashboardService
     /**
      * Get new customers count for period.
      */
-    private function getNewCustomersCount(Carbon $start, Carbon $end): int
+    private function getNewCustomersCount(CarbonInterface $start, CarbonInterface $end): int
     {
         return Customer::query()
             ->whereBetween('created_at', [$start, $end])
@@ -91,7 +118,7 @@ class DashboardService
      *
      * @return array<int, array<string, mixed>>
      */
-    private function getTopSellingProducts(Carbon $start, Carbon $end, int $limit): array
+    private function getTopSellingProducts(CarbonInterface $start, CarbonInterface $end, int $limit): array
     {
         $results = DB::query()
             ->select([
@@ -106,10 +133,10 @@ class DashboardService
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->whereBetween('orders.created_at', [$start, $end])
             ->whereIn('orders.status', [
-                OrderStatusEnum::Pending->value,
-                OrderStatusEnum::Processing->value,
-                OrderStatusEnum::Shipped->value,
-                OrderStatusEnum::Delivered->value,
+                OrderStatusEnum::PENDING->value,
+                OrderStatusEnum::PROCESSING->value,
+                OrderStatusEnum::SHIPPED->value,
+                OrderStatusEnum::DELIVERED->value,
             ])
             ->groupBy('product_variants.product_id', 'products.name')
             ->orderByDesc('total_quantity')
@@ -152,7 +179,7 @@ class DashboardService
      *
      * @return array<string, int>
      */
-    private function getOrdersByStatus(Carbon $start, Carbon $end): array
+    private function getOrdersByStatus(CarbonInterface $start, CarbonInterface $end): array
     {
         $results = Order::query()
             ->whereBetween('created_at', [$start, $end])
@@ -177,14 +204,14 @@ class DashboardService
      *
      * @return array<string, int>
      */
-    private function getRevenueByDay(Carbon $start, Carbon $end): array
+    private function getRevenueByDay(CarbonInterface $start, CarbonInterface $end): array
     {
         $results = Order::query()
             ->whereBetween('created_at', [$start, $end])
             ->whereIn('status', [
-                OrderStatusEnum::Pending->value,
-                OrderStatusEnum::Processing->value,
-                OrderStatusEnum::Shipped->value,
+                OrderStatusEnum::PENDING->value,
+                OrderStatusEnum::PROCESSING->value,
+                OrderStatusEnum::SHIPPED->value,
                 OrderStatusEnum::Delivered::value,
             ])
             ->select(

@@ -73,6 +73,7 @@ class HandleInertiaRequests extends Middleware
             'frontendUrl' => config('app.frontend_url', 'http://localhost:3000'),
             'locales' => Locale::getLocales(),
             'adminTranslations' => $this->loadAdminTranslations(),
+            'modules' => config('modules'),
         ];
     }
 
