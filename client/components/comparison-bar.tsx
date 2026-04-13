@@ -62,9 +62,12 @@ export function ComparisonBar() {
                             <button
                                 onClick={() => removeFromCompare(product.id)}
                                 className="text-muted-foreground hover:text-foreground"
-                                aria-label="Remove"
+                                aria-label={t(
+                                    'compare.remove_product',
+                                    `Remove ${product.name} from comparison`,
+                                ).replace('{name}', product.name)}
                             >
-                                <X className="h-3.5 w-3.5" />
+                                <X className="h-3.5 w-3.5" aria-hidden="true" />
                             </button>
                         </div>
                     ))}
@@ -74,9 +77,12 @@ export function ComparisonBar() {
                     <button
                         onClick={handleShareUrl}
                         className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs underline"
-                        title={t('compare.copy_link', 'Copy comparison link')}
+                        aria-label={t(
+                            'compare.copy_link',
+                            'Copy comparison link',
+                        )}
                     >
-                        <Copy className="h-3 w-3" />
+                        <Copy className="h-3 w-3" aria-hidden="true" />
                         {t('compare.share', 'Share')}
                     </button>
                     <button

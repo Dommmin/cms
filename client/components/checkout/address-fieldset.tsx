@@ -170,18 +170,24 @@ function addressToPayload(addr: Address): AddressPayload {
 function SavedAddressPicker({
     addresses,
     onSelect,
+    pickerId,
 }: {
     addresses: Address[];
     onSelect: (payload: AddressPayload) => void;
+    pickerId: string;
 }) {
     const { t } = useTranslation();
     if (addresses.length === 0) return null;
     return (
         <div className="mb-3">
-            <label className="text-muted-foreground mb-1 block text-xs font-medium">
+            <label
+                htmlFor={pickerId}
+                className="text-muted-foreground mb-1 block text-xs font-medium"
+            >
                 {t('address.saved_address_label', 'Select saved address')}
             </label>
             <select
+                id={pickerId}
                 defaultValue=""
                 onChange={(e) => {
                     const addr = addresses.find(
@@ -212,22 +218,37 @@ function SavedAddressPicker({
 
 function Field({
     label,
+    id,
     error,
+    errorId,
     children,
     className,
 }: {
     label: string;
+    id?: string;
     error?: string;
+    errorId?: string;
     children: React.ReactNode;
     className?: string;
 }) {
     return (
         <div className={className}>
-            <label className="text-muted-foreground mb-1 block text-xs">
+            <label
+                htmlFor={id}
+                className="text-muted-foreground mb-1 block text-xs"
+            >
                 {label}
             </label>
             {children}
-            {error && <p className="text-destructive mt-1 text-xs">{error}</p>}
+            {error && (
+                <p
+                    id={errorId}
+                    role="alert"
+                    className="text-destructive mt-1 text-xs"
+                >
+                    {error}
+                </p>
+            )}
         </div>
     );
 }
@@ -333,6 +354,7 @@ export function AddressFieldset({
                     <SavedAddressPicker
                         addresses={savedAddresses}
                         onSelect={onChange}
+                        pickerId={`${autocompleteSection}-saved-address`}
                     />
                 </div>
             )}
@@ -341,28 +363,46 @@ export function AddressFieldset({
                 {/* First / Last name */}
                 <Field
                     label={t('address.first_name', 'First Name *')}
+                    id={`${autocompleteSection}-first-name`}
                     error={err('first_name')}
+                    errorId={`${autocompleteSection}-first-name-error`}
                 >
                     <input
+                        id={`${autocompleteSection}-first-name`}
                         required
                         autoComplete={`${autocompleteSection} given-name`}
                         value={value.first_name}
                         onChange={(e) => set('first_name', e.target.value)}
                         onBlur={() => touch('first_name')}
+                        aria-describedby={
+                            err('first_name')
+                                ? `${autocompleteSection}-first-name-error`
+                                : undefined
+                        }
+                        aria-invalid={!!err('first_name')}
                         className={inputCls(err('first_name'))}
                     />
                 </Field>
 
                 <Field
                     label={t('address.last_name', 'Last Name *')}
+                    id={`${autocompleteSection}-last-name`}
                     error={err('last_name')}
+                    errorId={`${autocompleteSection}-last-name-error`}
                 >
                     <input
+                        id={`${autocompleteSection}-last-name`}
                         required
                         autoComplete={`${autocompleteSection} family-name`}
                         value={value.last_name}
                         onChange={(e) => set('last_name', e.target.value)}
                         onBlur={() => touch('last_name')}
+                        aria-describedby={
+                            err('last_name')
+                                ? `${autocompleteSection}-last-name-error`
+                                : undefined
+                        }
+                        aria-invalid={!!err('last_name')}
                         className={inputCls(err('last_name'))}
                     />
                 </Field>
@@ -370,9 +410,11 @@ export function AddressFieldset({
                 {/* Company */}
                 <Field
                     label={t('address.company', 'Company')}
+                    id={`${autocompleteSection}-company`}
                     className="sm:col-span-2"
                 >
                     <input
+                        id={`${autocompleteSection}-company`}
                         autoComplete={`${autocompleteSection} organization`}
                         value={value.company_name ?? ''}
                         onChange={(e) => set('company_name', e.target.value)}
@@ -383,12 +425,15 @@ export function AddressFieldset({
                 {/* Street with autocomplete */}
                 <Field
                     label={t('address.street', 'Street & Number *')}
+                    id={`${autocompleteSection}-street`}
                     error={err('street')}
+                    errorId={`${autocompleteSection}-street-error`}
                     className="sm:col-span-2"
                 >
                     <div ref={suggestionsRef} className="relative">
                         <div className="relative">
                             <input
+                                id={`${autocompleteSection}-street`}
                                 required
                                 autoComplete={`${autocompleteSection} street-address`}
                                 value={value.street}
@@ -398,6 +443,12 @@ export function AddressFieldset({
                                     setShowSuggestions(true);
                                 }}
                                 onBlur={() => touch('street')}
+                                aria-describedby={
+                                    err('street')
+                                        ? `${autocompleteSection}-street-error`
+                                        : undefined
+                                }
+                                aria-invalid={!!err('street')}
                                 className={inputCls(err('street'))}
                                 placeholder="np. ul. Marszałkowska 1"
                             />
@@ -434,9 +485,12 @@ export function AddressFieldset({
                 {/* Postal code */}
                 <Field
                     label={t('address.postal_code', 'Postal Code *')}
+                    id={`${autocompleteSection}-postal-code`}
                     error={err('postal_code')}
+                    errorId={`${autocompleteSection}-postal-code-error`}
                 >
                     <input
+                        id={`${autocompleteSection}-postal-code`}
                         required
                         autoComplete={`${autocompleteSection} postal-code`}
                         value={value.postal_code}
@@ -451,18 +505,36 @@ export function AddressFieldset({
                             set('postal_code', formatted);
                         }}
                         onBlur={() => touch('postal_code')}
+                        aria-describedby={
+                            err('postal_code')
+                                ? `${autocompleteSection}-postal-code-error`
+                                : undefined
+                        }
+                        aria-invalid={!!err('postal_code')}
                         className={inputCls(err('postal_code'))}
                     />
                 </Field>
 
                 {/* City */}
-                <Field label={t('address.city', 'City *')} error={err('city')}>
+                <Field
+                    label={t('address.city', 'City *')}
+                    id={`${autocompleteSection}-city`}
+                    error={err('city')}
+                    errorId={`${autocompleteSection}-city-error`}
+                >
                     <input
+                        id={`${autocompleteSection}-city`}
                         required
                         autoComplete={`${autocompleteSection} address-level2`}
                         value={value.city}
                         onChange={(e) => set('city', e.target.value)}
                         onBlur={() => touch('city')}
+                        aria-describedby={
+                            err('city')
+                                ? `${autocompleteSection}-city-error`
+                                : undefined
+                        }
+                        aria-invalid={!!err('city')}
                         className={inputCls(err('city'))}
                     />
                 </Field>
@@ -470,9 +542,11 @@ export function AddressFieldset({
                 {/* Country */}
                 <Field
                     label={t('address.country', 'Country *')}
+                    id={`${autocompleteSection}-country`}
                     className="sm:col-span-2"
                 >
                     <select
+                        id={`${autocompleteSection}-country`}
                         autoComplete={`${autocompleteSection} country`}
                         value={value.country_code}
                         onChange={(e) => {
@@ -496,10 +570,13 @@ export function AddressFieldset({
                 {/* Phone */}
                 <Field
                     label={t('address.phone', 'Phone *')}
+                    id={`${autocompleteSection}-phone`}
                     error={err('phone')}
+                    errorId={`${autocompleteSection}-phone-error`}
                     className="sm:col-span-2"
                 >
                     <input
+                        id={`${autocompleteSection}-phone`}
                         required
                         type="tel"
                         autoComplete={`${autocompleteSection} tel`}
@@ -507,6 +584,12 @@ export function AddressFieldset({
                         onChange={(e) => set('phone', e.target.value)}
                         onBlur={() => touch('phone')}
                         placeholder="+48 123 456 789"
+                        aria-describedby={
+                            err('phone')
+                                ? `${autocompleteSection}-phone-error`
+                                : undefined
+                        }
+                        aria-invalid={!!err('phone')}
                         className={inputCls(err('phone'))}
                     />
                 </Field>

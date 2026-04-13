@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Enums\ShippingCarrierEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\HasTranslations;
 
@@ -23,16 +24,61 @@ class ShippingMethod extends Model
         'carrier', 'name', 'description', 'is_active', 'min_weight', 'max_weight',
         'min_order_value', 'free_shipping_threshold', 'base_price', 'price_per_kg',
         'estimated_days_min', 'estimated_days_max',
+        'max_length_cm', 'max_width_cm', 'max_depth_cm',
+        'requires_signature', 'insurance_available',
     ];
 
     protected $casts = [
         'carrier' => ShippingCarrierEnum::class,
         'is_active' => 'boolean',
+        'requires_signature' => 'boolean',
+        'insurance_available' => 'boolean',
     ];
 
     public function shipments(): HasMany
     {
         return $this->hasMany(Shipment::class);
+    }
+
+    public function restrictedProducts(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Product::class,
+            'shipping_method_restrictions',
+            'shipping_method_id',
+            'restrictable_id',
+        )->wherePivot('restrictable_type', 'product');
+    }
+
+    public function restrictedCategories(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Category::class,
+            'shipping_method_restrictions',
+            'shipping_method_id',
+            'restrictable_id',
+        )->wherePivot('restrictable_type', 'category');
+    }
+
+    public function isRestrictedFor(array $productIds, array $categoryIds): bool
+    {
+        if ($productIds === [] && $categoryIds === []) {
+            return false;
+        }
+
+        $loadedProducts = $this->relationLoaded('restrictedProducts')
+            ? $this->restrictedProducts
+            : $this->restrictedProducts()->get();
+
+        if ($productIds !== [] && $loadedProducts->whereIn('id', $productIds)->isNotEmpty()) {
+            return true;
+        }
+
+        $loadedCategories = $this->relationLoaded('restrictedCategories')
+            ? $this->restrictedCategories
+            : $this->restrictedCategories()->get();
+
+        return $categoryIds !== [] && $loadedCategories->whereIn('id', $categoryIds)->isNotEmpty();
     }
 
     /** Oblicza koszt shipping dla danej wagi i wartości zamówienia (grosze) */
@@ -52,6 +98,13 @@ class ShippingMethod extends Model
     public function requiresPickupPoint(): bool
     {
         return $this->carrier instanceof ShippingCarrierEnum && $this->carrier->requiresPickupPoint();
+    }
+
+    public function hasMaxDimensions(): bool
+    {
+        return $this->max_length_cm !== null
+            || $this->max_width_cm !== null
+            || $this->max_depth_cm !== null;
     }
 
     /** Czy metoda jest dostępna dla tej wagi? */

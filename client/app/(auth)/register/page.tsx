@@ -51,7 +51,10 @@ export default function RegisterPage() {
             </p>
 
             {errorMessage && (
-                <div className="border-destructive/50 bg-destructive/10 text-destructive mb-4 rounded-xl border p-4 text-sm">
+                <div
+                    role="alert"
+                    className="border-destructive/50 bg-destructive/10 text-destructive mb-4 rounded-xl border p-4 text-sm"
+                >
                     {errorMessage}
                 </div>
             )}

@@ -1,5 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { ArrowLeftIcon } from 'lucide-react';
+import { ArrowLeftIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
@@ -35,7 +35,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Create Post', href: BlogPostController.create.url() },
 ];
 
-export default function CreateBlogPost({ categories }: CreateProps) {
+export default function CreateBlogPost({ categories, available_tags }: CreateProps) {
     const { locales } = usePage<{ locales: SharedLocale[] }>().props;
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
     const __ = useTranslation();
@@ -50,7 +50,7 @@ export default function CreateBlogPost({ categories }: CreateProps) {
         status: 'draft',
         published_at: '',
         blog_category_id: '',
-        tags: '',
+        tags: [],
         available_locales: null,
         is_featured: false,
         featured_image: '',
@@ -60,6 +60,7 @@ export default function CreateBlogPost({ categories }: CreateProps) {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
     const [isSlugManual, setIsSlugManual] = useState(false);
+    const [tagInput, setTagInput] = useState('');
 
     const handleTitleChange = (value: string) => {
         setData((prev) => ({
@@ -95,12 +96,6 @@ export default function CreateBlogPost({ categories }: CreateProps) {
 
         const payload = {
             ...data,
-            tags: data.tags
-                ? data.tags
-                      .split(',')
-                      .map((t) => t.trim())
-                      .filter(Boolean)
-                : [],
             blog_category_id: data.blog_category_id || null,
             featured_image: data.featured_image || null,
         };
@@ -578,21 +573,115 @@ export default function CreateBlogPost({ categories }: CreateProps) {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="tags">Tags</Label>
+                                    <Label>Tags</Label>
+                                    {data.tags.length > 0 && (
+                                        <div className="flex flex-wrap gap-1">
+                                            {data.tags.map((tag) => (
+                                                <span
+                                                    key={tag}
+                                                    className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs"
+                                                >
+                                                    {tag}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setData((prev) => ({
+                                                                ...prev,
+                                                                tags: prev.tags.filter(
+                                                                    (t) =>
+                                                                        t !==
+                                                                        tag,
+                                                                ),
+                                                            }))
+                                                        }
+                                                        className="text-muted-foreground hover:text-foreground"
+                                                        aria-label={`Remove ${tag}`}
+                                                    >
+                                                        <XIcon className="h-3 w-3" />
+                                                    </button>
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
                                     <Input
                                         id="tags"
-                                        value={data.tags}
+                                        value={tagInput}
                                         onChange={(e) =>
-                                            setData((prev) => ({
-                                                ...prev,
-                                                tags: e.target.value,
-                                            }))
+                                            setTagInput(e.target.value)
                                         }
-                                        placeholder="tag1, tag2, tag3"
+                                        onKeyDown={(e) => {
+                                            if (
+                                                e.key === 'Enter' ||
+                                                e.key === ','
+                                            ) {
+                                                e.preventDefault();
+                                                const value =
+                                                    tagInput.trim();
+                                                if (
+                                                    value &&
+                                                    !data.tags.includes(value)
+                                                ) {
+                                                    setData((prev) => ({
+                                                        ...prev,
+                                                        tags: [
+                                                            ...prev.tags,
+                                                            value,
+                                                        ],
+                                                    }));
+                                                }
+                                                setTagInput('');
+                                            }
+                                        }}
+                                        placeholder="Add tag and press Enter"
+                                        list="available-tags-list"
                                     />
-                                    <p className="text-xs text-muted-foreground">
-                                        Separate tags with commas
-                                    </p>
+                                    <datalist id="available-tags-list">
+                                        {available_tags
+                                            .filter(
+                                                (t) =>
+                                                    !data.tags.includes(
+                                                        t.name,
+                                                    ),
+                                            )
+                                            .map((t) => (
+                                                <option
+                                                    key={t.id}
+                                                    value={t.name}
+                                                />
+                                            ))}
+                                    </datalist>
+                                    {available_tags.filter(
+                                        (t) => !data.tags.includes(t.name),
+                                    ).length > 0 && (
+                                        <div className="flex flex-wrap gap-1">
+                                            {available_tags
+                                                .filter(
+                                                    (t) =>
+                                                        !data.tags.includes(
+                                                            t.name,
+                                                        ),
+                                                )
+                                                .slice(0, 8)
+                                                .map((t) => (
+                                                    <button
+                                                        key={t.id}
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setData((prev) => ({
+                                                                ...prev,
+                                                                tags: [
+                                                                    ...prev.tags,
+                                                                    t.name,
+                                                                ],
+                                                            }))
+                                                        }
+                                                        className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground hover:border-foreground hover:text-foreground"
+                                                    >
+                                                        + {t.name}
+                                                    </button>
+                                                ))}
+                                        </div>
+                                    )}
                                     <InputError message={errors.tags} />
                                 </div>
                             </div>

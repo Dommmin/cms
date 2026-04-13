@@ -23,10 +23,39 @@ const paymentStatusColors: Record<string, string> = {
     refunded: 'bg-gray-100 text-gray-800',
 };
 
-export function useOrderColumns(): ColumnDef<OrderRow>[] {
+type SelectionProps = {
+    selectedIds?: number[];
+    onToggleAll?: () => void;
+    onToggleOne?: (id: number) => void;
+    allSelected?: boolean;
+};
+
+export function useOrderColumns(selection?: SelectionProps): ColumnDef<OrderRow>[] {
     const __ = useTranslation();
 
-    return [
+    const checkboxColumn: ColumnDef<OrderRow> = {
+        id: 'select',
+        header: () => (
+            <input
+                type="checkbox"
+                checked={selection?.allSelected ?? false}
+                onChange={selection?.onToggleAll}
+                className="h-4 w-4 rounded border-gray-300"
+                aria-label="Select all orders"
+            />
+        ),
+        cell: ({ row }) => (
+            <input
+                type="checkbox"
+                checked={selection?.selectedIds?.includes(row.original.id) ?? false}
+                onChange={() => selection?.onToggleOne?.(row.original.id)}
+                className="h-4 w-4 rounded border-gray-300"
+                aria-label={`Select order ${row.original.order_number}`}
+            />
+        ),
+    };
+
+    const dataColumns: ColumnDef<OrderRow>[] = [
         {
             accessorKey: 'order_number',
             header: 'Order',
@@ -132,6 +161,8 @@ export function useOrderColumns(): ColumnDef<OrderRow>[] {
             ),
         },
     ];
+
+    return selection ? [checkboxColumn, ...dataColumns] : dataColumns;
 }
 
 /** @deprecated Use useOrderColumns() hook instead */

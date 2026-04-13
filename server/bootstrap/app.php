@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Http\Middleware\AdminAccess;
+use App\Http\Middleware\AdminSessionTimeout;
+use App\Http\Middleware\ApiCacheHeaders;
 use App\Http\Middleware\EnsureEmailVerified;
 use App\Http\Middleware\ForceJsonResponse;
 use App\Http\Middleware\HandleAppearance;
@@ -47,10 +49,12 @@ return Application::configure(basePath: dirname(__DIR__))
             ForceJsonResponse::class,
             LogApiRequests::class,
             SetLocale::class,
+            ApiCacheHeaders::class,
         ]);
 
         $middleware->alias([
             'admin' => AdminAccess::class,
+            'admin.timeout' => AdminSessionTimeout::class,
             'role' => RoleMiddleware::class,
             'force.json' => ForceJsonResponse::class,
             'log.api' => LogApiRequests::class,

@@ -10,6 +10,7 @@ use App\Http\Requests\Api\V1\StoreReturnRequestRequest;
 use App\Http\Resources\Api\V1\OrderResource;
 use App\Models\Order;
 use App\Models\ReturnRequest;
+use App\Services\CartService;
 use App\Services\InvoiceService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -43,7 +44,7 @@ class OrderController extends ApiController
         $order = Order::query()
             ->where('reference_number', $reference)
             ->where('customer_id', $customer?->id)
-            ->with(['items', 'billingAddress', 'shippingAddress', 'payment', 'shipment', 'statusHistory'])
+            ->with(['items', 'billingAddress', 'shippingAddress', 'payment', 'shipment', 'statusHistory', 'returns.items.orderItem'])
             ->firstOrFail();
 
         return $this->ok(new OrderResource($order));
@@ -80,6 +81,52 @@ class OrderController extends ApiController
             ->firstOrFail();
 
         return $invoiceService->download($order);
+    }
+
+    public function reorder(Request $request, string $reference, CartService $cartService): JsonResponse
+    {
+        $customer = $request->user()->customer;
+
+        $order = Order::query()
+            ->where('reference_number', $reference)
+            ->where('customer_id', $customer?->id)
+            ->with('items.variant')
+            ->firstOrFail();
+
+        $cart = $cartService->getOrCreateCart($request->user(), $request->header('X-Cart-Token'));
+
+        $addedCount = 0;
+        $skippedCount = 0;
+
+        foreach ($order->items as $item) {
+            if (! $item->variant || ! $item->variant->is_active || $item->variant->stock_quantity < 1) {
+                $skippedCount++;
+
+                continue;
+            }
+
+            $existingCartItem = $cart->items()->where('variant_id', $item->variant_id)->first();
+
+            if ($existingCartItem) {
+                $existingCartItem->increment('quantity', $item->quantity);
+            } else {
+                $cart->items()->create([
+                    'variant_id' => $item->variant_id,
+                    'quantity' => min($item->quantity, $item->variant->stock_quantity),
+                ]);
+            }
+
+            $addedCount++;
+        }
+
+        $suffix = $skippedCount > 0 ? sprintf(', %d unavailable', $skippedCount) : '';
+
+        return $this->ok([
+            'cart_token' => $cart->session_token,
+            'added' => $addedCount,
+            'skipped' => $skippedCount,
+            'message' => sprintf('Added %d item(s) to cart%s.', $addedCount, $suffix),
+        ]);
     }
 
     public function requestReturn(StoreReturnRequestRequest $request, string $reference): JsonResponse

@@ -39,21 +39,19 @@ class CustomerController extends Controller
 
     public function show(Customer $customer): Response
     {
-        $customer->load(['addresses', 'orders' => fn ($q) => $q->latest()->limit(10)]);
+        $customer->load(['addresses', 'orders' => fn ($q) => $q->latest()->limit(10)->with('payment')]);
 
-        $stats = [
-            'total_orders' => $customer->orders()->count(),
-            'total_spent' => $customer->orders()
-                ->where('status', OrderStatusEnum::DELIVERED->value)
-                ->sum('total'),
-            'pending_orders' => $customer->orders()
-                ->whereNotIn('status', [OrderStatusEnum::CANCELLED->value, OrderStatusEnum::DELIVERED->value])
-                ->count(),
-        ];
+        $delivered = fn () => $customer->orders()->where('status', OrderStatusEnum::DELIVERED->value);
 
         return inertia('admin/ecommerce/customers/show', [
-            'customer' => $customer,
-            'stats' => $stats,
+            'customer' => array_merge($customer->toArray(), [
+                'total_orders' => $customer->orders()->count(),
+                'total_spent' => (int) $delivered()->sum('total'),
+                'ltv_30_days' => (int) $delivered()->where('created_at', '>=', now()->subDays(30))->sum('total'),
+                'ltv_90_days' => (int) $delivered()->where('created_at', '>=', now()->subDays(90))->sum('total'),
+                'avg_order_value' => (int) ($delivered()->avg('total') ?? 0),
+                'last_order_at' => $customer->orders()->latest()->value('created_at'),
+            ]),
         ]);
     }
 

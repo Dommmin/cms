@@ -45,6 +45,7 @@ class Product extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'is_saleable' => 'boolean',
+        'is_search_promoted' => 'boolean',
         'available_from' => 'datetime',
         'available_until' => 'datetime',
         'sitemap_exclude' => 'boolean',
@@ -173,6 +174,7 @@ class Product extends Model
             'brand_name' => $this->brand?->name,
             'is_active' => $this->is_active,
             'is_featured' => $this->is_featured ?? false,
+            'is_search_promoted' => $this->is_search_promoted ?? false,
             'created_at' => $this->created_at?->timestamp,
             'thumbnail' => $this->getFirstMediaUrl('images', 'thumb') ?: null,
         ];

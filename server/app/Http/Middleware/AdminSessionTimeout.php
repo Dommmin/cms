@@ -15,9 +15,9 @@ final class AdminSessionTimeout
      * Shorter session timeout for admin users (in minutes).
      * Default: 30 minutes (vs 120 minutes for regular users).
      */
-    private const ADMIN_TIMEOUT_MINUTES = 30;
+    private const int ADMIN_TIMEOUT_MINUTES = 30;
 
-    private const SESSION_LAST_ACTIVITY_KEY = 'admin_last_activity';
+    private const string SESSION_LAST_ACTIVITY_KEY = 'admin_last_activity';
 
     /**
      * Handle an incoming request.
@@ -45,7 +45,7 @@ final class AdminSessionTimeout
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect()->route('login')->withErrors([
+            return to_route('login')->withErrors([
                 'email' => __('Session expired. Please log in again.'),
             ]);
         }

@@ -168,6 +168,7 @@ export default function Edit({
         brand_id?: number;
         is_active: boolean;
         is_saleable: boolean;
+        is_search_promoted?: boolean;
         seo_title?: string;
         seo_description?: string;
         meta_robots?: string;
@@ -207,6 +208,7 @@ export default function Edit({
         brand_id: product.brand_id ?? null,
         is_active: product.is_active,
         is_saleable: product.is_saleable,
+        is_search_promoted: product.is_search_promoted ?? false,
         seo_title: product.seo_title ?? '',
         seo_description: product.seo_description ?? '',
         meta_robots: product.meta_robots ?? 'index, follow',
@@ -1027,6 +1029,41 @@ export default function Edit({
                                                                 >
                                                                     Available
                                                                     for sale
+                                                                </Label>
+                                                            </div>
+
+                                                            <div className="flex items-center gap-2">
+                                                                <input
+                                                                    type="hidden"
+                                                                    name="is_search_promoted"
+                                                                    value="0"
+                                                                />
+                                                                <input
+                                                                    type="checkbox"
+                                                                    id="is_search_promoted"
+                                                                    name="is_search_promoted"
+                                                                    value="1"
+                                                                    checked={
+                                                                        formData.is_search_promoted
+                                                                    }
+                                                                    onChange={(
+                                                                        e,
+                                                                    ) =>
+                                                                        handleFormChange(
+                                                                            'is_search_promoted',
+                                                                            e
+                                                                                .target
+                                                                                .checked,
+                                                                        )
+                                                                    }
+                                                                    className="h-4 w-4 rounded border-input"
+                                                                />
+                                                                <Label
+                                                                    htmlFor="is_search_promoted"
+                                                                    className="font-normal"
+                                                                >
+                                                                    Promoted in
+                                                                    Search
                                                                 </Label>
                                                             </div>
                                                         </div>

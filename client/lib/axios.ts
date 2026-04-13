@@ -1,4 +1,5 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
+import Cookies from 'js-cookie';
 
 export const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:80/api/v1',
@@ -12,25 +13,34 @@ export const api = axios.create({
 // ── Token helpers ────────────────────────────────────────────────────────────
 
 const TOKEN_KEY = 'auth_token';
+const CSRF_COOKIE_KEY = 'XSRF-TOKEN';
 
 export function getToken(): string | null {
-    if (typeof document === 'undefined') return null;
-    const match = document.cookie.match(
-        new RegExp(`(?:^|; )${TOKEN_KEY}=([^;]*)`),
-    );
-    return match ? decodeURIComponent(match[1]) : null;
+    if (typeof window === 'undefined') return null;
+    return Cookies.get(TOKEN_KEY) ?? null;
 }
 
 export function setToken(token: string): void {
-    const maxAge = 60 * 60 * 24 * 7; // 7 days
-    document.cookie = `${TOKEN_KEY}=${encodeURIComponent(token)}; max-age=${maxAge}; path=/; SameSite=Lax`;
+    Cookies.set(TOKEN_KEY, token, {
+        expires: 7,
+        path: '/',
+        sameSite: 'Lax',
+        secure: process.env.NODE_ENV === 'production',
+    });
 }
 
 export function removeToken(): void {
-    document.cookie = `${TOKEN_KEY}=; max-age=0; path=/`;
+    Cookies.remove(TOKEN_KEY, { path: '/' });
 }
 
-// ── Request interceptor: attach Bearer token + locale ────────────────────────
+// ── CSRF Token ──────────────────────────────────────────────────────────────
+
+function getCsrfToken(): string | undefined {
+    if (typeof window === 'undefined') return undefined;
+    return Cookies.get(CSRF_COOKIE_KEY);
+}
+
+// ── Request interceptor: attach Bearer token + CSRF + locale ─────────────────
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     const token = getToken();
@@ -38,13 +48,19 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
         config.headers.Authorization = `Bearer ${token}`;
     }
 
-    // Append ?locale= from cookie so the backend SetLocale middleware can translate responses
-    if (typeof document !== 'undefined') {
-        const localeMatch = document.cookie.match(/(?:^|; )locale=([^;]*)/);
-        const locale = localeMatch ? decodeURIComponent(localeMatch[1]) : null;
-        if (locale) {
-            config.params = { locale, ...config.params };
+    // CSRF token for state-changing requests (Sanctum)
+    const method = config.method?.toUpperCase();
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method ?? '') && !token) {
+        const csrf = getCsrfToken();
+        if (csrf) {
+            config.headers['X-XSRF-TOKEN'] = decodeURIComponent(csrf);
         }
+    }
+
+    // Append ?locale= from cookie so the backend SetLocale middleware can translate responses
+    const locale = Cookies.get('locale');
+    if (locale) {
+        config.params = { locale, ...config.params };
     }
 
     return config;
@@ -66,12 +82,7 @@ api.interceptors.response.use(
             // Only redirect when an actual authenticated action fails (checkout, profile, etc.).
             const url = error.config?.url ?? '';
             if (typeof window !== 'undefined' && !url.endsWith('/auth/me')) {
-                const localeMatch = document.cookie.match(
-                    /(?:^|; )locale=([^;]*)/,
-                );
-                const locale = localeMatch
-                    ? decodeURIComponent(localeMatch[1])
-                    : 'en';
+                const locale = Cookies.get('locale') ?? 'en';
                 window.location.href = `/${locale}/login`;
             }
         }

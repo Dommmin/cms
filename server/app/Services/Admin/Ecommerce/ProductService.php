@@ -64,6 +64,7 @@ class ProductService
                 'brand_id' => $data['brand_id'] ?? null,
                 'is_active' => $data['is_active'] ?? $product->is_active,
                 'is_saleable' => $data['is_saleable'] ?? $product->is_saleable,
+                'is_search_promoted' => $data['is_search_promoted'] ?? $product->is_search_promoted,
                 'seo_title' => $data['seo_title'] ?? null,
                 'seo_description' => $data['seo_description'] ?? null,
                 'available_from' => $data['available_from'] ?? null,

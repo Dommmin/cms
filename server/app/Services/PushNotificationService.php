@@ -6,10 +6,10 @@ namespace App\Services;
 
 use App\Models\PushSubscription;
 use App\Models\User;
-use Illuminate\Support\Facades\Http;
+use Exception;
 use Illuminate\Support\Facades\Log;
-use Minishlink\WebPush\WebPush;
 use Minishlink\WebPush\Subscription;
+use Minishlink\WebPush\WebPush;
 
 final class PushNotificationService
 {
@@ -20,9 +20,19 @@ final class PushNotificationService
         private readonly ?string $privateKey
     ) {}
 
+    public static function generateVapidKeys(): array
+    {
+        $vapid = WebPush::createVapidKeys();
+
+        return [
+            'public_key' => $vapid['publicKey'],
+            'private_key' => $vapid['privateKey'],
+        ];
+    }
+
     public function subscribe(User $user, array $subscriptionData): PushSubscription
     {
-        //check if subscription already exists
+        // check if subscription already exists
         $existing = PushSubscription::query()
             ->where('endpoint', $subscriptionData['endpoint'])
             ->first();
@@ -39,7 +49,7 @@ final class PushNotificationService
             return $existing;
         }
 
-        return PushSubscription::create([
+        return PushSubscription::query()->create([
             'user_id' => $user->id,
             'endpoint' => $subscriptionData['endpoint'],
             'public_key' => $subscriptionData['keys']['p256dh'] ?? null,
@@ -127,10 +137,10 @@ final class PushNotificationService
                     $subscription->delete();
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $exception) {
             Log::error('Push notification failed', [
                 'subscription_id' => $subscription->id,
-                'error' => $e->getMessage(),
+                'error' => $exception->getMessage(),
             ]);
         }
 
@@ -139,7 +149,7 @@ final class PushNotificationService
 
     private function getWebPush(): WebPush
     {
-        if ($this->webPush === null) {
+        if (! $this->webPush instanceof WebPush) {
             $this->webPush = new WebPush([
                 'VAPID' => [
                     'subject' => config('app.url'),
@@ -150,15 +160,5 @@ final class PushNotificationService
         }
 
         return $this->webPush;
-    }
-
-    public static function generateVapidKeys(): array
-    {
-        $vapid = WebPush::createVapidKeys();
-
-        return [
-            'public_key' => $vapid['publicKey'],
-            'private_key' => $vapid['privateKey'],
-        ];
     }
 }

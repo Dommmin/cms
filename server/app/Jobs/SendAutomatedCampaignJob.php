@@ -22,8 +22,8 @@ final class SendAutomatedCampaignJob implements ShouldQueue
 
     public function handle(): void
     {
-        $campaign = NewsletterCampaign::find($this->campaignId);
-        $customer = Customer::find($this->customerId);
+        $campaign = NewsletterCampaign::query()->find($this->campaignId);
+        $customer = Customer::query()->find($this->customerId);
 
         if (! $campaign || ! $customer || ! $customer->user) {
             return;

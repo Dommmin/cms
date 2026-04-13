@@ -6,11 +6,13 @@ namespace App\Services;
 
 use App\Enums\CampaignStatusEnum;
 use App\Enums\CampaignTriggerEnum;
+use App\Jobs\SendAutomatedCampaignJob;
 use App\Models\Customer;
 use App\Models\NewsletterCampaign;
 use App\Models\NewsletterSubscriber;
 use App\Models\Order;
 use App\Models\Product;
+use App\Notifications\NewsletterCampaignNotification;
 use Illuminate\Support\Facades\Notification;
 
 final class MarketingAutomationService
@@ -26,6 +28,32 @@ final class MarketingAutomationService
         foreach ($campaigns as $campaign) {
             $this->processCampaign($campaign, $context);
         }
+    }
+
+    public function processBirthdays(): void
+    {
+        $today = now()->format('m-d');
+
+        Customer::query()
+            ->whereRaw("DATE_FORMAT(birth_date, '%m-%d') = ?", [$today])
+            ->whereNotNull('birth_date')
+            ->each(fn (Customer $customer) => $this->trigger(CampaignTriggerEnum::OnBirthday, $customer));
+    }
+
+    public function processInactiveCustomers(): void
+    {
+        $inactiveDays = 30;
+
+        Customer::query()
+            ->whereHas('orders')
+            ->whereDoesntHave('orders', function ($query) use ($inactiveDays): void {
+                $query->where('created_at', '>=', now()->subDays($inactiveDays));
+            })
+            ->each(function (Customer $customer): void {
+                if ($customer->user) {
+                    $this->trigger(CampaignTriggerEnum::CustomerInactive, $customer);
+                }
+            });
     }
 
     private function processCampaign(NewsletterCampaign $campaign, object $context): void
@@ -54,7 +82,7 @@ final class MarketingAutomationService
     private function handleFirstOrder(NewsletterCampaign $campaign, Order $order): void
     {
         $customer = $order->customer;
-        
+
         $previousOrders = Order::query()
             ->where('customer_id', $customer->id)
             ->where('id', '!=', $order->id)
@@ -131,7 +159,7 @@ final class MarketingAutomationService
     private function sendToEmail(NewsletterCampaign $campaign, string $email): void
     {
         Notification::route('mail', $email)
-            ->notify(new \App\Notifications\NewsletterCampaignNotification($campaign));
+            ->notify(new NewsletterCampaignNotification($campaign));
     }
 
     private function sendToCustomer(NewsletterCampaign $campaign, Customer $customer): void
@@ -140,38 +168,12 @@ final class MarketingAutomationService
             return;
         }
 
-        $customer->user->notify(new \App\Notifications\NewsletterCampaignNotification($campaign));
+        $customer->user->notify(new NewsletterCampaignNotification($campaign));
     }
 
     private function scheduleDelayed(NewsletterCampaign $campaign, Customer $customer, int $delayHours, array $context = []): void
     {
-        \App\Jobs\SendAutomatedCampaignJob::dispatch($campaign->id, $customer->id, $context)
+        dispatch(new SendAutomatedCampaignJob($campaign->id, $customer->id, $context))
             ->delay(now()->addHours($delayHours));
-    }
-
-    public function processBirthdays(): void
-    {
-        $today = now()->format('m-d');
-
-        Customer::query()
-            ->whereRaw("DATE_FORMAT(birth_date, '%m-%d') = ?", [$today])
-            ->whereNotNull('birth_date')
-            ->each(fn (Customer $customer) => $this->trigger(CampaignTriggerEnum::OnBirthday, $customer));
-    }
-
-    public function processInactiveCustomers(): void
-    {
-        $inactiveDays = 30;
-
-        Customer::query()
-            ->whereHas('orders')
-            ->whereDoesntHave('orders', function ($query) use ($inactiveDays): void {
-                $query->where('created_at', '>=', now()->subDays($inactiveDays));
-            })
-            ->each(function (Customer $customer): void {
-                if ($customer->user) {
-                    $this->trigger(CampaignTriggerEnum::CustomerInactive, $customer);
-                }
-            });
     }
 }

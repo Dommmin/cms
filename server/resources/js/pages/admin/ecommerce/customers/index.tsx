@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { DownloadIcon, UserCircle } from 'lucide-react';
 import * as CustomerController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CustomerController';
 import DataTable from '@/components/data-table';
@@ -45,7 +45,10 @@ export default function CustomersIndex({ customers, filters }: IndexProps) {
                             accessorKey: 'name',
                             header: __('column.customer', 'Customer'),
                             cell: ({ row }) => (
-                                <div className="flex items-center gap-2">
+                                <Link
+                                    href={CustomerController.show.url(row.original.id)}
+                                    className="flex items-center gap-2 hover:underline"
+                                >
                                     <div className="flex h-8 w-8 items-center justify-center rounded bg-indigo-100">
                                         <UserCircle className="h-4 w-4 text-indigo-600" />
                                     </div>
@@ -60,7 +63,7 @@ export default function CustomersIndex({ customers, filters }: IndexProps) {
                                             </p>
                                         )}
                                     </div>
-                                </div>
+                                </Link>
                             ),
                         },
                         {
@@ -80,6 +83,23 @@ export default function CustomersIndex({ customers, filters }: IndexProps) {
                                     {(
                                         row.original.orders_sum_total / 100
                                     ).toFixed(2)}
+                                </span>
+                            ),
+                        },
+                        {
+                            accessorKey: 'is_active',
+                            header: __('column.status', 'Status'),
+                            cell: ({ row }) => (
+                                <span
+                                    className={
+                                        row.original.is_active
+                                            ? 'inline-flex rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800'
+                                            : 'inline-flex rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800'
+                                    }
+                                >
+                                    {row.original.is_active
+                                        ? __('label.active', 'Active')
+                                        : __('label.inactive', 'Inactive')}
                                 </span>
                             ),
                         },

@@ -22,7 +22,7 @@ class BlogPostController extends ApiController
         $sort = $request->query('sort', '-created_at');
 
         $posts = BlogPost::query()->published()
-            ->with(['author:id,name', 'category:id,name,slug'])
+            ->with(['author:id,name', 'category:id,name,slug', 'tags'])
             ->where(function ($q) use ($locale): void {
                 $q->whereNull('available_locales')
                     ->orWhereJsonContains('available_locales', $locale);
@@ -57,7 +57,7 @@ class BlogPostController extends ApiController
                 $q->whereNull('available_locales')
                     ->orWhereJsonContains('available_locales', $locale);
             })
-            ->with(['author:id,name', 'category:id,name,slug', 'votes'])
+            ->with(['author:id,name', 'category:id,name,slug', 'votes', 'tags'])
             ->firstOrFail();
 
         return $this->ok(new BlogPostResource($post));
@@ -143,7 +143,7 @@ class BlogPostController extends ApiController
                 $q->whereNull('available_locales')
                     ->orWhereJsonContains('available_locales', $locale);
             })
-            ->with(['author:id,name', 'category:id,name,slug'])
+            ->with(['author:id,name', 'category:id,name,slug', 'tags'])
             ->latest('published_at')
             ->paginate(15)
             ->withQueryString();

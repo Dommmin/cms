@@ -123,15 +123,19 @@ export function SearchClient() {
                         ).value;
                         setParam('q', input);
                     }}
+                    role="search"
                     className="flex flex-1 items-center gap-2"
                 >
                     <div className="relative flex-1">
-                        <label htmlFor="search-q" className="sr-only">
-                            {t('search.search_label', 'Search products')}
+                        <Search
+                            className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
+                            aria-hidden="true"
+                        />
+                        <label htmlFor="search-page-input" className="sr-only">
+                            {t('shop.search_label', 'Search products')}
                         </label>
-                        <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                         <input
-                            id="search-q"
+                            id="search-page-input"
                             name="q"
                             defaultValue={q}
                             placeholder={t(
@@ -151,7 +155,7 @@ export function SearchClient() {
 
                 <div className="flex items-center gap-2">
                     <label htmlFor="search-sort" className="sr-only">
-                        {t('search.sort_label', 'Sort by')}
+                        {t('shop.sort_label', 'Sort by')}
                     </label>
                     <select
                         id="search-sort"
@@ -167,9 +171,14 @@ export function SearchClient() {
                     </select>
                     <button
                         onClick={() => setSidebarOpen((v) => !v)}
+                        aria-expanded={sidebarOpen}
+                        aria-controls="search-filters-sidebar"
                         className="border-input bg-background hover:bg-accent inline-flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm lg:hidden"
                     >
-                        <SlidersHorizontal className="h-4 w-4" />
+                        <SlidersHorizontal
+                            className="h-4 w-4"
+                            aria-hidden="true"
+                        />
                         {t('shop.filters', 'Filters')}
                         {activeFilters.length > 0 && (
                             <span className="bg-primary text-primary-foreground flex h-5 w-5 items-center justify-center rounded-full text-xs">
@@ -190,10 +199,14 @@ export function SearchClient() {
                         <button
                             key={f.key}
                             onClick={() => setParam(f.key, '')}
+                            aria-label={t(
+                                'search.remove_filter',
+                                `Remove filter: ${f.label}`,
+                            ).replace('{label}', f.label)}
                             className="border-border bg-accent hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium"
                         >
                             {f.label}
-                            <X className="h-3 w-3" />
+                            <X className="h-3 w-3" aria-hidden="true" />
                         </button>
                     ))}
                     <button
@@ -208,6 +221,8 @@ export function SearchClient() {
             <div className="flex gap-6">
                 {/* Sidebar */}
                 <aside
+                    id="search-filters-sidebar"
+                    aria-label={t('shop.filters_label', 'Search filters')}
                     className={`${sidebarOpen ? 'block' : 'hidden'} w-64 shrink-0 lg:block`}
                 >
                     <div className="border-border bg-card space-y-6 rounded-xl border p-4">
@@ -297,10 +312,7 @@ export function SearchClient() {
                             </p>
                             <div className="flex items-center gap-2">
                                 <label htmlFor="price-min" className="sr-only">
-                                    {t(
-                                        'search.min_price_label',
-                                        'Minimum price',
-                                    )}
+                                    {t('search.price_min', 'Minimum price')}
                                 </label>
                                 <input
                                     id="price-min"
@@ -313,12 +325,14 @@ export function SearchClient() {
                                     }
                                     className="border-input bg-background focus:ring-ring w-full rounded-lg border px-2 py-1.5 text-sm focus:ring-2 focus:outline-none"
                                 />
-                                <span className="text-muted-foreground">–</span>
+                                <span
+                                    className="text-muted-foreground"
+                                    aria-hidden="true"
+                                >
+                                    –
+                                </span>
                                 <label htmlFor="price-max" className="sr-only">
-                                    {t(
-                                        'search.max_price_label',
-                                        'Maximum price',
-                                    )}
+                                    {t('search.price_max', 'Maximum price')}
                                 </label>
                                 <input
                                     id="price-max"
@@ -339,7 +353,12 @@ export function SearchClient() {
                 {/* Results */}
                 <div className="min-w-0 flex-1">
                     {/* Result count */}
-                    <p className="text-muted-foreground mb-4 text-sm">
+                    <p
+                        className="text-muted-foreground mb-4 text-sm"
+                        aria-live="polite"
+                        aria-atomic="true"
+                        role="status"
+                    >
                         {isLoading ? (
                             t('search.searching', 'Searching…')
                         ) : (
@@ -450,26 +469,48 @@ export function SearchClient() {
 
                             {/* Pagination */}
                             {data.meta && data.meta.last_page > 1 && (
-                                <div className="mt-8 flex items-center justify-center gap-2">
+                                <nav
+                                    aria-label={t(
+                                        'search.pagination',
+                                        'Pagination',
+                                    )}
+                                    className="mt-8 flex items-center justify-center gap-2"
+                                >
                                     {Array.from(
                                         { length: data.meta.last_page },
                                         (_, i) => i + 1,
-                                    ).map((page) => (
-                                        <button
-                                            key={page}
-                                            onClick={() =>
-                                                setParam('page', String(page))
-                                            }
-                                            className={`h-9 w-9 rounded-md text-sm font-medium ${
-                                                page === data.meta!.current_page
-                                                    ? 'bg-primary text-primary-foreground'
-                                                    : 'border-input hover:bg-accent border'
-                                            }`}
-                                        >
-                                            {page}
-                                        </button>
-                                    ))}
-                                </div>
+                                    ).map((page) => {
+                                        const isCurrent =
+                                            page === data.meta!.current_page;
+                                        return (
+                                            <button
+                                                key={page}
+                                                onClick={() =>
+                                                    setParam(
+                                                        'page',
+                                                        String(page),
+                                                    )
+                                                }
+                                                aria-current={
+                                                    isCurrent
+                                                        ? 'page'
+                                                        : undefined
+                                                }
+                                                aria-label={t(
+                                                    'search.page_n',
+                                                    `Page ${page}`,
+                                                ).replace('{n}', String(page))}
+                                                className={`h-9 w-9 rounded-md text-sm font-medium ${
+                                                    isCurrent
+                                                        ? 'bg-primary text-primary-foreground'
+                                                        : 'border-input hover:bg-accent border'
+                                                }`}
+                                            >
+                                                {page}
+                                            </button>
+                                        );
+                                    })}
+                                </nav>
                             )}
                         </>
                     )}

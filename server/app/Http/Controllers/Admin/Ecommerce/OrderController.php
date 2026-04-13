@@ -8,6 +8,7 @@ use App\Enums\OrderStatusEnum;
 use App\Enums\ShipmentStatusEnum;
 use App\Exports\OrdersExport;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Ecommerce\BulkUpdateOrderStatusRequest;
 use App\Http\Requests\Admin\Ecommerce\UpdateOrderStatusRequest;
 use App\Models\Order;
 use App\Queries\Admin\OrderIndexQuery;
@@ -62,6 +63,26 @@ class OrderController extends Controller
         $filename = 'orders-'.now()->format('Y-m-d').'.xlsx';
 
         return Excel::download(new OrdersExport($request), $filename);
+    }
+
+    public function bulkUpdateStatus(BulkUpdateOrderStatusRequest $request): RedirectResponse
+    {
+        $data = $request->validated();
+        $newStatus = OrderStatusEnum::from($data['status']);
+
+        $updated = 0;
+
+        Order::query()
+            ->whereIn('id', $data['ids'])
+            ->get()
+            ->each(function (Order $order) use ($newStatus, &$updated): void {
+                rescue(function () use ($order, $newStatus, &$updated): void {
+                    $order->changeStatus($newStatus, changedBy: 'admin', notes: 'Bulk status update');
+                    $updated++;
+                }, fn (): null => null);
+            });
+
+        return back()->with('success', $updated.' orders updated.');
     }
 
     public function updateStatus(UpdateOrderStatusRequest $request, Order $order): RedirectResponse

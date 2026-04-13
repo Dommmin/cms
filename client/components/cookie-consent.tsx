@@ -185,7 +185,10 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                 {!showDetails ? (
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-start gap-3">
-                            <Cookie className="text-muted-foreground mt-0.5 h-5 w-5 shrink-0" />
+                            <Cookie
+                                className="text-muted-foreground mt-0.5 h-5 w-5 shrink-0"
+                                aria-hidden="true"
+                            />
                             <p className="text-muted-foreground text-sm">
                                 {bannerDescription}{' '}
                                 <button
@@ -249,10 +252,16 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                             {/* Functional — always on */}
                             <div className="border-border flex items-center justify-between rounded-lg border p-3">
                                 <div>
-                                    <p className="text-sm font-medium">
+                                    <p
+                                        id="consent-functional-label"
+                                        className="text-sm font-medium"
+                                    >
                                         Functional (strictly necessary)
                                     </p>
-                                    <p className="text-muted-foreground text-xs">
+                                    <p
+                                        id="consent-functional-desc"
+                                        className="text-muted-foreground text-xs"
+                                    >
                                         Essential for the site to work —
                                         session, cart, security. Cannot be
                                         disabled.
@@ -262,6 +271,8 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                                     type="checkbox"
                                     checked
                                     disabled
+                                    aria-labelledby="consent-functional-label"
+                                    aria-describedby="consent-functional-desc"
                                     className="h-4 w-4 cursor-not-allowed"
                                 />
                             </div>
@@ -269,10 +280,16 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                             {/* Analytics */}
                             <div className="border-border flex items-center justify-between rounded-lg border p-3">
                                 <div>
-                                    <p className="text-sm font-medium">
+                                    <p
+                                        id="consent-analytics-label"
+                                        className="text-sm font-medium"
+                                    >
                                         Analytics
                                     </p>
-                                    <p className="text-muted-foreground text-xs">
+                                    <p
+                                        id="consent-analytics-desc"
+                                        className="text-muted-foreground text-xs"
+                                    >
                                         {analyticsDesc}
                                     </p>
                                 </div>
@@ -285,6 +302,8 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                                             analytics: e.target.checked,
                                         }))
                                     }
+                                    aria-labelledby="consent-analytics-label"
+                                    aria-describedby="consent-analytics-desc"
                                     className="h-4 w-4 cursor-pointer"
                                 />
                             </div>
@@ -292,10 +311,16 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                             {/* Marketing */}
                             <div className="border-border flex items-center justify-between rounded-lg border p-3">
                                 <div>
-                                    <p className="text-sm font-medium">
+                                    <p
+                                        id="consent-marketing-label"
+                                        className="text-sm font-medium"
+                                    >
                                         Marketing
                                     </p>
-                                    <p className="text-muted-foreground text-xs">
+                                    <p
+                                        id="consent-marketing-desc"
+                                        className="text-muted-foreground text-xs"
+                                    >
                                         {marketingDesc}
                                     </p>
                                 </div>
@@ -308,6 +333,8 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                                             marketing: e.target.checked,
                                         }))
                                     }
+                                    aria-labelledby="consent-marketing-label"
+                                    aria-describedby="consent-marketing-desc"
                                     className="h-4 w-4 cursor-pointer"
                                 />
                             </div>

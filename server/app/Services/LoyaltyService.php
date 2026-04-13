@@ -19,10 +19,7 @@ class LoyaltyService
 
     public function getOrCreatePoints(Customer $customer): LoyaltyPoint
     {
-        return LoyaltyPoint::firstOrCreate(
-            ['customer_id' => $customer->id],
-            ['balance' => 0, 'total_earned' => 0, 'total_spent' => 0]
-        );
+        return LoyaltyPoint::query()->firstOrCreate(['customer_id' => $customer->id], ['balance' => 0, 'total_earned' => 0, 'total_spent' => 0]);
     }
 
     public function earnFromOrder(Order $order, int $points): LoyaltyTransaction
@@ -34,11 +31,11 @@ class LoyaltyService
         $loyalty->total_earned += $points;
         $loyalty->save();
 
-        return LoyaltyTransaction::create([
+        return LoyaltyTransaction::query()->create([
             'customer_id' => $customer->id,
             'type' => 'earn',
             'points' => $points,
-            'description' => "Points earned from order #{$order->reference_number}",
+            'description' => 'Points earned from order #'.$order->reference_number,
             'source_type' => Order::class,
             'source_id' => $order->id,
             'balance_after' => $loyalty->balance,
@@ -61,7 +58,7 @@ class LoyaltyService
         $loyalty->total_spent += $points;
         $loyalty->save();
 
-        return LoyaltyTransaction::create([
+        return LoyaltyTransaction::query()->create([
             'customer_id' => $customer->id,
             'type' => 'spend',
             'points' => $points,

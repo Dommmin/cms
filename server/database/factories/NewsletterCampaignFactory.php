@@ -35,14 +35,14 @@ final class NewsletterCampaignFactory extends Factory
 
     public function automated(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'type' => CampaignTypeEnum::Automated,
         ]);
     }
 
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'status' => CampaignStatusEnum::Active,
         ]);
     }

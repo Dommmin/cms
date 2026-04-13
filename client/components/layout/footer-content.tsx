@@ -76,7 +76,10 @@ export function FooterContent({
                         © {currentYear} Store.{' '}
                         {t('footer.rights', 'All rights reserved.')}
                     </p>
-                    <nav className="flex flex-wrap gap-4">
+                    <nav
+                        aria-label={t('footer.legal_nav', 'Legal links')}
+                        className="flex flex-wrap gap-4"
+                    >
                         {legalItems.map((item) => (
                             <Link
                                 key={item.id}

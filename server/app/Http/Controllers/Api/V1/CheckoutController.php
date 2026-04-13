@@ -9,17 +9,21 @@ use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\CheckoutRequest;
 use App\Http\Resources\Api\V1\OrderResource;
 use App\Http\Resources\Api\V1\ShippingMethodResource;
+use App\Models\Product;
 use App\Models\ShippingMethod;
+use App\Services\CartService;
 use App\Services\CheckoutService;
 use App\Services\PaymentGatewayManager;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class CheckoutController extends ApiController
 {
     public function __construct(
         private readonly CheckoutService $checkoutService,
-        private readonly PaymentGatewayManager $gatewayManager
+        private readonly PaymentGatewayManager $gatewayManager,
+        private readonly CartService $cartService,
     ) {}
 
     /**
@@ -96,12 +100,24 @@ class CheckoutController extends ApiController
         return $this->ok($methods);
     }
 
-    public function shippingMethods(): AnonymousResourceCollection
+    public function shippingMethods(Request $request): AnonymousResourceCollection
     {
+        $user = auth('sanctum')->user();
+        $cartToken = $request->header('X-Cart-Token');
+
+        $cart = $this->cartService->getOrCreateCart($user, is_string($cartToken) ? $cartToken : null);
+        $cart->load('items.variant');
+
+        $productIds = $cart->items->pluck('variant.product_id')->filter()->unique()->values()->all();
+        $categoryIds = Product::query()->whereIn('id', $productIds)->pluck('category_id')->filter()->unique()->values()->all();
+
         $methods = ShippingMethod::query()
             ->where('is_active', true)
+            ->with(['restrictedProducts', 'restrictedCategories'])
             ->orderBy('base_price')
-            ->get();
+            ->get()
+            ->reject(fn (ShippingMethod $method): bool => $method->isRestrictedFor($productIds, $categoryIds))
+            ->values();
 
         return ShippingMethodResource::collection($methods);
     }

@@ -36,10 +36,7 @@ class AnonymizeUserData
             $customer->wishlists()->delete();
 
             if ($customer->newsletterSubscriber) {
-                $customer->newsletterSubscriber->update([
-                    'subscribed' => false,
-                    'unsubscribed_at' => now(),
-                ]);
+                $customer->newsletterSubscriber->unsubscribe();
             }
 
             $customer->delete(); // soft delete

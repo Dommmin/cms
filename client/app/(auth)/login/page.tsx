@@ -44,7 +44,10 @@ export default function LoginPage() {
             </p>
 
             {errorMessage && (
-                <div className="border-destructive/50 bg-destructive/10 text-destructive mb-4 rounded-xl border p-4 text-sm">
+                <div
+                    role="alert"
+                    className="border-destructive/50 bg-destructive/10 text-destructive mb-4 rounded-xl border p-4 text-sm"
+                >
                     {errorMessage}
                 </div>
             )}
@@ -101,6 +104,7 @@ export default function LoginPage() {
                 <button
                     type="submit"
                     disabled={isPending}
+                    aria-busy={isPending}
                     className="bg-primary text-primary-foreground w-full rounded-xl py-2.5 font-semibold hover:opacity-90 disabled:opacity-50"
                 >
                     {isPending ? '…' : t('auth.login_btn', 'Sign In')}

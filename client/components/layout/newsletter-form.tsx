@@ -27,7 +27,11 @@ export function NewsletterForm() {
 
     if (status === 'success') {
         return (
-            <p className="text-sm text-green-600">
+            <p
+                role="status"
+                aria-live="polite"
+                className="text-sm text-green-600"
+            >
                 {t(
                     'newsletter.success',
                     'Check your inbox to confirm your subscription!',
@@ -40,7 +44,7 @@ export function NewsletterForm() {
         <div className="flex flex-col gap-1.5">
             <form onSubmit={handleSubmit} className="flex gap-2">
                 <label htmlFor="newsletter-email" className="sr-only">
-                    {t('newsletter.label', 'Email address')}
+                    {t('newsletter.email_label', 'Email address')}
                 </label>
                 <input
                     id="newsletter-email"
@@ -49,11 +53,13 @@ export function NewsletterForm() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={t('newsletter.placeholder', 'Your email')}
+                    aria-describedby="newsletter-hint"
                     className="border-input bg-background focus:ring-ring flex-1 rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
                 />
                 <button
                     type="submit"
                     disabled={status === 'loading'}
+                    aria-busy={status === 'loading'}
                     className="bg-primary text-primary-foreground rounded-md px-3 py-1.5 text-xs font-medium hover:opacity-90 disabled:opacity-50"
                 >
                     {status === 'loading'
@@ -61,14 +67,14 @@ export function NewsletterForm() {
                         : t('newsletter.subscribe', 'Subscribe')}
                 </button>
             </form>
-            <p className="text-muted-foreground text-xs">
+            <p id="newsletter-hint" className="text-muted-foreground text-xs">
                 {t(
                     'newsletter.double_optin_info',
                     'You will receive a confirmation email. We respect your privacy — unsubscribe at any time.',
                 )}
             </p>
             {status === 'error' && (
-                <p className="text-destructive text-xs">
+                <p role="alert" className="text-destructive text-xs">
                     {t('newsletter.error', 'Something went wrong.')}
                 </p>
             )}

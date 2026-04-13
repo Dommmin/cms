@@ -53,6 +53,9 @@ class OrderResource extends JsonResource
                     'created_at' => $h->created_at?->toISOString(),
                 ])
                 : [],
+            'returns' => $order->relationLoaded('returns')
+                ? ReturnResource::collection($order->returns)
+                : [],
         ];
     }
 }

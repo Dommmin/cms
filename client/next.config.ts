@@ -58,6 +58,70 @@ const nextConfig: NextConfig = {
                         key: 'Cache-Control',
                         value: 'public, max-age=31536000, immutable',
                     },
+                    {
+                        key: 'Cloudflare-CDN-Cache-Control',
+                        value: 'public, max-age=31536000, immutable',
+                    },
+                ],
+            },
+            {
+                // Static public files (favicons, fonts, images, icons)
+                source: '/(:path*\\.(?:ico|png|jpg|jpeg|webp|svg|woff2|woff|ttf|otf))',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=31536000, immutable',
+                    },
+                    {
+                        key: 'Cloudflare-CDN-Cache-Control',
+                        value: 'public, max-age=31536000, immutable',
+                    },
+                ],
+            },
+            {
+                // Public content pages: stale-while-revalidate at edge
+                source: '/:locale(en|pl)/(products|categories|blog)(.*)',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, s-maxage=300, stale-while-revalidate=3600',
+                    },
+                    {
+                        key: 'Cloudflare-CDN-Cache-Control',
+                        value: 'public, max-age=300, stale-while-revalidate=3600',
+                    },
+                ],
+            },
+            {
+                // Flash sales and stores pages — moderate cache
+                source: '/:locale(en|pl)/(flash-sales|stores)(.*)',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, s-maxage=120, stale-while-revalidate=600',
+                    },
+                    {
+                        key: 'Cloudflare-CDN-Cache-Control',
+                        value: 'public, max-age=120, stale-while-revalidate=600',
+                    },
+                ],
+            },
+            {
+                // Checkout and account pages: never cache (private, user-specific)
+                source: '/:locale(en|pl)/(checkout|account)(.*)',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'private, no-store',
+                    },
+                    {
+                        key: 'Surrogate-Control',
+                        value: 'no-store',
+                    },
+                    {
+                        key: 'Cloudflare-CDN-Cache-Control',
+                        value: 'private, no-store',
+                    },
                 ],
             },
         ];

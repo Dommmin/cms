@@ -10,10 +10,10 @@ use App\Services\MarketingAutomationService;
 use Illuminate\Events\Attributes\AsListener;
 
 #[AsListener(event: OrderCreated::class)]
-final class TriggerMarketingAutomation
+final readonly class TriggerMarketingAutomation
 {
     public function __construct(
-        private readonly MarketingAutomationService $service
+        private MarketingAutomationService $service
     ) {}
 
     public function handle(OrderCreated $event): void

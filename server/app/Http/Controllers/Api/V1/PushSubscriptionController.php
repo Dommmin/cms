@@ -18,9 +18,9 @@ final class PushSubscriptionController extends ApiController
     public function subscribe(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'endpoint' => 'required|string|url',
-            'keys.p256dh' => 'required|string',
-            'keys.auth' => 'required|string',
+            'endpoint' => ['required', 'string', 'url'],
+            'keys.p256dh' => ['required', 'string'],
+            'keys.auth' => ['required', 'string'],
         ]);
 
         $subscription = $this->pushService->subscribe(
@@ -37,7 +37,7 @@ final class PushSubscriptionController extends ApiController
     public function unsubscribe(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'endpoint' => 'required|string|url',
+            'endpoint' => ['required', 'string', 'url'],
         ]);
 
         $this->pushService->unsubscribe($validated['endpoint']);

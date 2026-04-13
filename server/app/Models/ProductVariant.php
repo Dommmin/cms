@@ -121,6 +121,29 @@ class ProductVariant extends Model
         return $this->hasMany(ProductDownload::class, 'product_variant_id');
     }
 
+    public function priceTiers(): HasMany
+    {
+        return $this->hasMany(ProductVariantPriceTier::class)->orderBy('min_quantity');
+    }
+
+    /**
+     * Get the unit price for a given quantity, checking tiers first.
+     * Falls back to the base price when no matching tier exists.
+     */
+    public function getPriceForQuantity(int $quantity): int
+    {
+        $tiers = $this->relationLoaded('priceTiers')
+            ? $this->priceTiers
+            : $this->priceTiers()->get();
+
+        $matching = $tiers
+            ->filter(fn (ProductVariantPriceTier $t): bool => $t->min_quantity <= $quantity && ($t->max_quantity === null || $t->max_quantity >= $quantity))
+            ->sortByDesc('min_quantity')
+            ->first();
+
+        return $matching instanceof ProductVariantPriceTier ? $matching->price : $this->price;
+    }
+
     public function priceHistory(): HasMany
     {
         return $this->hasMany(PriceHistory::class)->latest('recorded_at');

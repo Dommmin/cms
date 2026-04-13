@@ -14,5 +14,12 @@ export interface ShippingMethod {
     max_weight: number | null;
     min_order_value: number | null;
     free_shipping_threshold: number | null;
+    estimated_days_min: number | null;
+    estimated_days_max: number | null;
+    max_length_cm: number | null;
+    max_width_cm: number | null;
+    max_depth_cm: number | null;
+    requires_signature: boolean;
+    insurance_available: boolean;
     shipments_count: number;
 }

@@ -24,7 +24,7 @@ class CartItemResource extends JsonResource
             'id' => $item->id,
             'variant_id' => $item->variant_id,
             'quantity' => $item->quantity,
-            'unit_price' => $variant?->price ?? 0,
+            'unit_price' => $item->unitPrice(),
             'subtotal' => $item->subtotal(),
             'variant' => $variant ? [
                 'id' => $variant->id,

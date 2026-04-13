@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -44,7 +45,6 @@ class BlogPost extends Model
         'content_type',
         'status',
         'featured_image',
-        'tags',
         'available_locales',
         'is_featured',
         'published_at',
@@ -102,6 +102,12 @@ class BlogPost extends Model
         return (int) max(1, ceil($wordCount / 200));
     }
 
+    /** @return BelongsToMany<Tag, $this> */
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+
     #[Scope]
     protected function published(Builder $query): Builder
     {
@@ -123,7 +129,6 @@ class BlogPost extends Model
     protected function casts(): array
     {
         return [
-            'tags' => 'array',
             'available_locales' => 'array',
             'is_featured' => 'boolean',
             'published_at' => 'datetime',

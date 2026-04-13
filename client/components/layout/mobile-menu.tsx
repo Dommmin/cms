@@ -104,13 +104,28 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
             {open &&
                 mounted &&
                 createPortal(
-                    <div className="bg-background fixed inset-x-0 top-16 bottom-0 z-[200] flex flex-col overflow-y-auto md:hidden">
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label={t('nav.mobile_menu', 'Navigation menu')}
+                        className="bg-background fixed inset-x-0 top-16 bottom-0 z-[200] flex flex-col overflow-y-auto md:hidden"
+                    >
                         {/* ── Search ─────────────────────────────────────── */}
                         <div className="border-border border-b px-4 py-3">
                             <form onSubmit={handleSearch} noValidate>
                                 <div className="border-border bg-muted/50 flex items-center gap-3 rounded-xl border px-3 py-2.5">
-                                    <Search className="text-muted-foreground h-4 w-4 shrink-0" />
+                                    <Search
+                                        className="text-muted-foreground h-4 w-4 shrink-0"
+                                        aria-hidden="true"
+                                    />
+                                    <label
+                                        htmlFor="mobile-search-input"
+                                        className="sr-only"
+                                    >
+                                        {t('nav.search', 'Search products')}
+                                    </label>
                                     <input
+                                        id="mobile-search-input"
                                         ref={searchRef}
                                         value={query}
                                         onChange={(e) =>
@@ -126,9 +141,16 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
                                         <button
                                             type="button"
                                             onClick={() => setQuery('')}
+                                            aria-label={t(
+                                                'nav.clear_search',
+                                                'Clear search',
+                                            )}
                                             className="text-muted-foreground"
                                         >
-                                            <X className="h-4 w-4" />
+                                            <X
+                                                className="h-4 w-4"
+                                                aria-hidden="true"
+                                            />
                                         </button>
                                     )}
                                 </div>
@@ -310,7 +332,13 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
 
                         {/* ── CMS nav links ───────────────────────────────── */}
                         {items.length > 0 && (
-                            <nav className="border-border border-b px-4 py-2">
+                            <nav
+                                aria-label={t(
+                                    'nav.main_navigation',
+                                    'Main navigation',
+                                )}
+                                className="border-border border-b px-4 py-2"
+                            >
                                 {items.map((item) => (
                                     <Link
                                         key={item.id}

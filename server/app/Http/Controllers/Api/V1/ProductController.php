@@ -13,6 +13,7 @@ use App\Http\Resources\Api\V1\ProductCollection;
 use App\Http\Resources\Api\V1\ProductResource;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\FlashSale;
 use App\Models\Product;
 use App\Sorts\RatingSort;
 use App\Sorts\VariantPriceSort;
@@ -157,6 +158,7 @@ class ProductController extends ApiController
                 )->all(),
                 'omnibus_price' => $variant->lowestPriceInLast30Days(),
             ]),
+            'flash_sale' => $this->resolveFlashSale($product->id),
         ]);
     }
 
@@ -302,6 +304,30 @@ class ProductController extends ApiController
             ->withQueryString();
 
         return $this->collection(ProductResource::collection($products));
+    }
+
+    /**
+     * @return array{id: int, name: string, sale_price: int, ends_at: string}|null
+     */
+    private function resolveFlashSale(int $productId): ?array
+    {
+        $flashSale = FlashSale::query()
+            ->active()
+            ->where('product_id', $productId)
+            ->first();
+
+        if ($flashSale === null) {
+            return null;
+        }
+
+        return [
+            'id' => $flashSale->id,
+            'name' => $flashSale->name,
+            'sale_price' => $flashSale->sale_price,
+            'ends_at' => $flashSale->ends_at->toIso8601String(),
+            'stock_remaining' => $flashSale->stockRemaining(),
+            'variant_id' => $flashSale->variant_id,
+        ];
     }
 
     private function applyAttributeFilters(QueryBuilder $query, mixed $attributeFilters): void

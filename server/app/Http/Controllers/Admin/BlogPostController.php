@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreBlogPostRequest;
 use App\Http\Requests\Admin\UpdateBlogPostRequest;
 use App\Models\BlogPost;
+use App\Models\Tag;
 use App\Queries\Admin\BlogCategoryIndexQuery;
 use App\Queries\Admin\BlogPostIndexQuery;
 use Illuminate\Http\RedirectResponse;
@@ -41,6 +42,7 @@ class BlogPostController extends Controller
 
         return inertia('admin/blog/posts/create', [
             'categories' => $categoryQuery->categoriesForSelect(),
+            'available_tags' => Tag::query()->orderBy('name')->get(['id', 'name', 'slug']),
         ]);
     }
 
@@ -67,7 +69,8 @@ class BlogPostController extends Controller
             $data['published_at'] = null;
         }
 
-        BlogPost::query()->create($data);
+        $post = BlogPost::query()->create($data);
+        $post->tags()->sync($this->resolveTagIds($request->input('tags', [])));
 
         return to_route('admin.blog.posts.index')->with('success', 'Blog post created successfully');
     }
@@ -75,7 +78,7 @@ class BlogPostController extends Controller
     public function edit(BlogPost $post): Response
     {
         $categoryQuery = new BlogCategoryIndexQuery;
-        $post->load('category', 'author');
+        $post->load('category', 'author', 'tags');
 
         return inertia('admin/blog/posts/edit', [
             'post' => array_merge($post->toArray(), [
@@ -83,8 +86,10 @@ class BlogPostController extends Controller
                 'excerpt' => $post->getTranslations('excerpt'),
                 'content' => $post->getTranslations('content'),
                 'available_locales' => $post->available_locales,
+                'tag_list' => $post->tags->pluck('name')->values()->all(),
             ]),
             'categories' => $categoryQuery->categoriesForSelect(),
+            'available_tags' => Tag::query()->orderBy('name')->get(['id', 'name', 'slug']),
         ]);
     }
 
@@ -111,6 +116,7 @@ class BlogPostController extends Controller
         }
 
         $post->update($data);
+        $post->tags()->sync($this->resolveTagIds($request->input('tags', [])));
 
         return back()->with('success', 'Blog post updated successfully');
     }
@@ -146,5 +152,16 @@ class BlogPostController extends Controller
         $message = $post->is_featured ? 'Blog post marked as featured' : 'Blog post removed from featured';
 
         return back()->with('success', $message);
+    }
+
+    /** @param array<int, string> $tagNames */
+    private function resolveTagIds(array $tagNames): array
+    {
+        return collect($tagNames)
+            ->filter()
+            ->map(fn (string $name): int => Tag::query()->firstOrCreate(['slug' => Str::slug($name)], ['name' => $name])->id)
+            ->unique()
+            ->values()
+            ->all();
     }
 }

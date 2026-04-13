@@ -52,6 +52,13 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
     const [maxWeight, setMaxWeight] = useState('');
     const [minOrderValue, setMinOrderValue] = useState('');
     const [freeShippingThreshold, setFreeShippingThreshold] = useState('');
+    const [estimatedDaysMin, setEstimatedDaysMin] = useState('');
+    const [estimatedDaysMax, setEstimatedDaysMax] = useState('');
+    const [maxLengthCm, setMaxLengthCm] = useState('');
+    const [maxWidthCm, setMaxWidthCm] = useState('');
+    const [maxDepthCm, setMaxDepthCm] = useState('');
+    const [requiresSignature, setRequiresSignature] = useState(false);
+    const [insuranceAvailable, setInsuranceAvailable] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
 
@@ -73,6 +80,17 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
             free_shipping_threshold: freeShippingThreshold
                 ? Math.round(parseFloat(freeShippingThreshold) * 100)
                 : null,
+            estimated_days_min: estimatedDaysMin
+                ? parseInt(estimatedDaysMin, 10)
+                : null,
+            estimated_days_max: estimatedDaysMax
+                ? parseInt(estimatedDaysMax, 10)
+                : null,
+            max_length_cm: maxLengthCm ? parseInt(maxLengthCm, 10) : null,
+            max_width_cm: maxWidthCm ? parseInt(maxWidthCm, 10) : null,
+            max_depth_cm: maxDepthCm ? parseInt(maxDepthCm, 10) : null,
+            requires_signature: requiresSignature,
+            insurance_available: insuranceAvailable,
         };
 
         locales.forEach((locale) => {
@@ -419,6 +437,220 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
                                         <InputError
                                             message={errors.max_weight}
                                         />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Delivery Time */}
+                            <div className="space-y-4 rounded-xl border bg-card p-6">
+                                <h2 className="font-semibold">
+                                    {__(
+                                        'misc.delivery_time',
+                                        'Delivery Time',
+                                    )}
+                                </h2>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="estimated_days_min">
+                                            {__(
+                                                'label.estimated_days_min',
+                                                'Min. delivery days',
+                                            )}
+                                        </Label>
+                                        <Input
+                                            id="estimated_days_min"
+                                            type="number"
+                                            min="0"
+                                            max="365"
+                                            value={estimatedDaysMin}
+                                            onChange={(e) =>
+                                                setEstimatedDaysMin(
+                                                    e.target.value,
+                                                )
+                                            }
+                                            placeholder="e.g. 1"
+                                        />
+                                        <InputError
+                                            message={
+                                                errors.estimated_days_min
+                                            }
+                                        />
+                                    </div>
+
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="estimated_days_max">
+                                            {__(
+                                                'label.estimated_days_max',
+                                                'Max. delivery days',
+                                            )}
+                                        </Label>
+                                        <Input
+                                            id="estimated_days_max"
+                                            type="number"
+                                            min="0"
+                                            max="365"
+                                            value={estimatedDaysMax}
+                                            onChange={(e) =>
+                                                setEstimatedDaysMax(
+                                                    e.target.value,
+                                                )
+                                            }
+                                            placeholder="e.g. 3"
+                                        />
+                                        <InputError
+                                            message={
+                                                errors.estimated_days_max
+                                            }
+                                        />
+                                    </div>
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                    {__(
+                                        'misc.delivery_time_help',
+                                        'Business days for delivery estimate shown to customers',
+                                    )}
+                                </p>
+                            </div>
+
+                            {/* Dimensions */}
+                            <div className="space-y-4 rounded-xl border bg-card p-6">
+                                <h2 className="font-semibold">
+                                    {__('misc.dimensions', 'Dimensions')}
+                                </h2>
+
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="max_length_cm">
+                                            {__(
+                                                'label.max_length_cm',
+                                                'Max Length (cm)',
+                                            )}
+                                        </Label>
+                                        <Input
+                                            id="max_length_cm"
+                                            type="number"
+                                            min="1"
+                                            max="9999"
+                                            value={maxLengthCm}
+                                            onChange={(e) =>
+                                                setMaxLengthCm(e.target.value)
+                                            }
+                                            placeholder="Optional"
+                                        />
+                                        <InputError
+                                            message={errors.max_length_cm}
+                                        />
+                                    </div>
+
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="max_width_cm">
+                                            {__(
+                                                'label.max_width_cm',
+                                                'Max Width (cm)',
+                                            )}
+                                        </Label>
+                                        <Input
+                                            id="max_width_cm"
+                                            type="number"
+                                            min="1"
+                                            max="9999"
+                                            value={maxWidthCm}
+                                            onChange={(e) =>
+                                                setMaxWidthCm(e.target.value)
+                                            }
+                                            placeholder="Optional"
+                                        />
+                                        <InputError
+                                            message={errors.max_width_cm}
+                                        />
+                                    </div>
+
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="max_depth_cm">
+                                            {__(
+                                                'label.max_depth_cm',
+                                                'Max Depth (cm)',
+                                            )}
+                                        </Label>
+                                        <Input
+                                            id="max_depth_cm"
+                                            type="number"
+                                            min="1"
+                                            max="9999"
+                                            value={maxDepthCm}
+                                            onChange={(e) =>
+                                                setMaxDepthCm(e.target.value)
+                                            }
+                                            placeholder="Optional"
+                                        />
+                                        <InputError
+                                            message={errors.max_depth_cm}
+                                        />
+                                    </div>
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                    {__(
+                                        'misc.dimensions_help',
+                                        'Leave empty for no dimension restrictions',
+                                    )}
+                                </p>
+                            </div>
+
+                            {/* Service Options */}
+                            <div className="space-y-4 rounded-xl border bg-card p-6">
+                                <h2 className="font-semibold">
+                                    {__(
+                                        'misc.service_options',
+                                        'Service Options',
+                                    )}
+                                </h2>
+
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            id="requires_signature"
+                                            checked={requiresSignature}
+                                            onChange={(e) =>
+                                                setRequiresSignature(
+                                                    e.target.checked,
+                                                )
+                                            }
+                                            className="h-4 w-4 rounded border-input"
+                                        />
+                                        <Label
+                                            htmlFor="requires_signature"
+                                            className="font-normal"
+                                        >
+                                            {__(
+                                                'label.requires_signature',
+                                                'Requires signature on delivery',
+                                            )}
+                                        </Label>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            id="insurance_available"
+                                            checked={insuranceAvailable}
+                                            onChange={(e) =>
+                                                setInsuranceAvailable(
+                                                    e.target.checked,
+                                                )
+                                            }
+                                            className="h-4 w-4 rounded border-input"
+                                        />
+                                        <Label
+                                            htmlFor="insurance_available"
+                                            className="font-normal"
+                                        >
+                                            {__(
+                                                'label.insurance_available',
+                                                'Insurance available',
+                                            )}
+                                        </Label>
                                     </div>
                                 </div>
                             </div>

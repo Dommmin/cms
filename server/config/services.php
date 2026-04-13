@@ -104,4 +104,9 @@ return [
         'turnstile_secret' => env('CLOUDFLARE_TURNSTILE_SECRET_KEY'),
     ],
 
+    'vapid' => [
+        'public_key' => env('VAPID_PUBLIC_KEY'),
+        'private_key' => env('VAPID_PRIVATE_KEY'),
+    ],
+
 ];

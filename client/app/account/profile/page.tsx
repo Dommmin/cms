@@ -1,7 +1,7 @@
 'use client';
 
 import { Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
     useAddresses,
@@ -15,7 +15,12 @@ import {
 } from '@/hooks/use-profile';
 import { useTranslation } from '@/hooks/use-translation';
 import { api } from '@/lib/axios';
-import type { AddressForm, DeleteAccountModalState } from './page.types';
+import type {
+    AddressForm,
+    ConsentState,
+    DeleteAccountModalState,
+    ProcessingRestrictionState,
+} from './page.types';
 
 const EMPTY_ADDRESS: AddressForm = {
     type: 'shipping',
@@ -68,6 +73,38 @@ export default function ProfilePage() {
         password: '',
         error: null,
     });
+    const [consent, setConsent] = useState<ConsentState>({
+        analytics: false,
+        marketing: false,
+    });
+    const [savingConsent, setSavingConsent] = useState(false);
+    const [processingRestriction, setProcessingRestriction] =
+        useState<ProcessingRestrictionState>({
+            restricted: false,
+            restricted_since: null,
+        });
+    const [togglingRestriction, setTogglingRestriction] = useState(false);
+
+    useEffect(() => {
+        api.get<{
+            analytics: boolean;
+            marketing: boolean;
+        }>('/consent').then((res) => {
+            setConsent({
+                analytics: res.data.analytics,
+                marketing: res.data.marketing,
+            });
+        });
+    }, []);
+
+    useEffect(() => {
+        if (!profile) return;
+        const restrictedAt = profile.processing_restricted_at ?? null;
+        setProcessingRestriction({
+            restricted: restrictedAt !== null,
+            restricted_since: restrictedAt,
+        });
+    }, [profile]);
 
     async function handleExportData() {
         setExportingData(true);
@@ -83,6 +120,46 @@ export default function ProfilePage() {
             URL.revokeObjectURL(url);
         } finally {
             setExportingData(false);
+        }
+    }
+
+    async function handleSaveConsent() {
+        setSavingConsent(true);
+        try {
+            await api.post('/consent', {
+                analytics: consent.analytics,
+                marketing: consent.marketing,
+                functional: true,
+            });
+        } finally {
+            setSavingConsent(false);
+        }
+    }
+
+    async function handleToggleProcessingRestriction() {
+        setTogglingRestriction(true);
+        try {
+            if (processingRestriction.restricted) {
+                await api.delete('/profile/restrict-processing');
+                setProcessingRestriction({
+                    restricted: false,
+                    restricted_since: null,
+                });
+            } else {
+                const res = await api.post('/profile/restrict-processing');
+                const restrictedAt =
+                    (
+                        res.data as {
+                            processing_restricted_at?: string | null;
+                        }
+                    )?.processing_restricted_at ?? new Date().toISOString();
+                setProcessingRestriction({
+                    restricted: true,
+                    restricted_since: restrictedAt,
+                });
+            }
+        } finally {
+            setTogglingRestriction(false);
         }
     }
 
@@ -525,6 +602,169 @@ export default function ProfilePage() {
                         ))}
                     </ul>
                 )}
+            </section>
+
+            {/* ── Cookie Preferences ───────────────────────────────────── */}
+            <section className="border-border rounded-xl border p-6">
+                <h2 className="mb-2 text-base font-semibold">
+                    {t('account.cookie_preferences', 'Cookie Preferences')}
+                </h2>
+                <p className="text-muted-foreground mb-4 text-sm">
+                    {t(
+                        'account.cookie_preferences_desc',
+                        'Manage your cookie consent choices. Functional cookies are always required for the site to work.',
+                    )}
+                </p>
+                <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium">
+                                {t(
+                                    'account.cookie_functional',
+                                    'Functional (required)',
+                                )}
+                            </p>
+                            <p className="text-muted-foreground text-xs">
+                                {t(
+                                    'account.cookie_functional_desc',
+                                    'Essential for site operation.',
+                                )}
+                            </p>
+                        </div>
+                        <input
+                            type="checkbox"
+                            checked
+                            disabled
+                            aria-label={t(
+                                'account.cookie_functional',
+                                'Functional (required)',
+                            )}
+                            className="h-4 w-4 cursor-not-allowed opacity-50"
+                        />
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium">
+                                {t('account.cookie_analytics', 'Analytics')}
+                            </p>
+                            <p className="text-muted-foreground text-xs">
+                                {t(
+                                    'account.cookie_analytics_desc',
+                                    'Helps us understand how you use the site.',
+                                )}
+                            </p>
+                        </div>
+                        <input
+                            type="checkbox"
+                            checked={consent.analytics}
+                            onChange={(e) =>
+                                setConsent((c) => ({
+                                    ...c,
+                                    analytics: e.target.checked,
+                                }))
+                            }
+                            aria-label={t(
+                                'account.cookie_analytics',
+                                'Analytics',
+                            )}
+                            className="h-4 w-4 cursor-pointer"
+                        />
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium">
+                                {t('account.cookie_marketing', 'Marketing')}
+                            </p>
+                            <p className="text-muted-foreground text-xs">
+                                {t(
+                                    'account.cookie_marketing_desc',
+                                    'Used for personalised ads and offers.',
+                                )}
+                            </p>
+                        </div>
+                        <input
+                            type="checkbox"
+                            checked={consent.marketing}
+                            onChange={(e) =>
+                                setConsent((c) => ({
+                                    ...c,
+                                    marketing: e.target.checked,
+                                }))
+                            }
+                            aria-label={t(
+                                'account.cookie_marketing',
+                                'Marketing',
+                            )}
+                            className="h-4 w-4 cursor-pointer"
+                        />
+                    </div>
+                </div>
+                <button
+                    onClick={handleSaveConsent}
+                    disabled={savingConsent}
+                    className="bg-primary text-primary-foreground mt-4 rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50"
+                >
+                    {savingConsent
+                        ? t('account.saving', 'Saving…')
+                        : t('account.save_preferences', 'Save preferences')}
+                </button>
+            </section>
+
+            {/* ── Data Processing (Art. 18) ─────────────────────────────── */}
+            <section className="border-border rounded-xl border p-6">
+                <h2 className="mb-2 text-base font-semibold">
+                    {t('account.data_processing', 'Data Processing')}
+                </h2>
+                <p className="text-muted-foreground mb-1 text-sm">
+                    {t(
+                        'account.data_processing_desc',
+                        "Restricting processing means we'll keep your data but won't use it for personalisation or marketing while you dispute its accuracy.",
+                    )}
+                </p>
+                <p className="text-muted-foreground mb-4 text-sm">
+                    {processingRestriction.restricted &&
+                    processingRestriction.restricted_since ? (
+                        <>
+                            <span className="font-medium text-amber-600">
+                                {t(
+                                    'account.processing_restricted',
+                                    'Processing restricted since',
+                                )}{' '}
+                            </span>
+                            {new Date(
+                                processingRestriction.restricted_since,
+                            ).toLocaleDateString()}
+                        </>
+                    ) : (
+                        <span className="font-medium text-green-600">
+                            {t(
+                                'account.processing_active',
+                                'Processing active',
+                            )}
+                        </span>
+                    )}
+                </p>
+                <button
+                    onClick={handleToggleProcessingRestriction}
+                    disabled={togglingRestriction}
+                    className={`rounded-lg border px-4 py-2 text-sm font-medium disabled:opacity-50 ${
+                        processingRestriction.restricted
+                            ? 'border-border hover:bg-accent'
+                            : 'border-amber-400 text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/20'
+                    }`}
+                >
+                    {togglingRestriction
+                        ? t('account.saving', 'Saving…')
+                        : processingRestriction.restricted
+                          ? t(
+                                'account.resume_processing',
+                                'Resume data processing',
+                            )
+                          : t(
+                                'account.restrict_processing',
+                                'Restrict data processing',
+                            )}
+                </button>
             </section>
 
             {/* ── Danger zone ───────────────────────────────────────────── */}

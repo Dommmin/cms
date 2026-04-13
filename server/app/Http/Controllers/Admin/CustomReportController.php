@@ -48,23 +48,23 @@ final class CustomReportController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'data_source' => 'required|string',
-            'metrics' => 'required|array',
-            'dimensions' => 'nullable|array',
-            'filters' => 'nullable|array',
-            'group_by' => 'nullable|array',
-            'chart_type' => 'nullable|string|in:table,line,bar,pie',
-            'is_public' => 'boolean',
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'data_source' => ['required', 'string'],
+            'metrics' => ['required', 'array'],
+            'dimensions' => ['nullable', 'array'],
+            'filters' => ['nullable', 'array'],
+            'group_by' => ['nullable', 'array'],
+            'chart_type' => ['nullable', 'string', 'in:table,line,bar,pie'],
+            'is_public' => ['boolean'],
         ]);
 
-        $report = CustomReport::create([
+        $report = CustomReport::query()->create([
             ...$validated,
             'user_id' => auth()->id(),
         ]);
 
-        return redirect()->route('admin.reports.show', $report)
+        return to_route('admin.reports.show', $report)
             ->with('success', 'Report created successfully.');
     }
 
@@ -92,20 +92,20 @@ final class CustomReportController extends Controller
     public function update(Request $request, CustomReport $report): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'data_source' => 'required|string',
-            'metrics' => 'required|array',
-            'dimensions' => 'nullable|array',
-            'filters' => 'nullable|array',
-            'group_by' => 'nullable|array',
-            'chart_type' => 'nullable|string|in:table,line,bar,pie',
-            'is_public' => 'boolean',
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'data_source' => ['required', 'string'],
+            'metrics' => ['required', 'array'],
+            'dimensions' => ['nullable', 'array'],
+            'filters' => ['nullable', 'array'],
+            'group_by' => ['nullable', 'array'],
+            'chart_type' => ['nullable', 'string', 'in:table,line,bar,pie'],
+            'is_public' => ['boolean'],
         ]);
 
         $report->update($validated);
 
-        return redirect()->route('admin.reports.show', $report)
+        return to_route('admin.reports.show', $report)
             ->with('success', 'Report updated successfully.');
     }
 
@@ -113,17 +113,17 @@ final class CustomReportController extends Controller
     {
         $report->delete();
 
-        return redirect()->route('admin.reports.index')
+        return to_route('admin.reports.index')
             ->with('success', 'Report deleted successfully.');
     }
 
-    public function export(CustomReport $report): \Symfony\Component\HttpFoundation\Response
+    public function export(CustomReport $report): HttpResponse
     {
         $csv = $this->builder->exportToCsv($report);
 
         return response($csv)
             ->header('Content-Type', 'text/csv')
-            ->header('Content-Disposition', "attachment; filename=\"{$report->name}.csv\"");
+            ->header('Content-Disposition', sprintf('attachment; filename="%s.csv"', $report->name));
     }
 
     public function exportExcel(CustomReport $report): BinaryFileResponse
@@ -136,12 +136,12 @@ final class CustomReportController extends Controller
         );
     }
 
-    public function exportPdf(CustomReport $report): HttpResponse
+    public function exportPdf(CustomReport $report): \Illuminate\Http\Response
     {
         $results = $this->builder->build($report);
         $filename = str($report->name)->slug()->append('-').now()->format('Y-m-d').'.pdf';
 
-        return Pdf::view('pdf.report', compact('report', 'results'))
+        return Pdf::view('pdf.report', ['report' => $report, 'results' => $results])
             ->name($filename)
             ->download()
             ->toResponse(request());

@@ -24,7 +24,7 @@ class BlogPostResource extends JsonResource
             'content_type' => $this->content_type,
             'status' => $this->status,
             'featured_image' => $this->featured_image,
-            'tags' => $this->tags ?? [],
+            'tags' => $this->whenLoaded('tags', fn (): array => $this->tags->pluck('name')->values()->all(), []),
             'is_featured' => $this->is_featured,
             'views_count' => $this->views_count,
             'reading_time' => $this->reading_time,

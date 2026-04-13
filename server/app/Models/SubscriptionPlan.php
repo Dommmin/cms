@@ -25,15 +25,6 @@ final class SubscriptionPlan extends Model
         'sort_order',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'price' => 'integer',
-            'features' => 'array',
-            'is_active' => 'boolean',
-        ];
-    }
-
     public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class);
@@ -49,5 +40,14 @@ final class SubscriptionPlan extends Model
             'USD' => '$'.number_format($amount, 2, '.', ','),
             default => number_format($amount, 2, '.', ' ').' '.$this->currency,
         };
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'price' => 'integer',
+            'features' => 'array',
+            'is_active' => 'boolean',
+        ];
     }
 }

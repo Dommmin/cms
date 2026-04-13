@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\AppNotificationController;
 use App\Http\Controllers\Admin\BlockRelationController;
 use App\Http\Controllers\Admin\CookieConsentController;
 use App\Http\Controllers\Admin\CurrencyController;
+use App\Http\Controllers\Admin\CustomReportController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DashboardWidgetController;
 use App\Http\Controllers\Admin\Ecommerce\AddressController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\FormController;
 use App\Http\Controllers\Admin\FormSubmissionController;
 use App\Http\Controllers\Admin\LocaleController;
+use App\Http\Controllers\Admin\Marketing\AutomationController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\ModelVersionController;
@@ -29,6 +31,8 @@ use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PreviewController;
 use App\Http\Controllers\Admin\ReferralController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\SearchAnalyticsController;
+use App\Http\Controllers\Admin\SearchSynonymController;
 use App\Http\Controllers\Admin\SectionTemplateController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\StoreController;
@@ -37,15 +41,27 @@ use App\Http\Controllers\Admin\SupportConversationController;
 use App\Http\Controllers\Admin\ThemeController;
 use App\Http\Controllers\Admin\TranslationController as AdminTranslationController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\WebhookController;
+use App\Http\Middleware\AdminSessionTimeout;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function (): void {
+Route::middleware(['admin', AdminSessionTimeout::class])->prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('dashboard/widgets', [DashboardWidgetController::class, 'store'])->name('dashboard.widgets.store');
     Route::patch('dashboard/widgets/{dashboardWidget}', [DashboardWidgetController::class, 'update'])->name('dashboard.widgets.update');
     Route::delete('dashboard/widgets/{dashboardWidget}', [DashboardWidgetController::class, 'destroy'])->name('dashboard.widgets.destroy');
     Route::post('dashboard/widgets/reset', [DashboardWidgetController::class, 'reset'])->name('dashboard.widgets.reset');
+
+    // Custom Reports
+    Route::resource('reports', CustomReportController::class);
+    Route::get('reports/{report}/export', [CustomReportController::class, 'export'])->name('reports.export');
+    Route::get('reports/{report}/export/excel', [CustomReportController::class, 'exportExcel'])->name('reports.export.excel');
+    Route::get('reports/{report}/export/pdf', [CustomReportController::class, 'exportPdf'])->name('reports.export.pdf');
+    Route::get('reports/filters/{dataSource}', [CustomReportController::class, 'getFilters'])->name('reports.filters');
+
     Route::get('/search', AdminSearchController::class)->name('search');
+    Route::get('search/analytics', [SearchAnalyticsController::class, 'index'])->name('search.analytics');
+    Route::resource('search/synonyms', SearchSynonymController::class)->names('search.synonyms')->parameters(['synonyms' => 'synonym']);
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/stream', [NotificationController::class, 'stream'])->name('notifications.stream');
     Route::get('/activity-log', [ActivityLogController::class, 'index'])->middleware('role:admin')->name('activity-log.index');
@@ -82,6 +98,17 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
         Route::post('campaigns/{campaign}/send', [NewsletterCampaignController::class, 'send'])->name('campaigns.send');
         Route::post('campaigns/{campaign}/schedule', [NewsletterCampaignController::class, 'schedule'])->name('campaigns.schedule');
         Route::post('campaigns/{campaign}/duplicate', [NewsletterCampaignController::class, 'duplicate'])->name('campaigns.duplicate');
+    });
+
+    // Marketing Automation
+    Route::prefix('marketing')->name('marketing.')->group(function (): void {
+        Route::get('automations', [AutomationController::class, 'index'])->name('automations.index');
+        Route::get('automations/create', [AutomationController::class, 'create'])->name('automations.create');
+        Route::post('automations', [AutomationController::class, 'store'])->name('automations.store');
+        Route::get('automations/{automation}/edit', [AutomationController::class, 'edit'])->name('automations.edit');
+        Route::put('automations/{automation}', [AutomationController::class, 'update'])->name('automations.update');
+        Route::delete('automations/{automation}', [AutomationController::class, 'destroy'])->name('automations.destroy');
+        Route::post('automations/{automation}/toggle', [AutomationController::class, 'toggle'])->name('automations.toggle');
     });
 
     // Currency & Exchange Rates (admin only)
@@ -198,6 +225,11 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
         Route::post('referrals/{referral}/cancel', [ReferralController::class, 'cancel'])->name('referrals.cancel');
         Route::post('referrals/bulk-mark-paid', [ReferralController::class, 'bulkMarkPaid'])->name('referrals.bulk-mark-paid');
     });
+
+    // Outgoing Webhooks
+    Route::resource('webhooks', WebhookController::class)->except(['show']);
+    Route::get('webhooks/{webhook}/deliveries', [WebhookController::class, 'deliveries'])->name('webhooks.deliveries');
+    Route::post('webhooks/{webhook}/test', [WebhookController::class, 'test'])->name('webhooks.test');
 
     // Editor playground
     Route::get('editor', fn () => inertia('admin/editor'))->name('editor');

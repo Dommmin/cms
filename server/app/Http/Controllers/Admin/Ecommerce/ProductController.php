@@ -11,6 +11,7 @@ use App\Http\Requests\Admin\Ecommerce\ImportProductsRequest;
 use App\Http\Requests\Admin\Ecommerce\StoreProductRequest;
 use App\Http\Requests\Admin\Ecommerce\UpdateProductRequest;
 use App\Imports\ProductsImport;
+use App\Imports\ProductsImportPreview;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
@@ -18,8 +19,10 @@ use App\Models\ProductFlag;
 use App\Models\ProductType;
 use App\Queries\Admin\ProductIndexQuery;
 use App\Services\Admin\Ecommerce\ProductService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Response;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -86,6 +89,68 @@ class ProductController extends Controller
         $this->productService->updateProduct($product, $request->validated());
 
         return back()->with('success', 'Product updated successfully.');
+    }
+
+    public function validateImport(ImportProductsRequest $request): JsonResponse
+    {
+        $preview = new ProductsImportPreview;
+        Excel::import($preview, $request->file('file'));
+
+        $rows = $preview->getRows();
+
+        if ($rows->isEmpty()) {
+            return response()->json([
+                'valid' => false,
+                'errors' => [],
+                'preview' => [],
+                'total_rows' => 0,
+                'missing_headers' => [],
+            ]);
+        }
+
+        $firstRow = $rows->first();
+        $headers = is_array($firstRow) ? array_keys($firstRow) : $firstRow->keys()->all();
+        $missingHeaders = $preview->validateHeaders($headers);
+
+        if ($missingHeaders !== []) {
+            return response()->json([
+                'valid' => false,
+                'errors' => [],
+                'preview' => [],
+                'total_rows' => 0,
+                'missing_headers' => $missingHeaders,
+            ]);
+        }
+
+        $importRules = (new ProductsImport)->rules();
+        $validationErrors = [];
+
+        foreach ($rows as $index => $row) {
+            $rowArray = is_array($row) ? $row : $row->toArray();
+            $rowNumber = $index + 2; // +2 because row 1 is the header
+
+            $validator = Validator::make($rowArray, $importRules);
+
+            if ($validator->fails()) {
+                foreach ($validator->errors()->toArray() as $field => $messages) {
+                    foreach ($messages as $message) {
+                        $validationErrors[] = [
+                            'row' => $rowNumber,
+                            'field' => $field,
+                            'message' => $message,
+                        ];
+                    }
+                }
+            }
+        }
+
+        return response()->json([
+            'valid' => $validationErrors === [],
+            'errors' => $validationErrors,
+            'preview' => $rows->map(fn ($row): array => is_array($row) ? $row : $row->toArray())->values()->all(),
+            'total_rows' => $rows->count(),
+            'missing_headers' => [],
+        ]);
     }
 
     public function export(Request $request): BinaryFileResponse

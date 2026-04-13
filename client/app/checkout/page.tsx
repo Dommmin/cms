@@ -264,8 +264,15 @@ export default function CheckoutPage() {
 
     if (cartLoading) {
         return (
-            <div className="mx-auto max-w-4xl px-4 py-16 text-center">
-                <div className="border-primary mx-auto h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
+            <div
+                className="mx-auto max-w-4xl px-4 py-16 text-center"
+                role="status"
+                aria-label={t('common.loading', 'Loading')}
+            >
+                <div
+                    className="border-primary mx-auto h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"
+                    aria-hidden="true"
+                />
             </div>
         );
     }
@@ -370,11 +377,22 @@ export default function CheckoutPage() {
                                     }
                                     placeholder="you@example.com"
                                     required
-                                    aria-describedby="guest-email-hint"
+                                    aria-describedby={
+                                        submitAttempted && !guestEmail.trim()
+                                            ? 'guest-email-hint guest-email-error'
+                                            : 'guest-email-hint'
+                                    }
+                                    aria-invalid={
+                                        submitAttempted && !guestEmail.trim()
+                                    }
                                     className="border-input bg-background focus:ring-ring w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
                                 />
                                 {submitAttempted && !guestEmail.trim() && (
-                                    <p className="text-destructive mt-1 text-xs">
+                                    <p
+                                        id="guest-email-error"
+                                        role="alert"
+                                        className="text-destructive mt-1 text-xs"
+                                    >
                                         {t(
                                             'checkout.guest_email_required',
                                             'Email address is required.',
@@ -720,64 +738,85 @@ export default function CheckoutPage() {
                             </div>
 
                             {error && (
-                                <p className="bg-destructive/10 text-destructive mt-3 rounded-lg p-2 text-xs">
+                                <p
+                                    role="alert"
+                                    className="bg-destructive/10 text-destructive mt-3 rounded-lg p-2 text-xs"
+                                >
                                     {t('checkout.error', 'Error')}:{' '}
                                     {(error as Error).message}
                                 </p>
                             )}
 
-                            <label className="mt-5 flex cursor-pointer items-start gap-3">
-                                <input
-                                    type="checkbox"
-                                    checked={termsAccepted}
-                                    onChange={(e) =>
-                                        setTermsAccepted(e.target.checked)
-                                    }
-                                    className="accent-primary mt-0.5 h-4 w-4 shrink-0"
-                                    required
-                                />
-                                <span className="text-muted-foreground text-xs">
-                                    {t(
-                                        'checkout.terms_accept_prefix',
-                                        'I have read and accept the',
-                                    )}{' '}
-                                    <Link
-                                        href={lp('/terms-of-service')}
-                                        target="_blank"
-                                        className="hover:text-foreground underline"
-                                    >
+                            <div className="mt-5">
+                                <label
+                                    htmlFor="terms-accepted"
+                                    className="flex cursor-pointer items-start gap-3"
+                                >
+                                    <input
+                                        id="terms-accepted"
+                                        type="checkbox"
+                                        checked={termsAccepted}
+                                        onChange={(e) =>
+                                            setTermsAccepted(e.target.checked)
+                                        }
+                                        className="accent-primary mt-0.5 h-4 w-4 shrink-0"
+                                        required
+                                        aria-describedby={
+                                            submitAttempted && !termsAccepted
+                                                ? 'terms-error'
+                                                : undefined
+                                        }
+                                        aria-invalid={
+                                            submitAttempted && !termsAccepted
+                                        }
+                                    />
+                                    <span className="text-muted-foreground text-xs">
                                         {t(
-                                            'checkout.terms_link',
-                                            'Terms of Service',
-                                        )}
-                                    </Link>{' '}
-                                    {t('checkout.and', 'and')}{' '}
-                                    <Link
-                                        href={lp('/privacy-policy')}
-                                        target="_blank"
-                                        className="hover:text-foreground underline"
-                                    >
+                                            'checkout.terms_accept_prefix',
+                                            'I have read and accept the',
+                                        )}{' '}
+                                        <Link
+                                            href={lp('/terms-of-service')}
+                                            target="_blank"
+                                            className="hover:text-foreground underline"
+                                        >
+                                            {t(
+                                                'checkout.terms_link',
+                                                'Terms of Service',
+                                            )}
+                                        </Link>{' '}
+                                        {t('checkout.and', 'and')}{' '}
+                                        <Link
+                                            href={lp('/privacy-policy')}
+                                            target="_blank"
+                                            className="hover:text-foreground underline"
+                                        >
+                                            {t(
+                                                'checkout.privacy_link',
+                                                'Privacy Policy',
+                                            )}
+                                        </Link>
+                                        {'. '}
                                         {t(
-                                            'checkout.privacy_link',
-                                            'Privacy Policy',
+                                            'checkout.withdrawal_note',
+                                            'I am aware of my right to withdraw within 14 days.',
                                         )}
-                                    </Link>
-                                    {'. '}
-                                    {t(
-                                        'checkout.withdrawal_note',
-                                        'I am aware of my right to withdraw within 14 days.',
-                                    )}
-                                </span>
-                            </label>
+                                    </span>
+                                </label>
 
-                            {submitAttempted && !termsAccepted && (
-                                <p className="text-destructive mt-1 text-xs">
-                                    {t(
-                                        'checkout.terms_required',
-                                        'You must accept the terms to place an order.',
-                                    )}
-                                </p>
-                            )}
+                                {submitAttempted && !termsAccepted && (
+                                    <p
+                                        id="terms-error"
+                                        role="alert"
+                                        className="text-destructive mt-1 text-xs"
+                                    >
+                                        {t(
+                                            'checkout.terms_required',
+                                            'You must accept the terms to place an order.',
+                                        )}
+                                    </p>
+                                )}
+                            </div>
 
                             <button
                                 type="submit"
@@ -786,6 +825,7 @@ export default function CheckoutPage() {
                                     !selectedMethod ||
                                     !termsAccepted
                                 }
+                                aria-busy={isPending}
                                 className="bg-primary text-primary-foreground mt-4 w-full rounded-xl px-4 py-3 text-sm font-semibold hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 {isPending

@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { setCartToken } from '@/api/cart';
 import type { CheckoutPayload } from '@/api/orders';
 import {
     cancelOrder,
@@ -9,6 +10,7 @@ import {
     getOrder,
     getOrders,
     getShippingMethods,
+    reorder,
 } from '@/api/orders';
 import { trackPurchase } from '@/lib/datalayer';
 
@@ -46,6 +48,21 @@ export function useCancelOrder() {
                 order,
             );
             queryClient.invalidateQueries({ queryKey: orderKeys.all });
+        },
+    });
+}
+
+export function useReorder() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (reference: string) => reorder(reference),
+        onSuccess: (data) => {
+            if (!data) return;
+            if (data.cart_token) {
+                setCartToken(data.cart_token);
+            }
+            queryClient.invalidateQueries({ queryKey: ['cart'] });
         },
     });
 }

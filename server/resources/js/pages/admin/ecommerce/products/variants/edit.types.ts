@@ -14,6 +14,12 @@ export type VariantAttribute = {
     is_required: boolean;
     values: Array<{ id: number; value: string; slug: string }>;
 };
+export type PriceTier = {
+    id?: number;
+    min_quantity: number;
+    max_quantity: number | null;
+    price: number; // in cents
+};
 export type Variant = {
     id: number;
     sku: string;
@@ -28,4 +34,5 @@ export type Variant = {
     is_active: boolean;
     is_default: boolean;
     attribute_values?: Array<{ attribute_value_id: number }>;
+    price_tiers: PriceTier[];
 };

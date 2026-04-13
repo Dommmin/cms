@@ -136,15 +136,31 @@ export function SearchBar() {
                     />
 
                     {/* Panel */}
-                    <div className="border-border bg-background fixed top-16 right-0 left-0 z-50 border-b shadow-xl">
+                    <div
+                        role="dialog"
+                        aria-label="Search"
+                        aria-modal="true"
+                        className="border-border bg-background fixed top-16 right-0 left-0 z-50 border-b shadow-xl"
+                    >
                         <div className="mx-auto max-w-2xl px-4 py-4">
                             {/* Input row */}
                             <form
                                 onSubmit={handleSubmit}
+                                role="search"
                                 className="flex items-center gap-2"
                             >
-                                <Search className="text-muted-foreground h-5 w-5 shrink-0" />
+                                <Search
+                                    className="text-muted-foreground h-5 w-5 shrink-0"
+                                    aria-hidden="true"
+                                />
+                                <label
+                                    htmlFor="header-search-input"
+                                    className="sr-only"
+                                >
+                                    Search products and categories
+                                </label>
                                 <input
+                                    id="header-search-input"
                                     ref={inputRef}
                                     value={query}
                                     onChange={(e) => {
@@ -153,15 +169,22 @@ export function SearchBar() {
                                     }}
                                     onKeyDown={handleKeyDown}
                                     placeholder="Search products, categories…"
+                                    aria-autocomplete="list"
+                                    aria-controls="search-listbox"
+                                    autoComplete="off"
                                     className="placeholder:text-muted-foreground flex-1 bg-transparent text-base outline-none"
                                 />
                                 {query && (
                                     <button
                                         type="button"
                                         onClick={() => setQuery('')}
+                                        aria-label="Clear search"
                                         className="hover:bg-accent rounded p-1"
                                     >
-                                        <X className="h-4 w-4" />
+                                        <X
+                                            className="h-4 w-4"
+                                            aria-hidden="true"
+                                        />
                                     </button>
                                 )}
                                 <button
@@ -172,6 +195,22 @@ export function SearchBar() {
                                     Cancel
                                 </button>
                             </form>
+
+                            {/* Live region for screen reader result announcements */}
+                            <div
+                                aria-live="polite"
+                                aria-atomic="true"
+                                className="sr-only"
+                            >
+                                {showResults && !isLoading && (
+                                    <>
+                                        {products.length === 0 &&
+                                        matchedCategories.length === 0
+                                            ? `No results for ${query}`
+                                            : `${products.length + matchedCategories.length} results found`}
+                                    </>
+                                )}
+                            </div>
 
                             {/* Recent searches */}
                             {showRecent && (
@@ -185,6 +224,7 @@ export function SearchBar() {
                                                 clearRecentSearches();
                                                 setRecentSearches([]);
                                             }}
+                                            aria-label="Clear recent searches"
                                             className="text-muted-foreground hover:text-foreground text-xs"
                                         >
                                             Clear
@@ -215,7 +255,10 @@ export function SearchBar() {
 
                             {/* Results */}
                             {showResults && (
-                                <div className="mt-4 space-y-4">
+                                <div
+                                    id="search-listbox"
+                                    className="mt-4 space-y-4"
+                                >
                                     {/* Categories */}
                                     {matchedCategories.length > 0 && (
                                         <div>

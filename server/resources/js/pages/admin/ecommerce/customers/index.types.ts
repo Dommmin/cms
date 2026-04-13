@@ -5,6 +5,8 @@ export interface Customer {
     email: string;
     phone?: string;
     company_name?: string;
+    notes: string | null;
+    is_active: boolean;
     orders_count: number;
     orders_sum_total: number;
 }

@@ -24,6 +24,7 @@ class UserResource extends JsonResource
             'name' => $user->name,
             'email' => $user->email,
             'email_verified_at' => $user->email_verified_at?->toISOString(),
+            'processing_restricted_at' => $user->processing_restricted_at?->toISOString(),
             'customer' => $customer ? [
                 'id' => $customer->id,
                 'first_name' => $customer->first_name,

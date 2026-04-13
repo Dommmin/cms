@@ -31,23 +31,6 @@ final class Subscription extends Model
         'metadata',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'status' => SubscriptionStatusEnum::class,
-            'starts_at' => 'datetime',
-            'expires_at' => 'datetime',
-            'trial_ends_at' => 'datetime',
-            'cancelled_at' => 'datetime',
-            'paused_at' => 'datetime',
-            'next_billing_at' => 'datetime',
-            'billing_price' => 'integer',
-            'billing_cycle_count' => 'integer',
-            'auto_renew' => 'boolean',
-            'metadata' => 'array',
-        ];
-    }
-
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
@@ -84,7 +67,7 @@ final class Subscription extends Model
         return (int) now()->diffInDays($this->expires_at, false);
     }
 
-    public function scopeActive($query)
+    protected function scopeActive($query)
     {
         return $query->whereIn('status', [
             SubscriptionStatusEnum::Active->value,
@@ -92,8 +75,25 @@ final class Subscription extends Model
         ]);
     }
 
-    public function scopeExpired($query)
+    protected function scopeExpired($query)
     {
         return $query->where('status', SubscriptionStatusEnum::Expired->value);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'status' => SubscriptionStatusEnum::class,
+            'starts_at' => 'datetime',
+            'expires_at' => 'datetime',
+            'trial_ends_at' => 'datetime',
+            'cancelled_at' => 'datetime',
+            'paused_at' => 'datetime',
+            'next_billing_at' => 'datetime',
+            'billing_price' => 'integer',
+            'billing_cycle_count' => 'integer',
+            'auto_renew' => 'boolean',
+            'metadata' => 'array',
+        ];
     }
 }

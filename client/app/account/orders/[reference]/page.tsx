@@ -1,16 +1,24 @@
 'use client';
 
-import { ArrowLeft, CheckCircle2, Circle, Package, Truck } from 'lucide-react';
+import {
+    ArrowLeft,
+    CheckCircle2,
+    Circle,
+    Loader2,
+    Package,
+    RefreshCw,
+    Truck,
+} from 'lucide-react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { useCurrency } from '@/hooks/use-currency';
 import { useLocalePath } from '@/hooks/use-locale';
-import { useCancelOrder, useOrder } from '@/hooks/use-orders';
+import { useCancelOrder, useOrder, useReorder } from '@/hooks/use-orders';
 import { useTranslation } from '@/hooks/use-translation';
 import { api } from '@/lib/axios';
-import type { OrderStatus } from '@/types/api';
+import type { OrderReturn, OrderStatus } from '@/types/api';
 
 const STATUS_COLORS: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-800',
@@ -29,6 +37,106 @@ const STATUS_STEPS: OrderStatus[] = [
     'shipped',
     'delivered',
 ];
+
+const RETURN_STATUS_COLORS: Record<string, string> = {
+    pending: 'bg-yellow-100 text-yellow-800',
+    approved: 'bg-blue-100 text-blue-800',
+    rejected: 'bg-red-100 text-red-800',
+    refunded: 'bg-green-100 text-green-800',
+    received: 'bg-orange-100 text-orange-800',
+    return_label_sent: 'bg-purple-100 text-purple-800',
+    awaiting_return: 'bg-purple-50 text-purple-700',
+    inspected: 'bg-gray-100 text-gray-800',
+    closed: 'bg-gray-100 text-gray-600',
+};
+
+function ReturnsList({ returns }: { returns: OrderReturn[] }) {
+    const { t } = useTranslation();
+    const { formatPrice } = useCurrency();
+
+    return (
+        <div className="border-border bg-card rounded-xl border">
+            <div className="border-border border-b px-4 py-3">
+                <h2 className="font-semibold">
+                    {t('order.returns', 'Your Returns & Complaints')}
+                </h2>
+            </div>
+            <ul className="divide-border divide-y">
+                {returns.map((ret) => (
+                    <li key={ret.id} className="px-4 py-3">
+                        <div className="mb-2 flex flex-wrap items-center gap-2">
+                            <span className="font-mono text-sm font-medium">
+                                {ret.reference_number}
+                            </span>
+                            <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs capitalize">
+                                {ret.return_type}
+                            </span>
+                            <span
+                                className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${
+                                    RETURN_STATUS_COLORS[ret.status] ??
+                                    'bg-muted text-muted-foreground'
+                                }`}
+                            >
+                                {ret.status.replace(/_/g, ' ')}
+                            </span>
+                            <span className="text-muted-foreground ml-auto text-xs">
+                                {new Date(ret.created_at).toLocaleDateString(
+                                    'en-US',
+                                    {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric',
+                                    },
+                                )}
+                            </span>
+                        </div>
+                        {ret.items.length > 0 && (
+                            <ul className="text-muted-foreground mb-2 space-y-0.5 text-xs">
+                                {ret.items.map((item, idx) => (
+                                    <li key={idx}>
+                                        {item.product_name
+                                            ? `${item.product_name} × ${item.quantity}`
+                                            : `${t('order.qty', 'Qty')}: ${item.quantity}`}
+                                        {item.condition
+                                            ? ` — ${item.condition}`
+                                            : ''}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                        {ret.refund_amount !== null && (
+                            <p className="text-sm">
+                                <span className="text-muted-foreground">
+                                    {t('order.refund_amount', 'Refund amount')}
+                                    :{' '}
+                                </span>
+                                <span className="font-medium text-green-600">
+                                    {formatPrice(ret.refund_amount)}
+                                </span>
+                            </p>
+                        )}
+                        {ret.return_tracking_number && (
+                            <p className="text-muted-foreground text-xs">
+                                {t('order.return_tracking', 'Return tracking')}:{' '}
+                                <span className="font-mono">
+                                    {ret.return_tracking_number}
+                                </span>
+                            </p>
+                        )}
+                        {ret.admin_notes && (
+                            <p className="mt-1 text-sm">
+                                <span className="text-muted-foreground">
+                                    {t('order.admin_notes', 'Note')}:{' '}
+                                </span>
+                                {ret.admin_notes}
+                            </p>
+                        )}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+}
 
 const RETURN_TYPES = [
     { value: 'return', labelKey: 'order.return_type_return' as const },
@@ -132,11 +240,14 @@ function StatusTimeline({
 export default function OrderDetailPage() {
     const { reference } = useParams<{ reference: string }>();
     const lp = useLocalePath();
+    const router = useRouter();
     const { data: order, isLoading } = useOrder(reference);
     const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder();
+    const { mutate: reorderItems, isPending: isReordering } = useReorder();
     const { formatPrice } = useCurrency();
     const { t } = useTranslation();
 
+    const [reorderToast, setReorderToast] = useState<string | null>(null);
     const [showReturnForm, setShowReturnForm] = useState(false);
     const [returnType, setReturnType] = useState('return');
     const [returnReason, setReturnReason] = useState('');
@@ -150,6 +261,32 @@ export default function OrderDetailPage() {
                 ? prev.filter((id) => id !== itemId)
                 : [...prev, itemId],
         );
+    }
+
+    function handleReorder() {
+        reorderItems(reference, {
+            onSuccess: (data) => {
+                if (!data) return;
+                const skippedNote =
+                    data.skipped > 0
+                        ? ` (${data.skipped} ${t('order.reorder_unavailable', 'item(s) unavailable')})`
+                        : '';
+                setReorderToast(
+                    `${t('order.reorder_added', 'Added')} ${data.added} ${t('order.reorder_items', 'item(s) to cart')}${skippedNote}.`,
+                );
+                setTimeout(() => {
+                    router.push(lp('/cart'));
+                }, 1500);
+            },
+            onError: () => {
+                setReorderToast(
+                    t(
+                        'order.reorder_error',
+                        'Could not reorder. Please try again.',
+                    ),
+                );
+            },
+        });
     }
 
     async function handleReturnSubmit(e: React.FormEvent) {
@@ -240,6 +377,19 @@ export default function OrderDetailPage() {
                         'order.return_submitted',
                         "Your return request has been submitted. We'll get back to you within 1-2 business days.",
                     )}
+                </div>
+            )}
+
+            {/* Reorder toast */}
+            {reorderToast && (
+                <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
+                    {reorderToast}{' '}
+                    <Link
+                        href={lp('/cart')}
+                        className="font-semibold underline"
+                    >
+                        {t('order.view_cart', 'View cart')}
+                    </Link>
                 </div>
             )}
 
@@ -364,6 +514,11 @@ export default function OrderDetailPage() {
                 </div>
             </div>
 
+            {/* Returns */}
+            {order.returns && order.returns.length > 0 && (
+                <ReturnsList returns={order.returns} />
+            )}
+
             {/* Addresses */}
             {(order.shipping_address || order.billing_address) && (
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -441,8 +596,8 @@ export default function OrderDetailPage() {
             )}
 
             {/* Actions */}
-            {['pending', 'processing'].includes(order.status) && (
-                <div>
+            <div className="flex flex-wrap gap-3">
+                {['pending', 'processing'].includes(order.status) && (
                     <button
                         onClick={() => cancelOrder(reference)}
                         disabled={isCancelling}
@@ -452,11 +607,33 @@ export default function OrderDetailPage() {
                             ? t('order.cancelling', 'Cancelling…')
                             : t('order.cancel', 'Cancel Order')}
                     </button>
-                </div>
-            )}
+                )}
+
+                {['delivered', 'cancelled'].includes(order.status) && (
+                    <button
+                        onClick={handleReorder}
+                        disabled={isReordering}
+                        aria-label={t('order.reorder', 'Reorder')}
+                        className="border-input hover:bg-accent inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium disabled:opacity-50"
+                    >
+                        {isReordering ? (
+                            <Loader2
+                                className="h-4 w-4 animate-spin"
+                                aria-hidden="true"
+                            />
+                        ) : (
+                            <RefreshCw className="h-4 w-4" aria-hidden="true" />
+                        )}
+                        {isReordering
+                            ? t('order.reordering', 'Adding to cart…')
+                            : t('order.reorder', 'Reorder')}
+                    </button>
+                )}
+            </div>
 
             {['delivered', 'shipped'].includes(order.status) &&
-                !returnSuccess && (
+                !returnSuccess &&
+                !(order.returns && order.returns.length > 0) && (
                     <div>
                         <button
                             onClick={() => setShowReturnForm(!showReturnForm)}

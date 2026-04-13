@@ -33,6 +33,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'google_id',
         'github_id',
         'avatar_url',
+        'processing_restricted_at',
     ];
 
     protected $hidden = [
@@ -56,6 +57,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Customer::class);
     }
 
+    public function isProcessingRestricted(): bool
+    {
+        return $this->processing_restricted_at !== null;
+    }
+
     protected function getAdminAttribute(): bool
     {
         if ($this->hasRole('admin')) {
@@ -71,6 +77,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
+            'processing_restricted_at' => 'datetime',
         ];
     }
 }

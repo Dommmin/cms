@@ -27,10 +27,18 @@ class CartItem extends Model
     }
 
     /**
+     * Unit price for current quantity, respecting tiered pricing.
+     */
+    public function unitPrice(): int
+    {
+        return $this->variant->getPriceForQuantity($this->quantity);
+    }
+
+    /**
      * Subtotal per item (in cents)
      */
     public function subtotal(): int
     {
-        return $this->variant->price * $this->quantity;
+        return $this->unitPrice() * $this->quantity;
     }
 }

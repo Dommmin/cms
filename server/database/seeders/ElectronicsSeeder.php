@@ -973,7 +973,7 @@ class ElectronicsSeeder extends Seeder
             ['Audio-Technica', 299, 1999, 'Sluchawki dokanalkowe'],
             ['Skullcandy', 99, 799, 'Sluchawki bezprzewodowe'],
             ['Marshall', 799, 2499, 'Sluchawki nauszne'],
-            ['Bang Olufsen', 1999, 5999, 'Sluchawki premium'],
+            ['Bang Olufsen', 1999, 5999, 'Sluchawki nauszne'],
         ];
 
         foreach ($headphones as [$brand, $priceMin, $priceMax, $category]) {
@@ -1324,7 +1324,7 @@ class ElectronicsSeeder extends Seeder
 
         $games = [
             ['Sony', 249, 399, 'Gry PS5'],
-            ['Microsoft', 249, 399, 'Gry Xbox'],
+            ['Microsoft', 249, 399, 'Gry na PC'],
             ['Nintendo', 199, 399, 'Gry Switch'],
             ['EA', 199, 399, 'Gry na PC'],
             ['Ubisoft', 199, 399, 'Gry na PC'],
@@ -1526,7 +1526,7 @@ class ElectronicsSeeder extends Seeder
         $accessories = [
             ['Manfrotto', 199, 1999, 'Statywy'],
             ['Peak Design', 299, 1999, 'Torby i plecaki'],
-            ['Lowepro', 199, 1499, 'Torby fotograficzne'],
+            ['Lowepro', 199, 1499, 'Torby i plecaki'],
             ['SanDisk', 49, 799, 'Karty pamieci'],
             ['Godox', 199, 1999, 'Lampy blyskowe'],
             ['Hoya', 49, 499, 'Filtry'],

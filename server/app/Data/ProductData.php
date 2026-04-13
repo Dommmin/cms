@@ -18,6 +18,7 @@ class ProductData extends Data
         public bool $is_active,
         public int $price_min,
         public int $price_max,
+        public bool $is_search_promoted = false,
         public bool $is_on_sale = false,
         public ?int $discount_percentage = null,
         public ?string $seo_title = null,

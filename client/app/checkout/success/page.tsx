@@ -36,7 +36,10 @@ function SuccessContent() {
 
     return (
         <div className="mx-auto max-w-lg px-4 py-20 text-center">
-            <CheckCircle2 className="mx-auto mb-4 h-16 w-16 text-green-500" />
+            <CheckCircle2
+                className="mx-auto mb-4 h-16 w-16 text-green-500"
+                aria-hidden="true"
+            />
             <h1 className="mb-2 text-3xl font-bold">
                 {t('checkout.success_title', 'Order Placed!')}
             </h1>
@@ -54,7 +57,7 @@ function SuccessContent() {
             {bankDetails && (
                 <div className="border-primary/30 bg-primary/5 mb-8 rounded-xl border p-5 text-left text-sm">
                     <div className="text-primary mb-3 flex items-center gap-2 font-semibold">
-                        <Building2 className="h-4 w-4" />
+                        <Building2 className="h-4 w-4" aria-hidden="true" />
                         {t(
                             'checkout.bank_transfer_instructions',
                             'Transfer details',

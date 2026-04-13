@@ -7,3 +7,13 @@ export interface DeleteAccountModalState {
     password: string;
     error: string | null;
 }
+
+export interface ConsentState {
+    analytics: boolean;
+    marketing: boolean;
+}
+
+export interface ProcessingRestrictionState {
+    restricted: boolean;
+    restricted_since: string | null;
+}

@@ -25,7 +25,7 @@ final class SubscriptionService
 
         $expiresAt = $this->calculateExpirationDate($startsAt, $plan);
 
-        return Subscription::create([
+        return Subscription::query()->create([
             'customer_id' => $customer->id,
             'subscription_plan_id' => $plan->id,
             'status' => $status,
@@ -109,6 +109,7 @@ final class SubscriptionService
                             'status' => SubscriptionStatusEnum::Expired,
                         ]);
                     }
+
                     $expiredCount++;
                 }
             });

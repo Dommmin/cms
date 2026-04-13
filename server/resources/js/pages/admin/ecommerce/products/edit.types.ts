@@ -56,6 +56,7 @@ export type FormData = {
     brand_id: string | number | null;
     is_active: boolean;
     is_saleable: boolean;
+    is_search_promoted: boolean;
     seo_title: string;
     seo_description: string;
     meta_robots: string;

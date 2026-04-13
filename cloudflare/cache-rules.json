@@ -1,0 +1,178 @@
+{
+    "_comment": "Cloudflare Cache Rules — import via Terraform cloudflare_ruleset resource or apply manually in the Cloudflare Dashboard under Caching > Cache Rules. Rules are evaluated in order; first match wins.",
+    "kind": "zone",
+    "phase": "http_request_cache_settings",
+    "name": "CMS Cache Rules",
+    "rules": [
+        {
+            "_name": "Bypass cache — Admin SPA",
+            "_priority": 1,
+            "_description": "Admin pages are Inertia SPA served with session auth. Never cache at edge to prevent leaking admin UI to unauthenticated users.",
+            "expression": "(http.request.uri.path matches \"^/admin(/.*)?$\")",
+            "action": "set_cache_settings",
+            "action_parameters": {
+                "cache": false
+            }
+        },
+        {
+            "_name": "Bypass cache — Authenticated API (cart, orders, account)",
+            "_priority": 2,
+            "_description": "These endpoints return user-specific data. Cloudflare must not serve one user's response to another.",
+            "expression": "(http.request.uri.path matches \"^/api/v1/(cart|orders|account|profile|wishlist|checkout|payments|reviews|support|notifications|notification-preferences|push-subscriptions|addresses)(/.*)?$\")",
+            "action": "set_cache_settings",
+            "action_parameters": {
+                "cache": false
+            }
+        },
+        {
+            "_name": "Bypass cache — Non-GET API methods",
+            "_priority": 3,
+            "_description": "POST/PUT/PATCH/DELETE requests must always reach the origin to mutate state.",
+            "expression": "(http.request.uri.path matches \"^/api/\" and not http.request.method in {\"GET\" \"HEAD\"})",
+            "action": "set_cache_settings",
+            "action_parameters": {
+                "cache": false
+            }
+        },
+        {
+            "_name": "Bypass cache — Checkout and account pages (frontend)",
+            "_priority": 4,
+            "_description": "User-specific Next.js pages. Never cache at CDN edge.",
+            "expression": "(http.request.uri.path matches \"^/[a-z]{2}/(checkout|account)(/.*)?$\")",
+            "action": "set_cache_settings",
+            "action_parameters": {
+                "cache": false
+            }
+        },
+        {
+            "_name": "Cache — Next.js static assets (immutable)",
+            "_priority": 5,
+            "_description": "/_next/static/ files contain content-hashed filenames. Safe to cache for 1 year at both browser and edge.",
+            "expression": "(http.request.uri.path matches \"^/_next/static/\")",
+            "action": "set_cache_settings",
+            "action_parameters": {
+                "cache": true,
+                "edge_ttl": {
+                    "mode": "override_origin",
+                    "default": 31536000
+                },
+                "browser_ttl": {
+                    "mode": "override_origin",
+                    "default": 31536000
+                },
+                "cache_key": {
+                    "ignore_query_strings_order": false,
+                    "cache_by_device_type": false
+                }
+            }
+        },
+        {
+            "_name": "Cache — Public static files (fonts, images, favicons)",
+            "_priority": 6,
+            "_description": "Public assets under /images/, /fonts/, /icons/ etc. Cached 1 year with immutable semantics.",
+            "expression": "(http.request.uri.path matches \"^/(images|fonts|icons|favicon)\") or (http.request.uri.path matches \"\\.(ico|png|jpg|jpeg|webp|svg|woff2|woff|ttf|otf)$\")",
+            "action": "set_cache_settings",
+            "action_parameters": {
+                "cache": true,
+                "edge_ttl": {
+                    "mode": "override_origin",
+                    "default": 31536000
+                },
+                "browser_ttl": {
+                    "mode": "override_origin",
+                    "default": 31536000
+                }
+            }
+        },
+        {
+            "_name": "Cache — API: settings/public (1 hour)",
+            "_priority": 7,
+            "_description": "Site settings almost never change. Cache 1 hour at edge; stale-while-revalidate allows serving stale content up to 24h while revalidating in background.",
+            "expression": "(http.request.uri.path eq \"/api/v1/settings/public\" and http.request.method in {\"GET\" \"HEAD\"})",
+            "action": "set_cache_settings",
+            "action_parameters": {
+                "cache": true,
+                "edge_ttl": {
+                    "mode": "override_origin",
+                    "default": 3600
+                },
+                "browser_ttl": {
+                    "mode": "respect_origin",
+                    "default": 3600
+                }
+            }
+        },
+        {
+            "_name": "Cache — API: locales & translations (1 hour)",
+            "_priority": 8,
+            "_description": "Translation strings and locale list change rarely. Cache 1 hour.",
+            "expression": "(http.request.uri.path matches \"^/api/v1/(locales|translations)(/.*)?$\" and http.request.method in {\"GET\" \"HEAD\"})",
+            "action": "set_cache_settings",
+            "action_parameters": {
+                "cache": true,
+                "edge_ttl": {
+                    "mode": "override_origin",
+                    "default": 3600
+                },
+                "browser_ttl": {
+                    "mode": "respect_origin",
+                    "default": 3600
+                }
+            }
+        },
+        {
+            "_name": "Cache — API: blog posts (10 minutes)",
+            "_priority": 9,
+            "_description": "Blog content is updated infrequently. 10-minute edge cache with 2-hour stale-while-revalidate window.",
+            "expression": "(http.request.uri.path matches \"^/api/v1/blog(/.*)?$\" and http.request.method in {\"GET\" \"HEAD\"})",
+            "action": "set_cache_settings",
+            "action_parameters": {
+                "cache": true,
+                "edge_ttl": {
+                    "mode": "override_origin",
+                    "default": 600
+                },
+                "browser_ttl": {
+                    "mode": "respect_origin",
+                    "default": 600
+                }
+            }
+        },
+        {
+            "_name": "Cache — API: products & categories (5 minutes)",
+            "_priority": 10,
+            "_description": "Product catalog data changes occasionally. 5-minute edge TTL balances freshness vs. origin load.",
+            "expression": "(http.request.uri.path matches \"^/api/v1/(products|categories)(/.*)?$\" and http.request.method in {\"GET\" \"HEAD\"})",
+            "action": "set_cache_settings",
+            "action_parameters": {
+                "cache": true,
+                "edge_ttl": {
+                    "mode": "override_origin",
+                    "default": 300
+                },
+                "browser_ttl": {
+                    "mode": "respect_origin",
+                    "default": 300
+                }
+            }
+        },
+        {
+            "_name": "Cache — Frontend HTML pages (10 minutes)",
+            "_priority": 11,
+            "_description": "Public Next.js pages (products, blog, homepage). Edge cache 10 minutes. Browsers get s-maxage directive from the page itself.",
+            "expression": "(http.request.uri.path matches \"^/[a-z]{2}/(products|categories|blog|flash-sales|stores|search|compare|faq)(/.*)?$\" or http.request.uri.path matches \"^/[a-z]{2}/?$\")",
+            "action": "set_cache_settings",
+            "action_parameters": {
+                "cache": true,
+                "edge_ttl": {
+                    "mode": "override_origin",
+                    "default": 600
+                },
+                "browser_ttl": {
+                    "mode": "respect_origin",
+                    "default": 300
+                }
+            }
+        }
+    ]
+}

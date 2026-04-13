@@ -25,7 +25,6 @@ import {
 import { addRecentlyViewed } from '@/hooks/use-recently-viewed';
 import { useTranslation } from '@/hooks/use-translation';
 import { trackViewItem } from '@/lib/datalayer';
-import { sanitizeHtml } from '@/lib/sanitize';
 import { buildBreadcrumbList, buildProduct } from '@/lib/schema';
 import { generateCanonical } from '@/lib/seo';
 
@@ -437,6 +436,9 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                                                             disabled={
                                                                 !isSelectable
                                                             }
+                                                            aria-pressed={
+                                                                isSelected
+                                                            }
                                                             className={`rounded-md border px-3 py-1.5 text-sm disabled:opacity-40 ${
                                                                 isSelected
                                                                     ? 'border-primary bg-primary text-primary-foreground'
@@ -489,9 +491,10 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                     <button
                         onClick={handleAddToCart}
                         disabled={isPending || !product.is_active}
+                        aria-busy={isPending}
                         className="bg-primary text-primary-foreground mt-4 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
                     >
-                        <ShoppingCart className="h-5 w-5" />
+                        <ShoppingCart className="h-5 w-5" aria-hidden="true" />
                         {isPending
                             ? t('product.adding', 'Adding…')
                             : t('product.add_to_cart', 'Add to Cart')}
@@ -541,10 +544,18 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
             {/* Tabs: Description / Reviews */}
             <div className="mt-12">
-                <div className="border-border flex gap-1 border-b">
+                <div
+                    role="tablist"
+                    aria-label={t('product.tabs_label', 'Product information')}
+                    className="border-border flex gap-1 border-b"
+                >
                     {(['description', 'reviews'] as const).map((tab) => (
                         <button
                             key={tab}
+                            role="tab"
+                            id={`tab-${tab}`}
+                            aria-selected={activeTab === tab}
+                            aria-controls={`tabpanel-${tab}`}
                             onClick={() => setActiveTab(tab)}
                             className={`px-4 py-2 text-sm font-medium capitalize ${
                                 activeTab === tab
@@ -566,16 +577,24 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                     {/* Description tab */}
                     {activeTab === 'description' && (
                         <div
+                            role="tabpanel"
+                            id="tabpanel-description"
+                            aria-labelledby="tab-description"
                             className="prose prose-lg"
                             dangerouslySetInnerHTML={{
-                                __html: sanitizeHtml(product.description ?? ''),
+                                __html: product.description ?? '',
                             }}
                         />
                     )}
 
                     {/* Reviews tab */}
                     {activeTab === 'reviews' && (
-                        <div className="space-y-8">
+                        <div
+                            role="tabpanel"
+                            id="tabpanel-reviews"
+                            aria-labelledby="tab-reviews"
+                            className="space-y-8"
+                        >
                             {/* Review list */}
                             {reviews.length === 0 ? (
                                 <p className="text-muted-foreground">
@@ -631,11 +650,23 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                                                     onClick={() =>
                                                         markHelpful(review.id)
                                                     }
+                                                    aria-label={t(
+                                                        'product.mark_helpful',
+                                                        `Mark review by ${review.author} as helpful`,
+                                                    ).replace(
+                                                        '{author}',
+                                                        review.author,
+                                                    )}
                                                     className="border-border text-muted-foreground hover:bg-accent hover:text-foreground inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs"
                                                 >
-                                                    <ThumbsUp className="h-3.5 w-3.5" />
-                                                    Helpful (
-                                                    {review.helpful_count})
+                                                    <ThumbsUp
+                                                        className="h-3.5 w-3.5"
+                                                        aria-hidden="true"
+                                                    />
+                                                    <span>
+                                                        Helpful (
+                                                        {review.helpful_count})
+                                                    </span>
                                                 </button>
                                             </div>
                                         </div>
@@ -663,23 +694,44 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                                         </h3>
 
                                         <div className="mb-4">
-                                            <label className="mb-1 block text-sm font-medium">
-                                                Rating *
-                                            </label>
-                                            <StarRating
-                                                value={rating}
-                                                onChange={setRating}
-                                            />
+                                            <p
+                                                id="review-rating-label"
+                                                className="mb-1 block text-sm font-medium"
+                                            >
+                                                {t(
+                                                    'product.rating_label',
+                                                    'Rating',
+                                                )}{' '}
+                                                *
+                                            </p>
+                                            <div aria-labelledby="review-rating-label">
+                                                <StarRating
+                                                    value={rating}
+                                                    onChange={setRating}
+                                                />
+                                            </div>
                                         </div>
 
                                         <div className="mb-4">
-                                            <label className="mb-1 block text-sm font-medium">
-                                                Title{' '}
+                                            <label
+                                                htmlFor="review-title"
+                                                className="mb-1 block text-sm font-medium"
+                                            >
+                                                {t(
+                                                    'product.review_title_label',
+                                                    'Title',
+                                                )}{' '}
                                                 <span className="text-muted-foreground font-normal">
-                                                    (optional)
+                                                    (
+                                                    {t(
+                                                        'common.optional',
+                                                        'optional',
+                                                    )}
+                                                    )
                                                 </span>
                                             </label>
                                             <input
+                                                id="review-title"
                                                 type="text"
                                                 value={reviewTitle}
                                                 onChange={(e) =>
@@ -693,10 +745,18 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                                         </div>
 
                                         <div className="mb-4">
-                                            <label className="mb-1 block text-sm font-medium">
-                                                Review *
+                                            <label
+                                                htmlFor="review-body"
+                                                className="mb-1 block text-sm font-medium"
+                                            >
+                                                {t(
+                                                    'product.review_body_label',
+                                                    'Review',
+                                                )}{' '}
+                                                *
                                             </label>
                                             <textarea
+                                                id="review-body"
                                                 required
                                                 value={reviewBody}
                                                 onChange={(e) =>

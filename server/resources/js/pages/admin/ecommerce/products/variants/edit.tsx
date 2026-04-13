@@ -1,5 +1,5 @@
-import { Form, Head, Link } from '@inertiajs/react';
-import { ArrowLeftIcon } from 'lucide-react';
+import { Form, Head, Link, useForm } from '@inertiajs/react';
+import { ArrowLeftIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
 import * as ProductVariantController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductVariantController';
 import InputError from '@/components/input-error';
@@ -13,7 +13,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
-import type { Product, TaxRate, Variant, VariantAttribute } from './edit.types';
+import type { PriceTier, Product, TaxRate, Variant, VariantAttribute } from './edit.types';
 
 export default function EditVariant({
     product,
@@ -28,6 +28,61 @@ export default function EditVariant({
 }) {
     const __ = useTranslation();
     const formId = 'product-variant-edit-form';
+
+    const initialTiers: PriceTier[] = (variant.price_tiers ?? []).map((t) => ({
+        id: t.id,
+        min_quantity: t.min_quantity,
+        max_quantity: t.max_quantity,
+        price: t.price / 100,
+    }));
+
+    const { data, setData, post, processing: tierProcessing, errors: tierErrors } = useForm<{
+        tiers: Array<{ min_quantity: number | ''; max_quantity: number | null | ''; price: number | '' }>;
+    }>({
+        tiers: initialTiers.length > 0
+            ? initialTiers.map((t) => ({
+                  min_quantity: t.min_quantity,
+                  max_quantity: t.max_quantity,
+                  price: t.price,
+              }))
+            : [],
+    });
+
+    function addTier(): void {
+        setData('tiers', [
+            ...data.tiers,
+            { min_quantity: '', max_quantity: null, price: '' },
+        ]);
+    }
+
+    function removeTier(index: number): void {
+        setData(
+            'tiers',
+            data.tiers.filter((_, i) => i !== index),
+        );
+    }
+
+    function updateTier(
+        index: number,
+        field: 'min_quantity' | 'max_quantity' | 'price',
+        value: string,
+    ): void {
+        const updated = data.tiers.map((tier, i) => {
+            if (i !== index) return tier;
+            if (field === 'max_quantity') {
+                return { ...tier, max_quantity: value === '' ? null : Number(value) };
+            }
+            return { ...tier, [field]: value === '' ? '' : Number(value) };
+        });
+        setData('tiers', updated);
+    }
+
+    function submitTiers(e: React.FormEvent): void {
+        e.preventDefault();
+        post(
+            ProductVariantController.savePriceTiers.url([product.id, variant.id]),
+        );
+    }
     const productName = resolveLocalizedText(product.name);
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -387,6 +442,116 @@ export default function EditVariant({
                         </div>
                     )}
                 </Form>
+                {/* Tiered Pricing */}
+                <form onSubmit={submitTiers} className="space-y-4 rounded-xl border bg-card p-6">
+                    <div>
+                        <h2 className="text-base font-semibold">
+                            Tiered Pricing (Quantity-Based)
+                        </h2>
+                        <p className="text-sm text-muted-foreground">
+                            Set different prices based on quantity ordered.
+                        </p>
+                    </div>
+
+                    {data.tiers.length > 0 && (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="border-b text-left text-xs text-muted-foreground">
+                                        <th className="pb-2 pr-4 font-medium">Min Qty</th>
+                                        <th className="pb-2 pr-4 font-medium">Max Qty</th>
+                                        <th className="pb-2 pr-4 font-medium">Price (PLN)</th>
+                                        <th className="pb-2 font-medium"></th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y">
+                                    {data.tiers.map((tier, index) => (
+                                        <tr key={index} className="py-2">
+                                            <td className="pr-4 py-2">
+                                                <Input
+                                                    type="number"
+                                                    min="1"
+                                                    value={tier.min_quantity}
+                                                    onChange={(e) =>
+                                                        updateTier(index, 'min_quantity', e.target.value)
+                                                    }
+                                                    className="w-24"
+                                                    placeholder="1"
+                                                />
+                                                <InputError
+                                                    message={(tierErrors as Record<string, string>)[`tiers.${index}.min_quantity`]}
+                                                />
+                                            </td>
+                                            <td className="pr-4 py-2">
+                                                <Input
+                                                    type="number"
+                                                    min="1"
+                                                    value={tier.max_quantity ?? ''}
+                                                    onChange={(e) =>
+                                                        updateTier(index, 'max_quantity', e.target.value)
+                                                    }
+                                                    className="w-24"
+                                                    placeholder="∞"
+                                                />
+                                                <InputError
+                                                    message={(tierErrors as Record<string, string>)[`tiers.${index}.max_quantity`]}
+                                                />
+                                            </td>
+                                            <td className="pr-4 py-2">
+                                                <Input
+                                                    type="number"
+                                                    step="0.01"
+                                                    min="0"
+                                                    value={tier.price}
+                                                    onChange={(e) =>
+                                                        updateTier(index, 'price', e.target.value)
+                                                    }
+                                                    className="w-32"
+                                                    placeholder="0.00"
+                                                />
+                                                <InputError
+                                                    message={(tierErrors as Record<string, string>)[`tiers.${index}.price`]}
+                                                />
+                                            </td>
+                                            <td className="py-2">
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => removeTier(index)}
+                                                    aria-label="Remove tier"
+                                                >
+                                                    <TrashIcon className="h-4 w-4 text-destructive" />
+                                                </Button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+
+                    {data.tiers.length === 0 && (
+                        <p className="text-sm text-muted-foreground">
+                            No tiers configured. Base variant price applies to all quantities.
+                        </p>
+                    )}
+
+                    <div className="flex items-center justify-between pt-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={addTier}
+                        >
+                            <PlusIcon className="mr-2 h-4 w-4" />
+                            Add Tier
+                        </Button>
+                        <Button type="submit" disabled={tierProcessing} size="sm">
+                            {tierProcessing ? 'Saving…' : 'Save Tiered Pricing'}
+                        </Button>
+                    </div>
+                </form>
             </Wrapper>
         </AppLayout>
     );

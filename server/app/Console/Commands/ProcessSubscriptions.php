@@ -19,7 +19,7 @@ final class ProcessSubscriptions extends Command
 
         $count = $service->processExpiredSubscriptions();
 
-        $this->info("Processed {$count} subscriptions.");
+        $this->info(sprintf('Processed %d subscriptions.', $count));
 
         return self::SUCCESS;
     }

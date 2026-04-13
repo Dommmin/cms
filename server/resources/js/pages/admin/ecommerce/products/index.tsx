@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
-import { DownloadIcon, PlusIcon } from 'lucide-react';
+import { DownloadIcon, PlusIcon, UploadIcon } from 'lucide-react';
+import { useState } from 'react';
 import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
 import { useProductColumns } from '@/components/columns/product-columns';
 
@@ -10,6 +11,7 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
+import ImportDialog from './ImportDialog';
 import type { ProductData } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -25,6 +27,7 @@ export default function ProductsIndex({
 }) {
     const __ = useTranslation();
     const productColumns = useProductColumns();
+    const [importOpen, setImportOpen] = useState(false);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -43,6 +46,13 @@ export default function ProductsIndex({
                                 <DownloadIcon className="mr-2 h-4 w-4" />
                                 {__('action.export_csv', 'Export CSV')}
                             </a>
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => setImportOpen(true)}
+                        >
+                            <UploadIcon className="mr-2 h-4 w-4" />
+                            {__('action.import', 'Import')}
                         </Button>
                         <Button asChild variant="outline">
                             <Link
@@ -77,6 +87,11 @@ export default function ProductsIndex({
                     baseUrl={ProductController.index.url()}
                 />
             </Wrapper>
+
+            <ImportDialog
+                open={importOpen}
+                onClose={() => setImportOpen(false)}
+            />
         </AppLayout>
     );
 }

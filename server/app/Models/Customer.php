@@ -21,7 +21,7 @@ class Customer extends Model
 
     protected $fillable = [
         'user_id', 'first_name', 'last_name', 'email',
-        'phone', 'company_name', 'tax_id',
+        'phone', 'company_name', 'tax_id', 'notes', 'is_active',
     ];
 
     public function user(): BelongsTo
@@ -75,5 +75,12 @@ class Customer extends Model
         return (int) $this->orders()
             ->where('status', OrderStatusEnum::DELIVERED->value)
             ->sum('total');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+        ];
     }
 }

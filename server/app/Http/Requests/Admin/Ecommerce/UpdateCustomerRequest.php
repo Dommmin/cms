@@ -29,7 +29,10 @@ class UpdateCustomerRequest extends FormRequest
             'last_name' => ['required', 'string', 'max:255'],
             'email' => 'required|email|unique:customers,email,'.$this->customer->id,
             'phone' => ['nullable', 'string', 'max:50'],
+            'company_name' => ['nullable', 'string', 'max:255'],
+            'tax_id' => ['nullable', 'string', 'max:50'],
             'is_active' => ['boolean'],
+            'notes' => ['nullable', 'string', 'max:5000'],
         ];
     }
 }

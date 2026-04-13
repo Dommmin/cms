@@ -18,3 +18,6 @@ Schedule::command('cart:clean')->daily();
 Schedule::job(new SendAbandonedCartEmails)->hourly();
 Schedule::job(new SendLowStockAlerts)->daily();
 Schedule::command('user:prune')->monthly();
+Schedule::command('marketing:process')->daily();
+Schedule::command('subscriptions:process')->hourly();
+Schedule::command('flash-sales:deactivate-expired')->everyFiveMinutes();

@@ -29,9 +29,15 @@ export function LocaleSwitcher() {
                 setOpen(false);
             }
         }
+        function handleKeyDown(e: KeyboardEvent) {
+            if (e.key === 'Escape') setOpen(false);
+        }
         document.addEventListener('mousedown', handleClickOutside);
-        return () =>
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
             document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
     }, []);
 
     if (!locales || locales.length <= 1) return null;
@@ -50,7 +56,10 @@ export function LocaleSwitcher() {
             >
                 {current.flag_emoji && <span>{current.flag_emoji}</span>}
                 <span>{current.native_name}</span>
-                <ChevronDown className="h-3 w-3 opacity-60" />
+                <ChevronDown
+                    className="h-3 w-3 opacity-60"
+                    aria-hidden="true"
+                />
             </button>
 
             {open && (

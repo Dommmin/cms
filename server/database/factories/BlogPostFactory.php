@@ -30,7 +30,6 @@ class BlogPostFactory extends Factory
             'content_type' => 'richtext',
             'status' => BlogPostStatusEnum::Draft,
             'featured_image' => null,
-            'tags' => null,
             'available_locales' => null,
             'is_featured' => false,
             'published_at' => null,

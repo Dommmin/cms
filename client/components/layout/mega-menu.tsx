@@ -80,7 +80,10 @@ export function MegaMenu({ items, categories }: MegaMenuProps) {
     }
 
     return (
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav
+            aria-label="Main navigation"
+            className="hidden items-center gap-1 md:flex"
+        >
             {/* ── Categories mega dropdown ─────────────────────────────────── */}
             {categories.length > 0 && (
                 <div
@@ -88,7 +91,12 @@ export function MegaMenu({ items, categories }: MegaMenuProps) {
                     onMouseEnter={() => open('categories')}
                     onMouseLeave={scheduleClose}
                 >
-                    <button className="text-foreground/80 hover:bg-accent hover:text-foreground flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors">
+                    <button
+                        aria-expanded={openKey === 'categories'}
+                        aria-haspopup="true"
+                        aria-controls="mega-menu-categories"
+                        className="text-foreground/80 hover:bg-accent hover:text-foreground flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors"
+                    >
                         {t('nav.categories', 'Categories')}
                         <ChevronDown
                             className={`h-3.5 w-3.5 transition-transform ${openKey === 'categories' ? 'rotate-180' : ''}`}
@@ -98,6 +106,7 @@ export function MegaMenu({ items, categories }: MegaMenuProps) {
 
                     {openKey === 'categories' && (
                         <div
+                            id="mega-menu-categories"
                             className="border-border bg-background fixed top-16 right-0 left-0 z-40 border-t shadow-xl"
                             onMouseEnter={cancelClose}
                             onMouseLeave={scheduleClose}
@@ -263,6 +272,14 @@ export function MegaMenu({ items, categories }: MegaMenuProps) {
                     <Link
                         href={localiseUrl(item.url, lp)}
                         target={item.target}
+                        aria-expanded={
+                            item.children?.length
+                                ? openKey === item.id
+                                : undefined
+                        }
+                        aria-haspopup={
+                            item.children?.length ? 'true' : undefined
+                        }
                         className="text-foreground/80 hover:bg-accent hover:text-foreground flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors"
                     >
                         {item.label}

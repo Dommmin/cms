@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin\Ecommerce;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateEmailTemplateRequest;
 use App\Models\EmailTemplate;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -24,23 +24,17 @@ class EmailTemplateController extends Controller
         ]);
     }
 
-    public function edit(EmailTemplate $template): Response
+    public function edit(EmailTemplate $emailTemplate): Response
     {
         return Inertia::render('admin/email-templates/edit', [
-            'template' => $template,
+            'template' => $emailTemplate,
         ]);
     }
 
-    public function update(Request $request, EmailTemplate $template): RedirectResponse
+    public function update(UpdateEmailTemplateRequest $request, EmailTemplate $emailTemplate): RedirectResponse
     {
-        $validated = $request->validate([
-            'subject' => ['required', 'string', 'max:255'],
-            'body' => ['required', 'string'],
-            'is_active' => ['boolean'],
-        ]);
+        $emailTemplate->update($request->validated());
 
-        $template->update($validated);
-
-        return back()->with('success', 'Template updated.');
+        return back()->with('success', 'Template updated successfully.');
     }
 }

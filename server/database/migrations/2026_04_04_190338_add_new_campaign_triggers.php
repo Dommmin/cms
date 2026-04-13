@@ -14,7 +14,7 @@ return new class extends Migration
             $triggers = array_column(CampaignTriggerEnum::cases(), 'value');
             $enum = "'".implode("','", $triggers)."'";
 
-            DB::statement("ALTER TABLE newsletter_campaigns MODIFY COLUMN `trigger` ENUM($enum) NULL");
+            DB::statement(sprintf('ALTER TABLE newsletter_campaigns MODIFY COLUMN `trigger` ENUM(%s) NULL', $enum));
         }
     }
 
@@ -24,7 +24,7 @@ return new class extends Migration
             $oldTriggers = ['on_subscribe', 'on_first_order', 'on_birthday', 'after_purchase', 'cart_abandonment'];
             $enum = "'".implode("','", $oldTriggers)."'";
 
-            DB::statement("ALTER TABLE newsletter_campaigns MODIFY COLUMN `trigger` ENUM($enum) NULL");
+            DB::statement(sprintf('ALTER TABLE newsletter_campaigns MODIFY COLUMN `trigger` ENUM(%s) NULL', $enum));
         }
     }
 };

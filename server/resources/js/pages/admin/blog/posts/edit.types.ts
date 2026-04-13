@@ -1,3 +1,4 @@
+export type TagOption = { id: number; name: string; slug: string };
 export type Category = { id: number; name: string };
 export type BlogPost = {
     id: number;
@@ -8,7 +9,7 @@ export type BlogPost = {
     content_type: 'richtext' | 'markdown';
     status: string;
     blog_category_id: number | null;
-    tags: string[] | null;
+    tag_list: string[];
     available_locales: string[] | null;
     is_featured: boolean;
     featured_image: string | null;
@@ -22,6 +23,7 @@ export type BlogPost = {
 export type EditProps = {
     post: BlogPost;
     categories: Category[];
+    available_tags: TagOption[];
 };
 export type FormData = {
     title: Record<string, string>;
@@ -32,7 +34,7 @@ export type FormData = {
     status: string;
     published_at: string;
     blog_category_id: string;
-    tags: string;
+    tags: string[];
     available_locales: string[] | null;
     is_featured: boolean;
     featured_image: string;

@@ -15,6 +15,7 @@ use App\Models\ProductVariant;
 use App\Models\VariantAttributeValue;
 use App\Queries\Admin\ProductVariantIndexQuery;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Inertia\Response;
 
@@ -72,7 +73,7 @@ class ProductVariantController extends Controller
 
     public function edit(Product $product, ProductVariant $variant): Response
     {
-        $variant->load(['taxRate', 'attributeValues.attribute', 'images.media']);
+        $variant->load(['taxRate', 'attributeValues.attribute', 'images.media', 'priceTiers']);
 
         $taxRates = new ProductVariantIndexQuery(request())->getTaxRates();
 
@@ -122,6 +123,28 @@ class ProductVariantController extends Controller
         $variant->update(['stock_quantity' => $newQuantity]);
 
         return back()->with('success', 'Stan magazynowy został zaktualizowany');
+    }
+
+    public function savePriceTiers(Request $request, Product $product, ProductVariant $variant): RedirectResponse
+    {
+        $validated = $request->validate([
+            'tiers' => ['nullable', 'array'],
+            'tiers.*.min_quantity' => ['required', 'integer', 'min:1'],
+            'tiers.*.max_quantity' => ['nullable', 'integer'],
+            'tiers.*.price' => ['required', 'numeric', 'min:0'],
+        ]);
+
+        $variant->priceTiers()->delete();
+
+        foreach ($validated['tiers'] ?? [] as $tier) {
+            $variant->priceTiers()->create([
+                'min_quantity' => $tier['min_quantity'],
+                'max_quantity' => isset($tier['max_quantity']) && $tier['max_quantity'] !== null && $tier['max_quantity'] !== '' ? (int) $tier['max_quantity'] : null,
+                'price' => (int) round((float) $tier['price'] * 100),
+            ]);
+        }
+
+        return back()->with('success', 'Price tiers saved.');
     }
 
     private function variantAttributes(Product $product): Collection

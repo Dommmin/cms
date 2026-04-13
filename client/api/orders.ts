@@ -1,4 +1,6 @@
+import { getCartToken } from '@/api/cart';
 import { apiGet, apiGetMany, apiGetPage, apiPost } from '@/lib/api';
+import { api } from '@/lib/axios';
 import type { Order, PaginatedResponse, ShippingMethod } from '@/types/api';
 
 export async function getOrders(
@@ -13,6 +15,25 @@ export async function getOrder(reference: string): Promise<Order | null> {
 
 export async function cancelOrder(reference: string): Promise<Order | null> {
     return apiPost<Order>(`/orders/${reference}/cancel`);
+}
+
+export interface ReorderResult {
+    cart_token: string | null;
+    added: number;
+    skipped: number;
+    message: string;
+}
+
+export async function reorder(
+    reference: string,
+): Promise<ReorderResult | null> {
+    const cartToken = getCartToken();
+    const { data } = await api.post<ReorderResult>(
+        `/orders/${reference}/reorder`,
+        {},
+        cartToken ? { headers: { 'X-Cart-Token': cartToken } } : {},
+    );
+    return data ?? null;
 }
 
 export async function getShippingMethods(): Promise<ShippingMethod[]> {

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\ApiController;
-use App\Http\Resources\ProductResource;
+use App\Http\Resources\Api\V1\ProductResource;
 use App\Models\Product;
+use App\Models\SearchLog;
+use App\Models\SearchSynonym;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Laravel\Scout\Builder;
@@ -23,21 +25,45 @@ class SearchController extends ApiController
         $sort = $request->input('sort', 'created_at:desc');
         $perPage = (int) $request->input('per_page', 20);
 
-        $searchBuilder = Product::search($query);
+        $expandedQuery = $this->expandWithSynonyms($query);
+
+        $searchBuilder = Product::search($expandedQuery);
 
         $this->applyFilters($searchBuilder, $filters);
         $this->applySorting($searchBuilder, $sort);
 
         $results = $searchBuilder->paginate($perPage);
 
+        // Float promoted products to top on first page
+        $items = $results->items();
+        if ($results->currentPage() === 1) {
+            $items = $this->floatPromotedFirst($items);
+        }
+
+        $didYouMean = null;
+        if ($results->total() === 0 && mb_strlen((string) $query) >= 2) {
+            $didYouMean = $this->findDidYouMean($query);
+        }
+
+        if (mb_strlen((string) $query) >= 2) {
+            SearchLog::query()->create([
+                'query' => mb_strtolower(mb_trim($query)),
+                'results_count' => $results->total(),
+                'is_autocomplete' => false,
+                'locale' => $request->input('locale'),
+                'ip' => $request->ip(),
+            ]);
+        }
+
         return $this->ok([
-            'data' => ProductResource::collection($results->items()),
+            'data' => ProductResource::collection($items),
             'meta' => [
                 'total' => $results->total(),
                 'per_page' => $results->perPage(),
                 'current_page' => $results->currentPage(),
                 'last_page' => $results->lastPage(),
                 'facets' => $this->getFacets($filters),
+                'did_you_mean' => $didYouMean,
             ],
         ]);
     }
@@ -66,7 +92,78 @@ class SearchController extends ApiController
             'price' => $product->priceRange()['min'],
         ]);
 
+        SearchLog::query()->create([
+            'query' => mb_strtolower(mb_trim($query)),
+            'results_count' => $results->count(),
+            'is_autocomplete' => true,
+            'locale' => $request->input('locale'),
+            'ip' => $request->ip(),
+        ]);
+
         return $this->ok(['suggestions' => $suggestions]);
+    }
+
+    /**
+     * Expand search query with synonyms from DB.
+     * If the query matches a synonym word, also include the main term.
+     */
+    private function expandWithSynonyms(string $query): string
+    {
+        if (mb_strlen($query) < 2) {
+            return $query;
+        }
+
+        $lower = mb_strtolower(mb_trim($query));
+
+        $synonym = SearchSynonym::query()
+            ->where('is_active', true)
+            ->get()
+            ->first(function (SearchSynonym $s) use ($lower): bool {
+                $synonymWords = array_map(mb_strtolower(...), $s->synonyms ?? []);
+
+                return in_array($lower, $synonymWords, true) || mb_strtolower($s->term) === $lower;
+            });
+
+        if (! $synonym) {
+            return $query;
+        }
+
+        $terms = array_merge([$synonym->term], $synonym->synonyms ?? []);
+        $terms = array_unique(array_filter($terms));
+
+        return implode(' OR ', $terms);
+    }
+
+    /**
+     * Float promoted products to the beginning of the result list.
+     *
+     * @param  array<Product>  $items
+     * @return array<Product>
+     */
+    private function floatPromotedFirst(array $items): array
+    {
+        $promoted = array_filter($items, fn (Product $p): bool => (bool) $p->is_search_promoted);
+        $regular = array_filter($items, fn (Product $p): bool => ! $p->is_search_promoted);
+
+        return array_values(array_merge($promoted, $regular));
+    }
+
+    /**
+     * Suggest a "did you mean" query from past successful searches.
+     */
+    private function findDidYouMean(string $query): ?string
+    {
+        $lower = mb_strtolower(mb_trim($query));
+
+        $suggestion = SearchLog::query()
+            ->where('results_count', '>', 0)
+            ->where('is_autocomplete', false)
+            ->where('query', 'like', '%'.mb_substr($lower, 0, 3).'%')
+            ->where('query', '!=', $lower)
+            ->orderByDesc('results_count')
+            ->value('query');
+
+        return $suggestion ?: null;
     }
 
     private function applyFilters(Builder $builder, array $filters): void

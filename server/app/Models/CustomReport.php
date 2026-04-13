@@ -25,6 +25,11 @@ final class CustomReport extends Model
         'is_public',
     ];
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     protected function casts(): array
     {
         return [
@@ -34,10 +39,5 @@ final class CustomReport extends Model
             'group_by' => 'array',
             'is_public' => 'boolean',
         ];
-    }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
     }
 }
