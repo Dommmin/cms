@@ -33,7 +33,6 @@ use App\Http\Controllers\Admin\ReferralController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SearchAnalyticsController;
 use App\Http\Controllers\Admin\SearchSynonymController;
-use App\Http\Controllers\Admin\SectionTemplateController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\StoreController;
 use App\Http\Controllers\Admin\SupportCannedResponseController;
@@ -136,9 +135,6 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('admin')->name(
     Route::resource('faqs', FaqController::class)->except(['show']);
     Route::post('faqs/{faq}/toggle-active', [FaqController::class, 'toggleActive'])->name('faqs.toggle-active');
     Route::post('faqs/reorder', [FaqController::class, 'reorder'])->name('faqs.reorder');
-
-    Route::resource('section-templates', SectionTemplateController::class)->except(['show']);
-    Route::post('section-templates/{sectionTemplate}/duplicate', [SectionTemplateController::class, 'duplicate'])->name('section-templates.duplicate');
 
     // Opcjonalne - Read only / relacje
     Route::prefix('ecommerce')->name('ecommerce.')->group(function (): void {

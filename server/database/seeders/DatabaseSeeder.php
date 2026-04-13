@@ -20,7 +20,6 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             FormSeeder::class,
             PagesDemoSeeder::class,
-            SectionTemplateSeeder::class,
             ThemeSeeder::class,
             SettingsSeeder::class,
             MenuSeeder::class,

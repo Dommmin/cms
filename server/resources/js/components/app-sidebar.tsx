@@ -75,7 +75,6 @@ import * as NewsletterCampaignController from '@/actions/App/Http/Controllers/Ad
 import * as NewsletterSegmentController from '@/actions/App/Http/Controllers/Admin/NewsletterSegmentController';
 import * as NewsletterSubscriberController from '@/actions/App/Http/Controllers/Admin/NewsletterSubscriberController';
 import * as ReferralController from '@/actions/App/Http/Controllers/Admin/ReferralController';
-import * as SectionTemplateController from '@/actions/App/Http/Controllers/Admin/SectionTemplateController';
 import * as SettingsController from '@/actions/App/Http/Controllers/Admin/SettingsController';
 import * as StoreController from '@/actions/App/Http/Controllers/Admin/StoreController';
 import * as SupportCannedResponseController from '@/actions/App/Http/Controllers/Admin/SupportCannedResponseController';
@@ -160,12 +159,7 @@ export function AppSidebar() {
                     href: FaqController.index.url(),
                     icon: HelpCircle,
                 },
-                {
-                    title: __('nav.section_templates', 'Section Templates'),
-                    href: SectionTemplateController.index.url(),
-                    icon: LibraryBig,
-                },
-                {
+{
                     title: __('nav.stores', 'Stores'),
                     href: StoreController.index.url(),
                     icon: MapPin,

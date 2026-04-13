@@ -361,7 +361,6 @@ class TranslationSeeder extends Seeder
             ['group' => 'admin', 'key' => 'nav.themes',              'en' => 'Themes',             'pl' => 'Motywy'],
             ['group' => 'admin', 'key' => 'nav.forms',               'en' => 'Forms',              'pl' => 'Formularze'],
             ['group' => 'admin', 'key' => 'nav.faq',                 'en' => 'FAQ',                'pl' => 'FAQ'],
-            ['group' => 'admin', 'key' => 'nav.section_templates',   'en' => 'Section Templates',  'pl' => 'Szablony sekcji'],
             ['group' => 'admin', 'key' => 'nav.stores',              'en' => 'Stores',             'pl' => 'Sklepy'],
             ['group' => 'admin', 'key' => 'nav.blog_posts',          'en' => 'Blog Posts',         'pl' => 'Posty blogowe'],
             ['group' => 'admin', 'key' => 'nav.blog_categories',     'en' => 'Blog Categories',    'pl' => 'Kategorie bloga'],

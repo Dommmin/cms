@@ -1183,48 +1183,6 @@ parameters:
 			path: app/Http/Controllers/Admin/ReferralController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\SectionTemplate\:\:\$category\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/SectionTemplateController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\SectionTemplate\:\:\$is_global\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/SectionTemplateController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\SectionTemplate\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/SectionTemplateController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\SectionTemplate\:\:\$preset_data\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/SectionTemplateController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\SectionTemplate\:\:\$section_type\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/SectionTemplateController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\SectionTemplate\:\:\$thumbnail\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/SectionTemplateController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\SectionTemplate\:\:\$variant\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/SectionTemplateController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Setting\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
@@ -5297,18 +5255,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Queries/Admin/ReturnRequestIndexQuery.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$category\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Queries/Admin/SectionTemplateIndexQuery.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$search\.$#'
-			identifier: property.notFound
-			count: 3
-			path: app/Queries/Admin/SectionTemplateIndexQuery.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$group\.$#'
