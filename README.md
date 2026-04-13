@@ -119,4 +119,4 @@ k8s/      — Kubernetes manifests
 scripts/  — Utility scripts
 ```
 
-See [`ai/guide.md`](ai/guide.md) for the full feature map, key paths, and conventions.
+See [`ai/guide.md`](.ai/guide.md) for the full feature map, key paths, and conventions.

@@ -79,7 +79,6 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - **Promo Badge %** — `discount_percentage` field in ProductData/ProductResource, shown on product cards
 - **Recently Viewed** — `use-recently-viewed.ts` hook, `<RecentlyViewed />` component (localStorage, max 10)
 - **Product Comparison** — `use-comparison.ts`, `<CompareButton />`, `<ComparisonBar />`, `/compare` page (max 4)
-- **Block Templates Library** — `SectionTemplate` model/seeder (8 templates), admin CRUD at `/admin/section-templates`, in sidebar
 - **Social Login** — Google + GitHub via `laravel/socialite` v5, `SocialLoginController`, `GET /api/v1/auth/social/{provider}/redirect` + `POST callback`, `<SocialLoginButtons />`, callback page at `/(auth)/social/callback`
 - **Admin Bar (Preview Mode)** — `GET /admin/preview?url=&entity_type=&entity_id=&entity_name=&admin_url=` sets `admin_preview` cookie (2h, non-HttpOnly), redirects to frontend URL; "Preview" buttons on Page/BlogPost/Product/Category edit pages; `useAdminPreview()` hook + `<AdminBar />` component in Next.js root layout (fixed dark bar, z-9999, entity badge, "Edit in Admin" + "Exit Preview")
 - **Lexical RTE** — full-featured rich text editor at `resources/js/components/ui/rich-text-editor/`; block type dropdown (P/H1–H6/Quote/Code/Bullet/Number/Check), inline formatting (B/I/U/S/Code/Subscript/Superscript/Highlight/Eraser), alignment, floating link editor, floating bubble menu, insert (HR/Image/YouTube/Table/2-3 Columns/Collapsible/Emoji/Special chars), code language selector, copy-code button, word/character count footer, `maxHeight` + `editable` + `showWordCount` props; font size (10–36px), font family, text color picker (24 colors), spellcheck; `TableActionMenuPlugin` (right-click: row/col ops + cell bg color), `SlashCommandPlugin` (type `/`), `DraggableBlockPlugin`; custom nodes: `LayoutContainerNode`, `LayoutItemNode`, `CollapsibleContainerNode`, `CollapsibleTitleNode`, `CollapsibleContentNode`
@@ -185,7 +184,7 @@ docker compose exec php vendor/bin/pint --dirty
 
 ## Seeder Order
 
-`RolePermissionSeeder → UserSeeder → ProductTypeSeeder → EcommerceDemoSeeder → DiscountSeeder → PromotionSeeder → FormSeeder → PagesDemoSeeder → SectionTemplateSeeder → ThemeSeeder → SettingsSeeder → ShippingMethodSeeder → MenuSeeder → BlogSeeder → LocaleSeeder → TranslationSeeder → DashboardWidgetSeeder`
+`RolePermissionSeeder → UserSeeder → ProductTypeSeeder → EcommerceDemoSeeder → DiscountSeeder → PromotionSeeder → FormSeeder → PagesDemoSeeder → ThemeSeeder → SettingsSeeder → ShippingMethodSeeder → MenuSeeder → BlogSeeder → LocaleSeeder → TranslationSeeder → DashboardWidgetSeeder`
 
 ---
 
