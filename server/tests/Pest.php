@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\LaravelPdf\Facades\Pdf;
 use Tests\TestCase;
 
 /*
@@ -19,6 +20,15 @@ use Tests\TestCase;
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
     ->in('Feature');
+
+/*
+|--------------------------------------------------------------------------
+| Global PDF mock — prevent Gotenberg HTTP calls in tests
+|--------------------------------------------------------------------------
+*/
+beforeEach(function (): void {
+    Pdf::fake();
+});
 
 /*
 |--------------------------------------------------------------------------
