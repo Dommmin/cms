@@ -41,8 +41,11 @@ it('downloads pdf export for a custom report', function (): void {
         'group_by' => [],
     ]);
 
-    actingAs($this->admin, 'sanctum')
+    $response = actingAs($this->admin, 'sanctum')
         ->get(route('admin.reports.export.pdf', $report));
+
+    $response->assertSuccessful();
+    $response->assertHeader('content-type', 'application/pdf');
 });
 
 it('returns 404 for excel export of non-existent report', function (): void {
