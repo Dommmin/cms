@@ -62,7 +62,7 @@ export default function Edit({
         },
         {
             title: 'Edit Role',
-            href: RoleController.edit.url(role.id),
+            href: RoleController.edit.url({ id: role.id }),
         },
     ];
 
@@ -109,7 +109,7 @@ export default function Edit({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(RoleController.update.url(role.id));
+        put(RoleController.update.url({ id: role.id }));
     };
 
     return (

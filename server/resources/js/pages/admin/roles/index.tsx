@@ -110,7 +110,7 @@ export default function Index({ roles }: { roles: Role[] }) {
                                         {role.name !== 'super-admin' && (
                                             <Link
                                                 href={RoleController.edit.url(
-                                                    role.id,
+                                                    { id: role.id },
                                                 )}
                                                 className="text-primary hover:underline"
                                             >
