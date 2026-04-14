@@ -21,7 +21,7 @@ class BlogController extends Controller
         $blogs = Blog::query()
             ->withCount('posts')
             ->when($request->input('search'), function ($query, string $search): void {
-                $query->where('slug', 'like', "%{$search}%");
+                $query->where('slug', 'like', sprintf('%%%s%%', $search));
             })
             ->orderBy('position')
             ->orderBy('id')

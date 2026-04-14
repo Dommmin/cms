@@ -15,12 +15,14 @@ use App\Http\Controllers\Api\V1\FaqController;
 use App\Http\Controllers\Api\V1\FormController;
 use App\Http\Controllers\Api\V1\LocaleController as ApiLocaleController;
 use App\Http\Controllers\Api\V1\MenuController;
+use App\Http\Controllers\Api\V1\MetafieldController as ApiMetafieldController;
 use App\Http\Controllers\Api\V1\NotificationCenterController;
 use App\Http\Controllers\Api\V1\NotificationPreferenceController;
 use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\StoreController as ApiStoreController;
 use App\Http\Controllers\Api\V1\SupportController;
+use App\Http\Controllers\Api\V1\TagController;
 use App\Http\Controllers\Api\V1\TranslationController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -73,9 +75,9 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::get('stores/{store}', new ApiStoreController()->show(...))->name('stores.show');
 
         // Blogs (containers)
-        Route::get('blogs', [ApiBlogController::class, 'index'])->name('blogs.index');
-        Route::get('blogs/{slug}', [ApiBlogController::class, 'show'])->name('blogs.show');
-        Route::get('blogs/{slug}/posts', [ApiBlogController::class, 'posts'])->name('blogs.posts');
+        Route::get('blogs', new ApiBlogController()->index(...))->name('blogs.index');
+        Route::get('blogs/{slug}', new ApiBlogController()->show(...))->name('blogs.show');
+        Route::get('blogs/{slug}/posts', new ApiBlogController()->posts(...))->name('blogs.posts');
 
         // Blog
         Route::prefix('blog')->name('blog.')->group(function (): void {
@@ -91,6 +93,9 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::get('consent', [ConsentController::class, 'index'])->name('consent.index');
         Route::post('consent', [ConsentController::class, 'store'])->name('consent.store');
         Route::delete('consent/{category}', [ConsentController::class, 'withdraw'])->name('consent.withdraw');
+
+        Route::get('metafields/{type}/{id}', new ApiMetafieldController()->forResource(...))->name('metafields.for-resource');
+        Route::get('tags', [TagController::class, 'index'])->name('tags.index');
     });
 
     // ── Authenticated core ───────────────────────────────────────────────────

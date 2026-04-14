@@ -19,7 +19,7 @@ it('shows a blog with paginated published posts', function (): void {
     BlogPost::factory()->published()->count(3)->create(['blog_id' => $blog->id]);
     BlogPost::factory()->count(2)->create(['blog_id' => $blog->id]); // draft
 
-    $response = $this->getJson("/api/v1/blogs/{$blog->slug}")
+    $response = $this->getJson('/api/v1/blogs/'.$blog->slug)
         ->assertSuccessful();
 
     expect($response->json('blog.slug'))->toBe($blog->slug);
@@ -29,7 +29,7 @@ it('shows a blog with paginated published posts', function (): void {
 it('returns 404 for inactive blog', function (): void {
     $blog = Blog::factory()->inactive()->create();
 
-    $this->getJson("/api/v1/blogs/{$blog->slug}")
+    $this->getJson('/api/v1/blogs/'.$blog->slug)
         ->assertNotFound();
 });
 
@@ -37,7 +37,7 @@ it('returns standalone posts for a blog', function (): void {
     $blog = Blog::factory()->create();
     BlogPost::factory()->published()->count(2)->create(['blog_id' => $blog->id]);
 
-    $this->getJson("/api/v1/blogs/{$blog->slug}/posts")
+    $this->getJson(sprintf('/api/v1/blogs/%s/posts', $blog->slug))
         ->assertSuccessful()
         ->assertJsonCount(2, 'data');
 });

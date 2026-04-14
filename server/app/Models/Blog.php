@@ -58,7 +58,7 @@ class Blog extends Model
     }
 
     /** @param Builder<Blog> $query */
-    public function scopeActive(Builder $query): Builder
+    protected function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
