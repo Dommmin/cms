@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 
 it('returns 200 and ok status when all services are healthy', function (): void {
+    Redis::shouldReceive('connection->ping')->andReturn(true);
+
     $this->getJson('/health')
         ->assertSuccessful()
         ->assertJsonPath('status', 'ok')
@@ -27,7 +29,7 @@ it('returns 503 and degraded status when the database is unavailable', function 
 });
 
 it('returns 503 and degraded status when redis is unavailable', function (): void {
-    Redis::shouldReceive('ping')->andThrow(new RuntimeException('Redis down'));
+    Redis::shouldReceive('connection->ping')->andThrow(new RuntimeException('Redis down'));
 
     $this->getJson('/health')
         ->assertStatus(503)
@@ -36,6 +38,7 @@ it('returns 503 and degraded status when redis is unavailable', function (): voi
 });
 
 it('includes the app version in the response', function (): void {
+    Redis::shouldReceive('connection->ping')->andReturn(true);
     config(['app.version' => '1.2.3']);
 
     $this->getJson('/health')
@@ -43,6 +46,7 @@ it('includes the app version in the response', function (): void {
 });
 
 it('includes the active deployment slot in the response', function (): void {
+    Redis::shouldReceive('connection->ping')->andReturn(true);
     config(['app.slot' => 'blue']);
 
     $this->getJson('/health')
@@ -50,6 +54,8 @@ it('includes the active deployment slot in the response', function (): void {
 });
 
 it('is accessible without authentication', function (): void {
+    Redis::shouldReceive('connection->ping')->andReturn(true);
+
     $this->getJson('/health')
         ->assertSuccessful();
 });

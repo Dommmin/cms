@@ -33,6 +33,10 @@ it('downloads excel export for a custom report', function (): void {
 });
 
 it('downloads pdf export for a custom report', function (): void {
+    if (! config('services.gotenberg.url') && ! env('GOTENBERG_URL')) {
+        test()->skip('Gotenberg service not available');
+    }
+
     $report = CustomReport::factory()->create([
         'user_id' => $this->admin->id,
         'data_source' => 'orders',
@@ -46,7 +50,7 @@ it('downloads pdf export for a custom report', function (): void {
 
     $response->assertSuccessful();
     $response->assertHeader('content-type', 'application/pdf');
-});
+})->skip(! env('GOTENBERG_URL'), 'Gotenberg service not available');
 
 it('returns 404 for excel export of non-existent report', function (): void {
     $response = actingAs($this->admin, 'sanctum')
