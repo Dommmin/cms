@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Concerns\HasMetafields;
+use App\Concerns\HasTags;
 use App\Enums\PageLayoutEnum;
 use App\Enums\PageTypeEnum;
 use Carbon\CarbonInterface;
@@ -57,6 +59,8 @@ use Spatie\Translatable\HasTranslations;
 class Page extends Model
 {
     use HasFactory;
+    use HasMetafields;
+    use HasTags;
     use HasTranslations;
     use LogsActivity;
 
@@ -68,7 +72,8 @@ class Page extends Model
     protected $fillable = [
         'parent_id', 'locale', 'title', 'slug', 'slug_translations', 'content', 'rich_content', 'excerpt', 'layout',
         'builder_snapshot', 'page_type', 'module_name', 'module_config',
-        'theme_id', 'is_published', 'published_at', 'published_version_id', 'draft_version_id', 'position',
+        'theme_id', 'is_published', 'published_at', 'scheduled_publish_at', 'scheduled_unpublish_at',
+        'published_version_id', 'draft_version_id', 'position',
         'seo_title', 'seo_description', 'seo_canonical', 'meta_robots', 'og_image', 'sitemap_exclude', 'available_locales',
     ];
 
@@ -276,6 +281,8 @@ class Page extends Model
             'available_locales' => 'array',
             'is_published' => 'boolean',
             'published_at' => 'datetime',
+            'scheduled_publish_at' => 'datetime',
+            'scheduled_unpublish_at' => 'datetime',
             'sitemap_exclude' => 'boolean',
         ];
     }

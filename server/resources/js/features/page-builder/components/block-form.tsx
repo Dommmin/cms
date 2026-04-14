@@ -4,7 +4,7 @@
  * No more tab separation — media and relations are inline with content fields.
  */
 
-import { Globe2Icon, UnlinkIcon } from 'lucide-react';
+import { ChevronDownIcon, Globe2Icon, UnlinkIcon } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import {
     Select,
@@ -138,6 +138,72 @@ export function BlockForm({
                     Select a block type above to configure its content.
                 </div>
             )}
+
+            {/* Advanced: Custom CSS / Classes / ID */}
+            <details className="group rounded-lg border">
+                <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium select-none">
+                    <span>Advanced</span>
+                    <ChevronDownIcon className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180" />
+                </summary>
+                <div className="space-y-3 border-t px-4 py-3">
+                    <div className="space-y-1.5">
+                        <Label htmlFor="custom-classes">Custom CSS Classes</Label>
+                        <input
+                            id="custom-classes"
+                            type="text"
+                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                            placeholder="my-class another-class"
+                            value={(block.configuration._custom_classes as string) ?? ''}
+                            onChange={(e) =>
+                                onUpdate({
+                                    configuration: {
+                                        ...block.configuration,
+                                        _custom_classes: e.target.value,
+                                    },
+                                })
+                            }
+                        />
+                    </div>
+                    <div className="space-y-1.5">
+                        <Label htmlFor="custom-id">Custom Element ID</Label>
+                        <input
+                            id="custom-id"
+                            type="text"
+                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                            placeholder="hero-section"
+                            value={(block.configuration._custom_id as string) ?? ''}
+                            onChange={(e) =>
+                                onUpdate({
+                                    configuration: {
+                                        ...block.configuration,
+                                        _custom_id: e.target.value,
+                                    },
+                                })
+                            }
+                        />
+                    </div>
+                    <div className="space-y-1.5">
+                        <Label htmlFor="custom-css">Custom CSS</Label>
+                        <textarea
+                            id="custom-css"
+                            className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 font-mono text-xs shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                            placeholder={'/* Custom CSS for this block */\n.my-class { color: red; }'}
+                            value={(block.configuration._custom_css as string) ?? ''}
+                            onChange={(e) =>
+                                onUpdate({
+                                    configuration: {
+                                        ...block.configuration,
+                                        _custom_css: e.target.value,
+                                    },
+                                })
+                            }
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            CSS is scoped to this block. Avoid &lt;script&gt; or external URLs.
+                        </p>
+                    </div>
+                </div>
+            </details>
         </div>
     );
 }

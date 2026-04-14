@@ -9,12 +9,15 @@ use App\Http\Requests\Admin\Ecommerce\StoreCategoryRequest;
 use App\Http\Requests\Admin\Ecommerce\UpdateCategoryRequest;
 use App\Models\Category;
 use App\Queries\Admin\CategoryIndexQuery;
+use App\Services\SmartCollectionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Response;
 
 class CategoryController extends Controller
 {
+    public function __construct(private readonly SmartCollectionService $smartCollectionService) {}
+
     public function index(Request $request): Response
     {
         $categoryQuery = new CategoryIndexQuery($request);
@@ -52,6 +55,10 @@ class CategoryController extends Controller
         $categoryQuery = new CategoryIndexQuery(request());
         $categories = $categoryQuery->getCategoriesForParentSelection($category->id);
 
+        $smartProductCount = $category->isSmartCollection()
+            ? $this->smartCollectionService->countMatchingProducts($category)
+            : 0;
+
         return inertia('admin/ecommerce/categories/edit', [
             'category' => [
                 'id' => $category->id,
@@ -60,8 +67,17 @@ class CategoryController extends Controller
                 'description' => $category->getTranslations('description'),
                 'parent_id' => $category->parent_id,
                 'is_active' => $category->is_active,
+                'collection_type' => $category->collection_type ?? 'manual',
+                'rules' => $category->rules ?? [],
+                'rules_match' => $category->rules_match ?? 'all',
+                'seo_title' => $category->seo_title,
+                'seo_description' => $category->seo_description,
+                'meta_robots' => $category->meta_robots,
+                'og_image' => $category->og_image,
+                'sitemap_exclude' => $category->sitemap_exclude,
             ],
             'categories' => $categories,
+            'smart_product_count' => $smartProductCount,
         ]);
     }
 
@@ -69,6 +85,12 @@ class CategoryController extends Controller
     {
         $data = $request->validated();
         $data['is_active'] ??= true;
+
+        // Clear rules when switching back to manual
+        if (($data['collection_type'] ?? 'manual') === 'manual') {
+            $data['rules'] = null;
+        }
+
         $category->update($data);
 
         return to_route('admin.ecommerce.categories.index')->with('success', 'Category updated');

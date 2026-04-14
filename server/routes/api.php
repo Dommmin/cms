@@ -15,12 +15,14 @@ use App\Http\Controllers\Api\V1\FaqController;
 use App\Http\Controllers\Api\V1\FormController;
 use App\Http\Controllers\Api\V1\LocaleController as ApiLocaleController;
 use App\Http\Controllers\Api\V1\MenuController;
+use App\Http\Controllers\Api\V1\MetafieldController as ApiMetafieldController;
 use App\Http\Controllers\Api\V1\NotificationCenterController;
 use App\Http\Controllers\Api\V1\NotificationPreferenceController;
 use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\StoreController as ApiStoreController;
 use App\Http\Controllers\Api\V1\SupportController;
+use App\Http\Controllers\Api\V1\TagController;
 use App\Http\Controllers\Api\V1\TranslationController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -91,6 +93,9 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::get('consent', [ConsentController::class, 'index'])->name('consent.index');
         Route::post('consent', [ConsentController::class, 'store'])->name('consent.store');
         Route::delete('consent/{category}', [ConsentController::class, 'withdraw'])->name('consent.withdraw');
+
+        Route::get('metafields/{type}/{id}', [ApiMetafieldController::class, 'forResource'])->name('metafields.for-resource');
+        Route::get('tags', [TagController::class, 'index'])->name('tags.index');
     });
 
     // ── Authenticated core ───────────────────────────────────────────────────

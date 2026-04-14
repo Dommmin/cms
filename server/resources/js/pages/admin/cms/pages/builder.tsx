@@ -3,11 +3,14 @@ import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import * as PageBuilderController from '@/actions/App/Http/Controllers/Admin/Cms/PageBuilderController';
 import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
+import * as SectionTemplateController from '@/actions/App/Http/Controllers/Admin/Cms/SectionTemplateController';
 import type { PreviewDevice, Section } from '@/features/page-builder';
 import { PageBuilder } from '@/features/page-builder';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { BuilderPageProps } from './builder.types';
+
+const AUTO_SAVE_DELAY_MS = 30_000;
 
 export default function BuilderPage({
     page,
@@ -21,8 +24,19 @@ export default function BuilderPage({
         useState<PreviewDevice>('desktop');
     const [isAutoSaving, setIsAutoSaving] = useState(false);
     const [localSections, setLocalSections] = useState<Section[]>(sections);
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+    const [scheduledPublishAt, setScheduledPublishAt] = useState<string | null>(
+        page.scheduled_publish_at ?? null,
+    );
+    const [scheduledUnpublishAt, setScheduledUnpublishAt] = useState<
+        string | null
+    >(page.scheduled_unpublish_at ?? null);
+
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    // Track whether sections have been changed since mount (skip first render)
+    const isFirstRender = useRef(true);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'CMS', href: PageController.index.url() },
@@ -64,10 +78,18 @@ export default function BuilderPage({
         return () => clearInterval(interval);
     }, []);
 
-    // Auto-save with debounce when in split view
-
+    // Mark unsaved changes whenever sections change (skip initial mount)
     useEffect(() => {
-        if (!isSplitView) return;
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+        setHasUnsavedChanges(true);
+    }, [localSections]);
+
+    // Auto-save every 30s when there are unsaved changes
+    useEffect(() => {
+        if (!hasUnsavedChanges) return;
 
         if (autoSaveTimerRef.current) {
             clearTimeout(autoSaveTimerRef.current);
@@ -82,18 +104,54 @@ export default function BuilderPage({
                 {
                     preserveScroll: true,
                     onSuccess: () => {
-                        iframeRef.current?.contentWindow?.location.reload();
+                        setHasUnsavedChanges(false);
+                        setLastSavedAt(new Date());
+                        if (isSplitView) {
+                            iframeRef.current?.contentWindow?.location.reload();
+                        }
                     },
                     onFinish: () => {
                         setIsAutoSaving(false);
                     },
                 },
             );
-        }, 1500);
+        }, AUTO_SAVE_DELAY_MS);
 
         return () => {
             if (autoSaveTimerRef.current) {
                 clearTimeout(autoSaveTimerRef.current);
+            }
+        };
+    }, [hasUnsavedChanges, localSections]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Split-view debounce auto-save (separate from the 30s timer)
+    const splitViewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+        null,
+    );
+    useEffect(() => {
+        if (!isSplitView) return;
+
+        if (splitViewTimerRef.current) {
+            clearTimeout(splitViewTimerRef.current);
+        }
+
+        splitViewTimerRef.current = setTimeout(() => {
+            router.put(
+                PageBuilderController.update.url(page.id),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                { sections: localSections as any },
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        iframeRef.current?.contentWindow?.location.reload();
+                    },
+                },
+            );
+        }, 1500);
+
+        return () => {
+            if (splitViewTimerRef.current) {
+                clearTimeout(splitViewTimerRef.current);
             }
         };
     }, [localSections, isSplitView]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -114,6 +172,8 @@ export default function BuilderPage({
                 preserveScroll: true,
                 onSuccess: () => {
                     toast.success('Page builder saved successfully');
+                    setHasUnsavedChanges(false);
+                    setLastSavedAt(new Date());
                     if (isSplitView) {
                         iframeRef.current?.contentWindow?.location.reload();
                     }
@@ -126,6 +186,57 @@ export default function BuilderPage({
                 },
                 onFinish: () => {
                     setIsSaving(false);
+                },
+            },
+        );
+    };
+
+    const handleScheduleSave = (
+        publishAt: string | null,
+        unpublishAt: string | null,
+    ) => {
+        router.put(
+            PageBuilderController.schedule.url(page.id),
+            {
+                scheduled_publish_at: publishAt,
+                scheduled_unpublish_at: unpublishAt,
+            },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setScheduledPublishAt(publishAt);
+                    setScheduledUnpublishAt(unpublishAt);
+                    toast.success('Schedule saved.');
+                },
+                onError: () => {
+                    toast.error('Failed to save schedule.');
+                },
+            },
+        );
+    };
+
+    const handleSaveTemplate = (
+        name: string,
+        description: string,
+        category: string,
+        isGlobal: boolean,
+    ) => {
+        router.post(
+            SectionTemplateController.store.url(),
+            {
+                name,
+                description,
+                category,
+                is_global: isGlobal,
+                snapshot: localSections,
+            },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    toast.success('Template saved!');
+                },
+                onError: () => {
+                    toast.error('Failed to save template.');
                 },
             },
         );
@@ -179,6 +290,12 @@ export default function BuilderPage({
                         previewDevice={previewDevice}
                         onToggleSplitView={handleToggleSplitView}
                         onChangeDevice={setPreviewDevice}
+                        hasUnsavedChanges={hasUnsavedChanges}
+                        lastSavedAt={lastSavedAt}
+                        scheduledPublishAt={scheduledPublishAt}
+                        scheduledUnpublishAt={scheduledUnpublishAt}
+                        onScheduleSave={handleScheduleSave}
+                        onSaveTemplate={handleSaveTemplate}
                     />
                 </div>
 

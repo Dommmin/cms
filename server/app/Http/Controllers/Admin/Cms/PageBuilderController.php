@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin\Cms;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Cms\AddBlockRequest;
 use App\Http\Requests\Admin\Cms\AddSectionRequest;
+use App\Http\Requests\Admin\Cms\SchedulePageRequest;
 use App\Http\Requests\Admin\Cms\UpdateBlockRequest;
 use App\Http\Requests\Admin\Cms\UpdatePageBuilderRequest;
 use App\Http\Requests\Admin\Cms\UpdateSectionRequest;
@@ -150,6 +151,18 @@ class PageBuilderController extends Controller
         }
 
         return back();
+    }
+
+    public function schedule(SchedulePageRequest $request, int $page): RedirectResponse
+    {
+        $pageModel = Page::query()->findOrFail($page);
+
+        $pageModel->update([
+            'scheduled_publish_at' => $request->input('scheduled_publish_at'),
+            'scheduled_unpublish_at' => $request->input('scheduled_unpublish_at'),
+        ]);
+
+        return back()->with('success', 'Schedule saved.');
     }
 
     public function addSection(AddSectionRequest $request, int $page): JsonResponse

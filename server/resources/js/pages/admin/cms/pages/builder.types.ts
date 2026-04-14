@@ -10,6 +10,8 @@ export type BuilderPageProps = {
         title: string;
         slug: string;
         is_published?: boolean;
+        scheduled_publish_at?: string | null;
+        scheduled_unpublish_at?: string | null;
     };
     sections: Section[];
     available_sections: Record<string, AvailableSection>;

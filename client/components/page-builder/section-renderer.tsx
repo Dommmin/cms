@@ -5,6 +5,14 @@ import { AnimatedSection } from './animated-section';
 import { BlockRenderer } from './block-renderer';
 import type { SectionRendererProps } from './section-renderer.types';
 
+function sanitizeCss(css: string): string {
+    return css
+        .replace(/expression\s*\(/gi, '')
+        .replace(/javascript\s*:/gi, '')
+        .replace(/<\s*script/gi, '')
+        .replace(/url\s*\(\s*['"]\s*javascript/gi, '');
+}
+
 const variantStyles: Record<string, string> = {
     light: 'bg-background text-foreground',
     dark: 'bg-gray-950 text-white dark:bg-slate-900',
@@ -73,7 +81,29 @@ export function SectionRenderer({
                         <BlockRenderer block={block} />
                     </AdminBlockOverlay>
                 ) : (
-                    <div key={block.id} className="w-full">
+                    <div
+                        key={block.id}
+                        className={cn(
+                            'w-full',
+                            (block.configuration._custom_classes as string) ||
+                                undefined,
+                        )}
+                        id={
+                            (block.configuration._custom_id as string) ||
+                            undefined
+                        }
+                    >
+                        {(block.configuration._custom_css as string) && (
+                            <style
+                                // eslint-disable-next-line react/no-danger
+                                dangerouslySetInnerHTML={{
+                                    __html: sanitizeCss(
+                                        block.configuration
+                                            ._custom_css as string,
+                                    ),
+                                }}
+                            />
+                        )}
                         <BlockRenderer block={block} />
                     </div>
                 ),

@@ -76,6 +76,9 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('admin')->name(
     // CMS admin routes
     require __DIR__.'/admin/cms.php';
 
+    // Metafields admin routes
+    require __DIR__.'/admin/metafields.php';
+
     // Blog admin routes
     require __DIR__.'/admin/blog.php';
 
