@@ -36,6 +36,16 @@ export function PageBuilder({
     previewDevice = 'desktop',
     onToggleSplitView,
     onChangeDevice,
+    hasUnsavedChanges = false,
+    lastSavedAt = null,
+    scheduledPublishAt = null,
+    scheduledUnpublishAt = null,
+    approvalStatus = 'draft',
+    onScheduleSave,
+    onSaveTemplate,
+    onSubmitForReview,
+    onApprove,
+    onReject,
 }: PageBuilderProps) {
     const {
         sections,
@@ -129,6 +139,12 @@ export function PageBuilder({
                 canUndo={canUndo}
                 canRedo={canRedo}
                 previewDevice={previewDevice}
+                hasUnsavedChanges={hasUnsavedChanges}
+                lastSavedAt={lastSavedAt}
+                scheduledPublishAt={scheduledPublishAt}
+                scheduledUnpublishAt={scheduledUnpublishAt}
+                approvalStatus={approvalStatus}
+                sections={sections}
                 onAddSection={() => addSection(firstSectionType)}
                 onOpenTemplates={() => setTemplatesOpen(true)}
                 onSave={handleSave}
@@ -137,6 +153,11 @@ export function PageBuilder({
                 onUndo={undo}
                 onRedo={redo}
                 onChangeDevice={onChangeDevice ?? (() => {})}
+                onScheduleSave={onScheduleSave ?? (() => {})}
+                onSaveTemplate={onSaveTemplate ?? (() => {})}
+                onSubmitForReview={onSubmitForReview ?? (() => {})}
+                onApprove={onApprove ?? (() => {})}
+                onReject={onReject ?? (() => {})}
             />
 
             <div

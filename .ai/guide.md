@@ -22,6 +22,15 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 
 ### CMS / Content
 - **Page Builder** — drag-and-drop blocks, sections, reusable blocks, draft/publish versioning, live preview, mobile preview, undo/redo, copy/paste blocks
+  - **B1 Auto-save** — 30s debounced auto-save via `router.put` when `hasUnsavedChanges`; `AutoSaveIndicator` in toolbar shows Saving.../Unsaved changes/Saved X min ago with colored dots; split-view triggers 1.5s debounce save + iframe reload
+  - **B2 Scheduled Publishing** — `scheduled_publish_at` + `scheduled_unpublish_at` on `pages` table; `cms:process-scheduled-pages` Artisan command run every minute; `PUT /admin/cms/pages/{page}/builder/schedule` endpoint; `SchedulePopover` in toolbar with datetime-local inputs
+  - **B3 Custom CSS per Block** — `_custom_classes`, `_custom_id`, `_custom_css` keys in `block.configuration`; rendered in `SectionRenderer` with sanitized inline `<style>` tag + class/id attributes; Advanced panel in block form
+  - **B4 Save as Template** — `section_templates` table (name, description, category, snapshot JSON, is_global, usage_count); `SectionTemplateController` (index/store/destroy/incrementUsage); "Save as Template" button in toolbar with dialog; templates shown in add-section panel
+  - **B5 Block Animations** — per-block animation config (`_animation.type/duration/delay/trigger`) stored in configuration; `data-animation-*` attrs on frontend divs; `BlockAnimationObserver` uses IntersectionObserver; CSS in `globals.css`
+  - **B6 Block Lock** — `_locked: true` in block.configuration shows amber banner + disables drag/delete in `BlockCard`; Lock toggle in Advanced panel; unlock button in form
+  - **B7 Export/Import** — `GET /admin/cms/pages/{page}/builder/export` (JSON download), `POST /admin/cms/pages/{page}/builder/import` (file upload); Export/Import buttons in toolbar (Wayfinder)
+  - **B8 Approval Workflow** — `approval_status` (draft/in_review/approved) + `reviewer_id/review_note/submitted_for_review_at/approved_at` on `pages` table; `PageApprovalController` (submitForReview/approve/reject); approval buttons in BuilderToolbar; state managed in builder.tsx
+  - **B9 New Block Types** — `alert_banner` (dismissable, cookie-persisted, 4 variants) + `pricing_cards` (monthly/yearly toggle, popular badge); in `PageBlockTypeEnum`, `config/blocks.php`, `block-renderer.tsx`, `client/types/api.ts`
 - **Themes** — multiple themes, activate/deactivate
 - **Menus** — CRUD, menu items with link types
 - **Forms** — form builder, submissions, email notifications
@@ -60,6 +69,29 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - Checkout response: `{ order, payment: { id, action, redirect_url } }`
 - Infrastructure: `app/Infrastructure/Payments/PayU/` + `app/Infrastructure/Payments/P24/`
 - Frontend: `PaymentStep`, `BlikInput`, `ApplePayButton`, `GooglePayButton`, `usePaymentStatus` hook (3s poll), `/checkout/pending` page
+
+### Polymorphic Tags (A2)
+- **`HasTags` trait** (`app/Concerns/HasTags.php`) — added to Product, BlogPost, Page, Category; uses polymorphic `taggables` table (`tag_id`, `taggable_type`, `taggable_id`); methods: `tags()` (MorphToMany), `syncTags(array)`, `attachTag(string)`, `detachTag(string)`, `hasTag(string)`, `getTagNames()`; `bootHasTags()` detaches tags on model delete
+- **`taggables` table** — replaces old `blog_post_tag` pivot; unique on `[tag_id, taggable_type, taggable_id]`; data migrated from `blog_post_tag` automatically
+- **Tag model** — `blogPosts()`, `products()`, `categories()`, `pages()` via `morphedByMany`
+- **API**: `GET /api/v1/tags` — public, optional `?type=blog-post|product|page|category` filter by morph type; returns `[{id, name, slug}]`
+- **TagController**: `app/Http/Controllers/Api/V1/TagController.php`
+
+### Smart Collections (A3)
+- **Smart Category** — `collection_type` column on `categories` (`manual`|`smart`), `rules` (JSON), `rules_match` (`all`|`any`); migration `2026_04_14_000008_add_smart_collection_to_categories_table.php`
+- **`SmartCollectionService`** (`app/Services/SmartCollectionService.php`) — `buildQuery(Category)`, `getMatchingProducts(Category)`, `countMatchingProducts(Category)`; supported fields: `price` (less/greater than cents), `brand_id`, `product_type_id`, `tag` (equals/not_equals name), `is_active`, `created_at` (after/before)
+- **Category model** — `rules` cast to array, `isSmartCollection(): bool`; `collection_type`, `rules`, `rules_match` allowed in FormRequests
+- **API**: `ProductController::byCategory()` uses `SmartCollectionService->buildQuery()` when `category->isSmartCollection()`
+- **Admin**: Category edit page has Collection Type radio (Manual/Smart) + `SmartCollectionBuilder` component (`resources/js/components/smart-collection-builder.tsx`) for rule editing; `smart_product_count` prop passed from controller
+
+### Metafields
+- **Metafields** — Shopify-like arbitrary key/value metadata on any model; `metafields` table (polymorphic `owner_type`/`owner_id`, `namespace`, `key`, `type`, `value`); types: string, integer, float, boolean, json, date, datetime, url, color, image, rich_text
+- **MetafieldDefinitions** — admin-managed schema definitions for metafields per owner type; `metafield_definitions` table; supports `pinned`, `position`, `validations`
+- **`HasMetafields` trait** (`app/Concerns/HasMetafields.php`) — added to Product, BlogPost, Page, Category; methods: `metafields()`, `metafield()`, `getMetafield()`, `setMetafield()`, `deleteMetafield()`, `syncMetafields()`, `getMetafieldsByNamespace()`
+- **`Metafield` model** — `getCastedValue()` auto-casts value to correct PHP type
+- **API**: `GET /api/v1/metafields/{type}/{id}` — public, returns `MetafieldResource` collection with `casted_value`; types: product, blog-post, page, category
+- **Admin CRUD** — `/admin/metafield-definitions` (index/create/edit/destroy), `/admin/metafields/{type}/{id}/sync` (POST)
+- **`MetafieldEditor` component** — reusable React component (`resources/js/components/metafield-editor.tsx`) embeddable in any admin edit form; grouped by namespace, type-specific inputs, add/delete, definition autocomplete
 
 ### System / Infrastructure
 - **Settings** — 6 groups (general, mail, etc.), DB-driven, cached 1h, admin UI

@@ -15,6 +15,7 @@ import { AnnouncementBar } from '@/components/layout/announcement-bar';
 import { Footer } from '@/components/layout/footer';
 import { GoogleTagManager } from '@/components/layout/google-tag-manager';
 import { Header } from '@/components/layout/header';
+import { BlockAnimationObserver } from '@/components/page-builder/block-animation-observer';
 import { buildOrganization, buildWebSite } from '@/lib/schema';
 import { serverFetch } from '@/lib/server-fetch';
 import { QueryProvider } from '@/providers/query-provider';
@@ -178,6 +179,7 @@ export default async function RootLayout({
                         <CookieConsent settings={cookieSettings} />
                         <ChatWidgetLoader />
                         <ComparisonBarLoader />
+                        <BlockAnimationObserver />
                         <ToastContainer
                             position="bottom-right"
                             autoClose={2000}

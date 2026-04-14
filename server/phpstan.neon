@@ -16,4 +16,6 @@ parameters:
 
     level: 5
 
+    reportUnmatchedIgnoredErrors: false
+
     tmpDir: /tmp/phpstan

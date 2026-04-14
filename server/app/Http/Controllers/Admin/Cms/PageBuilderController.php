@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin\Cms;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Cms\AddBlockRequest;
 use App\Http\Requests\Admin\Cms\AddSectionRequest;
+use App\Http\Requests\Admin\Cms\SchedulePageRequest;
 use App\Http\Requests\Admin\Cms\UpdateBlockRequest;
 use App\Http\Requests\Admin\Cms\UpdatePageBuilderRequest;
 use App\Http\Requests\Admin\Cms\UpdateSectionRequest;
@@ -16,8 +17,10 @@ use App\Models\PageSection;
 use App\Services\PageBuilderSyncService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class PageBuilderController extends Controller
 {
@@ -61,6 +64,10 @@ class PageBuilderController extends Controller
                 'id' => $pageModel->id,
                 'title' => $pageModel->title,
                 'slug' => $pageModel->slug,
+                'approval_status' => $pageModel->approval_status ?? 'draft',
+                'review_note' => $pageModel->review_note,
+                'scheduled_publish_at' => $pageModel->scheduled_publish_at?->toIso8601String(),
+                'scheduled_unpublish_at' => $pageModel->scheduled_unpublish_at?->toIso8601String(),
             ],
             'sections' => $sections,
             'available_sections' => config('cms.sections', []),
@@ -150,6 +157,18 @@ class PageBuilderController extends Controller
         }
 
         return back();
+    }
+
+    public function schedule(SchedulePageRequest $request, int $page): RedirectResponse
+    {
+        $pageModel = Page::query()->findOrFail($page);
+
+        $pageModel->update([
+            'scheduled_publish_at' => $request->input('scheduled_publish_at'),
+            'scheduled_unpublish_at' => $request->input('scheduled_unpublish_at'),
+        ]);
+
+        return back()->with('success', 'Schedule saved.');
     }
 
     public function addSection(AddSectionRequest $request, int $page): JsonResponse
@@ -249,5 +268,75 @@ class PageBuilderController extends Controller
         $block->delete();
 
         return response()->json(['success' => true]);
+    }
+
+    public function export(Page $page): SymfonyResponse
+    {
+        $sections = $page->allSections()->with(['allBlocks'])->orderBy('position')->get();
+
+        $data = [
+            'version' => '1.0',
+            'exported_at' => now()->toIso8601String(),
+            'page_title' => $page->title,
+            'sections' => $sections->map(fn (PageSection $s): array => [
+                'section_type' => $s->section_type,
+                'layout' => $s->layout,
+                'variant' => $s->variant,
+                'settings' => $s->settings,
+                'position' => $s->position,
+                'is_active' => $s->is_active,
+                'blocks' => $s->allBlocks->map(fn (PageBlock $b): array => [
+                    'type' => $b->type->value,
+                    'configuration' => $b->configuration,
+                    'position' => $b->position,
+                    'is_active' => $b->is_active,
+                ])->values()->all(),
+            ])->values()->all(),
+        ];
+
+        $filename = 'page-'.$page->id.'-'.now()->format('Y-m-d').'.json';
+
+        return response((string) json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), 200, [
+            'Content-Type' => 'application/json',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ]);
+    }
+
+    public function import(Request $request, Page $page): RedirectResponse
+    {
+        $request->validate(['file' => ['required', 'file', 'mimes:json', 'max:2048']]);
+
+        $content = (string) file_get_contents((string) $request->file('file')->getRealPath());
+        $data = json_decode($content, true);
+
+        if (! isset($data['sections']) || ! is_array($data['sections'])) {
+            return back()->withErrors(['file' => 'Invalid page export file.']);
+        }
+
+        $page->allBlocks()->delete();
+        $page->allSections()->delete();
+
+        foreach ($data['sections'] as $sectionData) {
+            $section = $page->allSections()->create([
+                'section_type' => $sectionData['section_type'] ?? 'content',
+                'layout' => $sectionData['layout'] ?? 'contained',
+                'variant' => $sectionData['variant'] ?? null,
+                'settings' => $sectionData['settings'] ?? null,
+                'position' => $sectionData['position'] ?? 0,
+                'is_active' => $sectionData['is_active'] ?? true,
+            ]);
+
+            foreach ($sectionData['blocks'] ?? [] as $blockData) {
+                $section->allBlocks()->create([
+                    'page_id' => $page->id,
+                    'type' => $blockData['type'],
+                    'configuration' => $blockData['configuration'] ?? [],
+                    'position' => $blockData['position'] ?? 0,
+                    'is_active' => $blockData['is_active'] ?? true,
+                ]);
+            }
+        }
+
+        return back()->with('success', 'Page imported successfully.');
     }
 }

@@ -590,7 +590,9 @@ export type BlockType =
     | 'team_members'
     | 'icon_list'
     | 'steps_process'
-    | 'trust_badges';
+    | 'trust_badges'
+    | 'alert_banner'
+    | 'pricing_cards';
 
 export interface Page {
     id: number;

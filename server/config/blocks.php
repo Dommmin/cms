@@ -1361,5 +1361,68 @@ return [
                 ],
             ],
         ],
+        'alert_banner' => [
+            'name' => 'Alert Banner',
+            'description' => 'Dismissable announcement bar',
+            'icon' => 'alert-circle',
+            'category' => 'layout',
+            'enum' => PageBlockTypeEnum::AlertBanner,
+            'schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'message' => [
+                        'type' => 'string',
+                        'label' => 'Message',
+                        'required' => true,
+                    ],
+                    'link' => [
+                        'type' => 'string',
+                        'format' => 'url',
+                        'label' => 'Link URL',
+                    ],
+                    'link_label' => [
+                        'type' => 'string',
+                        'label' => 'Link Label',
+                        'default' => 'Learn more',
+                    ],
+                    'variant' => [
+                        'type' => 'string',
+                        'label' => 'Variant',
+                        'enum' => ['info', 'warning', 'success', 'error'],
+                        'default' => 'info',
+                    ],
+                    'dismissable' => [
+                        'type' => 'boolean',
+                        'label' => 'Dismissable',
+                        'default' => true,
+                    ],
+                ],
+            ],
+        ],
+        'pricing_cards' => [
+            'name' => 'Pricing Cards',
+            'description' => 'Pricing plans with monthly/yearly toggle',
+            'icon' => 'credit-card',
+            'category' => 'marketing',
+            'enum' => PageBlockTypeEnum::PricingCards,
+            'schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'title' => [
+                        'type' => 'string',
+                        'label' => 'Section Title',
+                    ],
+                    'subtitle' => [
+                        'type' => 'string',
+                        'label' => 'Subtitle',
+                    ],
+                    'show_toggle' => [
+                        'type' => 'boolean',
+                        'label' => 'Show Monthly/Yearly Toggle',
+                        'default' => true,
+                    ],
+                ],
+            ],
+        ],
     ],
 ];

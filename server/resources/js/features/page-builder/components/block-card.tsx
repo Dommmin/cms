@@ -13,6 +13,7 @@ import {
     Globe2,
     GripVertical,
     LibraryBig,
+    Lock,
     Trash2,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -73,6 +74,8 @@ export function BlockCard({
         setGlobalDesc('');
     };
 
+    const isLocked = !!block.configuration._locked;
+
     const displayName =
         block.reusable_block_name ??
         blockTypeName ??
@@ -98,9 +101,16 @@ export function BlockCard({
                     <div className="flex items-center gap-2">
                         {/* Drag Handle */}
                         <div
-                            {...attributes}
-                            {...listeners}
-                            className="cursor-grab active:cursor-grabbing"
+                            {...(!isLocked ? attributes : {})}
+                            {...(!isLocked ? listeners : {})}
+                            className={
+                                isLocked
+                                    ? 'cursor-not-allowed opacity-30'
+                                    : 'cursor-grab active:cursor-grabbing'
+                            }
+                            title={
+                                isLocked ? 'Unlock block to move' : undefined
+                            }
                         >
                             <GripVertical className="h-4 w-4 text-muted-foreground" />
                         </div>
@@ -155,6 +165,17 @@ export function BlockCard({
                             </Badge>
                         )}
 
+                        {/* Locked badge */}
+                        {isLocked && (
+                            <Badge
+                                variant="outline"
+                                className="h-5 border-amber-300 text-xs text-amber-600 dark:border-amber-700 dark:text-amber-400"
+                            >
+                                <Lock className="mr-1 h-2.5 w-2.5" />
+                                Locked
+                            </Badge>
+                        )}
+
                         {/* Active Status */}
                         <Badge
                             variant={block.is_active ? 'default' : 'secondary'}
@@ -204,9 +225,13 @@ export function BlockCard({
                             size="sm"
                             onClick={(e) => {
                                 e.stopPropagation();
-                                onDelete();
+                                if (!isLocked) onDelete();
                             }}
-                            className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                            disabled={isLocked}
+                            title={
+                                isLocked ? 'Unlock block to delete' : undefined
+                            }
+                            className="h-6 w-6 p-0 text-destructive hover:text-destructive disabled:opacity-30"
                         >
                             <Trash2 className="h-3 w-3" />
                         </Button>

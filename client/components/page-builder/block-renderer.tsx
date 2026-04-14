@@ -1,5 +1,6 @@
 import type { BlockRendererProps } from './block-renderer.types';
 import { AccordionBlock } from './blocks/accordion-block';
+import { AlertBannerBlock } from './blocks/alert-banner';
 import { BrandsSliderBlock } from './blocks/brands-slider';
 import { CallToActionBlock } from './blocks/call-to-action';
 import { CategoriesGridBlock } from './blocks/categories-grid';
@@ -14,6 +15,7 @@ import { ImageGalleryBlock } from './blocks/image-gallery';
 import { LogoCloudBlock } from './blocks/logo-cloud';
 import { MapBlock } from './blocks/map-block';
 import { NewsletterSignupBlock } from './blocks/newsletter-signup';
+import { PricingCardsBlock } from './blocks/pricing-cards';
 import { PricingTableBlock } from './blocks/pricing-table';
 import { PromotionalBannerBlock } from './blocks/promotional-banner';
 import { RichTextBlock } from './blocks/rich-text';
@@ -86,6 +88,10 @@ export function BlockRenderer({ block }: BlockRendererProps) {
             return <StepsProcessBlock block={block} />;
         case 'trust_badges':
             return <TrustBadgesBlock block={block} />;
+        case 'alert_banner':
+            return <AlertBannerBlock block={block} />;
+        case 'pricing_cards':
+            return <PricingCardsBlock block={block} />;
         default:
             // Unknown block type — silent fallback in production
             if (process.env.NODE_ENV === 'development') {

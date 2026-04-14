@@ -13,7 +13,10 @@ export type * from './types';
 export { BlockCard } from './components/block-card';
 export { BlockForm } from './components/block-form';
 export { BuilderToolbar } from './components/builder-toolbar';
-export type { PreviewDevice } from './components/builder-toolbar.types';
+export type {
+    ApprovalStatus,
+    PreviewDevice,
+} from './components/builder-toolbar.types';
 export { SectionCard } from './components/section-card';
 export { SectionForm } from './components/section-form';
 

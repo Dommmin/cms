@@ -17,7 +17,10 @@ import {
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
-import { bulkUpdateStatus, exportMethod } from '@/routes/admin/ecommerce/orders';
+import {
+    bulkUpdateStatus,
+    exportMethod,
+} from '@/routes/admin/ecommerce/orders';
 import type { BreadcrumbItem } from '@/types';
 import type { OrderData } from './index.types';
 

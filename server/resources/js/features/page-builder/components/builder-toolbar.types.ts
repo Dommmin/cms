@@ -2,6 +2,8 @@ import type { Section } from '../types';
 
 export type PreviewDevice = 'desktop' | 'tablet' | 'mobile';
 
+export type ApprovalStatus = 'draft' | 'in_review' | 'approved';
+
 export type BuilderToolbarProps = {
     pageId: number;
     pageTitle: string;
@@ -13,9 +15,9 @@ export type BuilderToolbarProps = {
     previewDevice: PreviewDevice;
     hasUnsavedChanges: boolean;
     lastSavedAt: Date | null;
-    timeSince?: string | null;
     scheduledPublishAt: string | null;
     scheduledUnpublishAt: string | null;
+    approvalStatus: ApprovalStatus;
     sections: Section[];
     onAddSection: () => void;
     onOpenTemplates: () => void;
@@ -35,4 +37,7 @@ export type BuilderToolbarProps = {
         category: string,
         isGlobal: boolean,
     ) => void;
+    onSubmitForReview: () => void;
+    onApprove: () => void;
+    onReject: (note: string) => void;
 };

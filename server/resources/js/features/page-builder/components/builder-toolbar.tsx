@@ -4,13 +4,17 @@
  * Follows Interface Segregation Principle - minimal props
  */
 
+import { router } from '@inertiajs/react';
 import { Link } from '@inertiajs/react';
 import {
     ArrowLeft,
     BookmarkPlus,
     Calendar,
+    Check,
     Columns2,
     Eye,
+    FileDown,
+    FileUp,
     LayoutTemplate,
     Loader2,
     Monitor,
@@ -20,7 +24,13 @@ import {
     Smartphone,
     Tablet,
     Undo2,
+    X,
 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import {
+    exportMethod as pbExport,
+    importMethod as pbImport,
+} from '@/actions/App/Http/Controllers/Admin/Cms/PageBuilderController';
 import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -50,17 +60,33 @@ import type { BuilderToolbarProps } from './builder-toolbar.types';
 
 // ── Auto-save indicator ────────────────────────────────────────────────────
 
+function formatTimeSince(date: Date): string {
+    const diffMs = Date.now() - date.getTime();
+    const diffMin = Math.floor(diffMs / 60_000);
+    if (diffMin < 1) return 'just now';
+    if (diffMin === 1) return '1 min ago';
+    return `${diffMin} min ago`;
+}
+
 function AutoSaveIndicator({
     isSaving,
     hasUnsavedChanges,
     lastSavedAt,
-    timeSince,
 }: {
     isSaving: boolean;
     hasUnsavedChanges: boolean;
     lastSavedAt: Date | null;
-    timeSince?: string | null;
 }) {
+    // Tick every 30s to recompute the "X min ago" label without storing derived state
+    const [, setTick] = useState(0);
+    useEffect(() => {
+        if (!lastSavedAt) return;
+        const id = setInterval(() => setTick((n) => n + 1), 30_000);
+        return () => clearInterval(id);
+    }, [lastSavedAt]);
+
+    const timeSince = lastSavedAt ? formatTimeSince(lastSavedAt) : null;
+
     if (isSaving) {
         return (
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -329,7 +355,7 @@ function SaveAsTemplateDialog({
 // ── Toolbar ────────────────────────────────────────────────────────────────
 
 export function BuilderToolbar({
-    pageId: _pageId,
+    pageId,
     pageTitle,
     isPublished: _isPublished,
     isSaving,
@@ -341,6 +367,7 @@ export function BuilderToolbar({
     lastSavedAt,
     scheduledPublishAt,
     scheduledUnpublishAt,
+    approvalStatus,
     onAddSection,
     onOpenTemplates,
     onSave,
@@ -351,8 +378,32 @@ export function BuilderToolbar({
     onChangeDevice,
     onScheduleSave,
     onSaveTemplate,
+    onSubmitForReview,
+    onApprove,
+    onReject,
 }: BuilderToolbarProps) {
     const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
+    const [rejectNoteOpen, setRejectNoteOpen] = useState(false);
+    const [rejectNote, setRejectNote] = useState('');
+    const importInputRef = useRef<HTMLInputElement>(null);
+
+    const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const formData = new FormData();
+        formData.append('file', file);
+        router.post(pbImport.url(pageId), formData, {
+            forceFormData: true,
+            preserveScroll: true,
+        });
+        e.target.value = '';
+    };
+
+    const handleRejectSubmit = () => {
+        onReject(rejectNote);
+        setRejectNote('');
+        setRejectNoteOpen(false);
+    };
 
     return (
         <div className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -405,7 +456,6 @@ export function BuilderToolbar({
                             isSaving={isSaving}
                             hasUnsavedChanges={hasUnsavedChanges}
                             lastSavedAt={lastSavedAt}
-                            timeSince={timeSince}
                         />
                     </div>
 
@@ -505,6 +555,73 @@ export function BuilderToolbar({
                         Save as Template
                     </Button>
 
+                    {/* Export / Import */}
+                    <a
+                        href={pbExport.url(pageId)}
+                        download
+                        className="inline-flex h-8 items-center gap-1.5 rounded-md border border-input bg-background px-3 text-xs font-medium shadow-sm hover:bg-accent"
+                        title="Export page as JSON"
+                    >
+                        <FileDown className="h-3.5 w-3.5" />
+                        Export
+                    </a>
+                    <input
+                        ref={importInputRef}
+                        type="file"
+                        accept=".json"
+                        className="hidden"
+                        onChange={handleImportFile}
+                    />
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => importInputRef.current?.click()}
+                        title="Import page from JSON"
+                    >
+                        <FileUp className="mr-1.5 h-3.5 w-3.5" />
+                        Import
+                    </Button>
+
+                    {/* Approval Workflow */}
+                    <div className="h-4 w-px bg-border" />
+                    {approvalStatus === 'draft' && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={onSubmitForReview}
+                        >
+                            Submit for Review
+                        </Button>
+                    )}
+                    {approvalStatus === 'in_review' && (
+                        <>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-green-300 text-green-700 hover:bg-green-50 dark:border-green-700 dark:text-green-400"
+                                onClick={onApprove}
+                            >
+                                <Check className="mr-1.5 h-3.5 w-3.5" />
+                                Approve
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-destructive text-destructive hover:bg-destructive/10"
+                                onClick={() => setRejectNoteOpen(true)}
+                            >
+                                <X className="mr-1.5 h-3.5 w-3.5" />
+                                Reject
+                            </Button>
+                        </>
+                    )}
+                    {approvalStatus === 'approved' && (
+                        <span className="flex items-center gap-1.5 rounded-md border border-green-300 px-2.5 py-1 text-xs font-medium text-green-700 dark:border-green-700 dark:text-green-400">
+                            <Check className="h-3 w-3" />
+                            Approved
+                        </span>
+                    )}
+
                     <Button onClick={onSave} disabled={isSaving} size="sm">
                         <Save className="mr-2 h-4 w-4" />
                         {isSaving ? 'Saving...' : 'Save'}
@@ -517,6 +634,44 @@ export function BuilderToolbar({
                 onClose={() => setSaveTemplateOpen(false)}
                 onSave={onSaveTemplate}
             />
+
+            {/* Reject note dialog */}
+            <Dialog
+                open={rejectNoteOpen}
+                onOpenChange={(o) => !o && setRejectNoteOpen(false)}
+            >
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Reject Page</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-3 py-2">
+                        <p className="text-sm text-muted-foreground">
+                            Optionally leave a note for the author explaining
+                            what needs to be changed.
+                        </p>
+                        <Textarea
+                            value={rejectNote}
+                            onChange={(e) => setRejectNote(e.target.value)}
+                            placeholder="Describe what needs to be changed..."
+                            rows={4}
+                        />
+                    </div>
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setRejectNoteOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={handleRejectSubmit}
+                        >
+                            Reject
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

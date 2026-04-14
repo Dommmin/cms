@@ -34,6 +34,8 @@ enum PageBlockTypeEnum: string
     case IconList = 'icon_list';
     case StepsProcess = 'steps_process';
     case TrustBadges = 'trust_badges';
+    case AlertBanner = 'alert_banner';
+    case PricingCards = 'pricing_cards';
 
     public function label(): string
     {
@@ -66,6 +68,8 @@ enum PageBlockTypeEnum: string
             self::IconList => 'Lista ikon',
             self::StepsProcess => 'Jak to działa',
             self::TrustBadges => 'Znaki zaufania',
+            self::AlertBanner => 'Alert Banner',
+            self::PricingCards => 'Pricing Cards',
         };
     }
 }
