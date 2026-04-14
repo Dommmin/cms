@@ -106,19 +106,15 @@ export default function ImportDialog({
         const formData = new FormData();
         formData.append('file', file);
 
-        router.post(
-            ProductController.importMethod.url(),
-            formData as unknown as Record<string, unknown>,
-            {
-                forceFormData: true,
-                onSuccess: () => {
-                    handleClose();
-                },
-                onFinish: () => {
-                    setImporting(false);
-                },
+        router.post(ProductController.importMethod.url(), formData, {
+            forceFormData: true,
+            onSuccess: () => {
+                handleClose();
             },
-        );
+            onFinish: () => {
+                setImporting(false);
+            },
+        });
     }
 
     const previewColumns =

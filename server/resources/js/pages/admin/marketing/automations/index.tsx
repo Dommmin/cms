@@ -198,11 +198,7 @@ export default function AutomationsIndex({ campaigns }: IndexProps) {
                     </PageHeaderActions>
                 </PageHeader>
 
-                <DataTable
-                    data={campaigns}
-                    columns={columns}
-                    emptyMessage="No automated campaigns yet. Create one to get started."
-                />
+                <DataTable data={campaigns} columns={columns} />
             </Wrapper>
         </AppLayout>
     );

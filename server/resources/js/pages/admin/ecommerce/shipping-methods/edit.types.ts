@@ -2,6 +2,11 @@ export interface Carrier {
     value: string;
     label: string;
 }
+export interface RestrictionItem {
+    id: number;
+    name: string;
+}
+
 export interface ShippingMethod {
     id: number;
     name: Record<string, string>;

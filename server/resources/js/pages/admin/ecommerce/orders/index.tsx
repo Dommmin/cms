@@ -17,7 +17,7 @@ import {
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
-import * as OrderRoutes from '@/routes/admin/ecommerce/orders';
+import { bulkUpdateStatus } from '@/routes/admin/ecommerce/orders';
 import type { BreadcrumbItem } from '@/types';
 import type { OrderData } from './index.types';
 
@@ -60,7 +60,7 @@ export default function OrdersIndex({
     function handleBulkSubmit() {
         if (selectedIds.length === 0 || !bulkStatus) return;
         router.post(
-            OrderController.bulkUpdateStatus.url(),
+            bulkUpdateStatus.url(),
             { ids: selectedIds, status: bulkStatus },
             {
                 onSuccess: () => {

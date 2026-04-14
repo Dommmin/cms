@@ -6,7 +6,8 @@ export interface ReportFormData {
     data_source: string;
     metrics: string[];
     dimensions: string[];
-    filters: unknown[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    filters: any[];
     group_by: string[];
     chart_type: string;
     is_public: boolean;

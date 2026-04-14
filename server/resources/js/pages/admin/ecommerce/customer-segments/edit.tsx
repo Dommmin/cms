@@ -51,7 +51,7 @@ export default function Edit({ segment }: Required<FormProps>) {
         name: segment.name,
         description: segment.description ?? '',
         type: segment.type,
-        rules: (segment.rules ?? []) as SegmentRule[],
+        rules: (segment.rules ?? []) as unknown as SegmentRule[],
         is_active: segment.is_active,
     });
 
