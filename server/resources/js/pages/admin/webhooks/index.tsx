@@ -72,7 +72,7 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
             header: 'URL',
             cell: ({ row }) => (
                 <span
-                    className="max-w-[200px] truncate text-sm font-mono text-muted-foreground"
+                    className="max-w-[200px] truncate font-mono text-sm text-muted-foreground"
                     title={row.original.url}
                 >
                     {row.original.url}
@@ -85,7 +85,11 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
             cell: ({ row }) => (
                 <div className="flex flex-wrap gap-1">
                     {row.original.events.slice(0, 3).map((event) => (
-                        <Badge key={event} variant="outline" className="text-xs">
+                        <Badge
+                            key={event}
+                            variant="outline"
+                            className="text-xs"
+                        >
                             {event}
                         </Badge>
                     ))}
@@ -101,7 +105,9 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
             accessorKey: 'is_active',
             header: 'Active',
             cell: ({ row }) => (
-                <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
+                <Badge
+                    variant={row.original.is_active ? 'default' : 'secondary'}
+                >
                     {row.original.is_active ? 'Active' : 'Inactive'}
                 </Badge>
             ),
@@ -112,7 +118,9 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
             cell: ({ row }) =>
                 row.original.last_triggered_at ? (
                     <span className="text-xs text-muted-foreground">
-                        {new Date(row.original.last_triggered_at).toLocaleString()}
+                        {new Date(
+                            row.original.last_triggered_at,
+                        ).toLocaleString()}
                     </span>
                 ) : (
                     <span className="text-xs text-muted-foreground">Never</span>
@@ -123,7 +131,9 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
             header: 'Failures',
             cell: ({ row }) =>
                 row.original.failure_count > 0 ? (
-                    <Badge variant="destructive">{row.original.failure_count}</Badge>
+                    <Badge variant="destructive">
+                        {row.original.failure_count}
+                    </Badge>
                 ) : (
                     <span className="text-xs text-muted-foreground">0</span>
                 ),

@@ -60,10 +60,7 @@ export default function CreateWebhook({ available_events }: FormProps) {
                     </PageHeaderActions>
                 </PageHeader>
 
-                <form
-                    onSubmit={handleSubmit}
-                    className="max-w-2xl space-y-6"
-                >
+                <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
                     <div className="grid gap-2">
                         <Label htmlFor="name">Name *</Label>
                         <Input

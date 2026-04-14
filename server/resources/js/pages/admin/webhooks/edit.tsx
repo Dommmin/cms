@@ -66,10 +66,7 @@ export default function EditWebhook({ webhook, available_events }: FormProps) {
                     </PageHeaderActions>
                 </PageHeader>
 
-                <form
-                    onSubmit={handleSubmit}
-                    className="max-w-2xl space-y-6"
-                >
+                <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
                     <div className="grid gap-2">
                         <Label htmlFor="name">Name *</Label>
                         <Input
@@ -125,7 +122,10 @@ export default function EditWebhook({ webhook, available_events }: FormProps) {
                         </div>
                         <p className="text-xs text-muted-foreground">
                             Use this secret to verify webhook signatures (
-                            <Badge variant="outline" className="font-mono text-xs">
+                            <Badge
+                                variant="outline"
+                                className="font-mono text-xs"
+                            >
                                 X-Webhook-Signature: sha256=...
                             </Badge>
                             ).

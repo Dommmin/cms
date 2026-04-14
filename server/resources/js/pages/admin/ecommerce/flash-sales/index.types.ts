@@ -1,4 +1,9 @@
-export type FlashSaleStatus = 'active' | 'scheduled' | 'ended' | 'exhausted' | 'inactive';
+export type FlashSaleStatus =
+    | 'active'
+    | 'scheduled'
+    | 'ended'
+    | 'exhausted'
+    | 'inactive';
 
 export interface FlashSaleListItem {
     id: number;

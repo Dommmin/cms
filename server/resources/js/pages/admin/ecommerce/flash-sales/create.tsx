@@ -27,10 +27,17 @@ export default function Create({ products }: FormPageProps) {
             <Head title="Create Flash Sale" />
 
             <Wrapper>
-                <PageHeader title="Create Flash Sale" description="Add a new limited-time flash sale">
+                <PageHeader
+                    title="Create Flash Sale"
+                    description="Add a new limited-time flash sale"
+                >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href={FlashSaleController.index.url()} prefetch cacheFor={30}>
+                            <Link
+                                href={FlashSaleController.index.url()}
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>
@@ -66,7 +73,9 @@ export default function Create({ products }: FormPageProps) {
                                     required
                                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                                 >
-                                    <option value="">— Select a product —</option>
+                                    <option value="">
+                                        — Select a product —
+                                    </option>
                                     {products.map((p) => (
                                         <option key={p.id} value={p.id}>
                                             {p.name}
@@ -90,7 +99,8 @@ export default function Create({ products }: FormPageProps) {
                                     placeholder="Price in grosze (e.g. 9900 = 99.00 PLN)"
                                 />
                                 <p className="text-xs text-muted-foreground">
-                                    Enter price in grosze (cents). 9900 = 99.00 PLN.
+                                    Enter price in grosze (cents). 9900 = 99.00
+                                    PLN.
                                 </p>
                                 <InputError message={errors.sale_price} />
                             </div>
@@ -145,7 +155,10 @@ export default function Create({ products }: FormPageProps) {
                                     defaultChecked
                                     className="h-4 w-4 rounded border-input"
                                 />
-                                <Label htmlFor="is_active" className="font-normal">
+                                <Label
+                                    htmlFor="is_active"
+                                    className="font-normal"
+                                >
                                     {__('label.is_active', 'Active')}
                                 </Label>
                             </div>
@@ -153,7 +166,10 @@ export default function Create({ products }: FormPageProps) {
                             <StickyFormActions
                                 formId={formId}
                                 processing={processing}
-                                submitLabel={__('action.create', 'Create Flash Sale')}
+                                submitLabel={__(
+                                    'action.create',
+                                    'Create Flash Sale',
+                                )}
                             />
                         </>
                     )}

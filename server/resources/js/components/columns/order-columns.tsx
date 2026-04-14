@@ -30,7 +30,9 @@ type SelectionProps = {
     allSelected?: boolean;
 };
 
-export function useOrderColumns(selection?: SelectionProps): ColumnDef<OrderRow>[] {
+export function useOrderColumns(
+    selection?: SelectionProps,
+): ColumnDef<OrderRow>[] {
     const __ = useTranslation();
 
     const checkboxColumn: ColumnDef<OrderRow> = {
@@ -47,7 +49,9 @@ export function useOrderColumns(selection?: SelectionProps): ColumnDef<OrderRow>
         cell: ({ row }) => (
             <input
                 type="checkbox"
-                checked={selection?.selectedIds?.includes(row.original.id) ?? false}
+                checked={
+                    selection?.selectedIds?.includes(row.original.id) ?? false
+                }
                 onChange={() => selection?.onToggleOne?.(row.original.id)}
                 className="h-4 w-4 rounded border-gray-300"
                 aria-label={`Select order ${row.original.order_number}`}

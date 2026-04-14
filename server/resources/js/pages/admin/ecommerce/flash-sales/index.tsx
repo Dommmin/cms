@@ -15,16 +15,27 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 function StatusBadge({ status }: { status: FlashSaleStatus }) {
-    const config: Record<FlashSaleStatus, { label: string; className: string }> = {
+    const config: Record<
+        FlashSaleStatus,
+        { label: string; className: string }
+    > = {
         active: { label: 'Active', className: 'bg-green-100 text-green-700' },
-        scheduled: { label: 'Scheduled', className: 'bg-blue-100 text-blue-700' },
+        scheduled: {
+            label: 'Scheduled',
+            className: 'bg-blue-100 text-blue-700',
+        },
         ended: { label: 'Ended', className: 'bg-gray-100 text-gray-600' },
-        exhausted: { label: 'Exhausted', className: 'bg-yellow-100 text-yellow-700' },
+        exhausted: {
+            label: 'Exhausted',
+            className: 'bg-yellow-100 text-yellow-700',
+        },
         inactive: { label: 'Inactive', className: 'bg-red-100 text-red-600' },
     };
     const { label, className } = config[status] ?? config.inactive;
     return (
-        <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${className}`}>
+        <span
+            className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${className}`}
+        >
             {label}
         </span>
     );
@@ -34,7 +45,8 @@ export default function FlashSalesIndex({ flashSales, filters }: IndexProps) {
     const __ = useTranslation();
 
     function handleDelete(id: number) {
-        if (!confirm('Are you sure you want to delete this flash sale?')) return;
+        if (!confirm('Are you sure you want to delete this flash sale?'))
+            return;
         router.delete(FlashSaleController.destroy.url(id));
     }
 
@@ -49,7 +61,11 @@ export default function FlashSalesIndex({ flashSales, filters }: IndexProps) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href={FlashSaleController.create.url()} prefetch cacheFor={30}>
+                            <Link
+                                href={FlashSaleController.create.url()}
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <Plus className="mr-2 h-4 w-4" />
                                 {__('action.add', 'Add Flash Sale')}
                             </Link>
@@ -68,10 +84,14 @@ export default function FlashSalesIndex({ flashSales, filters }: IndexProps) {
                                         <Flame className="h-4 w-4 text-orange-600" />
                                     </div>
                                     <div>
-                                        <p className="font-medium">{row.original.name}</p>
+                                        <p className="font-medium">
+                                            {row.original.name}
+                                        </p>
                                         <p className="text-xs text-muted-foreground">
                                             {row.original.product?.name ?? '—'}
-                                            {row.original.variant ? ` / ${row.original.variant.sku}` : ''}
+                                            {row.original.variant
+                                                ? ` / ${row.original.variant.sku}`
+                                                : ''}
                                         </p>
                                     </div>
                                 </div>
@@ -82,19 +102,26 @@ export default function FlashSalesIndex({ flashSales, filters }: IndexProps) {
                             header: 'Sale Price',
                             cell: ({ row }) => (
                                 <span className="font-mono">
-                                    {(row.original.sale_price / 100).toFixed(2)} PLN
+                                    {(row.original.sale_price / 100).toFixed(2)}{' '}
+                                    PLN
                                 </span>
                             ),
                         },
                         {
                             accessorKey: 'starts_at',
                             header: 'Start',
-                            cell: ({ row }) => new Date(row.original.starts_at).toLocaleString('pl-PL'),
+                            cell: ({ row }) =>
+                                new Date(row.original.starts_at).toLocaleString(
+                                    'pl-PL',
+                                ),
                         },
                         {
                             accessorKey: 'ends_at',
                             header: 'End',
-                            cell: ({ row }) => new Date(row.original.ends_at).toLocaleString('pl-PL'),
+                            cell: ({ row }) =>
+                                new Date(row.original.ends_at).toLocaleString(
+                                    'pl-PL',
+                                ),
                         },
                         {
                             accessorKey: 'stock_sold',
@@ -107,7 +134,9 @@ export default function FlashSalesIndex({ flashSales, filters }: IndexProps) {
                         {
                             accessorKey: 'status',
                             header: 'Status',
-                            cell: ({ row }) => <StatusBadge status={row.original.status} />,
+                            cell: ({ row }) => (
+                                <StatusBadge status={row.original.status} />
+                            ),
                         },
                         {
                             id: 'actions',
@@ -115,17 +144,26 @@ export default function FlashSalesIndex({ flashSales, filters }: IndexProps) {
                             cell: ({ row }) => (
                                 <div className="flex items-center gap-2">
                                     <Button asChild variant="ghost" size="sm">
-                                        <Link href={FlashSaleController.edit.url(row.original.id)}>
+                                        <Link
+                                            href={FlashSaleController.edit.url(
+                                                row.original.id,
+                                            )}
+                                        >
                                             Edit
                                         </Link>
                                     </Button>
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() => handleDelete(row.original.id)}
+                                        onClick={() =>
+                                            handleDelete(row.original.id)
+                                        }
                                         aria-label={`Delete ${row.original.name}`}
                                     >
-                                        <Trash2 className="h-4 w-4 text-destructive" aria-hidden="true" />
+                                        <Trash2
+                                            className="h-4 w-4 text-destructive"
+                                            aria-hidden="true"
+                                        />
                                     </Button>
                                 </div>
                             ),

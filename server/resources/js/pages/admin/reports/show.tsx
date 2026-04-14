@@ -1,5 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
-import { DownloadIcon, FileSpreadsheetIcon, FileTextIcon, PencilIcon } from 'lucide-react';
+import {
+    DownloadIcon,
+    FileSpreadsheetIcon,
+    FileTextIcon,
+    PencilIcon,
+} from 'lucide-react';
 import * as CustomReportController from '@/actions/App/Http/Controllers/Admin/CustomReportController';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
@@ -105,7 +110,7 @@ export default function ShowReport({ report, results }: ShowProps) {
                                 key={key}
                                 className="rounded-xl border bg-card p-4"
                             >
-                                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                                     {key.replace(/_/g, ' ')}
                                 </p>
                                 <p className="mt-1 text-2xl font-bold">

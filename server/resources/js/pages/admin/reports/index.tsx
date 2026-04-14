@@ -1,6 +1,12 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { DownloadIcon, EyeIcon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import {
+    DownloadIcon,
+    EyeIcon,
+    PencilIcon,
+    PlusIcon,
+    TrashIcon,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import * as CustomReportController from '@/actions/App/Http/Controllers/Admin/CustomReportController';
 import { ConfirmButton } from '@/components/confirm-dialog';

@@ -92,7 +92,9 @@ function RestrictionSection({
 
     const handleAdd = (item: SearchResult) => {
         fetch(
-            ShippingMethodController.addRestriction.url({ shippingMethod: shippingMethodId }),
+            ShippingMethodController.addRestriction.url({
+                shippingMethod: shippingMethodId,
+            }),
             {
                 method: 'POST',
                 headers: {
@@ -119,7 +121,9 @@ function RestrictionSection({
 
     const handleRemove = (id: number) => {
         fetch(
-            ShippingMethodController.removeRestriction.url({ shippingMethod: shippingMethodId }),
+            ShippingMethodController.removeRestriction.url({
+                shippingMethod: shippingMethodId,
+            }),
             {
                 method: 'DELETE',
                 headers: {
@@ -174,7 +178,7 @@ function RestrictionSection({
             <div ref={wrapperRef} className="relative">
                 <div className="flex gap-2">
                     <div className="relative flex-1">
-                        <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <SearchIcon className="absolute top-2.5 left-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
@@ -200,11 +204,14 @@ function RestrictionSection({
                     </div>
                 )}
 
-                {open && !loading && results.length === 0 && query.length >= 1 && (
-                    <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover px-3 py-2 text-sm text-muted-foreground shadow-md">
-                        {__('misc.no_results', 'No results found')}
-                    </div>
-                )}
+                {open &&
+                    !loading &&
+                    results.length === 0 &&
+                    query.length >= 1 && (
+                        <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover px-3 py-2 text-sm text-muted-foreground shadow-md">
+                            {__('misc.no_results', 'No results found')}
+                        </div>
+                    )}
             </div>
         </div>
     );
@@ -260,9 +267,7 @@ export default function ShippingRestrictions({
                     items={categories}
                     onAdd={(item) => setCategories((prev) => [...prev, item])}
                     onRemove={(id) =>
-                        setCategories((prev) =>
-                            prev.filter((c) => c.id !== id),
-                        )
+                        setCategories((prev) => prev.filter((c) => c.id !== id))
                     }
                 />
             </div>

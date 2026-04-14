@@ -67,7 +67,7 @@ export default function CustomerSegmentsIndex({ segments }: IndexProps) {
                                             {row.original.name}
                                         </div>
                                         {row.original.description && (
-                                            <div className="text-muted-foreground max-w-xs truncate text-xs">
+                                            <div className="max-w-xs truncate text-xs text-muted-foreground">
                                                 {row.original.description}
                                             </div>
                                         )}

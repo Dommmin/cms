@@ -20,7 +20,10 @@ function StatusBadge({ status }: { status: 'pending' | 'success' | 'failed' }) {
     return <Badge variant={variants[status]}>{status}</Badge>;
 }
 
-export default function WebhookDeliveries({ webhook, deliveries }: DeliveriesProps) {
+export default function WebhookDeliveries({
+    webhook,
+    deliveries,
+}: DeliveriesProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Webhooks', href: WebhookController.index.url() },
         { title: webhook.name, href: WebhookController.edit.url(webhook.id) },

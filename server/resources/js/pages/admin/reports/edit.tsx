@@ -20,27 +20,33 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { FormProps, ReportFormData } from './form.types';
 
-export default function EditReport({ report, dataSources, metrics }: FormProps) {
+export default function EditReport({
+    report,
+    dataSources,
+    metrics,
+}: FormProps) {
     if (!report) return null;
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Reports', href: CustomReportController.index.url() },
-        { title: report.name, href: CustomReportController.show.url(report.id) },
+        {
+            title: report.name,
+            href: CustomReportController.show.url(report.id),
+        },
         { title: 'Edit', href: '' },
     ];
 
-    const { data, setData, put, processing, errors } =
-        useForm<ReportFormData>({
-            name: report.name,
-            description: report.description ?? '',
-            data_source: report.data_source,
-            metrics: report.metrics,
-            dimensions: report.dimensions ?? [],
-            filters: report.filters ?? [],
-            group_by: report.group_by ?? [],
-            chart_type: report.chart_type ?? 'table',
-            is_public: report.is_public,
-        });
+    const { data, setData, put, processing, errors } = useForm<ReportFormData>({
+        name: report.name,
+        description: report.description ?? '',
+        data_source: report.data_source,
+        metrics: report.metrics,
+        dimensions: report.dimensions ?? [],
+        filters: report.filters ?? [],
+        group_by: report.group_by ?? [],
+        chart_type: report.chart_type ?? 'table',
+        is_public: report.is_public,
+    });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -78,10 +84,7 @@ export default function EditReport({ report, dataSources, metrics }: FormProps) 
                     </PageHeaderActions>
                 </PageHeader>
 
-                <form
-                    onSubmit={handleSubmit}
-                    className="max-w-2xl space-y-6"
-                >
+                <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
                     <div className="grid gap-2">
                         <Label htmlFor="name">Name *</Label>
                         <Input

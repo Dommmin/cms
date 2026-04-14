@@ -159,7 +159,7 @@ export function AppSidebar() {
                     href: FaqController.index.url(),
                     icon: HelpCircle,
                 },
-{
+                {
                     title: __('nav.stores', 'Stores'),
                     href: StoreController.index.url(),
                     icon: MapPin,
@@ -176,119 +176,131 @@ export function AppSidebar() {
                 },
             ],
         },
-        ...(modules?.ecommerce ? [{
-            title: __('nav.shop', 'Shop'),
-            icon: ShoppingBag,
-            children: [
-                {
-                    title: __('nav.products', 'Products'),
-                    href: ProductController.index.url(),
-                    icon: Package,
-                },
-                {
-                    title: __('nav.categories', 'Categories'),
-                    href: CategoryController.index.url(),
-                    icon: List,
-                },
-                {
-                    title: __('nav.brands', 'Brands'),
-                    href: BrandController.index.url(),
-                    icon: Tag,
-                },
-                {
-                    title: __('nav.product_types', 'Product Types'),
-                    href: ProductTypeController.index.url(),
-                    icon: Box,
-                },
-                {
-                    title: __('nav.attributes', 'Attributes'),
-                    href: AttributeController.index.url(),
-                    icon: List,
-                },
-                {
-                    title: __('nav.product_flags', 'Product Flags'),
-                    href: ProductFlagController.index.url(),
-                    icon: Flag,
-                },
-                {
-                    title: __('nav.orders', 'Orders'),
-                    href: OrderController.index.url(),
-                    icon: ShoppingCart,
-                },
-                {
-                    title: __('nav.customers', 'Customers'),
-                    href: CustomerController.index.url(),
-                    icon: UserCircle,
-                },
-                {
-                    title: __('nav.discounts', 'Discounts'),
-                    href: DiscountController.index.url(),
-                    icon: Percent,
-                },
-                {
-                    title: __('nav.promotions', 'Promotions'),
-                    href: PromotionController.index.url(),
-                    icon: Tag,
-                },
-                {
-                    title: __('nav.tax_rates', 'Tax Rates'),
-                    href: TaxRateController.index.url(),
-                    icon: Receipt,
-                },
-                {
-                    title: __('nav.shipping', 'Shipping'),
-                    href: ShippingMethodController.index.url(),
-                    icon: Truck,
-                },
-                {
-                    title: __('nav.returns', 'Returns'),
-                    href: ReturnRequestController.index.url(),
-                    icon: RotateCcw,
-                },
-                {
-                    title: __('nav.reviews', 'Reviews'),
-                    href: ReviewController.index.url(),
-                    icon: Star,
-                },
-            ],
-        }] : []),
-        ...(modules?.newsletter ? [{
-            title: __('nav.newsletter', 'Newsletter'),
-            icon: Mail,
-            children: [
-                {
-                    title: __('nav.subscribers', 'Subscribers'),
-                    href: NewsletterSubscriberController.index.url(),
-                    icon: Users2,
-                },
-                {
-                    title: __('nav.segments', 'Segments'),
-                    href: NewsletterSegmentController.index.url(),
-                    icon: List,
-                },
-                {
-                    title: __('nav.campaigns', 'Campaigns'),
-                    href: NewsletterCampaignController.index.url(),
-                    icon: Megaphone,
-                },
-            ],
-        }] : []),
-        ...(modules?.ecommerce ? [{
-            title: __('nav.finance', 'Finance'),
-            icon: Coins,
-            children: [
-                {
-                    title: __('nav.currencies', 'Currencies'),
-                    href: CurrencyController.index.url(),
-                    icon: Coins,
-                },
-                {
-                    title: __('nav.exchange_rates', 'Exchange Rates'),
-                    href: ExchangeRateController.index.url(),
-                    icon: ArrowRightLeft,
-                },
-            ],
-        }] : []),
+        ...(modules?.ecommerce
+            ? [
+                  {
+                      title: __('nav.shop', 'Shop'),
+                      icon: ShoppingBag,
+                      children: [
+                          {
+                              title: __('nav.products', 'Products'),
+                              href: ProductController.index.url(),
+                              icon: Package,
+                          },
+                          {
+                              title: __('nav.categories', 'Categories'),
+                              href: CategoryController.index.url(),
+                              icon: List,
+                          },
+                          {
+                              title: __('nav.brands', 'Brands'),
+                              href: BrandController.index.url(),
+                              icon: Tag,
+                          },
+                          {
+                              title: __('nav.product_types', 'Product Types'),
+                              href: ProductTypeController.index.url(),
+                              icon: Box,
+                          },
+                          {
+                              title: __('nav.attributes', 'Attributes'),
+                              href: AttributeController.index.url(),
+                              icon: List,
+                          },
+                          {
+                              title: __('nav.product_flags', 'Product Flags'),
+                              href: ProductFlagController.index.url(),
+                              icon: Flag,
+                          },
+                          {
+                              title: __('nav.orders', 'Orders'),
+                              href: OrderController.index.url(),
+                              icon: ShoppingCart,
+                          },
+                          {
+                              title: __('nav.customers', 'Customers'),
+                              href: CustomerController.index.url(),
+                              icon: UserCircle,
+                          },
+                          {
+                              title: __('nav.discounts', 'Discounts'),
+                              href: DiscountController.index.url(),
+                              icon: Percent,
+                          },
+                          {
+                              title: __('nav.promotions', 'Promotions'),
+                              href: PromotionController.index.url(),
+                              icon: Tag,
+                          },
+                          {
+                              title: __('nav.tax_rates', 'Tax Rates'),
+                              href: TaxRateController.index.url(),
+                              icon: Receipt,
+                          },
+                          {
+                              title: __('nav.shipping', 'Shipping'),
+                              href: ShippingMethodController.index.url(),
+                              icon: Truck,
+                          },
+                          {
+                              title: __('nav.returns', 'Returns'),
+                              href: ReturnRequestController.index.url(),
+                              icon: RotateCcw,
+                          },
+                          {
+                              title: __('nav.reviews', 'Reviews'),
+                              href: ReviewController.index.url(),
+                              icon: Star,
+                          },
+                      ],
+                  },
+              ]
+            : []),
+        ...(modules?.newsletter
+            ? [
+                  {
+                      title: __('nav.newsletter', 'Newsletter'),
+                      icon: Mail,
+                      children: [
+                          {
+                              title: __('nav.subscribers', 'Subscribers'),
+                              href: NewsletterSubscriberController.index.url(),
+                              icon: Users2,
+                          },
+                          {
+                              title: __('nav.segments', 'Segments'),
+                              href: NewsletterSegmentController.index.url(),
+                              icon: List,
+                          },
+                          {
+                              title: __('nav.campaigns', 'Campaigns'),
+                              href: NewsletterCampaignController.index.url(),
+                              icon: Megaphone,
+                          },
+                      ],
+                  },
+              ]
+            : []),
+        ...(modules?.ecommerce
+            ? [
+                  {
+                      title: __('nav.finance', 'Finance'),
+                      icon: Coins,
+                      children: [
+                          {
+                              title: __('nav.currencies', 'Currencies'),
+                              href: CurrencyController.index.url(),
+                              icon: Coins,
+                          },
+                          {
+                              title: __('nav.exchange_rates', 'Exchange Rates'),
+                              href: ExchangeRateController.index.url(),
+                              icon: ArrowRightLeft,
+                          },
+                      ],
+                  },
+              ]
+            : []),
         {
             title: __('nav.users', 'Users'),
             href: UserController.index.url(),
@@ -325,22 +337,26 @@ export function AppSidebar() {
                 },
             ],
         },
-        ...(modules?.ecommerce && modules?.marketing ? [{
-            title: __('nav.affiliates', 'Affiliates'),
-            icon: Link2,
-            children: [
-                {
-                    title: __('nav.affiliate_codes', 'Codes'),
-                    href: AffiliateCodeController.index.url(),
-                    icon: GitBranch,
-                },
-                {
-                    title: __('nav.referrals', 'Referrals'),
-                    href: ReferralController.index.url(),
-                    icon: Users2,
-                },
-            ],
-        }] : []),
+        ...(modules?.ecommerce && modules?.marketing
+            ? [
+                  {
+                      title: __('nav.affiliates', 'Affiliates'),
+                      icon: Link2,
+                      children: [
+                          {
+                              title: __('nav.affiliate_codes', 'Codes'),
+                              href: AffiliateCodeController.index.url(),
+                              icon: GitBranch,
+                          },
+                          {
+                              title: __('nav.referrals', 'Referrals'),
+                              href: ReferralController.index.url(),
+                              icon: Users2,
+                          },
+                      ],
+                  },
+              ]
+            : []),
         {
             title: __('nav.support', 'Support'),
             icon: MessageCircle,

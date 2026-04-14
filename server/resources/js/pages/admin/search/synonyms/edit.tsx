@@ -92,7 +92,10 @@ export default function EditSynonym({ synonym }: { synonym: SearchSynonym }) {
                                     defaultChecked={synonym.is_active}
                                     className="h-4 w-4 rounded border-input"
                                 />
-                                <Label htmlFor="is_active" className="font-normal">
+                                <Label
+                                    htmlFor="is_active"
+                                    className="font-normal"
+                                >
                                     Active
                                 </Label>
                             </div>

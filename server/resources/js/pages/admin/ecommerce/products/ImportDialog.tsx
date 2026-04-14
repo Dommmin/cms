@@ -21,9 +21,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import type {
-    ImportValidationResult,
-} from './import-dialog.types';
+import type { ImportValidationResult } from './import-dialog.types';
 
 type Step = 'pick' | 'result';
 
@@ -108,15 +106,19 @@ export default function ImportDialog({
         const formData = new FormData();
         formData.append('file', file);
 
-        router.post(ProductController.importMethod.url(), formData as unknown as Record<string, unknown>, {
-            forceFormData: true,
-            onSuccess: () => {
-                handleClose();
+        router.post(
+            ProductController.importMethod.url(),
+            formData as unknown as Record<string, unknown>,
+            {
+                forceFormData: true,
+                onSuccess: () => {
+                    handleClose();
+                },
+                onFinish: () => {
+                    setImporting(false);
+                },
             },
-            onFinish: () => {
-                setImporting(false);
-            },
-        });
+        );
     }
 
     const previewColumns =
@@ -157,7 +159,9 @@ export default function ImportDialog({
                         {networkError && (
                             <Alert variant="destructive">
                                 <AlertCircleIcon className="h-4 w-4" />
-                                <AlertDescription>{networkError}</AlertDescription>
+                                <AlertDescription>
+                                    {networkError}
+                                </AlertDescription>
                             </Alert>
                         )}
 
@@ -227,21 +231,19 @@ export default function ImportDialog({
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
-                                                {result.errors.map(
-                                                    (err, i) => (
-                                                        <TableRow key={i}>
-                                                            <TableCell className="font-mono">
-                                                                {err.row}
-                                                            </TableCell>
-                                                            <TableCell className="font-mono">
-                                                                {err.field}
-                                                            </TableCell>
-                                                            <TableCell className="text-destructive">
-                                                                {err.message}
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ),
-                                                )}
+                                                {result.errors.map((err, i) => (
+                                                    <TableRow key={i}>
+                                                        <TableCell className="font-mono">
+                                                            {err.row}
+                                                        </TableCell>
+                                                        <TableCell className="font-mono">
+                                                            {err.field}
+                                                        </TableCell>
+                                                        <TableCell className="text-destructive">
+                                                            {err.message}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
                                             </TableBody>
                                         </Table>
                                     </div>
@@ -266,7 +268,7 @@ export default function ImportDialog({
                                                 {previewColumns.map((col) => (
                                                     <TableHead
                                                         key={col}
-                                                        className="whitespace-nowrap font-mono text-xs"
+                                                        className="font-mono text-xs whitespace-nowrap"
                                                     >
                                                         {col}
                                                     </TableHead>
@@ -280,7 +282,7 @@ export default function ImportDialog({
                                                         (col) => (
                                                             <TableCell
                                                                 key={col}
-                                                                className="whitespace-nowrap text-xs"
+                                                                className="text-xs whitespace-nowrap"
                                                             >
                                                                 {String(
                                                                     row[col] ??

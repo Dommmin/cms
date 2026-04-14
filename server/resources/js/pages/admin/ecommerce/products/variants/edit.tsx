@@ -13,7 +13,13 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
-import type { PriceTier, Product, TaxRate, Variant, VariantAttribute } from './edit.types';
+import type {
+    PriceTier,
+    Product,
+    TaxRate,
+    Variant,
+    VariantAttribute,
+} from './edit.types';
 
 export default function EditVariant({
     product,
@@ -36,16 +42,27 @@ export default function EditVariant({
         price: t.price / 100,
     }));
 
-    const { data, setData, post, processing: tierProcessing, errors: tierErrors } = useForm<{
-        tiers: Array<{ min_quantity: number | ''; max_quantity: number | null | ''; price: number | '' }>;
+    const {
+        data,
+        setData,
+        post,
+        processing: tierProcessing,
+        errors: tierErrors,
+    } = useForm<{
+        tiers: Array<{
+            min_quantity: number | '';
+            max_quantity: number | null | '';
+            price: number | '';
+        }>;
     }>({
-        tiers: initialTiers.length > 0
-            ? initialTiers.map((t) => ({
-                  min_quantity: t.min_quantity,
-                  max_quantity: t.max_quantity,
-                  price: t.price,
-              }))
-            : [],
+        tiers:
+            initialTiers.length > 0
+                ? initialTiers.map((t) => ({
+                      min_quantity: t.min_quantity,
+                      max_quantity: t.max_quantity,
+                      price: t.price,
+                  }))
+                : [],
     });
 
     function addTier(): void {
@@ -70,7 +87,10 @@ export default function EditVariant({
         const updated = data.tiers.map((tier, i) => {
             if (i !== index) return tier;
             if (field === 'max_quantity') {
-                return { ...tier, max_quantity: value === '' ? null : Number(value) };
+                return {
+                    ...tier,
+                    max_quantity: value === '' ? null : Number(value),
+                };
             }
             return { ...tier, [field]: value === '' ? '' : Number(value) };
         });
@@ -80,7 +100,10 @@ export default function EditVariant({
     function submitTiers(e: React.FormEvent): void {
         e.preventDefault();
         post(
-            ProductVariantController.savePriceTiers.url([product.id, variant.id]),
+            ProductVariantController.savePriceTiers.url([
+                product.id,
+                variant.id,
+            ]),
         );
     }
     const productName = resolveLocalizedText(product.name);
@@ -443,7 +466,10 @@ export default function EditVariant({
                     )}
                 </Form>
                 {/* Tiered Pricing */}
-                <form onSubmit={submitTiers} className="space-y-4 rounded-xl border bg-card p-6">
+                <form
+                    onSubmit={submitTiers}
+                    className="space-y-4 rounded-xl border bg-card p-6"
+                >
                     <div>
                         <h2 className="text-base font-semibold">
                             Tiered Pricing (Quantity-Based)
@@ -458,59 +484,106 @@ export default function EditVariant({
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b text-left text-xs text-muted-foreground">
-                                        <th className="pb-2 pr-4 font-medium">Min Qty</th>
-                                        <th className="pb-2 pr-4 font-medium">Max Qty</th>
-                                        <th className="pb-2 pr-4 font-medium">Price (PLN)</th>
+                                        <th className="pr-4 pb-2 font-medium">
+                                            Min Qty
+                                        </th>
+                                        <th className="pr-4 pb-2 font-medium">
+                                            Max Qty
+                                        </th>
+                                        <th className="pr-4 pb-2 font-medium">
+                                            Price (PLN)
+                                        </th>
                                         <th className="pb-2 font-medium"></th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y">
                                     {data.tiers.map((tier, index) => (
                                         <tr key={index} className="py-2">
-                                            <td className="pr-4 py-2">
+                                            <td className="py-2 pr-4">
                                                 <Input
                                                     type="number"
                                                     min="1"
                                                     value={tier.min_quantity}
                                                     onChange={(e) =>
-                                                        updateTier(index, 'min_quantity', e.target.value)
+                                                        updateTier(
+                                                            index,
+                                                            'min_quantity',
+                                                            e.target.value,
+                                                        )
                                                     }
                                                     className="w-24"
                                                     placeholder="1"
                                                 />
                                                 <InputError
-                                                    message={(tierErrors as Record<string, string>)[`tiers.${index}.min_quantity`]}
+                                                    message={
+                                                        (
+                                                            tierErrors as Record<
+                                                                string,
+                                                                string
+                                                            >
+                                                        )[
+                                                            `tiers.${index}.min_quantity`
+                                                        ]
+                                                    }
                                                 />
                                             </td>
-                                            <td className="pr-4 py-2">
+                                            <td className="py-2 pr-4">
                                                 <Input
                                                     type="number"
                                                     min="1"
-                                                    value={tier.max_quantity ?? ''}
+                                                    value={
+                                                        tier.max_quantity ?? ''
+                                                    }
                                                     onChange={(e) =>
-                                                        updateTier(index, 'max_quantity', e.target.value)
+                                                        updateTier(
+                                                            index,
+                                                            'max_quantity',
+                                                            e.target.value,
+                                                        )
                                                     }
                                                     className="w-24"
                                                     placeholder="∞"
                                                 />
                                                 <InputError
-                                                    message={(tierErrors as Record<string, string>)[`tiers.${index}.max_quantity`]}
+                                                    message={
+                                                        (
+                                                            tierErrors as Record<
+                                                                string,
+                                                                string
+                                                            >
+                                                        )[
+                                                            `tiers.${index}.max_quantity`
+                                                        ]
+                                                    }
                                                 />
                                             </td>
-                                            <td className="pr-4 py-2">
+                                            <td className="py-2 pr-4">
                                                 <Input
                                                     type="number"
                                                     step="0.01"
                                                     min="0"
                                                     value={tier.price}
                                                     onChange={(e) =>
-                                                        updateTier(index, 'price', e.target.value)
+                                                        updateTier(
+                                                            index,
+                                                            'price',
+                                                            e.target.value,
+                                                        )
                                                     }
                                                     className="w-32"
                                                     placeholder="0.00"
                                                 />
                                                 <InputError
-                                                    message={(tierErrors as Record<string, string>)[`tiers.${index}.price`]}
+                                                    message={
+                                                        (
+                                                            tierErrors as Record<
+                                                                string,
+                                                                string
+                                                            >
+                                                        )[
+                                                            `tiers.${index}.price`
+                                                        ]
+                                                    }
                                                 />
                                             </td>
                                             <td className="py-2">
@@ -518,7 +591,9 @@ export default function EditVariant({
                                                     type="button"
                                                     variant="ghost"
                                                     size="sm"
-                                                    onClick={() => removeTier(index)}
+                                                    onClick={() =>
+                                                        removeTier(index)
+                                                    }
                                                     aria-label="Remove tier"
                                                 >
                                                     <TrashIcon className="h-4 w-4 text-destructive" />
@@ -533,7 +608,8 @@ export default function EditVariant({
 
                     {data.tiers.length === 0 && (
                         <p className="text-sm text-muted-foreground">
-                            No tiers configured. Base variant price applies to all quantities.
+                            No tiers configured. Base variant price applies to
+                            all quantities.
                         </p>
                     )}
 
@@ -547,7 +623,11 @@ export default function EditVariant({
                             <PlusIcon className="mr-2 h-4 w-4" />
                             Add Tier
                         </Button>
-                        <Button type="submit" disabled={tierProcessing} size="sm">
+                        <Button
+                            type="submit"
+                            disabled={tierProcessing}
+                            size="sm"
+                        >
                             {tierProcessing ? 'Saving…' : 'Save Tiered Pricing'}
                         </Button>
                     </div>

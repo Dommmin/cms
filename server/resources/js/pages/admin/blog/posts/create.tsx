@@ -35,7 +35,10 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Create Post', href: BlogPostController.create.url() },
 ];
 
-export default function CreateBlogPost({ categories, available_tags }: CreateProps) {
+export default function CreateBlogPost({
+    categories,
+    available_tags,
+}: CreateProps) {
     const { locales } = usePage<{ locales: SharedLocale[] }>().props;
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
     const __ = useTranslation();
@@ -615,8 +618,7 @@ export default function CreateBlogPost({ categories, available_tags }: CreatePro
                                                 e.key === ','
                                             ) {
                                                 e.preventDefault();
-                                                const value =
-                                                    tagInput.trim();
+                                                const value = tagInput.trim();
                                                 if (
                                                     value &&
                                                     !data.tags.includes(value)
@@ -639,9 +641,7 @@ export default function CreateBlogPost({ categories, available_tags }: CreatePro
                                         {available_tags
                                             .filter(
                                                 (t) =>
-                                                    !data.tags.includes(
-                                                        t.name,
-                                                    ),
+                                                    !data.tags.includes(t.name),
                                             )
                                             .map((t) => (
                                                 <option

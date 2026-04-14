@@ -13,7 +13,11 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { CustomerEdit } from './edit.types';
 
-export default function CustomerEditPage({ customer }: { customer: CustomerEdit }) {
+export default function CustomerEditPage({
+    customer,
+}: {
+    customer: CustomerEdit;
+}) {
     const __ = useTranslation();
     const formId = 'customer-edit-form';
 
@@ -45,7 +49,9 @@ export default function CustomerEditPage({ customer }: { customer: CustomerEdit 
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href={CustomerController.show.url(customer.id)}>
+                            <Link
+                                href={CustomerController.show.url(customer.id)}
+                            >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>
@@ -120,12 +126,17 @@ export default function CustomerEditPage({ customer }: { customer: CustomerEdit 
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div className="grid gap-2">
                                     <Label htmlFor="company_name">
-                                        {__('label.company_name', 'Company Name')}
+                                        {__(
+                                            'label.company_name',
+                                            'Company Name',
+                                        )}
                                     </Label>
                                     <Input
                                         id="company_name"
                                         name="company_name"
-                                        defaultValue={customer.company_name ?? ''}
+                                        defaultValue={
+                                            customer.company_name ?? ''
+                                        }
                                     />
                                     <InputError message={errors.company_name} />
                                 </div>
@@ -153,7 +164,10 @@ export default function CustomerEditPage({ customer }: { customer: CustomerEdit 
                                     rows={4}
                                     maxLength={5000}
                                     defaultValue={customer.notes ?? ''}
-                                    placeholder={__('placeholder.notes', 'Internal notes about this customer...')}
+                                    placeholder={__(
+                                        'placeholder.notes',
+                                        'Internal notes about this customer...',
+                                    )}
                                     className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                 />
                                 <InputError message={errors.notes} />
@@ -168,7 +182,10 @@ export default function CustomerEditPage({ customer }: { customer: CustomerEdit 
                                     defaultChecked={customer.is_active}
                                     className="h-4 w-4 rounded border-input"
                                 />
-                                <Label htmlFor="is_active" className="font-normal">
+                                <Label
+                                    htmlFor="is_active"
+                                    className="font-normal"
+                                >
                                     {__('label.is_active', 'Active')}
                                 </Label>
                             </div>
@@ -176,7 +193,10 @@ export default function CustomerEditPage({ customer }: { customer: CustomerEdit 
                             <StickyFormActions
                                 formId={formId}
                                 processing={processing}
-                                submitLabel={__('action.save_changes', 'Save Changes')}
+                                submitLabel={__(
+                                    'action.save_changes',
+                                    'Save Changes',
+                                )}
                             />
                         </>
                     )}

@@ -26,8 +26,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function CreateReport({ dataSources, metrics }: FormProps) {
-    const { data, setData, post, processing, errors } =
-        useForm<ReportFormData>({
+    const { data, setData, post, processing, errors } = useForm<ReportFormData>(
+        {
             name: '',
             description: '',
             data_source: dataSources[0]?.key ?? 'orders',
@@ -37,7 +37,8 @@ export default function CreateReport({ dataSources, metrics }: FormProps) {
             group_by: [],
             chart_type: 'table',
             is_public: false,
-        });
+        },
+    );
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -71,10 +72,7 @@ export default function CreateReport({ dataSources, metrics }: FormProps) {
                     </PageHeaderActions>
                 </PageHeader>
 
-                <form
-                    onSubmit={handleSubmit}
-                    className="max-w-2xl space-y-6"
-                >
+                <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
                     <div className="grid gap-2">
                         <Label htmlFor="name">Name *</Label>
                         <Input

@@ -475,10 +475,7 @@ export default function Edit({
                             {/* Delivery Time */}
                             <div className="space-y-4 rounded-xl border bg-card p-6">
                                 <h2 className="font-semibold">
-                                    {__(
-                                        'misc.delivery_time',
-                                        'Delivery Time',
-                                    )}
+                                    {__('misc.delivery_time', 'Delivery Time')}
                                 </h2>
 
                                 <div className="grid grid-cols-2 gap-4">
@@ -503,9 +500,7 @@ export default function Edit({
                                             placeholder="e.g. 1"
                                         />
                                         <InputError
-                                            message={
-                                                errors.estimated_days_min
-                                            }
+                                            message={errors.estimated_days_min}
                                         />
                                     </div>
 
@@ -530,9 +525,7 @@ export default function Edit({
                                             placeholder="e.g. 3"
                                         />
                                         <InputError
-                                            message={
-                                                errors.estimated_days_max
-                                            }
+                                            message={errors.estimated_days_max}
                                         />
                                     </div>
                                 </div>
@@ -801,8 +794,7 @@ export default function Edit({
                                         </div>
                                     )}
                                 </dl>
-                                {(requiresSignature ||
-                                    insuranceAvailable) && (
+                                {(requiresSignature || insuranceAvailable) && (
                                     <div className="mt-3 flex flex-wrap gap-1.5">
                                         {requiresSignature && (
                                             <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">

@@ -114,9 +114,7 @@ export default function Create() {
                     className="max-w-2xl space-y-6"
                 >
                     <div className="grid gap-2">
-                        <Label htmlFor="name">
-                            {__('label.name', 'Name')}
-                        </Label>
+                        <Label htmlFor="name">{__('label.name', 'Name')}</Label>
                         <Input
                             id="name"
                             name="name"
@@ -146,9 +144,7 @@ export default function Create() {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="type">
-                            {__('label.type', 'Type')}
-                        </Label>
+                        <Label htmlFor="type">{__('label.type', 'Type')}</Label>
                         <select
                             id="type"
                             name="type"
@@ -187,7 +183,7 @@ export default function Create() {
                             </div>
 
                             {data.rules.length === 0 && (
-                                <p className="text-muted-foreground text-sm">
+                                <p className="text-sm text-muted-foreground">
                                     No rules yet. Add a rule to filter customers
                                     automatically.
                                 </p>

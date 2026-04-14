@@ -19,7 +19,10 @@ export default function Edit({ flashSale, products }: Required<FormPageProps>) {
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Flash Sales', href: FlashSaleController.index.url() },
-        { title: 'Edit Flash Sale', href: FlashSaleController.edit.url(flashSale.id!) },
+        {
+            title: 'Edit Flash Sale',
+            href: FlashSaleController.edit.url(flashSale.id!),
+        },
     ];
 
     // Convert ISO datetime to datetime-local format
@@ -36,7 +39,11 @@ export default function Edit({ flashSale, products }: Required<FormPageProps>) {
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href={FlashSaleController.index.url()} prefetch cacheFor={30}>
+                            <Link
+                                href={FlashSaleController.index.url()}
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>
@@ -74,7 +81,9 @@ export default function Edit({ flashSale, products }: Required<FormPageProps>) {
                                     defaultValue={flashSale.product_id}
                                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                                 >
-                                    <option value="">— Select a product —</option>
+                                    <option value="">
+                                        — Select a product —
+                                    </option>
                                     {products.map((p) => (
                                         <option key={p.id} value={p.id}>
                                             {p.name}
@@ -98,7 +107,8 @@ export default function Edit({ flashSale, products }: Required<FormPageProps>) {
                                     defaultValue={flashSale.sale_price}
                                 />
                                 <p className="text-xs text-muted-foreground">
-                                    Enter price in grosze (cents). 9900 = 99.00 PLN.
+                                    Enter price in grosze (cents). 9900 = 99.00
+                                    PLN.
                                 </p>
                                 <InputError message={errors.sale_price} />
                             </div>
@@ -111,7 +121,9 @@ export default function Edit({ flashSale, products }: Required<FormPageProps>) {
                                         name="starts_at"
                                         type="datetime-local"
                                         required
-                                        defaultValue={toDatetimeLocal(flashSale.starts_at)}
+                                        defaultValue={toDatetimeLocal(
+                                            flashSale.starts_at,
+                                        )}
                                     />
                                     <InputError message={errors.starts_at} />
                                 </div>
@@ -123,7 +135,9 @@ export default function Edit({ flashSale, products }: Required<FormPageProps>) {
                                         name="ends_at"
                                         type="datetime-local"
                                         required
-                                        defaultValue={toDatetimeLocal(flashSale.ends_at)}
+                                        defaultValue={toDatetimeLocal(
+                                            flashSale.ends_at,
+                                        )}
                                     />
                                     <InputError message={errors.ends_at} />
                                 </div>
@@ -139,7 +153,9 @@ export default function Edit({ flashSale, products }: Required<FormPageProps>) {
                                     type="number"
                                     min="1"
                                     placeholder="Unlimited"
-                                    defaultValue={flashSale.stock_limit ?? undefined}
+                                    defaultValue={
+                                        flashSale.stock_limit ?? undefined
+                                    }
                                 />
                                 <InputError message={errors.stock_limit} />
                             </div>
@@ -153,7 +169,10 @@ export default function Edit({ flashSale, products }: Required<FormPageProps>) {
                                     defaultChecked={flashSale.is_active}
                                     className="h-4 w-4 rounded border-input"
                                 />
-                                <Label htmlFor="is_active" className="font-normal">
+                                <Label
+                                    htmlFor="is_active"
+                                    className="font-normal"
+                                >
                                     {__('label.is_active', 'Active')}
                                 </Label>
                             </div>
@@ -161,7 +180,10 @@ export default function Edit({ flashSale, products }: Required<FormPageProps>) {
                             <StickyFormActions
                                 formId={formId}
                                 processing={processing}
-                                submitLabel={__('action.save_changes', 'Save Changes')}
+                                submitLabel={__(
+                                    'action.save_changes',
+                                    'Save Changes',
+                                )}
                             />
                         </>
                     )}

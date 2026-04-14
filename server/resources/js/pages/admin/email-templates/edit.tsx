@@ -1,5 +1,10 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import { ArrowLeftIcon, ClipboardCopyIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
+import {
+    ArrowLeftIcon,
+    ClipboardCopyIcon,
+    EyeIcon,
+    EyeOffIcon,
+} from 'lucide-react';
 import { useState } from 'react';
 import * as EmailTemplateController from '@/actions/App/Http/Controllers/Admin/Ecommerce/EmailTemplateController';
 import InputError from '@/components/input-error';
@@ -182,40 +187,39 @@ export default function EmailTemplatesEdit({ template }: EditProps) {
                     </div>
 
                     <div className="space-y-4">
-                        {template.variables && template.variables.length > 0 && (
-                            <div className="rounded-lg border p-4">
-                                <h3 className="mb-3 text-sm font-semibold">
-                                    Available Variables
-                                </h3>
-                                <p className="mb-3 text-xs text-muted-foreground">
-                                    Click a variable to copy it to your
-                                    clipboard.
-                                </p>
-                                <div className="flex flex-wrap gap-2">
-                                    {template.variables.map((variable) => (
-                                        <button
-                                            key={variable}
-                                            type="button"
-                                            onClick={() => {
-                                                navigator.clipboard.writeText(
-                                                    variable,
-                                                );
-                                            }}
-                                            className="inline-flex items-center gap-1 rounded bg-muted px-2 py-0.5 font-mono text-xs transition-colors hover:bg-muted/70"
-                                            title={`Click to copy ${variable}`}
-                                        >
-                                            <ClipboardCopyIcon className="h-3 w-3" />
-                                            {variable}
-                                        </button>
-                                    ))}
+                        {template.variables &&
+                            template.variables.length > 0 && (
+                                <div className="rounded-lg border p-4">
+                                    <h3 className="mb-3 text-sm font-semibold">
+                                        Available Variables
+                                    </h3>
+                                    <p className="mb-3 text-xs text-muted-foreground">
+                                        Click a variable to copy it to your
+                                        clipboard.
+                                    </p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {template.variables.map((variable) => (
+                                            <button
+                                                key={variable}
+                                                type="button"
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(
+                                                        variable,
+                                                    );
+                                                }}
+                                                className="inline-flex items-center gap-1 rounded bg-muted px-2 py-0.5 font-mono text-xs transition-colors hover:bg-muted/70"
+                                                title={`Click to copy ${variable}`}
+                                            >
+                                                <ClipboardCopyIcon className="h-3 w-3" />
+                                                {variable}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
                         <div className="rounded-lg border p-4">
-                            <h3 className="mb-2 text-sm font-semibold">
-                                Tips
-                            </h3>
+                            <h3 className="mb-2 text-sm font-semibold">Tips</h3>
                             <ul className="space-y-1 text-xs text-muted-foreground">
                                 <li>
                                     Use variables in both the subject line and

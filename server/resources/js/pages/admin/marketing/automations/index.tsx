@@ -40,18 +40,28 @@ const TRIGGER_DESCRIPTIONS: Record<string, string> = {
     product_purchased: 'Sends after a specific product is purchased',
 };
 
-function TriggerCell({ trigger, triggerLabel }: { trigger: string | null; triggerLabel: string | null }) {
+function TriggerCell({
+    trigger,
+    triggerLabel,
+}: {
+    trigger: string | null;
+    triggerLabel: string | null;
+}) {
     if (!trigger) {
-        return <span className="text-muted-foreground text-sm">—</span>;
+        return <span className="text-sm text-muted-foreground">—</span>;
     }
 
     const description = TRIGGER_DESCRIPTIONS[trigger];
 
     return (
         <div>
-            <span className="text-sm font-medium">{triggerLabel ?? trigger}</span>
+            <span className="text-sm font-medium">
+                {triggerLabel ?? trigger}
+            </span>
             {description && (
-                <p className="text-muted-foreground mt-0.5 text-xs">{description}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                    {description}
+                </p>
             )}
         </div>
     );
@@ -94,14 +104,16 @@ export default function AutomationsIndex({ campaigns }: IndexProps) {
             accessorKey: 'total_sent',
             header: 'Emails Sent',
             cell: ({ row }) => (
-                <span className="text-sm">{row.original.total_sent.toLocaleString()}</span>
+                <span className="text-sm">
+                    {row.original.total_sent.toLocaleString()}
+                </span>
             ),
         },
         {
             accessorKey: 'created_at',
             header: 'Created',
             cell: ({ row }) => (
-                <span className="text-muted-foreground text-sm">
+                <span className="text-sm text-muted-foreground">
                     {new Date(row.original.created_at).toLocaleDateString()}
                 </span>
             ),
@@ -112,13 +124,19 @@ export default function AutomationsIndex({ campaigns }: IndexProps) {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                        <Link href={AutomationController.edit.url(row.original.id)}>
+                        <Link
+                            href={AutomationController.edit.url(
+                                row.original.id,
+                            )}
+                        >
                             Edit
                         </Link>
                     </Button>
 
                     <Form
-                        action={AutomationController.toggle.url(row.original.id)}
+                        action={AutomationController.toggle.url(
+                            row.original.id,
+                        )}
                         method="post"
                     >
                         {({ processing }) => (
@@ -127,7 +145,11 @@ export default function AutomationsIndex({ campaigns }: IndexProps) {
                                 variant="ghost"
                                 size="sm"
                                 disabled={processing}
-                                title={row.original.status === 'ready' ? 'Set to Draft' : 'Set to Ready'}
+                                title={
+                                    row.original.status === 'ready'
+                                        ? 'Set to Draft'
+                                        : 'Set to Ready'
+                                }
                             >
                                 <PowerIcon className="h-4 w-4" />
                             </Button>
@@ -135,7 +157,9 @@ export default function AutomationsIndex({ campaigns }: IndexProps) {
                     </Form>
 
                     <Form
-                        action={AutomationController.destroy.url(row.original.id)}
+                        action={AutomationController.destroy.url(
+                            row.original.id,
+                        )}
                         method="delete"
                         onBefore={() => confirm('Delete this automation?')}
                     >

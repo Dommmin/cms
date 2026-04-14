@@ -1,5 +1,11 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeftIcon, EditIcon, MapPinIcon, ShoppingBagIcon, UserCircleIcon } from 'lucide-react';
+import {
+    ArrowLeftIcon,
+    EditIcon,
+    MapPinIcon,
+    ShoppingBagIcon,
+    UserCircleIcon,
+} from 'lucide-react';
 import * as CustomerController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CustomerController';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -48,7 +54,8 @@ function StatCard({ label, value }: { label: string; value: string }) {
 }
 
 function OrderRow({ order }: { order: OrderSummary }) {
-    const color = ORDER_STATUS_COLORS[order.status] ?? 'bg-gray-100 text-gray-700';
+    const color =
+        ORDER_STATUS_COLORS[order.status] ?? 'bg-gray-100 text-gray-700';
     return (
         <tr className="border-b border-border last:border-0">
             <td className="px-4 py-3 font-mono text-sm">
@@ -93,7 +100,11 @@ function AddressCard({ address }: { address: Address }) {
     );
 }
 
-export default function CustomerShowPage({ customer }: { customer: CustomerShow }) {
+export default function CustomerShowPage({
+    customer,
+}: {
+    customer: CustomerShow;
+}) {
     const __ = useTranslation();
 
     const fullName = `${customer.first_name} ${customer.last_name}`.trim();
@@ -129,13 +140,19 @@ export default function CustomerShowPage({ customer }: { customer: CustomerShow 
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href={CustomerController.index.url()} prefetch cacheFor={30}>
+                            <Link
+                                href={CustomerController.index.url()}
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>
                         </Button>
                         <Button asChild>
-                            <Link href={CustomerController.edit.url(customer.id)}>
+                            <Link
+                                href={CustomerController.edit.url(customer.id)}
+                            >
                                 <EditIcon className="mr-2 h-4 w-4" />
                                 {__('action.edit', 'Edit')}
                             </Link>
@@ -147,7 +164,9 @@ export default function CustomerShowPage({ customer }: { customer: CustomerShow 
                 <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                     <UserCircleIcon className="h-4 w-4" />
                     {customer.phone && <span>{customer.phone}</span>}
-                    {customer.company_name && <span>{customer.company_name}</span>}
+                    {customer.company_name && (
+                        <span>{customer.company_name}</span>
+                    )}
                     {customer.tax_id && <span>NIP: {customer.tax_id}</span>}
                     <span
                         className={cn(
@@ -191,7 +210,10 @@ export default function CustomerShowPage({ customer }: { customer: CustomerShow 
                     {/* LTV section */}
                     <div className="rounded-xl border border-border p-5">
                         <h2 className="mb-4 font-semibold">
-                            {__('misc.lifetime_value', 'Lifetime Value (delivered orders)')}
+                            {__(
+                                'misc.lifetime_value',
+                                'Lifetime Value (delivered orders)',
+                            )}
                         </h2>
                         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                             <div>
@@ -229,7 +251,10 @@ export default function CustomerShowPage({ customer }: { customer: CustomerShow 
                                 <div className="flex items-center gap-2 border-b border-border px-5 py-3">
                                     <ShoppingBagIcon className="h-4 w-4 text-muted-foreground" />
                                     <h2 className="font-semibold">
-                                        {__('misc.recent_orders', 'Recent Orders')}
+                                        {__(
+                                            'misc.recent_orders',
+                                            'Recent Orders',
+                                        )}
                                     </h2>
                                 </div>
                                 {customer.orders.length === 0 ? (
@@ -241,13 +266,22 @@ export default function CustomerShowPage({ customer }: { customer: CustomerShow 
                                         <thead className="bg-muted/40 text-xs text-muted-foreground">
                                             <tr>
                                                 <th className="px-4 py-2.5 text-left font-medium">
-                                                    {__('column.reference', 'Reference')}
+                                                    {__(
+                                                        'column.reference',
+                                                        'Reference',
+                                                    )}
                                                 </th>
                                                 <th className="px-4 py-2.5 text-left font-medium">
-                                                    {__('column.status', 'Status')}
+                                                    {__(
+                                                        'column.status',
+                                                        'Status',
+                                                    )}
                                                 </th>
                                                 <th className="px-4 py-2.5 text-right font-medium">
-                                                    {__('column.total', 'Total')}
+                                                    {__(
+                                                        'column.total',
+                                                        'Total',
+                                                    )}
                                                 </th>
                                                 <th className="px-4 py-2.5 text-right font-medium">
                                                     {__('column.date', 'Date')}
@@ -256,7 +290,10 @@ export default function CustomerShowPage({ customer }: { customer: CustomerShow 
                                         </thead>
                                         <tbody>
                                             {customer.orders.map((order) => (
-                                                <OrderRow key={order.id} order={order} />
+                                                <OrderRow
+                                                    key={order.id}
+                                                    order={order}
+                                                />
                                             ))}
                                         </tbody>
                                     </table>
@@ -268,20 +305,35 @@ export default function CustomerShowPage({ customer }: { customer: CustomerShow 
                                 <h2 className="mb-3 font-semibold">
                                     {__('misc.admin_notes', 'Admin Notes')}
                                 </h2>
-                                <form onSubmit={saveNotes} className="space-y-3">
+                                <form
+                                    onSubmit={saveNotes}
+                                    className="space-y-3"
+                                >
                                     <textarea
                                         value={data.notes}
-                                        onChange={(e) => setData('notes', e.target.value)}
+                                        onChange={(e) =>
+                                            setData('notes', e.target.value)
+                                        }
                                         rows={4}
                                         maxLength={5000}
-                                        placeholder={__('placeholder.notes', 'Internal notes about this customer...')}
+                                        placeholder={__(
+                                            'placeholder.notes',
+                                            'Internal notes about this customer...',
+                                        )}
                                         className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
                                     />
                                     <div className="flex justify-end">
-                                        <Button type="submit" disabled={processing} size="sm">
+                                        <Button
+                                            type="submit"
+                                            disabled={processing}
+                                            size="sm"
+                                        >
                                             {processing
                                                 ? __('misc.saving', 'Saving...')
-                                                : __('action.save', 'Save Notes')}
+                                                : __(
+                                                      'action.save',
+                                                      'Save Notes',
+                                                  )}
                                         </Button>
                                     </div>
                                 </form>
@@ -299,12 +351,18 @@ export default function CustomerShowPage({ customer }: { customer: CustomerShow 
                                 </div>
                                 {customer.addresses.length === 0 ? (
                                     <p className="text-sm text-muted-foreground">
-                                        {__('misc.no_addresses', 'No addresses saved.')}
+                                        {__(
+                                            'misc.no_addresses',
+                                            'No addresses saved.',
+                                        )}
                                     </p>
                                 ) : (
                                     <div className="space-y-2">
                                         {customer.addresses.map((address) => (
-                                            <AddressCard key={address.id} address={address} />
+                                            <AddressCard
+                                                key={address.id}
+                                                address={address}
+                                            />
                                         ))}
                                     </div>
                                 )}

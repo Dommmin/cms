@@ -114,9 +114,7 @@ export default function Edit({ segment }: Required<FormProps>) {
                     className="max-w-2xl space-y-6"
                 >
                     <div className="grid gap-2">
-                        <Label htmlFor="name">
-                            {__('label.name', 'Name')}
-                        </Label>
+                        <Label htmlFor="name">{__('label.name', 'Name')}</Label>
                         <Input
                             id="name"
                             name="name"
@@ -146,9 +144,7 @@ export default function Edit({ segment }: Required<FormProps>) {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="type">
-                            {__('label.type', 'Type')}
-                        </Label>
+                        <Label htmlFor="type">{__('label.type', 'Type')}</Label>
                         <select
                             id="type"
                             name="type"
@@ -187,7 +183,7 @@ export default function Edit({ segment }: Required<FormProps>) {
                             </div>
 
                             {data.rules.length === 0 && (
-                                <p className="text-muted-foreground text-sm">
+                                <p className="text-sm text-muted-foreground">
                                     No rules yet. Add a rule to filter customers
                                     automatically.
                                 </p>
@@ -296,10 +292,7 @@ export default function Edit({ segment }: Required<FormProps>) {
                     <StickyFormActions
                         formId={formId}
                         processing={processing}
-                        submitLabel={__(
-                            'action.save_changes',
-                            'Save Changes',
-                        )}
+                        submitLabel={__('action.save_changes', 'Save Changes')}
                     />
                 </form>
             </Wrapper>

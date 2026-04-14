@@ -19,8 +19,14 @@ export default function Edit({ automation, triggers }: EditPageProps) {
     const formId = 'automation-edit-form';
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Marketing Automations', href: AutomationController.index.url() },
-        { title: 'Edit Automation', href: AutomationController.edit.url(automation.id!) },
+        {
+            title: 'Marketing Automations',
+            href: AutomationController.index.url(),
+        },
+        {
+            title: 'Edit Automation',
+            href: AutomationController.edit.url(automation.id!),
+        },
     ];
 
     return (
@@ -34,9 +40,15 @@ export default function Edit({ automation, triggers }: EditPageProps) {
                 >
                     <PageHeaderActions>
                         <Form
-                            action={AutomationController.destroy.url(automation.id!)}
+                            action={AutomationController.destroy.url(
+                                automation.id!,
+                            )}
                             method="delete"
-                            onBefore={() => confirm('Are you sure you want to delete this automation?')}
+                            onBefore={() =>
+                                confirm(
+                                    'Are you sure you want to delete this automation?',
+                                )
+                            }
                         >
                             {({ processing }) => (
                                 <Button
@@ -89,7 +101,9 @@ export default function Edit({ automation, triggers }: EditPageProps) {
                                     defaultValue={automation.trigger}
                                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                                 >
-                                    <option value="">— Select a trigger —</option>
+                                    <option value="">
+                                        — Select a trigger —
+                                    </option>
                                     {triggers.map((t) => (
                                         <option key={t.value} value={t.value}>
                                             {t.label}
@@ -140,7 +154,10 @@ export default function Edit({ automation, triggers }: EditPageProps) {
                             <StickyFormActions
                                 formId={formId}
                                 processing={processing}
-                                submitLabel={__('action.save_changes', 'Save Changes')}
+                                submitLabel={__(
+                                    'action.save_changes',
+                                    'Save Changes',
+                                )}
                             />
                         </>
                     )}

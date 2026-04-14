@@ -9,9 +9,7 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { AnalyticsProps } from './analytics.types';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Search Analytics', href: '' },
-];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Search Analytics', href: '' }];
 
 const PERIOD_OPTIONS = [
     { label: '7 days', value: 7 },
@@ -61,7 +59,7 @@ export default function SearchAnalytics({
                 {/* Stat cards */}
                 <div className="mb-8 grid gap-4 sm:grid-cols-3">
                     <div className="rounded-xl border bg-card p-5">
-                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                             Total Searches
                         </p>
                         <p className="mt-2 text-3xl font-bold">
@@ -69,7 +67,7 @@ export default function SearchAnalytics({
                         </p>
                     </div>
                     <div className="rounded-xl border bg-card p-5">
-                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                             Unique Queries
                         </p>
                         <p className="mt-2 text-3xl font-bold">
@@ -77,7 +75,7 @@ export default function SearchAnalytics({
                         </p>
                     </div>
                     <div className="rounded-xl border bg-card p-5">
-                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                             Zero-result Rate
                         </p>
                         <p className="mt-2 text-3xl font-bold">
@@ -98,7 +96,9 @@ export default function SearchAnalytics({
                         {topQueries.length === 0 ? (
                             <div className="flex flex-col items-center gap-2 p-10 text-center text-muted-foreground">
                                 <SearchIcon className="h-8 w-8 opacity-30" />
-                                <p className="text-sm">No searches recorded yet.</p>
+                                <p className="text-sm">
+                                    No searches recorded yet.
+                                </p>
                             </div>
                         ) : (
                             <div className="overflow-x-auto">
@@ -157,7 +157,9 @@ export default function SearchAnalytics({
                         {zeroResults.length === 0 ? (
                             <div className="flex flex-col items-center gap-2 p-10 text-center text-muted-foreground">
                                 <SearchIcon className="h-8 w-8 opacity-30" />
-                                <p className="text-sm">No zero-result queries.</p>
+                                <p className="text-sm">
+                                    No zero-result queries.
+                                </p>
                             </div>
                         ) : (
                             <div className="overflow-x-auto">

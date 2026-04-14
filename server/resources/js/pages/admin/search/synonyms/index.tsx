@@ -17,9 +17,7 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { SearchSynonym } from './synonyms.types';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Search Synonyms', href: '' },
-];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Search Synonyms', href: '' }];
 
 export default function SynonymsIndex({
     synonyms,
@@ -66,7 +64,8 @@ export default function SynonymsIndex({
                                         colSpan={4}
                                         className="py-8 text-center text-muted-foreground"
                                     >
-                                        No synonyms yet. Add one to improve search.
+                                        No synonyms yet. Add one to improve
+                                        search.
                                     </TableCell>
                                 </TableRow>
                             )}

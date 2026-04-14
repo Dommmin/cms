@@ -46,7 +46,9 @@ export default function CustomersIndex({ customers, filters }: IndexProps) {
                             header: __('column.customer', 'Customer'),
                             cell: ({ row }) => (
                                 <Link
-                                    href={CustomerController.show.url(row.original.id)}
+                                    href={CustomerController.show.url(
+                                        row.original.id,
+                                    )}
                                     className="flex items-center gap-2 hover:underline"
                                 >
                                     <div className="flex h-8 w-8 items-center justify-center rounded bg-indigo-100">

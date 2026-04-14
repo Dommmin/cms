@@ -32,7 +32,11 @@ import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
 import type { EditProps, FormData } from './edit.types';
 
-export default function EditBlogPost({ post, categories, available_tags }: EditProps) {
+export default function EditBlogPost({
+    post,
+    categories,
+    available_tags,
+}: EditProps) {
     const { frontendUrl, locales } = usePage().props as {
         frontendUrl: string;
         locales: SharedLocale[];
@@ -629,9 +633,7 @@ export default function EditBlogPost({ post, categories, available_tags }: EditP
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label>
-                                        {__('label.tags', 'Tags')}
-                                    </Label>
+                                    <Label>{__('label.tags', 'Tags')}</Label>
                                     {data.tags.length > 0 && (
                                         <div className="flex flex-wrap gap-1">
                                             {data.tags.map((tag) => (
@@ -646,7 +648,9 @@ export default function EditBlogPost({ post, categories, available_tags }: EditP
                                                             setData((prev) => ({
                                                                 ...prev,
                                                                 tags: prev.tags.filter(
-                                                                    (t) => t !== tag,
+                                                                    (t) =>
+                                                                        t !==
+                                                                        tag,
                                                                 ),
                                                             }))
                                                         }
@@ -671,8 +675,7 @@ export default function EditBlogPost({ post, categories, available_tags }: EditP
                                                 e.key === ','
                                             ) {
                                                 e.preventDefault();
-                                                const value =
-                                                    tagInput.trim();
+                                                const value = tagInput.trim();
                                                 if (
                                                     value &&
                                                     !data.tags.includes(value)
@@ -688,16 +691,17 @@ export default function EditBlogPost({ post, categories, available_tags }: EditP
                                                 setTagInput('');
                                             }
                                         }}
-                                        placeholder={__('placeholder.add_tag', 'Add tag and press Enter')}
+                                        placeholder={__(
+                                            'placeholder.add_tag',
+                                            'Add tag and press Enter',
+                                        )}
                                         list="available-tags-list"
                                     />
                                     <datalist id="available-tags-list">
                                         {available_tags
                                             .filter(
                                                 (t) =>
-                                                    !data.tags.includes(
-                                                        t.name,
-                                                    ),
+                                                    !data.tags.includes(t.name),
                                             )
                                             .map((t) => (
                                                 <option

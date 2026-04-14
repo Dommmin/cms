@@ -444,10 +444,7 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
                             {/* Delivery Time */}
                             <div className="space-y-4 rounded-xl border bg-card p-6">
                                 <h2 className="font-semibold">
-                                    {__(
-                                        'misc.delivery_time',
-                                        'Delivery Time',
-                                    )}
+                                    {__('misc.delivery_time', 'Delivery Time')}
                                 </h2>
 
                                 <div className="grid grid-cols-2 gap-4">
@@ -472,9 +469,7 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
                                             placeholder="e.g. 1"
                                         />
                                         <InputError
-                                            message={
-                                                errors.estimated_days_min
-                                            }
+                                            message={errors.estimated_days_min}
                                         />
                                     </div>
 
@@ -499,9 +494,7 @@ export default function Create({ carriers }: { carriers: Carrier[] }) {
                                             placeholder="e.g. 3"
                                         />
                                         <InputError
-                                            message={
-                                                errors.estimated_days_max
-                                            }
+                                            message={errors.estimated_days_max}
                                         />
                                     </div>
                                 </div>
