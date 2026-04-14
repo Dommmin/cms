@@ -1,11 +1,4 @@
 export type Category = { id: number; name: string; slug: string };
-
-export type CollectionRule = {
-    field: string;
-    condition: string;
-    value: string;
-};
-
 export type CategoryEditProps = {
     id: number;
     name: Record<string, string>;
@@ -13,9 +6,6 @@ export type CategoryEditProps = {
     description?: Record<string, string>;
     parent_id?: number | null;
     is_active: boolean;
-    collection_type: 'manual' | 'smart';
-    rules: CollectionRule[];
-    rules_match: 'all' | 'any';
     seo_title?: string | null;
     seo_description?: string | null;
     meta_robots?: string | null;

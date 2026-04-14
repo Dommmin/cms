@@ -33,13 +33,6 @@ class UpdateCategoryRequest extends FormRequest
             'description.*' => ['nullable', 'string'],
             'parent_id' => ['nullable', 'exists:categories,id'],
             'is_active' => ['boolean'],
-            'collection_type' => ['sometimes', 'string', 'in:manual,smart'],
-            'rules' => ['nullable', 'array'],
-            'rules.*' => ['nullable', 'array'],
-            'rules.*.field' => ['nullable', 'string'],
-            'rules.*.condition' => ['nullable', 'string'],
-            'rules.*.value' => ['nullable'],
-            'rules_match' => ['sometimes', 'string', 'in:all,any'],
         ];
     }
 

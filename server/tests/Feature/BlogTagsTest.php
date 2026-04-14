@@ -70,7 +70,7 @@ describe('Blog Tags', function (): void {
         $postId = $post->id;
         $post->delete();
 
-        $this->assertDatabaseMissing('taggables', ['taggable_type' => 'App\Models\BlogPost', 'taggable_id' => $postId]);
+        $this->assertDatabaseMissing('blog_post_tag', ['blog_post_id' => $postId]);
         $this->assertDatabaseHas('tags', ['slug' => 'persistent']);
     });
 

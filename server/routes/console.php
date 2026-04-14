@@ -13,7 +13,6 @@ Artisan::command('inspire', function (): void {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('blog:publish-scheduled')->everyMinute();
-Schedule::command('cms:process-scheduled-pages')->everyMinute();
 Schedule::command('activitylog:clean')->weekly();
 Schedule::command('cart:clean')->daily();
 Schedule::job(new SendAbandonedCartEmails)->hourly();

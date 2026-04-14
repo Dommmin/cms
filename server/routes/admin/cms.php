@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Http\Controllers\Admin\Cms\PageBuilderController;
 use App\Http\Controllers\Admin\Cms\PageController;
 use App\Http\Controllers\Admin\Cms\ReusableBlockController;
-use App\Http\Controllers\Admin\Cms\SectionTemplateController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('cms')->name('cms.')->group(function (): void {
@@ -34,17 +33,10 @@ Route::prefix('cms')->name('cms.')->group(function (): void {
     Route::get('pages/{page}/preview', [PageBuilderController::class, 'preview'])->name('pages.builder.preview');
     Route::get('pages/{page}/builder', [PageBuilderController::class, 'show'])->name('pages.builder');
     Route::put('pages/{page}/builder', [PageBuilderController::class, 'update'])->name('pages.builder.update');
-    Route::put('pages/{page}/builder/schedule', [PageBuilderController::class, 'schedule'])->name('pages.builder.schedule');
     Route::post('pages/{page}/builder/sections', [PageBuilderController::class, 'addSection'])->name('pages.builder.sections.add');
     Route::put('pages/{page}/builder/sections/{section}', [PageBuilderController::class, 'updateSection'])->name('pages.builder.sections.update');
     Route::delete('pages/{page}/builder/sections/{section}', [PageBuilderController::class, 'deleteSection'])->name('pages.builder.sections.delete');
     Route::post('pages/{page}/builder/sections/{section}/blocks', [PageBuilderController::class, 'addBlock'])->name('pages.builder.blocks.add');
     Route::put('pages/{page}/builder/sections/{section}/blocks/{block}', [PageBuilderController::class, 'updateBlock'])->name('pages.builder.blocks.update');
     Route::delete('pages/{page}/builder/sections/{section}/blocks/{block}', [PageBuilderController::class, 'deleteBlock'])->name('pages.builder.blocks.delete');
-
-    // Section Templates
-    Route::get('section-templates', [SectionTemplateController::class, 'index'])->name('section-templates.index');
-    Route::post('section-templates', [SectionTemplateController::class, 'store'])->name('section-templates.store');
-    Route::delete('section-templates/{sectionTemplate}', [SectionTemplateController::class, 'destroy'])->name('section-templates.destroy');
-    Route::post('section-templates/{sectionTemplate}/use', [SectionTemplateController::class, 'incrementUsage'])->name('section-templates.use');
 });

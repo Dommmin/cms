@@ -6,7 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
 /**
@@ -20,28 +20,10 @@ class Tag extends Model
 
     protected $fillable = ['name', 'slug'];
 
-    /** @return MorphToMany<BlogPost, $this> */
-    public function blogPosts(): MorphToMany
+    /** @return BelongsToMany<BlogPost, $this> */
+    public function blogPosts(): BelongsToMany
     {
-        return $this->morphedByMany(BlogPost::class, 'taggable');
-    }
-
-    /** @return MorphToMany<Product, $this> */
-    public function products(): MorphToMany
-    {
-        return $this->morphedByMany(Product::class, 'taggable');
-    }
-
-    /** @return MorphToMany<Category, $this> */
-    public function categories(): MorphToMany
-    {
-        return $this->morphedByMany(Category::class, 'taggable');
-    }
-
-    /** @return MorphToMany<Page, $this> */
-    public function pages(): MorphToMany
-    {
-        return $this->morphedByMany(Page::class, 'taggable');
+        return $this->belongsToMany(BlogPost::class);
     }
 
     protected static function booted(): void

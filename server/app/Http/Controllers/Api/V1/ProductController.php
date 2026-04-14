@@ -15,7 +15,6 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\FlashSale;
 use App\Models\Product;
-use App\Services\SmartCollectionService;
 use App\Sorts\RatingSort;
 use App\Sorts\VariantPriceSort;
 use Illuminate\Database\Eloquent\Builder;
@@ -284,15 +283,11 @@ class ProductController extends ApiController
         return $this->ok(ProductResource::collection($related));
     }
 
-    public function byCategory(string $slug, SmartCollectionService $smartCollectionService): AnonymousResourceCollection
+    public function byCategory(string $slug): AnonymousResourceCollection
     {
         $category = Category::query()->where('slug', $slug)->where('is_active', true)->firstOrFail();
 
-        $baseQuery = $category->isSmartCollection()
-            ? $smartCollectionService->buildQuery($category)
-            : Product::available()->whereHas('categories', fn ($q) => $q->where('categories.id', $category->id));
-
-        $products = QueryBuilder::for($baseQuery)
+        $products = QueryBuilder::for(Product::available()->whereHas('categories', fn ($q) => $q->where('categories.id', $category->id)))
             ->allowedFilters([
                 AllowedFilter::partial('name'),
                 AllowedFilter::custom('min_price', new MinPriceFilter),

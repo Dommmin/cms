@@ -7,7 +7,6 @@ import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { SeoPanel } from '@/components/seo-panel';
-import { SmartCollectionBuilder } from '@/components/smart-collection-builder';
 import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,16 +20,14 @@ import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
-import type { Category, CategoryEditProps, CollectionRule } from './edit.types';
+import type { Category, CategoryEditProps } from './edit.types';
 
 export default function Edit({
     category,
     categories = [],
-    smart_product_count = 0,
 }: {
     category: CategoryEditProps;
     categories?: Category[];
-    smart_product_count?: number;
 }) {
     const { locales, frontendUrl } = usePage().props as {
         locales: SharedLocale[];
@@ -53,15 +50,6 @@ export default function Edit({
     const [slug, setSlug] = useState(category.slug);
     const [isSlugManual, setIsSlugManual] = useState(
         category.slug !== slugify(category.name?.[defaultLocale] ?? ''),
-    );
-    const [collectionType, setCollectionType] = useState<'manual' | 'smart'>(
-        category.collection_type ?? 'manual',
-    );
-    const [rules, setRules] = useState<CollectionRule[]>(
-        category.rules ?? [],
-    );
-    const [rulesMatch, setRulesMatch] = useState<'all' | 'any'>(
-        category.rules_match ?? 'all',
     );
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
@@ -106,9 +94,6 @@ export default function Edit({
                 slug,
                 parent_id: parentId,
                 is_active: isActive,
-                collection_type: collectionType,
-                rules: collectionType === 'smart' ? rules : [],
-                rules_match: rulesMatch,
                 ...seoData,
             },
             {
@@ -380,59 +365,6 @@ export default function Edit({
                                     {__('label.is_active', 'Active')}
                                 </Label>
                             </div>
-
-                            <div className="grid gap-2">
-                                <Label>Collection Type</Label>
-                                <div className="flex gap-4">
-                                    <label className="flex cursor-pointer items-center gap-2 text-sm">
-                                        <input
-                                            type="radio"
-                                            name="collection_type"
-                                            value="manual"
-                                            checked={
-                                                collectionType === 'manual'
-                                            }
-                                            onChange={() =>
-                                                setCollectionType('manual')
-                                            }
-                                            className="h-4 w-4"
-                                        />
-                                        Manual
-                                    </label>
-                                    <label className="flex cursor-pointer items-center gap-2 text-sm">
-                                        <input
-                                            type="radio"
-                                            name="collection_type"
-                                            value="smart"
-                                            checked={collectionType === 'smart'}
-                                            onChange={() =>
-                                                setCollectionType('smart')
-                                            }
-                                            className="h-4 w-4"
-                                        />
-                                        Smart (auto-rule based)
-                                    </label>
-                                </div>
-                                <p className="text-xs text-muted-foreground">
-                                    {collectionType === 'smart'
-                                        ? 'Products are automatically included based on rules below.'
-                                        : 'Products are manually assigned to this category.'}
-                                </p>
-                            </div>
-
-                            {collectionType === 'smart' && (
-                                <div className="grid gap-2">
-                                    <Label>Rules</Label>
-                                    <SmartCollectionBuilder
-                                        rules={rules}
-                                        rulesMatch={rulesMatch}
-                                        smartProductCount={smart_product_count}
-                                        onRulesChange={setRules}
-                                        onRulesMatchChange={setRulesMatch}
-                                    />
-                                    <InputError message={errors.rules} />
-                                </div>
-                            )}
                         </TabsContent>
 
                         <TabsContent value="seo" className="space-y-6">

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Concerns\HasMetafields;
-use App\Concerns\HasTags;
 use App\Concerns\HasVersions;
 use App\Enums\BlogPostStatusEnum;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -13,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -21,8 +20,6 @@ use Spatie\Translatable\HasTranslations;
 class BlogPost extends Model
 {
     use HasFactory;
-    use HasMetafields;
-    use HasTags;
     use HasTranslations;
     use HasVersions;
     use LogsActivity;
@@ -109,6 +106,12 @@ class BlogPost extends Model
         $wordCount = str_word_count(strip_tags($content));
 
         return (int) max(1, ceil($wordCount / 200));
+    }
+
+    /** @return BelongsToMany<Tag, $this> */
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class);
     }
 
     #[Scope]

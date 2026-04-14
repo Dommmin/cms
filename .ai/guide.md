@@ -61,29 +61,6 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - Infrastructure: `app/Infrastructure/Payments/PayU/` + `app/Infrastructure/Payments/P24/`
 - Frontend: `PaymentStep`, `BlikInput`, `ApplePayButton`, `GooglePayButton`, `usePaymentStatus` hook (3s poll), `/checkout/pending` page
 
-### Polymorphic Tags (A2)
-- **`HasTags` trait** (`app/Concerns/HasTags.php`) — added to Product, BlogPost, Page, Category; uses polymorphic `taggables` table (`tag_id`, `taggable_type`, `taggable_id`); methods: `tags()` (MorphToMany), `syncTags(array)`, `attachTag(string)`, `detachTag(string)`, `hasTag(string)`, `getTagNames()`; `bootHasTags()` detaches tags on model delete
-- **`taggables` table** — replaces old `blog_post_tag` pivot; unique on `[tag_id, taggable_type, taggable_id]`; data migrated from `blog_post_tag` automatically
-- **Tag model** — `blogPosts()`, `products()`, `categories()`, `pages()` via `morphedByMany`
-- **API**: `GET /api/v1/tags` — public, optional `?type=blog-post|product|page|category` filter by morph type; returns `[{id, name, slug}]`
-- **TagController**: `app/Http/Controllers/Api/V1/TagController.php`
-
-### Smart Collections (A3)
-- **Smart Category** — `collection_type` column on `categories` (`manual`|`smart`), `rules` (JSON), `rules_match` (`all`|`any`); migration `2026_04_14_000008_add_smart_collection_to_categories_table.php`
-- **`SmartCollectionService`** (`app/Services/SmartCollectionService.php`) — `buildQuery(Category)`, `getMatchingProducts(Category)`, `countMatchingProducts(Category)`; supported fields: `price` (less/greater than cents), `brand_id`, `product_type_id`, `tag` (equals/not_equals name), `is_active`, `created_at` (after/before)
-- **Category model** — `rules` cast to array, `isSmartCollection(): bool`; `collection_type`, `rules`, `rules_match` allowed in FormRequests
-- **API**: `ProductController::byCategory()` uses `SmartCollectionService->buildQuery()` when `category->isSmartCollection()`
-- **Admin**: Category edit page has Collection Type radio (Manual/Smart) + `SmartCollectionBuilder` component (`resources/js/components/smart-collection-builder.tsx`) for rule editing; `smart_product_count` prop passed from controller
-
-### Metafields
-- **Metafields** — Shopify-like arbitrary key/value metadata on any model; `metafields` table (polymorphic `owner_type`/`owner_id`, `namespace`, `key`, `type`, `value`); types: string, integer, float, boolean, json, date, datetime, url, color, image, rich_text
-- **MetafieldDefinitions** — admin-managed schema definitions for metafields per owner type; `metafield_definitions` table; supports `pinned`, `position`, `validations`
-- **`HasMetafields` trait** (`app/Concerns/HasMetafields.php`) — added to Product, BlogPost, Page, Category; methods: `metafields()`, `metafield()`, `getMetafield()`, `setMetafield()`, `deleteMetafield()`, `syncMetafields()`, `getMetafieldsByNamespace()`
-- **`Metafield` model** — `getCastedValue()` auto-casts value to correct PHP type
-- **API**: `GET /api/v1/metafields/{type}/{id}` — public, returns `MetafieldResource` collection with `casted_value`; types: product, blog-post, page, category
-- **Admin CRUD** — `/admin/metafield-definitions` (index/create/edit/destroy), `/admin/metafields/{type}/{id}/sync` (POST)
-- **`MetafieldEditor` component** — reusable React component (`resources/js/components/metafield-editor.tsx`) embeddable in any admin edit form; grouped by namespace, type-specific inputs, add/delete, definition autocomplete
-
 ### System / Infrastructure
 - **Settings** — 6 groups (general, mail, etc.), DB-driven, cached 1h, admin UI
 - **Notifications** — SSE stream, channels, admin panel

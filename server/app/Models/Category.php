@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Concerns\HasMetafields;
-use App\Concerns\HasTags;
 use App\Concerns\HasVersions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,8 +20,6 @@ use Spatie\Translatable\HasTranslations;
 class Category extends Model
 {
     use HasFactory;
-    use HasMetafields;
-    use HasTags;
     use HasTranslations;
     use HasVersions;
     use LogsActivity;
@@ -43,13 +39,7 @@ class Category extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'sitemap_exclude' => 'boolean',
-        'rules' => 'array',
     ];
-
-    public function isSmartCollection(): bool
-    {
-        return $this->collection_type === 'smart';
-    }
 
     public static function roots()
     {

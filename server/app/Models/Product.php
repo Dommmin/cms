@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Concerns\HasMetafields;
-use App\Concerns\HasTags;
 use App\Concerns\HasVersions;
 use App\Enums\ReviewStatusEnum;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -30,8 +28,6 @@ use Spatie\Translatable\HasTranslations;
 class Product extends Model implements HasMedia
 {
     use HasFactory;
-    use HasMetafields;
-    use HasTags;
     use HasTranslations;
     use HasVersions;
     use InteractsWithMedia;
