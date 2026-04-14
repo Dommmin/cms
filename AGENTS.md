@@ -143,3 +143,9 @@ After implementing a feature:
 2. Update `docs/backend.md` or `docs/frontend.md` if architecture changed
 3. Update `server/docs/USER_GUIDE.md` — non-technical editor instructions
 4. Update `server/docs/DEVELOPER_GUIDE.md` — developer extension patterns
+
+---
+
+## Commit Rules
+
+**Only commit files you explicitly modified.** Never stage or commit unrelated changes — including auto-generated files (Wayfinder, migrations, etc.), other developers' work, or files you did not intentionally edit. Always review `git diff --staged` before committing.
