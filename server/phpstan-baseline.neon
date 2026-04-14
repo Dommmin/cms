@@ -1531,18 +1531,6 @@ parameters:
 			path: app/Http/Controllers/Api/V1/ConsentController.php
 
 		-
-			message: '#^Method App\\Services\\DashboardService\:\:getStats\(\) invoked with 2 parameters, 1 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: app/Http/Controllers/Api/V1/Dashboard/DashboardController.php
-
-		-
-			message: '#^Parameter \#1 \$period of method App\\Services\\DashboardService\:\:getStats\(\) expects array\{start\: Carbon\\Carbon, end\: Carbon\\Carbon\}, Carbon\\CarbonInterface given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Http/Controllers/Api/V1/Dashboard/DashboardController.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$category\.$#'
 			identifier: property.notFound
 			count: 1

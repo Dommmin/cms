@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V1\Dashboard;
 
 use App\Http\Controllers\Api\ApiController;
 use App\Services\DashboardService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -29,7 +30,10 @@ class DashboardController extends ApiController
             ? Date::parse($request->input('end_date'))->endOfDay()
             : now()->endOfDay();
 
-        $stats = $this->dashboardService->getStats($startDate, $endDate);
+        /** @var array{start: Carbon, end: Carbon} $period */
+        $period = ['start' => $startDate, 'end' => $endDate];
+
+        $stats = $this->dashboardService->getStats($period);
 
         return $this->ok($stats);
     }
