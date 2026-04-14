@@ -25,6 +25,18 @@ export default function EditReport({
     dataSources,
     metrics,
 }: FormProps) {
+    const { data, setData, put, processing, errors } = useForm<ReportFormData>({
+        name: report?.name ?? '',
+        description: report?.description ?? '',
+        data_source: report?.data_source ?? '',
+        metrics: report?.metrics ?? [],
+        dimensions: report?.dimensions ?? [],
+        filters: report?.filters ?? [],
+        group_by: report?.group_by ?? [],
+        chart_type: report?.chart_type ?? 'table',
+        is_public: report?.is_public ?? false,
+    });
+
     if (!report) return null;
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -35,18 +47,6 @@ export default function EditReport({
         },
         { title: 'Edit', href: '' },
     ];
-
-    const { data, setData, put, processing, errors } = useForm<ReportFormData>({
-        name: report.name,
-        description: report.description ?? '',
-        data_source: report.data_source,
-        metrics: report.metrics,
-        dimensions: report.dimensions ?? [],
-        filters: report.filters ?? [],
-        group_by: report.group_by ?? [],
-        chart_type: report.chart_type ?? 'table',
-        is_public: report.is_public,
-    });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

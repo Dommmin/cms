@@ -140,7 +140,7 @@ export function SearchBar() {
                         role="dialog"
                         aria-label="Search"
                         aria-modal="true"
-                        className="border-border bg-background fixed top-16 right-0 left-0 z-50 border-b shadow-xl"
+                        className="border-border/50 bg-background/80 fixed top-16 right-0 left-0 z-50 overflow-hidden rounded-b-2xl border shadow-[0_20px_60px_-10px_oklch(0_0_0_/_0.2)] backdrop-blur-2xl backdrop-saturate-150 dark:shadow-[0_20px_60px_-10px_oklch(0_0_0_/_0.5)]"
                     >
                         <div className="mx-auto max-w-2xl px-4 py-4">
                             {/* Input row */}

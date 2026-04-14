@@ -1,9 +1,7 @@
-import { router } from '@inertiajs/react';
 import { PlusIcon, SearchIcon, XIcon } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as ShippingMethodController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ShippingMethodController';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from '@/hooks/use-translation';
 import type { RestrictionItem } from '@/pages/admin/ecommerce/shipping-methods/edit.types';

@@ -336,4 +336,15 @@
         --prose-quote-borders: oklch(1 0 0 / 30%);
         --prose-quotes: oklch(0.8 0 0);
     }
+
+    .glassmorphism {
+        background: oklch(from var(--background) l c h / 0.7);
+        backdrop-filter: blur(2rem) saturate(1.5);
+        -webkit-backdrop-filter: blur(2rem) saturate(1.5);
+        border: 1px solid oklch(from var(--foreground) l c h / 0.1);
+    }
+
+    .dark .glassmorphism {
+        border: 1px solid oklch(1 0 0 / 5%);
+    }
 }

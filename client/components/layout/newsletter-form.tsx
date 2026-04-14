@@ -30,7 +30,7 @@ export function NewsletterForm() {
             <p
                 role="status"
                 aria-live="polite"
-                className="text-sm text-green-600"
+                className="text-sm font-medium text-green-600 dark:text-green-400"
             >
                 {t(
                     'newsletter.success',
@@ -54,13 +54,13 @@ export function NewsletterForm() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={t('newsletter.placeholder', 'Your email')}
                     aria-describedby="newsletter-hint"
-                    className="border-input bg-background focus:ring-ring flex-1 rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
+                    className="border-input bg-background/80 focus:ring-ring flex-1 rounded-xl border px-4 py-2.5 text-sm backdrop-blur-sm focus:ring-2 focus:outline-none"
                 />
                 <button
                     type="submit"
                     disabled={status === 'loading'}
                     aria-busy={status === 'loading'}
-                    className="bg-primary text-primary-foreground rounded-md px-3 py-1.5 text-xs font-medium hover:opacity-90 disabled:opacity-50"
+                    className="bg-primary text-primary-foreground rounded-xl px-5 py-2.5 text-sm font-semibold shadow-sm transition-all hover:opacity-90 hover:shadow-md disabled:opacity-50"
                 >
                     {status === 'loading'
                         ? '…'

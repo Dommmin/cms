@@ -179,7 +179,7 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
             role="dialog"
             aria-modal="true"
             aria-label={bannerTitle}
-            className="border-border bg-background/95 fixed right-0 bottom-0 left-0 z-50 border-t shadow-lg backdrop-blur"
+            className="bg-background/70 fixed right-0 bottom-0 left-0 z-50 overflow-hidden border-t border-white/10 shadow-[0_-8px_32px_0_oklch(0_0_0_/_0.15)] backdrop-blur-2xl backdrop-saturate-150 dark:border-white/5 dark:shadow-[0_-8px_32px_0_oklch(0_0_0_/_0.4)]"
         >
             <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
                 {!showDetails ? (
@@ -216,13 +216,13 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                         <div className="flex shrink-0 items-center gap-2">
                             <button
                                 onClick={rejectAll}
-                                className="border-border hover:bg-accent rounded-lg border px-3 py-1.5 text-sm"
+                                className="border-border/60 hover:bg-accent rounded-xl border px-4 py-2 text-sm backdrop-blur-sm transition-colors"
                             >
                                 Reject all
                             </button>
                             <button
                                 onClick={acceptAll}
-                                className="bg-primary text-primary-foreground rounded-lg px-3 py-1.5 text-sm font-medium hover:opacity-90"
+                                className="bg-primary text-primary-foreground rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition-all hover:opacity-90 hover:shadow-md"
                             >
                                 Accept all
                             </button>

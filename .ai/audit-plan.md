@@ -1254,9 +1254,9 @@ function EmptyProducts() {
 | 8.8  | Cart bounce animation                             | P2        | `components/layout/cart-button.tsx`                             | —                   |
 | 8.9  | Checkout step states (completed/current/upcoming) | P1        | `app/checkout/page.tsx`                                         | —                   |
 | 8.10 | Mega-menu thumbnails + floating mobile nav        | P2        | `components/layout/mega-menu.tsx`, nowy `mobile-bottom-nav.tsx` | —                   |
-| 8.11 | Footer gradient + newsletter band                 | P3        | `components/layout/footer-content.tsx`                          | —                   |
+| 8.11 | Footer gradient + newsletter band                 | P3 ✅     | `components/layout/footer-content.tsx`, `newsletter-form.tsx`    | —                   |
 | 8.12 | framer-motion page/card/cart animations           | P2        | `layout.tsx`, `product-card.tsx`, nowy `page-transition.tsx`    | framer-motion       |
-| 8.13 | Glassmorphism cards, search dropdown, modals      | P3        | `components/layout/search-bar.tsx`, cart drawer                 | —                   |
+| 8.13 | Glassmorphism cards, search dropdown, modals      | P3 ✅     | `search-bar.tsx`, `cookie-consent.tsx`, `globals.css`           | —                   |
 | 8.14 | Shimmer skeletons + rich empty states             | P2        | `globals.css`, product listing, blog listing                    | —                   |
 
 ---
@@ -1270,19 +1270,19 @@ function EmptyProducts() {
 
 ### 9.1 Obecny stan vs Shopify — porównanie architektoniczne
 
-| Koncept | Shopify | Obecny CMS | Gap | Propozycja |
-|---------|---------|------------|-----|------------|
-| **Blog kontener** | `Blog` model (np. "News", "Recipes") → ma wiele `Article` | Brak — `BlogPost` jest flat, tylko `BlogCategory` grupuje | Duży | Dodać model `Blog` jako kontener |
-| **Artykuły** | `Article` (belongs to `Blog`) | `BlogPost` (belongs to `BlogCategory`) | Mały | Rename na `Article` opcjonalny, ale `Blog` kontener kluczowy |
-| **Strony** | `Page` — flat, prosty content | `Page` — zaawansowany (builder, moduły, hierarchia) | **CMS lepszy** | Zachować — Page jest mocniejszy niż Shopify |
-| **Kolekcje** | `Collection` (manual + smart/automatic) | `Category` (manual only, hierarchiczna) | Średni | Dodać Smart Collections (auto-reguły) |
-| **Metafields** | Uniwersalny system key-value per resource | Brak — JSON columns ad-hoc | Duży | Nowy system `Metafield` / `Metaobject` |
-| **Metaobjects** | Custom content types (np. "FAQ", "Banner", "Chef") | Brak | Duży | Rozważyć — zastępuje hardcoded modele |
-| **Nawigacja** | `Menu` → `MenuItem` (prosty URL-based) | `Menu` → `MenuItem` (polymorphic links) | **CMS lepszy** | Zachować |
-| **Tagi** | Globalne tagi per resource (products + articles) | Tagi tylko na BlogPost | Średni | Rozszerzyć na Products, Pages |
-| **Files** | Global file manager | Spatie MediaLibrary per model | **CMS lepszy** | Zachować + dodać globalny DAM UI |
-| **Tłumaczenia** | Translation API per field | Spatie HasTranslations (JSON columns) | **CMS lepszy** | Zachować |
-| **Themes** | Liquid templates z sections/blocks | Page Builder z 28 typami bloków | **CMS lepszy** | Rozbudować builder (sekcja 11) |
+| Koncept           | Shopify                                                   | Obecny CMS                                                | Gap            | Propozycja                                                   |
+|-------------------|-----------------------------------------------------------|-----------------------------------------------------------|----------------|--------------------------------------------------------------|
+| **Blog kontener** | `Blog` model (np. "News", "Recipes") → ma wiele `Article` | Brak — `BlogPost` jest flat, tylko `BlogCategory` grupuje | Duży           | Dodać model `Blog` jako kontener                             |
+| **Artykuły**      | `Article` (belongs to `Blog`)                             | `BlogPost` (belongs to `BlogCategory`)                    | Mały           | Rename na `Article` opcjonalny, ale `Blog` kontener kluczowy |
+| **Strony**        | `Page` — flat, prosty content                             | `Page` — zaawansowany (builder, moduły, hierarchia)       | **CMS lepszy** | Zachować — Page jest mocniejszy niż Shopify                  |
+| **Kolekcje**      | `Collection` (manual + smart/automatic)                   | `Category` (manual only, hierarchiczna)                   | Średni         | Dodać Smart Collections (auto-reguły)                        |
+| **Metafields**    | Uniwersalny system key-value per resource                 | Brak — JSON columns ad-hoc                                | Duży           | Nowy system `Metafield` / `Metaobject`                       |
+| **Metaobjects**   | Custom content types (np. "FAQ", "Banner", "Chef")        | Brak                                                      | Duży           | Rozważyć — zastępuje hardcoded modele                        |
+| **Nawigacja**     | `Menu` → `MenuItem` (prosty URL-based)                    | `Menu` → `MenuItem` (polymorphic links)                   | **CMS lepszy** | Zachować                                                     |
+| **Tagi**          | Globalne tagi per resource (products + articles)          | Tagi tylko na BlogPost                                    | Średni         | Rozszerzyć na Products, Pages                                |
+| **Files**         | Global file manager                                       | Spatie MediaLibrary per model                             | **CMS lepszy** | Zachować + dodać globalny DAM UI                             |
+| **Tłumaczenia**   | Translation API per field                                 | Spatie HasTranslations (JSON columns)                     | **CMS lepszy** | Zachować                                                     |
+| **Themes**        | Liquid templates z sections/blocks                        | Page Builder z 28 typami bloków                           | **CMS lepszy** | Rozbudować builder (sekcja 11)                               |
 
 ### 9.2 Model `Blog` jako kontener — kluczowa zmiana
 
@@ -1438,20 +1438,20 @@ trait HasTags {
 
 ### 9.5 Porównanie: co zostawić, co zmienić
 
-| Element | Decyzja | Uzasadnienie |
-|---------|---------|--------------|
-| **Page** (z builderem) | ✅ Zostawić — **lepszy niż Shopify** | Hierarchia, moduły, builder, wersje — Shopify nie ma nic takiego natywnie |
-| **Page hierarchia** (parent/child) | ✅ Zostawić | WordPress-like nested pages, Shopify tego nie ma |
-| **BlogPost** | ⚠️ Dodać `Blog` kontener | Shopify pattern: Blog → Article. Pozwala na wiele blogów |
-| **BlogCategory** | ✅ Zostawić jako sub-grouping | W ramach bloga — kategorie dalej mają sens |
-| **Category** (produktowa) | ⚠️ Rozszerzyć o Smart Collections | Manual + Smart jak Shopify |
-| **Menu / MenuItem** | ✅ Zostawić — **lepszy niż Shopify** | Polymorphic links, hierarchia, tłumaczenia |
-| **Form / FormField** | ✅ Zostawić — **Shopify nie ma natywnie** | Wbudowany form builder to przewaga |
-| **FAQ** | ✅ Zostawić | Prosty model, schema.org integration |
-| **Tag** | ⚠️ Rozszerzyć na polymorphic | Globalne tagi jak Shopify |
-| **Theme** | ✅ Zostawić | Shopify ma themes, CMS też |
-| **ReusableBlock** | ✅ Zostawić + rozbudować | Global blocks — odpowiednik Shopify Sections |
-| **Media (Spatie)** | ✅ Zostawić + dodać DAM UI | Centralny media manager w adminie |
+| Element                            | Decyzja                                  | Uzasadnienie                                                              |
+|------------------------------------|------------------------------------------|---------------------------------------------------------------------------|
+| **Page** (z builderem)             | ✅ Zostawić — **lepszy niż Shopify**      | Hierarchia, moduły, builder, wersje — Shopify nie ma nic takiego natywnie |
+| **Page hierarchia** (parent/child) | ✅ Zostawić                               | WordPress-like nested pages, Shopify tego nie ma                          |
+| **BlogPost**                       | ⚠️ Dodać `Blog` kontener                 | Shopify pattern: Blog → Article. Pozwala na wiele blogów                  |
+| **BlogCategory**                   | ✅ Zostawić jako sub-grouping             | W ramach bloga — kategorie dalej mają sens                                |
+| **Category** (produktowa)          | ⚠️ Rozszerzyć o Smart Collections        | Manual + Smart jak Shopify                                                |
+| **Menu / MenuItem**                | ✅ Zostawić — **lepszy niż Shopify**      | Polymorphic links, hierarchia, tłumaczenia                                |
+| **Form / FormField**               | ✅ Zostawić — **Shopify nie ma natywnie** | Wbudowany form builder to przewaga                                        |
+| **FAQ**                            | ✅ Zostawić                               | Prosty model, schema.org integration                                      |
+| **Tag**                            | ⚠️ Rozszerzyć na polymorphic             | Globalne tagi jak Shopify                                                 |
+| **Theme**                          | ✅ Zostawić                               | Shopify ma themes, CMS też                                                |
+| **ReusableBlock**                  | ✅ Zostawić + rozbudować                  | Global blocks — odpowiednik Shopify Sections                              |
+| **Media (Spatie)**                 | ✅ Zostawić + dodać DAM UI                | Centralny media manager w adminie                                         |
 
 ---
 
@@ -1512,22 +1512,22 @@ Schema::create('metafield_definitions', function (Blueprint $table) {
 
 ### 10.3 Typy wartości metafields
 
-| Typ | PHP Cast | Walidacja | Admin Input | Przykład |
-|-----|----------|-----------|-------------|---------|
-| `string` | string | max:5000 | text input | "cotton blend" |
-| `integer` | int | numeric, integer | number input | 42 |
-| `float` | float | numeric | number input (step=0.01) | 3.14 |
-| `boolean` | bool | boolean | toggle switch | true |
-| `json` | array | valid JSON | code editor / key-value pairs | `{"width":10,"height":20}` |
-| `date` | Carbon | date format | date picker | "2026-04-13" |
-| `datetime` | Carbon | datetime format | datetime picker | "2026-04-13T14:00:00" |
-| `url` | string | url | url input | "https://example.com" |
-| `color` | string | hex color | color picker | "#FF5733" |
-| `image` | string | exists in media | media picker | "/media/123/photo.webp" |
-| `rich_text` | string | — | WYSIWYG editor | "<p>Rich <b>text</b></p>" |
-| `reference` | int | exists in table | entity picker | Product ID: 42 |
-| `list.string` | array | array of strings | tag-like input | ["red", "blue", "green"] |
-| `list.reference` | array | array of IDs | multi-entity picker | [1, 5, 12] |
+| Typ              | PHP Cast | Walidacja        | Admin Input                   | Przykład                   |
+|------------------|----------|------------------|-------------------------------|----------------------------|
+| `string`         | string   | max:5000         | text input                    | "cotton blend"             |
+| `integer`        | int      | numeric, integer | number input                  | 42                         |
+| `float`          | float    | numeric          | number input (step=0.01)      | 3.14                       |
+| `boolean`        | bool     | boolean          | toggle switch                 | true                       |
+| `json`           | array    | valid JSON       | code editor / key-value pairs | `{"width":10,"height":20}` |
+| `date`           | Carbon   | date format      | date picker                   | "2026-04-13"               |
+| `datetime`       | Carbon   | datetime format  | datetime picker               | "2026-04-13T14:00:00"      |
+| `url`            | string   | url              | url input                     | "https://example.com"      |
+| `color`          | string   | hex color        | color picker                  | "#FF5733"                  |
+| `image`          | string   | exists in media  | media picker                  | "/media/123/photo.webp"    |
+| `rich_text`      | string   | —                | WYSIWYG editor                | "<p>Rich <b>text</b></p>"  |
+| `reference`      | int      | exists in table  | entity picker                 | Product ID: 42             |
+| `list.string`    | array    | array of strings | tag-like input                | ["red", "blue", "green"]   |
+| `list.reference` | array    | array of IDs     | multi-entity picker           | [1, 5, 12]                 |
 
 ### 10.4 Trait `HasMetafields`
 
@@ -1596,26 +1596,26 @@ $product->setMetafield('custom', 'care_instructions', 'rich_text', '<p>Hand wash
 
 ### 10.6 Porównanie z istniejącymi "ad-hoc" metadanymi
 
-| Obecne rozwiązanie | Metafield odpowiednik | Migracja |
-|--------------------|-----------------------|----------|
-| `Promotion.metadata` (JSON) | `metafield('promo', 'buy_quantity', 'integer')` | Opcjonalna — JSON działa OK dla Promotion |
-| `ProductVariant.attributes` (pivot) | Zostawić — attribute system jest oddzielny od metafields | Nie migrować |
-| `Setting` model (group/key/value) | Zostawić — Settings to config systemowy, nie per-resource | Nie migrować |
-| `PageBlock.configuration` (JSON) | Zostawić — blocks mają własny schema | Nie migrować |
-| SEO fields (seo_title, etc.) | Zostawić jako kolumny — zbyt często queryowane | Nie migrować |
-| `og_image`, `meta_robots` | Zostawić — SEO fields powinny być first-class | Nie migrować |
+| Obecne rozwiązanie                  | Metafield odpowiednik                                     | Migracja                                  |
+|-------------------------------------|-----------------------------------------------------------|-------------------------------------------|
+| `Promotion.metadata` (JSON)         | `metafield('promo', 'buy_quantity', 'integer')`           | Opcjonalna — JSON działa OK dla Promotion |
+| `ProductVariant.attributes` (pivot) | Zostawić — attribute system jest oddzielny od metafields  | Nie migrować                              |
+| `Setting` model (group/key/value)   | Zostawić — Settings to config systemowy, nie per-resource | Nie migrować                              |
+| `PageBlock.configuration` (JSON)    | Zostawić — blocks mają własny schema                      | Nie migrować                              |
+| SEO fields (seo_title, etc.)        | Zostawić jako kolumny — zbyt często queryowane            | Nie migrować                              |
+| `og_image`, `meta_robots`           | Zostawić — SEO fields powinny być first-class             | Nie migrować                              |
 
 **Zasada:** Metafields NIE zastępują istniejących, wyspecjalizowanych systemów (attributes, SEO, settings). Służą do **rozszerzania** modeli o nowe, niestandardowe pola bez migracji.
 
 ### 10.7 Plan implementacji Metafields
 
-| Faza | Zakres | Effort | Priorytet |
-|------|--------|--------|-----------|
-| **M1. Core** | Model `Metafield` + migracja + trait `HasMetafields` + dodanie do Product, BlogPost, Page, Category | 2 dni | P2 |
-| **M2. Definitions** | Model `MetafieldDefinition` + admin CRUD `/admin/metafield-definitions` | 1-2 dni | P2 |
-| **M3. Admin Editor** | Komponent `MetafieldEditor` (React) + integracja w edit pages (produkt, post, strona, kategoria) | 2-3 dni | P2 |
-| **M4. API** | Metafields w API responses + dedykowane endpointy | 1 dzień | P2 |
-| **M5. Frontend** | Helper `useMetafield()` + rendering w Next.js templates | 1 dzień | P3 |
+| Faza                 | Zakres                                                                                              | Effort  | Priorytet |
+|----------------------|-----------------------------------------------------------------------------------------------------|---------|-----------|
+| **M1. Core**         | Model `Metafield` + migracja + trait `HasMetafields` + dodanie do Product, BlogPost, Page, Category | 2 dni   | P2        |
+| **M2. Definitions**  | Model `MetafieldDefinition` + admin CRUD `/admin/metafield-definitions`                             | 1-2 dni | P2        |
+| **M3. Admin Editor** | Komponent `MetafieldEditor` (React) + integracja w edit pages (produkt, post, strona, kategoria)    | 2-3 dni | P2        |
+| **M4. API**          | Metafields w API responses + dedykowane endpointy                                                   | 1 dzień | P2        |
+| **M5. Frontend**     | Helper `useMetafield()` + rendering w Next.js templates                                             | 1 dzień | P3        |
 
 **Łączny effort: ~7-9 dni**
 
@@ -1628,32 +1628,32 @@ $product->setMetafield('custom', 'care_instructions', 'rich_text', '<p>Hand wash
 
 ### 11.1 Obecne możliwości (co jest dobrze)
 
-| Feature | Status | Szczegóły |
-|---------|--------|-----------|
-| **28 typów bloków** | ✅ Kompletne | Hero, RichText, Products, Gallery, Video, Forms, Accordion, Tabs, CTA, Newsletter, Map, Timeline, i więcej |
-| **Sekcje z layoutami** | ✅ Kompletne | contained, full-width, flush, two-col, three-col + warianty (light/dark/muted/brand/hero) |
-| **Drag & Drop** | ✅ Kompletne | @dnd-kit z keyboard support |
-| **Reusable Blocks** | ✅ Kompletne | Global blocks z sync do wszystkich stron, unlink do lokalnej kopii |
-| **Wersje (Draft/Publish)** | ✅ Kompletne | PageVersion snapshots, publish/unpublish, restore |
-| **Undo/Redo** | ✅ Kompletne | useReducer z 20-step history, Ctrl+Z/Ctrl+Y |
-| **Copy/Paste bloków** | ✅ Kompletne | localStorage clipboard, copy/paste buttons |
-| **Mobile Preview** | ✅ Kompletne | Device selector (Desktop/Tablet/Mobile) w split view |
-| **SEO Integration** | ✅ Kompletne | SeoPanel z SERP preview, meta robots, OG image, canonical |
-| **Block Relations** | ✅ Kompletne | Polymorphic — media, produkty, kategorie, posty, FAQ, formularze |
-| **Schema-driven Forms** | ✅ Kompletne | Block config renderowany automatycznie z `config/blocks.php` |
-| **Hardcoded Templates** | ⚠️ Partial | 7 presetów (Landing, Product, About, Blog, Contact, FAQ, CTAs) — brak user-created |
+| Feature                    | Status      | Szczegóły                                                                                                  |
+|----------------------------|-------------|------------------------------------------------------------------------------------------------------------|
+| **28 typów bloków**        | ✅ Kompletne | Hero, RichText, Products, Gallery, Video, Forms, Accordion, Tabs, CTA, Newsletter, Map, Timeline, i więcej |
+| **Sekcje z layoutami**     | ✅ Kompletne | contained, full-width, flush, two-col, three-col + warianty (light/dark/muted/brand/hero)                  |
+| **Drag & Drop**            | ✅ Kompletne | @dnd-kit z keyboard support                                                                                |
+| **Reusable Blocks**        | ✅ Kompletne | Global blocks z sync do wszystkich stron, unlink do lokalnej kopii                                         |
+| **Wersje (Draft/Publish)** | ✅ Kompletne | PageVersion snapshots, publish/unpublish, restore                                                          |
+| **Undo/Redo**              | ✅ Kompletne | useReducer z 20-step history, Ctrl+Z/Ctrl+Y                                                                |
+| **Copy/Paste bloków**      | ✅ Kompletne | localStorage clipboard, copy/paste buttons                                                                 |
+| **Mobile Preview**         | ✅ Kompletne | Device selector (Desktop/Tablet/Mobile) w split view                                                       |
+| **SEO Integration**        | ✅ Kompletne | SeoPanel z SERP preview, meta robots, OG image, canonical                                                  |
+| **Block Relations**        | ✅ Kompletne | Polymorphic — media, produkty, kategorie, posty, FAQ, formularze                                           |
+| **Schema-driven Forms**    | ✅ Kompletne | Block config renderowany automatycznie z `config/blocks.php`                                               |
+| **Hardcoded Templates**    | ⚠️ Partial  | 7 presetów (Landing, Product, About, Blog, Contact, FAQ, CTAs) — brak user-created                         |
 
 ### 11.2 Brakujące Enterprise Features — analiza priorytetowa
 
 #### 11.2.1 🔴 Krytyczne (P1) — wymagane dla enterprise
 
-| # | Feature | Opis | Shopify/WP equivalent | Effort |
-|---|---------|------|----------------------|--------|
-| **PB1** | **Scheduled Publishing** | Publikacja strony o określonej dacie/godzinie (np. "opublikuj landing Black Friday 29.11 o 00:00") | WP: Schedule post; Shopify: Visibility dates | 1-2 dni |
-| **PB2** | **Save as Template (user-created)** | Admin może zapisać dowolną kombinację sekcji/bloków jako własny szablon do reużycia | WP: Reusable blocks/patterns; Shopify: Save section as template | 2-3 dni |
-| **PB3** | **Content Approval Workflow** | Draft → In Review → Approved → Published z przypisaniem reviewer'a i komentarzami | WP: Editorial workflow plugins; Enterprise CMS standard | 3-4 dni |
-| **PB4** | **Custom CSS per Block** | Pole "Custom CSS" i "Custom Classes" na każdym bloku — pozwala na brand-specific styling bez deployowania kodu | WP Gutenberg: Additional CSS class; Elementor: Custom CSS | 1 dzień |
-| **PB5** | **Conditional Visibility** | Bloki widoczne tylko dla zalogowanych / niezalogowanych / specific customer segment / specific locale | Shopify: Conditional sections; WP: Visibility plugins | 2-3 dni |
+| #       | Feature                             | Opis                                                                                                           | Shopify/WP equivalent                                           | Effort  |
+|---------|-------------------------------------|----------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------|---------|
+| **PB1** | **Scheduled Publishing**            | Publikacja strony o określonej dacie/godzinie (np. "opublikuj landing Black Friday 29.11 o 00:00")             | WP: Schedule post; Shopify: Visibility dates                    | 1-2 dni |
+| **PB2** | **Save as Template (user-created)** | Admin może zapisać dowolną kombinację sekcji/bloków jako własny szablon do reużycia                            | WP: Reusable blocks/patterns; Shopify: Save section as template | 2-3 dni |
+| **PB3** | **Content Approval Workflow**       | Draft → In Review → Approved → Published z przypisaniem reviewer'a i komentarzami                              | WP: Editorial workflow plugins; Enterprise CMS standard         | 3-4 dni |
+| **PB4** | **Custom CSS per Block**            | Pole "Custom CSS" i "Custom Classes" na każdym bloku — pozwala na brand-specific styling bez deployowania kodu | WP Gutenberg: Additional CSS class; Elementor: Custom CSS       | 1 dzień |
+| **PB5** | **Conditional Visibility**          | Bloki widoczne tylko dla zalogowanych / niezalogowanych / specific customer segment / specific locale          | Shopify: Conditional sections; WP: Visibility plugins           | 2-3 dni |
 
 **Implementacja PB1 — Scheduled Publishing:**
 
@@ -1736,16 +1736,16 @@ Schema::create('section_templates', function (Blueprint $table) {
 
 #### 11.2.2 🟡 Ważne (P2) — oczekiwane w enterprise
 
-| # | Feature | Opis | Effort |
-|---|---------|------|--------|
-| **PB6** | **Block Animations/Transitions** | Presets: fade-in, slide-up, scale-in, parallax. Konfigurowalne per block: trigger (on-scroll/on-load), duration, delay | 2-3 dni |
-| **PB7** | **Block Lock & Permissions** | Lock block (prevent editing/moving/deleting). Permission: "only Super Admin can edit this block" | 1-2 dni |
-| **PB8** | **Export/Import Page as JSON** | Download page jako JSON, upload na innej instancji. Przenoszenie stron między środowiskami | 1-2 dni |
-| **PB9** | **Block Presets/Variations** | Zapisane konfiguracje bloku: "Hero — Dark Centered", "Hero — Light Left-aligned", "Hero — Video Background" | 2 dni |
-| **PB10** | **Inline Text Editing** | Kliknij tekst w preview → edytuj in-place (nie w sidebar formularzu). Jak Gutenberg | 3-5 dni |
-| **PB11** | **Block Revision History** | Per-block diff: "co się zmieniło w tym bloku od ostatniej wersji" | 2 dni |
-| **PB12** | **Auto-save** | Debounced auto-save co 30s do draftu. Indicator "Saved" / "Unsaved changes" w toolbar | 1 dzień |
-| **PB13** | **Multi-language Block Content** | Toggle języka w toolbarze → edycja treści bloku w wybranym locale (oddzielne configuration per locale) | 3-4 dni |
+| #        | Feature                          | Opis                                                                                                                   | Effort  |
+|----------|----------------------------------|------------------------------------------------------------------------------------------------------------------------|---------|
+| **PB6**  | **Block Animations/Transitions** | Presets: fade-in, slide-up, scale-in, parallax. Konfigurowalne per block: trigger (on-scroll/on-load), duration, delay | 2-3 dni |
+| **PB7**  | **Block Lock & Permissions**     | Lock block (prevent editing/moving/deleting). Permission: "only Super Admin can edit this block"                       | 1-2 dni |
+| **PB8**  | **Export/Import Page as JSON**   | Download page jako JSON, upload na innej instancji. Przenoszenie stron między środowiskami                             | 1-2 dni |
+| **PB9**  | **Block Presets/Variations**     | Zapisane konfiguracje bloku: "Hero — Dark Centered", "Hero — Light Left-aligned", "Hero — Video Background"            | 2 dni   |
+| **PB10** | **Inline Text Editing**          | Kliknij tekst w preview → edytuj in-place (nie w sidebar formularzu). Jak Gutenberg                                    | 3-5 dni |
+| **PB11** | **Block Revision History**       | Per-block diff: "co się zmieniło w tym bloku od ostatniej wersji"                                                      | 2 dni   |
+| **PB12** | **Auto-save**                    | Debounced auto-save co 30s do draftu. Indicator "Saved" / "Unsaved changes" w toolbar                                  | 1 dzień |
+| **PB13** | **Multi-language Block Content** | Toggle języka w toolbarze → edycja treści bloku w wybranym locale (oddzielne configuration per locale)                 | 3-4 dni |
 
 **Implementacja PB6 — Block Animations:**
 
@@ -1804,65 +1804,65 @@ useEffect(() => {
 
 #### 11.2.3 🟢 Nice-to-have (P3) — differentiators
 
-| # | Feature | Opis | Effort |
-|---|---------|------|--------|
-| **PB14** | **AI Content Generation** | "Generate hero text" → AI tworzy headline + subtitle na podstawie kontekstu strony/produktu | 2-3 dni |
-| **PB15** | **A/B Test Variants** | Dwie wersje bloku/sekcji, losowy render, tracking konwersji | 3-5 dni |
-| **PB16** | **Live Collaborative Editing** | Multi-user presence (avatary), lock per section, real-time sync (WebSocket/Pusher) | 5-10 dni |
-| **PB17** | **Dynamic Data Binding** | "Bind this field to product.name" — blok auto-wypełnia się z modelu (np. product page template) | 3-5 dni |
-| **PB18** | **Visual History Panel** | Timeline wersji z thumbnail screenshots, diff highlighter, one-click restore | 2-3 dni |
-| **PB19** | **Responsive Block Settings** | Oddzielne ustawienia per breakpoint: "padding: 20px na mobile, 60px na desktop" | 3-4 dni |
-| **PB20** | **Form Builder w Page Builder** | Drag-drop budowanie formularzy bezpośrednio w builderze (nie tylko embed istniejącego) | 3-5 dni |
+| #        | Feature                         | Opis                                                                                            | Effort   |
+|----------|---------------------------------|-------------------------------------------------------------------------------------------------|----------|
+| **PB14** | **AI Content Generation**       | "Generate hero text" → AI tworzy headline + subtitle na podstawie kontekstu strony/produktu     | 2-3 dni  |
+| **PB15** | **A/B Test Variants**           | Dwie wersje bloku/sekcji, losowy render, tracking konwersji                                     | 3-5 dni  |
+| **PB16** | **Live Collaborative Editing**  | Multi-user presence (avatary), lock per section, real-time sync (WebSocket/Pusher)              | 5-10 dni |
+| **PB17** | **Dynamic Data Binding**        | "Bind this field to product.name" — blok auto-wypełnia się z modelu (np. product page template) | 3-5 dni  |
+| **PB18** | **Visual History Panel**        | Timeline wersji z thumbnail screenshots, diff highlighter, one-click restore                    | 2-3 dni  |
+| **PB19** | **Responsive Block Settings**   | Oddzielne ustawienia per breakpoint: "padding: 20px na mobile, 60px na desktop"                 | 3-4 dni  |
+| **PB20** | **Form Builder w Page Builder** | Drag-drop budowanie formularzy bezpośrednio w builderze (nie tylko embed istniejącego)          | 3-5 dni  |
 
 ### 11.3 Porównanie z konkurencją
 
-| Feature | Nasz CMS | Shopify OS 2.0 | WordPress Gutenberg | Elementor Pro | Webflow |
-|---------|----------|----------------|--------------------|--------------| --------|
-| Block types | 28 ✅ | ~20 (sections) | 90+ (blocks) | 100+ (widgets) | 30+ |
-| Drag & Drop | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Reusable blocks | ✅ | ✅ (sections) | ✅ (patterns) | ✅ (saved) | ✅ (symbols) |
-| Versions | ✅ | ❌ | ✅ (revisions) | ✅ | ✅ |
-| Custom CSS | ❌ **brak** | ❌ (Liquid only) | ✅ | ✅ | ✅ |
-| Animations | ❌ **brak** | ❌ | ❌ (plugin) | ✅ | ✅ |
-| Scheduled publish | ❌ **brak** | ✅ | ✅ | ❌ | ✅ |
-| Templates (user) | ❌ **brak** | ✅ | ✅ (patterns) | ✅ | ✅ |
-| Approval workflow | ❌ **brak** | ❌ | ❌ (plugin) | ❌ | ✅ |
-| A/B testing | ❌ **brak** | ❌ (app) | ❌ (plugin) | ❌ (plugin) | ✅ |
-| Inline editing | ❌ **brak** | ❌ | ✅ | ✅ | ✅ |
-| Conditional visibility | ❌ **brak** | ✅ | ❌ (plugin) | ✅ | ✅ |
-| Multi-language | ❌ **brak** | ✅ (Markets) | ❌ (plugin) | ❌ (WPML) | ✅ |
-| Responsive settings | ❌ **brak** | ❌ | ❌ | ✅ | ✅ |
-| Auto-save | ❌ **brak** | ✅ | ✅ | ✅ | ✅ |
-| SEO panel | ✅ | ❌ (app) | ❌ (Yoast) | ❌ (Yoast) | ✅ |
-| Block relations (media, products) | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Feature                           | Nasz CMS   | Shopify OS 2.0  | WordPress Gutenberg | Elementor Pro  | Webflow     |
+|-----------------------------------|------------|-----------------|---------------------|----------------|-------------|
+| Block types                       | 28 ✅       | ~20 (sections)  | 90+ (blocks)        | 100+ (widgets) | 30+         |
+| Drag & Drop                       | ✅          | ✅               | ✅                   | ✅              | ✅           |
+| Reusable blocks                   | ✅          | ✅ (sections)    | ✅ (patterns)        | ✅ (saved)      | ✅ (symbols) |
+| Versions                          | ✅          | ❌               | ✅ (revisions)       | ✅              | ✅           |
+| Custom CSS                        | ❌ **brak** | ❌ (Liquid only) | ✅                   | ✅              | ✅           |
+| Animations                        | ❌ **brak** | ❌               | ❌ (plugin)          | ✅              | ✅           |
+| Scheduled publish                 | ❌ **brak** | ✅               | ✅                   | ❌              | ✅           |
+| Templates (user)                  | ❌ **brak** | ✅               | ✅ (patterns)        | ✅              | ✅           |
+| Approval workflow                 | ❌ **brak** | ❌               | ❌ (plugin)          | ❌              | ✅           |
+| A/B testing                       | ❌ **brak** | ❌ (app)         | ❌ (plugin)          | ❌ (plugin)     | ✅           |
+| Inline editing                    | ❌ **brak** | ❌               | ✅                   | ✅              | ✅           |
+| Conditional visibility            | ❌ **brak** | ✅               | ❌ (plugin)          | ✅              | ✅           |
+| Multi-language                    | ❌ **brak** | ✅ (Markets)     | ❌ (plugin)          | ❌ (WPML)       | ✅           |
+| Responsive settings               | ❌ **brak** | ❌               | ❌                   | ✅              | ✅           |
+| Auto-save                         | ❌ **brak** | ✅               | ✅                   | ✅              | ✅           |
+| SEO panel                         | ✅          | ❌ (app)         | ❌ (Yoast)           | ❌ (Yoast)      | ✅           |
+| Block relations (media, products) | ✅          | ✅               | ❌                   | ❌              | ❌           |
 
 ### 11.4 Plan implementacji Page Builder Enterprise
 
-| Faza | Features | Effort | Priorytet |
-|------|----------|--------|-----------|
-| **PB-Phase 1** | PB12 (Auto-save) + PB1 (Scheduled Publishing) + PB4 (Custom CSS/Classes) | 3-4 dni | **P1** |
-| **PB-Phase 2** | PB2 (Save as Template) + PB8 (Export/Import JSON) + PB9 (Block Presets) | 4-5 dni | **P1** |
-| **PB-Phase 3** | PB5 (Conditional Visibility) + PB6 (Animations) + PB7 (Block Lock) | 5-6 dni | **P2** |
-| **PB-Phase 4** | PB3 (Approval Workflow) + PB13 (Multi-language content) | 5-7 dni | **P2** |
-| **PB-Phase 5** | PB10 (Inline Editing) + PB11 (Block Revision History) + PB18 (Visual History) | 7-10 dni | **P2** |
-| **PB-Phase 6** | PB14 (AI Content) + PB15 (A/B Testing) + PB19 (Responsive Settings) | 8-12 dni | **P3** |
+| Faza           | Features                                                                      | Effort   | Priorytet |
+|----------------|-------------------------------------------------------------------------------|----------|-----------|
+| **PB-Phase 1** | PB12 (Auto-save) + PB1 (Scheduled Publishing) + PB4 (Custom CSS/Classes)      | 3-4 dni  | **P1**    |
+| **PB-Phase 2** | PB2 (Save as Template) + PB8 (Export/Import JSON) + PB9 (Block Presets)       | 4-5 dni  | **P1**    |
+| **PB-Phase 3** | PB5 (Conditional Visibility) + PB6 (Animations) + PB7 (Block Lock)            | 5-6 dni  | **P2**    |
+| **PB-Phase 4** | PB3 (Approval Workflow) + PB13 (Multi-language content)                       | 5-7 dni  | **P2**    |
+| **PB-Phase 5** | PB10 (Inline Editing) + PB11 (Block Revision History) + PB18 (Visual History) | 7-10 dni | **P2**    |
+| **PB-Phase 6** | PB14 (AI Content) + PB15 (A/B Testing) + PB19 (Responsive Settings)           | 8-12 dni | **P3**    |
 
 **Łączny effort: ~32-44 dni (fazy P1+P2: ~17-22 dni)**
 
 ### 11.5 Nowe typy bloków do rozważenia
 
-| Typ | Opis | Priorytet | Effort |
-|-----|------|-----------|--------|
-| **Comparison Table** | Porównanie produktów/planów (kolumny z checkmarks) | P2 | 1 dzień |
-| **Before/After Slider** | Dwa obrazy z suwakiem (np. remont, metamorfoza) | P3 | 1 dzień |
-| **Popup/Modal CTA** | Blok triggerujący popup z ofertą/formularzem | P2 | 1-2 dni |
-| **Social Feed** | Embed Instagram/TikTok grid | P3 | 1 dzień |
-| **Code Snippet** | Syntax-highlighted code z kopiowaniem (dla tech blogów) | P3 | 0.5 dnia |
-| **Table of Contents** | Auto-generowany spis treści z anchor links | P2 | 1 dzień |
-| **Breadcrumbs** | Konfigurowalny breadcrumb z schema.org | P2 | 0.5 dnia |
-| **Product Reviews Carousel** | Karuzela najlepszych recenzji | P2 | 1 dzień |
-| **Pricing Cards** | Cennik z toggle Monthly/Yearly i popular badge | P1 | 1 dzień |
-| **Alert/Banner** | Dismissable announcement bar (cookie-persisted) | P1 | 0.5 dnia |
+| Typ                          | Opis                                                    | Priorytet | Effort   |
+|------------------------------|---------------------------------------------------------|-----------|----------|
+| **Comparison Table**         | Porównanie produktów/planów (kolumny z checkmarks)      | P2        | 1 dzień  |
+| **Before/After Slider**      | Dwa obrazy z suwakiem (np. remont, metamorfoza)         | P3        | 1 dzień  |
+| **Popup/Modal CTA**          | Blok triggerujący popup z ofertą/formularzem            | P2        | 1-2 dni  |
+| **Social Feed**              | Embed Instagram/TikTok grid                             | P3        | 1 dzień  |
+| **Code Snippet**             | Syntax-highlighted code z kopiowaniem (dla tech blogów) | P3        | 0.5 dnia |
+| **Table of Contents**        | Auto-generowany spis treści z anchor links              | P2        | 1 dzień  |
+| **Breadcrumbs**              | Konfigurowalny breadcrumb z schema.org                  | P2        | 0.5 dnia |
+| **Product Reviews Carousel** | Karuzela najlepszych recenzji                           | P2        | 1 dzień  |
+| **Pricing Cards**            | Cennik z toggle Monthly/Yearly i popular badge          | P1        | 1 dzień  |
+| **Alert/Banner**             | Dismissable announcement bar (cookie-persisted)         | P1        | 0.5 dnia |
 
 ---
 
@@ -1870,41 +1870,41 @@ useEffect(() => {
 
 ### Faza A: Content Model (2-3 tygodnie)
 
-| # | Task | Effort | Priorytet |
-|---|------|--------|-----------|
-| A1 | Blog kontener model + migracja + admin UI + API | 3-4 dni | **P1** |
-| A2 | Polymorphic Tags (HasTags trait) | 1-2 dni | **P2** |
-| A3 | Smart Collections (reguły automatyczne na Category) | 3-4 dni | **P2** |
-| A4 | Metafields Core (model + trait + migracja) | 2 dni | **P2** |
-| A5 | Metafield Definitions + Admin UI | 3-4 dni | **P2** |
-| A6 | Metafields w API responses + frontend helpers | 1-2 dni | **P3** |
+| #  | Task                                                | Effort  | Priorytet |
+|----|-----------------------------------------------------|---------|-----------|
+| A1 | Blog kontener model + migracja + admin UI + API     | 3-4 dni | **P1**    |
+| A2 | Polymorphic Tags (HasTags trait)                    | 1-2 dni | **P2**    |
+| A3 | Smart Collections (reguły automatyczne na Category) | 3-4 dni | **P2**    |
+| A4 | Metafields Core (model + trait + migracja)          | 2 dni   | **P2**    |
+| A5 | Metafield Definitions + Admin UI                    | 3-4 dni | **P2**    |
+| A6 | Metafields w API responses + frontend helpers       | 1-2 dni | **P3**    |
 
 ### Faza B: Page Builder Enterprise (3-4 tygodnie)
 
-| # | Task | Effort | Priorytet |
-|---|------|--------|-----------|
-| B1 | Auto-save + "Unsaved changes" indicator | 1 dzień | **P1** |
-| B2 | Scheduled Publishing + Admin UI | 1-2 dni | **P1** |
-| B3 | Custom CSS/Classes per block | 1 dzień | **P1** |
-| B4 | Save as Template (user-created) | 2-3 dni | **P1** |
-| B5 | Block Presets/Variations | 2 dni | **P2** |
-| B6 | Export/Import Page JSON | 1-2 dni | **P2** |
-| B7 | Block Animations | 2-3 dni | **P2** |
-| B8 | Conditional Visibility | 2-3 dni | **P2** |
-| B9 | Content Approval Workflow | 3-4 dni | **P2** |
-| B10 | Multi-language block editing | 3-4 dni | **P2** |
-| B11 | Nowe typy bloków (Alert, Pricing, TOC, Comparison) | 3-4 dni | **P2** |
+| #   | Task                                               | Effort  | Priorytet |
+|-----|----------------------------------------------------|---------|-----------|
+| B1  | Auto-save + "Unsaved changes" indicator            | 1 dzień | **P1**    |
+| B2  | Scheduled Publishing + Admin UI                    | 1-2 dni | **P1**    |
+| B3  | Custom CSS/Classes per block                       | 1 dzień | **P1**    |
+| B4  | Save as Template (user-created)                    | 2-3 dni | **P1**    |
+| B5  | Block Presets/Variations                           | 2 dni   | **P2**    |
+| B6  | Export/Import Page JSON                            | 1-2 dni | **P2**    |
+| B7  | Block Animations                                   | 2-3 dni | **P2**    |
+| B8  | Conditional Visibility                             | 2-3 dni | **P2**    |
+| B9  | Content Approval Workflow                          | 3-4 dni | **P2**    |
+| B10 | Multi-language block editing                       | 3-4 dni | **P2**    |
+| B11 | Nowe typy bloków (Alert, Pricing, TOC, Comparison) | 3-4 dni | **P2**    |
 
 ### Faza C: Advanced (opcjonalne, miesiąc 3+)
 
-| # | Task | Effort | Priorytet |
-|---|------|--------|-----------|
-| C1 | Inline Text Editing | 3-5 dni | **P3** |
-| C2 | AI Content Generation | 2-3 dni | **P3** |
-| C3 | A/B Test Variants | 3-5 dni | **P3** |
-| C4 | Responsive per-breakpoint settings | 3-4 dni | **P3** |
-| C5 | Visual History Panel z thumbnails | 2-3 dni | **P3** |
-| C6 | Metaobjects (custom content types) | 5-7 dni | **P3** |
+| #  | Task                               | Effort  | Priorytet |
+|----|------------------------------------|---------|-----------|
+| C1 | Inline Text Editing                | 3-5 dni | **P3**    |
+| C2 | AI Content Generation              | 2-3 dni | **P3**    |
+| C3 | A/B Test Variants                  | 3-5 dni | **P3**    |
+| C4 | Responsive per-breakpoint settings | 3-4 dni | **P3**    |
+| C5 | Visual History Panel z thumbnails  | 2-3 dni | **P3**    |
+| C6 | Metaobjects (custom content types) | 5-7 dni | **P3**    |
 
 **Łączny effort faz A+B: ~30-40 dni roboczych**
 **Priorytet ogólny: A1 (Blog) → B1-B4 (Builder core) → A4-A5 (Metafields) → reszta**

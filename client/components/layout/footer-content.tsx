@@ -1,5 +1,6 @@
 'use client';
 
+import { Mail } from 'lucide-react';
 import Link from 'next/link';
 
 import { useTranslation } from '@/hooks/use-translation';
@@ -15,10 +16,37 @@ export function FooterContent({
     const { t } = useTranslation();
 
     return (
-        <footer className="border-border bg-muted/30 border-t">
+        <footer className="border-border relative overflow-hidden border-t">
+            <div className="via-primary/50 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent" />
+
+            <div
+                className="from-muted/20 to-muted/50 dark:from-background dark:to-card absolute inset-0 -z-10 bg-gradient-to-b"
+                aria-hidden="true"
+            />
+
+            <div className="border-border/50 border-b py-12">
+                <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+                    <Mail
+                        className="text-primary mx-auto mb-3 h-6 w-6"
+                        aria-hidden="true"
+                    />
+                    <h2 className="text-2xl font-bold tracking-tight">
+                        {t('footer.newsletter_title', 'Stay in the loop')}
+                    </h2>
+                    <p className="text-muted-foreground mt-2 text-sm">
+                        {t(
+                            'footer.newsletter_desc_full',
+                            'New collections, exclusive offers, and design inspiration — straight to your inbox.',
+                        )}
+                    </p>
+                    <div className="mx-auto mt-4 max-w-md">
+                        <NewsletterForm />
+                    </div>
+                </div>
+            </div>
+
             <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-                    {/* Brand */}
                     <div>
                         <Link
                             href="/"
@@ -34,7 +62,6 @@ export function FooterContent({
                         </p>
                     </div>
 
-                    {/* Main links */}
                     {mainItems.length > 0 && (
                         <div>
                             <h3 className="text-muted-foreground mb-3 text-sm font-semibold tracking-wider uppercase">
@@ -55,22 +82,19 @@ export function FooterContent({
                         </div>
                     )}
 
-                    {/* Newsletter */}
                     <div>
                         <h3 className="text-muted-foreground mb-3 text-sm font-semibold tracking-wider uppercase">
-                            {t('footer.newsletter', 'Newsletter')}
+                            {t('footer.support', 'Support')}
                         </h3>
-                        <p className="text-muted-foreground mb-3 text-sm">
+                        <p className="text-muted-foreground text-sm">
                             {t(
-                                'footer.newsletter_desc',
-                                'Get exclusive offers and style inspiration.',
+                                'footer.support_text',
+                                'Need help? Contact our support team.',
                             )}
                         </p>
-                        <NewsletterForm />
                     </div>
                 </div>
 
-                {/* Bottom row */}
                 <div className="border-border mt-8 flex flex-col items-center justify-between gap-4 border-t pt-8 sm:flex-row">
                     <p className="text-muted-foreground text-xs">
                         © {currentYear} Store.{' '}
