@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Services\InvoiceService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\LaravelPdf\Facades\Pdf;
 use Tests\TestCase;
@@ -23,11 +24,12 @@ pest()->extend(TestCase::class)
 
 /*
 |--------------------------------------------------------------------------
-| Global PDF mock — prevent Gotenberg HTTP calls in tests
+| Global mocks — prevent external HTTP calls (Gotenberg) in tests
 |--------------------------------------------------------------------------
 */
 beforeEach(function (): void {
     Pdf::fake();
+    $this->mock(InvoiceService::class);
 });
 
 /*
