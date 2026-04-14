@@ -61,6 +61,12 @@ parameters:
 			path: app/Console/Commands/GenerateSitemap.php
 
 		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Query\\Builder\:\:each\(\) expects callable\(stdClass, int\)\: mixed, Closure\(App\\Models\\Page\)\: void given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Console/Commands/ProcessScheduledPages.php
+
+		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Locale\>\:\:active\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -673,6 +679,12 @@ parameters:
 			path: app/Http/Controllers/Admin/Cms/ReusableBlockController.php
 
 		-
+			message: '#^Call to protected method increment\(\) of class Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: method.protected
+			count: 1
+			path: app/Http/Controllers/Admin/Cms/SectionTemplateController.php
+
+		-
 			message: '#^Access to an undefined property App\\Models\\Currency\:\:\$is_base\.$#'
 			identifier: property.notFound
 			count: 3
@@ -757,7 +769,37 @@ parameters:
 			path: app/Http/Controllers/Admin/Ecommerce/CategoryController.php
 
 		-
+			message: '#^Access to an undefined property App\\Models\\Category\:\:\$meta_robots\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/Ecommerce/CategoryController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Category\:\:\$og_image\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/Ecommerce/CategoryController.php
+
+		-
 			message: '#^Access to an undefined property App\\Models\\Category\:\:\$parent_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/Ecommerce/CategoryController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Category\:\:\$seo_description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/Ecommerce/CategoryController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Category\:\:\$seo_title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/Ecommerce/CategoryController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Category\:\:\$sitemap_exclude\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Controllers/Admin/Ecommerce/CategoryController.php
@@ -1123,6 +1165,24 @@ parameters:
 			path: app/Http/Controllers/Admin/MenuController.php
 
 		-
+			message: '#^Call to method syncMetafields\(\) on an unknown class App\\Concerns\\HasMetafields\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/MetafieldController.php
+
+		-
+			message: '#^PHPDoc tag @var for variable \$model has invalid type App\\Concerns\\HasMetafields\.$#'
+			identifier: varTag.trait
+			count: 1
+			path: app/Http/Controllers/Admin/MetafieldController.php
+
+		-
+			message: '#^PHPDoc tag @var with type App\\Concerns\\HasMetafields is not subtype of native type Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: varTag.nativeType
+			count: 1
+			path: app/Http/Controllers/Admin/MetafieldController.php
+
+		-
 			message: '#^PHPDoc tag @var for variable \$model contains unresolvable type\.$#'
 			identifier: varTag.unresolvableType
 			count: 1
@@ -1393,6 +1453,12 @@ parameters:
 			path: app/Http/Controllers/Api/V1/Blog/BlogCommentController.php
 
 		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Blog\>\:\:active\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: app/Http/Controllers/Api/V1/Blog/BlogController.php
+
+		-
 			message: '#^Access to an undefined property App\\Models\\BlogPostVote\:\:\$vote\.$#'
 			identifier: property.notFound
 			count: 1
@@ -1595,6 +1661,12 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: app/Http/Controllers/Api/V1/LocaleController.php
+
+		-
+			message: '#^PHPDoc tag @var for variable \$model contains unresolvable type\.$#'
+			identifier: varTag.unresolvableType
+			count: 1
+			path: app/Http/Controllers/Api/V1/MetafieldController.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\NewsletterSubscriber\:\:\$email\.$#'
@@ -2539,6 +2611,96 @@ parameters:
 			path: app/Http/Resources/Api/V1/BlogPostResource.php
 
 		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogResource\:\:\$available_locales\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogResource\:\:\$commentable\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogResource\:\:\$defaultAuthor\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogResource\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogResource\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogResource\:\:\$layout\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogResource\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogResource\:\:\$position\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogResource\:\:\$posts_per_page\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogResource\:\:\$seo_description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogResource\:\:\$seo_title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogResource\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/BlogResource.php
+
+		-
 			message: '#^Access to an undefined property App\\Models\\CartItem\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
@@ -2651,6 +2813,42 @@ parameters:
 			identifier: argument.unresolvableType
 			count: 1
 			path: app/Http/Resources/Api/V1/MenuResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Metafield\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/MetafieldResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Metafield\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/MetafieldResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Metafield\:\:\$key\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/MetafieldResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Metafield\:\:\$namespace\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/MetafieldResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Metafield\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/MetafieldResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Metafield\:\:\$value\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/MetafieldResource.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\OrderItem\:\:\$id\.$#'
@@ -3739,10 +3937,22 @@ parameters:
 			path: app/Models/BlockRelation.php
 
 		-
+			message: '#^Method App\\Models\\Blog\:\:publishedPosts\(\) should return Illuminate\\Database\\Eloquent\\Relations\\HasMany\<App\\Models\\BlogPost, \$this\(App\\Models\\Blog\)\> but returns Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\BlogPost\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/Blog.php
+
+		-
 			message: '#^Method App\\Models\\BlogCategory\:\:roots\(\) should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\Query\\Builder\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Models/BlogCategory.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$tags\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/BlogPost.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\ModelVersion\:\:\$version_number\.$#'
@@ -3821,6 +4031,18 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Models/CartItem.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Category\:\:\$collection_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Category.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Category\:\:\$tags\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/Category.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\ModelVersion\:\:\$version_number\.$#'
@@ -4039,6 +4261,18 @@ parameters:
 			path: app/Models/MenuItem.php
 
 		-
+			message: '#^Access to an undefined property App\\Models\\Metafield\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Metafield.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Metafield\:\:\$value\.$#'
+			identifier: property.notFound
+			count: 6
+			path: app/Models/Metafield.php
+
+		-
 			message: '#^Access to an undefined property App\\Models\\NewsletterCampaign\:\:\$total_clicked\.$#'
 			identifier: property.notFound
 			count: 1
@@ -4097,6 +4331,12 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Models/OrderItem.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Page\:\:\$tags\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/Page.php
 
 		-
 			message: '#^Method App\\Models\\Page\:\:allBlocks\(\) should return Illuminate\\Database\\Eloquent\\Relations\\HasMany but returns Illuminate\\Database\\Query\\Builder\.$#'
@@ -4294,6 +4534,12 @@ parameters:
 			message: '#^Access to an undefined property App\\Models\\Product\:\:\$slug\.$#'
 			identifier: property.notFound
 			count: 1
+			path: app/Models/Product.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$tags\.$#'
+			identifier: property.notFound
+			count: 2
 			path: app/Models/Product.php
 
 		-
@@ -5933,6 +6179,18 @@ parameters:
 			identifier: staticMethod.notFound
 			count: 1
 			path: app/Services/PushNotificationService.php
+
+		-
+			message: '#^Method App\\Services\\SmartCollectionService\:\:buildQuery\(\) should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/SmartCollectionService.php
+
+		-
+			message: '#^Method App\\Services\\SmartCollectionService\:\:getMatchingProducts\(\) should return Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Product\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/SmartCollectionService.php
 
 		-
 			message: '#^Cannot call method update\(\) on stdClass\.$#'
