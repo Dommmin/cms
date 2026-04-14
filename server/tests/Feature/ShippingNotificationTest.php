@@ -68,7 +68,10 @@ it('SendShippingNotification handle sends email via Mail::html when active templ
     ]);
 
     $user = User::factory()->create(['email' => 'customer@example.com']);
-    $customer = Customer::factory()->create(['user_id' => $user->id]);
+    $customer = Customer::factory()->create([
+        'user_id' => $user->id,
+        'phone' => null,
+    ]);
     $order = Order::factory()->create(['customer_id' => $customer->id]);
 
     $shippingMethod = ShippingMethod::factory()->create();
@@ -91,7 +94,10 @@ it('SendShippingNotification handle sends email via Mail::html when active templ
 
 it('SendShippingNotification handle skips email when no active template exists', function (): void {
     $user = User::factory()->create(['email' => 'customer@example.com']);
-    $customer = Customer::factory()->create(['user_id' => $user->id]);
+    $customer = Customer::factory()->create([
+        'user_id' => $user->id,
+        'phone' => null,
+    ]);
     $order = Order::factory()->create(['customer_id' => $customer->id]);
 
     Mail::shouldReceive('html')->never();

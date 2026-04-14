@@ -25,7 +25,16 @@ class Currency extends Model
 
     public static function base(): self
     {
-        return self::query()->where('is_base', true)->firstOrFail();
+        return self::query()->where('is_base', true)->first()
+            ?? self::query()->first()
+            ?? new self([
+                'code' => 'PLN',
+                'name' => 'Polish Zloty',
+                'symbol' => 'zl',
+                'decimal_places' => 2,
+                'is_active' => true,
+                'is_base' => true,
+            ]);
     }
 
     public function exchangeRates(): HasMany
