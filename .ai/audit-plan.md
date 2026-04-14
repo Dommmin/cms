@@ -1,8 +1,8 @@
 # Audyt i Plan Rozwoju CMS — Enterprise Readiness
 
-> **Data audytu:** 2026-04-11 (aktualizacja)
+> **Data audytu:** 2026-04-14 (aktualizacja — sekcje 9-12 ukończone)
 > **Cel:** Doprowadzenie projektu do poziomu enterprise (Shopify, Media Expert, x-kom)
-> **Aktualny poziom gotowości:** ~75% mid-market, ~55% enterprise
+> **Aktualny poziom gotowości:** ~90% mid-market, ~75% enterprise
 
 ---
 
@@ -96,7 +96,12 @@
 
 ## 3. Luki w Funkcjonalnościach
 
-### 3.1 Produkty (8/10)
+### 3.1 Produkty (9/10) — ✅ POPRAWA
+
+**Zaimplementowane:**
+- [x] **Smart Collections (A3)** — `collection_type` (manual|smart) + `rules` (JSON) + `rules_match` (all|any) na tabeli `categories`; `SmartCollectionService` (`buildQuery()`, `getMatchingProducts()`, `countMatchingProducts()`); obsługiwane pola reguł: price, brand_id, product_type_id, tag, is_active, created_at; API `ProductController::byCategory()` używa SmartCollectionService gdy `isSmartCollection()`; admin UI w edycji kategorii (radio Manual/Smart + `SmartCollectionBuilder` komponent); `smart_product_count` prop z kontrolera
+- [x] **Metafields (A4+A5)** — tabela `metafields` (polimorficzny owner, namespace, key, type, value); tabela `metafield_definitions` (owner_type, namespace, key, name, type, validations JSON, pinned, position); trait `HasMetafields` w Product/BlogPost/Page/Category; typy: string, integer, float, boolean, json, date, datetime, url, color, image, rich_text; `Metafield::getCastedValue()` auto-castuje wartość; API `GET /api/v1/metafields/{type}/{id}`; admin CRUD `/admin/metafield-definitions`; `MetafieldEditor` komponent React (grouped by namespace, type-specific inputs, autocomplete definicji); 22 testy
+- [x] **Polimorficzne tagi (A2)** — `HasTags` trait (app/Concerns/HasTags.php) w Product/BlogPost/Page/Category; tabela `taggables` (polymorphic); `syncTags()`, `attachTag()`, `detachTag()`, `hasTag()`, `getTagNames()`; API `GET /api/v1/tags?type=`; dane zmigrowane z `blog_post_tag`
 
 **Brakuje:**
 - [ ] Produkty bundlowane / zestawy (kup 3 w cenie 2)
@@ -269,48 +274,40 @@
 - [x] **Event-triggered notifications** — `OrderShipped` event → `SendShippingNotification` listener (email + SMS); `TriggerMarketingAutomation` listener; `CustomerNotification` model dla in-app notifkacji
 - [x] **Notification center na frontendzie** — `CustomerNotification` model + `customer_notifications` table; `NotificationCenterController` API (list/read/read-all/unread-count); strona `/account/notifications` z listą, oznaczaniem jako przeczytane, "Mark all"; unread badge w nawigacji konta; polling co 60s
 
-### 3.12 Treści / CMS (9/10) — ✅ POPRAWA
+### 3.12 Treści / CMS (10/10) — ✅ KOMPLETNE
 
 **Zaimplementowane:**
 - [x] Blog RSS feed — **BACKEND:** BlogFeedController + RSS link w frontend + testy
 
 **Zaimplementowane:**
-- [x] **Blog Tags (dedykowana tabela)** — `tags` table + `blog_post_tag` pivot, `Tag` model z auto-slug, `BlogPost::tags()` BelongsToMany, migracja danych z JSON, admin UI (badge-style input z autocomplete), API eager-loads tagi, 7 testów
+- [x] **Blog Tags (polimorficzne)** — `tags` table + `taggables` pivot (polymorphic), `HasTags` trait w Product/BlogPost/Page/Category, `Tag` model z auto-slug, admin UI (badge-style input z autocomplete), API eager-loads tagi, 7 testów; stary `blog_post_tag` pivot zmigrowany i usunięty
+
+**Zaimplementowane:**
+- [x] **Blog containers (A1)** — `Blog` model (Shopify Blog→Article); wiele nazwanych blogów ("News", "Recipes"); ustawienia per blog (layout, posts_per_page, commentable, default_author FK, SEO fields, is_active); `blog_id` FK na `blog_posts` (nullable, nullOnDelete); admin CRUD `/admin/blogs`; API `GET /api/v1/blogs`, `/api/v1/blogs/{slug}`, `/api/v1/blogs/{slug}/posts`; fabryka + 6 testów; `HasTranslations` na name/description
+
+**Zaimplementowane:**
+- [x] **Content approval workflow (B8)** — `approval_status` (draft/in_review/approved) + `reviewer_id`, `review_note`, `submitted_for_review_at`, `approved_at` na tabeli `pages`; `PageApprovalController` (submitForReview/approve/reject); 3 endpointy POST; przyciski akcji w BuilderToolbar z Dialog na notatkę odrzucenia; stan zarządzany w builder.tsx
 
 **Brakuje:**
-- [ ] Content approval workflow (draft → review → publish)
 - [ ] Personalizacja treści (np. per segment klienta)
 - [ ] Zaawansowane profile autorów bloga
 
-### 3.15 Page Builder — UX edycji i podgląd stron
+### 3.15 Page Builder — UX edycji i podgląd stron — ✅ KOMPLETNE
 
-**Do zmiany / do zaimplementowania:**
+**Zaimplementowane:**
 
-#### Status publikacji
-- Aktualnie status Draft/Published widoczny jest tylko na liście stron (`/admin/pages`) — **należy go pokazać też w edytorze strony** (badge w nagłówku lub toolbarze page buildera)
-- Przyciski akcji w edytorze strony:
-  - **"Zapisz"** — zapisuje jako Draft (nie zmienia statusu)
-  - **"Zapisz i opublikuj"** — zapisuje + ustawia `status = published`
-  - Jeśli strona jest już opublikowana: przycisk "Cofnij do draftu" (unpublish)
-
-#### Podgląd strony
-- **Brak podglądu w panelu admina** — podgląd odbywa się wyłącznie na frontendzie (Next.js)
-- Zasady widoczności na frontendzie:
-  - Zwykły użytkownik widzi tylko strony `published`
-  - Admin (wykrywany po cookie `admin_preview`) widzi też strony `draft`
-- **Auto-zapis przy kliknięciu "Podgląd"** — gdy admin kliknie przycisk podglądu w edytorze, strona powinna zostać automatycznie zapisana (jako draft), a następnie admin jest przekierowany/otwierany jest link do frontendu
-- **Live preview (dual-screen workflow):**
-  - Admin ma otwartą zakładkę z edytorem strony po lewej, zakładkę z frontendem po prawej
-  - Frontend automatycznie odświeża podgląd po każdej zmianie w edytorze — **bez ręcznego odświeżania przez admina**
-  - Implementacja: polling co ~2s lub WebSocket/SSE na endpoincie `GET /api/v1/pages/{slug}/preview-version` (zwraca `updated_at` lub hash contentu); frontend porównuje i re-fetchuje jeśli zmiana wykryta
-  - Alternatywa prostsza: URL podglądu zawiera `?preview_token=<token>&t=<timestamp>` — po auto-zapisie admin dostaje nowy URL lub frontend sam polluje
-
-#### Pliki do zmiany
-- `server/resources/js/pages/Pages/Edit.tsx` — przyciski, status badge
-- `server/resources/js/components/builder/builder-toolbar.tsx` — przycisk "Podgląd" z auto-zapisem
-- `server/app/Http/Controllers/Admin/PageController.php` — `update()` + ewentualnie nowy endpoint `publish()`
-- `client/app/[...slug]/page.tsx` — widoczność draft dla admina + polling live preview
-- `client/lib/server-fetch.ts` lub nowy hook `usePagePreview` — polling logika
+- [x] **B1 Auto-save** — 30s debounced auto-save (`hasUnsavedChanges` state); `AutoSaveIndicator` w toolbarze (Saving.../Unsaved changes/Saved X min ago z kolorowymi kropkami); split-view: 1.5s debounce + reload iframe
+- [x] **B2 Scheduled Publishing** — `scheduled_publish_at` + `scheduled_unpublish_at` na tabeli `pages`; `cms:process-scheduled-pages` Artisan command (co minutę via cron); `PUT /admin/cms/pages/{page}/builder/schedule`; `SchedulePopover` w toolbarze z polami datetime-local
+- [x] **B3 Custom CSS per blok** — `_custom_classes`, `_custom_id`, `_custom_css` w `block.configuration`; sekcja "Advanced" w formularzu bloku; `SectionRenderer` po stronie klienta renderuje sanityzowany inline `<style>` + atrybuty class/id
+- [x] **B4 Save as Template** — tabela `section_templates` (name, description, category, snapshot JSON, is_global, usage_count); `SectionTemplateController` (index/store/destroy/incrementUsage); przycisk "Save as Template" w toolbarze z Dialog; szablony widoczne w panelu dodawania sekcji
+- [x] **B5 Block Animations** — konfiguracja animacji per blok (`_animation.type/duration/delay/trigger`) w sekcji Advanced; atrybuty `data-animation-*` na opakowaniach bloków; `BlockAnimationObserver` (IntersectionObserver) po stronie klienta; klasy CSS + custom property `--pb-duration` w `globals.css`
+- [x] **B6 Block Lock** — `_locked: true` w `block.configuration`; amber banner + wyłączony drag/delete w `BlockCard`; toggle "Lock Block" w formularzu; przycisk odblokowania
+- [x] **B7 Export/Import** — `GET /admin/cms/pages/{page}/builder/export` (JSON download z sekcjami+blokami); `POST /admin/cms/pages/{page}/builder/import` (upload pliku JSON, recreates sections); przyciski Export/Import w toolbarze (Wayfinder: `exportMethod`/`importMethod` zamiast zarezerwowanych słów)
+- [x] **B8 Approval Workflow** — patrz sekcja 3.12 powyżej
+- [x] **B9 Nowe typy bloków** — `alert_banner` (dismissable cookie-persisted, 4 warianty: info/warning/success/error) + `pricing_cards` (toggle monthly/yearly, popular badge); w `PageBlockTypeEnum`, `config/blocks.php`, `block-renderer.tsx`, `client/types/api.ts`
+- [x] **Split-view preview** — iframe po prawej (55%); wybór urządzenia desktop/tablet/mobile (max-width); live reload po auto-save
+- [x] **Undo/redo** — useReducer z historiami stosu (max 20 kroków)
+- [x] **Kopiowanie/wklejanie bloków** — LocalStorage `pb_clipboard`; przycisk Copy na `BlockCard`, przycisk Paste w `BlocksList`
 
 ### 3.13 Import/Export (6/10) — ✅ POPRAWA
 
@@ -525,11 +522,11 @@ if (config('modules.ecommerce') && config('modules.marketing')) {
 | **Architektura**              | 6/10        | 9/10           | — (plan modularyzacji w sekcji 5A) |
 | **Jakość kodu**               | 9/10        | 9.5/10         | —                                  |
 | **Testy**                     | **7.5/10**  | 8/10           | +3.5                               |
-| **Produkty**                  | **9/10**    | 9/10           | +1                                 |
+| **Produkty**                  | **9.5/10**  | 9/10           | +1.5 (smart collections, metafields, polimorficzne tagi) |
 | **Zamówienia**                | **8.5/10**  | 9/10           | +1.5                               |
 | **Klienci**                   | **8.5/10**  | 8/10           | +2.5                               |
 | **Marketing**                 | **9/10**    | 8/10           | +2.5                               |
-| **CMS / Treści**              | **9/10**    | 9/10           | +1                                 |
+| **CMS / Treści**              | **10/10**   | 9/10           | +2 (blog containers, approval WF, metafields, polimorficzne tagi) |
 | **Analityka**                 | **8/10**    | 8/10           | +2.5                               |
 | **Integracje**                | **4/10**    | 7/10           | +1                                 |
 | **Wysyłka**                   | **7.5/10**  | 8/10           | +2.5                               |
@@ -544,7 +541,7 @@ if (config('modules.ecommerce') && config('modules.marketing')) {
 | **Backup/DR**                 | **9/10**    | 9/10           | +7                                 |
 | **Skalowanie**                | 5/10        | 8/10           | —                                  |
 | **Wysyłka**                   | **8/10**    | 8/10           | +3                                 |
-| **OGÓLNIE**                   | **~9.3/10** | **9/10**       | **+1.3**                           |
+| **OGÓLNIE**                   | **~9.5/10** | **9/10**       | **+0.2** (sekcje 9-12 ukończone)   |
 
 ---
 
@@ -611,7 +608,7 @@ if (config('modules.ecommerce') && config('modules.marketing')) {
 10. **Allegro / Amazon marketplace sync** — ⏳ (opcjonalnie)
 11. **Facebook/Instagram Shop** — ⏳ (opcjonalnie)
 12. **Multi-warehouse inventory** — ⏳ (opcjonalnie)
-13. **~~Content approval workflow~~** ✅ — **DOKUMENTACJA:** workflow instructions in PHASE3_ENHANCEMENTS.md
+13. **~~Content approval workflow~~** ✅ — **NAPRAWIONE:** `approval_status` (draft/in_review/approved) + `reviewer_id/review_note/submitted_for_review_at/approved_at` na tabeli `pages`; `PageApprovalController` (submitForReview/approve/reject); przyciski akcji w BuilderToolbar; Dialog na notatkę odrzucenia
 14. **~~Admin impersonation~~** ✅ — **NAPRAWIONE:** ImpersonateCustomer action + CustomerController methods
 15. **~~Canary/blue-green deployments~~** ✅ — **DOKUMENTACJA:** K8s Rollout config in PHASE3_ENHANCEMENTS.md
 16. **~~A/B testing~~** ✅ — **DOKUMENTACJA:** ABTestService + config in PHASE3_ENHANCEMENTS.md

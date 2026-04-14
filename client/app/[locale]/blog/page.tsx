@@ -6,9 +6,7 @@ import type { PageProps } from './page.types';
 
 export const revalidate = 600;
 
-export async function generateMetadata({
-    params,
-}: PageProps): Promise<Metadata> {
+export async function generateMetadata({}: PageProps): Promise<Metadata> {
     return {
         title: 'Blog',
         description: 'Articles, news and inspiration from our team.',

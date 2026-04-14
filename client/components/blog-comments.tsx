@@ -217,7 +217,7 @@ function CommentItem({ comment, slug }: CommentItemProps) {
     );
 }
 
-export function BlogComments({ slug, locale }: BlogCommentsProps) {
+export function BlogComments({ slug }: BlogCommentsProps) {
     const { t } = useTranslation();
     const lp = useLocalePath();
     const { data: user } = useMe();
