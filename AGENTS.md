@@ -149,3 +149,5 @@ After implementing a feature:
 ## Commit Rules
 
 **Only commit files you explicitly modified.** Never stage or commit unrelated changes — including auto-generated files (Wayfinder, migrations, etc.), other developers' work, or files you did not intentionally edit. Always review `git diff --staged` before committing.
+
+**Always run tests before committing PHP changes.** Use `docker compose exec php php artisan test --compact` (or filter to specific files) to verify nothing is broken. Do not commit if tests fail.

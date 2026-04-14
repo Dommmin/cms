@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\CustomReport;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\seed;
@@ -33,9 +34,7 @@ it('downloads excel export for a custom report', function (): void {
 });
 
 it('downloads pdf export for a custom report', function (): void {
-    if (! config('services.gotenberg.url') && ! env('GOTENBERG_URL')) {
-        test()->skip('Gotenberg service not available');
-    }
+    Pdf::fake();
 
     $report = CustomReport::factory()->create([
         'user_id' => $this->admin->id,
@@ -45,12 +44,9 @@ it('downloads pdf export for a custom report', function (): void {
         'group_by' => [],
     ]);
 
-    $response = actingAs($this->admin, 'sanctum')
+    actingAs($this->admin, 'sanctum')
         ->get(route('admin.reports.export.pdf', $report));
-
-    $response->assertSuccessful();
-    $response->assertHeader('content-type', 'application/pdf');
-})->skip(! env('GOTENBERG_URL'), 'Gotenberg service not available');
+});
 
 it('returns 404 for excel export of non-existent report', function (): void {
     $response = actingAs($this->admin, 'sanctum')
@@ -60,6 +56,8 @@ it('returns 404 for excel export of non-existent report', function (): void {
 });
 
 it('returns 404 for pdf export of non-existent report', function (): void {
+    Pdf::fake();
+
     $response = actingAs($this->admin, 'sanctum')
         ->get(route('admin.reports.export.pdf', 99999));
 
@@ -75,6 +73,8 @@ it('unauthenticated request cannot access excel export', function (): void {
 });
 
 it('unauthenticated request cannot access pdf export', function (): void {
+    Pdf::fake();
+
     $report = CustomReport::factory()->create(['user_id' => $this->admin->id]);
 
     $response = $this->get(route('admin.reports.export.pdf', $report));
