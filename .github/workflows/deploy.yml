@@ -49,6 +49,9 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
+      - name: Generate Wayfinder types
+        run: php artisan wayfinder:generate
+
       - name: PHP code style (Pint)
         run: vendor/bin/pint --test
 
@@ -183,6 +186,9 @@ jobs:
 
       - name: Generate application key
         run: php artisan key:generate
+
+      - name: Generate Wayfinder types
+        run: php artisan wayfinder:generate
 
       - name: Build frontend assets
         run: npm run build
