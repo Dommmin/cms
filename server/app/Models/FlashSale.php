@@ -4,12 +4,27 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Date;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property int $product_id
+ * @property int|null $variant_id
+ * @property int $sale_price
+ * @property Carbon|null $starts_at
+ * @property Carbon|null $ends_at
+ * @property bool $is_active
+ * @property int|null $stock_limit
+ * @property int $stock_sold
+ * @property Product|null $product
+ * @property ProductVariant|null $variant
+ */
 class FlashSale extends Model
 {
     use HasFactory;

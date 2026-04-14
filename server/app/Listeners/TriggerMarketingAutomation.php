@@ -7,9 +7,7 @@ namespace App\Listeners;
 use App\Enums\CampaignTriggerEnum;
 use App\Events\OrderCreated;
 use App\Services\MarketingAutomationService;
-use Illuminate\Events\Attributes\AsListener;
 
-#[AsListener(event: OrderCreated::class)]
 final readonly class TriggerMarketingAutomation
 {
     public function __construct(

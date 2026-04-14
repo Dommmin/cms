@@ -6,12 +6,25 @@ namespace App\Models;
 
 use App\Enums\ReturnStatusEnum;
 use App\Enums\ReturnTypeEnum;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
+ * @property int $id
+ * @property string $reference_number
+ * @property string $return_type
+ * @property string $status
+ * @property string|null $reason
+ * @property string|null $customer_notes
+ * @property string|null $admin_notes
+ * @property int|null $refund_amount
+ * @property string|null $return_tracking_number
+ * @property Carbon $created_at
+ * @property Collection $items
  * @property-read Order $order
  */
 class ReturnRequest extends Model

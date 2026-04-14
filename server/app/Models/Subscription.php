@@ -5,11 +5,21 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\SubscriptionStatusEnum;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property string $status
+ * @property Carbon|null $trial_ends_at
+ * @property Carbon|null $expires_at
+ * @property bool $auto_renew
+ * @property int $billing_cycle_count
+ * @property SubscriptionPlan $plan
+ */
 final class Subscription extends Model
 {
     use HasFactory;

@@ -17,13 +17,20 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Translatable\HasTranslations;
 
-class Product extends Model
+/**
+ * @property bool $is_search_promoted
+ * @property bool $is_active
+ */
+class Product extends Model implements HasMedia
 {
     use HasFactory;
     use HasTranslations;
     use HasVersions;
+    use InteractsWithMedia;
     use LogsActivity;
     use Searchable;
 
@@ -127,6 +134,11 @@ class Product extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(ProductReview::class);
+    }
+
+    public function wishlistItems(): HasMany
+    {
+        return $this->hasMany(WishlistItem::class);
     }
 
     /**

@@ -9,6 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $balance
+ * @property int $total_earned
+ * @property int $total_spent
+ */
 class LoyaltyPoint extends Model
 {
     use HasFactory;

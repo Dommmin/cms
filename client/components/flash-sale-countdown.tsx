@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 interface FlashSaleCountdownProps {
-    endsAt: string;
+    endsAt: string | null;
     name?: string;
     salePrice: number;
     originalPrice?: number;
@@ -30,6 +30,7 @@ export function FlashSaleCountdown({
     stockRemaining,
 }: FlashSaleCountdownProps) {
     const [secondsLeft, setSecondsLeft] = useState<number>(() => {
+        if (!endsAt) return 0;
         const diff = Math.floor(
             (new Date(endsAt).getTime() - Date.now()) / 1000,
         );
@@ -38,7 +39,12 @@ export function FlashSaleCountdown({
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        setMounted(true);
+        requestAnimationFrame(() => setMounted(true));
+    }, []);
+
+    useEffect(() => {
+        if (!endsAt) return;
+
         const tick = () => {
             const diff = Math.floor(
                 (new Date(endsAt).getTime() - Date.now()) / 1000,

@@ -126,12 +126,14 @@ export default function NotificationsPage() {
                                                 </p>
                                                 <time
                                                     dateTime={
-                                                        notification.created_at
+                                                        notification.created_at ??
+                                                        ''
                                                     }
                                                     className="text-muted-foreground flex-shrink-0 text-xs"
                                                 >
                                                     {relativeTime(
-                                                        notification.created_at,
+                                                        notification.created_at ??
+                                                            '',
                                                     )}
                                                 </time>
                                             </div>

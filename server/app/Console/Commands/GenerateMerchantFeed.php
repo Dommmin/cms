@@ -73,7 +73,7 @@ class GenerateMerchantFeed extends Command
                 $item->addChild('g:image_link', $variant->getFirstMediaUrl('images') ?? $product->getFirstMediaUrl('images'), 'http://base.google.com/ns/1.0');
                 $item->addChild('g:availability', $variant->stock > 0 ? 'in stock' : 'out of stock', 'http://base.google.com/ns/1.0');
                 $item->addChild('g:price', number_format($variant->price / 100, 2).' PLN', 'http://base.google.com/ns/1.0');
-                $item->addChild('g:brand', $product->brand?->name ?? '', 'http://base.google.com/ns/1.0');
+                $item->addChild('g:brand', $product->brand->name ?? '', 'http://base.google.com/ns/1.0');
                 $item->addChild('g:condition', 'new', 'http://base.google.com/ns/1.0');
                 $item->addChild('g:gtin', $variant->ean ?? '', 'http://base.google.com/ns/1.0');
                 $item->addChild('g:mpn', $variant->sku, 'http://base.google.com/ns/1.0');
@@ -103,7 +103,7 @@ class GenerateMerchantFeed extends Command
                 $productXml->addChild('price', number_format($variant->price / 100, 2).' PLN');
                 $productXml->addChild('link', route('products.show', $product->slug));
                 $productXml->addChild('image_link', $variant->getFirstMediaUrl('images') ?? $product->getFirstMediaUrl('images'));
-                $productXml->addChild('brand', $product->brand?->name ?? '');
+                $productXml->addChild('brand', $product->brand->name ?? '');
 
                 if ($product->category) {
                     $productXml->addChild('product_type', $product->category->getTranslation('name', $locale));

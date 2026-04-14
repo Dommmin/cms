@@ -9,11 +9,11 @@ return [
 
     'environment' => env('APP_ENV', 'production'),
 
-    'sample_rate' => env('GLITCHTIP_SAMPLE_RATE', env('SENTRY_SAMPLE_RATE', 1.0)),
+    'sample_rate' => (float) env('GLITCHTIP_SAMPLE_RATE', env('SENTRY_SAMPLE_RATE', 1.0)),
 
-    'traces_sample_rate' => env('GLITCHTIP_TRACES_SAMPLE_RATE', env('SENTRY_TRACES_SAMPLE_RATE', 0.2)),
+    'traces_sample_rate' => (float) env('GLITCHTIP_TRACES_SAMPLE_RATE', env('SENTRY_TRACES_SAMPLE_RATE', 0.2)),
 
-    'profiles_sample_rate' => env('GLITCHTIP_PROFILES_SAMPLE_RATE', env('SENTRY_PROFILES_SAMPLE_RATE', 0.2)),
+    'profiles_sample_rate' => (float) env('GLITCHTIP_PROFILES_SAMPLE_RATE', env('SENTRY_PROFILES_SAMPLE_RATE', 0.2)),
 
     'breadcrumbs' => [
         'logs' => true,

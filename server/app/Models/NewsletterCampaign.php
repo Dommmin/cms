@@ -8,11 +8,31 @@ use App\Enums\AudienceTypeEnum;
 use App\Enums\CampaignStatusEnum;
 use App\Enums\CampaignTriggerEnum;
 use App\Enums\CampaignTypeEnum;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $subject
+ * @property string|null $preview_text
+ * @property string $sender_email
+ * @property string $sender_name
+ * @property string $html_content
+ * @property string|null $plain_text_content
+ * @property string $audience_type
+ * @property string $type
+ * @property string $status
+ * @property string $trigger
+ * @property int|null $trigger_delay_hours
+ * @property Carbon|null $scheduled_at
+ * @property Carbon|null $created_at
+ * @property int $total_sent
+ * @property int $sends_count
+ */
 class NewsletterCampaign extends Model
 {
     use HasFactory;
@@ -38,6 +58,9 @@ class NewsletterCampaign extends Model
         'started_sending_at' => 'datetime',
         'finished_sending_at' => 'datetime',
     ];
+
+    /** @var array<int, string> */
+    protected $appends = ['sends_count'];
 
     public function segment(): BelongsTo
     {

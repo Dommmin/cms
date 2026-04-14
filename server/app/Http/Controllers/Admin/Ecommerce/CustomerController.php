@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Queries\Admin\CustomerIndexQuery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Response;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -86,7 +87,7 @@ class CustomerController extends Controller
 
     public function impersonate(Customer $customer): RedirectResponse
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         abort_unless($user->can('customers.impersonate'), 403, 'Unauthorized to impersonate customers');
 
@@ -99,7 +100,7 @@ class CustomerController extends Controller
         session()->put('impersonator_id', $user->id);
         session()->put('impersonating_customer', true);
 
-        auth()->login($customerUser);
+        Auth::login($customerUser);
 
         return to_route('account.index')
             ->with('success', 'You are now impersonating '.$customer->name);
@@ -112,7 +113,7 @@ class CustomerController extends Controller
 
         if ($impersonatorId) {
             $admin = User::query()->find($impersonatorId);
-            auth()->login($admin);
+            Auth::login($admin);
         }
 
         return to_route('admin.ecommerce.customers.index')

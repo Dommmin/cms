@@ -11,6 +11,7 @@ use App\Models\Form;
 use App\Models\FormSubmission;
 use App\Models\Order;
 use App\Models\Page;
+use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 
@@ -22,8 +23,11 @@ class DashboardService
      * @param  array{start: Carbon, end: Carbon}  $period
      * @return array<string, mixed>
      */
-    public function getStats(CarbonInterface $start, CarbonInterface $end): array
+    public function getStats(array $period): array
     {
+        $start = $period['start'];
+        $end = $period['end'];
+
         $stats = [
             'cms' => $this->getCmsStats($start, $end),
         ];
@@ -212,7 +216,7 @@ class DashboardService
                 OrderStatusEnum::PENDING->value,
                 OrderStatusEnum::PROCESSING->value,
                 OrderStatusEnum::SHIPPED->value,
-                OrderStatusEnum::Delivered::value,
+                OrderStatusEnum::DELIVERED->value,
             ])
             ->select(
                 DB::raw('DATE(created_at) as date'),

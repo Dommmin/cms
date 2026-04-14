@@ -108,7 +108,7 @@ class OrderController extends ApiController
             $existingCartItem = $cart->items()->where('variant_id', $item->variant_id)->first();
 
             if ($existingCartItem) {
-                $existingCartItem->increment('quantity', $item->quantity);
+                $existingCartItem->getQuery()->where('id', $existingCartItem->id)->increment('quantity', $item->quantity);
             } else {
                 $cart->items()->create([
                     'variant_id' => $item->variant_id,

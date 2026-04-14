@@ -46,7 +46,7 @@ class HealthCheckController extends Controller
     private function checkRedis(): bool
     {
         try {
-            Redis::ping();
+            Redis::connection()->ping();
 
             return true;
         } catch (Throwable) {

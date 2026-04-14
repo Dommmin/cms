@@ -26,7 +26,7 @@ final class NewsletterCampaignNotification extends Notification
             ->from($this->campaign->sender_email, $this->campaign->sender_name);
 
         if ($this->campaign->preview_text) {
-            $mail->introLine($this->campaign->preview_text);
+            $mail->line($this->campaign->preview_text);
         }
 
         if ($this->campaign->html_content) {

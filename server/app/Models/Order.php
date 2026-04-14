@@ -19,6 +19,8 @@ use App\States\Order\PendingState;
 use App\States\Order\ProcessingState;
 use App\States\Order\RefundedState;
 use App\States\Order\ShippedState;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,6 +31,25 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\ModelStates\Exceptions\TransitionNotAllowed;
 use Spatie\ModelStates\HasStates;
 
+/**
+ * @property int $id
+ * @property string $reference_number
+ * @property string $status
+ * @property int $subtotal
+ * @property int $shipping_cost
+ * @property int $discount_amount
+ * @property int $tax_amount
+ * @property int $total
+ * @property string $currency_code
+ * @property string|null $notes
+ * @property string|null $guest_email
+ * @property Carbon $created_at
+ * @property Collection $items
+ * @property Customer|null $customer
+ * @property Shipment|null $shipment
+ * @property Payment|null $payment
+ * @property Collection $returns
+ */
 class Order extends Model
 {
     use HasFactory;

@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Jobs\DeliverWebhookJob;
 use App\Models\Webhook;
+use App\Models\WebhookDelivery;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -118,6 +119,7 @@ final class WebhookController extends Controller
 
         dispatch_sync(new DeliverWebhookJob($webhook, 'webhook.test', $payload));
 
+        /** @var WebhookDelivery|null $latestDelivery */
         $latestDelivery = $webhook->deliveries()->latest()->first();
 
         return response()->json([

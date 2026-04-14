@@ -8,6 +8,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property int $price
+ * @property string $currency
+ * @property string $billing_period
+ * @property int $billing_cycle
+ * @property int $trial_days
+ */
 final class SubscriptionPlan extends Model
 {
     use HasFactory;

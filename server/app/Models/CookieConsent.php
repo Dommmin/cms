@@ -7,6 +7,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property bool $granted
+ * @property string $consent_version
+ */
 class CookieConsent extends Model
 {
     use HasFactory;

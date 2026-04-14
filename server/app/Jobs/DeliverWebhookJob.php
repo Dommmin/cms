@@ -67,11 +67,11 @@ final class DeliverWebhookJob implements ShouldQueue
                     'failure_count' => 0,
                 ]);
             } else {
-                $this->webhook->increment('failure_count');
+                Webhook::query()->where('id', $this->webhook->id)->increment('failure_count');
                 $this->fail('HTTP '.$response->status());
             }
         } catch (Exception $exception) {
-            $this->webhook->increment('failure_count');
+            Webhook::query()->where('id', $this->webhook->id)->increment('failure_count');
             throw $exception;
         }
     }

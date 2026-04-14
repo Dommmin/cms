@@ -22,10 +22,6 @@ final class ApiCacheHeaders
     {
         $response = $next($request);
 
-        if (! $response instanceof Response) {
-            return $response;
-        }
-
         // Never cache error responses
         if ($response->getStatusCode() >= 400) {
             $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');

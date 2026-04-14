@@ -8,6 +8,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $data_source
+ * @property array $metrics
+ * @property array $dimensions
+ * @property array $filters
+ * @property string $chart_type
+ */
 final class CustomReport extends Model
 {
     use HasFactory;

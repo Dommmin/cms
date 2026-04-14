@@ -52,13 +52,15 @@ class ProfileController extends ApiController
     {
         $user = $request->user();
 
-        if (! Hash::check($request->current_password, $user->password)) {
+        $validated = $request->validated();
+
+        if (! Hash::check($validated['current_password'], $user->password)) {
             throw ValidationException::withMessages([
                 'current_password' => ['The provided password does not match your current password.'],
             ]);
         }
 
-        $user->update(['password' => Hash::make($request->password)]);
+        $user->update(['password' => Hash::make($validated['password'])]);
 
         return $this->ok(['message' => 'Password updated successfully']);
     }

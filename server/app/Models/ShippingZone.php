@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property float $base_rate
+ * @property float $per_kg_rate
+ */
 class ShippingZone extends Model
 {
     use HasFactory;

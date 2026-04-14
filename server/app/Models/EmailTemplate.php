@@ -7,6 +7,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property string $subject
+ * @property string $body
+ */
 class EmailTemplate extends Model
 {
     use HasFactory;

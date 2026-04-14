@@ -4,12 +4,25 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Date;
 
+/**
+ * @property int $id
+ * @property int $customer_id
+ * @property int|null $user_id
+ * @property string $type
+ * @property string $title
+ * @property string $body
+ * @property array|null $data
+ * @property Carbon|null $read_at
+ * @property string|null $action_url
+ * @property Carbon|null $created_at
+ */
 final class CustomerNotification extends Model
 {
     use HasFactory;

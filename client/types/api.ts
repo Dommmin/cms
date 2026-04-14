@@ -261,6 +261,7 @@ export interface Shipment {
     id: number;
     carrier: string;
     tracking_number: string | null;
+    tracking_url: string | null;
     status: string;
     shipped_at: string | null;
 }
@@ -278,6 +279,27 @@ export interface OrderStatusHistory {
     status: string;
     note: string | null;
     created_at: string;
+}
+
+export interface OrderReturnItem {
+    quantity: number;
+    condition: string | null;
+    product_name: string | null;
+}
+
+export interface OrderReturn {
+    id: number;
+    reference_number: string;
+    return_type: string;
+    status: string;
+    reason: string | null;
+    customer_notes: string | null;
+    admin_notes: string | null;
+    /** refund amount in cents */
+    refund_amount: number | null;
+    return_tracking_number: string | null;
+    created_at: string;
+    items: OrderReturnItem[];
 }
 
 export interface Order {
@@ -303,6 +325,7 @@ export interface Order {
     shipping_address?: Address;
     billing_address?: Address;
     status_history?: OrderStatusHistory[];
+    returns?: OrderReturn[];
     created_at: string;
 }
 
@@ -645,6 +668,30 @@ export interface ActivePromotion {
     banner_color: string | null;
     banner_url: string | null;
     ends_at: string | null;
+}
+
+export interface CustomerNotification {
+    id: number;
+    type: string;
+    title: string;
+    body: string;
+    data: Record<string, unknown> | null;
+    read_at: string | null;
+    action_url: string | null;
+    created_at: string | null;
+}
+
+export interface FlashSale {
+    id: number;
+    name: string;
+    product_id: number;
+    variant_id: number | null;
+    /** sale price in cents */
+    sale_price: number;
+    ends_at: string | null;
+    stock_remaining: number | null;
+    product: { id: number; name: string; slug: string } | null;
+    variant: { id: number; sku: string } | null;
 }
 
 // ── Support Chat ──────────────────────────────────────────────────────────────

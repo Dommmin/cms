@@ -62,7 +62,7 @@ describe('Module system', function (): void {
         config(['modules.ecommerce' => false]);
 
         $service = new DashboardService();
-        $stats = $service->getStats(now()->subDays(30), now());
+        $stats = $service->getStats(['start' => now()->subDays(30), 'end' => now()]);
 
         expect($stats)->toHaveKey('cms')
             ->and($stats['cms'])->toHaveKeys(['published_pages', 'published_posts', 'new_form_submissions', 'active_forms'])

@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property string $channel
+ * @property string $event
+ * @property bool $is_enabled
+ */
 class NotificationPreference extends Model
 {
     use HasFactory;

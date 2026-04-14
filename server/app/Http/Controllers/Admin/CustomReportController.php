@@ -10,6 +10,7 @@ use App\Models\CustomReport;
 use App\Services\CustomReportBuilderService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use Maatwebsite\Excel\Facades\Excel;
@@ -27,7 +28,7 @@ final class CustomReportController extends Controller
     {
         $reports = CustomReport::query()
             ->with('user')
-            ->where('user_id', auth()->id())
+            ->where('user_id', Auth::id())
             ->orWhere('is_public', true)
             ->latest()
             ->get();
@@ -61,7 +62,7 @@ final class CustomReportController extends Controller
 
         $report = CustomReport::query()->create([
             ...$validated,
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
         ]);
 
         return to_route('admin.reports.show', $report)

@@ -6,7 +6,7 @@ self.addEventListener('push', (event) => {
             icon: data.icon || '/icon-192x192.png',
             badge: '/icon-96x96.png',
             data: data.url ? { url: data.url } : {},
-        })
+        }),
     );
 });
 

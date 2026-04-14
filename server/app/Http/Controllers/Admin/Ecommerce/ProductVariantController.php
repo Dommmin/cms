@@ -139,7 +139,7 @@ class ProductVariantController extends Controller
         foreach ($validated['tiers'] ?? [] as $tier) {
             $variant->priceTiers()->create([
                 'min_quantity' => $tier['min_quantity'],
-                'max_quantity' => isset($tier['max_quantity']) && $tier['max_quantity'] !== null && $tier['max_quantity'] !== '' ? (int) $tier['max_quantity'] : null,
+                'max_quantity' => isset($tier['max_quantity']) && $tier['max_quantity'] !== '' ? (int) $tier['max_quantity'] : null,
                 'price' => (int) round((float) $tier['price'] * 100),
             ]);
         }
