@@ -37,6 +37,7 @@ class BlogPost extends Model
 
     protected $fillable = [
         'user_id',
+        'blog_id',
         'blog_category_id',
         'title',
         'slug',
@@ -63,6 +64,11 @@ class BlogPost extends Model
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->useLogName('blog_post');
+    }
+
+    public function blog(): BelongsTo
+    {
+        return $this->belongsTo(Blog::class);
     }
 
     public function author(): BelongsTo

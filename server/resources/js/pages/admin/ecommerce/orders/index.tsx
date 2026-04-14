@@ -17,7 +17,7 @@ import {
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
-import { bulkUpdateStatus } from '@/routes/admin/ecommerce/orders';
+import { bulkUpdateStatus, exportMethod } from '@/routes/admin/ecommerce/orders';
 import type { BreadcrumbItem } from '@/types';
 import type { OrderData } from './index.types';
 
@@ -91,7 +91,7 @@ export default function OrdersIndex({
                 >
                     <PageHeaderActions>
                         <Button variant="outline" asChild>
-                            <a href={OrderRoutes.exportMethod.url()}>
+                            <a href={exportMethod.url()}>
                                 <DownloadIcon className="mr-2 h-4 w-4" />
                                 {__('action.export_csv', 'Export CSV')}
                             </a>

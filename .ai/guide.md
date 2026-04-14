@@ -29,6 +29,7 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - **Media** — upload, search, spatie/medialibrary
 - **Locales + Translations** — CRUD, inline edit, URL-based locale (`/en/`, `/pl/`)
 - **Blog** — posts (markdown/richtext), categories, featured, scheduling, SEO, views count
+- **Blog containers** — `Blog` model (Shopify Blog→Article pattern); multiple named blogs ("News", "Recipes"); settings per blog (layout, posts_per_page, commentable, default_author); `blog_id` FK on `blog_posts` (nullable, nullOnDelete); admin CRUD at `/admin/blogs`; API at `GET /api/v1/blogs`, `GET /api/v1/blogs/{slug}`, `GET /api/v1/blogs/{slug}/posts`
 - **Stores** — physical store locations with map
 
 ### E-commerce

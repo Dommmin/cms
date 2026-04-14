@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\SocialLoginController;
 use App\Http\Controllers\Api\V1\Blog\BlogCategoryController as ApiBlogCategoryController;
 use App\Http\Controllers\Api\V1\Blog\BlogCommentController as ApiBlogCommentController;
+use App\Http\Controllers\Api\V1\Blog\BlogController as ApiBlogController;
 use App\Http\Controllers\Api\V1\Blog\BlogPostController as ApiBlogPostController;
 use App\Http\Controllers\Api\V1\ConsentController;
 use App\Http\Controllers\Api\V1\FaqController;
@@ -70,6 +71,11 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::get('faqs', [FaqController::class, 'index'])->name('faqs.index');
         Route::get('stores', new ApiStoreController()->index(...))->name('stores.index');
         Route::get('stores/{store}', new ApiStoreController()->show(...))->name('stores.show');
+
+        // Blogs (containers)
+        Route::get('blogs', [ApiBlogController::class, 'index'])->name('blogs.index');
+        Route::get('blogs/{slug}', [ApiBlogController::class, 'show'])->name('blogs.show');
+        Route::get('blogs/{slug}/posts', [ApiBlogController::class, 'posts'])->name('blogs.posts');
 
         // Blog
         Route::prefix('blog')->name('blog.')->group(function (): void {
