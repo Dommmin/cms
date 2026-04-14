@@ -15,14 +15,20 @@ class SmsService
         private string $apiKey = '',
         private string $sender = ''
     ) {
-        $this->provider = config('services.sms.provider', 'smsapi');
-        $this->apiKey = config('services.sms.api_key');
-        $this->sender = config('services.sms.sender', 'CMS');
+        $this->provider = (string) config('services.sms.provider', 'smsapi');
+        $this->apiKey = (string) config('services.sms.api_key', '');
+        $this->sender = (string) config('services.sms.sender', 'CMS');
     }
 
     public function send(string $to, string $message): bool
     {
         if ($this->provider === 'smsapi') {
+            if ($this->apiKey === '') {
+                Log::warning('SMS API key is not configured');
+
+                return false;
+            }
+
             return $this->sendViaSmsApi($to, $message);
         }
 
@@ -58,8 +64,14 @@ class SmsService
     private function sendViaTwilio(string $to, string $message): bool
     {
         try {
-            $accountSid = config('services.twilio.account_sid');
-            $authToken = config('services.twilio.auth_token');
+            $accountSid = (string) config('services.twilio.account_sid', '');
+            $authToken = (string) config('services.twilio.auth_token', '');
+
+            if ($accountSid === '' || $authToken === '' || $this->sender === '') {
+                Log::warning('Twilio credentials are not configured');
+
+                return false;
+            }
 
             $response = Http::withBasicAuth($accountSid, $authToken)
                 ->post(sprintf('https://api.twilio.com/2010-04-01/Accounts/%s/Messages.json', $accountSid), [

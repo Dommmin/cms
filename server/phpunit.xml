@@ -26,6 +26,10 @@
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>
         <env name="MAIL_MAILER" value="array"/>
+        <env name="MODULE_BLOG" value="true"/>
+        <env name="MODULE_ECOMMERCE" value="true"/>
+        <env name="MODULE_NEWSLETTER" value="true"/>
+        <env name="MODULE_MARKETING" value="true"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>

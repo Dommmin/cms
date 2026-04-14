@@ -100,6 +100,17 @@ return [
         'bank_name' => env('BANK_TRANSFER_BANK_NAME', ''),
     ],
 
+    'sms' => [
+        'provider' => env('SMS_PROVIDER', 'smsapi'),
+        'api_key' => env('SMS_API_KEY', ''),
+        'sender' => env('SMS_SENDER', 'CMS'),
+    ],
+
+    'twilio' => [
+        'account_sid' => env('TWILIO_ACCOUNT_SID', ''),
+        'auth_token' => env('TWILIO_AUTH_TOKEN', ''),
+    ],
+
     'cloudflare' => [
         'turnstile_secret' => env('CLOUDFLARE_TURNSTILE_SECRET_KEY'),
     ],
