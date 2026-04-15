@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { CompareButton } from '@/components/compare-button';
 import { JsonLd } from '@/components/json-ld';
+import { LiveViewers } from '@/components/live-viewers';
 import { ProductCard } from '@/components/product-card';
 import { RecentlyViewed } from '@/components/recently-viewed';
 import { useMe } from '@/hooks/use-auth';
@@ -370,6 +371,9 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
                     <div className="mt-3">
                         <p className="text-2xl font-semibold">{price}</p>
+                        <div className="mt-1">
+                            <LiveViewers />
+                        </div>
                         {selectedVariant?.compare_at_price &&
                             selectedVariant.compare_at_price >
                                 selectedVariant.price && (

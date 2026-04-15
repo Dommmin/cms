@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist, Geist_Mono, Playfair_Display } from 'next/font/google';
 import { cookies } from 'next/headers';
 import { cache } from 'react';
 import { ToastContainer } from 'react-toastify';
@@ -15,6 +15,8 @@ import { AnnouncementBar } from '@/components/layout/announcement-bar';
 import { Footer } from '@/components/layout/footer';
 import { GoogleTagManager } from '@/components/layout/google-tag-manager';
 import { Header } from '@/components/layout/header';
+import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
+import { PageTransition } from '@/components/layout/page-transition';
 import { BlockAnimationObserver } from '@/components/page-builder/block-animation-observer';
 import { buildOrganization, buildWebSite } from '@/lib/schema';
 import { serverFetch } from '@/lib/server-fetch';
@@ -32,6 +34,12 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
     variable: '--font-geist-mono',
+    subsets: ['latin'],
+    display: 'swap',
+});
+
+const playfair = Playfair_Display({
+    variable: '--font-playfair',
     subsets: ['latin'],
     display: 'swap',
 });
@@ -157,7 +165,7 @@ export default async function RootLayout({
                 />
             </head>
             <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased${isAdminPreview ? 'pt-10' : ''}`}
+                className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased${isAdminPreview ? 'pt-10' : ''}`}
             >
                 <a
                     href="#main-content"
@@ -171,10 +179,14 @@ export default async function RootLayout({
                         <div className="flex min-h-screen flex-col">
                             <AnnouncementBar />
                             <Header modules={modules} />
-                            <main id="main-content" className="flex-1">
-                                {children}
+                            <main
+                                id="main-content"
+                                className="flex-1 pb-16 md:pb-0"
+                            >
+                                <PageTransition>{children}</PageTransition>
                             </main>
                             <Footer />
+                            <MobileBottomNav />
                         </div>
                         <CookieConsent settings={cookieSettings} />
                         <ChatWidgetLoader />

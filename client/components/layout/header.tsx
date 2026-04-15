@@ -6,6 +6,7 @@ import type { Category, MenuItem } from '@/types/api';
 
 import { AuthButton } from './auth-button';
 import { CartButton } from './cart-button';
+import { HeaderClient } from './header-client';
 import type { HeaderProps } from './header.types';
 import { LocaleSwitcher } from './locale-switcher';
 import { MegaMenu } from './mega-menu';
@@ -41,10 +42,7 @@ export async function Header({ modules }: HeaderProps) {
     ]);
 
     return (
-        <header
-            aria-label="Site header"
-            className="border-border bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 border-b backdrop-blur"
-        >
+        <HeaderClient>
             <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 {/* Logo */}
                 <Link
@@ -75,6 +73,6 @@ export async function Header({ modules }: HeaderProps) {
                     />
                 </div>
             </div>
-        </header>
+        </HeaderClient>
     );
 }

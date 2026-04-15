@@ -1,6 +1,12 @@
 'use client';
 
-import { ShoppingBag } from 'lucide-react';
+import {
+    Check,
+    RotateCcw,
+    ShieldCheck,
+    ShoppingBag,
+    Truck,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -28,6 +34,44 @@ import { useTranslation } from '@/hooks/use-translation';
 import { getToken } from '@/lib/axios';
 import { trackBeginCheckout, trackPurchase } from '@/lib/datalayer';
 import type { Address } from '@/types/api';
+import type { StepState } from './checkout.types';
+
+// ── Step indicator ─────────────────────────────────────────────────────────
+
+function CheckoutStepIndicator({
+    label,
+    number,
+    state,
+}: {
+    label: string;
+    number: number;
+    state: StepState;
+}) {
+    return (
+        <div className="flex items-center gap-2">
+            <span
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all duration-300 ${
+                    state === 'completed'
+                        ? 'bg-green-500 text-white'
+                        : state === 'current'
+                          ? 'bg-primary text-primary-foreground shadow-[0_0_0_4px_oklch(0.537_0.229_276.9_/_0.2)]'
+                          : 'bg-muted text-muted-foreground'
+                }`}
+            >
+                {state === 'completed' ? <Check className="h-4 w-4" /> : number}
+            </span>
+            <span
+                className={`hidden text-sm font-medium sm:inline ${
+                    state === 'upcoming'
+                        ? 'text-muted-foreground'
+                        : 'text-foreground'
+                }`}
+            >
+                {label}
+            </span>
+        </div>
+    );
+}
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -319,27 +363,27 @@ export default function CheckoutPage() {
                 className="mb-8"
             >
                 <ol className="flex items-center gap-0">
-                    {CHECKOUT_STEPS.map((step, i) => (
-                        <li
-                            key={step.label}
-                            className="flex flex-1 items-center"
-                        >
-                            <span className="flex items-center gap-2">
-                                <span className="bg-primary text-primary-foreground flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold">
-                                    {i + 1}
-                                </span>
-                                <span className="hidden text-sm font-medium sm:inline">
-                                    {step.label}
-                                </span>
-                            </span>
-                            {i < CHECKOUT_STEPS.length - 1 && (
-                                <span
-                                    className="bg-border mx-2 h-px flex-1"
-                                    aria-hidden="true"
+                    {CHECKOUT_STEPS.map((step, i) => {
+                        const state: StepState = 'current';
+                        return (
+                            <li
+                                key={step.label}
+                                className="flex flex-1 items-center"
+                            >
+                                <CheckoutStepIndicator
+                                    label={step.label}
+                                    number={i + 1}
+                                    state={state}
                                 />
-                            )}
-                        </li>
-                    ))}
+                                {i < CHECKOUT_STEPS.length - 1 && (
+                                    <span
+                                        className="bg-border mx-2 h-px flex-1"
+                                        aria-hidden="true"
+                                    />
+                                )}
+                            </li>
+                        );
+                    })}
                 </ol>
             </nav>
 
@@ -735,6 +779,40 @@ export default function CheckoutPage() {
                                     <span>{t('cart.total', 'Total')}</span>
                                     <span>{formatPrice(total)}</span>
                                 </div>
+                            </div>
+
+                            {/* Trust badges */}
+                            <div className="border-border text-muted-foreground mt-4 flex flex-col gap-2 border-t pt-4 text-xs">
+                                {(
+                                    [
+                                        {
+                                            icon: ShieldCheck,
+                                            label: 'Bezpieczna płatność SSL',
+                                        },
+                                        {
+                                            icon: RotateCcw,
+                                            label: '14 dni na zwrot',
+                                        },
+                                        {
+                                            icon: Truck,
+                                            label: 'Darmowa dostawa od 200 zł',
+                                        },
+                                    ] as {
+                                        icon: React.ElementType;
+                                        label: string;
+                                    }[]
+                                ).map(({ icon: Icon, label }) => (
+                                    <div
+                                        key={label}
+                                        className="flex items-center gap-2"
+                                    >
+                                        <Icon
+                                            className="text-primary h-3.5 w-3.5 shrink-0"
+                                            aria-hidden="true"
+                                        />
+                                        <span>{label}</span>
+                                    </div>
+                                ))}
                             </div>
 
                             {error && (

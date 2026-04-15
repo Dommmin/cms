@@ -1,8 +1,8 @@
 # Audyt i Plan Rozwoju CMS — Enterprise Readiness
 
-> **Data audytu:** 2026-04-14 (aktualizacja — sekcje 9-12 ukończone)
+> **Data audytu:** 2026-04-15 (aktualizacja — UI/UX redesign + modularyzacja ukończone)
 > **Cel:** Doprowadzenie projektu do poziomu enterprise (Shopify, Media Expert, x-kom)
-> **Aktualny poziom gotowości:** ~90% mid-market, ~75% enterprise
+> **Aktualny poziom gotowości:** ~95% mid-market, ~80% enterprise
 
 ---
 
@@ -424,11 +424,11 @@
 
 ---
 
-## 5A. Architektura — Modularyzacja (CMS bez sklepu)
+## 5A. Architektura — Modularyzacja (CMS bez sklepu) ✅ KOMPLETNE
 
 > **Cel:** CMS powinien działać jako samodzielna platforma do budowy stron — bez e-commerce.
 > **Podejście:** Domain Service Providers (Option B) — modularność przez Laravel Service Providery.
-> **Status:** Planowane
+> **Status:** ✅ WDROŻONE (2026-04-15)
 
 ### 5A.1 Obecny stan — klasyfikacja kodu
 
@@ -519,7 +519,7 @@ if (config('modules.ecommerce') && config('modules.marketing')) {
 |-------------------------------|-------------|----------------|------------------------------------|
 | **Bezpieczeństwo — Backend**  | **9.5/10**  | 9.5/10         | +0.5                               |
 | **Bezpieczeństwo — Frontend** | **8.5/10**  | 9/10           | +2.5                               |
-| **Architektura**              | 6/10        | 9/10           | — (plan modularyzacji w sekcji 5A) |
+| **Architektura**              | **9/10**    | 9/10           | +3 (EcommerceServiceProvider, NewsletterServiceProvider, config/modules.php, warunkowy sidebar) |
 | **Jakość kodu**               | 9/10        | 9.5/10         | —                                  |
 | **Testy**                     | **7.5/10**  | 8/10           | +3.5                               |
 | **Produkty**                  | **9.5/10**  | 9/10           | +1.5 (smart collections, metafields, polimorficzne tagi) |
@@ -541,7 +541,7 @@ if (config('modules.ecommerce') && config('modules.marketing')) {
 | **Backup/DR**                 | **9/10**    | 9/10           | +7                                 |
 | **Skalowanie**                | 5/10        | 8/10           | —                                  |
 | **Wysyłka**                   | **8/10**    | 8/10           | +3                                 |
-| **OGÓLNIE**                   | **~9.5/10** | **9/10**       | **+0.2** (sekcje 9-12 ukończone)   |
+| **OGÓLNIE**                   | **~9.7/10** | **9/10**       | **+0.2** (UI/UX redesign + modularyzacja)   |
 
 ---
 
@@ -629,12 +629,13 @@ if (config('modules.ecommerce') && config('modules.marketing')) {
 
 ---
 
-## 8. UI/UX Visual Redesign — Storefront
+## 8. UI/UX Visual Redesign — Storefront ✅ KOMPLETNE
 
 > **Cel:** Przekształcenie storefrontu w nowoczesny, stunningowy e-commerce 2025/2026 — poziom Allbirds, Glossier, Arc.
 > **Dotyczy:** wyłącznie `client/` (Next.js).
-> **Obecny stan:** Solidna baza — Tailwind v4 + Geist Sans, dark mode, indigo primary, oklch kolory. Brakuje charakteru wizualnego, depth, micro-animacji i nowoczesnych layout patterns.
-> **Stack:** Tailwind v4, framer-motion (do dodania), Geist (można rozszerzyć o display font).
+> **Status:** ✅ WDROŻONE (2026-04-15)
+> **Zaimplementowano:** głębszy neutral bg, amber accent, Playfair Display font, fluid type scale, shimmer animation, header scroll effect (backdrop blur), product card hover lift + deep shadow, cart bounce animation, checkout step states (completed/current/upcoming), live viewers indicator, trust badges w checkout, mobile floating bottom nav, framer-motion page transitions.
+> **Stack:** Tailwind v4, framer-motion (zainstalowane), Geist + Playfair Display.
 
 ---
 

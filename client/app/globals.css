@@ -15,6 +15,7 @@
 
 @theme inline {
     --animate-marquee: marquee var(--marquee-duration, 35s) linear infinite;
+    --font-display: var(--font-playfair, var(--font-geist-sans));
     --color-background: var(--background);
     --color-foreground: var(--foreground);
     --font-sans: var(--font-geist-sans);
@@ -61,7 +62,7 @@
     --radius: 0.5rem;
 
     /* Base */
-    --background: oklch(1 0 0);
+    --background: oklch(0.985 0.004 264.7);
     --foreground: oklch(0.13 0.025 264.7);
 
     /* Cards / Popovers */
@@ -110,18 +111,25 @@
     --sidebar-accent-foreground: oklch(0.25 0.04 264.7);
     --sidebar-border: oklch(0.9 0.012 264.7);
     --sidebar-ring: oklch(0.537 0.229 276.9);
+
+    /* Vivid accent */
+    --accent-vivid: oklch(0.82 0.165 80);
+    --accent-vivid-foreground: oklch(0.15 0 0);
 }
 
 .dark {
     /* Base */
-    --background: oklch(0.135 0.022 264.7);
+    --background: oklch(0.1 0.02 264.7);
     --foreground: oklch(0.97 0 0);
 
     /* Cards / Popovers */
-    --card: oklch(0.195 0.022 264.7);
+    --card: oklch(0.16 0.022 264.7);
     --card-foreground: oklch(0.97 0 0);
-    --popover: oklch(0.195 0.022 264.7);
+    --popover: oklch(0.16 0.022 264.7);
     --popover-foreground: oklch(0.97 0 0);
+
+    /* Elevated card */
+    --card-elevated: oklch(0.22 0.022 264.7);
 
     /* Primary — indigo-400/500 (lighter for dark bg) */
     --primary: oklch(0.635 0.215 276.9);
@@ -154,8 +162,12 @@
     --chart-4: oklch(0.627 0.265 303.9);
     --chart-5: oklch(0.645 0.246 16.439);
 
+    /* Vivid accent */
+    --accent-vivid: oklch(0.82 0.165 80);
+    --accent-vivid-foreground: oklch(0.15 0 0);
+
     /* Sidebar */
-    --sidebar: oklch(0.195 0.022 264.7);
+    --sidebar: oklch(0.16 0.022 264.7);
     --sidebar-foreground: oklch(0.97 0 0);
     --sidebar-primary: oklch(0.635 0.215 276.9);
     --sidebar-primary-foreground: oklch(1 0 0);
@@ -347,6 +359,39 @@
     .dark .glassmorphism {
         border: 1px solid oklch(1 0 0 / 5%);
     }
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+    from {
+        background-position: -200% 0;
+    }
+    to {
+        background-position: 200% 0;
+    }
+}
+.skeleton-shimmer {
+    background: linear-gradient(
+        90deg,
+        var(--muted) 25%,
+        oklch(from var(--muted) l c h / 0.5) 50%,
+        var(--muted) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* Fluid typography utilities */
+.hero-heading {
+    font-size: clamp(2.5rem, 6vw + 1rem, 5.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    font-family: var(--font-display, var(--font-geist-sans));
+    font-weight: 700;
+}
+.section-heading {
+    font-size: clamp(1.75rem, 3vw + 0.5rem, 3rem);
+    letter-spacing: -0.02em;
 }
 
 /* Page Builder Block Animations */
