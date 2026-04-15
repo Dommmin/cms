@@ -4,28 +4,28 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+#[Fillable([
+    'name',
+    'slug',
+    'address',
+    'city',
+    'country',
+    'phone',
+    'email',
+    'opening_hours',
+    'lat',
+    'lng',
+    'is_active',
+])]
 class Store extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'name',
-        'slug',
-        'address',
-        'city',
-        'country',
-        'phone',
-        'email',
-        'opening_hours',
-        'lat',
-        'lng',
-        'is_active',
-    ];
 
     #[Scope]
     protected function active(Builder $query): Builder

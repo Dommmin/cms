@@ -9,6 +9,9 @@ use App\Enums\CampaignStatusEnum;
 use App\Enums\CampaignTriggerEnum;
 use App\Enums\CampaignTypeEnum;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -33,20 +36,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $total_sent
  * @property int $sends_count
  */
+#[Appends(['sends_count'])]
+#[Fillable([
+    'name', 'subject', 'preview_text', 'sender_name', 'sender_email',
+    'html_content', 'plain_text_content', 'audience_type', 'newsletter_segment_id',
+    'target_tags', 'type', 'status', 'trigger', 'trigger_delay_hours',
+    'scheduled_at', 'started_sending_at', 'finished_sending_at',
+    'total_recipients', 'total_sent', 'total_delivered', 'total_opened',
+    'total_clicked', 'total_bounced', 'total_unsubscribed',
+])]
+#[Table(name: 'newsletter_campaigns')]
 class NewsletterCampaign extends Model
 {
     use HasFactory;
-
-    protected $table = 'newsletter_campaigns';
-
-    protected $fillable = [
-        'name', 'subject', 'preview_text', 'sender_name', 'sender_email',
-        'html_content', 'plain_text_content', 'audience_type', 'newsletter_segment_id',
-        'target_tags', 'type', 'status', 'trigger', 'trigger_delay_hours',
-        'scheduled_at', 'started_sending_at', 'finished_sending_at',
-        'total_recipients', 'total_sent', 'total_delivered', 'total_opened',
-        'total_clicked', 'total_bounced', 'total_unsubscribed',
-    ];
 
     protected $casts = [
         'audience_type' => AudienceTypeEnum::class,
@@ -58,9 +60,6 @@ class NewsletterCampaign extends Model
         'started_sending_at' => 'datetime',
         'finished_sending_at' => 'datetime',
     ];
-
-    /** @var array<int, string> */
-    protected $appends = ['sends_count'];
 
     public function segment(): BelongsTo
     {

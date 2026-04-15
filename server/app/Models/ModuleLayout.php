@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,21 +22,20 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property array|null $default_configuration
  * @property bool $is_active
  */
+#[Fillable([
+    'page_module_id',
+    'key',
+    'name',
+    'type',
+    'component_name',
+    'preview_image',
+    'configuration_schema',
+    'default_configuration',
+    'is_active',
+])]
 class ModuleLayout extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'page_module_id',
-        'key',
-        'name',
-        'type',
-        'component_name',
-        'preview_image',
-        'configuration_schema',
-        'default_configuration',
-        'is_active',
-    ];
 
     protected $casts = [
         'configuration_schema' => 'array',

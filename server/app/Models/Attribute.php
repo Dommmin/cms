@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\AttributeTypeEnum;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable([
+    'name', 'slug', 'type', 'unit', 'is_filterable', 'is_variant_selection', 'position',
+])]
+#[Table(name: 'attributes')]
 class Attribute extends Model
 {
     use HasFactory;
-
-    protected $table = 'attributes';
-
-    protected $fillable = [
-        'name', 'slug', 'type', 'unit', 'is_filterable', 'is_variant_selection', 'position',
-    ];
 
     protected $casts = [
         'type' => AttributeTypeEnum::class,

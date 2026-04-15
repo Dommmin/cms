@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable([
+    'affiliate_code_id',
+    'order_id',
+    'referred_user_id',
+    'order_total',
+    'commission_amount',
+    'status',
+    'paid_at',
+])]
 class Referral extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'affiliate_code_id',
-        'order_id',
-        'referred_user_id',
-        'order_total',
-        'commission_amount',
-        'status',
-        'paid_at',
-    ];
 
     public function affiliateCode(): BelongsTo
     {

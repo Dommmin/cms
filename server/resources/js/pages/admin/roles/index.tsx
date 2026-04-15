@@ -109,9 +109,9 @@ export default function Index({ roles }: { roles: Role[] }) {
                                     <TableCell>
                                         {role.name !== 'super-admin' && (
                                             <Link
-                                                href={RoleController.edit.url(
-                                                    { id: role.id },
-                                                )}
+                                                href={RoleController.edit.url({
+                                                    id: role.id,
+                                                })}
                                                 className="text-primary hover:underline"
                                             >
                                                 {__('action.edit', 'Edit')}

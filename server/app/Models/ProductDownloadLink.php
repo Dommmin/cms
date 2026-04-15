@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,20 +26,18 @@ use Illuminate\Support\Str;
  * @property-read ProductVariant $variant
  * @property-read Collection<int, ProductDownloadEvent> $events
  */
+#[Fillable([
+    'order_item_id',
+    'product_variant_id',
+    'token',
+    'expires_at',
+    'max_downloads',
+    'download_count',
+])]
+#[Table(name: 'product_download_links')]
 class ProductDownloadLink extends Model
 {
     use HasFactory;
-
-    protected $table = 'product_download_links';
-
-    protected $fillable = [
-        'order_item_id',
-        'product_variant_id',
-        'token',
-        'expires_at',
-        'max_downloads',
-        'download_count',
-    ];
 
     protected $casts = [
         'expires_at' => 'datetime',

@@ -7,20 +7,20 @@ namespace App\Models;
 use App\Enums\PaymentProviderEnum;
 use App\Enums\PaymentStatusEnum;
 use App\Modules\Core\Domain\Models\Currency;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable([
+    'order_id', 'provider', 'payment_method', 'provider_transaction_id',
+    'status', 'amount', 'currency_code', 'payload',
+])]
+#[Table(name: 'payments')]
 class Payment extends Model
 {
     use HasFactory;
-
-    protected $table = 'payments';
-
-    protected $fillable = [
-        'order_id', 'provider', 'payment_method', 'provider_transaction_id',
-        'status', 'amount', 'currency_code', 'payload',
-    ];
 
     protected $casts = [
         'provider' => PaymentProviderEnum::class,

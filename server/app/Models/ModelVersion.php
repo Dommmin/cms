@@ -4,28 +4,28 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+#[Fillable([
+    'versionable_type',
+    'versionable_id',
+    'version_number',
+    'snapshot',
+    'changes',
+    'event',
+    'created_by',
+    'change_note',
+    'created_at',
+])]
 class ModelVersion extends Model
 {
     use HasFactory;
 
     public $timestamps = false;
-
-    protected $fillable = [
-        'versionable_type',
-        'versionable_id',
-        'version_number',
-        'snapshot',
-        'changes',
-        'event',
-        'created_by',
-        'change_note',
-        'created_at',
-    ];
 
     /**
      * Compute field-by-field diff between two snapshots.

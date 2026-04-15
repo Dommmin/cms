@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Guarded;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Guarded(['id'])]
+#[Table(name: 'cart_items')]
 class CartItem extends Model
 {
     use HasFactory;
-
-    protected $table = 'cart_items';
-
-    protected $guarded = ['id'];
 
     public function cart(): BelongsTo
     {

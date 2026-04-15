@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Attributes\Guarded;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -25,13 +27,11 @@ use Illuminate\Support\Facades\Date;
  * @property Product|null $product
  * @property ProductVariant|null $variant
  */
+#[Guarded(['id'])]
+#[Table(name: 'flash_sales')]
 class FlashSale extends Model
 {
     use HasFactory;
-
-    protected $table = 'flash_sales';
-
-    protected $guarded = ['id'];
 
     public function product(): BelongsTo
     {

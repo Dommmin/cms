@@ -20,6 +20,8 @@ use App\States\Order\ProcessingState;
 use App\States\Order\RefundedState;
 use App\States\Order\ShippedState;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -50,19 +52,17 @@ use Spatie\ModelStates\HasStates;
  * @property Payment|null $payment
  * @property Collection $returns
  */
+#[Fillable([
+    'reference_number', 'customer_id', 'guest_email', 'billing_address_id', 'shipping_address_id',
+    'status', 'subtotal', 'discount_amount', 'shipping_cost', 'tax_amount', 'total',
+    'currency_code', 'exchange_rate', 'notes',
+])]
+#[Table(name: 'orders')]
 class Order extends Model
 {
     use HasFactory;
     use HasStates;
     use LogsActivity;
-
-    protected $table = 'orders';
-
-    protected $fillable = [
-        'reference_number', 'customer_id', 'guest_email', 'billing_address_id', 'shipping_address_id',
-        'status', 'subtotal', 'discount_amount', 'shipping_cost', 'tax_amount', 'total',
-        'currency_code', 'exchange_rate', 'notes',
-    ];
 
     protected $dispatchesEvents = [
         'created' => OrderCreated::class,

@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ReturnItemConditionEnum;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable([
+    'return_id', 'order_item_id', 'quantity', 'condition', 'notes',
+])]
+#[Table(name: 'return_items')]
 class ReturnItem extends Model
 {
     use HasFactory;
 
     public $timestamps = false;
-
-    protected $table = 'return_items';
-
-    protected $fillable = [
-        'return_id', 'order_item_id', 'quantity', 'condition', 'notes',
-    ];
 
     protected $casts = [
         'condition' => ReturnItemConditionEnum::class,

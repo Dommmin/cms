@@ -8,7 +8,9 @@ use App\Concerns\HasMetafields;
 use App\Concerns\HasTags;
 use App\Concerns\HasVersions;
 use App\Enums\ReviewStatusEnum;
+use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,6 +29,8 @@ use Spatie\Translatable\HasTranslations;
  * @property bool $is_search_promoted
  * @property bool $is_active
  */
+#[Guarded(['id'])]
+#[Table(name: 'products')]
 class Product extends Model implements HasMedia
 {
     use HasFactory;
@@ -48,10 +52,6 @@ class Product extends Model implements HasMedia
     ];
 
     protected int $maxVersions = 50;
-
-    protected $table = 'products';
-
-    protected $guarded = ['id'];
 
     protected $casts = [
         'is_active' => 'boolean',

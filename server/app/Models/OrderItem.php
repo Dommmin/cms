@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,16 +14,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Order Item Model
  * Moved to Ecommerce module
  */
+#[Fillable([
+    'order_id', 'variant_id', 'product_name', 'variant_name',
+    'sku', 'quantity', 'unit_price', 'total_price',
+])]
+#[Table(name: 'order_items')]
 class OrderItem extends Model
 {
     use HasFactory;
-
-    protected $table = 'order_items';
-
-    protected $fillable = [
-        'order_id', 'variant_id', 'product_name', 'variant_name',
-        'sku', 'quantity', 'unit_price', 'total_price',
-    ];
 
     /**
      * Create snapshot from current variant data

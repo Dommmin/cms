@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,15 +25,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read Collection<int, PageBlock> $blocks
  * @property-read Collection<int, PageBlock> $allBlocks
  */
+#[Fillable([
+    'page_id', 'section_type', 'layout', 'variant', 'settings', 'position', 'is_active',
+])]
+#[Table(name: 'page_sections')]
 class PageSection extends Model
 {
     use HasFactory;
-
-    protected $table = 'page_sections';
-
-    protected $fillable = [
-        'page_id', 'section_type', 'layout', 'variant', 'settings', 'position', 'is_active',
-    ];
 
     protected $casts = [
         'settings' => 'array',

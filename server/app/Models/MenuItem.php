@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\MenuLinkTypeEnum;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable([
+    'menu_id', 'parent_id', 'label', 'url', 'target',
+    'link_type', 'linked_entity_id', 'icon', 'is_active', 'position',
+])]
+#[Table(name: 'menu_items')]
 class MenuItem extends Model
 {
     use HasFactory;
-
-    protected $table = 'menu_items';
-
-    protected $fillable = [
-        'menu_id', 'parent_id', 'label', 'url', 'target',
-        'link_type', 'linked_entity_id', 'icon', 'is_active', 'position',
-    ];
 
     public function getLocalizedLabel(string $locale = 'en'): string
     {

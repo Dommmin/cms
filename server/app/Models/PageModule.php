@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,24 +24,23 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property bool $is_active
  * @property bool $is_system
  */
+#[Fillable([
+    'key',
+    'name',
+    'icon',
+    'description',
+    'has_list_page',
+    'has_detail_page',
+    'list_route_pattern',
+    'detail_route_pattern',
+    'model_class',
+    'route_key_name',
+    'is_active',
+    'is_system',
+])]
 class PageModule extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'key',
-        'name',
-        'icon',
-        'description',
-        'has_list_page',
-        'has_detail_page',
-        'list_route_pattern',
-        'detail_route_pattern',
-        'model_class',
-        'route_key_name',
-        'is_active',
-        'is_system',
-    ];
 
     protected $casts = [
         'has_list_page' => 'boolean',

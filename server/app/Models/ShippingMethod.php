@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ShippingCarrierEnum;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,22 +25,20 @@ use Spatie\Translatable\HasTranslations;
  * @property Collection $restrictedProducts
  * @property Collection $restrictedCategories
  */
+#[Fillable([
+    'carrier', 'name', 'description', 'is_active', 'min_weight', 'max_weight',
+    'min_order_value', 'free_shipping_threshold', 'base_price', 'price_per_kg',
+    'estimated_days_min', 'estimated_days_max',
+    'max_length_cm', 'max_width_cm', 'max_depth_cm',
+    'requires_signature', 'insurance_available',
+])]
+#[Table(name: 'shipping_methods')]
 class ShippingMethod extends Model
 {
     use HasFactory;
     use HasTranslations;
 
     public array $translatable = ['name', 'description'];
-
-    protected $table = 'shipping_methods';
-
-    protected $fillable = [
-        'carrier', 'name', 'description', 'is_active', 'min_weight', 'max_weight',
-        'min_order_value', 'free_shipping_threshold', 'base_price', 'price_per_kg',
-        'estimated_days_min', 'estimated_days_max',
-        'max_length_cm', 'max_width_cm', 'max_depth_cm',
-        'requires_signature', 'insurance_available',
-    ];
 
     protected $casts = [
         'carrier' => ShippingCarrierEnum::class,

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,21 +23,19 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read ProductVariant $variant
  * @property-read Media|null $media
  */
+#[Fillable([
+    'product_variant_id',
+    'name',
+    'file_path',
+    'file_name',
+    'file_size',
+    'mime_type',
+    'position',
+])]
+#[Table(name: 'product_downloads')]
 class ProductDownload extends Model
 {
     use HasFactory;
-
-    protected $table = 'product_downloads';
-
-    protected $fillable = [
-        'product_variant_id',
-        'name',
-        'file_path',
-        'file_name',
-        'file_size',
-        'mime_type',
-        'position',
-    ];
 
     protected $casts = [
         'file_size' => 'integer',

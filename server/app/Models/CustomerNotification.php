@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,20 +24,19 @@ use Illuminate\Support\Facades\Date;
  * @property string|null $action_url
  * @property Carbon|null $created_at
  */
+#[Fillable([
+    'customer_id',
+    'user_id',
+    'type',
+    'title',
+    'body',
+    'data',
+    'read_at',
+    'action_url',
+])]
 final class CustomerNotification extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'customer_id',
-        'user_id',
-        'type',
-        'title',
-        'body',
-        'data',
-        'read_at',
-        'action_url',
-    ];
 
     public function customer(): BelongsTo
     {

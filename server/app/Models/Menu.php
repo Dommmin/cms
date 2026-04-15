@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\MenuLocationEnum;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable([
+    'name', 'location', 'is_active',
+])]
+#[Table(name: 'menus')]
 class Menu extends Model
 {
     use HasFactory;
-
-    protected $table = 'menus';
-
-    protected $fillable = [
-        'name', 'location', 'is_active',
-    ];
 
     protected $casts = [
         'location' => MenuLocationEnum::class,

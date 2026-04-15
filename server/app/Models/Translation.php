@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable([
+    'locale_code',
+    'group',
+    'key',
+    'value',
+])]
 class Translation extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'locale_code',
-        'group',
-        'key',
-        'value',
-    ];
 
     public function locale(): BelongsTo
     {

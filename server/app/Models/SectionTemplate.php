@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,20 +20,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property bool $is_global
  * @property int $usage_count
  */
+#[Fillable([
+    'name',
+    'description',
+    'category',
+    'thumbnail',
+    'snapshot',
+    'created_by',
+    'is_global',
+    'usage_count',
+])]
 class SectionTemplate extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'name',
-        'description',
-        'category',
-        'thumbnail',
-        'snapshot',
-        'created_by',
-        'is_global',
-        'usage_count',
-    ];
 
     public function creator(): BelongsTo
     {

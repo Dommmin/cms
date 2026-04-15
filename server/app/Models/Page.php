@@ -9,7 +9,9 @@ use App\Concerns\HasTags;
 use App\Enums\PageLayoutEnum;
 use App\Enums\PageTypeEnum;
 use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -63,6 +65,15 @@ use Spatie\Translatable\HasTranslations;
  * @property-read PageVersion|null $draftVersion
  * @property-read Theme|null $theme
  */
+#[Fillable([
+    'parent_id', 'locale', 'title', 'slug', 'slug_translations', 'content', 'rich_content', 'excerpt', 'layout',
+    'builder_snapshot', 'page_type', 'module_name', 'module_config',
+    'theme_id', 'is_published', 'published_at', 'scheduled_publish_at', 'scheduled_unpublish_at',
+    'published_version_id', 'draft_version_id', 'position',
+    'seo_title', 'seo_description', 'seo_canonical', 'meta_robots', 'og_image', 'sitemap_exclude', 'available_locales',
+    'approval_status', 'reviewer_id', 'review_note', 'submitted_for_review_at', 'approved_at',
+])]
+#[Table(name: 'pages')]
 class Page extends Model
 {
     use HasFactory;
@@ -73,17 +84,6 @@ class Page extends Model
 
     /** @var array<int, string> */
     public array $translatable = ['title', 'excerpt', 'content', 'rich_content'];
-
-    protected $table = 'pages';
-
-    protected $fillable = [
-        'parent_id', 'locale', 'title', 'slug', 'slug_translations', 'content', 'rich_content', 'excerpt', 'layout',
-        'builder_snapshot', 'page_type', 'module_name', 'module_config',
-        'theme_id', 'is_published', 'published_at', 'scheduled_publish_at', 'scheduled_unpublish_at',
-        'published_version_id', 'draft_version_id', 'position',
-        'seo_title', 'seo_description', 'seo_canonical', 'meta_robots', 'og_image', 'sitemap_exclude', 'available_locales',
-        'approval_status', 'reviewer_id', 'review_note', 'submitted_for_review_at', 'approved_at',
-    ];
 
     /**
      * Find a published page by path segments (e.g. ['parent', 'child'] for URL /parent/child).

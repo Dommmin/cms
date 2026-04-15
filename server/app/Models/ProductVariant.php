@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Modules\Core\Domain\Models\Currency;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -45,6 +47,12 @@ use Spatie\Translatable\HasTranslations;
  * @property-read Collection<int, ProductDownload> $downloads
  * @property-read Collection<int, PriceHistory> $priceHistory
  */
+#[Fillable([
+    'product_id', 'tax_rate_id', 'sku', 'barcode', 'ean', 'upc', 'name', 'price', 'cost_price',
+    'compare_at_price', 'weight', 'stock_quantity', 'stock_threshold',
+    'is_active', 'is_default', 'is_digital', 'download_limit', 'download_expiry_days', 'position',
+])]
+#[Table(name: 'product_variants')]
 class ProductVariant extends Model
 {
     use HasFactory;
@@ -53,14 +61,6 @@ class ProductVariant extends Model
 
     /** @var array<string> */
     public array $translatable = ['name'];
-
-    protected $table = 'product_variants';
-
-    protected $fillable = [
-        'product_id', 'tax_rate_id', 'sku', 'barcode', 'ean', 'upc', 'name', 'price', 'cost_price',
-        'compare_at_price', 'weight', 'stock_quantity', 'stock_threshold',
-        'is_active', 'is_default', 'is_digital', 'download_limit', 'download_expiry_days', 'position',
-    ];
 
     protected $casts = [
         'is_active' => 'boolean',

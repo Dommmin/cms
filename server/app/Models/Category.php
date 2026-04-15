@@ -7,6 +7,8 @@ namespace App\Models;
 use App\Concerns\HasMetafields;
 use App\Concerns\HasTags;
 use App\Concerns\HasVersions;
+use Illuminate\Database\Eloquent\Attributes\Guarded;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +21,8 @@ use Spatie\Translatable\HasTranslations;
  * Category Model
  * Moved to Ecommerce module
  */
+#[Guarded(['id'])]
+#[Table(name: 'categories')]
 class Category extends Model
 {
     use HasFactory;
@@ -35,10 +39,6 @@ class Category extends Model
     protected array $versionedAttributes = ['name', 'slug', 'description', 'is_active', 'parent_id'];
 
     protected int $maxVersions = 30;
-
-    protected $table = 'categories';
-
-    protected $guarded = ['id'];
 
     protected $casts = [
         'is_active' => 'boolean',

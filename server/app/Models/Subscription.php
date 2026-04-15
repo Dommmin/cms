@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\SubscriptionStatusEnum;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,26 +21,25 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $billing_cycle_count
  * @property SubscriptionPlan $plan
  */
+#[Fillable([
+    'customer_id',
+    'subscription_plan_id',
+    'status',
+    'starts_at',
+    'expires_at',
+    'trial_ends_at',
+    'cancelled_at',
+    'paused_at',
+    'next_billing_at',
+    'billing_price',
+    'payment_method_id',
+    'billing_cycle_count',
+    'auto_renew',
+    'metadata',
+])]
 final class Subscription extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'customer_id',
-        'subscription_plan_id',
-        'status',
-        'starts_at',
-        'expires_at',
-        'trial_ends_at',
-        'cancelled_at',
-        'paused_at',
-        'next_billing_at',
-        'billing_price',
-        'payment_method_id',
-        'billing_cycle_count',
-        'auto_renew',
-        'metadata',
-    ];
 
     public function customer(): BelongsTo
     {

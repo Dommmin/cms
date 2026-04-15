@@ -5,23 +5,23 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Modules\Core\Domain\Models\Customer;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable([
+    'customer_id', 'email', 'first_name', 'locale', 'token', 'tags',
+    'consent_given', 'consent_given_at', 'consent_ip', 'consent_source',
+    'is_active', 'unsubscribed_at', 'unsubscribe_reason',
+    'is_bounced', 'bounced_at',
+])]
+#[Table(name: 'newsletter_subscribers')]
 class NewsletterSubscriber extends Model
 {
     use HasFactory;
-
-    protected $table = 'newsletter_subscribers';
-
-    protected $fillable = [
-        'customer_id', 'email', 'first_name', 'locale', 'token', 'tags',
-        'consent_given', 'consent_given_at', 'consent_ip', 'consent_source',
-        'is_active', 'unsubscribed_at', 'unsubscribe_reason',
-        'is_bounced', 'bounced_at',
-    ];
 
     protected $casts = [
         'tags' => 'array',

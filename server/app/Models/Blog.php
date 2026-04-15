@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +12,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\HasTranslations;
 
+#[Fillable([
+    'name',
+    'slug',
+    'description',
+    'layout',
+    'posts_per_page',
+    'commentable',
+    'default_author_id',
+    'seo_title',
+    'seo_description',
+    'is_active',
+    'available_locales',
+    'position',
+])]
 class Blog extends Model
 {
     use HasFactory;
@@ -18,21 +33,6 @@ class Blog extends Model
 
     /** @var array<int, string> */
     public array $translatable = ['name', 'description'];
-
-    protected $fillable = [
-        'name',
-        'slug',
-        'description',
-        'layout',
-        'posts_per_page',
-        'commentable',
-        'default_author_id',
-        'seo_title',
-        'seo_description',
-        'is_active',
-        'available_locales',
-        'position',
-    ];
 
     public static function findBySlug(string $slug): ?self
     {

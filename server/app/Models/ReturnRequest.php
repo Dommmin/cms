@@ -7,6 +7,8 @@ namespace App\Models;
 use App\Enums\ReturnStatusEnum;
 use App\Enums\ReturnTypeEnum;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,17 +29,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property Collection $items
  * @property-read Order $order
  */
+#[Fillable([
+    'order_id', 'reference_number', 'return_type', 'status',
+    'reason', 'customer_notes', 'admin_notes',
+    'return_tracking_number', 'return_label_url', 'refund_amount',
+])]
+#[Table(name: 'returns')]
 class ReturnRequest extends Model
 {
     use HasFactory;
-
-    protected $table = 'returns';
-
-    protected $fillable = [
-        'order_id', 'reference_number', 'return_type', 'status',
-        'reason', 'customer_notes', 'admin_notes',
-        'return_tracking_number', 'return_label_url', 'refund_amount',
-    ];
 
     protected $casts = [
         'return_type' => ReturnTypeEnum::class,

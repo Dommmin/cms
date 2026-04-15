@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,22 +18,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property array $filters
  * @property string $chart_type
  */
+#[Fillable([
+    'user_id',
+    'name',
+    'description',
+    'data_source',
+    'metrics',
+    'dimensions',
+    'filters',
+    'group_by',
+    'chart_type',
+    'is_public',
+])]
 final class CustomReport extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'user_id',
-        'name',
-        'description',
-        'data_source',
-        'metrics',
-        'dimensions',
-        'filters',
-        'group_by',
-        'chart_type',
-        'is_public',
-    ];
 
     public function user(): BelongsTo
     {

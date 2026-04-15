@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable([
+    'code', 'name', 'symbol', 'decimal_places', 'is_active', 'is_base',
+])]
+#[Table(name: 'currencies')]
 class Currency extends Model
 {
     use HasFactory;
-
-    protected $table = 'currencies';
-
-    protected $fillable = [
-        'code', 'name', 'symbol', 'decimal_places', 'is_active', 'is_base',
-    ];
 
     protected $casts = [
         'is_active' => 'boolean',

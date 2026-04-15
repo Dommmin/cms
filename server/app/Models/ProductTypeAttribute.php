@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable([
+    'product_type_id', 'attribute_id', 'is_required', 'position',
+])]
+#[Table(name: 'product_type_attributes')]
 class ProductTypeAttribute extends Model
 {
     use HasFactory;
 
     public $timestamps = false;
-
-    protected $table = 'product_type_attributes';
-
-    protected $fillable = [
-        'product_type_id', 'attribute_id', 'is_required', 'position',
-    ];
 
     protected $casts = [
         'is_required' => 'boolean',

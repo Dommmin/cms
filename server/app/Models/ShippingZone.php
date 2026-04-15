@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,17 +14,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property float $base_rate
  * @property float $per_kg_rate
  */
+#[Fillable([
+    'name',
+    'description',
+    'is_active',
+    'base_rate',
+    'per_kg_rate',
+])]
 class ShippingZone extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'name',
-        'description',
-        'is_active',
-        'base_rate',
-        'per_kg_rate',
-    ];
 
     protected $casts = [
         'is_active' => 'boolean',

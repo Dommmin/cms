@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable([
+    'currency_id', 'rate', 'source', 'fetched_at',
+])]
+#[Table(name: 'exchange_rates')]
 class ExchangeRate extends Model
 {
     use HasFactory;
-
-    protected $table = 'exchange_rates';
-
-    protected $fillable = [
-        'currency_id', 'rate', 'source', 'fetched_at',
-    ];
 
     protected $casts = [
         'rate' => 'float',

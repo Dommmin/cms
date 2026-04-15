@@ -7,21 +7,21 @@ namespace App\Models;
 use App\Enums\NotificationChannelEnum;
 use App\Enums\NotificationStatusEnum;
 use App\Enums\NotificationTypeEnum;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable([
+    'customer_id', 'type', 'channel', 'status',
+    'related_model', 'related_model_id', 'metadata',
+    'sent_at', 'failed_at', 'error_message',
+])]
+#[Table(name: 'app_notifications')]
 class AppNotification extends Model
 {
     use HasFactory;
-
-    protected $table = 'app_notifications';
-
-    protected $fillable = [
-        'customer_id', 'type', 'channel', 'status',
-        'related_model', 'related_model_id', 'metadata',
-        'sent_at', 'failed_at', 'error_message',
-    ];
 
     protected $casts = [
         'type' => NotificationTypeEnum::class,

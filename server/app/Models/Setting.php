@@ -6,22 +6,22 @@ namespace App\Models;
 
 use App\Enums\SettingTypeEnum;
 use Exception;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+#[Fillable([
+    'group', 'key', 'label', 'value', 'type', 'description', 'is_public',
+])]
+#[Table(name: 'settings')]
 class Setting extends Model
 {
     use HasFactory;
     use LogsActivity;
-
-    protected $table = 'settings';
-
-    protected $fillable = [
-        'group', 'key', 'label', 'value', 'type', 'description', 'is_public',
-    ];
 
     protected $casts = [
         'type' => SettingTypeEnum::class,

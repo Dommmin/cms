@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+#[Fillable([
+    'name',
+    'slug',
+    'color',
+    'description',
+    'is_active',
+    'position',
+])]
+#[Table(name: 'product_flags')]
 class ProductFlag extends Model
 {
     use HasFactory;
-
-    protected $table = 'product_flags';
-
-    protected $fillable = [
-        'name',
-        'slug',
-        'color',
-        'description',
-        'is_active',
-        'position',
-    ];
 
     protected $casts = [
         'is_active' => 'boolean',

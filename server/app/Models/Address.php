@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\AddressTypeEnum;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable([
+    'customer_id', 'type', 'first_name', 'last_name', 'company_name',
+    'street', 'street2', 'city', 'postal_code', 'country_code', 'phone', 'is_default',
+])]
+#[Table(name: 'addresses')]
 class Address extends Model
 {
     use HasFactory;
-
-    protected $table = 'addresses';
-
-    protected $fillable = [
-        'customer_id', 'type', 'first_name', 'last_name', 'company_name',
-        'street', 'street2', 'city', 'postal_code', 'country_code', 'phone', 'is_default',
-    ];
 
     protected $casts = [
         'type' => AddressTypeEnum::class,

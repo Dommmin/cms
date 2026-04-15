@@ -6,6 +6,8 @@ namespace App\Models;
 
 use App\Enums\OrderStatusEnum;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,17 +22,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon|null $birth_date
  * @property User|null $user
  */
+#[Fillable([
+    'user_id', 'first_name', 'last_name', 'email',
+    'phone', 'company_name', 'tax_id', 'notes', 'is_active',
+])]
+#[Table(name: 'customers')]
 class Customer extends Model
 {
     use HasFactory;
     use SoftDeletes;
-
-    protected $table = 'customers';
-
-    protected $fillable = [
-        'user_id', 'first_name', 'last_name', 'email',
-        'phone', 'company_name', 'tax_id', 'notes', 'is_active',
-    ];
 
     public function user(): BelongsTo
     {

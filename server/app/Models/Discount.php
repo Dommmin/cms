@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable([
+    'code', 'name', 'type', 'value', 'apply_to',
+    'min_order_value', 'max_uses', 'uses_count', 'max_uses_per_customer',
+    'starts_at', 'ends_at', 'is_active',
+])]
+#[Table(name: 'discounts')]
 class Discount extends Model
 {
     use HasFactory;
-
-    protected $table = 'discounts';
-
-    protected $fillable = [
-        'code', 'name', 'type', 'value', 'apply_to',
-        'min_order_value', 'max_uses', 'uses_count', 'max_uses_per_customer',
-        'starts_at', 'ends_at', 'is_active',
-    ];
 
     protected $casts = [
         'is_active' => 'boolean',

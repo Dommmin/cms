@@ -8,6 +8,7 @@ use App\Concerns\HasMetafields;
 use App\Concerns\HasTags;
 use App\Concerns\HasVersions;
 use App\Enums\BlogPostStatusEnum;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,6 +19,27 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
+#[Fillable([
+    'user_id',
+    'blog_id',
+    'blog_category_id',
+    'title',
+    'slug',
+    'excerpt',
+    'content',
+    'content_type',
+    'status',
+    'featured_image',
+    'available_locales',
+    'is_featured',
+    'published_at',
+    'reading_time',
+    'seo_title',
+    'seo_description',
+    'meta_robots',
+    'og_image',
+    'sitemap_exclude',
+])]
 class BlogPost extends Model
 {
     use HasFactory;
@@ -37,28 +59,6 @@ class BlogPost extends Model
     ];
 
     protected int $maxVersions = 30;
-
-    protected $fillable = [
-        'user_id',
-        'blog_id',
-        'blog_category_id',
-        'title',
-        'slug',
-        'excerpt',
-        'content',
-        'content_type',
-        'status',
-        'featured_image',
-        'available_locales',
-        'is_featured',
-        'published_at',
-        'reading_time',
-        'seo_title',
-        'seo_description',
-        'meta_robots',
-        'og_image',
-        'sitemap_exclude',
-    ];
 
     public function getActivitylogOptions(): LogOptions
     {

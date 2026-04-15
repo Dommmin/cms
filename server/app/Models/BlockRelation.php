@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,21 +24,19 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property-read PageBlock $block
  * @property-read Model $related
  */
+#[Fillable([
+    'page_block_id',
+    'relation_type',
+    'relation_id',
+    'relation_key',
+    'position',
+    'metadata',
+])]
+#[Table(name: 'block_relations')]
 class BlockRelation extends Model
 {
     use HasFactory;
     use HasFactory;
-
-    protected $table = 'block_relations';
-
-    protected $fillable = [
-        'page_block_id',
-        'relation_type',
-        'relation_id',
-        'relation_key',
-        'position',
-        'metadata',
-    ];
 
     protected $casts = [
         'metadata' => 'array',

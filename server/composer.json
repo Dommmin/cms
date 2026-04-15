@@ -31,7 +31,7 @@
         "spatie/laravel-health": "^1.39",
         "spatie/laravel-medialibrary": "^11.19",
         "spatie/laravel-model-states": "^2.13",
-        "spatie/laravel-pdf": "^2.2",
+        "spatie/laravel-pdf": "^2.6",
         "spatie/laravel-permission": "^7.0",
         "spatie/laravel-query-builder": "^6.4",
         "spatie/laravel-sitemap": "^7.3",

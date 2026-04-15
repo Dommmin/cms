@@ -4,26 +4,26 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+#[Fillable([
+    'question',
+    'answer',
+    'category',
+    'position',
+    'is_active',
+    'views_count',
+    'helpful_count',
+])]
+#[Table(name: 'faqs')]
 class Faq extends Model
 {
     use HasFactory;
-
-    protected $table = 'faqs';
-
-    protected $fillable = [
-        'question',
-        'answer',
-        'category',
-        'position',
-        'is_active',
-        'views_count',
-        'helpful_count',
-    ];
 
     /**
      * Increment views count.

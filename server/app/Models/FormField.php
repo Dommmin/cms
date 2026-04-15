@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable([
+    'form_id', 'name', 'label', 'type', 'options', 'validation', 'settings',
+    'position', 'is_required',
+])]
+#[Table(name: 'form_fields')]
 class FormField extends Model
 {
     use HasFactory;
-
-    protected $table = 'form_fields';
-
-    protected $fillable = [
-        'form_id', 'name', 'label', 'type', 'options', 'validation', 'settings',
-        'position', 'is_required',
-    ];
 
     protected $casts = [
         'options' => 'array',

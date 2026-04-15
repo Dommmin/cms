@@ -6,6 +6,8 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -22,6 +24,21 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $processing_restricted_at
  * @property Customer|null $customer
  */
+#[Fillable([
+    'name',
+    'email',
+    'password',
+    'google_id',
+    'github_id',
+    'avatar_url',
+    'processing_restricted_at',
+])]
+#[Hidden([
+    'password',
+    'two_factor_secret',
+    'two_factor_recovery_codes',
+    'remember_token',
+])]
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens;
@@ -31,23 +48,6 @@ class User extends Authenticatable implements MustVerifyEmail
     use Notifiable;
     use SoftDeletes;
     use TwoFactorAuthenticatable;
-
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'google_id',
-        'github_id',
-        'avatar_url',
-        'processing_restricted_at',
-    ];
-
-    protected $hidden = [
-        'password',
-        'two_factor_secret',
-        'two_factor_recovery_codes',
-        'remember_token',
-    ];
 
     public function getActivitylogOptions(): LogOptions
     {

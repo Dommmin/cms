@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -14,11 +15,10 @@ use Illuminate\Support\Str;
  * @property string $name
  * @property string $slug
  */
+#[Fillable(['name', 'slug'])]
 class Tag extends Model
 {
     use HasFactory;
-
-    protected $fillable = ['name', 'slug'];
 
     /** @return MorphToMany<BlogPost, $this> */
     public function blogPosts(): MorphToMany

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,21 +13,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * Theme model representing UI/themes configuration stored in the database.
  */
+#[Fillable([
+    'name',
+    'slug',
+    'description',
+    'tokens',
+    'settings',
+    'preview_image',
+    'is_active',
+])]
+#[Table(name: 'themes')]
 class Theme extends Model
 {
     use HasFactory;
-
-    protected $table = 'themes';
-
-    protected $fillable = [
-        'name',
-        'slug',
-        'description',
-        'tokens',
-        'settings',
-        'preview_image',
-        'is_active',
-    ];
 
     protected $casts = [
         'tokens' => 'array',

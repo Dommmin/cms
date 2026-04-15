@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+#[Fillable([
+    'name', 'slug', 'description', 'type', 'value', 'min_value', 'max_discount',
+    'apply_to', 'is_active', 'is_stackable', 'priority', 'starts_at', 'ends_at', 'metadata',
+])]
+#[Table(name: 'promotions')]
 class Promotion extends Model
 {
     use HasFactory;
-
-    protected $table = 'promotions';
-
-    protected $fillable = [
-        'name', 'slug', 'description', 'type', 'value', 'min_value', 'max_discount',
-        'apply_to', 'is_active', 'is_stackable', 'priority', 'starts_at', 'ends_at', 'metadata',
-    ];
 
     protected $casts = [
         'is_active' => 'boolean',

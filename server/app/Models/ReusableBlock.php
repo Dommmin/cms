@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable([
+    'name',
+    'description',
+    'type',
+    'configuration',
+    'relations_config',
+    'is_active',
+])]
 class ReusableBlock extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'name',
-        'description',
-        'type',
-        'configuration',
-        'relations_config',
-        'is_active',
-    ];
 
     public function pageBlocks(): HasMany
     {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,21 +24,20 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon|null $last_triggered_at
  * @property Collection $deliveries
  */
+#[Fillable([
+    'name',
+    'url',
+    'secret',
+    'events',
+    'is_active',
+    'description',
+    'last_triggered_at',
+    'failure_count',
+])]
 final class Webhook extends Model
 {
     use HasFactory;
     use SoftDeletes;
-
-    protected $fillable = [
-        'name',
-        'url',
-        'secret',
-        'events',
-        'is_active',
-        'description',
-        'last_triggered_at',
-        'failure_count',
-    ];
 
     public function deliveries(): HasMany
     {

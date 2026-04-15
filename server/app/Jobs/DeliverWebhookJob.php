@@ -9,15 +9,15 @@ use App\Models\WebhookDelivery;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Http;
 
+#[Backoff(60)]
+#[Tries(3)]
 final class DeliverWebhookJob implements ShouldQueue
 {
     use Queueable;
-
-    public int $tries = 3;
-
-    public int $backoff = 60;
 
     public function __construct(
         public readonly Webhook $webhook,

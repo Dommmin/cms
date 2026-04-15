@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\PageBlockTypeEnum;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,15 +26,13 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read PageSection|null $section
  * @property-read Collection<BlockRelation> $relations
  */
+#[Fillable([
+    'page_id', 'section_id', 'type', 'configuration', 'position', 'is_active', 'reusable_block_id',
+])]
+#[Table(name: 'page_blocks')]
 class PageBlock extends Model
 {
     use HasFactory;
-
-    protected $table = 'page_blocks';
-
-    protected $fillable = [
-        'page_id', 'section_id', 'type', 'configuration', 'position', 'is_active', 'reusable_block_id',
-    ];
 
     protected $casts = [
         'type' => PageBlockTypeEnum::class,

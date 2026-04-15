@@ -6,22 +6,22 @@ namespace App\Models;
 
 use App\Enums\SupportChannelEnum;
 use App\Enums\SupportConversationStatusEnum;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
+#[Fillable([
+    'token', 'customer_id', 'assigned_to', 'email', 'name',
+    'subject', 'status', 'channel', 'last_reply_at',
+])]
+#[Table(name: 'support_conversations')]
 class SupportConversation extends Model
 {
     use HasFactory;
-
-    protected $table = 'support_conversations';
-
-    protected $fillable = [
-        'token', 'customer_id', 'assigned_to', 'email', 'name',
-        'subject', 'status', 'channel', 'last_reply_at',
-    ];
 
     public function customer(): BelongsTo
     {

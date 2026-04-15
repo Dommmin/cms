@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,22 +17,21 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $billing_cycle
  * @property int $trial_days
  */
+#[Fillable([
+    'name',
+    'description',
+    'price',
+    'currency',
+    'billing_period',
+    'billing_cycle',
+    'trial_days',
+    'features',
+    'is_active',
+    'sort_order',
+])]
 final class SubscriptionPlan extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'name',
-        'description',
-        'price',
-        'currency',
-        'billing_period',
-        'billing_cycle',
-        'trial_days',
-        'features',
-        'is_active',
-        'sort_order',
-    ];
 
     public function subscriptions(): HasMany
     {

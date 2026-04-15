@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,16 +15,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $total_earned
  * @property int $total_spent
  */
+#[Fillable([
+    'customer_id',
+    'balance',
+    'total_earned',
+    'total_spent',
+])]
 class LoyaltyPoint extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'customer_id',
-        'balance',
-        'total_earned',
-        'total_spent',
-    ];
 
     protected $casts = [
         'balance' => 'integer',

@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable([
+    'page_id', 'page_version_id', 'token_hash', 'expires_at', 'created_by',
+])]
+#[Table(name: 'page_preview_tokens')]
 class PagePreviewToken extends Model
 {
     use HasFactory;
-
-    protected $table = 'page_preview_tokens';
-
-    protected $fillable = [
-        'page_id', 'page_version_id', 'token_hash', 'expires_at', 'created_by',
-    ];
 
     protected $casts = [
         'expires_at' => 'datetime',
