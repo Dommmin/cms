@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[Fillable([
     'name', 'slug', 'description', 'type', 'value', 'min_value', 'max_discount',
@@ -19,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Promotion extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     protected $casts = [
         'is_active' => 'boolean',
@@ -27,6 +30,15 @@ class Promotion extends Model
         'ends_at' => 'datetime',
         'metadata' => 'array',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'type', 'value', 'is_active'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('promotion');
+    }
 
     public function products(): BelongsToMany
     {

@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[Fillable([
     'name', 'slug', 'description', 'settings', 'notify_emails', 'is_active',
@@ -18,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Form extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     protected $casts = [
         'settings' => 'array',
@@ -25,6 +28,15 @@ class Form extends Model
         'is_active' => 'boolean',
         'allow_multiple' => 'boolean',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'is_active'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('form');
+    }
 
     public function fields(): HasMany
     {

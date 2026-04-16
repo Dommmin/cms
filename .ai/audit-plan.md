@@ -1,8 +1,8 @@
 # Audyt i Plan Rozwoju CMS — Enterprise Readiness
 
-> **Data audytu:** 2026-04-15 (aktualizacja — UI/UX redesign + modularyzacja ukończone)
+> **Data audytu:** 2026-04-15 (aktualizacja — faktury VAT, JPK_V7, partial shipments, draft orders, custom roles, customer tags, 2FA UI, analytics reports)
 > **Cel:** Doprowadzenie projektu do poziomu enterprise (Shopify, Media Expert, x-kom)
-> **Aktualny poziom gotowości:** ~95% mid-market, ~80% enterprise
+> **Aktualny poziom gotowości:** ~97% mid-market, ~85% enterprise
 
 ---
 
@@ -107,7 +107,7 @@
 - [ ] Produkty bundlowane / zestawy (kup 3 w cenie 2)
 - [x] Produkty cyfrowe / pliki do pobrania
 - [x] Zdjęcia per wariant (nie tylko na poziomie produktu)
-- [ ] Pre-order / backorder status
+- [x] **Pre-order / backorder status** — kolumny `stock_status` (in_stock/out_of_stock/backorder/preorder), `backorder_allowed`, `available_at` na `product_variants`; `isInStock()` uwzględnia `backorder_allowed`; admin UI w wariant edit (sekcja "Stock Availability")
 - [ ] Multi-warehouse inventory (wiele magazynów)
 - [x] Kody kreskowe / EAN / UPC management
 - [x] **Tiered pricing (ceny progowe/ilościowe)** — `product_variant_price_tiers` table, `ProductVariantPriceTier` model, `getPriceForQuantity()` na wariancie, `CartItem::unitPrice()` + `Cart::subtotal()` używają tierów, admin UI w wariant edit, testy (11)
@@ -123,12 +123,14 @@
 - [x] **UI zwrotów/reklamacji na frontendzie** — formularz wyboru pozycji + typ + powód na stronie zamówienia (`/account/orders/[reference]`); lista przesłanych zwrotów z informacją o statusie; `POST /api/v1/orders/{reference}/return`
 - [x] **Automatyczne powiadomienia o wysyłce** — `OrderShipped` event + `SendShippingNotification` listener (ShouldQueue): email via EmailTemplate `order.shipped` + SMS jeśli klient ma telefon; event fire'uje się automatycznie przy zmianie statusu na shipped
 
+**Zaimplementowane:**
+- [x] **Częściowe wysyłki (partial shipments)** — tabela `shipment_items` (shipment_id, order_item_id, quantity); `ShipmentService::createPartialShipment()` + `updateOrderFulfillmentStatus()`; `OrderItem.shipped_quantity`; admin UI w `ShipmentSection` z wizualizacją remaining items
+- [x] **Draft orders (admin creates order for customer)** — `OrderStatusEnum::DRAFT`; `DraftState` w state machine; `AdminDraftOrderService::createDraft/confirmDraft`; `AdminOrderCreateController` (create/store/searchVariants/confirm); `/admin/ecommerce/orders/create-draft` strona z wyszukiwarką klientów i wariantów; przycisk "Confirm Draft" na stronie zamówienia; przycisk "Create Order" w liście zamówień
+
 **Brakuje:**
 - [ ] Częściowe zwroty (partial refunds) — aktualnie all-or-nothing
-- [ ] Częściowe wysyłki (partial shipments)
 - [ ] Workflow fulfillmentu (approve → pick → pack → ship) — **DOKUMENTACJA:** `docs/FULFILLMENT_WORKFLOW.md`
 - [ ] Zamówienia subskrypcyjne (recurring orders)
-- [ ] Draft orders (zamówienia robocze)
 
 ### 3.3 Klienci (8/10) — ✅ POPRAWA
 
@@ -140,9 +142,11 @@
 - [x] **Customer Lifetime Value (LTV)** — `show()` zwraca total_spent, ltv_30_days, ltv_90_days, avg_order_value, last_order_at; wyświetlane jako stat karty w admin customer show
 - [x] **Notatki przy profilu klienta** — kolumna `notes` (text nullable), edytowalne w show (inline form) i edit page; `UpdateCustomerRequest` waliduje max 5000 znaków
 
+**Zaimplementowane:**
+- [x] **Tagi klientów** — kolumna `tags` (JSON) na tabeli `customers`; `PATCH /admin/ecommerce/customers/{customer}/tags`; inline tag editor na stronie klienta (Enter/comma dodaje tag, × usuwa); `CustomerController::updateTags()`
+- [x] **Historia aktywności klienta** — timeline zdarzeń na stronie `/admin/ecommerce/customers/{customer}` (pobiera z `activity_log` przez spatie/laravel-activitylog); wyświetla: opis, sprawcę, datę, zmiany (stare/nowe wartości)
+
 **Brakuje:**
-- [ ] Tagi klientów / grupy
-- [ ] Historia aktywności klienta (admin dashboard)
 - [ ] ~~Program lojalnościowy~~ ⏳ opcjonalne (faza późniejsza)
 - [ ] ~~Impersonacja klienta~~ ✅ (już wdrożone — `CustomerController::impersonate()`)
 
@@ -177,11 +181,14 @@
 **Zaimplementowane:**
 - [x] **Eksport raportów do PDF i Excel** — `CustomReportExport` (maatwebsite/excel), `exportPdf()` (spatie/laravel-pdf); Blade view `views/pdf/report.blade.php`; przyciski "Export Excel" i "Export PDF" na stronie wyników raportu; `GET /admin/reports/{report}/export/excel` + `GET /admin/reports/{report}/export/pdf`; eksport zamówień `GET /admin/ecommerce/orders/export`
 
+**Zaimplementowane:**
+- [x] **Raport konwersji** — `AnalyticsReportService::conversionFunnel()` (lejek: registered → added-to-cart → checkout → delivered), admin view `/admin/analytics/conversion`
+- [x] **Raport klientów** — `AnalyticsReportService::customerReport()` (nowi vs. powracający, LTV, wykres), admin view `/admin/analytics/customers`
+- [x] **Raport stanów magazynowych** — `AnalyticsReportService::inventoryReport()` (out-of-stock, low-stock, top by value), admin view `/admin/analytics/inventory`
+- [x] **Raport podatkowy / VAT** — `AnalyticsReportService::vatReport()` (net/vat/gross per miesiąc), admin view `/admin/analytics/vat`
+- [x] **Eksport JPK_V7M** — `AnalyticsController::jpkExport()` generuje XML JPK_V7M (PL VAT reporting); dostępny pod `/admin/analytics/jpk-v7?month=YYYY-MM-01`; przycisk w widoku VAT
+
 **Brakuje:**
-- [ ] Raport konwersji (lejek: wizyta → koszyk → checkout → zakup)
-- [ ] Raport klientów (nowi vs. powracający, LTV)
-- [ ] Raport stanów magazynowych (stock levels, turnover)
-- [ ] Raport podatkowy / VAT
 - [ ] ~~Real-time dashboard (SSE/WebSocket)~~ ⏳ opcjonalne — serwer 8GB RAM na K8s, polling wystarczający
 - [ ] ~~Core Web Vitals tracking~~ ⏳ opcjonalne
 
@@ -225,9 +232,12 @@
 - [x] Automatyczne obliczanie VAT per kraj EU (OSS/IOSS) — **BACKEND:** VatEuService z OSS calculation
 - [x] Walidacja NIP / VAT ID (VIES) — **BACKEND:** VatEuService::validateVatId()
 
+**Zaimplementowane:**
+- [x] **Faktury VAT z numeracją sekwencyjną** — kolumny `invoice_number` (FV/YYYY/NNNNN), `invoice_issued_at`, `buyer_vat_id`, `buyer_company_name` w tabeli `orders`; `InvoiceService::ensureInvoiceNumber()` generuje i persystuje numer przy pierwszym pobraniu; PDF z PL-lokalizacją (Faktura VAT, NIP sekcja B2B); sekcja "Faktura VAT" na stronie zamówienia w adminie
+- [x] **JPK_V7M eksport** — patrz sekcja 3.5
+
 **Brakuje:**
 - [ ] Zwolnienia podatkowe (B2B, NGO)
-- [ ] Raportowanie podatkowe
 - [ ] Integracja z systemem fiskalnym
 
 ### 3.9 Role i Uprawnienia Admina (6/10) — ✅ POPRAWA GŁÓWNA
@@ -239,11 +249,14 @@
 - [x] 6 predefiniowanych ról z odpowiednimi permission sets
 - [x] Admin UI do zarządzania rolami i uprawnieniami
 
+**Zaimplementowane:**
+- [x] **Custom roles z selektywnymi permissions** — `is_system` flag na tabelce `roles`; system roles (super-admin/admin/editor/customer) są chronione przed usunięciem; admin może tworzyć/usuwać custom roles z permission builderem; `RoleController::create/store/destroy`; strony `/admin/roles/create` i `/admin/roles/{role}/edit`
+- [x] **Audit log per admin** — `spatie/laravel-activitylog` (LogsActivity) na modelach: Order (update-status/bulk), Product, Customer, Discount, ShippingMethod, Brand, TaxRate, Promotion, FlashSale, EmailTemplate, Webhook, Form, Theme, Locale; eksport CSV `/admin/activity-log/export`
+- [x] **2FA dla adminów** — Fortify konfiguracja działa; linki "Profile settings" i "Two-factor auth" dostępne z user menu (prawym górnym rogu) → `/settings/two-factor`; pełny QR code setup z recovery codes
+
 **Brakuje:**
-- [ ] Custom roles z selektywnymi permissions
 - [ ] Resource-level permissions (edytuj swoje vs. wszystkie)
 - [ ] Role per dział / zespół
-- [ ] Audit log per admin (kto co zmienił)
 
 ### 3.10 Search (6/10) — ✅ POPRAWA GŁÓWNA
 

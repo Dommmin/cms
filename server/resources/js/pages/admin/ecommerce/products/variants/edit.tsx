@@ -414,6 +414,87 @@ export default function EditVariant({
                                 </div>
                             )}
 
+                            <div className="space-y-4 rounded-xl border p-4">
+                                <h3 className="text-sm font-semibold">
+                                    Stock Availability
+                                </h3>
+
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <Label>Allow Backorders</Label>
+                                        <p className="text-xs text-muted-foreground">
+                                            Customers can order even when out of
+                                            stock
+                                        </p>
+                                    </div>
+                                    <label className="flex items-center gap-2">
+                                        <input
+                                            type="hidden"
+                                            name="backorder_allowed"
+                                            value="0"
+                                        />
+                                        <input
+                                            type="checkbox"
+                                            name="backorder_allowed"
+                                            value="1"
+                                            defaultChecked={
+                                                variant.backorder_allowed
+                                            }
+                                            className="h-4 w-4 rounded border-input"
+                                        />
+                                    </label>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <Label htmlFor="stock_status">
+                                        Stock Status Override
+                                    </Label>
+                                    <select
+                                        id="stock_status"
+                                        name="stock_status"
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                                        defaultValue={variant.stock_status}
+                                    >
+                                        <option value="in_stock">
+                                            In Stock
+                                        </option>
+                                        <option value="out_of_stock">
+                                            Out of Stock
+                                        </option>
+                                        <option value="backorder">
+                                            Backorder
+                                        </option>
+                                        <option value="pre_order">
+                                            Pre-Order
+                                        </option>
+                                    </select>
+                                    <InputError message={errors.stock_status} />
+                                </div>
+
+                                {variant.stock_status === 'pre_order' && (
+                                    <div className="space-y-1">
+                                        <Label htmlFor="available_at">
+                                            Available From
+                                        </Label>
+                                        <Input
+                                            id="available_at"
+                                            name="available_at"
+                                            type="datetime-local"
+                                            defaultValue={
+                                                variant.available_at ?? ''
+                                            }
+                                        />
+                                        <p className="text-xs text-muted-foreground">
+                                            When will this product be available
+                                            for shipping?
+                                        </p>
+                                        <InputError
+                                            message={errors.available_at}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
                             <div className="flex items-center gap-6">
                                 <label className="flex items-center gap-2">
                                     <input

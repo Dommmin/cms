@@ -18,6 +18,7 @@ export type Customer = {
 export type OrderItem = {
     id: number;
     quantity: number;
+    shipped_quantity: number;
     unit_price: number;
     subtotal: number;
     product_name?: string;
@@ -27,6 +28,12 @@ export type OrderItem = {
         attributes?: Record<string, string>;
         product?: { name: string; slug: string };
     };
+};
+export type ShipmentItemView = {
+    id: number;
+    quantity: number;
+    order_item_id: number;
+    order_item?: OrderItem;
 };
 export type Payment = {
     id: number;
@@ -39,8 +46,11 @@ export type Shipment = {
     id: number;
     status: string;
     tracking_number?: string | null;
-    carrier?: string;
-    shipping_method?: { name: string };
+    carrier?: string | null;
+    tracking_url?: string | null;
+    created_at?: string;
+    shipping_method?: { name: string } | null;
+    items?: ShipmentItemView[];
 };
 export type StatusHistory = {
     id: number;
@@ -54,6 +64,10 @@ export type StatusOption = { value: string; label: string; color: string };
 export type OrderView = {
     id: number;
     reference_number: string;
+    invoice_number?: string | null;
+    invoice_issued_at?: string | null;
+    buyer_vat_id?: string | null;
+    buyer_company_name?: string | null;
     customer?: Customer;
     billing_address?: Address;
     shipping_address?: Address;
@@ -70,5 +84,6 @@ export type OrderView = {
     items?: OrderItem[];
     payment?: Payment | null;
     shipment?: Shipment | null;
+    shipments?: Shipment[];
     status_history?: StatusHistory[];
 };

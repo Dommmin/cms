@@ -20,12 +20,14 @@ class OrderItemFactory extends Factory
     {
         return [
             'order_id' => Order::factory(),
-            'product_variant_id' => ProductVariant::factory(),
+            'variant_id' => ProductVariant::factory(),
             'product_name' => fake()->words(3, true),
-            'variant_sku' => mb_strtoupper(fake()->bothify('???-####')),
+            'variant_name' => fake()->words(2, true),
+            'sku' => mb_strtoupper(fake()->bothify('???-####')),
             'quantity' => fake()->numberBetween(1, 5),
             'unit_price' => fake()->numberBetween(100, 10000),
-            'subtotal' => fake()->numberBetween(100, 50000),
+            'total_price' => fake()->numberBetween(100, 50000),
+            'shipped_quantity' => 0,
         ];
     }
 }

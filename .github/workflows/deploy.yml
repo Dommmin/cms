@@ -55,6 +55,11 @@ jobs:
       - name: Generate application key
         run: php artisan key:generate
 
+      - name: Run database migrations
+        run: |
+          touch database/database.sqlite
+          php artisan migrate --force
+
       - name: Generate Wayfinder types
         run: php artisan wayfinder:generate
 

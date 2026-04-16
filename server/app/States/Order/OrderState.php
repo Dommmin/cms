@@ -17,6 +17,8 @@ abstract class OrderState extends State
     {
         return parent::config()
             ->default(PendingState::class)
+            ->allowTransition(DraftState::class, PendingState::class)
+            ->allowTransition(DraftState::class, CancelledState::class)
             ->allowTransition(PendingState::class, ProcessingState::class)
             ->allowTransition(PendingState::class, CancelledState::class)
             ->allowTransition(AwaitingPaymentState::class, PaidState::class)

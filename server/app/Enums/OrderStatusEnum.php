@@ -6,6 +6,7 @@ namespace App\Enums;
 
 enum OrderStatusEnum: string
 {
+    case DRAFT = 'draft';
     case PENDING = 'pending';
     case AWAITING = 'awaiting_payment';
     case PAID = 'paid';
@@ -18,6 +19,7 @@ enum OrderStatusEnum: string
     public function getLabel(): string
     {
         return match ($this) {
+            self::DRAFT => 'Szkic',
             self::PENDING => 'Oczekujące',
             self::AWAITING => 'Oczekuje na płatność',
             self::PAID => 'Opłacone',
@@ -32,6 +34,7 @@ enum OrderStatusEnum: string
     public function getColor(): string
     {
         return match ($this) {
+            self::DRAFT => 'slate',
             self::PENDING => 'gray',
             self::AWAITING => 'yellow',
             self::PAID => 'green',

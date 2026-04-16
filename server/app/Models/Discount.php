@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[Fillable([
     'code', 'name', 'type', 'value', 'apply_to',
@@ -19,12 +21,22 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Discount extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     protected $casts = [
         'is_active' => 'boolean',
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['code', 'type', 'value', 'is_active', 'ends_at', 'max_uses'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('discount');
+    }
 
     public function conditions(): HasMany
     {

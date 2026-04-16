@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[Fillable([
     'code',
@@ -24,6 +26,7 @@ use Illuminate\Support\Collection;
 class Locale extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     /**
      * @return Collection<Locale>
@@ -36,6 +39,15 @@ class Locale extends Model
             ->orderByDesc('is_default')
             ->orderBy('name')
             ->get();
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['code', 'name', 'is_active'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('locale');
     }
 
     public function translations(): HasMany

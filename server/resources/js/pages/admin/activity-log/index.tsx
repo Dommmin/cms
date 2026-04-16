@@ -282,6 +282,24 @@ export default function ActivityLogIndex({
                         >
                             Reset
                         </Button>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                                const params = new URLSearchParams(
+                                    Object.entries(localFilters).filter(
+                                        ([, v]) => v != null,
+                                    ) as [string, string][],
+                                );
+                                window.location.href =
+                                    ActivityLogController.export.url() +
+                                    (params.toString()
+                                        ? '?' + params.toString()
+                                        : '');
+                            }}
+                        >
+                            Export CSV
+                        </Button>
                         <span className="ml-auto text-xs text-muted-foreground">
                             {activities.total} entries
                         </span>

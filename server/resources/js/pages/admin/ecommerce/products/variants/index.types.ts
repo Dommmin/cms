@@ -4,6 +4,8 @@ export type Variant = {
     name: string;
     price: number;
     stock_quantity: number;
+    stock_status: string;
+    backorder_allowed: boolean;
     is_active: boolean;
     is_default: boolean;
 };

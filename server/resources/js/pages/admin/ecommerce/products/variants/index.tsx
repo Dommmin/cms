@@ -4,6 +4,7 @@ import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommer
 import * as ProductVariantController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductVariantController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
@@ -92,6 +93,9 @@ export default function ProductVariantsIndex({
                                     {__('column.stock', 'Stock')}
                                 </th>
                                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                                    Stock Status
+                                </th>
+                                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
                                     {__('column.status', 'Status')}
                                 </th>
                                 <th className="px-4 py-3 text-right font-medium text-muted-foreground">
@@ -103,7 +107,7 @@ export default function ProductVariantsIndex({
                             {variants.length === 0 ? (
                                 <tr>
                                     <td
-                                        colSpan={6}
+                                        colSpan={7}
                                         className="px-4 py-8 text-center text-muted-foreground"
                                     >
                                         {__(
@@ -139,6 +143,28 @@ export default function ProductVariantsIndex({
                                         </td>
                                         <td className="px-4 py-3">
                                             {variant.stock_quantity}
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            {variant.stock_status ===
+                                            'in_stock' ? (
+                                                <Badge className="bg-green-100 text-green-800 border-green-200">
+                                                    In Stock
+                                                </Badge>
+                                            ) : variant.stock_status ===
+                                              'backorder' ? (
+                                                <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+                                                    Backorder
+                                                </Badge>
+                                            ) : variant.stock_status ===
+                                              'pre_order' ? (
+                                                <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
+                                                    Pre-Order
+                                                </Badge>
+                                            ) : (
+                                                <Badge className="bg-red-100 text-red-800 border-red-200">
+                                                    Out of Stock
+                                                </Badge>
+                                            )}
                                         </td>
                                         <td className="px-4 py-3">
                                             {variant.is_active

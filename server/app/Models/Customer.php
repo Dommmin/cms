@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * @property int $id
@@ -24,13 +26,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 #[Fillable([
     'user_id', 'first_name', 'last_name', 'email',
-    'phone', 'company_name', 'tax_id', 'notes', 'is_active',
+    'phone', 'company_name', 'tax_id', 'notes', 'is_active', 'tags',
 ])]
 #[Table(name: 'customers')]
 class Customer extends Model
 {
     use HasFactory;
+    use LogsActivity;
     use SoftDeletes;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['first_name', 'last_name', 'email', 'phone', 'is_active', 'notes'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('customer');
+    }
 
     public function user(): BelongsTo
     {
@@ -89,6 +101,7 @@ class Customer extends Model
     {
         return [
             'is_active' => 'boolean',
+            'tags' => 'array',
         ];
     }
 }

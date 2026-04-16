@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[Fillable([
     'name', 'rate', 'country_code', 'is_active', 'is_default',
@@ -17,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class TaxRate extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     protected $casts = [
         'is_active' => 'boolean',
@@ -26,6 +29,15 @@ class TaxRate extends Model
     public static function default(): ?self
     {
         return self::query()->where('is_default', true)->first();
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'rate'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('tax_rate');
     }
 
     public function categories(): HasMany

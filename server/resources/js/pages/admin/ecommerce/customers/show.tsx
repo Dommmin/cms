@@ -1,20 +1,25 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import {
     ArrowLeftIcon,
+    Clock,
     EditIcon,
     MapPinIcon,
     ShoppingBagIcon,
+    Tag,
     UserCircleIcon,
+    X,
 } from 'lucide-react';
+import { useRef, useState } from 'react';
 import * as CustomerController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CustomerController';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
-import type { Address, CustomerShow, OrderSummary } from './show.types';
+import type { ActivityEntry, Address, CustomerShow, OrderSummary } from './show.types';
 
 const ORDER_STATUS_COLORS: Record<string, string> = {
     pending: 'bg-gray-100 text-gray-700',
@@ -102,8 +107,10 @@ function AddressCard({ address }: { address: Address }) {
 
 export default function CustomerShowPage({
     customer,
+    activityLog = [],
 }: {
     customer: CustomerShow;
+    activityLog?: ActivityEntry[];
 }) {
     const __ = useTranslation();
 
@@ -127,6 +134,30 @@ export default function CustomerShowPage({
     function saveNotes(e: React.FormEvent) {
         e.preventDefault();
         patch(CustomerController.update.url(customer.id));
+    }
+
+    // Tags state
+    const [tags, setTags] = useState<string[]>(customer.tags ?? []);
+    const [tagInput, setTagInput] = useState('');
+    const tagInputRef = useRef<HTMLInputElement>(null);
+
+    function addTag(e: React.KeyboardEvent<HTMLInputElement>) {
+        if ((e.key === 'Enter' || e.key === ',') && tagInput.trim()) {
+            e.preventDefault();
+            const newTag = tagInput.trim().toLowerCase().replace(/\s+/g, '-');
+            if (!tags.includes(newTag)) {
+                const next = [...tags, newTag];
+                setTags(next);
+                router.patch(CustomerController.updateTags.url({ customer: customer.id }), { tags: next });
+            }
+            setTagInput('');
+        }
+    }
+
+    function removeTag(tag: string) {
+        const next = tags.filter((t) => t !== tag);
+        setTags(next);
+        router.patch(CustomerController.updateTags.url({ customer: customer.id }), { tags: next });
     }
 
     return (
@@ -180,6 +211,34 @@ export default function CustomerShowPage({
                             ? __('label.active', 'Active')
                             : __('label.inactive', 'Inactive')}
                     </span>
+                </div>
+
+                {/* Tags */}
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                    <Tag className="h-3.5 w-3.5 text-muted-foreground" />
+                    {tags.map((tag) => (
+                        <span
+                            key={tag}
+                            className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary"
+                        >
+                            {tag}
+                            <button
+                                type="button"
+                                onClick={() => removeTag(tag)}
+                                className="ml-0.5 rounded-full hover:text-destructive"
+                            >
+                                <X className="h-3 w-3" />
+                            </button>
+                        </span>
+                    ))}
+                    <Input
+                        ref={tagInputRef}
+                        value={tagInput}
+                        onChange={(e) => setTagInput(e.target.value)}
+                        onKeyDown={addTag}
+                        placeholder="Add tag…"
+                        className="h-6 w-28 px-2 text-xs"
+                    />
                 </div>
 
                 <div className="mt-6 space-y-6">
@@ -370,6 +429,52 @@ export default function CustomerShowPage({
                         </div>
                     </div>
                 </div>
+
+                {/* Activity Timeline */}
+                {activityLog.length > 0 && (
+                    <div className="rounded-xl border border-border p-5">
+                        <div className="mb-4 flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                            <h2 className="font-semibold">Activity History</h2>
+                        </div>
+                        <ol className="relative border-l border-border pl-4">
+                            {activityLog.map((entry) => (
+                                <li key={entry.id} className="mb-4 ml-2 last:mb-0">
+                                    <div className="absolute -left-1.5 h-3 w-3 rounded-full border border-background bg-muted-foreground/40" />
+                                    <div className="flex flex-wrap items-baseline gap-2">
+                                        <span className="text-sm font-medium capitalize">
+                                            {entry.description}
+                                        </span>
+                                        {entry.causer && (
+                                            <span className="text-xs text-muted-foreground">
+                                                by {entry.causer.name}
+                                            </span>
+                                        )}
+                                        <span className="ml-auto text-xs text-muted-foreground">
+                                            {new Date(entry.created_at).toLocaleString('pl-PL')}
+                                        </span>
+                                    </div>
+                                    {entry.changes?.attributes && Object.keys(entry.changes.attributes).length > 0 && (
+                                        <div className="mt-1 grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs text-muted-foreground">
+                                            {Object.entries(entry.changes.attributes).map(([k, v]) => (
+                                                <div key={k}>
+                                                    <span className="font-medium">{k}:</span>{' '}
+                                                    {entry.changes?.old?.[k] !== undefined ? (
+                                                        <span>
+                                                            <span className="line-through opacity-60">{String(entry.changes.old[k])}</span>
+                                                            {' → '}
+                                                        </span>
+                                                    ) : null}
+                                                    {String(v)}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </li>
+                            ))}
+                        </ol>
+                    </div>
+                )}
             </Wrapper>
         </AppLayout>
     );

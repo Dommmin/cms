@@ -1,6 +1,7 @@
 import { Head, router } from '@inertiajs/react';
-import { DownloadIcon } from 'lucide-react';
+import { DownloadIcon, Plus } from 'lucide-react';
 import { useState } from 'react';
+import * as AdminOrderCreateController from '@/actions/App/Http/Controllers/Admin/Ecommerce/AdminOrderCreateController';
 import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
 import { useOrderColumns } from '@/components/columns/order-columns';
 
@@ -97,6 +98,12 @@ export default function OrdersIndex({
                             <a href={exportMethod.url()}>
                                 <DownloadIcon className="mr-2 h-4 w-4" />
                                 {__('action.export_csv', 'Export CSV')}
+                            </a>
+                        </Button>
+                        <Button asChild>
+                            <a href={AdminOrderCreateController.create.url()}>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Create Order
                             </a>
                         </Button>
                     </PageHeaderActions>

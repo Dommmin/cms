@@ -13,6 +13,7 @@ use App\Http\Requests\Admin\Ecommerce\UpdateOrderStatusRequest;
 use App\Models\Order;
 use App\Queries\Admin\OrderIndexQuery;
 use App\Services\InvoiceService;
+use App\Services\ShipmentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Response;
@@ -39,7 +40,8 @@ class OrderController extends Controller
             'billingAddress',
             'shippingAddress',
             'payment',
-            'shipment.shippingMethod',
+            'shipments.items.orderItem',
+            'shipments.shippingMethod',
             'statusHistory',
         ]);
 
@@ -82,6 +84,11 @@ class OrderController extends Controller
                 }, fn (): null => null);
             });
 
+        activity('order')
+            ->causedBy(auth()->user())
+            ->withProperties(['order_ids' => $data['ids'], 'new_status' => $data['status']])
+            ->log('bulk_status_changed');
+
         return back()->with('success', $updated.' orders updated.');
     }
 
@@ -89,6 +96,8 @@ class OrderController extends Controller
     {
         $data = $request->validated();
         $newStatus = OrderStatusEnum::from($data['status']);
+
+        $oldStatus = $order->status->value;
 
         try {
             $order->changeStatus(
@@ -100,6 +109,12 @@ class OrderController extends Controller
             return back()->with('error', 'Ta zmiana statusu nie jest dozwolona dla bieżącego statusu zamówienia.');
         }
 
+        activity('order')
+            ->causedBy(auth()->user())
+            ->performedOn($order)
+            ->withProperties(['old_status' => $oldStatus, 'new_status' => $order->status->value])
+            ->log('status_changed');
+
         // If SHIPPED and tracking number provided — update shipment
         if ($newStatus === OrderStatusEnum::SHIPPED && (! empty($data['tracking_number']) || ! empty($data['tracking_url']))) {
             $order->shipment?->update([
@@ -110,5 +125,28 @@ class OrderController extends Controller
         }
 
         return back()->with('success', 'Status zamówienia został zaktualizowany.');
+    }
+
+    public function createShipment(
+        Request $request,
+        Order $order,
+        ShipmentService $shipmentService,
+    ): RedirectResponse {
+        $validated = $request->validate([
+            'carrier' => ['nullable', 'string', 'max:100'],
+            'tracking_number' => ['nullable', 'string', 'max:255'],
+            'tracking_url' => ['nullable', 'url', 'max:500'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.order_item_id' => ['required', 'integer', 'exists:order_items,id'],
+            'items.*.quantity' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $shipmentService->createPartialShipment(
+            $order,
+            $validated['items'],
+            $validated,
+        );
+
+        return back()->with('success', 'Shipment created successfully.');
     }
 }

@@ -4,12 +4,16 @@ import {
     Ban,
     CheckCircle2,
     Clock,
+    Download,
+    FileText,
     Package,
     PackageCheck,
     RefreshCcw,
+    SendHorizonal,
     Truck,
 } from 'lucide-react';
 import { useState } from 'react';
+import * as AdminOrderCreateController from '@/actions/App/Http/Controllers/Admin/Ecommerce/AdminOrderCreateController';
 import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
 
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -19,6 +23,7 @@ import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import * as OrderRoutes from '@/routes/admin/ecommerce/orders';
 import type { BreadcrumbItem } from '@/types';
+import { ShipmentSection } from './ShipmentSection';
 import type { Address, OrderView, StatusOption } from './show.types';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -267,6 +272,26 @@ export default function OrderShow({
                     description={`${customerName} · ${fmtDate(order.created_at)}`}
                 >
                     <PageHeaderActions>
+                        {order.status === 'draft' && (
+                            <Link
+                                href={AdminOrderCreateController.confirm.url({ order: order.id })}
+                                method="post"
+                                as="button"
+                                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                            >
+                                <SendHorizonal className="h-4 w-4" />
+                                Confirm Draft
+                            </Link>
+                        )}
+                        <a
+                            href={OrderRoutes.invoice.url({ order: order.id })}
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm hover:bg-accent"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <Download className="h-4 w-4" />
+                            {order.invoice_number ? order.invoice_number : 'Download Invoice'}
+                        </a>
                         <Link
                             href={OrderController.index.url()}
                             prefetch
@@ -434,6 +459,9 @@ export default function OrderShow({
                                 </div>
                             </div>
                         </div>
+
+                        {/* Fulfillment / Shipments */}
+                        <ShipmentSection order={order} />
 
                         {/* Status history */}
                         {order.status_history &&
@@ -623,6 +651,45 @@ export default function OrderShow({
                                 </p>
                             </div>
                         )}
+
+                        {/* Invoice / B2B */}
+                        <div className="rounded-xl border border-border p-5">
+                            <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+                                <FileText className="h-4 w-4" />
+                                Faktura VAT
+                            </h2>
+                            <div className="space-y-1 text-sm">
+                                {order.invoice_number ? (
+                                    <>
+                                        <div className="flex justify-between">
+                                            <span className="text-muted-foreground">Nr faktury</span>
+                                            <span className="font-mono font-medium">{order.invoice_number}</span>
+                                        </div>
+                                        {order.invoice_issued_at && (
+                                            <div className="flex justify-between">
+                                                <span className="text-muted-foreground">Data wystawienia</span>
+                                                <span>{fmtDate(order.invoice_issued_at)}</span>
+                                            </div>
+                                        )}
+                                    </>
+                                ) : (
+                                    <p className="text-xs text-muted-foreground">
+                                        Faktura zostanie wystawiona przy pierwszym pobraniu.
+                                    </p>
+                                )}
+                                {(order.buyer_vat_id || order.buyer_company_name) && (
+                                    <div className="mt-3 border-t border-border pt-3">
+                                        <p className="mb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">Nabywca B2B</p>
+                                        {order.buyer_company_name && (
+                                            <p className="font-medium">{order.buyer_company_name}</p>
+                                        )}
+                                        {order.buyer_vat_id && (
+                                            <p className="text-muted-foreground">NIP: {order.buyer_vat_id}</p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </Wrapper>

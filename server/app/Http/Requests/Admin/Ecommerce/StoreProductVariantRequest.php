@@ -6,6 +6,7 @@ namespace App\Http\Requests\Admin\Ecommerce;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreProductVariantRequest extends FormRequest
 {
@@ -36,6 +37,9 @@ class StoreProductVariantRequest extends FormRequest
             'weight' => ['nullable', 'numeric', 'min:0'],
             'stock_quantity' => ['required', 'integer', 'min:0'],
             'stock_threshold' => ['nullable', 'integer', 'min:0'],
+            'stock_status' => ['sometimes', 'string', Rule::in(['in_stock', 'out_of_stock', 'backorder', 'pre_order'])],
+            'backorder_allowed' => ['sometimes', 'boolean'],
+            'available_at' => ['sometimes', 'nullable', 'date', 'after:today'],
             'tax_rate_id' => ['nullable', 'exists:tax_rates,id'],
             'is_active' => ['sometimes', 'boolean'],
             'is_default' => ['sometimes', 'boolean'],

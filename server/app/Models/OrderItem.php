@@ -9,14 +9,17 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Order Item Model
  * Moved to Ecommerce module
+ *
+ * @property int $shipped_quantity
  */
 #[Fillable([
     'order_id', 'variant_id', 'product_name', 'variant_name',
-    'sku', 'quantity', 'unit_price', 'total_price',
+    'sku', 'quantity', 'unit_price', 'total_price', 'shipped_quantity',
 ])]
 #[Table(name: 'order_items')]
 class OrderItem extends Model
@@ -47,5 +50,20 @@ class OrderItem extends Model
     public function variant(): BelongsTo
     {
         return $this->belongsTo(ProductVariant::class);
+    }
+
+    public function shipmentItems(): HasMany
+    {
+        return $this->hasMany(ShipmentItem::class);
+    }
+
+    public function getRemainingToShipAttribute(): int
+    {
+        return max(0, $this->quantity - $this->shipped_quantity);
+    }
+
+    public function isFullyShipped(): bool
+    {
+        return $this->shipped_quantity >= $this->quantity;
     }
 }

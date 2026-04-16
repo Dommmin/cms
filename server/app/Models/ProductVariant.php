@@ -34,6 +34,9 @@ use Spatie\Translatable\HasTranslations;
  * @property float|null $weight
  * @property int $stock_quantity
  * @property int $stock_threshold
+ * @property string $stock_status
+ * @property bool $backorder_allowed
+ * @property \Illuminate\Support\Carbon|null $available_at
  * @property bool $is_active
  * @property bool $is_default
  * @property bool $is_digital
@@ -50,6 +53,7 @@ use Spatie\Translatable\HasTranslations;
 #[Fillable([
     'product_id', 'tax_rate_id', 'sku', 'barcode', 'ean', 'upc', 'name', 'price', 'cost_price',
     'compare_at_price', 'weight', 'stock_quantity', 'stock_threshold',
+    'stock_status', 'backorder_allowed', 'available_at',
     'is_active', 'is_default', 'is_digital', 'download_limit', 'download_expiry_days', 'position',
 ])]
 #[Table(name: 'product_variants')]
@@ -66,6 +70,8 @@ class ProductVariant extends Model
         'is_active' => 'boolean',
         'is_default' => 'boolean',
         'is_digital' => 'boolean',
+        'backorder_allowed' => 'boolean',
+        'available_at' => 'datetime',
         'download_limit' => 'integer',
         'download_expiry_days' => 'integer',
     ];
@@ -73,7 +79,7 @@ class ProductVariant extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['sku', 'barcode', 'ean', 'upc', 'price', 'stock_quantity', 'is_active', 'is_digital'])
+            ->logOnly(['sku', 'barcode', 'ean', 'upc', 'price', 'stock_quantity', 'is_active', 'is_digital', 'stock_status', 'backorder_allowed'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->useLogName('product_variant');
@@ -180,11 +186,35 @@ class ProductVariant extends Model
     }
 
     /**
-     * Check if in stock
+     * Check if in stock (backorder allows ordering when stock is zero)
      */
     public function isInStock(): bool
     {
+        if ($this->backorder_allowed) {
+            return true;
+        }
+
         return $this->stock_quantity > 0;
+    }
+
+    /**
+     * Get computed stock status label based on current state
+     */
+    public function getStockStatusLabel(): string
+    {
+        if ($this->stock_quantity > 0) {
+            return 'in_stock';
+        }
+
+        if ($this->stock_status === 'pre_order') {
+            return 'pre_order';
+        }
+
+        if ($this->backorder_allowed) {
+            return 'backorder';
+        }
+
+        return 'out_of_stock';
     }
 
     /**

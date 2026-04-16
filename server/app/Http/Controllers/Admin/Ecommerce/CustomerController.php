@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Response;
 use Maatwebsite\Excel\Facades\Excel;
+use Spatie\Activitylog\Models\Activity;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class CustomerController extends Controller
@@ -44,6 +45,21 @@ class CustomerController extends Controller
 
         $delivered = fn () => $customer->orders()->where('status', OrderStatusEnum::DELIVERED->value);
 
+        $activityLog = Activity::query()
+            ->where('subject_type', Customer::class)
+            ->where('subject_id', $customer->id)
+            ->latest()
+            ->limit(50)
+            ->get()
+            ->map(fn (Activity $a): array => [
+                'id' => $a->id,
+                'description' => $a->description,
+                'log_name' => $a->log_name,
+                'changes' => $a->changes,
+                'causer' => $a->causer_type ? ['name' => $a->causer?->name ?? 'System'] : null,
+                'created_at' => $a->created_at?->toISOString(),
+            ]);
+
         return inertia('admin/ecommerce/customers/show', [
             'customer' => array_merge($customer->toArray(), [
                 'total_orders' => $customer->orders()->count(),
@@ -53,7 +69,20 @@ class CustomerController extends Controller
                 'avg_order_value' => (int) ($delivered()->avg('total') ?? 0),
                 'last_order_at' => $customer->orders()->latest()->value('created_at'),
             ]),
+            'activityLog' => $activityLog,
         ]);
+    }
+
+    public function updateTags(Request $request, Customer $customer): RedirectResponse
+    {
+        $request->validate([
+            'tags' => ['nullable', 'array'],
+            'tags.*' => ['string', 'max:50'],
+        ]);
+
+        $customer->update(['tags' => $request->input('tags', [])]);
+
+        return back()->with('success', 'Tags updated');
     }
 
     public function edit(Customer $customer): Response
@@ -99,6 +128,11 @@ class CustomerController extends Controller
 
         session()->put('impersonator_id', $user->id);
         session()->put('impersonating_customer', true);
+
+        activity('customer')
+            ->causedBy($user)
+            ->performedOn($customer)
+            ->log('impersonated');
 
         Auth::login($customerUser);
 

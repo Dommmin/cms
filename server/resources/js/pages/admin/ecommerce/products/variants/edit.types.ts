@@ -30,6 +30,9 @@ export type Variant = {
     weight?: number | null;
     stock_quantity: number;
     stock_threshold: number;
+    stock_status: string;
+    backorder_allowed: boolean;
+    available_at: string | null;
     tax_rate_id?: number | null;
     is_active: boolean;
     is_default: boolean;

@@ -21,6 +21,15 @@ export interface Address {
     is_default: boolean;
 }
 
+export interface ActivityEntry {
+    id: number;
+    description: string;
+    log_name: string | null;
+    changes: { old?: Record<string, unknown>; attributes?: Record<string, unknown> } | null;
+    causer: { name: string } | null;
+    created_at: string;
+}
+
 export interface CustomerShow {
     id: number;
     first_name: string;
@@ -30,6 +39,7 @@ export interface CustomerShow {
     company_name: string | null;
     tax_id: string | null;
     notes: string | null;
+    tags: string[] | null;
     is_active: boolean;
     created_at: string;
     total_orders: number;

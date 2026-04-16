@@ -20,7 +20,7 @@ class RolePolicy
 
     public function create(User $user): bool
     {
-        return false;
+        return $user->can('roles.edit');
     }
 
     public function update(User $user): bool
@@ -30,7 +30,7 @@ class RolePolicy
 
     public function delete(User $user): bool
     {
-        return false;
+        return $user->can('roles.edit');
     }
 
     public function restore(User $user): bool

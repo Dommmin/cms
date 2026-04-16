@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\AdminSearchController;
 use App\Http\Controllers\Admin\AffiliateCodeController;
+use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\AppNotificationController;
 use App\Http\Controllers\Admin\BlockRelationController;
 use App\Http\Controllers\Admin\CookieConsentController;
@@ -51,6 +52,15 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('admin')->name(
     Route::delete('dashboard/widgets/{dashboardWidget}', [DashboardWidgetController::class, 'destroy'])->name('dashboard.widgets.destroy');
     Route::post('dashboard/widgets/reset', [DashboardWidgetController::class, 'reset'])->name('dashboard.widgets.reset');
 
+    // Analytics Reports
+    Route::prefix('analytics')->name('analytics.')->group(function (): void {
+        Route::get('/conversion', [AnalyticsController::class, 'conversion'])->name('conversion');
+        Route::get('/customers', [AnalyticsController::class, 'customers'])->name('customers');
+        Route::get('/inventory', [AnalyticsController::class, 'inventory'])->name('inventory');
+        Route::get('/vat', [AnalyticsController::class, 'vat'])->name('vat');
+        Route::get('/jpk-v7', [AnalyticsController::class, 'jpkExport'])->name('jpk-v7');
+    });
+
     // Custom Reports
     Route::resource('reports', CustomReportController::class);
     Route::get('reports/{report}/export', [CustomReportController::class, 'export'])->name('reports.export');
@@ -64,6 +74,7 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('admin')->name(
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/stream', [NotificationController::class, 'stream'])->name('notifications.stream');
     Route::get('/activity-log', [ActivityLogController::class, 'index'])->middleware('role:admin')->name('activity-log.index');
+    Route::get('/activity-log/export', [ActivityLogController::class, 'export'])->middleware('role:admin')->name('activity-log.export');
     Route::get('/preview', PreviewController::class)->name('preview');
 
     // Model Versioning
@@ -171,7 +182,7 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('admin')->name(
                 ->name('force-delete')->withTrashed();
         });
 
-        Route::resource('roles', RoleController::class)->only(['index', 'edit', 'update']);
+        Route::resource('roles', RoleController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
     });
     Route::resource('media', MediaController::class)
         ->except(['show', 'edit'])

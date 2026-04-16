@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\Ecommerce\CustomerSegmentController;
 use App\Http\Controllers\Admin\Ecommerce\DiscountController;
 use App\Http\Controllers\Admin\Ecommerce\EmailTemplateController;
 use App\Http\Controllers\Admin\Ecommerce\FlashSaleController;
+use App\Http\Controllers\Admin\Ecommerce\AdminOrderCreateController;
 use App\Http\Controllers\Admin\Ecommerce\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\Ecommerce\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\Ecommerce\ProductFlagController;
@@ -41,6 +42,12 @@ Route::prefix('ecommerce')->name('ecommerce.')->group(function (): void {
         ->only(['index', 'show'])
         ->names(['create' => 'ecommerce.orders.create', 'edit' => 'ecommerce.orders.edit']);
     Route::patch('orders/{order}/status', new AdminOrderController()->updateStatus(...))->name('orders.update-status');
+    Route::post('orders/{order}/shipments', new AdminOrderController()->createShipment(...))->name('orders.shipments.store');
+    // Draft orders — admin creates order on behalf of customer
+    Route::get('orders/create-draft', [AdminOrderCreateController::class, 'create'])->name('orders.create-draft');
+    Route::post('orders/create-draft', [AdminOrderCreateController::class, 'store'])->name('orders.store-draft');
+    Route::get('orders/search-variants', [AdminOrderCreateController::class, 'searchVariants'])->name('orders.search-variants');
+    Route::post('orders/{order}/confirm-draft', [AdminOrderCreateController::class, 'confirm'])->name('orders.confirm-draft');
     Route::get('customers/export', [CustomerController::class, 'export'])->name('customers.export');
     Route::resource('reviews', AdminReviewController::class)
         ->only(['index', 'show', 'update', 'destroy'])
@@ -57,6 +64,7 @@ Route::prefix('ecommerce')->name('ecommerce.')->group(function (): void {
     Route::post('product-flags/reorder', [ProductFlagController::class, 'reorder'])->name('product-flags.reorder');
 
     Route::resource('customers', CustomerController::class)->only(['index', 'show', 'edit', 'update', 'destroy']);
+    Route::patch('customers/{customer}/tags', [CustomerController::class, 'updateTags'])->name('customers.update-tags');
 
     Route::resource('discounts', DiscountController::class)->except(['show']);
     Route::post('discounts/{discount}/toggle-active', [DiscountController::class, 'toggleActive'])->name('discounts.toggle-active');

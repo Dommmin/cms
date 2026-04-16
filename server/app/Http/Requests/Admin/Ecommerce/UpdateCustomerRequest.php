@@ -33,6 +33,8 @@ class UpdateCustomerRequest extends FormRequest
             'tax_id' => ['nullable', 'string', 'max:50'],
             'is_active' => ['boolean'],
             'notes' => ['nullable', 'string', 'max:5000'],
+            'tags' => ['nullable', 'array'],
+            'tags.*' => ['string', 'max:50'],
         ];
     }
 }

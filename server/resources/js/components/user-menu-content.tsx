@@ -1,5 +1,5 @@
 import { Link, router } from '@inertiajs/react';
-import { LogOut } from 'lucide-react';
+import { LogOut, Settings, Shield } from 'lucide-react';
 import {
     DropdownMenuItem,
     DropdownMenuLabel,
@@ -7,6 +7,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
+import { edit as profileEdit } from '@/routes/profile';
+import { show as twoFactorShow } from '@/routes/two-factor';
 import type { UserMenuContentProps } from './user-menu-content.types';
 
 export function UserMenuContent({ user }: UserMenuContentProps) {
@@ -24,6 +26,19 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                     <UserInfo user={user} showEmail={true} />
                 </div>
             </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+                <Link href={profileEdit.url()} className="cursor-pointer">
+                    <Settings className="mr-2 h-4 w-4" />
+                    Profile settings
+                </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+                <Link href={twoFactorShow.url()} className="cursor-pointer">
+                    <Shield className="mr-2 h-4 w-4" />
+                    Two-factor auth
+                </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
                 <Link

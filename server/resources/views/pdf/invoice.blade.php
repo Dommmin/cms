@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice {{ $order->reference_number }}</title>
+    <title>Faktura {{ $order->invoice_number ?? $order->reference_number }}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; font-size: 14px; color: #333; padding: 40px; }
@@ -12,11 +12,13 @@
         .company p { color: #666; }
         .invoice-info { text-align: right; }
         .invoice-info h2 { font-size: 20px; text-transform: uppercase; color: #555; }
-        .invoice-info p { color: #666; }
+        .invoice-info p { color: #666; margin-top: 4px; }
+        .invoice-number { font-size: 16px; font-weight: bold; color: #333 !important; }
         .addresses { display: flex; gap: 40px; margin-bottom: 30px; }
         .address-block { flex: 1; }
         .address-block h3 { font-size: 12px; text-transform: uppercase; color: #999; margin-bottom: 8px; letter-spacing: 1px; }
         .address-block p { line-height: 1.6; }
+        .vat-id { font-weight: bold; margin-top: 4px; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         th { background: #f5f5f5; padding: 10px 12px; text-align: left; font-size: 12px; text-transform: uppercase; color: #666; letter-spacing: 0.5px; border-bottom: 1px solid #ddd; }
         td { padding: 10px 12px; border-bottom: 1px solid #eee; }
@@ -33,20 +35,35 @@
     <div class="header">
         <div class="company">
             <h1>{{ config('app.name') }}</h1>
-            <p>Invoice</p>
+            <p>Faktura VAT</p>
         </div>
         <div class="invoice-info">
-            <h2>Invoice</h2>
-            <p><strong>Reference:</strong> {{ $order->reference_number }}</p>
-            <p><strong>Date:</strong> {{ $order->created_at?->format('d/m/Y') }}</p>
+            <h2>Faktura VAT</h2>
+            @if($order->invoice_number)
+            <p class="invoice-number">{{ $order->invoice_number }}</p>
+            @endif
+            <p><strong>Nr zamówienia:</strong> {{ $order->reference_number }}</p>
+            <p><strong>Data wystawienia:</strong> {{ ($order->invoice_issued_at ?? $order->created_at)?->format('d/m/Y') }}</p>
             <p><strong>Status:</strong> <span class="badge">{{ \App\Enums\OrderStatusEnum::from((string) $order->status)->getLabel() }}</span></p>
         </div>
     </div>
 
     <div class="addresses">
+        @if($order->buyer_company_name || $order->buyer_vat_id)
+        <div class="address-block">
+            <h3>Nabywca (B2B)</h3>
+            @if($order->buyer_company_name)
+            <p><strong>{{ $order->buyer_company_name }}</strong></p>
+            @endif
+            @if($order->buyer_vat_id)
+            <p class="vat-id">NIP: {{ $order->buyer_vat_id }}</p>
+            @endif
+        </div>
+        @endif
+
         @if($order->billingAddress)
         <div class="address-block">
-            <h3>Billing Address</h3>
+            <h3>Adres rozliczeniowy</h3>
             <p>{{ $order->billingAddress->first_name }} {{ $order->billingAddress->last_name }}</p>
             <p>{{ $order->billingAddress->street }}</p>
             @if($order->billingAddress->street2)
@@ -59,7 +76,7 @@
 
         @if($order->shippingAddress)
         <div class="address-block">
-            <h3>Shipping Address</h3>
+            <h3>Adres dostawy</h3>
             <p>{{ $order->shippingAddress->first_name }} {{ $order->shippingAddress->last_name }}</p>
             <p>{{ $order->shippingAddress->street }}</p>
             @if($order->shippingAddress->street2)
@@ -70,9 +87,9 @@
         </div>
         @endif
 
-        @if($order->customer)
+        @if(!$order->buyer_company_name && $order->customer)
         <div class="address-block">
-            <h3>Customer</h3>
+            <h3>Klient</h3>
             <p>{{ $order->customer->first_name }} {{ $order->customer->last_name }}</p>
             <p>{{ $order->customer->email }}</p>
             @if($order->customer->phone)
@@ -85,11 +102,11 @@
     <table>
         <thead>
             <tr>
-                <th>Product</th>
+                <th>Produkt</th>
                 <th>SKU</th>
-                <th class="text-right">Unit Price</th>
-                <th class="text-right">Qty</th>
-                <th class="text-right">Subtotal</th>
+                <th class="text-right">Cena jedn.</th>
+                <th class="text-right">Ilość</th>
+                <th class="text-right">Wartość</th>
             </tr>
         </thead>
         <tbody>
@@ -108,34 +125,34 @@
     <div class="totals">
         <table>
             <tr>
-                <td>Subtotal</td>
+                <td>Suma netto</td>
                 <td class="text-right">{{ number_format($order->subtotal / 100, 2) }} {{ $order->currency_code }}</td>
             </tr>
             @if($order->discount_amount > 0)
             <tr>
-                <td>Discount</td>
+                <td>Rabat</td>
                 <td class="text-right">-{{ number_format($order->discount_amount / 100, 2) }} {{ $order->currency_code }}</td>
             </tr>
             @endif
             <tr>
-                <td>Shipping</td>
+                <td>Dostawa</td>
                 <td class="text-right">{{ number_format($order->shipping_cost / 100, 2) }} {{ $order->currency_code }}</td>
             </tr>
             @if($order->tax_amount > 0)
             <tr>
-                <td>Tax</td>
+                <td>VAT</td>
                 <td class="text-right">{{ number_format($order->tax_amount / 100, 2) }} {{ $order->currency_code }}</td>
             </tr>
             @endif
             <tr class="total-row">
-                <td>Total</td>
+                <td>Do zapłaty</td>
                 <td class="text-right">{{ number_format($order->total / 100, 2) }} {{ $order->currency_code }}</td>
             </tr>
         </table>
     </div>
 
     <div class="footer">
-        <p>Thank you for your business. This is a computer-generated document, no signature required.</p>
+        <p>Dokument wygenerowany automatycznie. Nie wymaga podpisu.</p>
     </div>
 </body>
 </html>

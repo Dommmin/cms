@@ -12,6 +12,7 @@ use App\Events\OrderShipped;
 use App\Notifications\OrderStatusChangedNotification;
 use App\States\Order\AwaitingPaymentState;
 use App\States\Order\CancelledState;
+use App\States\Order\DraftState;
 use App\States\Order\DeliveredState;
 use App\States\Order\OrderState;
 use App\States\Order\PaidState;
@@ -36,6 +37,10 @@ use Spatie\ModelStates\HasStates;
 /**
  * @property int $id
  * @property string $reference_number
+ * @property string|null $invoice_number
+ * @property \Carbon\Carbon|null $invoice_issued_at
+ * @property string|null $buyer_vat_id
+ * @property string|null $buyer_company_name
  * @property string $status
  * @property int $subtotal
  * @property int $shipping_cost
@@ -53,7 +58,8 @@ use Spatie\ModelStates\HasStates;
  * @property Collection $returns
  */
 #[Fillable([
-    'reference_number', 'customer_id', 'guest_email', 'billing_address_id', 'shipping_address_id',
+    'reference_number', 'invoice_number', 'invoice_issued_at', 'buyer_vat_id', 'buyer_company_name',
+    'customer_id', 'guest_email', 'billing_address_id', 'shipping_address_id',
     'status', 'subtotal', 'discount_amount', 'shipping_cost', 'tax_amount', 'total',
     'currency_code', 'exchange_rate', 'notes',
 ])]
@@ -121,7 +127,12 @@ class Order extends Model
 
     public function shipment(): HasOne
     {
-        return $this->hasOne(Shipment::class);
+        return $this->hasOne(Shipment::class)->latestOfMany();
+    }
+
+    public function shipments(): HasMany
+    {
+        return $this->hasMany(Shipment::class);
     }
 
     public function returns(): HasMany
@@ -177,6 +188,7 @@ class Order extends Model
     {
         return [
             'status' => OrderState::class,
+            'invoice_issued_at' => 'datetime',
         ];
     }
 
@@ -184,6 +196,7 @@ class Order extends Model
     private function enumToStateClass(OrderStatusEnum $enum): string
     {
         return match ($enum) {
+            OrderStatusEnum::DRAFT => DraftState::class,
             OrderStatusEnum::PENDING => PendingState::class,
             OrderStatusEnum::AWAITING => AwaitingPaymentState::class,
             OrderStatusEnum::PAID => PaidState::class,
