@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Admin\Ecommerce\AdminOrderCreateController;
 use App\Http\Controllers\Admin\Ecommerce\AttributeController;
 use App\Http\Controllers\Admin\Ecommerce\BrandController;
 use App\Http\Controllers\Admin\Ecommerce\CategoryController as AdminCategoryController;
@@ -10,7 +11,6 @@ use App\Http\Controllers\Admin\Ecommerce\CustomerSegmentController;
 use App\Http\Controllers\Admin\Ecommerce\DiscountController;
 use App\Http\Controllers\Admin\Ecommerce\EmailTemplateController;
 use App\Http\Controllers\Admin\Ecommerce\FlashSaleController;
-use App\Http\Controllers\Admin\Ecommerce\AdminOrderCreateController;
 use App\Http\Controllers\Admin\Ecommerce\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\Ecommerce\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\Ecommerce\ProductFlagController;

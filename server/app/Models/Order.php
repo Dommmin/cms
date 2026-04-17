@@ -12,8 +12,8 @@ use App\Events\OrderShipped;
 use App\Notifications\OrderStatusChangedNotification;
 use App\States\Order\AwaitingPaymentState;
 use App\States\Order\CancelledState;
-use App\States\Order\DraftState;
 use App\States\Order\DeliveredState;
+use App\States\Order\DraftState;
 use App\States\Order\OrderState;
 use App\States\Order\PaidState;
 use App\States\Order\PendingState;
@@ -38,7 +38,7 @@ use Spatie\ModelStates\HasStates;
  * @property int $id
  * @property string $reference_number
  * @property string|null $invoice_number
- * @property \Carbon\Carbon|null $invoice_issued_at
+ * @property Carbon|null $invoice_issued_at
  * @property string|null $buyer_vat_id
  * @property string|null $buyer_company_name
  * @property string $status
