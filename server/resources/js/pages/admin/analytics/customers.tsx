@@ -132,11 +132,11 @@ export default function CustomersReport({ data, filters }: CustomersProps) {
                                         key={date}
                                         className="group flex flex-col items-center gap-1"
                                     >
-                                        <span className="hidden text-xs tabular-nums text-muted-foreground group-hover:block">
+                                        <span className="hidden text-xs text-muted-foreground tabular-nums group-hover:block">
                                             {count}
                                         </span>
                                         <div
-                                            className="w-6 min-h-1 rounded-t bg-primary/70 transition-all group-hover:bg-primary"
+                                            className="min-h-1 w-6 rounded-t bg-primary/70 transition-all group-hover:bg-primary"
                                             style={{
                                                 height: `${Math.max(4, Math.round((count / maxChartValue) * 80))}px`,
                                             }}

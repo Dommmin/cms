@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Ecommerce\BulkUpdateOrderStatusRequest;
 use App\Http\Requests\Admin\Ecommerce\UpdateOrderStatusRequest;
 use App\Models\Order;
+use App\Models\User;
 use App\Queries\Admin\OrderIndexQuery;
 use App\Services\InvoiceService;
 use App\Services\ShipmentService;
@@ -85,7 +86,7 @@ class OrderController extends Controller
                 }, fn (): null => null);
             });
 
-        /** @var \App\Models\User|null $admin */
+        /** @var User|null $admin */
         $admin = Auth::user();
         activity('order')
             ->causedBy($admin)
@@ -112,7 +113,7 @@ class OrderController extends Controller
             return back()->with('error', 'Ta zmiana statusu nie jest dozwolona dla bieżącego statusu zamówienia.');
         }
 
-        /** @var \App\Models\User|null $admin */
+        /** @var User|null $admin */
         $admin = Auth::user();
         activity('order')
             ->causedBy($admin)

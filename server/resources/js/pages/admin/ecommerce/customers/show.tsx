@@ -19,7 +19,12 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
-import type { ActivityEntry, Address, CustomerShow, OrderSummary } from './show.types';
+import type {
+    ActivityEntry,
+    Address,
+    CustomerShow,
+    OrderSummary,
+} from './show.types';
 
 const ORDER_STATUS_COLORS: Record<string, string> = {
     pending: 'bg-gray-100 text-gray-700',
@@ -148,7 +153,12 @@ export default function CustomerShowPage({
             if (!tags.includes(newTag)) {
                 const next = [...tags, newTag];
                 setTags(next);
-                router.patch(CustomerController.updateTags.url({ customer: customer.id }), { tags: next });
+                router.patch(
+                    CustomerController.updateTags.url({
+                        customer: customer.id,
+                    }),
+                    { tags: next },
+                );
             }
             setTagInput('');
         }
@@ -157,7 +167,10 @@ export default function CustomerShowPage({
     function removeTag(tag: string) {
         const next = tags.filter((t) => t !== tag);
         setTags(next);
-        router.patch(CustomerController.updateTags.url({ customer: customer.id }), { tags: next });
+        router.patch(
+            CustomerController.updateTags.url({ customer: customer.id }),
+            { tags: next },
+        );
     }
 
     return (
@@ -439,7 +452,10 @@ export default function CustomerShowPage({
                         </div>
                         <ol className="relative border-l border-border pl-4">
                             {activityLog.map((entry) => (
-                                <li key={entry.id} className="mb-4 ml-2 last:mb-0">
+                                <li
+                                    key={entry.id}
+                                    className="mb-4 ml-2 last:mb-0"
+                                >
                                     <div className="absolute -left-1.5 h-3 w-3 rounded-full border border-background bg-muted-foreground/40" />
                                     <div className="flex flex-wrap items-baseline gap-2">
                                         <span className="text-sm font-medium capitalize">
@@ -451,25 +467,43 @@ export default function CustomerShowPage({
                                             </span>
                                         )}
                                         <span className="ml-auto text-xs text-muted-foreground">
-                                            {new Date(entry.created_at).toLocaleString('pl-PL')}
+                                            {new Date(
+                                                entry.created_at,
+                                            ).toLocaleString('pl-PL')}
                                         </span>
                                     </div>
-                                    {entry.changes?.attributes && Object.keys(entry.changes.attributes).length > 0 && (
-                                        <div className="mt-1 grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs text-muted-foreground">
-                                            {Object.entries(entry.changes.attributes).map(([k, v]) => (
-                                                <div key={k}>
-                                                    <span className="font-medium">{k}:</span>{' '}
-                                                    {entry.changes?.old?.[k] !== undefined ? (
-                                                        <span>
-                                                            <span className="line-through opacity-60">{String(entry.changes.old[k])}</span>
-                                                            {' → '}
-                                                        </span>
-                                                    ) : null}
-                                                    {String(v)}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
+                                    {entry.changes?.attributes &&
+                                        Object.keys(entry.changes.attributes)
+                                            .length > 0 && (
+                                            <div className="mt-1 grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs text-muted-foreground">
+                                                {Object.entries(
+                                                    entry.changes.attributes,
+                                                ).map(([k, v]) => (
+                                                    <div key={k}>
+                                                        <span className="font-medium">
+                                                            {k}:
+                                                        </span>{' '}
+                                                        {entry.changes?.old?.[
+                                                            k
+                                                        ] !== undefined ? (
+                                                            <span>
+                                                                <span className="line-through opacity-60">
+                                                                    {String(
+                                                                        entry
+                                                                            .changes
+                                                                            .old[
+                                                                            k
+                                                                        ],
+                                                                    )}
+                                                                </span>
+                                                                {' → '}
+                                                            </span>
+                                                        ) : null}
+                                                        {String(v)}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                 </li>
                             ))}
                         </ol>

@@ -109,7 +109,7 @@ export default function ConversionReport({ data, filters }: ConversionProps) {
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <span className="tabular-nums text-muted-foreground">
+                                        <span className="text-muted-foreground tabular-nums">
                                             {stage.count.toLocaleString()}
                                         </span>
                                         <span className="w-12 text-right font-medium tabular-nums">

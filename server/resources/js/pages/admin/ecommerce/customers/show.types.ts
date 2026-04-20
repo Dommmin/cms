@@ -25,7 +25,10 @@ export interface ActivityEntry {
     id: number;
     description: string;
     log_name: string | null;
-    changes: { old?: Record<string, unknown>; attributes?: Record<string, unknown> } | null;
+    changes: {
+        old?: Record<string, unknown>;
+        attributes?: Record<string, unknown>;
+    } | null;
     causer: { name: string } | null;
     created_at: string;
 }

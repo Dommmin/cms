@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd=$(jq -r '.tool_input.command' 2>/dev/null); if echo \"$cmd\" | grep -qE '(^| )(rtk )?git commit'; then cd /Users/domin/projects/laravel/cms && make check; fi",
+            "timeout": 300,
+            "statusMessage": "Running make check before commit (CI mirror)..."
+          }
+        ]
+      }
+    ]
+  }
+}

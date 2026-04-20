@@ -209,7 +209,7 @@ export default function InventoryReport({ data }: InventoryProps) {
                                             <td className="px-4 py-3 text-right tabular-nums">
                                                 {formatPrice(item.price)}
                                             </td>
-                                            <td className="px-4 py-3 text-right tabular-nums font-medium">
+                                            <td className="px-4 py-3 text-right font-medium tabular-nums">
                                                 {formatPrice(
                                                     item.stock_value ?? 0,
                                                 )}

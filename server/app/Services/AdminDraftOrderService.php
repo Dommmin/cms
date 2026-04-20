@@ -8,6 +8,7 @@ use App\Enums\OrderStatusEnum;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
+use App\Models\User;
 use App\States\Order\DraftState;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -62,7 +63,7 @@ class AdminDraftOrderService
                 ]);
             }
 
-            /** @var \App\Models\User|null $admin */
+            /** @var User|null $admin */
             $admin = Auth::user();
             activity('order')
                 ->causedBy($admin)
@@ -120,7 +121,7 @@ class AdminDraftOrderService
 
         $order->changeStatus(OrderStatusEnum::PENDING, changedBy: 'admin', notes: 'Draft confirmed by admin');
 
-        /** @var \App\Models\User|null $admin */
+        /** @var User|null $admin */
         $admin = Auth::user();
         activity('order')
             ->causedBy($admin)

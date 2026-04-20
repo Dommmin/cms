@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Inertia\Response;
 use Spatie\Activitylog\Models\Activity;
@@ -89,8 +90,8 @@ class ActivityLogController extends Controller
                 foreach ($activities as $activity) {
                     fputcsv($handle, [
                         $activity->created_at->format('Y-m-d H:i:s'),
-                        $activity->causer instanceof \Illuminate\Database\Eloquent\Model ? $activity->causer->getAttribute('name') : 'System',
-                        $activity->causer instanceof \Illuminate\Database\Eloquent\Model ? $activity->causer->getAttribute('email') : '',
+                        $activity->causer instanceof Model ? $activity->causer->getAttribute('name') : 'System',
+                        $activity->causer instanceof Model ? $activity->causer->getAttribute('email') : '',
                         $activity->event ?? $activity->description,
                         $activity->log_name,
                         $activity->subject_id,

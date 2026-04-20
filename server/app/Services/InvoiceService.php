@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Order;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Date;
 use Spatie\LaravelPdf\Facades\Pdf;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -44,7 +44,7 @@ class InvoiceService
         }
 
         $order->invoice_number = $this->generateInvoiceNumber();
-        $order->invoice_issued_at = Carbon::now();
+        $order->invoice_issued_at = Date::now();
         $order->saveQuietly();
     }
 

@@ -292,7 +292,7 @@ export default function ActivityLogIndex({
                                     ) as [string, string][],
                                 );
                                 window.location.href =
-                                    ActivityLogController.export.url() +
+                                    ActivityLogController.exportMethod.url() +
                                     (params.toString()
                                         ? '?' + params.toString()
                                         : '');

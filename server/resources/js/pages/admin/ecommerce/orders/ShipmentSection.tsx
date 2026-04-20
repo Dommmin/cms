@@ -1,8 +1,8 @@
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { Package, Plus, Truck } from 'lucide-react';
 import { useState } from 'react';
-import { store as shipmentsStore } from '@/routes/admin/ecommerce/orders/shipments';
 import { useTranslation } from '@/hooks/use-translation';
+import { store as shipmentsStore } from '@/routes/admin/ecommerce/orders/shipments';
 import type { OrderItem, OrderView, Shipment } from './show.types';
 
 type ShipmentItemInput = {
@@ -28,7 +28,8 @@ function ShipmentCard({
                 <div className="flex items-center gap-2">
                     <Truck className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium">
-                        {shipment.carrier ?? __('misc.shipment', 'Shipment')} #{shipment.id}
+                        {shipment.carrier ?? __('misc.shipment', 'Shipment')} #
+                        {shipment.id}
                     </span>
                 </div>
                 <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 capitalize">
@@ -39,7 +40,9 @@ function ShipmentCard({
             {(shipment.tracking_number || shipment.tracking_url) && (
                 <div className="mt-2 text-xs text-muted-foreground">
                     {shipment.tracking_number && (
-                        <span className="font-mono">{shipment.tracking_number}</span>
+                        <span className="font-mono">
+                            {shipment.tracking_number}
+                        </span>
                     )}
                     {shipment.tracking_url && (
                         <a
@@ -55,21 +58,32 @@ function ShipmentCard({
             )}
 
             {shipment.created_at && (
-                <p className="mt-1 text-xs text-muted-foreground">{fmtDate(shipment.created_at)}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                    {fmtDate(shipment.created_at)}
+                </p>
             )}
 
             {shipment.items && shipment.items.length > 0 && (
                 <ul className="mt-3 space-y-1 border-t border-border pt-3">
                     {shipment.items.map((si) => {
-                        const orderItem = (order.items ?? []).find((i) => i.id === si.order_item_id);
+                        const orderItem = (order.items ?? []).find(
+                            (i) => i.id === si.order_item_id,
+                        );
                         const name =
                             orderItem?.variant?.product?.name ??
                             orderItem?.product_name ??
                             `Item #${si.order_item_id}`;
                         return (
-                            <li key={si.id} className="flex justify-between text-xs">
-                                <span className="text-muted-foreground">{name}</span>
-                                <span className="font-medium">×{si.quantity}</span>
+                            <li
+                                key={si.id}
+                                className="flex justify-between text-xs"
+                            >
+                                <span className="text-muted-foreground">
+                                    {name}
+                                </span>
+                                <span className="font-medium">
+                                    ×{si.quantity}
+                                </span>
                             </li>
                         );
                     })}
@@ -93,7 +107,7 @@ export function ShipmentSection({ order }: { order: OrderView }) {
         enabled: true,
     }));
 
-    const { data, setData, post, processing, errors, reset } = useForm<{
+    const { data, setData, processing, errors, reset } = useForm<{
         carrier: string;
         tracking_number: string;
         tracking_url: string;
@@ -119,27 +133,37 @@ export function ShipmentSection({ order }: { order: OrderView }) {
 
         const enabledItems = data.items
             .filter((i) => i.enabled && i.quantity > 0)
-            .map(({ order_item_id, quantity }) => ({ order_item_id, quantity }));
+            .map(({ order_item_id, quantity }) => ({
+                order_item_id,
+                quantity,
+            }));
 
         if (enabledItems.length === 0) {
             return;
         }
 
-        post(shipmentsStore.url(order.id), {
-            data: {
+        router.post(
+            shipmentsStore.url(order.id),
+            {
                 carrier: data.carrier,
                 tracking_number: data.tracking_number,
                 tracking_url: data.tracking_url,
                 items: enabledItems,
             },
-            onSuccess: () => {
-                reset();
-                setShowForm(false);
+            {
+                onSuccess: () => {
+                    reset();
+                    setShowForm(false);
+                },
             },
-        });
+        );
     }
 
-    function updateItem(index: number, key: keyof ShipmentItemInput, value: boolean | number) {
+    function updateItem(
+        index: number,
+        key: keyof ShipmentItemInput,
+        value: boolean | number,
+    ) {
         const updated = [...data.items];
         updated[index] = { ...updated[index], [key]: value };
         setData('items', updated);
@@ -174,7 +198,12 @@ export function ShipmentSection({ order }: { order: OrderView }) {
                 )}
 
                 {shipments.map((s) => (
-                    <ShipmentCard key={s.id} shipment={s} fmtDate={fmtDate} order={order} />
+                    <ShipmentCard
+                        key={s.id}
+                        shipment={s}
+                        fmtDate={fmtDate}
+                        order={order}
+                    />
                 ))}
 
                 {/* Create shipment form */}
@@ -195,19 +224,29 @@ export function ShipmentSection({ order }: { order: OrderView }) {
                                 <input
                                     type="text"
                                     value={data.carrier}
-                                    onChange={(e) => setData('carrier', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('carrier', e.target.value)
+                                    }
                                     placeholder="DHL, InPost..."
                                     className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
                                 />
                             </div>
                             <div>
                                 <label className="mb-1 block text-xs font-medium">
-                                    {__('label.tracking_number', 'Tracking No.')}
+                                    {__(
+                                        'label.tracking_number',
+                                        'Tracking No.',
+                                    )}
                                 </label>
                                 <input
                                     type="text"
                                     value={data.tracking_number}
-                                    onChange={(e) => setData('tracking_number', e.target.value)}
+                                    onChange={(e) =>
+                                        setData(
+                                            'tracking_number',
+                                            e.target.value,
+                                        )
+                                    }
                                     className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
                                 />
                             </div>
@@ -215,17 +254,24 @@ export function ShipmentSection({ order }: { order: OrderView }) {
 
                         <div>
                             <label className="mb-1 block text-xs font-medium">
-                                {__('label.tracking_url_optional', 'Tracking URL (optional)')}
+                                {__(
+                                    'label.tracking_url_optional',
+                                    'Tracking URL (optional)',
+                                )}
                             </label>
                             <input
                                 type="url"
                                 value={data.tracking_url}
-                                onChange={(e) => setData('tracking_url', e.target.value)}
+                                onChange={(e) =>
+                                    setData('tracking_url', e.target.value)
+                                }
                                 placeholder="https://..."
                                 className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
                             />
                             {errors.tracking_url && (
-                                <p className="mt-1 text-xs text-destructive">{errors.tracking_url}</p>
+                                <p className="mt-1 text-xs text-destructive">
+                                    {errors.tracking_url}
+                                </p>
                             )}
                         </div>
 
@@ -235,7 +281,9 @@ export function ShipmentSection({ order }: { order: OrderView }) {
                                 {__('misc.items_to_ship', 'Items to ship')}
                             </p>
                             {errors.items && (
-                                <p className="mb-2 text-xs text-destructive">{errors.items}</p>
+                                <p className="mb-2 text-xs text-destructive">
+                                    {errors.items}
+                                </p>
                             )}
                             <div className="space-y-2">
                                 {data.items.map((input, idx) => {
@@ -245,7 +293,9 @@ export function ShipmentSection({ order }: { order: OrderView }) {
                                         orderItem.variant?.product?.name ??
                                         orderItem.product_name ??
                                         `Item #${orderItem.id}`;
-                                    const maxQty = orderItem.quantity - (orderItem.shipped_quantity ?? 0);
+                                    const maxQty =
+                                        orderItem.quantity -
+                                        (orderItem.shipped_quantity ?? 0);
 
                                     return (
                                         <div
@@ -256,7 +306,11 @@ export function ShipmentSection({ order }: { order: OrderView }) {
                                                 type="checkbox"
                                                 checked={input.enabled}
                                                 onChange={(e) =>
-                                                    updateItem(idx, 'enabled', e.target.checked)
+                                                    updateItem(
+                                                        idx,
+                                                        'enabled',
+                                                        e.target.checked,
+                                                    )
                                                 }
                                                 className="h-4 w-4 shrink-0 rounded border-input"
                                             />
@@ -283,7 +337,13 @@ export function ShipmentSection({ order }: { order: OrderView }) {
                                                         'quantity',
                                                         Math.min(
                                                             maxQty,
-                                                            Math.max(1, parseInt(e.target.value) || 1),
+                                                            Math.max(
+                                                                1,
+                                                                parseInt(
+                                                                    e.target
+                                                                        .value,
+                                                                ) || 1,
+                                                            ),
                                                         ),
                                                     )
                                                 }
@@ -305,12 +365,18 @@ export function ShipmentSection({ order }: { order: OrderView }) {
                             </button>
                             <button
                                 type="submit"
-                                disabled={processing || data.items.every((i) => !i.enabled)}
+                                disabled={
+                                    processing ||
+                                    data.items.every((i) => !i.enabled)
+                                }
                                 className="rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
                             >
                                 {processing
                                     ? __('misc.saving', 'Saving...')
-                                    : __('action.create_shipment', 'Create Shipment')}
+                                    : __(
+                                          'action.create_shipment',
+                                          'Create Shipment',
+                                      )}
                             </button>
                         </div>
                     </form>

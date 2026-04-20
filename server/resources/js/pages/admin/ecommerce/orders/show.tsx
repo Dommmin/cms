@@ -274,7 +274,9 @@ export default function OrderShow({
                     <PageHeaderActions>
                         {order.status === 'draft' && (
                             <Link
-                                href={AdminOrderCreateController.confirm.url({ order: order.id })}
+                                href={AdminOrderCreateController.confirm.url({
+                                    order: order.id,
+                                })}
                                 method="post"
                                 as="button"
                                 className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
@@ -290,7 +292,9 @@ export default function OrderShow({
                             rel="noreferrer"
                         >
                             <Download className="h-4 w-4" />
-                            {order.invoice_number ? order.invoice_number : 'Download Invoice'}
+                            {order.invoice_number
+                                ? order.invoice_number
+                                : 'Download Invoice'}
                         </a>
                         <Link
                             href={OrderController.index.url()}
@@ -662,29 +666,47 @@ export default function OrderShow({
                                 {order.invoice_number ? (
                                     <>
                                         <div className="flex justify-between">
-                                            <span className="text-muted-foreground">Nr faktury</span>
-                                            <span className="font-mono font-medium">{order.invoice_number}</span>
+                                            <span className="text-muted-foreground">
+                                                Nr faktury
+                                            </span>
+                                            <span className="font-mono font-medium">
+                                                {order.invoice_number}
+                                            </span>
                                         </div>
                                         {order.invoice_issued_at && (
                                             <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Data wystawienia</span>
-                                                <span>{fmtDate(order.invoice_issued_at)}</span>
+                                                <span className="text-muted-foreground">
+                                                    Data wystawienia
+                                                </span>
+                                                <span>
+                                                    {fmtDate(
+                                                        order.invoice_issued_at,
+                                                    )}
+                                                </span>
                                             </div>
                                         )}
                                     </>
                                 ) : (
                                     <p className="text-xs text-muted-foreground">
-                                        Faktura zostanie wystawiona przy pierwszym pobraniu.
+                                        Faktura zostanie wystawiona przy
+                                        pierwszym pobraniu.
                                     </p>
                                 )}
-                                {(order.buyer_vat_id || order.buyer_company_name) && (
+                                {(order.buyer_vat_id ||
+                                    order.buyer_company_name) && (
                                     <div className="mt-3 border-t border-border pt-3">
-                                        <p className="mb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">Nabywca B2B</p>
+                                        <p className="mb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                                            Nabywca B2B
+                                        </p>
                                         {order.buyer_company_name && (
-                                            <p className="font-medium">{order.buyer_company_name}</p>
+                                            <p className="font-medium">
+                                                {order.buyer_company_name}
+                                            </p>
                                         )}
                                         {order.buyer_vat_id && (
-                                            <p className="text-muted-foreground">NIP: {order.buyer_vat_id}</p>
+                                            <p className="text-muted-foreground">
+                                                NIP: {order.buyer_vat_id}
+                                            </p>
                                         )}
                                     </div>
                                 )}

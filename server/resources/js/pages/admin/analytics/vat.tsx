@@ -175,10 +175,10 @@ export default function VatReport({ data, filters }: VatProps) {
                                             <td className="px-4 py-3 text-right tabular-nums">
                                                 {formatPrice(row.net)}
                                             </td>
-                                            <td className="px-4 py-3 text-right tabular-nums text-amber-600 dark:text-amber-400">
+                                            <td className="px-4 py-3 text-right text-amber-600 tabular-nums dark:text-amber-400">
                                                 {formatPrice(row.vat)}
                                             </td>
-                                            <td className="px-4 py-3 text-right tabular-nums font-medium">
+                                            <td className="px-4 py-3 text-right font-medium tabular-nums">
                                                 {formatPrice(row.gross)}
                                             </td>
                                         </tr>
@@ -193,7 +193,7 @@ export default function VatReport({ data, filters }: VatProps) {
                                         <td className="px-4 py-3 text-right tabular-nums">
                                             {formatPrice(data.net_total)}
                                         </td>
-                                        <td className="px-4 py-3 text-right tabular-nums text-amber-600 dark:text-amber-400">
+                                        <td className="px-4 py-3 text-right text-amber-600 tabular-nums dark:text-amber-400">
                                             {formatPrice(data.vat_total)}
                                         </td>
                                         <td className="px-4 py-3 text-right tabular-nums">

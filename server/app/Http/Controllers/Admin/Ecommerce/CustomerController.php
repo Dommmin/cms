@@ -11,6 +11,7 @@ use App\Http\Requests\Admin\Ecommerce\UpdateCustomerRequest;
 use App\Models\Customer;
 use App\Models\User;
 use App\Queries\Admin\CustomerIndexQuery;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,16 +52,14 @@ class CustomerController extends Controller
             ->latest()
             ->limit(50)
             ->get()
-            ->map(/** @phpstan-ignore argument.type */ function (Activity $a): array {
-                return [
-                    'id' => $a->id,
-                    'description' => $a->description,
-                    'log_name' => $a->log_name,
-                    'changes' => $a->changes,
-                    'causer' => $a->causer_type ? ['name' => $a->causer instanceof \Illuminate\Database\Eloquent\Model ? $a->causer->getAttribute('name') : 'System'] : null,
-                    'created_at' => $a->created_at?->toISOString(),
-                ];
-            });
+            ->map(/** @phpstan-ignore argument.type */ fn (Activity $a): array => [
+                'id' => $a->id,
+                'description' => $a->description,
+                'log_name' => $a->log_name,
+                'changes' => $a->changes,
+                'causer' => $a->causer_type ? ['name' => $a->causer instanceof Model ? $a->causer->getAttribute('name') : 'System'] : null,
+                'created_at' => $a->created_at?->toISOString(),
+            ]);
 
         return inertia('admin/ecommerce/customers/show', [
             'customer' => array_merge($customer->toArray(), [

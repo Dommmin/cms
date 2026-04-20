@@ -54,16 +54,28 @@ export default function Create({
         if (checked) {
             setData('permissions', [...data.permissions, permissionId]);
         } else {
-            setData('permissions', data.permissions.filter((id) => id !== permissionId));
+            setData(
+                'permissions',
+                data.permissions.filter((id) => id !== permissionId),
+            );
         }
     };
 
-    const handleResourceToggle = (resourcePermissions: Permission[], checked: boolean) => {
+    const handleResourceToggle = (
+        resourcePermissions: Permission[],
+        checked: boolean,
+    ) => {
         const permissionIds = resourcePermissions.map((p) => p.id);
         if (checked) {
-            setData('permissions', Array.from(new Set([...data.permissions, ...permissionIds])));
+            setData(
+                'permissions',
+                Array.from(new Set([...data.permissions, ...permissionIds])),
+            );
         } else {
-            setData('permissions', data.permissions.filter((id) => !permissionIds.includes(id)));
+            setData(
+                'permissions',
+                data.permissions.filter((id) => !permissionIds.includes(id)),
+            );
         }
     };
 
@@ -81,10 +93,17 @@ export default function Create({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Role" />
             <Wrapper>
-                <PageHeader title="Create Role" description="Define a new custom role with selective permissions">
+                <PageHeader
+                    title="Create Role"
+                    description="Define a new custom role with selective permissions"
+                >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link href={RoleController.index.url()} prefetch cacheFor={30}>
+                            <Link
+                                href={RoleController.index.url()}
+                                prefetch
+                                cacheFor={30}
+                            >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 {__('action.back', 'Back')}
                             </Link>
@@ -97,7 +116,10 @@ export default function Create({
                     <Card>
                         <CardHeader>
                             <CardTitle>Role Name</CardTitle>
-                            <CardDescription>Choose a unique identifier for this role (e.g. "content-manager")</CardDescription>
+                            <CardDescription>
+                                Choose a unique identifier for this role (e.g.
+                                "content-manager")
+                            </CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="max-w-sm space-y-1">
@@ -105,11 +127,15 @@ export default function Create({
                                 <Input
                                     id="name"
                                     value={data.name}
-                                    onChange={(e) => setData('name', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('name', e.target.value)
+                                    }
                                     placeholder="e.g. content-manager"
                                 />
                                 {errors.name && (
-                                    <p className="text-xs text-destructive">{errors.name}</p>
+                                    <p className="text-xs text-destructive">
+                                        {errors.name}
+                                    </p>
                                 )}
                             </div>
                         </CardContent>
@@ -121,15 +147,25 @@ export default function Create({
                             <CardHeader>
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <CardTitle className="capitalize">{group.resource}</CardTitle>
-                                        <CardDescription>{group.permissions.length} permission(s)</CardDescription>
+                                        <CardTitle className="capitalize">
+                                            {group.resource}
+                                        </CardTitle>
+                                        <CardDescription>
+                                            {group.permissions.length}{' '}
+                                            permission(s)
+                                        </CardDescription>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <Checkbox
                                             id={`resource-${group.resource}`}
-                                            checked={hasAllResourcePermissions(group.permissions)}
+                                            checked={hasAllResourcePermissions(
+                                                group.permissions,
+                                            )}
                                             onCheckedChange={(checked) =>
-                                                handleResourceToggle(group.permissions, checked as boolean)
+                                                handleResourceToggle(
+                                                    group.permissions,
+                                                    checked as boolean,
+                                                )
                                             }
                                         />
                                         <Label
@@ -144,12 +180,20 @@ export default function Create({
                             <CardContent>
                                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
                                     {group.permissions.map((permission) => (
-                                        <div key={permission.id} className="flex items-center space-x-2">
+                                        <div
+                                            key={permission.id}
+                                            className="flex items-center space-x-2"
+                                        >
                                             <Checkbox
                                                 id={`permission-${permission.id}`}
-                                                checked={data.permissions.includes(permission.id)}
+                                                checked={data.permissions.includes(
+                                                    permission.id,
+                                                )}
                                                 onCheckedChange={(checked) =>
-                                                    handlePermissionToggle(permission.id, checked as boolean)
+                                                    handlePermissionToggle(
+                                                        permission.id,
+                                                        checked as boolean,
+                                                    )
                                                 }
                                             />
                                             <Label
@@ -166,7 +210,9 @@ export default function Create({
                     ))}
 
                     {errors.permissions && (
-                        <p className="text-sm text-destructive">{errors.permissions}</p>
+                        <p className="text-sm text-destructive">
+                            {errors.permissions}
+                        </p>
                     )}
 
                     <StickyFormActions
