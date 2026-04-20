@@ -26,6 +26,9 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Translatable\HasTranslations;
 
 /**
+ * @property int $id
+ * @property string $name
+ * @property string $slug
  * @property bool $is_search_promoted
  * @property bool $is_active
  */

@@ -63,15 +63,15 @@ class RoleController extends Controller
         ]);
 
         $role = Role::create([
-            'name' => $request->name,
+            'name' => $request->input('name'),
             'guard_name' => 'web',
             'is_system' => false,
         ]);
 
         $role->syncPermissions($request->input('permissions', []));
 
-        return redirect()->route('admin.roles.index')
-            ->with('success', "Role \"{$role->name}\" created.");
+        return to_route('admin.roles.index')
+            ->with('success', sprintf('Role "%s" created.', $role->name));
     }
 
     public function edit(Role $role): Response
@@ -104,11 +104,11 @@ class RoleController extends Controller
     {
         $this->authorize('update', $role);
 
-        if (! $role->is_system) {
+        if (! (bool) $role->getAttribute('is_system')) {
             $request->validate([
                 'name' => ['required', 'string', 'max:255', 'unique:roles,name,'.$role->id],
             ]);
-            $role->update(['name' => $request->name]);
+            $role->update(['name' => $request->input('name')]);
         }
 
         $role->syncPermissions($request->input('permissions', []));
@@ -120,7 +120,7 @@ class RoleController extends Controller
     {
         $this->authorize('delete', $role);
 
-        if ($role->is_system) {
+        if ((bool) $role->getAttribute('is_system')) {
             return back()->withErrors(['role' => 'System roles cannot be deleted.']);
         }
 
@@ -130,7 +130,7 @@ class RoleController extends Controller
 
         $role->delete();
 
-        return redirect()->route('admin.roles.index')
-            ->with('success', "Role \"{$role->name}\" deleted.");
+        return to_route('admin.roles.index')
+            ->with('success', sprintf('Role "%s" deleted.', $role->name));
     }
 }

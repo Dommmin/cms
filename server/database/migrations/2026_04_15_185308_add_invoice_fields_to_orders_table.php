@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
+        Schema::table('orders', function (Blueprint $table): void {
             // Sequential invoice number: FV/2026/00001
             $table->string('invoice_number')->nullable()->unique()->after('reference_number');
             $table->timestamp('invoice_issued_at')->nullable()->after('invoice_number');
@@ -22,7 +22,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
+        Schema::table('orders', function (Blueprint $table): void {
             $table->dropColumn(['invoice_number', 'invoice_issued_at', 'buyer_vat_id', 'buyer_company_name']);
         });
     }

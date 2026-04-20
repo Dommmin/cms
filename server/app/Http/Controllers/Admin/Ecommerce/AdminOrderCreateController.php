@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin\Ecommerce;
 
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Order;
@@ -26,10 +27,11 @@ class AdminOrderCreateController extends Controller
         $customers = Customer::query()
             ->with('user:id,name,email')
             ->when($request->filled('customer_search'), function ($q) use ($request): void {
-                $q->where(function ($q) use ($request): void {
-                    $q->where('first_name', 'like', '%'.$request->customer_search.'%')
-                        ->orWhere('last_name', 'like', '%'.$request->customer_search.'%')
-                        ->orWhere('email', 'like', '%'.$request->customer_search.'%');
+                $search = $request->input('customer_search');
+                $q->where(function ($q) use ($search): void {
+                    $q->where('first_name', 'like', '%'.$search.'%')
+                        ->orWhere('last_name', 'like', '%'.$search.'%')
+                        ->orWhere('email', 'like', '%'.$search.'%');
                 });
             })
             ->orderBy('first_name')
@@ -56,28 +58,27 @@ class AdminOrderCreateController extends Controller
 
         $order = $this->service->createDraft($validated);
 
-        return redirect()
-            ->route('admin.ecommerce.orders.show', $order)
+        return to_route('admin.ecommerce.orders.show', $order)
             ->with('success', 'Draft order created. Review and confirm when ready.');
     }
 
     /**
      * Search products/variants for the order form (AJAX).
      */
-    public function searchVariants(Request $request): \Illuminate\Http\JsonResponse
+    public function searchVariants(Request $request): JsonResponse
     {
         $q = $request->input('q', '');
 
         $variants = ProductVariant::query()
             ->with('product:id,name')
             ->where(function ($query) use ($q): void {
-                $query->where('sku', 'like', "%{$q}%")
-                    ->orWhereHas('product', fn ($p) => $p->where('name', 'like', "%{$q}%"));
+                $query->where('sku', 'like', sprintf('%%%s%%', $q))
+                    ->orWhereHas('product', fn ($p) => $p->where('name', 'like', sprintf('%%%s%%', $q)));
             })
             ->where('is_active', true)
             ->limit(20)
             ->get(['id', 'product_id', 'sku', 'name', 'price', 'stock_quantity'])
-            ->map(fn ($v) => [
+            ->map(fn ($v): array => [
                 'id' => $v->id,
                 'sku' => $v->sku,
                 'name' => $v->product->name.($v->name ? ' — '.$v->name : ''),
@@ -95,8 +96,7 @@ class AdminOrderCreateController extends Controller
     {
         $this->service->confirmDraft($order);
 
-        return redirect()
-            ->route('admin.ecommerce.orders.show', $order)
+        return to_route('admin.ecommerce.orders.show', $order)
             ->with('success', 'Order confirmed and sent to processing.');
     }
 }

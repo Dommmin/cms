@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Support\Carbon;
 use App\Modules\Core\Domain\Models\Currency;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
@@ -36,7 +37,7 @@ use Spatie\Translatable\HasTranslations;
  * @property int $stock_threshold
  * @property string $stock_status
  * @property bool $backorder_allowed
- * @property \Illuminate\Support\Carbon|null $available_at
+ * @property Carbon|null $available_at
  * @property bool $is_active
  * @property bool $is_default
  * @property bool $is_digital

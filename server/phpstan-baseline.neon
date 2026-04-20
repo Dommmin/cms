@@ -1269,13 +1269,13 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,stdClass\>\:\:map\(\) expects callable\(stdClass, int\)\: array\{id\: int\|string, name\: string, action\: string\}, Closure\(Spatie\\Permission\\Models\\Permission\)\: array\{id\: int\|string, name\: string, action\: string\} given\.$#'
 			identifier: argument.type
-			count: 1
+			count: 2
 			path: app/Http/Controllers/Admin/RoleController.php
 
 		-
 			message: '#^Parameter \#1 \$groupBy of method Illuminate\\Support\\Collection\<int,stdClass\>\:\:groupBy\(\) expects array\|\(callable\(stdClass, int\)\: string\)\|string, Closure\(Spatie\\Permission\\Models\\Permission\)\: string given\.$#'
 			identifier: argument.type
-			count: 1
+			count: 2
 			path: app/Http/Controllers/Admin/RoleController.php
 
 		-

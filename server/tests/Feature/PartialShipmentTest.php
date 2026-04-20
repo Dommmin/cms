@@ -29,7 +29,7 @@ test('createPartialShipment creates shipment and shipment items', function (): v
     $item1 = OrderItem::factory()->for($order)->create(['quantity' => 3, 'shipped_quantity' => 0]);
     $item2 = OrderItem::factory()->for($order)->create(['quantity' => 2, 'shipped_quantity' => 0]);
 
-    $service = app(ShipmentService::class);
+    $service = resolve(ShipmentService::class);
     $shipment = $service->createPartialShipment(
         $order,
         [
@@ -52,7 +52,7 @@ test('createPartialShipment does not exceed remaining quantity', function (): vo
     $order = Order::factory()->processing()->create();
     $item = OrderItem::factory()->for($order)->create(['quantity' => 2, 'shipped_quantity' => 1]);
 
-    $service = app(ShipmentService::class);
+    $service = resolve(ShipmentService::class);
     $service->createPartialShipment(
         $order,
         [['order_item_id' => $item->id, 'quantity' => 99]],
@@ -68,7 +68,7 @@ test('createPartialShipment sets order status to shipped when all items shipped'
     $order = Order::factory()->processing()->create();
     $item = OrderItem::factory()->for($order)->create(['quantity' => 1, 'shipped_quantity' => 0]);
 
-    $service = app(ShipmentService::class);
+    $service = resolve(ShipmentService::class);
     $service->createPartialShipment(
         $order,
         [['order_item_id' => $item->id, 'quantity' => 1]],

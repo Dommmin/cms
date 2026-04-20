@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\OrderStatusEnum;
-use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
 use App\States\Order\DraftState;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AdminDraftOrderService
@@ -31,9 +31,9 @@ class AdminDraftOrderService
         return DB::transaction(function () use ($data): Order {
             $items = $this->resolveItems($data['items']);
 
-            $subtotal = collect($items)->sum(fn ($i) => $i['unit_price'] * $i['quantity']);
+            $subtotal = collect($items)->sum(fn ($i): int => $i['unit_price'] * $i['quantity']);
 
-            $order = Order::create([
+            $order = Order::query()->create([
                 'reference_number' => Order::generateReferenceNumber(),
                 'customer_id' => $data['customer_id'],
                 'status' => OrderStatusEnum::DRAFT->value,
@@ -50,7 +50,7 @@ class AdminDraftOrderService
             ]);
 
             foreach ($items as $item) {
-                OrderItem::create([
+                OrderItem::query()->create([
                     'order_id' => $order->id,
                     'variant_id' => $item['variant_id'],
                     'product_name' => $item['product_name'],
@@ -62,8 +62,10 @@ class AdminDraftOrderService
                 ]);
             }
 
+            /** @var \App\Models\User|null $admin */
+            $admin = Auth::user();
             activity('order')
-                ->causedBy(auth()->user())
+                ->causedBy($admin)
                 ->performedOn($order)
                 ->withProperties(['customer_id' => $data['customer_id']])
                 ->log('draft_created');
@@ -85,10 +87,10 @@ class AdminDraftOrderService
             $order->items()->delete();
 
             $resolved = $this->resolveItems($items);
-            $subtotal = collect($resolved)->sum(fn ($i) => $i['unit_price'] * $i['quantity']);
+            $subtotal = collect($resolved)->sum(fn ($i): int => $i['unit_price'] * $i['quantity']);
 
             foreach ($resolved as $item) {
-                OrderItem::create([
+                OrderItem::query()->create([
                     'order_id' => $order->id,
                     'variant_id' => $item['variant_id'],
                     'product_name' => $item['product_name'],
@@ -118,8 +120,10 @@ class AdminDraftOrderService
 
         $order->changeStatus(OrderStatusEnum::PENDING, changedBy: 'admin', notes: 'Draft confirmed by admin');
 
+        /** @var \App\Models\User|null $admin */
+        $admin = Auth::user();
         activity('order')
-            ->causedBy(auth()->user())
+            ->causedBy($admin)
             ->performedOn($order)
             ->log('draft_confirmed');
 
@@ -137,7 +141,8 @@ class AdminDraftOrderService
      */
     private function resolveItems(array $rawItems): array
     {
-        return collect($rawItems)->map(function (array $item): array {
+        return collect($rawItems)->map(function (mixed $item): array {
+            /** @var array{variant_id: int, quantity: int} $item */
             $variant = ProductVariant::with('product:id,name')->findOrFail($item['variant_id']);
 
             return [
@@ -145,7 +150,7 @@ class AdminDraftOrderService
                 'product_name' => $variant->product->name,
                 'variant_name' => $variant->name,
                 'sku' => $variant->sku,
-                'quantity' => (int) $item['quantity'],
+                'quantity' => $item['quantity'],
                 'unit_price' => $variant->price,
             ];
         })->all();

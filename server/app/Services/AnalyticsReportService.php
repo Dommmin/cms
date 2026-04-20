@@ -274,9 +274,9 @@ class AnalyticsReportService
         ];
 
         $orders = Order::query()
+            ->with(['customer', 'billingAddress', 'items'])
             ->whereBetween('created_at', [$start, $end])
             ->whereIn('status', $completedStatuses)
-            ->with(['customer', 'billingAddress', 'items'])
             ->get();
 
         $doc = new DOMDocument('1.0', 'UTF-8');

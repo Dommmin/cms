@@ -80,7 +80,7 @@ class AdminSearchController extends Controller
                 $results[] = [
                     'group' => 'Orders',
                     'label' => '#'.$o->reference_number,
-                    'meta' => is_string($o->status) ? $o->status : $o->status?->value,
+                    'meta' => $o->status->getValue(),
                     'url' => '/admin/ecommerce/orders/'.$o->id,
                 ];
             });

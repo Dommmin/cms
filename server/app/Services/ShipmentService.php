@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Enums\OrderStatusEnum;
 use App\Enums\ShipmentStatusEnum;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Shipment;
 use App\Models\ShipmentItem;
 
@@ -20,6 +21,7 @@ class ShipmentService
      */
     public function createPartialShipment(Order $order, array $items, array $shipmentData): Shipment
     {
+        /** @var Shipment $shipment */
         $shipment = $order->shipments()->create([
             'shipping_method_id' => $order->shipping_method_id ?? null,
             'carrier' => $shipmentData['carrier'] ?? null,
@@ -29,6 +31,7 @@ class ShipmentService
         ]);
 
         foreach ($items as $item) {
+            /** @var OrderItem $orderItem */
             $orderItem = $order->items()->findOrFail($item['order_item_id']);
             $quantity = min((int) $item['quantity'], $orderItem->remaining_to_ship);
 
@@ -36,18 +39,21 @@ class ShipmentService
                 continue;
             }
 
-            ShipmentItem::create([
+            ShipmentItem::query()->create([
                 'shipment_id' => $shipment->id,
                 'order_item_id' => $orderItem->id,
                 'quantity' => $quantity,
             ]);
 
-            $orderItem->increment('shipped_quantity', $quantity);
+            $orderItem->update(['shipped_quantity' => $orderItem->shipped_quantity + $quantity]);
         }
 
         $this->updateOrderFulfillmentStatus($order);
 
-        return $shipment->load('items.orderItem');
+        /** @var Shipment $loaded */
+        $loaded = $shipment->load('items.orderItem');
+
+        return $loaded;
     }
 
     /**
@@ -57,8 +63,8 @@ class ShipmentService
     {
         $order->loadMissing('items');
 
-        $allShipped = $order->items->every(fn (mixed $item): bool => $item->isFullyShipped());
-        $anyShipped = $order->items->some(fn (mixed $item): bool => $item->shipped_quantity > 0);
+        $allShipped = $order->items->every(fn (OrderItem $item): bool => $item->isFullyShipped());
+        $anyShipped = $order->items->contains(fn (OrderItem $item): bool => $item->shipped_quantity > 0);
 
         if ($allShipped && $order->status->getValue() !== OrderStatusEnum::SHIPPED->value) {
             $order->changeStatus(OrderStatusEnum::SHIPPED, changedBy: 'system', notes: 'All items shipped');

@@ -51,14 +51,16 @@ class CustomerController extends Controller
             ->latest()
             ->limit(50)
             ->get()
-            ->map(fn (Activity $a): array => [
-                'id' => $a->id,
-                'description' => $a->description,
-                'log_name' => $a->log_name,
-                'changes' => $a->changes,
-                'causer' => $a->causer_type ? ['name' => $a->causer?->name ?? 'System'] : null,
-                'created_at' => $a->created_at?->toISOString(),
-            ]);
+            ->map(/** @phpstan-ignore argument.type */ function (Activity $a): array {
+                return [
+                    'id' => $a->id,
+                    'description' => $a->description,
+                    'log_name' => $a->log_name,
+                    'changes' => $a->changes,
+                    'causer' => $a->causer_type ? ['name' => $a->causer instanceof \Illuminate\Database\Eloquent\Model ? $a->causer->getAttribute('name') : 'System'] : null,
+                    'created_at' => $a->created_at?->toISOString(),
+                ];
+            });
 
         return inertia('admin/ecommerce/customers/show', [
             'customer' => array_merge($customer->toArray(), [
@@ -116,6 +118,7 @@ class CustomerController extends Controller
 
     public function impersonate(Customer $customer): RedirectResponse
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         abort_unless($user->can('customers.impersonate'), 403, 'Unauthorized to impersonate customers');

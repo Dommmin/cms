@@ -166,10 +166,10 @@ class DashboardService
             ->with(['customer', 'items'])->latest()
             ->limit($limit)
             ->get()
-            ->map(fn (Order $order): array => [
+            ->map(/** @phpstan-ignore argument.type */ fn (Order $order): array => [
                 'id' => $order->id,
                 'reference_number' => $order->reference_number,
-                'status' => $order->status->value,
+                'status' => $order->status->getValue(),
                 'total' => $order->total,
                 'items_count' => $order->items->count(),
                 'customer_name' => $order->customer?->name,

@@ -8,6 +8,7 @@ use App\Enums\OrderStatusEnum;
 use App\Enums\ShipmentStatusEnum;
 use App\Exports\OrdersExport;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Admin\Ecommerce\BulkUpdateOrderStatusRequest;
 use App\Http\Requests\Admin\Ecommerce\UpdateOrderStatusRequest;
 use App\Models\Order;
@@ -84,8 +85,10 @@ class OrderController extends Controller
                 }, fn (): null => null);
             });
 
+        /** @var \App\Models\User|null $admin */
+        $admin = Auth::user();
         activity('order')
-            ->causedBy(auth()->user())
+            ->causedBy($admin)
             ->withProperties(['order_ids' => $data['ids'], 'new_status' => $data['status']])
             ->log('bulk_status_changed');
 
@@ -97,7 +100,7 @@ class OrderController extends Controller
         $data = $request->validated();
         $newStatus = OrderStatusEnum::from($data['status']);
 
-        $oldStatus = $order->status->value;
+        $oldStatus = $order->status->getValue();
 
         try {
             $order->changeStatus(
@@ -109,10 +112,12 @@ class OrderController extends Controller
             return back()->with('error', 'Ta zmiana statusu nie jest dozwolona dla bieżącego statusu zamówienia.');
         }
 
+        /** @var \App\Models\User|null $admin */
+        $admin = Auth::user();
         activity('order')
-            ->causedBy(auth()->user())
+            ->causedBy($admin)
             ->performedOn($order)
-            ->withProperties(['old_status' => $oldStatus, 'new_status' => $order->status->value])
+            ->withProperties(['old_status' => $oldStatus, 'new_status' => $order->status->getValue()])
             ->log('status_changed');
 
         // If SHIPPED and tracking number provided — update shipment

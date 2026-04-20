@@ -9,7 +9,6 @@ use App\Services\AnalyticsReportService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
-use Illuminate\Support\Facades\Date;
 use Inertia\Response;
 
 class AnalyticsController extends Controller
@@ -55,9 +54,10 @@ class AnalyticsController extends Controller
 
     public function jpkExport(Request $request): HttpResponse
     {
+        /** @var \Carbon\Carbon $month */
         $month = $request->filled('month')
-            ? Date::parse($request->month)->startOfMonth()
-            : now()->subMonth()->startOfMonth();
+            ? Carbon::parse($request->input('month'))->startOfMonth()
+            : Carbon::now()->subMonth()->startOfMonth();
 
         $xml = $this->service->generateJpkV7Xml($month);
 
@@ -74,8 +74,10 @@ class AnalyticsController extends Controller
      */
     private function resolvePeriod(Request $request): array
     {
-        $from = $request->filled('from') ? Date::parse($request->from)->startOfDay() : now()->subDays(29)->startOfDay();
-        $to = $request->filled('to') ? Date::parse($request->to)->endOfDay() : now()->endOfDay();
+        /** @var \Carbon\Carbon $from */
+        $from = $request->filled('from') ? Carbon::parse($request->input('from'))->startOfDay() : Carbon::now()->subDays(29)->startOfDay();
+        /** @var \Carbon\Carbon $to */
+        $to = $request->filled('to') ? Carbon::parse($request->input('to'))->endOfDay() : Carbon::now()->endOfDay();
 
         return ['start' => $from, 'end' => $to];
     }

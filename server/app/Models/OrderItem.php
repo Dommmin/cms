@@ -15,7 +15,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * Order Item Model
  * Moved to Ecommerce module
  *
+ * @property int $id
+ * @property int $order_id
+ * @property int|null $variant_id
+ * @property string $product_name
+ * @property string|null $variant_name
+ * @property string $sku
+ * @property int $quantity
+ * @property int $unit_price
+ * @property int $total_price
  * @property int $shipped_quantity
+ * @property int|null $product_id
+ * @property-read ProductVariant|null $variant
+ * @property-read int $remaining_to_ship
  */
 #[Fillable([
     'order_id', 'variant_id', 'product_name', 'variant_name',
@@ -57,7 +69,7 @@ class OrderItem extends Model
         return $this->hasMany(ShipmentItem::class);
     }
 
-    public function getRemainingToShipAttribute(): int
+    protected function getRemainingToShipAttribute(): int
     {
         return max(0, $this->quantity - $this->shipped_quantity);
     }

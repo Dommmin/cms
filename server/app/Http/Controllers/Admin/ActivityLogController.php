@@ -58,24 +58,24 @@ class ActivityLogController extends Controller
         $query = Activity::with('causer:id,name,email')->latest();
 
         if ($request->filled('causer_id')) {
-            $query->where('causer_id', $request->causer_id)
+            $query->where('causer_id', $request->input('causer_id'))
                 ->where('causer_type', User::class);
         }
 
         if ($request->filled('log_name')) {
-            $query->where('log_name', $request->log_name);
+            $query->where('log_name', $request->input('log_name'));
         }
 
         if ($request->filled('event')) {
-            $query->where('event', $request->event);
+            $query->where('event', $request->input('event'));
         }
 
         if ($request->filled('date_from')) {
-            $query->whereDate('created_at', '>=', $request->date_from);
+            $query->whereDate('created_at', '>=', $request->input('date_from'));
         }
 
         if ($request->filled('date_to')) {
-            $query->whereDate('created_at', '<=', $request->date_to);
+            $query->whereDate('created_at', '<=', $request->input('date_to'));
         }
 
         $filename = 'activity-log-'.now()->format('Y-m-d').'.csv';
@@ -89,8 +89,8 @@ class ActivityLogController extends Controller
                 foreach ($activities as $activity) {
                     fputcsv($handle, [
                         $activity->created_at->format('Y-m-d H:i:s'),
-                        $activity->causer?->name ?? 'System',
-                        $activity->causer?->email ?? '',
+                        $activity->causer instanceof \Illuminate\Database\Eloquent\Model ? $activity->causer->getAttribute('name') : 'System',
+                        $activity->causer instanceof \Illuminate\Database\Eloquent\Model ? $activity->causer->getAttribute('email') : '',
                         $activity->event ?? $activity->description,
                         $activity->log_name,
                         $activity->subject_id,

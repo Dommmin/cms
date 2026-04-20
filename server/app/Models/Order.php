@@ -41,7 +41,7 @@ use Spatie\ModelStates\HasStates;
  * @property Carbon|null $invoice_issued_at
  * @property string|null $buyer_vat_id
  * @property string|null $buyer_company_name
- * @property string $status
+ * @property OrderState $status
  * @property int $subtotal
  * @property int $shipping_cost
  * @property int $discount_amount
@@ -51,7 +51,7 @@ use Spatie\ModelStates\HasStates;
  * @property string|null $notes
  * @property string|null $guest_email
  * @property Carbon $created_at
- * @property Collection $items
+ * @property Collection<int, OrderItem> $items
  * @property Customer|null $customer
  * @property Shipment|null $shipment
  * @property Payment|null $payment
@@ -145,9 +145,7 @@ class Order extends Model
      */
     public function changeStatus(OrderStatusEnum $newStatus, string $changedBy = 'system', ?string $notes = null): void
     {
-        $previousStatus = $this->status instanceof OrderState
-            ? $this->status->getValue()
-            : (string) $this->status;
+        $previousStatus = $this->status->getValue();
 
         $stateClass = $this->enumToStateClass($newStatus);
 

@@ -57,9 +57,9 @@ class ShippingMethodController extends Controller
             'carriers' => array_map(fn (ShippingCarrierEnum $c): array => ['value' => $c->value, 'label' => $c->getLabel()], ShippingCarrierEnum::cases()),
             'restrictions' => [
                 'products' => $shippingMethod->restrictedProducts()->select('products.id', 'products.name')->get()
-                    ->map(fn (Product $p): array => ['id' => $p->id, 'name' => $p->getTranslation('name', app()->getLocale(), false) ?: $p->name]),
+                    ->map(/** @phpstan-ignore argument.type */ fn (Product $p): array => ['id' => $p->id, 'name' => $p->getTranslation('name', app()->getLocale(), false) ?: $p->name]),
                 'categories' => $shippingMethod->restrictedCategories()->select('categories.id', 'categories.name')->get()
-                    ->map(fn (Category $c): array => ['id' => $c->id, 'name' => $c->getTranslation('name', app()->getLocale(), false) ?: $c->name]),
+                    ->map(/** @phpstan-ignore argument.type */ fn (Category $c): array => ['id' => $c->id, 'name' => $c->getTranslation('name', app()->getLocale(), false) ?: $c->name]),
             ],
         ]);
     }
@@ -161,7 +161,7 @@ class ShippingMethodController extends Controller
                 ->orderBy('name')
                 ->limit(10)
                 ->get(['id', 'name'])
-                ->map(fn (Category $c): array => [
+                ->map(/** @phpstan-ignore argument.type */ fn (Category $c): array => [
                     'id' => $c->id,
                     'name' => $c->getTranslation('name', app()->getLocale(), false) ?: (is_array($c->getRawOriginal('name')) ? reset($c->getRawOriginal('name')) : $c->getRawOriginal('name')),
                 ]);
@@ -171,7 +171,7 @@ class ShippingMethodController extends Controller
                 ->orderBy('name')
                 ->limit(10)
                 ->get(['id', 'name'])
-                ->map(fn (Product $p): array => [
+                ->map(/** @phpstan-ignore argument.type */ fn (Product $p): array => [
                     'id' => $p->id,
                     'name' => $p->getTranslation('name', app()->getLocale(), false) ?: (is_array($p->getRawOriginal('name')) ? reset($p->getRawOriginal('name')) : $p->getRawOriginal('name')),
                 ]);
