@@ -69,13 +69,13 @@ class OrderItem extends Model
         return $this->hasMany(ShipmentItem::class);
     }
 
-    protected function getRemainingToShipAttribute(): int
-    {
-        return max(0, $this->quantity - $this->shipped_quantity);
-    }
-
     public function isFullyShipped(): bool
     {
         return $this->shipped_quantity >= $this->quantity;
+    }
+
+    protected function getRemainingToShipAttribute(): int
+    {
+        return max(0, $this->quantity - $this->shipped_quantity);
     }
 }

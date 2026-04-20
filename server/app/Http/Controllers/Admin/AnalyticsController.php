@@ -54,7 +54,7 @@ class AnalyticsController extends Controller
 
     public function jpkExport(Request $request): HttpResponse
     {
-        /** @var \Carbon\Carbon $month */
+        /** @var Carbon $month */
         $month = $request->filled('month')
             ? Carbon::parse($request->input('month'))->startOfMonth()
             : Carbon::now()->subMonth()->startOfMonth();
@@ -74,9 +74,9 @@ class AnalyticsController extends Controller
      */
     private function resolvePeriod(Request $request): array
     {
-        /** @var \Carbon\Carbon $from */
+        /** @var Carbon $from */
         $from = $request->filled('from') ? Carbon::parse($request->input('from'))->startOfDay() : Carbon::now()->subDays(29)->startOfDay();
-        /** @var \Carbon\Carbon $to */
+        /** @var Carbon $to */
         $to = $request->filled('to') ? Carbon::parse($request->input('to'))->endOfDay() : Carbon::now()->endOfDay();
 
         return ['start' => $from, 'end' => $to];

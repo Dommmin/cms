@@ -118,7 +118,7 @@ class CustomerController extends Controller
 
     public function impersonate(Customer $customer): RedirectResponse
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         abort_unless($user->can('customers.impersonate'), 403, 'Unauthorized to impersonate customers');
