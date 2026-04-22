@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cms-mysql
+  namespace: cms-prod
+  labels:
+    app: cms-mysql
+spec:
+  selector:
+    app: cms-mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+  type: ClusterIP
+  clusterIP: None  # headless for StatefulSet DNS

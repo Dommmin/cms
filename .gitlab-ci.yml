@@ -1,0 +1,210 @@
+stages:
+  - lint
+  - test
+  - build
+  - deploy
+
+variables:
+  SERVER_IMAGE: $CI_REGISTRY_IMAGE/server
+  CLIENT_IMAGE: $CI_REGISTRY_IMAGE/client
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  FF_USE_FASTZIP: "true"
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "web"
+
+# ============================================================
+# Lint — server
+# ============================================================
+lint-server:
+  stage: lint
+  image: php:8.4-cli
+  before_script:
+    - apt-get update -qq && apt-get install -qq -y git unzip nodejs npm
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+  script:
+    - cd server
+    - cp .env.example .env
+    - composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+    - npm ci
+    - php artisan key:generate
+    - touch database/database.sqlite
+    - php artisan migrate --force
+    - php artisan wayfinder:generate
+    - vendor/bin/pint --test
+    - vendor/bin/rector process --dry-run
+    - php -d memory_limit=1G vendor/bin/phpstan analyse --no-progress
+    - npm run types
+    - npx eslint . --max-warnings=0
+    - npm run format:check
+  cache:
+    key: server-composer-$CI_COMMIT_REF_SLUG
+    paths:
+      - server/vendor/
+      - server/node_modules/
+
+# ============================================================
+# Lint — client
+# ============================================================
+lint-client:
+  stage: lint
+  image: node:24-slim
+  script:
+    - cd client
+    - npm ci
+    - npm run types
+    - npm run lint
+    - npm run format:check
+  cache:
+    key: client-node-$CI_COMMIT_REF_SLUG
+    paths:
+      - client/node_modules/
+
+# ============================================================
+# Security
+# ============================================================
+security:
+  stage: lint
+  image: php:8.4-cli
+  before_script:
+    - apt-get update -qq && apt-get install -qq -y git unzip nodejs npm
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+  script:
+    - cd server && composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist && composer audit
+    - cd server && npm ci && npm audit --audit-level=moderate
+    - cd client && npm ci && npm audit --audit-level=moderate
+  cache:
+    key: security-$CI_COMMIT_REF_SLUG
+    paths:
+      - server/vendor/
+      - server/node_modules/
+      - client/node_modules/
+
+# ============================================================
+# Tests
+# ============================================================
+test:
+  stage: test
+  image: php:8.4-cli
+  services:
+    - name: gotenberg/gotenberg:8
+      alias: gotenberg
+  variables:
+    GOTENBERG_URL: http://gotenberg:3000
+  before_script:
+    - apt-get update -qq && apt-get install -qq -y git unzip nodejs npm
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+  script:
+    - cd server
+    - cp .env.example .env
+    - composer install --no-interaction --prefer-dist --optimize-autoloader
+    - npm ci
+    - php artisan key:generate
+    - php artisan wayfinder:generate
+    - npm run build
+    - ./vendor/bin/pest --parallel
+  cache:
+    key: test-$CI_COMMIT_REF_SLUG
+    paths:
+      - server/vendor/
+      - server/node_modules/
+
+# ============================================================
+# Build — server image
+# ============================================================
+build-server:
+  stage: build
+  image: docker:26
+  services:
+    - docker:26-dind
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "web"
+  needs: [lint-server, lint-client, test, security]
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - |
+      docker buildx create --use
+      docker buildx build \
+        --platform linux/amd64 \
+        --file server/Dockerfile \
+        --build-arg SERVER_ENV="$SERVER_ENV" \
+        --tag $SERVER_IMAGE:$CI_COMMIT_SHORT_SHA \
+        --tag $SERVER_IMAGE:latest \
+        --push \
+        .
+
+# ============================================================
+# Build — client image
+# ============================================================
+build-client:
+  stage: build
+  image: docker:26
+  services:
+    - docker:26-dind
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "web"
+  needs: [lint-server, lint-client, test, security]
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - |
+      docker buildx create --use
+      docker buildx build \
+        --platform linux/amd64 \
+        --file client/Dockerfile \
+        --build-arg NEXT_PUBLIC_API_URL="$NEXT_PUBLIC_API_URL" \
+        --build-arg NEXT_PUBLIC_APP_NAME="$NEXT_PUBLIC_APP_NAME" \
+        --tag $CLIENT_IMAGE:$CI_COMMIT_SHORT_SHA \
+        --tag $CLIENT_IMAGE:latest \
+        --push \
+        .
+
+# ============================================================
+# Deploy to k3s
+# ============================================================
+deploy:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  needs: [build-server, build-client]
+  environment:
+    name: production
+    url: https://yourdomain.com
+  resource_group: production  # prevent concurrent deploys
+  before_script:
+    - mkdir -p ~/.kube
+    - echo "$KUBECONFIG" | base64 -d > ~/.kube/config
+    - chmod 600 ~/.kube/config
+  script:
+    - SHA=$CI_COMMIT_SHORT_SHA
+
+    # 1. Run migrations
+    - |
+      sed \
+        -e "s|IMAGE_PLACEHOLDER|${SERVER_IMAGE}:${SHA}|g" \
+        -e "s|REVISION_PLACEHOLDER|${SHA}|g" \
+        k8s/server/job-migrate.yaml | kubectl apply -f -
+    - kubectl -n cms-prod wait job/cms-migrate-$SHA --for=condition=complete --timeout=120s
+
+    # 2. Deploy server
+    - kubectl -n cms-prod set image deployment/cms-server app="${SERVER_IMAGE}:${SHA}"
+    - kubectl -n cms-prod rollout status deployment/cms-server --timeout=5m
+
+    # 3. Deploy queue workers
+    - kubectl -n cms-prod set image deployment/cms-queue queue="${SERVER_IMAGE}:${SHA}"
+    - kubectl -n cms-prod rollout status deployment/cms-queue --timeout=5m
+
+    # 4. Update scheduler
+    - kubectl -n cms-prod set image cronjob/cms-scheduler scheduler="${SERVER_IMAGE}:${SHA}"
+
+    # 5. Deploy client
+    - kubectl -n cms-prod set image deployment/cms-client frontend="${CLIENT_IMAGE}:${SHA}"
+    - kubectl -n cms-prod rollout status deployment/cms-client --timeout=5m

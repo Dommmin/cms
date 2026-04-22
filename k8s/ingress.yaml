@@ -1,10 +1,8 @@
-# Requires: nginx-ingress-controller + cert-manager with ClusterIssuer "letsencrypt-prod"
-# Replace yourdomain.com with your actual domain.
-#
-# Install cert-manager:
+# k3s uses Traefik ingress by default.
+# Requires: cert-manager installed on k3s cluster
 #   kubectl apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
 #
-# Create ClusterIssuer (letsencrypt-prod.yaml):
+# Create ClusterIssuer (once):
 #   apiVersion: cert-manager.io/v1
 #   kind: ClusterIssuer
 #   metadata:
@@ -18,7 +16,7 @@
 #       solvers:
 #         - http01:
 #             ingress:
-#               ingressClassName: nginx
+#               ingressClassName: traefik
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -26,16 +24,11 @@ metadata:
   name: cms-ingress
   namespace: cms-prod
   annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
-    # Redirect HTTP → HTTPS
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    # Let's Encrypt TLS
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+    traefik.ingress.kubernetes.io/router.middlewares: "cms-prod-body-size@kubernetescrd"
 spec:
-  ingressClassName: nginx
+  ingressClassName: traefik
   tls:
     - hosts:
         - yourdomain.com
@@ -43,7 +36,6 @@ spec:
         - api.yourdomain.com
       secretName: cms-tls
   rules:
-    # Public storefront
     - host: yourdomain.com
       http:
         paths:
@@ -64,7 +56,6 @@ spec:
                 name: cms-client
                 port:
                   number: 3000
-    # Laravel API + admin SPA
     - host: api.yourdomain.com
       http:
         paths:

@@ -1,0 +1,26 @@
+# k3s: configure Traefik to redirect HTTP → HTTPS globally
+# and allow large file uploads (100MB).
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    ports:
+      web:
+        redirectTo:
+          port: websecure
+          priority: 10
+    globalArguments:
+      - "--global.sendanonymoususage=false"
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: body-size
+  namespace: cms-prod
+spec:
+  buffering:
+    maxRequestBodyBytes: 104857600  # 100 MB

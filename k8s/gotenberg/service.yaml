@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cms-gotenberg
+  namespace: cms-prod
+  labels:
+    app: cms-gotenberg
+spec:
+  selector:
+    app: cms-gotenberg
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: ClusterIP
