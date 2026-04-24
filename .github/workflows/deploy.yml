@@ -416,12 +416,11 @@ jobs:
           if [ -z "${{ secrets.KUBECONFIG_PROD }}" ]; then
             echo "::error::KUBECONFIG_PROD secret is not set."
             echo "::error::Go to GitHub → Settings → Secrets → Actions and add KUBECONFIG_PROD."
-            echo "::error::Value: cat ~/.kube/config-hetzner | base64 | tr -d '\\n'"
+            echo "::error::Value: paste the raw content of ~/.kube/config-hetzner (no base64)"
             exit 1
           fi
           mkdir -p ~/.kube
-          # Strip all whitespace before decoding — prevents base64 invalid input errors
-          echo "${{ secrets.KUBECONFIG_PROD }}" | tr -d '[:space:]' | base64 -d > ~/.kube/config
+          printf '%s' "${{ secrets.KUBECONFIG_PROD }}" > ~/.kube/config
           chmod 600 ~/.kube/config
 
       # --------------------------------------------------------------------------
