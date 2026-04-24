@@ -40,6 +40,7 @@ To see why a container is failing: `docker compose logs <service> --tail=30`
 ### After adding a new package:
 - Add to the "Packages" section in `ai/guide.md`
 - Add to `docs/backend.md` or `docs/frontend.md` under dependencies
+- If the package requires new env variables: add them to `server/.env.production.example` (with empty value) and to `server/.env.example` (with local dev default)
 
 ### After adding/changing routes:
 - Note in `ai/guide.md` under the relevant feature

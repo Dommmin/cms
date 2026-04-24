@@ -25,16 +25,12 @@ WORKDIR /app
 COPY server/package.json server/package-lock.json ./
 RUN npm ci --prefer-offline
 
-ARG SERVER_ENV
-
 COPY server/ .
 COPY --from=vendor /app/vendor ./vendor
 
-RUN if [ -n "$SERVER_ENV" ]; then \
-        printf '%s' "$SERVER_ENV" > .env; \
-    else \
-        cp .env.example .env; \
-    fi \
+# .env.deploy contains only build-time placeholders — no real secrets.
+# Real production .env is mounted at runtime via Kubernetes Secret.
+RUN cp .env.deploy .env \
     && mkdir -p \
         storage/framework/views \
         storage/framework/cache \

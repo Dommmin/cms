@@ -259,8 +259,6 @@ jobs:
           tags: |
             ${{ steps.images.outputs.server }}:${{ steps.sha.outputs.short }}
             ${{ steps.images.outputs.server }}:latest
-          build-args: |
-            SERVER_ENV=${{ vars.SERVER_ENV }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -343,9 +341,36 @@ jobs:
 
       - name: Configure kubeconfig
         run: |
+          if [ -z "${{ secrets.KUBECONFIG_PROD }}" ]; then
+            echo "::error::KUBECONFIG_PROD secret is not set."
+            echo "::error::Go to GitHub → Settings → Secrets → Actions and add KUBECONFIG_PROD."
+            echo "::error::Value: cat ~/.kube/config-hetzner | base64 | tr -d '\\n'"
+            exit 1
+          fi
           mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG_PROD }}" | base64 -d > ~/.kube/config
           chmod 600 ~/.kube/config
+
+      # --------------------------------------------------------------------------
+      # 0. Sync production .env → Kubernetes Secret (from GitHub Variables)
+      #    PROD_ENV: Settings → Variables → Actions → PROD_ENV
+      #    Full .env content — readable & editable in GitHub UI.
+      # --------------------------------------------------------------------------
+      - name: Sync server secret
+        run: |
+          if [ -z "$PROD_ENV" ]; then
+            echo "::warning::PROD_ENV variable is not set — skipping secret sync."
+          else
+            printf '%s' "$PROD_ENV" > /tmp/prod.env
+            kubectl create secret generic cms-server-env \
+              --from-file=.env=/tmp/prod.env \
+              --namespace=cms-prod \
+              --dry-run=client -o yaml | kubectl apply -f -
+            rm /tmp/prod.env
+            echo "✓ cms-server-env secret updated"
+          fi
+        env:
+          PROD_ENV: ${{ vars.PROD_ENV }}
 
       # --------------------------------------------------------------------------
       # 1. Run database migrations (Job with new image, wait for completion)
@@ -358,7 +383,7 @@ jobs:
           sed \
             -e "s|IMAGE_PLACEHOLDER|${IMAGE}|g" \
             -e "s|REVISION_PLACEHOLDER|${SHA}|g" \
-            k8s/server/job-migrate.yaml | kubectl apply -f -
+            k8s/server/job-migrate.yaml | kubectl apply --validate=false -f -
 
           kubectl -n cms-prod wait job/cms-migrate-${SHA} \
             --for=condition=complete \

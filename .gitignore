@@ -164,3 +164,7 @@ Homestead.json
 /certs/
 .DS_Store
 !/.claude/worktrees/
+
+# k8s
+/k8s/*/secret.yaml
+/letsencrypt-prod.yaml

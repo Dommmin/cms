@@ -37,6 +37,10 @@ spec:
               subPath: .env
             - name: storage
               mountPath: /var/www/html/storage/app
+              subPath: app
+            - name: storage
+              mountPath: /var/www/html/storage/logs
+              subPath: logs
           resources:
             requests:
               cpu: 250m
@@ -71,6 +75,7 @@ spec:
           secret:
             secretName: cms-server-env
         - name: storage
-          emptyDir: {}   # media on S3; only framework cache/views here
+          persistentVolumeClaim:
+            claimName: cms-server-storage
       imagePullSecrets:
         - name: ghcr-pull-secret
