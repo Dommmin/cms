@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
     output: 'standalone',
     poweredByHeader: false,
     compress: true,
+    // Skip redundant checks in Docker builds — lint job already runs these
+    typescript: { ignoreBuildErrors: process.env.DOCKER_BUILD === '1' },
+    eslint: { ignoreDuringBuilds: process.env.DOCKER_BUILD === '1' },
     images: {
         remotePatterns: [
             {

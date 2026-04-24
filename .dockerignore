@@ -6,3 +6,6 @@ server/tests
 server/storage
 
 client/node_modules
+client/.next
+client/.env.local
+client/.env*.local

@@ -5,7 +5,8 @@ FROM node:24-alpine AS deps
 
 WORKDIR /app
 COPY client/package.json client/package-lock.json ./
-RUN npm ci --prefer-offline
+RUN --mount=type=cache,id=npm-client,target=/root/.npm \
+    npm ci --prefer-offline
 
 # =============================================================================
 # Stage 2: Build Next.js (standalone output)
@@ -21,8 +22,11 @@ ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_APP_NAME
 
 ENV NEXT_TELEMETRY_DISABLED=1
+# Skip TS + ESLint during docker build — already checked in lint-client CI job
+ENV DOCKER_BUILD=1
 
-RUN npm run build
+RUN --mount=type=cache,id=nextjs-client,target=/app/.next/cache \
+    npm run build
 
 # =============================================================================
 # Stage 3: Minimal production runner
