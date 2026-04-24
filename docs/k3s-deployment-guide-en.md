@@ -742,7 +742,7 @@ users:
   name: default
 ```
 
-The entire kubeconfig file (base64-encoded) is pasted as a single secret in CI/CD — it replaces SSH_HOST + SSH_PORT + SSH_USER + SSH_KEY combined.
+The kubeconfig file is pasted as a single secret in CI/CD — it replaces SSH_HOST + SSH_PORT + SSH_USER + SSH_KEY combined.
 
 | Traditional SSH | Kubernetes |
 |---|---|
@@ -756,11 +756,10 @@ The entire kubeconfig file (base64-encoded) is pasted as a single secret in CI/C
 On your local machine (kubectl already configured from section 4.2):
 
 ```bash
-# Encode kubeconfig to base64 — ready to paste into CI/CD
-cat ~/.kube/config-hetzner | base64 | tr -d '\n'
+cat ~/.kube/config-hetzner
 ```
 
-Copy the output and paste it as the variable `KUBECONFIG_PROD` (GitHub) or `KUBECONFIG` (GitLab).
+Copy the entire output (starts with `apiVersion: v1`) and paste it as the secret `KUBECONFIG_PROD` (GitHub) or `KUBECONFIG` (GitLab). Both support multiline values — **do not base64-encode it**.
 
 > **Make sure** the kubeconfig points to the server's public IP (not `127.0.0.1`). If you copied it with the command from section 4.2 (with `sed`), it's already correct.
 
@@ -785,13 +784,13 @@ In GitHub: **Settings → Secrets and variables → Actions → Secrets / Variab
 
 #### Secrets (write-only, masked in logs)
 
-| Secret            | Description                                    |
-|-------------------|------------------------------------------------|
-| `KUBECONFIG_PROD` | Base64 kubeconfig — see section 12             |
+| Secret            | Description                                       |
+|-------------------|---------------------------------------------------|
+| `KUBECONFIG_PROD` | Raw kubeconfig content — see section 12           |
 
 ```bash
-# How to get the value:
-cat ~/.kube/config-hetzner | base64 | tr -d '\n'
+# How to get the value (no base64):
+cat ~/.kube/config-hetzner
 ```
 
 #### Variables (visible and editable in the UI)
@@ -877,7 +876,7 @@ In GitLab: **Settings → CI/CD → Variables → Add variable**
 
 | Variable               | Type     | Masked | Protected | Description                              |
 |------------------------|----------|--------|-----------|------------------------------------------|
-| `KUBECONFIG`           | Variable | ✅      | ✅         | Base64 kubeconfig — see section 12       |
+| `KUBECONFIG`           | Variable | ✅      | ✅         | Raw kubeconfig content — see section 12  |
 | `SERVER_ENV`           | Variable | ✅      | ✅         | Full content of `server/.env.production` |
 | `NEXT_PUBLIC_API_URL`  | Variable | ❌      | ❌         | `https://api.yourdomain.com`             |
 | `NEXT_PUBLIC_APP_NAME` | Variable | ❌      | ❌         | Your application name                    |
@@ -887,15 +886,15 @@ In GitLab: **Settings → CI/CD → Variables → Add variable**
 - `CI_REGISTRY_USER` — username
 - `CI_REGISTRY_PASSWORD` — password
 
-#### How to get KUBECONFIG (base64)
+#### How to get KUBECONFIG
 
 On your local machine (where kubectl is configured):
 
 ```bash
-cat ~/.kube/config-hetzner | base64 | tr -d '\n'
+cat ~/.kube/config-hetzner
 ```
 
-Copy the output and paste it as the value of the `KUBECONFIG` variable in GitLab.
+Copy the entire output and paste it as the value of the `KUBECONFIG` variable in GitLab. **Do not base64-encode it** — GitLab supports multiline values natively.
 
 #### How to get SERVER_ENV
 
