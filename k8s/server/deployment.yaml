@@ -26,7 +26,7 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
         - name: app
-          image: ghcr.io/OWNER/cms-server:latest  # replaced by CI
+          image: ghcr.io/dommmin/cms-server:latest  # replaced by CI
           imagePullPolicy: Always
           ports:
             - containerPort: 80

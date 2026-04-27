@@ -26,7 +26,7 @@ spec:
       terminationGracePeriodSeconds: 120  # allow current job to finish
       containers:
         - name: queue
-          image: ghcr.io/OWNER/cms-server:latest  # replaced by CI
+          image: ghcr.io/dommmin/cms-server:latest  # replaced by CI
           imagePullPolicy: Always
           # --max-time restarts worker hourly to prevent memory leaks
           command:

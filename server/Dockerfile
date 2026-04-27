@@ -46,6 +46,8 @@ RUN cp .env.deploy .env \
 # =============================================================================
 FROM dommin/php-8.5-fpm-alpine:latest AS production
 
+ENV USER_NAME=www-data
+
 RUN apk add --no-cache nginx \
     && mkdir -p /var/log/supervisor /run/nginx
 

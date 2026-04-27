@@ -17,7 +17,7 @@ spec:
         spec:
           containers:
             - name: scheduler
-              image: ghcr.io/OWNER/cms-server:latest  # replaced by CI
+              image: ghcr.io/dommmin/cms-server:latest  # replaced by CI
               imagePullPolicy: IfNotPresent
               command: ["php", "artisan", "schedule:run", "--no-ansi"]
               volumeMounts:

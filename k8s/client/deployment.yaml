@@ -23,7 +23,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: frontend
-          image: ghcr.io/OWNER/cms-client:latest  # replaced by CI
+          image: ghcr.io/dommmin/cms-client:latest  # replaced by CI
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
@@ -52,8 +52,7 @@ spec:
             periodSeconds: 15
             failureThreshold: 3
           readinessProbe:
-            httpGet:
-              path: /en
+            tcpSocket:
               port: 3000
             initialDelaySeconds: 10
             periodSeconds: 5
