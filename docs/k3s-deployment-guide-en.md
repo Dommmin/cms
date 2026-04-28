@@ -744,12 +744,12 @@ users:
 
 The kubeconfig file is pasted as a single secret in CI/CD — it replaces SSH_HOST + SSH_PORT + SSH_USER + SSH_KEY combined.
 
-| Traditional SSH | Kubernetes |
-|---|---|
-| `SSH_HOST` | included in kubeconfig |
-| `SSH_PORT` | included in kubeconfig (6443) |
-| `SSH_USER` | included in kubeconfig (client cert) |
-| `SSH_KEY` | included in kubeconfig (client key) |
+| Traditional SSH | Kubernetes                           |
+|-----------------|--------------------------------------|
+| `SSH_HOST`      | included in kubeconfig               |
+| `SSH_PORT`      | included in kubeconfig (6443)        |
+| `SSH_USER`      | included in kubeconfig (client cert) |
+| `SSH_KEY`       | included in kubeconfig (client key)  |
 
 ### How to get the kubeconfig?
 

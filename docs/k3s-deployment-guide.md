@@ -738,12 +738,12 @@ users:
 
 Cały plik kubeconfig wklejasz jako jeden sekret w CI/CD — zastępuje SSH_HOST + SSH_PORT + SSH_USER + SSH_KEY razem.
 
-| Tradycyjny SSH | Kubernetes |
-|---|---|
-| `SSH_HOST` | ✅ zawarte w kubeconfig |
-| `SSH_PORT` | ✅ zawarte w kubeconfig (6443) |
-| `SSH_USER` | ✅ zawarte w kubeconfig (client cert) |
-| `SSH_KEY` | ✅ zawarte w kubeconfig (client key) |
+| Tradycyjny SSH | Kubernetes                           |
+|----------------|--------------------------------------|
+| `SSH_HOST`     | ✅ zawarte w kubeconfig               |
+| `SSH_PORT`     | ✅ zawarte w kubeconfig (6443)        |
+| `SSH_USER`     | ✅ zawarte w kubeconfig (client cert) |
+| `SSH_KEY`      | ✅ zawarte w kubeconfig (client key)  |
 
 ### Jak uzyskać kubeconfig?
 
@@ -778,9 +778,9 @@ W GitHub: **Settings → Secrets and Actions → Secrets / Variables**
 
 #### Secrets (write-only, maskowane w logach)
 
-| Secret              | Opis                                         |
-|---------------------|----------------------------------------------|
-| `KUBECONFIG_PROD`   | Surowa treść kubeconfig — patrz sekcja 12   |
+| Secret            | Opis                                      |
+|-------------------|-------------------------------------------|
+| `KUBECONFIG_PROD` | Surowa treść kubeconfig — patrz sekcja 12 |
 
 ```bash
 # Jak uzyskać wartość (bez base64):
@@ -868,12 +868,12 @@ W GitLab: **Settings → CI/CD → Variables → Add variable**
 
 #### Wymagane zmienne
 
-| Zmienna                | Typ      | Masked | Protected | Opis                                 |
-|------------------------|----------|--------|-----------|--------------------------------------|
+| Zmienna                | Typ      | Masked | Protected | Opis                                      |
+|------------------------|----------|--------|-----------|-------------------------------------------|
 | `KUBECONFIG`           | Variable | ✅      | ✅         | Surowa treść kubeconfig — patrz sekcja 12 |
-| `SERVER_ENV`           | Variable | ✅      | ✅         | Pełna treść `server/.env.production` |
-| `NEXT_PUBLIC_API_URL`  | Variable | ❌      | ❌         | `https://api.yourdomain.com`         |
-| `NEXT_PUBLIC_APP_NAME` | Variable | ❌      | ❌         | Nazwa twojej aplikacji               |
+| `SERVER_ENV`           | Variable | ✅      | ✅         | Pełna treść `server/.env.production`      |
+| `NEXT_PUBLIC_API_URL`  | Variable | ❌      | ❌         | `https://api.yourdomain.com`              |
+| `NEXT_PUBLIC_APP_NAME` | Variable | ❌      | ❌         | Nazwa twojej aplikacji                    |
 
 **Nie musisz** ustawiać zmiennych rejestru — GitLab dostarcza je automatycznie:
 - `CI_REGISTRY` — adres rejestru
