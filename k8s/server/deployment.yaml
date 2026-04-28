@@ -41,6 +41,9 @@ spec:
             - name: storage
               mountPath: /var/www/html/storage/logs
               subPath: logs
+          env:
+            - name: USER_NAME
+              value: "www-data"
           resources:
             requests:
               cpu: 250m
