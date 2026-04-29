@@ -1,7 +1,7 @@
 import { DEFAULT_LOCALE, localePath, LOCALES } from '@/lib/i18n';
 import type { Metadata } from 'next';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:8000';
 
 /** Absolute URL for a given locale and path. */
 export function absoluteUrl(locale: string, path: string): string {

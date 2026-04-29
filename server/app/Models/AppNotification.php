@@ -12,7 +12,22 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property int $customer_id
+ * @property NotificationTypeEnum $type
+ * @property NotificationChannelEnum $channel
+ * @property NotificationStatusEnum $status
+ * @property string|null $related_model
+ * @property int|null $related_model_id
+ * @property array<string, mixed>|null $metadata
+ * @property string|null $error_message
+ * @property Carbon|null $sent_at
+ * @property Carbon|null $failed_at
+ * @property-read Customer|null $customer
+ */
 #[Fillable([
     'customer_id', 'type', 'channel', 'status',
     'related_model', 'related_model_id', 'metadata',

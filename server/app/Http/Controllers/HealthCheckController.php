@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Throwable;
 
@@ -38,7 +39,9 @@ class HealthCheckController extends Controller
             DB::connection()->getPdo();
 
             return true;
-        } catch (Throwable) {
+        } catch (Throwable $throwable) {
+            Log::error('Health check: database connection failed', ['error' => $throwable->getMessage()]);
+
             return false;
         }
     }
@@ -49,7 +52,9 @@ class HealthCheckController extends Controller
             Redis::connection()->ping();
 
             return true;
-        } catch (Throwable) {
+        } catch (Throwable $throwable) {
+            Log::error('Health check: Redis connection failed', ['error' => $throwable->getMessage()]);
+
             return false;
         }
     }

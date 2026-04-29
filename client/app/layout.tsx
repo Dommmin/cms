@@ -20,6 +20,7 @@ import { PageTransition } from '@/components/layout/page-transition';
 import { BlockAnimationObserver } from '@/components/page-builder/block-animation-observer';
 import { buildOrganization, buildWebSite } from '@/lib/schema';
 import { serverFetch } from '@/lib/server-fetch';
+import { ModulesProvider } from '@/providers/modules-provider';
 import { QueryProvider } from '@/providers/query-provider';
 import { TranslationProvider } from '@/providers/translation-provider';
 
@@ -174,30 +175,32 @@ export default async function RootLayout({
                     Skip to main content
                 </a>
                 <QueryProvider>
-                    <TranslationProvider initialLocale={locale}>
-                        <AdminBar entity={adminPreviewEntity} />
-                        <div className="flex min-h-screen flex-col">
-                            <AnnouncementBar />
-                            <Header modules={modules} />
-                            <main
-                                id="main-content"
-                                className="flex-1 pb-16 md:pb-0"
-                            >
-                                <PageTransition>{children}</PageTransition>
-                            </main>
-                            <Footer />
-                            <MobileBottomNav />
-                        </div>
-                        <CookieConsent settings={cookieSettings} />
-                        <ChatWidgetLoader />
-                        <ComparisonBarLoader />
-                        <BlockAnimationObserver />
-                        <ToastContainer
-                            position="bottom-right"
-                            autoClose={2000}
-                        />
-                        {gtmId && <GoogleTagManager gtmId={gtmId} />}
-                    </TranslationProvider>
+                    <ModulesProvider modules={modules}>
+                        <TranslationProvider initialLocale={locale}>
+                            <AdminBar entity={adminPreviewEntity} />
+                            <div className="flex min-h-screen flex-col">
+                                <AnnouncementBar />
+                                <Header modules={modules} />
+                                <main
+                                    id="main-content"
+                                    className="flex-1 pb-16 md:pb-0"
+                                >
+                                    <PageTransition>{children}</PageTransition>
+                                </main>
+                                <Footer />
+                                <MobileBottomNav />
+                            </div>
+                            <CookieConsent settings={cookieSettings} />
+                            <ChatWidgetLoader />
+                            <ComparisonBarLoader />
+                            <BlockAnimationObserver />
+                            <ToastContainer
+                                position="bottom-right"
+                                autoClose={2000}
+                            />
+                            {gtmId && <GoogleTagManager gtmId={gtmId} />}
+                        </TranslationProvider>
+                    </ModulesProvider>
                 </QueryProvider>
             </body>
         </html>

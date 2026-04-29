@@ -17,10 +17,11 @@ export function LocaleSwitcher() {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 
-    const { data: locales } = useQuery({
+    const { data: locales, isError } = useQuery({
         queryKey: ['locales'],
         queryFn: fetchLocales,
         staleTime: Infinity,
+        retry: 2,
     });
 
     useEffect(() => {
@@ -40,7 +41,7 @@ export function LocaleSwitcher() {
         };
     }, []);
 
-    if (!locales || locales.length <= 1) return null;
+    if (isError || !locales || locales.length <= 1) return null;
 
     const current = locales.find((l) => l.code === locale) ?? locales[0];
 

@@ -9,6 +9,7 @@ use App\Enums\NotificationStatusEnum;
 use App\Enums\NotificationTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreAppNotificationRequest;
+use App\Jobs\SendAppNotificationJob;
 use App\Models\AppNotification;
 use App\Models\Customer;
 use App\Queries\Admin\AppNotificationIndexQuery;
@@ -47,14 +48,13 @@ class AppNotificationController extends Controller
             return back()->with('error', 'Można ponawiać tylko powiadomienia z błędem');
         }
 
-        // Reset statusu
         $notification->update([
             'status' => NotificationStatusEnum::Pending,
             'error_message' => null,
             'failed_at' => null,
         ]);
 
-        // TODO: Dispatch job do wysłania
+        dispatch(new SendAppNotificationJob($notification));
 
         return back()->with('success', 'Powiadomienie zostało dodane do kolejki');
     }
@@ -79,6 +79,7 @@ class AppNotificationController extends Controller
     {
         $customers = Customer::query()->select(['id', 'first_name', 'last_name', 'email'])
             ->orderBy('last_name')
+            ->limit(500)
             ->get();
 
         return inertia('admin/notifications/create', [

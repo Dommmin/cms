@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
 import { apiGetPage } from '@/lib/api';
+import { useModules } from '@/providers/modules-provider';
 import type { Product } from '@/types/api';
 
 const STORAGE_KEY = 'recently_viewed';
@@ -36,6 +37,7 @@ function getRecentlyViewedIds(): number[] {
 }
 
 export function useRecentlyViewedProducts(excludeId?: number) {
+    const { ecommerce } = useModules();
     const [ids, setIds] = useState<number[]>(() => {
         const all = getRecentlyViewedIds();
         return excludeId ? all.filter((id) => id !== excludeId) : all;
@@ -61,7 +63,7 @@ export function useRecentlyViewedProducts(excludeId?: number) {
             const map = new Map(result.data.map((p) => [p.id, p]));
             return ids.map((id) => map.get(id)).filter(Boolean) as Product[];
         },
-        enabled: ids.length > 0,
+        enabled: ids.length > 0 && ecommerce,
         staleTime: 5 * 60 * 1000,
     });
 }

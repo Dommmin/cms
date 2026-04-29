@@ -26,6 +26,7 @@ class UpdateSettingsRequest extends FormRequest
     {
         return [
             'settings' => ['required', 'array'],
+            'settings.*' => ['nullable'],
         ];
     }
 }

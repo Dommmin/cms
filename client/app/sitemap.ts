@@ -4,7 +4,7 @@ import { serverFetch } from '@/lib/server-fetch';
 import type { BlogPost, PaginatedResponse, Product } from '@/types/api';
 import type { MetadataRoute } from 'next';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:8000';
 
 /** Build sitemap entries for a given path with all locale alternates. */
 function sitemapEntry(

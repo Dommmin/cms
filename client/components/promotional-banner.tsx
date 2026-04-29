@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 
 import { useLocalePath } from '@/hooks/use-locale';
 import { useActivePromotions } from '@/hooks/use-promotions';
+import { useModules } from '@/providers/modules-provider';
 import type { CountdownProps } from './promotional-banner.types';
 
 function Countdown({ endsAt }: CountdownProps) {
@@ -42,10 +43,11 @@ function Countdown({ endsAt }: CountdownProps) {
 
 export function PromotionalBanner() {
     const lp = useLocalePath();
+    const { ecommerce } = useModules();
     const { data: promotions } = useActivePromotions();
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    const visiblePromotions = promotions ?? [];
+    const visiblePromotions = ecommerce ? (promotions ?? []) : [];
 
     useEffect(() => {
         if (visiblePromotions.length <= 1) return;

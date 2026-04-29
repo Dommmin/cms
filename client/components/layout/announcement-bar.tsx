@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import { apiGetMany } from '@/lib/api';
+import { useModules } from '@/providers/modules-provider';
 import type { BannerPromotion, CountdownProps } from './announcement-bar.types';
 
 function useCountdown(endsAt: string | null) {
@@ -53,11 +54,13 @@ function Countdown({ endsAt }: CountdownProps) {
 export function AnnouncementBar() {
     const [dismissed, setDismissed] = useState<number | null>(null);
     const [index, setIndex] = useState(0);
+    const { ecommerce } = useModules();
 
     const { data } = useQuery({
         queryKey: ['promotions', 'banners'],
         queryFn: () => apiGetMany<BannerPromotion>('/promotions'),
         staleTime: 5 * 60 * 1_000,
+        enabled: ecommerce,
     });
 
     const promos = (data ?? []).filter((p) => p.id !== dismissed);

@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { startTransition, useCallback, useEffect, useState } from 'react';
 
 import { api } from '@/lib/axios';
+import { useModules } from '@/providers/modules-provider';
 import type { Product } from '@/types/api';
 
 const STORAGE_KEY = 'compare_ids';
@@ -72,6 +73,7 @@ interface CompareResponse {
 
 export function useComparisonProducts() {
     const ids = useComparisonIds();
+    const { ecommerce } = useModules();
 
     return useQuery({
         queryKey: ['comparison', ids.join(',')],
@@ -95,7 +97,7 @@ export function useComparisonProducts() {
                 return { products: [], attributeKeys: [] };
             }
         },
-        enabled: ids.length >= 2,
+        enabled: ids.length >= 2 && ecommerce,
         staleTime: 60 * 1000,
         retry: false,
     });

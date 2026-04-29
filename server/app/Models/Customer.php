@@ -20,6 +20,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 /**
  * @property int $id
  * @property string $name
+ * @property string $email
  * @property string|null $phone
  * @property Carbon|null $birth_date
  * @property User|null $user

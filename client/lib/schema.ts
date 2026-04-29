@@ -1,6 +1,6 @@
 import type { BlogPost, Product, ProductReview, Store } from '@/types/api';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:8000';
 
 function centsToDecimal(cents: number): string {
     return (cents / 100).toFixed(2);

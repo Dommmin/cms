@@ -11,6 +11,14 @@ use Illuminate\Support\Facades\DB;
 class SegmentEvaluationService
 {
     /**
+     * Apply a single rule to the query.
+     *
+     * @param  Builder<Customer>  $query
+     * @param  array<string, mixed>  $rule
+     */
+    private const array ALLOWED_OPERATORS = ['=', '!=', '<', '>', '<=', '>='];
+
+    /**
      * Check if a customer matches the given segment rules.
      *
      * @param  array<string, mixed>  $rules
@@ -58,19 +66,17 @@ class SegmentEvaluationService
         }
     }
 
-    /**
-     * Apply a single rule to the query.
-     *
-     * @param  Builder<Customer>  $query
-     * @param  array<string, mixed>  $rule
-     */
     protected function applyRule(Builder $query, array $rule): void
     {
         $field = $rule['field'] ?? null;
         $operator = $rule['operator'] ?? '=';
         $value = $rule['value'] ?? null;
 
-        if (empty($field) || empty($operator) || $value === null) {
+        if (empty($field) || $value === null) {
+            return;
+        }
+
+        if (! in_array($operator, self::ALLOWED_OPERATORS, true)) {
             return;
         }
 

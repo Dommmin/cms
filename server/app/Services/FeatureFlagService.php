@@ -52,17 +52,8 @@ class FeatureFlagService
         ];
     }
 
-    /**
-     * Check if client has license for feature
-     * Can be extended with license verification API
-     */
     public function hasLicense(string $feature): bool
     {
-        // Basic check - if feature is enabled
-        // TODO: Can add license verification via API
-        // if (config('app.license_verification_enabled')) {
-        //     return $this->verifyLicense($feature);
-        // }
         return $this->isEnabled($feature);
     }
 }
