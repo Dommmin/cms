@@ -8,6 +8,7 @@ services:
     user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./server:/var/www/html:delegated
+      - server_node_modules:/var/www/html/node_modules
       - ./client:/var/www/client:delegated
       - ./.docker/php/php.ini:/usr/local/etc/php/conf.d/php.ini
       - ./.docker/php/www.conf:/usr/local/etc/php-fpm.d/www.conf
@@ -154,6 +155,7 @@ networks:
 
 volumes:
   mysql_data:
+  server_node_modules:
   client_node_modules:
   typesense_data:
   mailpit-data:
