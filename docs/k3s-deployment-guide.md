@@ -22,20 +22,21 @@ Nie zakładam, że znasz Kubernetes. Zakładam, że znasz Dockera i nie boisz si
 7. [Przygotowanie klastra — namespace i sekrety](#7-przygotowanie-klastra--namespace-i-sekrety)
 8. [Wdrożenie bazy danych i cache (MySQL + Redis)](#8-wdrożenie-bazy-danych-i-cache-mysql--redis)
 9. [Wdrożenie Gotenberg (PDF)](#9-wdrożenie-gotenberg-pdf)
-10. [Pull Secret dla Container Registry (GHCR / GitLab)](#10-pull-secret-dla-container-registry-ghcr--gitlab)
-11. [Wdrożenie aplikacji (serwer + klient)](#11-wdrożenie-aplikacji-serwer--klient)
-12. [Jak CI/CD łączy się z k3s?](#12-jak-cicd-łączy-się-z-k3s)
-13. [Konfiguracja GitHub Actions](#13-konfiguracja-github-actions)
-14. [Konfiguracja GitLab CI/CD](#14-konfiguracja-gitlab-cicd)
-15. [Pierwsze wdrożenie przez CI](#15-pierwsze-wdrożenie-przez-ci)
-16. [Weryfikacja — czy wszystko działa?](#16-weryfikacja--czy-wszystko-działa)
-17. [Codzienna obsługa — logi, restarty, aktualizacje](#17-codzienna-obsługa--logi-restarty-aktualizacje)
-18. [Backup MySQL](#18-backup-mysql)
-19. [Najczęstsze problemy (troubleshooting)](#19-najczęstsze-problemy-troubleshooting)
-20. [Rancher — zarządzanie klastrem przez UI](#20-rancher--zarządzanie-klastrem-przez-ui)
-21. [Czyszczenie dysku](#21-czyszczenie-dysku)
-22. [k9s — terminalowy panel zarządzania](#22-k9s--terminalowy-panel-zarządzania)
-23. [Rotacja secretów — aktualizacja .env i haseł bez downtime'u](#23-rotacja-secretów--aktualizacja-env-i-haseł-bez-downtimeu)
+10. [Wdrożenie Typesense (full-text search)](#10-wdrożenie-typesense-full-text-search)
+11. [Pull Secret dla Container Registry (GHCR / GitLab)](#11-pull-secret-dla-container-registry-ghcr--gitlab)
+12. [Wdrożenie aplikacji (serwer + klient)](#12-wdrożenie-aplikacji-serwer--klient)
+13. [Jak CI/CD łączy się z k3s?](#13-jak-cicd-łączy-się-z-k3s)
+14. [Konfiguracja GitHub Actions](#14-konfiguracja-github-actions)
+15. [Konfiguracja GitLab CI/CD](#15-konfiguracja-gitlab-cicd)
+16. [Pierwsze wdrożenie przez CI](#16-pierwsze-wdrożenie-przez-ci)
+17. [Weryfikacja — czy wszystko działa?](#17-weryfikacja--czy-wszystko-działa)
+18. [Codzienna obsługa — logi, restarty, aktualizacje](#18-codzienna-obsługa--logi-restarty-aktualizacje)
+19. [Backup MySQL](#19-backup-mysql)
+20. [Najczęstsze problemy (troubleshooting)](#20-najczęstsze-problemy-troubleshooting)
+21. [Rancher — zarządzanie klastrem przez UI](#21-rancher--zarządzanie-klastrem-przez-ui)
+22. [Czyszczenie dysku](#22-czyszczenie-dysku)
+23. [k9s — terminalowy panel zarządzania](#23-k9s--terminalowy-panel-zarządzania)
+24. [Rotacja secretów — aktualizacja .env i haseł bez downtime'u](#24-rotacja-secretów--aktualizacja-env-i-haseł-bez-downtimeu)
 
 ---
 
@@ -484,7 +485,7 @@ Ten sekret zawiera wewnętrzny URL API (używany przez Next.js server-side do fe
 
 ```bash
 kubectl apply -f k8s/client/secret.yaml.example
-# API_URL=http://cms-server.cms-prod.svc.cluster.local  (wartość już jest poprawna)
+# API_URL=http://cms-server.cms-prod.svc.cluster.local/api/v1  (wartość już jest poprawna)
 ```
 
 ---
@@ -551,13 +552,82 @@ kubectl -n cms-prod get pods | grep gotenberg
 
 ---
 
-## 10. Pull Secret dla Container Registry (GHCR / GitLab)
+## 10. Wdrożenie Typesense (full-text search)
+
+Typesense to szybki silnik full-text search. Aplikacja używa go przez Laravel Scout (`SCOUT_DRIVER=typesense`). Wdrażamy go jako osobny pod dostępny tylko wewnątrz klastra.
+
+### 10.1 Utwórz sekret z kluczem API
+
+Typesense wymaga klucza API do autoryzacji zapytań. Użyj losowego, silnego klucza (min. 16 znaków):
+
+```bash
+kubectl create secret generic cms-typesense \
+  --from-literal=api-key=<TWÓJ_KLUCZ_API> \
+  --namespace=cms-prod \
+  --dry-run=client -o yaml | kubectl apply -f -
+```
+
+> Ten sam klucz wpisz w PROD_ENV jako `TYPESENSE_API_KEY=<TWÓJ_KLUCZ_API>`.  
+> **Ważne:** Nie dodawaj komentarzy (`#`) za wartością — Laravel odczyta je jako część klucza.
+
+### 10.2 Wdróż Typesense
+
+```bash
+kubectl apply -f k8s/typesense/pvc.yaml
+kubectl apply -f k8s/typesense/deployment.yaml
+kubectl apply -f k8s/typesense/service.yaml
+```
+
+Poczekaj na uruchomienie (~20 sekund inicjalizacji):
+
+```bash
+kubectl -n cms-prod rollout status deployment/cms-typesense --timeout=120s
+# deployment "cms-typesense" successfully rolled out
+```
+
+Sprawdź health check:
+
+```bash
+kubectl -n cms-prod exec deployment/cms-typesense -- wget -qO- http://localhost:8108/health
+# {"ok":true}
+```
+
+### 10.3 Konfiguracja w PROD_ENV
+
+Upewnij się, że w `PROD_ENV` (zmienna CI/CD) masz:
+
+```dotenv
+SCOUT_DRIVER=typesense
+SCOUT_QUEUE=true
+TYPESENSE_HOST=cms-typesense.cms-prod.svc.cluster.local
+TYPESENSE_PORT=8108
+TYPESENSE_PROTOCOL=http
+TYPESENSE_API_KEY=<TWÓJ_KLUCZ_API>
+```
+
+### 10.4 Zaindeksuj dane po pierwszym wdrożeniu
+
+Po pierwszym deployu zaimportuj istniejące dane do indeksów:
+
+```bash
+kubectl -n cms-prod exec deployment/cms-server -- \
+  php artisan scout:import "App\Models\Product"
+
+kubectl -n cms-prod exec deployment/cms-server -- \
+  php artisan scout:import "App\Models\BlogPost"
+```
+
+> Scout automatycznie indeksuje nowe i zmienione rekordy przez kolejkę (Redis) — import ręczny jest potrzebny tylko raz, przy pierwszym wdrożeniu.
+
+---
+
+## 11. Pull Secret dla Container Registry (GHCR / GitLab)
 
 Twój klaster musi wiedzieć, jak pobierać prywatne obrazy Docker. Konfiguracja zależy od tego, jakiego CI/CD używasz.
 
 > **Ważne:** Nazwa sekretu `ghcr-pull-secret` jest taka sama w obu przypadkach — manifesty deploymentów (`k8s/server/deployment.yaml`, `k8s/client/deployment.yaml`) już jej używają. Nie zmieniaj tej nazwy.
 
-### 10.1 GitHub Container Registry (GHCR)
+### 11.1 GitHub Container Registry (GHCR)
 
 Jeśli używasz **GitHub Actions** i budujesz obrazy do `ghcr.io`:
 
@@ -578,7 +648,7 @@ kubectl create secret docker-registry ghcr-pull-secret \
   --namespace=cms-prod
 ```
 
-### 10.2 GitLab Container Registry
+### 11.2 GitLab Container Registry
 
 Jeśli używasz **GitLab CI** i budujesz obrazy do `registry.gitlab.com`:
 
@@ -603,11 +673,11 @@ kubectl create secret docker-registry ghcr-pull-secret \
 
 ---
 
-## 11. Wdrożenie aplikacji (serwer + klient)
+## 12. Wdrożenie aplikacji (serwer + klient)
 
 Przed pierwszym deployem przez CI/CD musimy ręcznie zastosować manifesty infrastruktury. Obrazy Docker będą budowane przez pipeline — na razie używamy `:latest` (po pierwszym CI pushu).
 
-### 11.1 Persistent storage dla uploadsów i logów
+### 12.1 Persistent storage dla uploadsów i logów
 
 Zanim uruchomisz serwer, utwórz PVC (PersistentVolumeClaim) — wolumen na dysku VPS, który przechowa uploadowane pliki i logi Laravel.
 
@@ -644,7 +714,7 @@ LOG_CHANNEL=stderr       # logi do kubectl logs (najwygodniejsze w k8s)
 
 > **Ograniczenie PVC:** działa tylko przy `replicas: 1`. Przy skalowaniu do 2+ podów przejdź na MinIO — patrz sekcja z bonusami na końcu przewodnika.
 
-### 11.2 Wdrożenie serwerów
+### 12.2 Wdrożenie serwerów
 
 ```bash
 # Serwer (Laravel)
@@ -690,7 +760,7 @@ service/cms-gotenberg ClusterIP 10.43.x.x
 
 ---
 
-## 12. Jak CI/CD łączy się z k3s?
+## 13. Jak CI/CD łączy się z k3s?
 
 Zanim przejdziesz do konfiguracji, warto zrozumieć jak pipeline w ogóle może sterować Kubernetes na Twoim serwerze.
 
@@ -768,11 +838,11 @@ Port 22 (SSH) możesz zostawić tylko dla siebie — CI/CD już go nie potrzebuj
 
 ---
 
-## 13. Konfiguracja GitHub Actions
+## 14. Konfiguracja GitHub Actions
 
 Repozytorium zawiera plik `.github/workflows/deploy.yml` z pełnym pipeline'em. Musisz tylko skonfigurować zmienne w GitHub.
 
-### 13.1 Zmienne i sekrety
+### 14.1 Zmienne i sekrety
 
 W GitHub: **Settings → Secrets and Actions → Secrets / Variables**
 
@@ -780,7 +850,7 @@ W GitHub: **Settings → Secrets and Actions → Secrets / Variables**
 
 | Secret            | Opis                                      |
 |-------------------|-------------------------------------------|
-| `KUBECONFIG_PROD` | Surowa treść kubeconfig — patrz sekcja 12 |
+| `KUBECONFIG_PROD` | Surowa treść kubeconfig — patrz sekcja 13 |
 
 ```bash
 # Jak uzyskać wartość (bez base64):
@@ -789,11 +859,10 @@ cat ~/.kube/config-hetzner
 
 #### Variables (widoczne i edytowalne w UI)
 
-| Variable               | Przykład                             | Opis                                 |
-|------------------------|--------------------------------------|--------------------------------------|
-| `PROD_ENV`             | *(pełna treść .env produkcyjnego)*   | Automatycznie sync do k8s Secret     |
-| `NEXT_PUBLIC_API_URL`  | `https://api.yourdomain.com`         | Build-time dla Next.js               |
-| `NEXT_PUBLIC_APP_NAME` | `MyCMS`                              | Build-time dla Next.js               |
+| Variable          | Przykład                            | Opis                                       |
+|-------------------|-------------------------------------|--------------------------------------------|
+| `PROD_ENV`        | *(pełna treść .env produkcyjnego)*  | Automatycznie sync do k8s Secret           |
+| `ENV_CLIENT_PROD` | *(pełna treść .env frontendowego)*  | Build-time zmienne dla Next.js (multiline) |
 
 > **Dlaczego `PROD_ENV` jako Variable, a nie Secret?**  
 > Secrets są write-only — raz wklejonego nie możesz odczytać ani edytować linijka po linijce. Variables są widoczne w UI, więc łatwo sprawdzisz co jest ustawione. Pipeline i tak sync'uje wartość do k8s Secret przed deployem.
@@ -822,7 +891,18 @@ GOTENBERG_URL=http://cms-gotenberg.cms-prod.svc.cluster.local:3000
 
 GitHub obsługuje wieloliniowe Variables — wklej całą treść.
 
-### 13.2 Jak działa pipeline
+#### Jak ustawić ENV_CLIENT_PROD
+
+Treść to `.env` dla frontendu Next.js — tylko zmienne build-time potrzebne przy budowaniu obrazu:
+
+```dotenv
+NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+NEXT_PUBLIC_APP_NAME=MyCMS
+```
+
+Dodaj tyle zmiennych `NEXT_PUBLIC_*` ile potrzebujesz. Pipeline automatycznie przekaże je wszystkie do `docker buildx build` jako wpisy `--build-arg`.
+
+### 14.2 Jak działa pipeline
 
 ```
 push → master/main
@@ -852,28 +932,28 @@ Każdy deploy:
 
 Dzięki temu migracje zawsze są przed nowym kodem — żadnych „column does not exist".
 
-### 13.3 Obrazy bez serwera rejestru
+### 14.3 Obrazy bez serwera rejestru
 
 GitHub Container Registry (GHCR) jest wbudowany w GitHub — nie musisz konfigurować żadnego zewnętrznego rejestru. Pipeline automatycznie loguje się z `GITHUB_TOKEN` (dostępny automatycznie w każdym workflow).
 
 ---
 
-## 14. Konfiguracja GitLab CI/CD
+## 15. Konfiguracja GitLab CI/CD
 
 Repozytorium zawiera plik `.gitlab-ci.yml` z pełnym pipeline'em. Musisz tylko skonfigurować zmienne.
 
-### 14.1 Zmienne CI/CD
+### 15.1 Zmienne CI/CD
+
 
 W GitLab: **Settings → CI/CD → Variables → Add variable**
 
 #### Wymagane zmienne
 
-| Zmienna                | Typ      | Masked | Protected | Opis                                      |
-|------------------------|----------|--------|-----------|-------------------------------------------|
-| `KUBECONFIG`           | Variable | ✅      | ✅         | Surowa treść kubeconfig — patrz sekcja 12 |
-| `SERVER_ENV`           | Variable | ✅      | ✅         | Pełna treść `server/.env.production`      |
-| `NEXT_PUBLIC_API_URL`  | Variable | ❌      | ❌         | `https://api.yourdomain.com`              |
-| `NEXT_PUBLIC_APP_NAME` | Variable | ❌      | ❌         | Nazwa twojej aplikacji                    |
+| Zmienna           | Typ      | Masked | Protected | Opis                                      |
+|-------------------|----------|--------|-----------|-------------------------------------------|
+| `KUBECONFIG`      | Variable | ✅      | ✅         | Surowa treść kubeconfig — patrz sekcja 13 |
+| `SERVER_ENV`      | Variable | ✅      | ✅         | Pełna treść `server/.env.production`      |
+| `ENV_CLIENT_PROD` | Variable | ❌      | ❌         | Build-time zmienne dla Next.js (multiline)|
 
 **Nie musisz** ustawiać zmiennych rejestru — GitLab dostarcza je automatycznie:
 - `CI_REGISTRY` — adres rejestru
@@ -904,7 +984,7 @@ FRONTEND_URL=https://yourdomain.com
 
 Wklej całą treść jako wartość zmiennej (GitLab obsługuje wieloliniowe zmienne).
 
-### 14.2 Jak działa pipeline
+### 15.2 Jak działa pipeline
 
 ```
 push → master
@@ -927,7 +1007,7 @@ push → master
 
 ---
 
-## 15. Pierwsze wdrożenie przez CI
+## 16. Pierwsze wdrożenie przez CI
 
 Zrób push do gałęzi `master`:
 
@@ -970,7 +1050,7 @@ Wejdź w przeglądarkę:
 
 ---
 
-## 16. Weryfikacja — czy wszystko działa?
+## 17. Weryfikacja — czy wszystko działa?
 
 ### Checklist po pierwszym wdrożeniu
 
@@ -1010,7 +1090,7 @@ Zaloguj się do panelu admina i spróbuj wgrać obraz — weryfikuje MySQL, stor
 
 ---
 
-## 17. Codzienna obsługa — logi, restarty, aktualizacje
+## 18. Codzienna obsługa — logi, restarty, aktualizacje
 
 ### Podgląd logów
 
@@ -1086,7 +1166,7 @@ curl -sfL https://get.k3s.io | sh -
 
 ---
 
-## 18. Backup MySQL
+## 19. Backup MySQL
 
 MySQL działa na PersistentVolume — dane są na dysku serwera. Nie polegaj jednak wyłącznie na tym!
 
@@ -1156,7 +1236,7 @@ kubectl apply -f k8s/mysql/cronjob-backup.yaml
 
 ---
 
-## 19. Najczęstsze problemy (troubleshooting)
+## 20. Najczęstsze problemy (troubleshooting)
 
 ### Pod utknął w `Pending`
 
@@ -1245,11 +1325,11 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 
 ---
 
-## 20. Rancher — zarządzanie klastrem przez UI
+## 21. Rancher — zarządzanie klastrem przez UI
 
 Jeśli w pracy korzystasz z Ranchera, możesz go postawić na tym samym VPS. Dostaniesz dokładnie to samo środowisko — podgląd podów, logi, shell do kontenera, zarządzanie secretami — wszystko przez przeglądarkę.
 
-### 20.1 Instalacja Ranchera
+### 21.1 Instalacja Ranchera
 
 Rancher działa jako kontener Docker — niezależnie od k3s. Na serwerze:
 
@@ -1271,7 +1351,7 @@ https://<IP_SERWERA>:8443
 
 > **Uwaga:** Rancher używa self-signed certyfikatu przy pierwszym uruchomieniu — przeglądarka pokaże ostrzeżenie, kliknij "Proceed anyway".
 
-### 20.2 Pierwsze logowanie
+### 21.2 Pierwsze logowanie
 
 Pobierz hasło bootstrapowe:
 
@@ -1281,7 +1361,7 @@ docker logs rancher 2>&1 | grep "Bootstrap Password"
 
 Zaloguj się i ustaw nowe hasło.
 
-### 20.3 Importuj klaster k3s
+### 21.3 Importuj klaster k3s
 
 1. W Rancherze kliknij **Import Existing** → **Generic**
 2. Nadaj nazwę klastrowi, np. `cms-prod`
@@ -1293,7 +1373,7 @@ kubectl apply -f https://<IP_RANCHERA>:8443/v3/import/xxxxx.yaml
 
 Po ~1 minucie klaster pojawi się w Rancherze ze statusem `Active`.
 
-### 20.4 Co możesz robić w UI
+### 21.4 Co możesz robić w UI
 
 | Funkcja                  | Gdzie w Rancherze                      |
 |--------------------------|----------------------------------------|
@@ -1306,7 +1386,7 @@ Po ~1 minucie klaster pojawi się w Rancherze ze statusem `Active`.
 | Zużycie CPU / RAM        | Cluster → Metrics                      |
 | CronJoby i Joby          | Workloads → CronJobs / Jobs            |
 
-### 20.5 Zabezpieczenie panelu Ranchera
+### 21.5 Zabezpieczenie panelu Ranchera
 
 Domyślnie Rancher jest dostępny publicznie na porcie 8443. Ogranicz dostęp przez firewall Hetzner (panel → Firewall) lub bezpośrednio na serwerze:
 
@@ -1322,11 +1402,11 @@ ufw enable
 
 ---
 
-## 21. Czyszczenie dysku
+## 22. Czyszczenie dysku
 
 k3s akumuluje stare obrazy kontenerów przy każdym deploymencie. Po kilku miesiącach możesz stracić kilkanaście GB — warto to zautomatyzować.
 
-### 21.1 Sprawdź zajętość dysku
+### 22.1 Sprawdź zajętość dysku
 
 ```bash
 df -h /
@@ -1335,7 +1415,7 @@ df -h /
 du -sh /var/lib/rancher/k3s/agent/containerd/
 ```
 
-### 21.2 Ręczne czyszczenie
+### 22.2 Ręczne czyszczenie
 
 k3s używa `containerd` (nie Dockera). Do zarządzania obrazami służy `crictl`:
 
@@ -1353,7 +1433,7 @@ Jeśli masz też Dockera na serwerze (Rancher, Uptime Kuma):
 docker system prune -af
 ```
 
-### 21.3 Automatyczne czyszczenie — CronJob
+### 22.3 Automatyczne czyszczenie — CronJob
 
 ```bash
 kubectl apply -f k8s/maintenance/cronjob-image-cleanup.yaml
@@ -1363,11 +1443,11 @@ CronJob uruchamia się co niedzielę o 2:00 i usuwa nieużywane obrazy z `contai
 
 ---
 
-## 22. k9s — terminalowy panel zarządzania
+## 23. k9s — terminalowy panel zarządzania
 
 k9s to terminalowy UI dla Kubernetes — jak Rancher, ale w konsoli. Przydatny gdy jesteś już połączony SSH i nie chcesz otwierać przeglądarki.
 
-### 22.1 Instalacja
+### 23.1 Instalacja
 
 macOS:
 ```bash
@@ -1386,7 +1466,7 @@ Windows:
 winget install k9s
 ```
 
-### 22.2 Uruchomienie
+### 23.2 Uruchomienie
 
 ```bash
 k9s
@@ -1394,7 +1474,7 @@ k9s
 k9s -n cms-prod
 ```
 
-### 22.3 Najważniejsze skróty
+### 23.3 Najważniejsze skróty
 
 | Klawisz   | Akcja                     |
 |-----------|---------------------------|
@@ -1412,9 +1492,9 @@ k9s -n cms-prod
 
 ---
 
-## 23. Rotacja secretów — aktualizacja .env i haseł bez downtime'u
+## 24. Rotacja secretów — aktualizacja .env i haseł bez downtime'u
 
-### 23.1 Aktualizacja Laravel .env
+### 24.1 Aktualizacja Laravel .env
 
 Zmodyfikuj `k8s/server/secret.yaml`, a następnie:
 
@@ -1426,7 +1506,7 @@ kubectl -n cms-prod rollout restart deployment/cms-server
 kubectl -n cms-prod rollout restart deployment/cms-queue
 ```
 
-### 23.2 Zmiana hasła MySQL
+### 24.2 Zmiana hasła MySQL
 
 **Krok 1** — zmień hasło w bazie:
 
@@ -1450,7 +1530,7 @@ kubectl -n cms-prod rollout restart deployment/cms-server
 kubectl -n cms-prod rollout restart deployment/cms-queue
 ```
 
-### 23.3 Zmiana hasła Redis
+### 24.3 Zmiana hasła Redis
 
 ```bash
 # Zaktualizuj k8s/redis/secret.yaml i k8s/server/secret.yaml (REDIS_PASSWORD)

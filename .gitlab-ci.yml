@@ -159,8 +159,7 @@ build-client:
       docker buildx build \
         --platform linux/amd64 \
         --file client/Dockerfile \
-        --build-arg NEXT_PUBLIC_API_URL="$NEXT_PUBLIC_API_URL" \
-        --build-arg NEXT_PUBLIC_APP_NAME="$NEXT_PUBLIC_APP_NAME" \
+        $(echo "$ENV_CLIENT_PROD" | grep -v '^#' | grep -v '^$' | sed 's/^/--build-arg /') \
         --tag $CLIENT_IMAGE:$CI_COMMIT_SHORT_SHA \
         --tag $CLIENT_IMAGE:latest \
         --push \

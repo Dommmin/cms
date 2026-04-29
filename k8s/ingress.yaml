@@ -25,18 +25,18 @@ metadata:
   namespace: cms-prod
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
-    traefik.ingress.kubernetes.io/router.middlewares: "cms-prod-body-size@kubernetescrd"
+    traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+    traefik.ingress.kubernetes.io/router.middlewares: "cms-prod-redirect-https@kubernetescrd,cms-prod-body-size@kubernetescrd"
 spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - yourdomain.com
-        - www.yourdomain.com
-        - api.yourdomain.com
+        - laravel-test.site
+        - www.laravel-test.site
+        - api.laravel-test.site
       secretName: cms-tls
   rules:
-    - host: yourdomain.com
+    - host: laravel-test.site
       http:
         paths:
           - path: /
@@ -46,7 +46,7 @@ spec:
                 name: cms-client
                 port:
                   number: 3000
-    - host: www.yourdomain.com
+    - host: www.laravel-test.site
       http:
         paths:
           - path: /
@@ -56,7 +56,7 @@ spec:
                 name: cms-client
                 port:
                   number: 3000
-    - host: api.yourdomain.com
+    - host: api.laravel-test.site
       http:
         paths:
           - path: /

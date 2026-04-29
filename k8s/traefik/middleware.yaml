@@ -10,7 +10,17 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: body-size
-  namespace: cms-prod   # change to your namespace
+  namespace: cms-prod
 spec:
   buffering:
     maxRequestBodyBytes: 104857600  # 100 MB
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-https
+  namespace: cms-prod
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true

@@ -13,10 +13,8 @@ metadata:
   namespace: kube-system
 spec:
   valuesContent: |-
-    ports:
-      web:
-        redirectTo:
-          port: websecure
-          priority: 10
+    service:
+      externalIPs:
+        - "46.225.188.145"
     globalArguments:
       - "--global.sendanonymoususage=false"

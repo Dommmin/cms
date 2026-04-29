@@ -22,20 +22,21 @@ I don't assume you know Kubernetes. I do assume you know Docker and aren't afrai
 7. [Cluster preparation — namespace and secrets](#7-cluster-preparation--namespace-and-secrets)
 8. [Deploying the database and cache (MySQL + Redis)](#8-deploying-the-database-and-cache-mysql--redis)
 9. [Deploying Gotenberg (PDF)](#9-deploying-gotenberg-pdf)
-10. [Pull Secret for Container Registry (GHCR / GitLab)](#10-pull-secret-for-container-registry-ghcr--gitlab)
-11. [Deploying the application (server + client)](#11-deploying-the-application-server--client)
-12. [How Does CI/CD Connect to k3s?](#12-how-does-cicd-connect-to-k3s)
-13. [Configuring GitHub Actions](#13-configuring-github-actions)
-14. [Configuring GitLab CI/CD](#14-configuring-gitlab-cicd)
-15. [First deployment via CI](#15-first-deployment-via-ci)
-16. [Verification — is everything working?](#16-verification--is-everything-working)
-17. [Day-to-day operations — logs, restarts, updates](#17-day-to-day-operations--logs-restarts-updates)
-18. [MySQL backup](#18-mysql-backup)
-19. [Common problems (troubleshooting)](#19-common-problems-troubleshooting)
-20. [Rancher — cluster management via UI](#20-rancher--cluster-management-via-ui)
-21. [Disk cleanup](#21-disk-cleanup)
-22. [k9s — terminal management UI](#22-k9s--terminal-management-ui)
-23. [Secret rotation — updating .env and passwords with no downtime](#23-secret-rotation--updating-env-and-passwords-with-no-downtime)
+10. [Deploying Typesense (full-text search)](#10-deploying-typesense-full-text-search)
+11. [Pull Secret for Container Registry (GHCR / GitLab)](#11-pull-secret-for-container-registry-ghcr--gitlab)
+12. [Deploying the application (server + client)](#12-deploying-the-application-server--client)
+13. [How Does CI/CD Connect to k3s?](#13-how-does-cicd-connect-to-k3s)
+14. [Configuring GitHub Actions](#14-configuring-github-actions)
+15. [Configuring GitLab CI/CD](#15-configuring-gitlab-cicd)
+16. [First deployment via CI](#16-first-deployment-via-ci)
+17. [Verification — is everything working?](#17-verification--is-everything-working)
+18. [Day-to-day operations — logs, restarts, updates](#18-day-to-day-operations--logs-restarts-updates)
+19. [MySQL backup](#19-mysql-backup)
+20. [Common problems (troubleshooting)](#20-common-problems-troubleshooting)
+21. [Rancher — cluster management via UI](#21-rancher--cluster-management-via-ui)
+22. [Disk cleanup](#22-disk-cleanup)
+23. [k9s — terminal management UI](#23-k9s--terminal-management-ui)
+24. [Secret rotation — updating .env and passwords with no downtime](#24-secret-rotation--updating-env-and-passwords-with-no-downtime)
 
 ---
 
@@ -490,7 +491,7 @@ This secret contains the internal API URL used by Next.js server-side fetches (b
 
 ```bash
 kubectl apply -f k8s/client/secret.yaml.example
-# API_URL=http://cms-server.cms-prod.svc.cluster.local  (value is already correct)
+# API_URL=http://cms-server.cms-prod.svc.cluster.local/api/v1  (value is already correct)
 ```
 
 ---
@@ -557,13 +558,82 @@ kubectl -n cms-prod get pods | grep gotenberg
 
 ---
 
-## 10. Pull Secret for Container Registry (GHCR / GitLab)
+## 10. Deploying Typesense (full-text search)
+
+Typesense is a fast full-text search engine. The application uses it via Laravel Scout (`SCOUT_DRIVER=typesense`). We deploy it as a separate pod accessible only inside the cluster.
+
+### 10.1 Create the API key secret
+
+Typesense requires an API key to authorize requests. Use a random, strong key (min. 16 characters):
+
+```bash
+kubectl create secret generic cms-typesense \
+  --from-literal=api-key=<YOUR_API_KEY> \
+  --namespace=cms-prod \
+  --dry-run=client -o yaml | kubectl apply -f -
+```
+
+> Use this same key in `PROD_ENV` as `TYPESENSE_API_KEY=<YOUR_API_KEY>`.  
+> **Important:** Do not add inline comments (`#`) after the value — Laravel will read them as part of the key.
+
+### 10.2 Deploy Typesense
+
+```bash
+kubectl apply -f k8s/typesense/pvc.yaml
+kubectl apply -f k8s/typesense/deployment.yaml
+kubectl apply -f k8s/typesense/service.yaml
+```
+
+Wait for it to start (~20 seconds initialization):
+
+```bash
+kubectl -n cms-prod rollout status deployment/cms-typesense --timeout=120s
+# deployment "cms-typesense" successfully rolled out
+```
+
+Verify the health check:
+
+```bash
+kubectl -n cms-prod exec deployment/cms-typesense -- wget -qO- http://localhost:8108/health
+# {"ok":true}
+```
+
+### 10.3 Configuration in PROD_ENV
+
+Make sure your `PROD_ENV` CI/CD variable contains:
+
+```dotenv
+SCOUT_DRIVER=typesense
+SCOUT_QUEUE=true
+TYPESENSE_HOST=cms-typesense.cms-prod.svc.cluster.local
+TYPESENSE_PORT=8108
+TYPESENSE_PROTOCOL=http
+TYPESENSE_API_KEY=<YOUR_API_KEY>
+```
+
+### 10.4 Import existing data after first deployment
+
+After the first deploy, import existing records into the search indexes:
+
+```bash
+kubectl -n cms-prod exec deployment/cms-server -- \
+  php artisan scout:import "App\Models\Product"
+
+kubectl -n cms-prod exec deployment/cms-server -- \
+  php artisan scout:import "App\Models\BlogPost"
+```
+
+> Scout automatically indexes new and changed records via the queue (Redis) — the manual import is only needed once, on first deployment.
+
+---
+
+## 11. Pull Secret for Container Registry (GHCR / GitLab)
 
 Your cluster needs to know how to pull private Docker images. The configuration depends on which CI/CD system you are using.
 
 > **Important:** The secret name `ghcr-pull-secret` is the same in both cases — the deployment manifests (`k8s/server/deployment.yaml`, `k8s/client/deployment.yaml`) already use this name. Do not change it.
 
-### 10.1 GitHub Container Registry (GHCR)
+### 11.1 GitHub Container Registry (GHCR)
 
 If you use **GitHub Actions** and build images to `ghcr.io`:
 
@@ -584,7 +654,7 @@ kubectl create secret docker-registry ghcr-pull-secret \
   --namespace=cms-prod
 ```
 
-### 10.2 GitLab Container Registry
+### 11.2 GitLab Container Registry
 
 If you use **GitLab CI** and build images to `registry.gitlab.com`:
 
@@ -609,11 +679,11 @@ kubectl create secret docker-registry ghcr-pull-secret \
 
 ---
 
-## 11. Deploying the application (server + client)
+## 12. Deploying the application (server + client)
 
 Before the first CI/CD deploy we need to manually apply the infrastructure manifests. Docker images will be built by the pipeline — for now we use `:latest` (after the first CI push).
 
-### 11.1 Persistent storage for uploads and logs
+### 12.1 Persistent storage for uploads and logs
 
 Before starting the server, create a PVC (PersistentVolumeClaim) — a volume on the VPS disk that will store uploaded files and Laravel logs.
 
@@ -650,7 +720,7 @@ LOG_CHANNEL=stderr       # logs to kubectl logs (most convenient in k8s)
 
 > **PVC limitation:** works only with `replicas: 1`. When scaling to 2+ pods, switch to MinIO — see the bonus section at the end of this guide.
 
-### 11.2 Deploying the servers
+### 12.2 Deploying the servers
 
 ```bash
 # Server (Laravel)
@@ -696,7 +766,7 @@ service/cms-gotenberg ClusterIP 10.43.x.x
 
 ---
 
-## 12. How Does CI/CD Connect to k3s?
+## 13. How Does CI/CD Connect to k3s?
 
 Before configuring the pipeline, it's worth understanding how it can control Kubernetes on your server at all.
 
@@ -774,11 +844,11 @@ Port 22 (SSH) can remain restricted to your IP only — CI/CD no longer needs it
 
 ---
 
-## 13. Configuring GitHub Actions
+## 14. Configuring GitHub Actions
 
 The repository contains a `.github/workflows/deploy.yml` file with a complete pipeline. You only need to configure variables in GitHub.
 
-### 13.1 Secrets and Variables
+### 14.1 Secrets and Variables
 
 In GitHub: **Settings → Secrets and variables → Actions → Secrets / Variables**
 
@@ -786,7 +856,7 @@ In GitHub: **Settings → Secrets and variables → Actions → Secrets / Variab
 
 | Secret            | Description                                       |
 |-------------------|---------------------------------------------------|
-| `KUBECONFIG_PROD` | Raw kubeconfig content — see section 12           |
+| `KUBECONFIG_PROD` | Raw kubeconfig content — see section 13           |
 
 ```bash
 # How to get the value (no base64):
@@ -795,11 +865,10 @@ cat ~/.kube/config-hetzner
 
 #### Variables (visible and editable in the UI)
 
-| Variable               | Example                               | Description                          |
-|------------------------|---------------------------------------|--------------------------------------|
-| `PROD_ENV`             | *(full content of production .env)*   | Automatically synced to k8s Secret   |
-| `NEXT_PUBLIC_API_URL`  | `https://api.yourdomain.com`          | Build-time variable for Next.js      |
-| `NEXT_PUBLIC_APP_NAME` | `MyCMS`                               | Build-time variable for Next.js      |
+| Variable          | Example                             | Description                                   |
+|-------------------|-------------------------------------|-----------------------------------------------|
+| `PROD_ENV`        | *(full content of production .env)* | Automatically synced to k8s Secret            |
+| `ENV_CLIENT_PROD` | *(full content of frontend .env)*   | Build-time variables for Next.js (multiline)  |
 
 > **Why `PROD_ENV` as a Variable, not a Secret?**  
 > Secrets are write-only — once saved you can't read or edit them line by line. Variables are visible in the UI, so you can easily check what's set. The pipeline syncs the value to a k8s Secret before deploying anyway.
@@ -828,7 +897,18 @@ GOTENBERG_URL=http://cms-gotenberg.cms-prod.svc.cluster.local:3000
 
 GitHub supports multiline Variables — paste the entire content.
 
-### 13.2 How the pipeline works
+#### How to set ENV_CLIENT_PROD
+
+The value is the `.env` content for the Next.js frontend — only the build-time variables needed at image build:
+
+```dotenv
+NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+NEXT_PUBLIC_APP_NAME=MyCMS
+```
+
+Add as many `NEXT_PUBLIC_*` variables as needed. The pipeline passes them all to `docker buildx build` as `--build-arg` entries automatically.
+
+### 14.2 How the pipeline works
 
 ```
 push → master/main
@@ -858,28 +938,27 @@ Each deploy:
 
 This means migrations always run before new code — no more "column does not exist".
 
-### 13.3 No registry server required
+### 14.3 No registry server required
 
 GitHub Container Registry (GHCR) is built into GitHub — you don't need to configure any external registry. The pipeline automatically authenticates using `GITHUB_TOKEN` (available automatically in every workflow).
 
 ---
 
-## 14. Configuring GitLab CI/CD
+## 15. Configuring GitLab CI/CD
 
 The repository contains a `.gitlab-ci.yml` file with a complete pipeline. You only need to configure variables.
 
-### 14.1 CI/CD variables
+### 15.1 CI/CD variables
 
 In GitLab: **Settings → CI/CD → Variables → Add variable**
 
 #### Required variables
 
-| Variable               | Type     | Masked | Protected | Description                              |
-|------------------------|----------|--------|-----------|------------------------------------------|
-| `KUBECONFIG`           | Variable | ✅      | ✅         | Raw kubeconfig content — see section 12  |
-| `SERVER_ENV`           | Variable | ✅      | ✅         | Full content of `server/.env.production` |
-| `NEXT_PUBLIC_API_URL`  | Variable | ❌      | ❌         | `https://api.yourdomain.com`             |
-| `NEXT_PUBLIC_APP_NAME` | Variable | ❌      | ❌         | Your application name                    |
+| Variable          | Type     | Masked | Protected | Description                              |
+|-------------------|----------|--------|-----------|------------------------------------------|
+| `KUBECONFIG`      | Variable | ✅      | ✅         | Raw kubeconfig content — see section 13  |
+| `SERVER_ENV`      | Variable | ✅      | ✅         | Full content of `server/.env.production` |
+| `ENV_CLIENT_PROD` | Variable | ❌      | ❌         | Build-time variables for Next.js (multiline) |
 
 **You don't need** to set registry variables — GitLab provides them automatically:
 - `CI_REGISTRY` — registry address
@@ -912,7 +991,7 @@ FRONTEND_URL=https://yourdomain.com
 
 Paste the entire content as the variable value (GitLab supports multiline variables).
 
-### 14.2 How the pipeline works
+### 15.2 How the pipeline works
 
 ```
 push → master
@@ -942,7 +1021,7 @@ This means migrations always run before new code — no more "column does not ex
 
 ---
 
-## 15. First deployment via CI
+## 16. First deployment via CI
 
 Push to the `master` branch:
 
@@ -993,7 +1072,7 @@ Open a browser and visit:
 
 ---
 
-## 16. Verification — is everything working?
+## 17. Verification — is everything working?
 
 ### Post-deployment checklist
 
@@ -1033,7 +1112,7 @@ Log in to the admin panel and try uploading an image — this verifies MySQL, st
 
 ---
 
-## 17. Day-to-day operations — logs, restarts, updates
+## 18. Day-to-day operations — logs, restarts, updates
 
 ### Viewing logs
 
@@ -1109,7 +1188,7 @@ curl -sfL https://get.k3s.io | sh -
 
 ---
 
-## 18. MySQL backup
+## 19. MySQL backup
 
 MySQL runs on a PersistentVolume — data is stored on the server's disk. Don't rely on that alone, though!
 
@@ -1179,7 +1258,7 @@ kubectl apply -f k8s/mysql/cronjob-backup.yaml
 
 ---
 
-## 19. Common problems (troubleshooting)
+## 20. Common problems (troubleshooting)
 
 ### Pod stuck in `Pending`
 
@@ -1268,11 +1347,11 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 
 ---
 
-## 20. Rancher — cluster management via UI
+## 21. Rancher — cluster management via UI
 
 If you use Rancher at work, you can run it on the same VPS. You'll get the exact same environment — pod overview, logs, shell into containers, secret management — all from the browser.
 
-### 20.1 Installing Rancher
+### 21.1 Installing Rancher
 
 Rancher runs as a Docker container — independently from k3s. On the server:
 
@@ -1294,7 +1373,7 @@ https://<SERVER_IP>:8443
 
 > **Note:** Rancher uses a self-signed certificate on first launch — the browser will show a warning, click "Proceed anyway".
 
-### 20.2 First login
+### 21.2 First login
 
 Get the bootstrap password:
 
@@ -1304,7 +1383,7 @@ docker logs rancher 2>&1 | grep "Bootstrap Password"
 
 Log in and set a new password.
 
-### 20.3 Import the k3s cluster
+### 21.3 Import the k3s cluster
 
 1. In Rancher click **Import Existing** → **Generic**
 2. Give the cluster a name, e.g. `cms-prod`
@@ -1316,7 +1395,7 @@ kubectl apply -f https://<RANCHER_IP>:8443/v3/import/xxxxx.yaml
 
 After ~1 minute the cluster will appear in Rancher with status `Active`.
 
-### 20.4 What you can do in the UI
+### 21.4 What you can do in the UI
 
 | Feature                | Where in Rancher                       |
 |------------------------|----------------------------------------|
@@ -1329,7 +1408,7 @@ After ~1 minute the cluster will appear in Rancher with status `Active`.
 | CPU / RAM usage        | Cluster → Metrics                      |
 | CronJobs and Jobs      | Workloads → CronJobs / Jobs            |
 
-### 20.5 Securing the Rancher panel
+### 21.5 Securing the Rancher panel
 
 By default Rancher is publicly accessible on port 8443. Restrict access via the Hetzner firewall panel or directly on the server:
 
@@ -1345,11 +1424,11 @@ ufw enable
 
 ---
 
-## 21. Disk cleanup
+## 22. Disk cleanup
 
 k3s accumulates old container images with every deployment. After a few months you can lose tens of gigabytes — worth automating.
 
-### 21.1 Check disk usage
+### 22.1 Check disk usage
 
 ```bash
 df -h /
@@ -1358,7 +1437,7 @@ df -h /
 du -sh /var/lib/rancher/k3s/agent/containerd/
 ```
 
-### 21.2 Manual cleanup
+### 22.2 Manual cleanup
 
 k3s uses `containerd` (not Docker). Use `crictl` to manage images:
 
@@ -1376,7 +1455,7 @@ If you also have Docker on the server (Rancher, Uptime Kuma):
 docker system prune -af
 ```
 
-### 21.3 Automatic cleanup — CronJob
+### 22.3 Automatic cleanup — CronJob
 
 ```bash
 kubectl apply -f k8s/maintenance/cronjob-image-cleanup.yaml
@@ -1386,11 +1465,11 @@ The CronJob runs every Sunday at 2:00 AM and removes unused images from `contain
 
 ---
 
-## 22. k9s — terminal management UI
+## 23. k9s — terminal management UI
 
 k9s is a terminal UI for Kubernetes — like Rancher, but in the console. Useful when you're already connected via SSH and don't want to open a browser.
 
-### 22.1 Installation
+### 23.1 Installation
 
 macOS:
 ```bash
@@ -1409,7 +1488,7 @@ Windows:
 winget install k9s
 ```
 
-### 22.2 Running k9s
+### 23.2 Running k9s
 
 ```bash
 k9s
@@ -1417,7 +1496,7 @@ k9s
 k9s -n cms-prod
 ```
 
-### 22.3 Key shortcuts
+### 23.3 Key shortcuts
 
 | Key       | Action               |
 |-----------|----------------------|
@@ -1435,9 +1514,9 @@ k9s -n cms-prod
 
 ---
 
-## 23. Secret rotation — updating .env and passwords with no downtime
+## 24. Secret rotation — updating .env and passwords with no downtime
 
-### 23.1 Updating the Laravel .env
+### 24.1 Updating the Laravel .env
 
 Edit `k8s/server/secret.yaml`, then:
 
@@ -1449,7 +1528,7 @@ kubectl -n cms-prod rollout restart deployment/cms-server
 kubectl -n cms-prod rollout restart deployment/cms-queue
 ```
 
-### 23.2 Changing the MySQL password
+### 24.2 Changing the MySQL password
 
 **Step 1** — change the password in the database:
 
@@ -1473,7 +1552,7 @@ kubectl -n cms-prod rollout restart deployment/cms-server
 kubectl -n cms-prod rollout restart deployment/cms-queue
 ```
 
-### 23.3 Changing the Redis password
+### 24.3 Changing the Redis password
 
 ```bash
 # Update k8s/redis/secret.yaml and k8s/server/secret.yaml (REDIS_PASSWORD)

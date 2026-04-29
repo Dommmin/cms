@@ -361,9 +361,7 @@ jobs:
           tags: |
             ${{ steps.images.outputs.client }}:${{ steps.sha.outputs.short }}
             ${{ steps.images.outputs.client }}:latest
-          build-args: |
-            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
-            NEXT_PUBLIC_APP_NAME=${{ vars.NEXT_PUBLIC_APP_NAME }}
+          build-args: ${{ vars.ENV_CLIENT_PROD }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
