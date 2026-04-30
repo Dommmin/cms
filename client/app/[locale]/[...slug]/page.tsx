@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import { getPage } from '@/api/cms';
@@ -19,7 +20,13 @@ export async function generateMetadata({
         const [resolvedLocale, slug] = isValidLocale(locale)
             ? [locale, rawSlug]
             : [DEFAULT_LOCALE, [locale, ...rawSlug]];
-        const page = await getPage(slug.join('/'), resolvedLocale);
+        const cookieStore = await cookies();
+        const previewToken = cookieStore.get('page_preview_token')?.value;
+        const page = await getPage(
+            slug.join('/'),
+            resolvedLocale,
+            previewToken,
+        );
         return {
             title: page.seo_title ?? page.title,
             description: page.seo_description ?? undefined,
@@ -44,22 +51,37 @@ export default async function DynamicPage({ params }: PageProps) {
     const [resolvedLocale, slug] = isValidLocale(locale)
         ? [locale, rawSlug]
         : [DEFAULT_LOCALE, [locale, ...rawSlug]];
-    const page = await getPage(slug.join('/'), resolvedLocale).catch(
-        () => null,
+
+    const cookieStore = await cookies();
+    const previewToken = cookieStore.get('page_preview_token')?.value;
+
+    const page = await getPage(
+        slug.join('/'),
+        resolvedLocale,
+        previewToken,
+    ).catch(() => null);
+    return (
+        <PageContent
+            page={page}
+            slug={slug}
+            locale={resolvedLocale}
+            isPreview={!!previewToken}
+        />
     );
-    return <PageContent page={page} slug={slug} locale={resolvedLocale} />;
 }
 
 function PageContent({
     page,
     slug,
     locale,
+    isPreview,
 }: {
     page: PageData | null;
     slug: string[];
     locale: string;
+    isPreview: boolean;
 }) {
-    if (!page || !page.is_published) {
+    if (!page || (!page.is_published && !isPreview)) {
         notFound();
     }
 

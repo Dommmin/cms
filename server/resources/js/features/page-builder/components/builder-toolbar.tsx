@@ -11,18 +11,14 @@ import {
     BookmarkPlus,
     Calendar,
     Check,
-    Columns2,
     Eye,
     FileDown,
     FileUp,
     LayoutTemplate,
     Loader2,
-    Monitor,
     Plus,
     Redo2,
     Save,
-    Smartphone,
-    Tablet,
     Undo2,
     X,
 } from 'lucide-react';
@@ -359,10 +355,8 @@ export function BuilderToolbar({
     pageTitle,
     isPublished: _isPublished,
     isSaving,
-    isSplitView,
     canUndo,
     canRedo,
-    previewDevice,
     hasUnsavedChanges,
     lastSavedAt,
     scheduledPublishAt,
@@ -372,10 +366,8 @@ export function BuilderToolbar({
     onOpenTemplates,
     onSave,
     onPreview,
-    onToggleSplitView,
     onUndo,
     onRedo,
-    onChangeDevice,
     onScheduleSave,
     onSaveTemplate,
     onSubmitForReview,
@@ -461,54 +453,6 @@ export function BuilderToolbar({
 
                     <div className="h-4 w-px bg-border" />
 
-                    {/* Device selector (split view only) */}
-                    {isSplitView && (
-                        <>
-                            <div className="flex items-center rounded-md border">
-                                <Button
-                                    onClick={() => onChangeDevice('desktop')}
-                                    variant={
-                                        previewDevice === 'desktop'
-                                            ? 'secondary'
-                                            : 'ghost'
-                                    }
-                                    size="sm"
-                                    title="Desktop preview"
-                                    className="h-8 w-8 rounded-r-none border-0 p-0"
-                                >
-                                    <Monitor className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                    onClick={() => onChangeDevice('tablet')}
-                                    variant={
-                                        previewDevice === 'tablet'
-                                            ? 'secondary'
-                                            : 'ghost'
-                                    }
-                                    size="sm"
-                                    title="Tablet preview"
-                                    className="h-8 w-8 rounded-none border-x p-0"
-                                >
-                                    <Tablet className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                    onClick={() => onChangeDevice('mobile')}
-                                    variant={
-                                        previewDevice === 'mobile'
-                                            ? 'secondary'
-                                            : 'ghost'
-                                    }
-                                    size="sm"
-                                    title="Mobile preview"
-                                    className="h-8 w-8 rounded-l-none border-0 p-0"
-                                >
-                                    <Smartphone className="h-4 w-4" />
-                                </Button>
-                            </div>
-                            <div className="h-4 w-px bg-border" />
-                        </>
-                    )}
-
                     <Button
                         onClick={onOpenTemplates}
                         variant="outline"
@@ -523,21 +467,10 @@ export function BuilderToolbar({
                         Add Section
                     </Button>
 
-                    <Button
-                        onClick={onToggleSplitView}
-                        variant={isSplitView ? 'secondary' : 'outline'}
-                        size="sm"
-                    >
-                        <Columns2 className="mr-2 h-4 w-4" />
-                        {isSplitView ? 'Exit Split View' : 'Split View'}
+                    <Button onClick={onPreview} variant="outline" size="sm">
+                        <Eye className="mr-2 h-4 w-4" />
+                        Preview
                     </Button>
-
-                    {!isSplitView && (
-                        <Button onClick={onPreview} variant="outline" size="sm">
-                            <Eye className="mr-2 h-4 w-4" />
-                            Preview
-                        </Button>
-                    )}
 
                     <SchedulePopover
                         scheduledPublishAt={scheduledPublishAt}

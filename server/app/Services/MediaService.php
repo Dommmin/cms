@@ -6,6 +6,8 @@ namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Image\Enums\Fit;
+use Spatie\Image\Image;
 
 /**
  * Media Service
@@ -63,18 +65,61 @@ class MediaService
     {
         $path = $file->store($folder, 'public');
 
-        // TODO: Process image sizes locally with Intervention Image
-        // $processor = app(ImageProcessor::class);
-        // $sizes = $processor->process(...);
+        $mimeType = $file->getMimeType() ?? '';
+
+        if (str_starts_with($mimeType, 'image/')) {
+            $variants = $this->generateLocalImageVariants((string) $path, $folder);
+        } else {
+            $url = Storage::url($path);
+            $variants = [
+                'thumbnail' => $url,
+                'medium' => $url,
+                'large' => $url,
+            ];
+        }
 
         return [
             'path' => $path,
             'url' => Storage::url($path),
-            'variants' => [
-                'thumbnail' => Storage::url($path),
-                'medium' => Storage::url($path),
-                'large' => Storage::url($path),
-            ],
+            'variants' => $variants,
         ];
+    }
+
+    /**
+     * Generate resized variants of a stored image using spatie/image.
+     *
+     * Uses Fit::Max which preserves aspect ratio and never upscales.
+     *
+     * @return array{thumbnail: string, medium: string, large: string}
+     */
+    private function generateLocalImageVariants(string $storedPath, string $folder): array
+    {
+        $absolutePath = Storage::disk('public')->path($storedPath);
+
+        $pathInfo = pathinfo($storedPath);
+        $basename = $pathInfo['filename'];
+        $ext = $pathInfo['extension'] ?? 'jpg';
+
+        $variantSizes = [
+            'thumbnail' => [300, 300],
+            'medium' => [800, 800],
+            'large' => [1200, 1200],
+        ];
+
+        $variants = [];
+
+        foreach ($variantSizes as $name => [$width, $height]) {
+            $variantFilename = sprintf('%s/%s_%s.%s', $folder, $basename, $name, $ext);
+            $variantPath = Storage::disk('public')->path($variantFilename);
+
+            Image::load($absolutePath)
+                ->fit(Fit::Max, $width, $height)
+                ->save($variantPath);
+
+            $variants[$name] = Storage::url($variantFilename);
+        }
+
+        /** @var array{thumbnail: string, medium: string, large: string} $variants */
+        return $variants;
     }
 }

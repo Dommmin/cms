@@ -83,7 +83,7 @@ Fallback `baseURL` to `http://localhost:80/api/v1` — port 80. `server-fetch.ts
 
 ---
 
-### [ ] TODO: `MediaService` nie generuje wariantów obrazów lokalnie
+### [x] TODO: `MediaService` nie generuje wariantów obrazów lokalnie
 **Plik:** `server/app/Services/MediaService.php:66`
 
 `// TODO: Process image sizes locally with Intervention Image` — metoda zwraca zduplikowane URL-e dla różnych rozmiarów zamiast faktycznych miniatur.
@@ -92,12 +92,12 @@ Fallback `baseURL` to `http://localhost:80/api/v1` — port 80. `server-fetch.ts
 
 ---
 
-### [ ] TODO: `SegmentEvaluationService` — reguła tagów jest pusta
+### [x] TODO: `SegmentEvaluationService` — reguła tagów jest pusta
 **Plik:** `server/app/Services/SegmentEvaluationService.php:144`
 
 `applyTagRule()` to placeholder — tagi klientów nie są jeszcze zaimplementowane, segmenty oparte na tagach nie działają.
 
-**Fix:** Zaimplementować po dodaniu tagów do modelu Customer, lub usunąć regułę z listy dostępnych jeśli tagi nie są planowane.
+**Fix:** Usunięto `has_tag` z match + metodę `applyTagRule()` — tagi nie są planowane.
 
 ---
 
@@ -149,6 +149,53 @@ Fallback `SITE_URL` to `http://localhost:3000` — jeśli zmienna env nie jest u
 
 ---
 
+## Page Builder — prawdziwy preview zamiast fake'owego
+
+### [x] Usunąć split view i zastąpić preview frontendem
+
+**Kontekst:**
+Aktualny „preview" to fikcja — `page-preview.tsx` re-implementuje wygląd bloków w panelu admina (osobne komponenty: `HeroBannerPreview`, `RichTextPreview` itd.), które nigdy nie są zsynchronizowane z prawdziwym frontendem. Split view (`isSplitView`) ładuje ten fake preview w iframe obok buildera.
+
+**Co usunąć:**
+- `isSplitView` state i cała logika split view w `resources/js/pages/admin/cms/pages/builder.tsx`
+- Props `previewDevice`, `onChangeDevice` z `BuilderToolbar` + selektor urządzeń (desktop/tablet/mobile)
+- Inertia page `resources/js/pages/admin/cms/pages/page-preview.tsx` i wszystkie `*Preview` komponenty
+- Metoda `preview()` w `PageBuilderController` + route `GET pages/{page}/preview` w `routes/admin/cms.php`
+
+**Co zbudować — preview przez prawdziwy frontend:**
+
+Flow: admin klika „Preview" → backend generuje podpisany token → frontend waliduje token → ustawia cookie → renderuje stronę z draftu.
+
+**1. Backend — endpoint tokenu**
+`GET /admin/pages/{page}/preview-url` (nowa akcja w `PageBuilderController`)
+- Generuje `URL::temporarySignedRoute('api.v1.pages.preview', now()->addMinutes(30), ['page' => $page->id])`
+- Zwraca JSON `{ url: 'https://frontend.com/api/preview?token=xxx&slug=xxx' }`
+- Tylko dla zalogowanych adminów
+
+**2. Backend — endpoint draftu**
+`GET /api/v1/pages/{slug}?preview_token=xxx`
+- Waliduje podpisany token (Laravel `Request::hasValidSignature()`)
+- Pomija filtr `status = published` — zwraca stronę niezależnie od statusu
+- Istniejący endpoint `PageController::show()` — dodać obsługę `preview_token`
+
+**3. Frontend — route obsługi tokenu**
+`client/app/api/preview/route.ts` (Next.js Route Handler)
+- Odbiera `?token=xxx&slug=xxx`
+- Ustawia cookie `page_preview_token=xxx` (httpOnly, 30 min)
+- Redirectuje na `/{locale}/{slug}`
+
+**4. Frontend — strona stron (`[...slug]`)**
+- Gdy cookie `page_preview_token` jest obecne, przekazuje token do `serverFetch('/pages/{slug}?preview_token=xxx')`
+- Backend zwraca draft → frontend renderuje normalnie
+- Cookie wygasa po 30 min lub po pierwszym użyciu
+
+**Uwagi:**
+- `admin_preview` cookie (AdminBar) już istnieje — można rozszerzyć ten mechanizm zamiast tworzyć nowy
+- Draft preview dostępny tylko przez podpisany URL — niepubliczne strony nie są nigdy dostępne bez tokenu
+- Po usunięciu split view toolbar upraszcza się znacznie (zostaje tylko Publish/Save/Preview button)
+
+---
+
 ## Pokrycie testami (braki)
 
 Brakuje testów dla:
@@ -160,4 +207,4 @@ Brakuje testów dla:
 
 ---
 
-*Ostatnia aktualizacja: 2026-04-29*
+*Ostatnia aktualizacja: 2026-04-30*

@@ -35,7 +35,7 @@ Route::prefix('cms')->name('cms.')->group(function (): void {
     Route::get('reusable-blocks/{reusableBlock}', [ReusableBlockController::class, 'show'])->name('reusable-blocks.show');
 
     // Page Builder
-    Route::get('pages/{page}/preview', [PageBuilderController::class, 'preview'])->name('pages.builder.preview');
+    Route::get('pages/{page}/preview-url', [PageBuilderController::class, 'previewUrl'])->name('pages.builder.preview-url');
     Route::get('pages/{page}/builder', [PageBuilderController::class, 'show'])->name('pages.builder');
     Route::put('pages/{page}/builder', [PageBuilderController::class, 'update'])->name('pages.builder.update');
     Route::put('pages/{page}/builder/schedule', [PageBuilderController::class, 'schedule'])->name('pages.builder.schedule');

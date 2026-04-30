@@ -31,11 +31,7 @@ export function PageBuilder({
     onSave,
     onPreview,
     onChange,
-    isSplitView = false,
     isSaving = false,
-    previewDevice = 'desktop',
-    onToggleSplitView,
-    onChangeDevice,
     hasUnsavedChanges = false,
     lastSavedAt = null,
     scheduledPublishAt = null,
@@ -135,10 +131,8 @@ export function PageBuilder({
                 pageTitle={data.page.title}
                 isPublished={data.page.is_published}
                 isSaving={isSaving}
-                isSplitView={isSplitView}
                 canUndo={canUndo}
                 canRedo={canRedo}
-                previewDevice={previewDevice}
                 hasUnsavedChanges={hasUnsavedChanges}
                 lastSavedAt={lastSavedAt}
                 scheduledPublishAt={scheduledPublishAt}
@@ -149,10 +143,8 @@ export function PageBuilder({
                 onOpenTemplates={() => setTemplatesOpen(true)}
                 onSave={handleSave}
                 onPreview={onPreview}
-                onToggleSplitView={onToggleSplitView ?? (() => {})}
                 onUndo={undo}
                 onRedo={redo}
-                onChangeDevice={onChangeDevice ?? (() => {})}
                 onScheduleSave={onScheduleSave ?? (() => {})}
                 onSaveTemplate={onSaveTemplate ?? (() => {})}
                 onSubmitForReview={onSubmitForReview ?? (() => {})}
@@ -160,11 +152,7 @@ export function PageBuilder({
                 onReject={onReject ?? (() => {})}
             />
 
-            <div
-                className={
-                    isSplitView ? 'px-4 py-8' : 'container max-w-5xl py-8'
-                }
-            >
+            <div className="container max-w-5xl py-8">
                 {sections.length === 0 ? (
                     <div className="rounded-lg border border-dashed bg-background p-16 text-center">
                         <h3 className="mb-2 text-lg font-semibold">

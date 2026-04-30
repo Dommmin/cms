@@ -5,11 +5,7 @@ import * as PageApprovalController from '@/actions/App/Http/Controllers/Admin/Cm
 import * as PageBuilderController from '@/actions/App/Http/Controllers/Admin/Cms/PageBuilderController';
 import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import * as SectionTemplateController from '@/actions/App/Http/Controllers/Admin/Cms/SectionTemplateController';
-import type {
-    ApprovalStatus,
-    PreviewDevice,
-    Section,
-} from '@/features/page-builder';
+import type { ApprovalStatus, Section } from '@/features/page-builder';
 import { PageBuilder } from '@/features/page-builder';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
@@ -24,9 +20,6 @@ export default function BuilderPage({
     available_block_relations,
 }: BuilderPageProps) {
     const [isSaving, setIsSaving] = useState(false);
-    const [isSplitView, setIsSplitView] = useState(false);
-    const [previewDevice, setPreviewDevice] =
-        useState<PreviewDevice>('desktop');
     const [isAutoSaving, setIsAutoSaving] = useState(false);
     const [localSections, setLocalSections] = useState<Section[]>(sections);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -41,7 +34,6 @@ export default function BuilderPage({
         (page.approval_status as ApprovalStatus) ?? 'draft',
     );
 
-    const iframeRef = useRef<HTMLIFrameElement>(null);
     const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     // Track whether sections have been changed since mount (skip first render)
     const isFirstRender = useRef(true);
@@ -114,9 +106,6 @@ export default function BuilderPage({
                     onSuccess: () => {
                         setHasUnsavedChanges(false);
                         setLastSavedAt(new Date());
-                        if (isSplitView) {
-                            iframeRef.current?.contentWindow?.location.reload();
-                        }
                     },
                     onFinish: () => {
                         setIsAutoSaving(false);
@@ -131,38 +120,6 @@ export default function BuilderPage({
             }
         };
     }, [hasUnsavedChanges, localSections]); // eslint-disable-line react-hooks/exhaustive-deps
-
-    // Split-view debounce auto-save (separate from the 30s timer)
-    const splitViewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
-        null,
-    );
-    useEffect(() => {
-        if (!isSplitView) return;
-
-        if (splitViewTimerRef.current) {
-            clearTimeout(splitViewTimerRef.current);
-        }
-
-        splitViewTimerRef.current = setTimeout(() => {
-            router.put(
-                PageBuilderController.update.url(page.id),
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                { sections: localSections as any },
-                {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        iframeRef.current?.contentWindow?.location.reload();
-                    },
-                },
-            );
-        }, 1500);
-
-        return () => {
-            if (splitViewTimerRef.current) {
-                clearTimeout(splitViewTimerRef.current);
-            }
-        };
-    }, [localSections, isSplitView]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleSectionsChange = (updatedSections: Section[]) => {
         setLocalSections(updatedSections);
@@ -182,9 +139,6 @@ export default function BuilderPage({
                     toast.success('Page builder saved successfully');
                     setHasUnsavedChanges(false);
                     setLastSavedAt(new Date());
-                    if (isSplitView) {
-                        iframeRef.current?.contentWindow?.location.reload();
-                    }
                 },
                 onError: (errors) => {
                     toast.error(
@@ -296,15 +250,23 @@ export default function BuilderPage({
         );
     };
 
-    const handlePreview = () => {
-        window.open(PageBuilderController.preview.url(page.id), '_blank');
+    const handlePreview = async () => {
+        const token = (
+            document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement
+        )?.content;
+        const res = await fetch(PageBuilderController.previewUrl.url(page.id), {
+            headers: {
+                'X-CSRF-TOKEN': token ?? '',
+                Accept: 'application/json',
+            },
+        });
+        if (res.ok) {
+            const data = (await res.json()) as { url: string };
+            window.open(data.url, '_blank');
+        }
     };
 
-    const handleToggleSplitView = () => {
-        setIsSplitView((prev) => !prev);
-    };
-
-    // Always use localSections so unsaved changes survive split-view toggle
+    // Always use localSections so unsaved changes survive any state toggle
     const builderData = {
         page: { ...page, is_published: page.is_published ?? false },
         sections: localSections,
@@ -316,73 +278,24 @@ export default function BuilderPage({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Builder - ${page.title}`} />
 
-            {/*
-             * Single layout — PageBuilder is never unmounted when toggling split
-             * view. The container CSS changes but the component stays mounted,
-             * preserving all unsaved state (sections, expanded panels, etc.).
-             */}
-            <div
-                className={
-                    isSplitView
-                        ? 'flex h-[calc(100vh-4rem)] overflow-hidden'
-                        : ''
-                }
-            >
-                {/* Builder panel */}
-                <div
-                    className={
-                        isSplitView ? 'w-[45%] overflow-y-auto border-r' : ''
-                    }
-                >
-                    <PageBuilder
-                        data={builderData}
-                        onSave={handleSave}
-                        onPreview={handlePreview}
-                        onChange={handleSectionsChange}
-                        isSplitView={isSplitView}
-                        isSaving={isSaving || isAutoSaving}
-                        previewDevice={previewDevice}
-                        onToggleSplitView={handleToggleSplitView}
-                        onChangeDevice={setPreviewDevice}
-                        hasUnsavedChanges={hasUnsavedChanges}
-                        lastSavedAt={lastSavedAt}
-                        scheduledPublishAt={scheduledPublishAt}
-                        scheduledUnpublishAt={scheduledUnpublishAt}
-                        approvalStatus={approvalStatus}
-                        onScheduleSave={handleScheduleSave}
-                        onSaveTemplate={handleSaveTemplate}
-                        onSubmitForReview={handleSubmitForReview}
-                        onApprove={handleApprove}
-                        onReject={handleReject}
-                    />
-                </div>
-
-                {/* Preview iframe (only rendered in split view) */}
-                {isSplitView && (
-                    <div className="relative flex w-[55%] flex-col items-center overflow-y-auto bg-muted/30">
-                        {isAutoSaving && (
-                            <div className="absolute top-3 right-3 z-10 rounded-md bg-background/80 px-2 py-1 text-xs text-muted-foreground shadow backdrop-blur">
-                                Auto-saving...
-                            </div>
-                        )}
-                        <div
-                            className={[
-                                'h-full w-full transition-all duration-300',
-                                previewDevice === 'tablet' && 'max-w-[768px]',
-                                previewDevice === 'mobile' && 'max-w-[390px]',
-                            ]
-                                .filter(Boolean)
-                                .join(' ')}
-                        >
-                            <iframe
-                                ref={iframeRef}
-                                src={PageBuilderController.preview.url(page.id)}
-                                className="h-full w-full border-0"
-                                title="Page Preview"
-                            />
-                        </div>
-                    </div>
-                )}
+            <div>
+                <PageBuilder
+                    data={builderData}
+                    onSave={handleSave}
+                    onPreview={handlePreview}
+                    onChange={handleSectionsChange}
+                    isSaving={isSaving || isAutoSaving}
+                    hasUnsavedChanges={hasUnsavedChanges}
+                    lastSavedAt={lastSavedAt}
+                    scheduledPublishAt={scheduledPublishAt}
+                    scheduledUnpublishAt={scheduledUnpublishAt}
+                    approvalStatus={approvalStatus}
+                    onScheduleSave={handleScheduleSave}
+                    onSaveTemplate={handleSaveTemplate}
+                    onSubmitForReview={handleSubmitForReview}
+                    onApprove={handleApprove}
+                    onReject={handleReject}
+                />
             </div>
         </AppLayout>
     );

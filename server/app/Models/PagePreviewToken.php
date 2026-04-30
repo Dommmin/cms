@@ -9,7 +9,15 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $page_id
+ * @property int|null $page_version_id
+ * @property string $token_hash
+ * @property Carbon $expires_at
+ * @property int|null $created_by
+ */
 #[Fillable([
     'page_id', 'page_version_id', 'token_hash', 'expires_at', 'created_by',
 ])]

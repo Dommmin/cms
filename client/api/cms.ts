@@ -12,11 +12,18 @@ import type {
 
 // ── Pages ─────────────────────────────────────────────────────────────────────
 
-export async function getPage(slug: string, locale?: string): Promise<Page> {
-    return serverFetch<Page>(`/pages/${slug}`, {
+export async function getPage(
+    slug: string,
+    locale?: string,
+    previewToken?: string,
+): Promise<Page> {
+    const path = previewToken
+        ? `/pages/${slug}?preview_token=${encodeURIComponent(previewToken)}`
+        : `/pages/${slug}`;
+    return serverFetch<Page>(path, {
         locale,
-        revalidate: 60,
-        tags: [`page:${slug}`],
+        revalidate: previewToken ? false : 60,
+        tags: previewToken ? undefined : [`page:${slug}`],
     });
 }
 

@@ -15,17 +15,18 @@ use App\Models\Page;
 use App\Models\PageBlock;
 use App\Models\PageSection;
 use App\Services\PageBuilderSyncService;
+use App\Services\PagePreviewService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Inertia\Response;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class PageBuilderController extends Controller
 {
     public function __construct(
-        private readonly PageBuilderSyncService $syncService
+        private readonly PageBuilderSyncService $syncService,
+        private readonly PagePreviewService $pagePreviewService,
     ) {}
 
     public function show(int $page)
@@ -75,33 +76,13 @@ class PageBuilderController extends Controller
         ]);
     }
 
-    public function preview(int $page): Response
+    public function previewUrl(Page $page): JsonResponse
     {
-        $pageModel = Page::with([
-            'sections' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
-            'sections.blocks' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
-        ])->findOrFail($page);
+        $token = $this->pagePreviewService->createToken($page, null, null, 30);
+        $frontendUrl = mb_rtrim(config('app.frontend_url', 'http://localhost:3000'), '/');
 
-        $sections = $pageModel->sections->map(fn (PageSection $section): array => [
-            'id' => $section->id,
-            'section_type' => $section->section_type,
-            'layout' => $section->layout,
-            'variant' => $section->variant,
-            'settings' => $section->settings,
-            'blocks' => $section->blocks->map(fn (PageBlock $block): array => [
-                'id' => $block->id,
-                'type' => $block->type->value,
-                'configuration' => $block->configuration,
-            ]),
-        ]);
-
-        return Inertia::render('admin/cms/pages/page-preview', [
-            'page' => [
-                'id' => $pageModel->id,
-                'title' => $pageModel->title,
-                'slug' => $pageModel->slug,
-            ],
-            'sections' => $sections,
+        return response()->json([
+            'url' => $frontendUrl.'/api/preview?token='.$token.'&slug='.urlencode($page->slug),
         ]);
     }
 

@@ -86,7 +86,6 @@ class SegmentEvaluationService
             'average_order_value' => $this->applyAvgOrderValueRule($query, $operator, $value),
             'last_order_date' => $this->applyLastOrderDateRule($query, $operator, $value),
             'customer_age_days' => $this->applyCustomerAgeRule($query, $operator, $value),
-            'has_tag' => $this->applyTagRule($query, $operator, $value),
             default => null,
         };
     }
@@ -142,11 +141,5 @@ class SegmentEvaluationService
         $days = (int) $value;
 
         $query->whereRaw('DATEDIFF(NOW(), created_at) '.$operator.' ?', [$days]);
-    }
-
-    protected function applyTagRule(Builder $query, string $operator, mixed $value): void
-    {
-        // Placeholder for future tag implementation
-        // TODO: Implement when customer tags are added
     }
 }
