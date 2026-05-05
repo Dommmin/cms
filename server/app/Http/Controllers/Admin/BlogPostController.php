@@ -72,7 +72,7 @@ class BlogPostController extends Controller
         $post = BlogPost::query()->create($data);
         $post->tags()->sync($this->resolveTagIds($request->input('tags', [])));
 
-        return to_route('admin.blog.posts.index')->with('success', 'Blog post created successfully');
+        return to_route('admin.blog.posts.index')->with('success', 'misc.blog_post_created');
     }
 
     public function edit(BlogPost $post): Response
@@ -118,14 +118,14 @@ class BlogPostController extends Controller
         $post->update($data);
         $post->tags()->sync($this->resolveTagIds($request->input('tags', [])));
 
-        return back()->with('success', 'Blog post updated successfully');
+        return back()->with('success', 'misc.blog_post_updated');
     }
 
     public function destroy(BlogPost $post): RedirectResponse
     {
         $post->delete();
 
-        return back()->with('success', 'Blog post deleted successfully');
+        return back()->with('success', 'misc.blog_post_deleted');
     }
 
     public function publish(BlogPost $post): RedirectResponse
@@ -135,21 +135,21 @@ class BlogPostController extends Controller
             'published_at' => $post->published_at ?? now(),
         ]);
 
-        return back()->with('success', 'Blog post published successfully');
+        return back()->with('success', 'misc.blog_post_published');
     }
 
     public function unpublish(BlogPost $post): RedirectResponse
     {
         $post->update(['status' => BlogPostStatusEnum::Draft]);
 
-        return back()->with('success', 'Blog post unpublished successfully');
+        return back()->with('success', 'misc.blog_post_unpublished');
     }
 
     public function toggleFeatured(BlogPost $post): RedirectResponse
     {
         $post->update(['is_featured' => ! $post->is_featured]);
 
-        $message = $post->is_featured ? 'Blog post marked as featured' : 'Blog post removed from featured';
+        $message = $post->is_featured ? 'misc.blog_post_featured' : 'misc.blog_post_unfeatured';
 
         return back()->with('success', $message);
     }

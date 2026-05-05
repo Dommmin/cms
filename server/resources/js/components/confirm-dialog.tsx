@@ -106,7 +106,7 @@ export function ConfirmButton({
     return (
         <>
             <Button
-                variant="outline"
+                variant={variant}
                 size={size}
                 disabled={disabled}
                 onClick={() => setOpen(true)}
@@ -122,7 +122,7 @@ export function ConfirmButton({
                 onConfirm={onConfirm}
                 confirmLabel={confirmLabel}
                 cancelLabel={cancelLabel}
-                variant={variant}
+                variant="destructive"
             />
         </>
     );

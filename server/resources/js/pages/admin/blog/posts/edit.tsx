@@ -121,10 +121,6 @@ export default function EditBlogPost({
         };
 
         router.post(BlogPostController.update.url(post.id), payload, {
-            onSuccess: () =>
-                toast.success(
-                    __('misc.post_updated', 'Post updated successfully'),
-                ),
             onError: (errs) => {
                 setErrors(errs);
                 toast.error(

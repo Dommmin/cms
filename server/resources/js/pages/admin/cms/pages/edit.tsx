@@ -1,11 +1,5 @@
 import { Form, Head, Link, router, usePage } from '@inertiajs/react';
-import {
-    ArrowLeftIcon,
-    EyeIcon,
-    GlobeIcon,
-    LayoutIcon,
-    PencilIcon,
-} from 'lucide-react';
+import { ArrowLeftIcon, EyeIcon, GlobeIcon, PencilIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import * as PageBuilderController from '@/actions/App/Http/Controllers/Admin/Cms/PageBuilderController';
 import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
@@ -49,7 +43,7 @@ export default function Edit({ page, modules, pages }: EditProps) {
     );
 
     const __ = useTranslation();
-    const [layout, setLayout] = useState<string>(page.layout ?? 'default');
+    const [layout] = useState<string>(page.layout ?? 'default');
     const [pageType, setPageType] = useState<string>(
         page.page_type ?? 'blocks',
     );
@@ -194,10 +188,6 @@ export default function Edit({ page, modules, pages }: EditProps) {
                             {page.is_published
                                 ? __('status.published', 'Published')
                                 : __('status.draft', 'Draft')}
-                        </Badge>
-                        <Badge variant="outline">
-                            <LayoutIcon className="mr-1 h-3 w-3" />
-                            {page.layout}
                         </Badge>
                         {page.locale ? (
                             <Badge
@@ -553,48 +543,6 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                             />
                                             <InputError
                                                 message={errors.excerpt}
-                                            />
-                                        </div>
-
-                                        <div className="grid gap-2">
-                                            <Label>
-                                                {__('label.layout', 'Layout')}
-                                            </Label>
-                                            <Select
-                                                value={layout}
-                                                onValueChange={setLayout}
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue
-                                                        placeholder={__(
-                                                            'placeholder.select_layout',
-                                                            'Select layout',
-                                                        )}
-                                                    />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="default">
-                                                        {__(
-                                                            'layout.standard',
-                                                            'Standard',
-                                                        )}
-                                                    </SelectItem>
-                                                    <SelectItem value="full_width">
-                                                        {__(
-                                                            'layout.full_width',
-                                                            'Full width',
-                                                        )}
-                                                    </SelectItem>
-                                                    <SelectItem value="sidebar">
-                                                        {__(
-                                                            'layout.sidebar',
-                                                            'Sidebar',
-                                                        )}
-                                                    </SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <InputError
-                                                message={errors.layout}
                                             />
                                         </div>
 

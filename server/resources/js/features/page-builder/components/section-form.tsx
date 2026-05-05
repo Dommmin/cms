@@ -75,7 +75,7 @@ export function SectionForm({
                 {/* Section Type */}
                 <div className="space-y-1.5">
                     <Label htmlFor="section-type">
-                        {__('builder.container_type', 'Container Type')}
+                        {__('builder.section_type', 'Section Type')}
                     </Label>
                     <Select
                         value={section.section_type || undefined}

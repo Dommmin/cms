@@ -1,7 +1,13 @@
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { PencilIcon, PlusIcon, StarIcon, TrashIcon } from 'lucide-react';
-import toast from 'react-hot-toast';
+import {
+    EyeOffIcon,
+    GlobeIcon,
+    PencilIcon,
+    PlusIcon,
+    StarIcon,
+    TrashIcon,
+} from 'lucide-react';
 import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
@@ -131,13 +137,10 @@ export default function BlogPostsIndex({
                                         row.original.id,
                                     ),
                                     {},
-                                    {
-                                        onSuccess: () =>
-                                            toast.success('Post published'),
-                                    },
                                 );
                             }}
                         >
+                            <GlobeIcon className="mr-1 h-3 w-3" />
                             {__('action.publish', 'Publish')}
                         </Button>
                     ) : (
@@ -150,13 +153,10 @@ export default function BlogPostsIndex({
                                         row.original.id,
                                     ),
                                     {},
-                                    {
-                                        onSuccess: () =>
-                                            toast.success('Post unpublished'),
-                                    },
                                 );
                             }}
                         >
+                            <EyeOffIcon className="mr-1 h-3 w-3" />
                             {__('action.unpublish', 'Unpublish')}
                         </Button>
                     )}
@@ -168,10 +168,6 @@ export default function BlogPostsIndex({
                         onConfirm={() => {
                             router.delete(
                                 BlogPostController.destroy.url(row.original.id),
-                                {
-                                    onSuccess: () =>
-                                        toast.success('Post deleted'),
-                                },
                             );
                         }}
                     >

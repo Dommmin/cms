@@ -39,7 +39,7 @@ export default function Create({ modules, pages }: CreateProps) {
         [modules],
     );
 
-    const [layout, setLayout] = useState<string>('default');
+    const [layout] = useState<string>('default');
     const [pageType, setPageType] = useState<string>('blocks');
     const [moduleName, setModuleName] = useState<string | null>(null);
     const [locale, setLocale] = useState<string>('global');
@@ -272,32 +272,6 @@ export default function Create({ modules, pages }: CreateProps) {
                                             placeholder="Short description..."
                                         />
                                         <InputError message={errors.excerpt} />
-                                    </div>
-
-                                    <div className="grid gap-2">
-                                        <Label>
-                                            {__('label.layout', 'Layout')}
-                                        </Label>
-                                        <Select
-                                            value={layout}
-                                            onValueChange={setLayout}
-                                        >
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select layout" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="default">
-                                                    Standard
-                                                </SelectItem>
-                                                <SelectItem value="full_width">
-                                                    Full width
-                                                </SelectItem>
-                                                <SelectItem value="sidebar">
-                                                    Sidebar
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <InputError message={errors.layout} />
                                     </div>
 
                                     <div className="grid gap-2">

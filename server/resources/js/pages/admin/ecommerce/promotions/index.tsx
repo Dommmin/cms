@@ -1,5 +1,12 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Edit, Plus, Power, PowerOff, Search, Trash2 } from 'lucide-react';
+import {
+    PencilIcon,
+    Plus,
+    Power,
+    PowerOff,
+    Search,
+    Trash2,
+} from 'lucide-react';
 import * as PromotionController from '@/actions/App/Http/Controllers/Admin/Ecommerce/PromotionController';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -344,7 +351,7 @@ export default function Index({
                                                             prefetch
                                                             cacheFor={30}
                                                         >
-                                                            <Edit className="h-4 w-4" />
+                                                            <PencilIcon className="h-4 w-4" />
                                                         </Link>
                                                     </Button>
                                                     <Button
