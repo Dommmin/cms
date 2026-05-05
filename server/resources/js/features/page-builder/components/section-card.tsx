@@ -16,6 +16,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
 import type { SectionCardProps } from './section-card.types';
 
@@ -28,10 +29,11 @@ export function SectionCard({
     onDelete,
     children,
 }: SectionCardProps) {
+    const __ = useTranslation();
     const sectionLabel =
         (availableSections?.[section.section_type]?.label ??
             section.section_type) ||
-        'Untitled Section';
+        __('builder.untitled_section', 'Untitled Section');
     const {
         attributes,
         listeners,
@@ -86,14 +88,16 @@ export function SectionCard({
                         <h3 className="font-medium">{sectionLabel}</h3>
                         {section.layout && section.layout !== 'default' && (
                             <p className="text-sm text-muted-foreground">
-                                Layout: {section.layout}
+                                {__('builder.layout', 'Layout')}:{' '}
+                                {section.layout}
                             </p>
                         )}
                     </div>
 
                     {/* Block Count Badge */}
                     <Badge variant="secondary">
-                        {section.blocks?.length ?? 0} blocks
+                        {section.blocks?.length ?? 0}{' '}
+                        {__('builder.blocks', 'blocks')}
                     </Badge>
 
                     {/* Delete Button */}

@@ -19,6 +19,7 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useEffect, useState } from 'react';
+import { useTranslation } from '@/hooks/use-translation';
 import { useBuilderState } from '../hooks/use-builder-state';
 import { BuilderToolbar } from './builder-toolbar';
 import type { PageBuilderProps } from './page-builder.types';
@@ -43,6 +44,7 @@ export function PageBuilder({
     onApprove,
     onReject,
 }: PageBuilderProps) {
+    const __ = useTranslation();
     const {
         sections,
         expandedSections,
@@ -156,23 +158,26 @@ export function PageBuilder({
                 {sections.length === 0 ? (
                     <div className="rounded-lg border border-dashed bg-background p-16 text-center">
                         <h3 className="mb-2 text-lg font-semibold">
-                            No sections yet
+                            {__('builder.no_sections_yet', 'No sections yet')}
                         </h3>
                         <p className="mb-6 text-sm text-muted-foreground">
-                            Get started by adding a section or choose a template
+                            {__(
+                                'builder.no_sections_hint',
+                                'Get started by adding a section or choose a template',
+                            )}
                         </p>
                         <div className="flex items-center justify-center gap-3">
                             <button
                                 onClick={() => addSection(firstSectionType)}
                                 className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                             >
-                                Add Section
+                                {__('builder.add_section', 'Add Section')}
                             </button>
                             <button
                                 onClick={() => setTemplatesOpen(true)}
                                 className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent"
                             >
-                                From Template
+                                {__('builder.from_template', 'From Template')}
                             </button>
                         </div>
                     </div>

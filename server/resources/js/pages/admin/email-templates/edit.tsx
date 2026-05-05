@@ -16,11 +16,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { EditProps } from './edit.types';
 
 export default function EmailTemplatesEdit({ template }: EditProps) {
+    const __ = useTranslation();
     const [showPreview, setShowPreview] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -35,13 +37,16 @@ export default function EmailTemplatesEdit({ template }: EditProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Edit: ${template.name}`} />
+            <Head title={`${__('action.edit', 'Edit')}: ${template.name}`} />
             <Wrapper>
                 <PageHeader
                     title={template.name}
                     description={
                         template.description ??
-                        'Edit the email template content and subject.'
+                        __(
+                            'email_template.edit_description',
+                            'Edit the email template content and subject.',
+                        )
                     }
                 >
                     <PageHeaderActions>
@@ -52,7 +57,10 @@ export default function EmailTemplatesEdit({ template }: EditProps) {
                                 cacheFor={30}
                             >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                Back to Templates
+                                {__(
+                                    'email_template.back_to_templates',
+                                    'Back to Templates',
+                                )}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -65,7 +73,9 @@ export default function EmailTemplatesEdit({ template }: EditProps) {
                     <Badge
                         variant={template.is_active ? 'default' : 'secondary'}
                     >
-                        {template.is_active ? 'Active' : 'Inactive'}
+                        {template.is_active
+                            ? __('status.active', 'Active')
+                            : __('status.inactive', 'Inactive')}
                     </Badge>
                 </div>
 
@@ -88,14 +98,21 @@ export default function EmailTemplatesEdit({ template }: EditProps) {
 
                                     <div className="grid gap-2">
                                         <Label htmlFor="subject">
-                                            Subject *
+                                            {__(
+                                                'email_template.field_subject',
+                                                'Subject',
+                                            )}{' '}
+                                            *
                                         </Label>
                                         <Input
                                             id="subject"
                                             name="subject"
                                             required
                                             defaultValue={template.subject}
-                                            placeholder="Email subject line"
+                                            placeholder={__(
+                                                'email_template.subject_placeholder',
+                                                'Email subject line',
+                                            )}
                                         />
                                         <InputError message={errors.subject} />
                                     </div>
@@ -103,7 +120,11 @@ export default function EmailTemplatesEdit({ template }: EditProps) {
                                     <div className="grid gap-2">
                                         <div className="flex items-center justify-between">
                                             <Label htmlFor="body">
-                                                Body (HTML) *
+                                                {__(
+                                                    'email_template.field_body',
+                                                    'Body (HTML)',
+                                                )}{' '}
+                                                *
                                             </Label>
                                             <Button
                                                 type="button"
@@ -116,12 +137,18 @@ export default function EmailTemplatesEdit({ template }: EditProps) {
                                                 {showPreview ? (
                                                     <>
                                                         <EyeOffIcon className="mr-1 h-4 w-4" />
-                                                        Hide Preview
+                                                        {__(
+                                                            'email_template.hide_preview',
+                                                            'Hide Preview',
+                                                        )}
                                                     </>
                                                 ) : (
                                                     <>
                                                         <EyeIcon className="mr-1 h-4 w-4" />
-                                                        Preview
+                                                        {__(
+                                                            'email_template.preview',
+                                                            'Preview',
+                                                        )}
                                                     </>
                                                 )}
                                             </Button>
@@ -131,7 +158,10 @@ export default function EmailTemplatesEdit({ template }: EditProps) {
                                             name="body"
                                             required
                                             defaultValue={template.body}
-                                            placeholder="Enter HTML content..."
+                                            placeholder={__(
+                                                'email_template.body_placeholder',
+                                                'Enter HTML content...',
+                                            )}
                                             rows={20}
                                             className="font-mono text-sm"
                                         />
@@ -141,8 +171,10 @@ export default function EmailTemplatesEdit({ template }: EditProps) {
                                     {showPreview && (
                                         <div className="rounded-lg border bg-white p-4">
                                             <p className="mb-2 text-xs font-medium text-muted-foreground">
-                                                HTML Preview (uses saved
-                                                content)
+                                                {__(
+                                                    'email_template.preview_label',
+                                                    'HTML Preview (uses saved content)',
+                                                )}
                                             </p>
                                             <div
                                                 className="prose max-w-none"
@@ -171,15 +203,20 @@ export default function EmailTemplatesEdit({ template }: EditProps) {
                                             htmlFor="is_active"
                                             className="font-normal"
                                         >
-                                            Active (template is used when
-                                            sending emails)
+                                            {__(
+                                                'email_template.active_label',
+                                                'Active (template is used when sending emails)',
+                                            )}
                                         </Label>
                                     </div>
 
                                     <StickyFormActions
                                         formId={formId}
                                         processing={processing}
-                                        submitLabel="Save Changes"
+                                        submitLabel={__(
+                                            'action.save_changes',
+                                            'Save Changes',
+                                        )}
                                     />
                                 </>
                             )}
@@ -191,11 +228,16 @@ export default function EmailTemplatesEdit({ template }: EditProps) {
                             template.variables.length > 0 && (
                                 <div className="rounded-lg border p-4">
                                     <h3 className="mb-3 text-sm font-semibold">
-                                        Available Variables
+                                        {__(
+                                            'email_template.available_variables',
+                                            'Available Variables',
+                                        )}
                                     </h3>
                                     <p className="mb-3 text-xs text-muted-foreground">
-                                        Click a variable to copy it to your
-                                        clipboard.
+                                        {__(
+                                            'email_template.variables_hint',
+                                            'Click a variable to copy it to your clipboard.',
+                                        )}
                                     </p>
                                     <div className="flex flex-wrap gap-2">
                                         {template.variables.map((variable) => (
@@ -219,23 +261,33 @@ export default function EmailTemplatesEdit({ template }: EditProps) {
                             )}
 
                         <div className="rounded-lg border p-4">
-                            <h3 className="mb-2 text-sm font-semibold">Tips</h3>
+                            <h3 className="mb-2 text-sm font-semibold">
+                                {__('email_template.tips_title', 'Tips')}
+                            </h3>
                             <ul className="space-y-1 text-xs text-muted-foreground">
                                 <li>
-                                    Use variables in both the subject line and
-                                    body.
+                                    {__(
+                                        'email_template.tip_variables',
+                                        'Use variables in both the subject line and body.',
+                                    )}
                                 </li>
                                 <li>
-                                    Variables are replaced with real values when
-                                    the email is sent.
+                                    {__(
+                                        'email_template.tip_replacement',
+                                        'Variables are replaced with real values when the email is sent.',
+                                    )}
                                 </li>
                                 <li>
-                                    The body must be valid HTML for proper email
-                                    rendering.
+                                    {__(
+                                        'email_template.tip_html',
+                                        'The body must be valid HTML for proper email rendering.',
+                                    )}
                                 </li>
                                 <li>
-                                    Inline CSS is recommended for best email
-                                    client compatibility.
+                                    {__(
+                                        'email_template.tip_css',
+                                        'Inline CSS is recommended for best email client compatibility.',
+                                    )}
                                 </li>
                             </ul>
                         </div>

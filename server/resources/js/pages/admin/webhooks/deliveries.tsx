@@ -7,6 +7,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { DeliveriesProps, WebhookDelivery } from './deliveries.types';
@@ -24,6 +25,7 @@ export default function WebhookDeliveries({
     webhook,
     deliveries,
 }: DeliveriesProps) {
+    const __ = useTranslation();
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Webhooks', href: WebhookController.index.url() },
         { title: webhook.name, href: WebhookController.edit.url(webhook.id) },
@@ -33,7 +35,7 @@ export default function WebhookDeliveries({
     const columns: ColumnDef<WebhookDelivery>[] = [
         {
             accessorKey: 'event',
-            header: 'Event',
+            header: __('webhook.event', 'Event'),
             cell: ({ row }) => (
                 <Badge variant="outline" className="font-mono text-xs">
                     {row.original.event}
@@ -42,12 +44,12 @@ export default function WebhookDeliveries({
         },
         {
             accessorKey: 'status',
-            header: 'Status',
+            header: __('table.status', 'Status'),
             cell: ({ row }) => <StatusBadge status={row.original.status} />,
         },
         {
             accessorKey: 'attempt',
-            header: 'Attempt',
+            header: __('webhook.attempt', 'Attempt'),
             cell: ({ row }) => (
                 <span className="text-sm text-muted-foreground">
                     #{row.original.attempt}
@@ -56,7 +58,7 @@ export default function WebhookDeliveries({
         },
         {
             accessorKey: 'response_status',
-            header: 'Response',
+            header: __('webhook.response', 'Response'),
             cell: ({ row }) =>
                 row.original.response_status ? (
                     <Badge
@@ -75,7 +77,7 @@ export default function WebhookDeliveries({
         },
         {
             accessorKey: 'duration_ms',
-            header: 'Duration',
+            header: __('webhook.duration', 'Duration'),
             cell: ({ row }) =>
                 row.original.duration_ms != null ? (
                     <span className="text-sm text-muted-foreground">
@@ -87,7 +89,7 @@ export default function WebhookDeliveries({
         },
         {
             accessorKey: 'delivered_at',
-            header: 'Delivered At',
+            header: __('webhook.delivered_at', 'Delivered At'),
             cell: ({ row }) =>
                 row.original.delivered_at ? (
                     <span className="text-xs text-muted-foreground">
@@ -99,7 +101,7 @@ export default function WebhookDeliveries({
         },
         {
             accessorKey: 'created_at',
-            header: 'Created',
+            header: __('table.created_at', 'Created'),
             cell: ({ row }) => (
                 <span className="text-xs text-muted-foreground">
                     {new Date(row.original.created_at).toLocaleString()}
@@ -110,17 +112,22 @@ export default function WebhookDeliveries({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Deliveries — ${webhook.name}`} />
+            <Head
+                title={`${__('webhook.deliveries', 'Deliveries')} — ${webhook.name}`}
+            />
             <Wrapper>
                 <PageHeader
-                    title={`Deliveries: ${webhook.name}`}
-                    description={`Showing ${deliveries.total} delivery records for this webhook.`}
+                    title={`${__('webhook.deliveries', 'Deliveries')}: ${webhook.name}`}
+                    description={`${__('webhook.deliveries_count', 'Showing')} ${deliveries.total} ${__('webhook.deliveries_suffix', 'delivery records for this webhook.')}`}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link href={WebhookController.index.url()}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                Back to Webhooks
+                                {__(
+                                    'webhook.back_to_webhooks',
+                                    'Back to Webhooks',
+                                )}
                             </Link>
                         </Button>
                     </PageHeaderActions>

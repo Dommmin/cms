@@ -11,6 +11,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { useTranslation } from '@/hooks/use-translation';
 import type { Block } from '../types';
 import type {
     SectionTemplate,
@@ -620,17 +621,20 @@ export function SectionTemplatesDialog({
     onClose,
     onInsert,
 }: SectionTemplatesDialogProps) {
+    const __ = useTranslation();
     return (
         <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
             <DialogContent className="flex max-h-[80vh] max-w-3xl flex-col gap-0 p-0">
                 <DialogHeader className="border-b px-6 pt-6 pb-4">
                     <DialogTitle className="flex items-center gap-2">
                         <LayoutTemplate className="h-5 w-5" />
-                        Section Templates
+                        {__('builder.section_templates', 'Section Templates')}
                     </DialogTitle>
                     <DialogDescription>
-                        Insert a pre-built section combo to get started quickly.
-                        You can edit all content after inserting.
+                        {__(
+                            'builder.section_templates_hint',
+                            'Insert a pre-built section combo to get started quickly. You can edit all content after inserting.',
+                        )}
                     </DialogDescription>
                 </DialogHeader>
 

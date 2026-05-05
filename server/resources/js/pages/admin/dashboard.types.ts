@@ -11,7 +11,15 @@ export interface WidgetShell {
     order: number;
     config: Record<string, unknown> | null;
 }
+
+export interface OnboardingStep {
+    key: string;
+    done: boolean;
+    url: string;
+}
+
 export interface DashboardProps {
     widgetShells: WidgetShell[];
+    onboarding: OnboardingStep[];
     widgets: Widget[] | undefined; // deferred — undefined until loaded
 }

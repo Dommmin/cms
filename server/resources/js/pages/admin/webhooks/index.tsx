@@ -15,6 +15,7 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { IndexProps, Webhook } from './index.types';
@@ -40,14 +41,23 @@ function StatusBadge({
 }
 
 export default function WebhooksIndex({ webhooks }: IndexProps) {
+    const __ = useTranslation();
+
     const handleTest = (webhook: Webhook) => {
         router.post(
             WebhookController.test.url(webhook.id),
             {},
             {
                 preserveScroll: true,
-                onSuccess: () => toast.success('Test webhook sent'),
-                onError: () => toast.error('Failed to send test webhook'),
+                onSuccess: () =>
+                    toast.success(__('webhook.test_sent', 'Test webhook sent')),
+                onError: () =>
+                    toast.error(
+                        __(
+                            'webhook.test_failed',
+                            'Failed to send test webhook',
+                        ),
+                    ),
             },
         );
     };
@@ -55,7 +65,7 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
     const columns: ColumnDef<Webhook>[] = [
         {
             accessorKey: 'name',
-            header: 'Name',
+            header: __('table.name', 'Name'),
             cell: ({ row }) => (
                 <div>
                     <p className="font-medium">{row.original.name}</p>
@@ -69,7 +79,7 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
         },
         {
             accessorKey: 'url',
-            header: 'URL',
+            header: __('table.url', 'URL'),
             cell: ({ row }) => (
                 <span
                     className="max-w-[200px] truncate font-mono text-sm text-muted-foreground"
@@ -81,7 +91,7 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
         },
         {
             accessorKey: 'events',
-            header: 'Events',
+            header: __('webhook.events', 'Events'),
             cell: ({ row }) => (
                 <div className="flex flex-wrap gap-1">
                     {row.original.events.slice(0, 3).map((event) => (
@@ -103,18 +113,20 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
         },
         {
             accessorKey: 'is_active',
-            header: 'Active',
+            header: __('webhook.active', 'Active'),
             cell: ({ row }) => (
                 <Badge
                     variant={row.original.is_active ? 'default' : 'secondary'}
                 >
-                    {row.original.is_active ? 'Active' : 'Inactive'}
+                    {row.original.is_active
+                        ? __('status.active', 'Active')
+                        : __('status.inactive', 'Inactive')}
                 </Badge>
             ),
         },
         {
             accessorKey: 'last_triggered_at',
-            header: 'Last Triggered',
+            header: __('webhook.last_triggered', 'Last Triggered'),
             cell: ({ row }) =>
                 row.original.last_triggered_at ? (
                     <span className="text-xs text-muted-foreground">
@@ -123,12 +135,14 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
                         ).toLocaleString()}
                     </span>
                 ) : (
-                    <span className="text-xs text-muted-foreground">Never</span>
+                    <span className="text-xs text-muted-foreground">
+                        {__('webhook.never', 'Never')}
+                    </span>
                 ),
         },
         {
             accessorKey: 'failure_count',
-            header: 'Failures',
+            header: __('webhook.failures', 'Failures'),
             cell: ({ row }) =>
                 row.original.failure_count > 0 ? (
                     <Badge variant="destructive">
@@ -140,14 +154,14 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
         },
         {
             accessorKey: 'last_delivery_status',
-            header: 'Last Delivery',
+            header: __('webhook.last_delivery', 'Last Delivery'),
             cell: ({ row }) => (
                 <StatusBadge status={row.original.last_delivery_status} />
             ),
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('table.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="sm">
@@ -155,7 +169,7 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
                             href={WebhookController.edit.url(row.original.id)}
                         >
                             <PencilIcon className="mr-1 h-3 w-3" />
-                            Edit
+                            {__('action.edit', 'Edit')}
                         </Link>
                     </Button>
                     <Button asChild variant="outline" size="sm">
@@ -165,7 +179,7 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
                             )}
                         >
                             <ActivityIcon className="mr-1 h-3 w-3" />
-                            Deliveries
+                            {__('webhook.deliveries', 'Deliveries')}
                         </Link>
                     </Button>
                     <Button
@@ -174,25 +188,33 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
                         onClick={() => handleTest(row.original)}
                     >
                         <FlaskConicalIcon className="mr-1 h-3 w-3" />
-                        Test
+                        {__('webhook.test', 'Test')}
                     </Button>
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Webhook"
-                        description="Are you sure you want to delete this webhook? This action cannot be undone."
+                        title={__('webhook.delete_title', 'Delete Webhook')}
+                        description={__(
+                            'webhook.delete_description',
+                            'Are you sure you want to delete this webhook? This action cannot be undone.',
+                        )}
                         onConfirm={() =>
                             router.delete(
                                 WebhookController.destroy.url(row.original.id),
                                 {
                                     onSuccess: () =>
-                                        toast.success('Webhook deleted'),
+                                        toast.success(
+                                            __(
+                                                'webhook.deleted',
+                                                'Webhook deleted',
+                                            ),
+                                        ),
                                 },
                             )
                         }
                     >
                         <TrashIcon className="mr-1 h-3 w-3" />
-                        Delete
+                        {__('action.delete', 'Delete')}
                     </ConfirmButton>
                 </div>
             ),
@@ -201,17 +223,20 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Webhooks" />
+            <Head title={__('webhook.page_title', 'Webhooks')} />
             <Wrapper>
                 <PageHeader
-                    title="Outgoing Webhooks"
-                    description="Manage webhooks that notify external systems about events."
+                    title={__('webhook.heading', 'Outgoing Webhooks')}
+                    description={__(
+                        'webhook.description',
+                        'Manage webhooks that notify external systems about events.',
+                    )}
                 >
                     <PageHeaderActions>
                         <Button asChild>
                             <Link href={WebhookController.create.url()}>
                                 <PlusIcon className="mr-2 h-4 w-4" />
-                                New Webhook
+                                {__('webhook.new', 'New Webhook')}
                             </Link>
                         </Button>
                     </PageHeaderActions>

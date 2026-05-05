@@ -19,6 +19,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BlockTypeConfig } from '../types';
 import type { BlockFormProps } from './block-form.types';
 import { DynamicBlockForm } from './dynamic-block-form';
@@ -29,6 +30,7 @@ export function BlockForm({
     onUpdate,
     onUnlinkReusable,
 }: BlockFormProps) {
+    const __ = useTranslation();
     const currentBlockConfig = availableBlockTypes[block.type];
     const isLinkedGlobal = !!block.reusable_block_id;
 
@@ -40,10 +42,13 @@ export function BlockForm({
                     <LockIcon className="h-4 w-4 shrink-0 text-amber-600" />
                     <div className="flex-1 text-sm">
                         <span className="font-medium text-amber-700 dark:text-amber-300">
-                            Block Locked
+                            {__('builder.block_locked', 'Block Locked')}
                         </span>
                         <p className="text-xs text-amber-600">
-                            This block is protected from editing.
+                            {__(
+                                'builder.block_locked_hint',
+                                'This block is protected from editing.',
+                            )}
                         </p>
                     </div>
                     <button
@@ -58,7 +63,7 @@ export function BlockForm({
                         }
                         className="text-xs text-amber-600 underline hover:text-amber-800"
                     >
-                        Unlock
+                        {__('builder.unlock', 'Unlock')}
                     </button>
                 </div>
             </div>
@@ -83,7 +88,7 @@ export function BlockForm({
                     <Globe2Icon className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
                     <div className="flex-1 text-sm">
                         <span className="font-medium text-blue-700 dark:text-blue-300">
-                            Global Block
+                            {__('builder.global_block', 'Global Block')}
                         </span>
                         {block.reusable_block_name && (
                             <span className="ml-1 text-blue-600 dark:text-blue-400">
@@ -91,7 +96,10 @@ export function BlockForm({
                             </span>
                         )}
                         <p className="text-xs text-blue-500 dark:text-blue-400">
-                            Changes propagate to all pages using this block.
+                            {__(
+                                'builder.global_block_propagate_hint',
+                                'Changes propagate to all pages using this block.',
+                            )}
                         </p>
                     </div>
                     {onUnlinkReusable && (
@@ -99,10 +107,13 @@ export function BlockForm({
                             type="button"
                             onClick={onUnlinkReusable}
                             className="flex items-center gap-1 rounded text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400"
-                            title="Unlink from global block (creates a local copy)"
+                            title={__(
+                                'builder.unlink_hint',
+                                'Unlink from global block (creates a local copy)',
+                            )}
                         >
                             <UnlinkIcon className="h-3 w-3" />
-                            Unlink
+                            {__('builder.unlink', 'Unlink')}
                         </button>
                     )}
                 </div>
@@ -110,7 +121,9 @@ export function BlockForm({
 
             {/* Block type selector */}
             <div className="space-y-1.5">
-                <Label htmlFor="block-type">Block Type</Label>
+                <Label htmlFor="block-type">
+                    {__('builder.block_type', 'Block Type')}
+                </Label>
                 <Select
                     value={block.type}
                     onValueChange={(value) =>
@@ -119,7 +132,12 @@ export function BlockForm({
                     disabled={isLinkedGlobal}
                 >
                     <SelectTrigger id="block-type">
-                        <SelectValue placeholder="Select block type…" />
+                        <SelectValue
+                            placeholder={__(
+                                'builder.select_block_type',
+                                'Select block type…',
+                            )}
+                        />
                     </SelectTrigger>
                     <SelectContent>
                         {Object.entries(grouped).map(([category, entries]) => (
@@ -146,9 +164,14 @@ export function BlockForm({
             {/* Active status */}
             <div className="flex items-center justify-between rounded-lg border p-3">
                 <div>
-                    <p className="text-sm font-medium">Visible</p>
+                    <p className="text-sm font-medium">
+                        {__('builder.visible', 'Visible')}
+                    </p>
                     <p className="text-xs text-muted-foreground">
-                        Show this block on the page
+                        {__(
+                            'builder.visible_hint',
+                            'Show this block on the page',
+                        )}
                     </p>
                 </div>
                 <Switch
@@ -173,24 +196,29 @@ export function BlockForm({
 
             {!block.type && (
                 <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-                    Select a block type above to configure its content.
+                    {__(
+                        'builder.select_block_type_hint',
+                        'Select a block type above to configure its content.',
+                    )}
                 </div>
             )}
 
             {/* Advanced: Custom CSS / Classes / ID */}
             <details className="group rounded-lg border">
                 <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium select-none">
-                    <span>Advanced</span>
+                    <span>{__('builder.advanced', 'Advanced')}</span>
                     <ChevronDownIcon className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180" />
                 </summary>
                 <div className="space-y-3 border-t px-4 py-3">
                     {/* Animation */}
                     <div className="space-y-3 border-b pb-3">
                         <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                            Animation
+                            {__('builder.animation', 'Animation')}
                         </p>
                         <div className="space-y-1.5">
-                            <Label>Animation Type</Label>
+                            <Label>
+                                {__('builder.animation_type', 'Animation Type')}
+                            </Label>
                             <Select
                                 value={
                                     ((
@@ -221,12 +249,45 @@ export function BlockForm({
                                 <SelectContent>
                                     {(
                                         [
-                                            ['none', 'None'],
-                                            ['fade-in', 'Fade In'],
-                                            ['slide-up', 'Slide Up'],
-                                            ['slide-left', 'Slide Left'],
-                                            ['slide-right', 'Slide Right'],
-                                            ['scale-in', 'Scale In'],
+                                            [
+                                                'none',
+                                                __('builder.none', 'None'),
+                                            ],
+                                            [
+                                                'fade-in',
+                                                __(
+                                                    'builder.fade_in',
+                                                    'Fade In',
+                                                ),
+                                            ],
+                                            [
+                                                'slide-up',
+                                                __(
+                                                    'builder.slide_up',
+                                                    'Slide Up',
+                                                ),
+                                            ],
+                                            [
+                                                'slide-left',
+                                                __(
+                                                    'builder.slide_left',
+                                                    'Slide Left',
+                                                ),
+                                            ],
+                                            [
+                                                'slide-right',
+                                                __(
+                                                    'builder.slide_right',
+                                                    'Slide Right',
+                                                ),
+                                            ],
+                                            [
+                                                'scale-in',
+                                                __(
+                                                    'builder.scale_in',
+                                                    'Scale In',
+                                                ),
+                                            ],
                                         ] as [string, string][]
                                     ).map(([v, l]) => (
                                         <SelectItem key={v} value={v}>
@@ -245,7 +306,9 @@ export function BlockForm({
                             <>
                                 <div className="grid grid-cols-2 gap-2">
                                     <div className="space-y-1.5">
-                                        <Label>Duration</Label>
+                                        <Label>
+                                            {__('builder.duration', 'Duration')}
+                                        </Label>
                                         <Select
                                             value={
                                                 ((
@@ -277,19 +340,30 @@ export function BlockForm({
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="fast">
-                                                    Fast (200ms)
+                                                    {__(
+                                                        'builder.fast',
+                                                        'Fast (200ms)',
+                                                    )}
                                                 </SelectItem>
                                                 <SelectItem value="normal">
-                                                    Normal (500ms)
+                                                    {__(
+                                                        'builder.normal',
+                                                        'Normal (500ms)',
+                                                    )}
                                                 </SelectItem>
                                                 <SelectItem value="slow">
-                                                    Slow (800ms)
+                                                    {__(
+                                                        'builder.slow',
+                                                        'Slow (800ms)',
+                                                    )}
                                                 </SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>
                                     <div className="space-y-1.5">
-                                        <Label>Trigger</Label>
+                                        <Label>
+                                            {__('builder.trigger', 'Trigger')}
+                                        </Label>
                                         <Select
                                             value={
                                                 ((
@@ -321,17 +395,25 @@ export function BlockForm({
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="on-scroll">
-                                                    On Scroll
+                                                    {__(
+                                                        'builder.on_scroll',
+                                                        'On Scroll',
+                                                    )}
                                                 </SelectItem>
                                                 <SelectItem value="on-load">
-                                                    On Load
+                                                    {__(
+                                                        'builder.on_load',
+                                                        'On Load',
+                                                    )}
                                                 </SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <Label>Delay (ms)</Label>
+                                    <Label>
+                                        {__('builder.delay_ms', 'Delay (ms)')}
+                                    </Label>
                                     <input
                                         type="number"
                                         min={0}
@@ -370,13 +452,19 @@ export function BlockForm({
 
                     <div className="space-y-1.5">
                         <Label htmlFor="custom-classes">
-                            Custom CSS Classes
+                            {__(
+                                'builder.custom_css_classes',
+                                'Custom CSS Classes',
+                            )}
                         </Label>
                         <input
                             id="custom-classes"
                             type="text"
                             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
-                            placeholder="my-class another-class"
+                            placeholder={__(
+                                'builder.custom_css_classes_placeholder',
+                                'my-class another-class',
+                            )}
                             value={
                                 (block.configuration
                                     ._custom_classes as string) ?? ''
@@ -392,12 +480,20 @@ export function BlockForm({
                         />
                     </div>
                     <div className="space-y-1.5">
-                        <Label htmlFor="custom-id">Custom Element ID</Label>
+                        <Label htmlFor="custom-id">
+                            {__(
+                                'builder.custom_element_id',
+                                'Custom Element ID',
+                            )}
+                        </Label>
                         <input
                             id="custom-id"
                             type="text"
                             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
-                            placeholder="hero-section"
+                            placeholder={__(
+                                'builder.custom_element_id_placeholder',
+                                'hero-section',
+                            )}
                             value={
                                 (block.configuration._custom_id as string) ?? ''
                             }
@@ -412,7 +508,9 @@ export function BlockForm({
                         />
                     </div>
                     <div className="space-y-1.5">
-                        <Label htmlFor="custom-css">Custom CSS</Label>
+                        <Label htmlFor="custom-css">
+                            {__('builder.custom_css', 'Custom CSS')}
+                        </Label>
                         <textarea
                             id="custom-css"
                             className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 font-mono text-xs shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
@@ -433,8 +531,10 @@ export function BlockForm({
                             }
                         />
                         <p className="text-xs text-muted-foreground">
-                            CSS is scoped to this block. Avoid &lt;script&gt; or
-                            external URLs.
+                            {__(
+                                'builder.custom_css_hint',
+                                'CSS is scoped to this block. Avoid <script> or external URLs.',
+                            )}
                         </p>
                     </div>
 
@@ -443,10 +543,13 @@ export function BlockForm({
                         <div>
                             <p className="flex items-center gap-1.5 text-sm font-medium">
                                 <LockIcon className="h-3.5 w-3.5" />
-                                Lock Block
+                                {__('builder.lock_block', 'Lock Block')}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                                Prevent editing, moving, and deleting
+                                {__(
+                                    'builder.lock_block_hint',
+                                    'Prevent editing, moving, and deleting',
+                                )}
                             </p>
                         </div>
                         <Switch

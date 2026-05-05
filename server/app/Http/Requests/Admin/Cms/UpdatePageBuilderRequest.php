@@ -4,43 +4,56 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\Cms;
 
+use App\Enums\PageBlockTypeEnum;
+use App\Models\Page;
+use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdatePageBuilderRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return true;
+        $page = Page::query()->find($this->route('page'));
+
+        if (! $page) {
+            return false;
+        }
+
+        return $this->user()?->can('update', $page) ?? false;
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
-        if ($this->has('snapshot')) {
-            return [
-                'snapshot' => ['required', 'array'],
-                'snapshot.sections' => ['sometimes', 'array'],
-                'snapshot.sections.*.section_type' => ['required', 'string'],
-                'snapshot.sections.*.blocks' => ['sometimes', 'array'],
-                'snapshot.sections.*.blocks.*.type' => ['required', 'string'],
-                'snapshot.sections.*.blocks.*.configuration' => ['sometimes', 'array'],
-            ];
-        }
+        $sectionTypes = array_keys((array) config('cms.sections', []));
+        $blockTypes = array_column(PageBlockTypeEnum::cases(), 'value');
+        $configRule = $this->configurationSizeRule();
 
         return [
-            'sections' => ['required', 'array'],
-            'sections.*.section_type' => ['required', 'string'],
-            'sections.*.blocks' => ['sometimes', 'array'],
-            'sections.*.blocks.*.type' => ['required', 'string'],
-            'sections.*.blocks.*.configuration' => ['sometimes', 'array'],
+            'snapshot' => ['required', 'array'],
+            'snapshot.sections' => ['sometimes', 'array'],
+            'snapshot.sections.*.section_type' => ['required', 'string', Rule::in($sectionTypes)],
+            'snapshot.sections.*.blocks' => ['sometimes', 'array'],
+            'snapshot.sections.*.blocks.*.type' => ['required', 'string', Rule::in($blockTypes)],
+            'snapshot.sections.*.blocks.*.configuration' => ['sometimes', 'nullable', 'array', $configRule],
         ];
+    }
+
+    private function configurationSizeRule(): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail): void {
+            if (! is_array($value)) {
+                return;
+            }
+
+            $encoded = json_encode($value);
+            if ($encoded === false || mb_strlen($encoded) > 65536) {
+                $fail(sprintf('The %s must not exceed 64KB.', $attribute));
+            }
+        };
     }
 }

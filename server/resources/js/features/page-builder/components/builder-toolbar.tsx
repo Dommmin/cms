@@ -52,6 +52,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BuilderToolbarProps } from './builder-toolbar.types';
 
 // ── Auto-save indicator ────────────────────────────────────────────────────
@@ -73,6 +74,7 @@ function AutoSaveIndicator({
     hasUnsavedChanges: boolean;
     lastSavedAt: Date | null;
 }) {
+    const __ = useTranslation();
     // Tick every 30s to recompute the "X min ago" label without storing derived state
     const [, setTick] = useState(0);
     useEffect(() => {
@@ -87,7 +89,7 @@ function AutoSaveIndicator({
         return (
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Loader2 className="h-3 w-3 animate-spin" />
-                <span>Saving...</span>
+                <span>{__('builder.saving', 'Saving...')}</span>
             </div>
         );
     }
@@ -96,7 +98,7 @@ function AutoSaveIndicator({
         return (
             <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
                 <span className="h-2 w-2 rounded-full bg-amber-500" />
-                <span>Unsaved changes</span>
+                <span>{__('builder.unsaved_changes', 'Unsaved changes')}</span>
             </div>
         );
     }
@@ -105,7 +107,10 @@ function AutoSaveIndicator({
         return (
             <div className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400">
                 <span className="h-2 w-2 rounded-full bg-green-500" />
-                <span>Saved {timeSince ?? 'just now'}</span>
+                <span>
+                    {__('builder.saved', 'Saved')}{' '}
+                    {timeSince ?? __('builder.just_now', 'just now')}
+                </span>
             </div>
         );
     }
@@ -124,6 +129,7 @@ function SchedulePopover({
     scheduledUnpublishAt: string | null;
     onSave: (publishAt: string | null, unpublishAt: string | null) => void;
 }) {
+    const __ = useTranslation();
     const toLocalDateTimeValue = (iso: string | null): string => {
         if (!iso) return '';
         // Convert ISO to datetime-local format (YYYY-MM-DDTHH:mm)
@@ -153,20 +159,28 @@ function SchedulePopover({
                 <Button
                     variant={hasSchedule ? 'secondary' : 'outline'}
                     size="sm"
-                    title="Schedule publishing"
+                    title={__(
+                        'builder.schedule_publishing',
+                        'Schedule publishing',
+                    )}
                 >
                     <Calendar className="mr-2 h-4 w-4" />
-                    Schedule
+                    {__('builder.schedule', 'Schedule')}
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80" align="end">
                 <div className="space-y-4">
                     <h4 className="text-sm font-semibold">
-                        Schedule Publishing
+                        {__(
+                            'builder.schedule_publishing',
+                            'Schedule Publishing',
+                        )}
                     </h4>
 
                     <div className="space-y-1.5">
-                        <Label htmlFor="scheduled-publish-at">Publish at</Label>
+                        <Label htmlFor="scheduled-publish-at">
+                            {__('builder.publish_at', 'Publish at')}
+                        </Label>
                         <input
                             id="scheduled-publish-at"
                             type="datetime-local"
@@ -175,13 +189,16 @@ function SchedulePopover({
                             className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
                         />
                         <p className="text-xs text-muted-foreground">
-                            Page will be automatically published at this time.
+                            {__(
+                                'builder.publish_at_hint',
+                                'Page will be automatically published at this time.',
+                            )}
                         </p>
                     </div>
 
                     <div className="space-y-1.5">
                         <Label htmlFor="scheduled-unpublish-at">
-                            Unpublish at
+                            {__('builder.unpublish_at', 'Unpublish at')}
                         </Label>
                         <input
                             id="scheduled-unpublish-at"
@@ -191,7 +208,10 @@ function SchedulePopover({
                             className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
                         />
                         <p className="text-xs text-muted-foreground">
-                            Page will be automatically unpublished at this time.
+                            {__(
+                                'builder.unpublish_at_hint',
+                                'Page will be automatically unpublished at this time.',
+                            )}
                         </p>
                     </div>
 
@@ -208,7 +228,7 @@ function SchedulePopover({
                                     setOpen(false);
                                 }}
                             >
-                                Clear schedule
+                                {__('builder.clear_schedule', 'Clear schedule')}
                             </Button>
                         )}
                         <Button
@@ -216,7 +236,7 @@ function SchedulePopover({
                             className="ml-auto"
                             onClick={handleSave}
                         >
-                            Save schedule
+                            {__('builder.save_schedule', 'Save schedule')}
                         </Button>
                     </div>
                 </div>
@@ -241,6 +261,7 @@ function SaveAsTemplateDialog({
         isGlobal: boolean,
     ) => void;
 }) {
+    const __ = useTranslation();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('custom');
@@ -263,53 +284,76 @@ function SaveAsTemplateDialog({
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <BookmarkPlus className="h-5 w-5" />
-                        Save as Template
+                        {__('builder.save_as_template', 'Save as Template')}
                     </DialogTitle>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-1.5">
-                        <Label htmlFor="tpl-name">Name</Label>
+                        <Label htmlFor="tpl-name">
+                            {__('builder.name', 'Name')}
+                        </Label>
                         <Input
                             id="tpl-name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            placeholder="My Template"
+                            placeholder={__(
+                                'builder.template_name_placeholder',
+                                'My Template',
+                            )}
                             required
                         />
                     </div>
 
                     <div className="space-y-1.5">
                         <Label htmlFor="tpl-description">
-                            Description{' '}
+                            {__('builder.description', 'Description')}{' '}
                             <span className="text-muted-foreground">
-                                (optional)
+                                ({__('builder.optional', 'optional')})
                             </span>
                         </Label>
                         <Textarea
                             id="tpl-description"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            placeholder="Describe what this template is for…"
+                            placeholder={__(
+                                'builder.template_description_placeholder',
+                                'Describe what this template is for…',
+                            )}
                             rows={3}
                         />
                     </div>
 
                     <div className="space-y-1.5">
-                        <Label htmlFor="tpl-category">Category</Label>
+                        <Label htmlFor="tpl-category">
+                            {__('builder.category', 'Category')}
+                        </Label>
                         <Select value={category} onValueChange={setCategory}>
                             <SelectTrigger id="tpl-category">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="custom">Custom</SelectItem>
-                                <SelectItem value="landing">Landing</SelectItem>
-                                <SelectItem value="product">Product</SelectItem>
-                                <SelectItem value="blog">Blog</SelectItem>
-                                <SelectItem value="portfolio">
-                                    Portfolio
+                                <SelectItem value="custom">
+                                    {__('builder.category_custom', 'Custom')}
                                 </SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
+                                <SelectItem value="landing">
+                                    {__('builder.category_landing', 'Landing')}
+                                </SelectItem>
+                                <SelectItem value="product">
+                                    {__('builder.category_product', 'Product')}
+                                </SelectItem>
+                                <SelectItem value="blog">
+                                    {__('builder.category_blog', 'Blog')}
+                                </SelectItem>
+                                <SelectItem value="portfolio">
+                                    {__(
+                                        'builder.category_portfolio',
+                                        'Portfolio',
+                                    )}
+                                </SelectItem>
+                                <SelectItem value="other">
+                                    {__('builder.category_other', 'Other')}
+                                </SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -326,7 +370,10 @@ function SaveAsTemplateDialog({
                             htmlFor="tpl-global"
                             className="cursor-pointer text-sm font-normal"
                         >
-                            Make visible to all admins
+                            {__(
+                                'builder.make_visible_to_all_admins',
+                                'Make visible to all admins',
+                            )}
                         </Label>
                     </div>
 
@@ -336,10 +383,10 @@ function SaveAsTemplateDialog({
                             variant="outline"
                             onClick={onClose}
                         >
-                            Cancel
+                            {__('builder.cancel', 'Cancel')}
                         </Button>
                         <Button type="submit" disabled={!name.trim()}>
-                            Save Template
+                            {__('builder.save_template', 'Save Template')}
                         </Button>
                     </DialogFooter>
                 </form>
@@ -374,6 +421,7 @@ export function BuilderToolbar({
     onApprove,
     onReject,
 }: BuilderToolbarProps) {
+    const __ = useTranslation();
     const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
     const [rejectNoteOpen, setRejectNoteOpen] = useState(false);
     const [rejectNote, setRejectNote] = useState('');
@@ -405,13 +453,13 @@ export function BuilderToolbar({
                     <Button variant="ghost" size="sm" asChild>
                         <Link href={PageController.index.url()}>
                             <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back
+                            {__('builder.back', 'Back')}
                         </Link>
                     </Button>
                     <div>
                         <h1 className="text-lg font-semibold">{pageTitle}</h1>
                         <p className="text-sm text-muted-foreground">
-                            Page Builder
+                            {__('builder.page_builder', 'Page Builder')}
                         </p>
                     </div>
                 </div>
@@ -425,7 +473,7 @@ export function BuilderToolbar({
                             disabled={!canUndo}
                             variant="ghost"
                             size="sm"
-                            title="Undo (Ctrl+Z)"
+                            title={__('builder.undo', 'Undo (Ctrl+Z)')}
                             className="h-8 w-8 p-0"
                         >
                             <Undo2 className="h-4 w-4" />
@@ -435,7 +483,7 @@ export function BuilderToolbar({
                             disabled={!canRedo}
                             variant="ghost"
                             size="sm"
-                            title="Redo (Ctrl+Shift+Z)"
+                            title={__('builder.redo', 'Redo (Ctrl+Shift+Z)')}
                             className="h-8 w-8 p-0"
                         >
                             <Redo2 className="h-4 w-4" />
@@ -459,17 +507,17 @@ export function BuilderToolbar({
                         size="sm"
                     >
                         <LayoutTemplate className="mr-2 h-4 w-4" />
-                        Templates
+                        {__('builder.templates', 'Templates')}
                     </Button>
 
                     <Button onClick={onAddSection} variant="outline" size="sm">
                         <Plus className="mr-2 h-4 w-4" />
-                        Add Section
+                        {__('builder.add_section', 'Add Section')}
                     </Button>
 
                     <Button onClick={onPreview} variant="outline" size="sm">
                         <Eye className="mr-2 h-4 w-4" />
-                        Preview
+                        {__('builder.preview', 'Preview')}
                     </Button>
 
                     <SchedulePopover
@@ -482,10 +530,13 @@ export function BuilderToolbar({
                         onClick={() => setSaveTemplateOpen(true)}
                         variant="outline"
                         size="sm"
-                        title="Save current layout as a reusable template"
+                        title={__(
+                            'builder.save_as_template_hint',
+                            'Save current layout as a reusable template',
+                        )}
                     >
                         <BookmarkPlus className="mr-2 h-4 w-4" />
-                        Save as Template
+                        {__('builder.save_as_template', 'Save as Template')}
                     </Button>
 
                     {/* Export / Import */}
@@ -493,10 +544,10 @@ export function BuilderToolbar({
                         href={pbExport.url(pageId)}
                         download
                         className="inline-flex h-8 items-center gap-1.5 rounded-md border border-input bg-background px-3 text-xs font-medium shadow-sm hover:bg-accent"
-                        title="Export page as JSON"
+                        title={__('builder.export_hint', 'Export page as JSON')}
                     >
                         <FileDown className="h-3.5 w-3.5" />
-                        Export
+                        {__('builder.export', 'Export')}
                     </a>
                     <input
                         ref={importInputRef}
@@ -509,10 +560,13 @@ export function BuilderToolbar({
                         variant="outline"
                         size="sm"
                         onClick={() => importInputRef.current?.click()}
-                        title="Import page from JSON"
+                        title={__(
+                            'builder.import_hint',
+                            'Import page from JSON',
+                        )}
                     >
                         <FileUp className="mr-1.5 h-3.5 w-3.5" />
-                        Import
+                        {__('builder.import', 'Import')}
                     </Button>
 
                     {/* Approval Workflow */}
@@ -523,7 +577,10 @@ export function BuilderToolbar({
                             size="sm"
                             onClick={onSubmitForReview}
                         >
-                            Submit for Review
+                            {__(
+                                'builder.submit_for_review',
+                                'Submit for Review',
+                            )}
                         </Button>
                     )}
                     {approvalStatus === 'in_review' && (
@@ -535,7 +592,7 @@ export function BuilderToolbar({
                                 onClick={onApprove}
                             >
                                 <Check className="mr-1.5 h-3.5 w-3.5" />
-                                Approve
+                                {__('builder.approve', 'Approve')}
                             </Button>
                             <Button
                                 variant="outline"
@@ -544,20 +601,22 @@ export function BuilderToolbar({
                                 onClick={() => setRejectNoteOpen(true)}
                             >
                                 <X className="mr-1.5 h-3.5 w-3.5" />
-                                Reject
+                                {__('builder.reject', 'Reject')}
                             </Button>
                         </>
                     )}
                     {approvalStatus === 'approved' && (
                         <span className="flex items-center gap-1.5 rounded-md border border-green-300 px-2.5 py-1 text-xs font-medium text-green-700 dark:border-green-700 dark:text-green-400">
                             <Check className="h-3 w-3" />
-                            Approved
+                            {__('builder.approved', 'Approved')}
                         </span>
                     )}
 
                     <Button onClick={onSave} disabled={isSaving} size="sm">
                         <Save className="mr-2 h-4 w-4" />
-                        {isSaving ? 'Saving...' : 'Save'}
+                        {isSaving
+                            ? __('builder.saving', 'Saving...')
+                            : __('builder.save', 'Save')}
                     </Button>
                 </div>
             </div>
@@ -575,17 +634,24 @@ export function BuilderToolbar({
             >
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
-                        <DialogTitle>Reject Page</DialogTitle>
+                        <DialogTitle>
+                            {__('builder.reject_page', 'Reject Page')}
+                        </DialogTitle>
                     </DialogHeader>
                     <div className="space-y-3 py-2">
                         <p className="text-sm text-muted-foreground">
-                            Optionally leave a note for the author explaining
-                            what needs to be changed.
+                            {__(
+                                'builder.reject_note_hint',
+                                'Optionally leave a note for the author explaining what needs to be changed.',
+                            )}
                         </p>
                         <Textarea
                             value={rejectNote}
                             onChange={(e) => setRejectNote(e.target.value)}
-                            placeholder="Describe what needs to be changed..."
+                            placeholder={__(
+                                'builder.reject_note_placeholder',
+                                'Describe what needs to be changed...',
+                            )}
                             rows={4}
                         />
                     </div>
@@ -594,13 +660,13 @@ export function BuilderToolbar({
                             variant="outline"
                             onClick={() => setRejectNoteOpen(false)}
                         >
-                            Cancel
+                            {__('builder.cancel', 'Cancel')}
                         </Button>
                         <Button
                             variant="destructive"
                             onClick={handleRejectSubmit}
                         >
-                            Reject
+                            {__('builder.reject', 'Reject')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

@@ -6,11 +6,25 @@ import { BlockRenderer } from './block-renderer';
 import type { SectionRendererProps } from './section-renderer.types';
 
 function sanitizeCss(css: string): string {
-    return css
-        .replace(/expression\s*\(/gi, '')
-        .replace(/javascript\s*:/gi, '')
-        .replace(/<\s*script/gi, '')
-        .replace(/url\s*\(\s*['"]\s*javascript/gi, '');
+    return (
+        css
+            // Prevent closing the <style> tag and injecting HTML
+            .replace(/<\s*\/\s*style\b[^>]*>/gi, '')
+            // Prevent opening script tags
+            .replace(/<\s*script\b[^>]*>/gi, '')
+            // Block @import (external CSS/data exfiltration)
+            .replace(/@import\b/gi, '')
+            // Block IE behavior (ActiveX XSS)
+            .replace(/behavior\s*:/gi, '')
+            // Block expression() including whitespace variants (IE XSS)
+            .replace(/expression\s*\(/gi, '')
+            // Block javascript: URIs in any context
+            .replace(/javascript\s*:/gi, '')
+            // Block vbscript: URIs
+            .replace(/vbscript\s*:/gi, '')
+            // Block data: URIs in url() (SVG/XML with script)
+            .replace(/url\s*\(\s*['"]?\s*data\s*:/gi, 'url(')
+    );
 }
 
 const variantStyles: Record<string, string> = {

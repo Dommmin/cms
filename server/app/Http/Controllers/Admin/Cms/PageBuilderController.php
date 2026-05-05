@@ -88,54 +88,8 @@ class PageBuilderController extends Controller
 
     public function update(UpdatePageBuilderRequest $request, int $page): RedirectResponse
     {
-        $request->validated();
-
-        $snapshot = $request->input('snapshot');
-        if (is_array($snapshot)) {
-            $pageModel = Page::query()->findOrFail($page);
-            $this->syncService->sync($pageModel, $snapshot);
-
-            return back();
-        }
-
-        $page = Page::query()->findOrFail($request->get('page_id', $page));
-
-        $sections = $request->input('sections', []);
-
-        $page->allBlocks()->delete();
-        $page->allSections()->delete();
-
-        foreach ($sections as $sectionIndex => $sectionData) {
-            $section = $page->allSections()->create([
-                'section_type' => $sectionData['section_type'],
-                'layout' => $sectionData['layout'] ?? 'default',
-                'variant' => $sectionData['variant'] ?? null,
-                'settings' => $sectionData['settings'] ?? null,
-                'position' => $sectionData['position'] ?? $sectionIndex,
-                'is_active' => $sectionData['is_active'] ?? true,
-            ]);
-
-            foreach ($sectionData['blocks'] ?? [] as $blockIndex => $blockData) {
-                $block = $section->allBlocks()->create([
-                    'page_id' => $page->id,
-                    'type' => $blockData['type'],
-                    'configuration' => $blockData['configuration'] ?? null,
-                    'position' => $blockData['position'] ?? $blockIndex,
-                    'reusable_block_id' => $blockData['reusable_block_id'] ?? null,
-                    'is_active' => $blockData['is_active'] ?? true,
-                ]);
-
-                foreach ($blockData['relations'] ?? [] as $relation) {
-                    $block->relations()->create([
-                        'relation_type' => $relation['relation_type'],
-                        'relation_id' => $relation['relation_id'],
-                        'relation_key' => $relation['relation_key'],
-                        'position' => $relation['position'] ?? 0,
-                        'metadata' => $relation['metadata'] ?? null,
-                    ]);
-                }
-            }
-        }
+        $pageModel = Page::query()->findOrFail($page);
+        $this->syncService->sync($pageModel, $request->validated()['snapshot']);
 
         return back();
     }

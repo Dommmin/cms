@@ -130,7 +130,7 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('admin')->name(
         Route::resource('exchange-rates', ExchangeRateController::class)->except(['show']);
     });
 
-    // Ważne - CMS & System
+    // Core CMS & System
     Route::resource('menus', MenuController::class);
     Route::post('menus/{menu}/duplicate', [MenuController::class, 'duplicate'])->name('menus.duplicate');
 
@@ -150,7 +150,7 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('admin')->name(
     Route::post('faqs/{faq}/toggle-active', [FaqController::class, 'toggleActive'])->name('faqs.toggle-active');
     Route::post('faqs/reorder', [FaqController::class, 'reorder'])->name('faqs.reorder');
 
-    // Opcjonalne - Read only / relacje
+    // Optional - Read only / relations
     Route::prefix('ecommerce')->name('ecommerce.')->group(function (): void {
         // Carts (read-only)
         Route::resource('carts', CartController::class)->only(['index', 'show']);

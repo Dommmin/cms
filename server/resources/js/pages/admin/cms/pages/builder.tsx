@@ -100,7 +100,7 @@ export default function BuilderPage({
             router.put(
                 PageBuilderController.update.url(page.id),
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                { sections: localSections as any },
+                { snapshot: { sections: localSections as any } },
                 {
                     preserveScroll: true,
                     onSuccess: () => {
@@ -132,7 +132,7 @@ export default function BuilderPage({
         router.put(
             PageBuilderController.update.url(page.id),
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            { sections: updatedSections as any },
+            { snapshot: { sections: updatedSections as any } },
             {
                 preserveScroll: true,
                 onSuccess: () => {

@@ -1,12 +1,17 @@
 import { Head, Link, router } from '@inertiajs/react';
 import {
     AlertTriangle,
+    CheckCircle2,
+    ChevronDown,
+    ChevronUp,
+    Circle,
     Eye,
     EyeOff,
     LayoutDashboard,
     RotateCcw,
     Star,
     Trash2,
+    X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import * as DashboardWidgetController from '@/actions/App/Http/Controllers/Admin/DashboardWidgetController';
@@ -20,11 +25,156 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes/admin';
 import type { BreadcrumbItem } from '@/types';
 import type { Widget, WidgetSize } from '@/types/widgets';
-import type { DashboardProps } from './dashboard.types';
+import type { DashboardProps, OnboardingStep } from './dashboard.types';
+
+const ONBOARDING_DISMISSED_KEY = 'onboarding_dismissed';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: dashboard().url },
 ];
+
+function OnboardingChecklist({ steps }: { steps: OnboardingStep[] }) {
+    const __ = useTranslation();
+    const allDone = steps.every((s) => s.done);
+    const doneCount = steps.filter((s) => s.done).length;
+
+    const [dismissed, setDismissed] = useState(() => {
+        try {
+            return localStorage.getItem(ONBOARDING_DISMISSED_KEY) === '1';
+        } catch {
+            return false;
+        }
+    });
+    const [collapsed, setCollapsed] = useState(false);
+
+    if (dismissed || allDone) {
+        return null;
+    }
+
+    function dismiss() {
+        try {
+            localStorage.setItem(ONBOARDING_DISMISSED_KEY, '1');
+        } catch {
+            // ignore
+        }
+        setDismissed(true);
+    }
+
+    const stepLabels: Record<string, string> = {
+        add_product: __('onboarding.add_product', 'Add your first product'),
+        create_page: __('onboarding.create_page', 'Create your first page'),
+        configure_shipping: __(
+            'onboarding.configure_shipping',
+            'Configure shipping',
+        ),
+        connect_payments: __('onboarding.connect_payments', 'Connect payments'),
+    };
+
+    const stepDescriptions: Record<string, string> = {
+        add_product: __(
+            'onboarding.add_product_desc',
+            'Add products to your catalog so customers can purchase.',
+        ),
+        create_page: __(
+            'onboarding.create_page_desc',
+            'Build your storefront with pages and content blocks.',
+        ),
+        configure_shipping: __(
+            'onboarding.configure_shipping_desc',
+            'Set up shipping rates for your store.',
+        ),
+        connect_payments: __(
+            'onboarding.connect_payments_desc',
+            'Configure a payment gateway (PayU or Przelewy24).',
+        ),
+    };
+
+    return (
+        <div className="rounded-xl border bg-card shadow-sm">
+            <div className="flex items-center justify-between px-5 py-4">
+                <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                        <LayoutDashboard className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                        <h3 className="text-sm font-semibold">
+                            {__('onboarding.title', 'Get started')}
+                        </h3>
+                        <p className="text-xs text-muted-foreground">
+                            {doneCount}/{steps.length}{' '}
+                            {__('onboarding.steps_done', 'steps complete')}
+                        </p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-1">
+                    <button
+                        onClick={() => setCollapsed((c) => !c)}
+                        className="rounded-md p-1 text-muted-foreground hover:bg-accent"
+                        aria-label={
+                            collapsed
+                                ? __('action.expand', 'Expand')
+                                : __('action.collapse', 'Collapse')
+                        }
+                    >
+                        {collapsed ? (
+                            <ChevronDown className="h-4 w-4" />
+                        ) : (
+                            <ChevronUp className="h-4 w-4" />
+                        )}
+                    </button>
+                    <button
+                        onClick={dismiss}
+                        className="rounded-md p-1 text-muted-foreground hover:bg-accent"
+                        aria-label={__('action.dismiss', 'Dismiss')}
+                    >
+                        <X className="h-4 w-4" />
+                    </button>
+                </div>
+            </div>
+
+            {!collapsed && (
+                <>
+                    <div className="mx-5 mb-2 h-1.5 overflow-hidden rounded-full bg-muted">
+                        <div
+                            className="h-full rounded-full bg-primary transition-all"
+                            style={{
+                                width: `${(doneCount / steps.length) * 100}%`,
+                            }}
+                        />
+                    </div>
+                    <ul className="divide-y px-5 pb-4">
+                        {steps.map((step) => (
+                            <li key={step.key} className="py-3">
+                                <Link
+                                    href={step.url}
+                                    className={`flex items-start gap-3 ${step.done ? 'pointer-events-none opacity-60' : 'group'}`}
+                                >
+                                    <span className="mt-0.5 shrink-0">
+                                        {step.done ? (
+                                            <CheckCircle2 className="h-5 w-5 text-green-500" />
+                                        ) : (
+                                            <Circle className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
+                                        )}
+                                    </span>
+                                    <span>
+                                        <span
+                                            className={`block text-sm font-medium ${step.done ? 'line-through' : 'group-hover:text-primary'}`}
+                                        >
+                                            {stepLabels[step.key] ?? step.key}
+                                        </span>
+                                        <span className="text-xs text-muted-foreground">
+                                            {stepDescriptions[step.key] ?? ''}
+                                        </span>
+                                    </span>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </>
+            )}
+        </div>
+    );
+}
 
 const STATUS_COLORS: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-800',
@@ -37,6 +187,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default function Dashboard({
     widgetShells,
+    onboarding,
     widgets: deferredWidgets,
 }: DashboardProps) {
     const __ = useTranslation();
@@ -421,6 +572,9 @@ export default function Dashboard({
                         </Button>
                     </div>
                 </div>
+
+                {/* Onboarding checklist */}
+                <OnboardingChecklist steps={onboarding} />
 
                 {/* Skeleton while deferred widgets load */}
                 {!loaded && (

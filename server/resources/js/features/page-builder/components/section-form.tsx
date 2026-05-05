@@ -14,6 +14,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useTranslation } from '@/hooks/use-translation';
 import type { SectionFormProps } from './section-form.types';
 
 export function SectionForm({
@@ -21,6 +22,7 @@ export function SectionForm({
     availableSections,
     onUpdate,
 }: SectionFormProps) {
+    const __ = useTranslation();
     const currentSectionConfig = availableSections[section.section_type];
     const layouts = currentSectionConfig?.layouts ?? {};
 
@@ -57,16 +59,24 @@ export function SectionForm({
             <div className="flex items-start gap-2 rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
                 <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 <span>
-                    Section container settings — define how the public site
-                    wraps this section. Add <strong>blocks</strong> below to set
-                    the actual content.
+                    {__(
+                        'builder.section_settings_hint',
+                        'Section container settings — define how the public site wraps this section. Add',
+                    )}{' '}
+                    <strong>{__('builder.blocks', 'blocks')}</strong>{' '}
+                    {__(
+                        'builder.section_settings_hint_2',
+                        'below to set the actual content.',
+                    )}
                 </span>
             </div>
 
             <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
                 {/* Section Type */}
                 <div className="space-y-1.5">
-                    <Label htmlFor="section-type">Container Type</Label>
+                    <Label htmlFor="section-type">
+                        {__('builder.container_type', 'Container Type')}
+                    </Label>
                     <Select
                         value={section.section_type || undefined}
                         onValueChange={(value) =>
@@ -78,7 +88,12 @@ export function SectionForm({
                         }
                     >
                         <SelectTrigger id="section-type">
-                            <SelectValue placeholder="Select type..." />
+                            <SelectValue
+                                placeholder={__(
+                                    'builder.select_type',
+                                    'Select type...',
+                                )}
+                            />
                         </SelectTrigger>
                         <SelectContent>
                             {Object.entries(availableSections).map(
@@ -99,14 +114,21 @@ export function SectionForm({
 
                 {/* Layout */}
                 <div className="space-y-1.5">
-                    <Label htmlFor="section-layout">Width / Layout</Label>
+                    <Label htmlFor="section-layout">
+                        {__('builder.width_layout', 'Width / Layout')}
+                    </Label>
                     <Select
                         value={layoutValue}
                         onValueChange={(value) => onUpdate({ layout: value })}
                         disabled={layoutOptions.length === 0}
                     >
                         <SelectTrigger id="section-layout">
-                            <SelectValue placeholder="Select layout..." />
+                            <SelectValue
+                                placeholder={__(
+                                    'builder.select_layout',
+                                    'Select layout...',
+                                )}
+                            />
                         </SelectTrigger>
                         <SelectContent>
                             {layoutOptions.length > 0 ? (
@@ -119,7 +141,9 @@ export function SectionForm({
                                     </SelectItem>
                                 ))
                             ) : (
-                                <SelectItem value="default">Default</SelectItem>
+                                <SelectItem value="default">
+                                    {__('builder.default', 'Default')}
+                                </SelectItem>
                             )}
                         </SelectContent>
                     </Select>
@@ -127,7 +151,9 @@ export function SectionForm({
 
                 {/* Padding */}
                 <div className="space-y-1.5">
-                    <Label htmlFor="section-padding">Spacing</Label>
+                    <Label htmlFor="section-padding">
+                        {__('builder.spacing', 'Spacing')}
+                    </Label>
                     <Select
                         value={
                             (section.settings?.padding as string | undefined) ??
@@ -146,18 +172,30 @@ export function SectionForm({
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="none">No padding</SelectItem>
-                            <SelectItem value="sm">Small</SelectItem>
-                            <SelectItem value="md">Medium</SelectItem>
-                            <SelectItem value="lg">Large (default)</SelectItem>
-                            <SelectItem value="xl">Extra large</SelectItem>
+                            <SelectItem value="none">
+                                {__('builder.no_padding', 'No padding')}
+                            </SelectItem>
+                            <SelectItem value="sm">
+                                {__('builder.small', 'Small')}
+                            </SelectItem>
+                            <SelectItem value="md">
+                                {__('builder.medium', 'Medium')}
+                            </SelectItem>
+                            <SelectItem value="lg">
+                                {__('builder.large_default', 'Large (default)')}
+                            </SelectItem>
+                            <SelectItem value="xl">
+                                {__('builder.extra_large', 'Extra large')}
+                            </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
 
                 {/* Scroll animation */}
                 <div className="space-y-1.5">
-                    <Label htmlFor="section-animation">Scroll Animation</Label>
+                    <Label htmlFor="section-animation">
+                        {__('builder.scroll_animation', 'Scroll Animation')}
+                    </Label>
                     <Select
                         value={
                             (section.settings?.animation as
@@ -178,16 +216,30 @@ export function SectionForm({
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="none">None</SelectItem>
-                            <SelectItem value="fade-in">Fade In</SelectItem>
-                            <SelectItem value="fade-up">Fade Up</SelectItem>
+                            <SelectItem value="none">
+                                {__('builder.none', 'None')}
+                            </SelectItem>
+                            <SelectItem value="fade-in">
+                                {__('builder.fade_in', 'Fade In')}
+                            </SelectItem>
+                            <SelectItem value="fade-up">
+                                {__('builder.fade_up', 'Fade Up')}
+                            </SelectItem>
                             <SelectItem value="fade-left">
-                                Slide from Left
+                                {__(
+                                    'builder.slide_from_left',
+                                    'Slide from Left',
+                                )}
                             </SelectItem>
                             <SelectItem value="fade-right">
-                                Slide from Right
+                                {__(
+                                    'builder.slide_from_right',
+                                    'Slide from Right',
+                                )}
                             </SelectItem>
-                            <SelectItem value="zoom-in">Zoom In</SelectItem>
+                            <SelectItem value="zoom-in">
+                                {__('builder.zoom_in', 'Zoom In')}
+                            </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -196,7 +248,10 @@ export function SectionForm({
                 {variantOptions.length > 0 && (
                     <div className="space-y-1.5">
                         <Label htmlFor="section-variant">
-                            Background / Style
+                            {__(
+                                'builder.background_style',
+                                'Background / Style',
+                            )}
                         </Label>
                         <Select
                             value={section.variant ?? '_none_'}
@@ -207,10 +262,17 @@ export function SectionForm({
                             }
                         >
                             <SelectTrigger id="section-variant">
-                                <SelectValue placeholder="Select style..." />
+                                <SelectValue
+                                    placeholder={__(
+                                        'builder.select_style',
+                                        'Select style...',
+                                    )}
+                                />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="_none_">None</SelectItem>
+                                <SelectItem value="_none_">
+                                    {__('builder.none', 'None')}
+                                </SelectItem>
                                 {variantOptions.map((option) => (
                                     <SelectItem
                                         key={option.value}

@@ -7,6 +7,7 @@ import { PageHeader } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { EmailTemplate, IndexProps } from './index.types';
@@ -19,17 +20,18 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function EmailTemplatesIndex({ templates }: IndexProps) {
+    const __ = useTranslation();
     const columns: ColumnDef<EmailTemplate>[] = [
         {
             accessorKey: 'name',
-            header: 'Name',
+            header: __('table.name', 'Name'),
             cell: ({ row }) => (
                 <div className="font-medium">{row.original.name}</div>
             ),
         },
         {
             accessorKey: 'key',
-            header: 'Key',
+            header: __('email_template.key', 'Key'),
             cell: ({ row }) => (
                 <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
                     {row.original.key}
@@ -38,7 +40,7 @@ export default function EmailTemplatesIndex({ templates }: IndexProps) {
         },
         {
             accessorKey: 'subject',
-            header: 'Subject',
+            header: __('email_template.subject', 'Subject'),
             cell: ({ row }) => (
                 <span className="text-sm text-muted-foreground">
                     {row.original.subject}
@@ -47,17 +49,21 @@ export default function EmailTemplatesIndex({ templates }: IndexProps) {
         },
         {
             accessorKey: 'is_active',
-            header: 'Status',
+            header: __('table.status', 'Status'),
             cell: ({ row }) =>
                 row.original.is_active ? (
-                    <Badge variant="default">Active</Badge>
+                    <Badge variant="default">
+                        {__('status.active', 'Active')}
+                    </Badge>
                 ) : (
-                    <Badge variant="secondary">Inactive</Badge>
+                    <Badge variant="secondary">
+                        {__('status.inactive', 'Inactive')}
+                    </Badge>
                 ),
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: __('table.actions', 'Actions'),
             cell: ({ row }) => (
                 <Button asChild variant="outline" size="sm">
                     <Link
@@ -66,7 +72,7 @@ export default function EmailTemplatesIndex({ templates }: IndexProps) {
                         cacheFor={30}
                     >
                         <PencilIcon className="mr-1 h-3 w-3" />
-                        Edit
+                        {__('action.edit', 'Edit')}
                     </Link>
                 </Button>
             ),

@@ -9,9 +9,11 @@ use App\Models\Customer;
 use App\Models\DashboardWidget;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Page;
 use App\Models\Product;
 use App\Models\ProductReview;
 use App\Models\ProductVariant;
+use App\Models\ShippingMethod;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -39,6 +41,7 @@ class DashboardController extends Controller
 
         return Inertia::render('admin/dashboard', [
             'widgetShells' => $shells,
+            'onboarding' => $this->getOnboardingStatus(),
             'widgets' => Inertia::defer(fn () => $widgets->map(fn ($w): array => [
                 'id' => $w->id,
                 'title' => $w->title,
@@ -52,6 +55,32 @@ class DashboardController extends Controller
                 'data' => $w->is_active ? $this->getWidgetData($w) : null,
             ])),
         ]);
+    }
+
+    private function getOnboardingStatus(): array
+    {
+        return [
+            [
+                'key' => 'add_product',
+                'done' => Product::query()->exists(),
+                'url' => route('admin.ecommerce.ecommerce.products.create'),
+            ],
+            [
+                'key' => 'create_page',
+                'done' => Page::query()->exists(),
+                'url' => route('admin.cms.pages.create'),
+            ],
+            [
+                'key' => 'configure_shipping',
+                'done' => ShippingMethod::query()->exists(),
+                'url' => route('admin.ecommerce.shipping-methods.create'),
+            ],
+            [
+                'key' => 'connect_payments',
+                'done' => ! empty(config('services.payu.client_id')) || ! empty(config('services.p24.merchant_id')),
+                'url' => route('admin.settings.index'),
+            ],
+        ];
     }
 
     private function getWidgetData(DashboardWidget $widget): mixed

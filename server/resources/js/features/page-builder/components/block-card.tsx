@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
 import type { BlockCardProps } from './block-card.types';
 import { BlockThumbnail } from './block-thumbnail';
@@ -45,6 +46,7 @@ export function BlockCard({
     onSaveAsGlobal,
     children,
 }: BlockCardProps) {
+    const __ = useTranslation();
     const [saveDialogOpen, setSaveDialogOpen] = useState(false);
     const [globalName, setGlobalName] = useState('');
     const [globalDesc, setGlobalDesc] = useState('');
@@ -109,7 +111,12 @@ export function BlockCard({
                                     : 'cursor-grab active:cursor-grabbing'
                             }
                             title={
-                                isLocked ? 'Unlock block to move' : undefined
+                                isLocked
+                                    ? __(
+                                          'builder.unlock_to_move',
+                                          'Unlock block to move',
+                                      )
+                                    : undefined
                             }
                         >
                             <GripVertical className="h-4 w-4 text-muted-foreground" />
@@ -161,7 +168,7 @@ export function BlockCard({
                                 variant="outline"
                                 className="h-5 border-blue-300 text-xs text-blue-600 dark:border-blue-700 dark:text-blue-400"
                             >
-                                Global
+                                {__('builder.global', 'Global')}
                             </Badge>
                         )}
 
@@ -172,7 +179,7 @@ export function BlockCard({
                                 className="h-5 border-amber-300 text-xs text-amber-600 dark:border-amber-700 dark:text-amber-400"
                             >
                                 <Lock className="mr-1 h-2.5 w-2.5" />
-                                Locked
+                                {__('builder.locked', 'Locked')}
                             </Badge>
                         )}
 
@@ -181,7 +188,9 @@ export function BlockCard({
                             variant={block.is_active ? 'default' : 'secondary'}
                             className="h-5 text-xs"
                         >
-                            {block.is_active ? 'Active' : 'Hidden'}
+                            {block.is_active
+                                ? __('builder.active', 'Active')
+                                : __('builder.hidden', 'Hidden')}
                         </Badge>
 
                         {/* Copy block */}
@@ -194,7 +203,7 @@ export function BlockCard({
                                     onCopy();
                                 }}
                                 className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
-                                title="Copy block"
+                                title={__('builder.copy_block', 'Copy block')}
                             >
                                 <Copy className="h-3.5 w-3.5" />
                             </Button>
@@ -213,7 +222,10 @@ export function BlockCard({
                                         setSaveDialogOpen(true);
                                     }}
                                     className="h-6 w-6 p-0 text-muted-foreground hover:text-primary"
-                                    title="Save as Global Block"
+                                    title={__(
+                                        'builder.save_as_global_block',
+                                        'Save as Global Block',
+                                    )}
                                 >
                                     <LibraryBig className="h-3.5 w-3.5" />
                                 </Button>
@@ -229,7 +241,12 @@ export function BlockCard({
                             }}
                             disabled={isLocked}
                             title={
-                                isLocked ? 'Unlock block to delete' : undefined
+                                isLocked
+                                    ? __(
+                                          'builder.unlock_to_delete',
+                                          'Unlock block to delete',
+                                      )
+                                    : undefined
                             }
                             className="h-6 w-6 p-0 text-destructive hover:text-destructive disabled:opacity-30"
                         >
@@ -249,36 +266,50 @@ export function BlockCard({
             <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Save as Global Block</DialogTitle>
+                        <DialogTitle>
+                            {__(
+                                'builder.save_as_global_block',
+                                'Save as Global Block',
+                            )}
+                        </DialogTitle>
                     </DialogHeader>
                     <div className="space-y-3 py-2">
                         <p className="text-sm text-muted-foreground">
-                            This block will be saved to the Global Block Library
-                            and linked here. Any future edits will propagate to
-                            all pages that use it.
+                            {__(
+                                'builder.global_block_hint',
+                                'This block will be saved to the Global Block Library and linked here. Any future edits will propagate to all pages that use it.',
+                            )}
                         </p>
                         <div className="space-y-1.5">
-                            <Label htmlFor="global-name">Name</Label>
+                            <Label htmlFor="global-name">
+                                {__('builder.name', 'Name')}
+                            </Label>
                             <Input
                                 id="global-name"
                                 value={globalName}
                                 onChange={(e) => setGlobalName(e.target.value)}
-                                placeholder="e.g. Homepage Hero"
+                                placeholder={__(
+                                    'builder.global_block_name_placeholder',
+                                    'e.g. Homepage Hero',
+                                )}
                                 autoFocus
                             />
                         </div>
                         <div className="space-y-1.5">
                             <Label htmlFor="global-desc">
-                                Description{' '}
+                                {__('builder.description', 'Description')}{' '}
                                 <span className="text-muted-foreground">
-                                    (optional)
+                                    ({__('builder.optional', 'optional')})
                                 </span>
                             </Label>
                             <Input
                                 id="global-desc"
                                 value={globalDesc}
                                 onChange={(e) => setGlobalDesc(e.target.value)}
-                                placeholder="Short description for the library"
+                                placeholder={__(
+                                    'builder.global_block_desc_placeholder',
+                                    'Short description for the library',
+                                )}
                             />
                         </div>
                     </div>
@@ -287,13 +318,13 @@ export function BlockCard({
                             variant="outline"
                             onClick={() => setSaveDialogOpen(false)}
                         >
-                            Cancel
+                            {__('builder.cancel', 'Cancel')}
                         </Button>
                         <Button
                             onClick={handleSaveGlobal}
                             disabled={!globalName.trim()}
                         >
-                            Save to Library
+                            {__('builder.save_to_library', 'Save to Library')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

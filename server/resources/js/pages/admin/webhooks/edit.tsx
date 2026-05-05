@@ -11,11 +11,13 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { FormProps, WebhookFormData } from './form.types';
 
 export default function EditWebhook({ webhook, available_events }: FormProps) {
+    const __ = useTranslation();
     const [showSecret, setShowSecret] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -50,17 +52,22 @@ export default function EditWebhook({ webhook, available_events }: FormProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Edit Webhook — ${webhook!.name}`} />
+            <Head
+                title={`${__('webhook.edit_title', 'Edit Webhook')} — ${webhook!.name}`}
+            />
             <Wrapper>
                 <PageHeader
-                    title={`Edit Webhook: ${webhook!.name}`}
-                    description="Update the webhook configuration."
+                    title={`${__('webhook.edit_title', 'Edit Webhook')}: ${webhook!.name}`}
+                    description={__(
+                        'webhook.edit_description',
+                        'Update the webhook configuration.',
+                    )}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link href={WebhookController.index.url()}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                Back
+                                {__('action.back', 'Back')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -68,44 +75,61 @@ export default function EditWebhook({ webhook, available_events }: FormProps) {
 
                 <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
                     <div className="grid gap-2">
-                        <Label htmlFor="name">Name *</Label>
+                        <Label htmlFor="name">
+                            {__('webhook.field_name', 'Name')} *
+                        </Label>
                         <Input
                             id="name"
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
-                            placeholder="e.g. Order Notifications"
+                            placeholder={__(
+                                'webhook.name_placeholder',
+                                'e.g. Order Notifications',
+                            )}
                         />
                         <InputError message={errors.name} />
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="url">URL *</Label>
+                        <Label htmlFor="url">
+                            {__('webhook.field_url', 'URL')} *
+                        </Label>
                         <Input
                             id="url"
                             type="url"
                             value={data.url}
                             onChange={(e) => setData('url', e.target.value)}
-                            placeholder="https://example.com/webhook"
+                            placeholder={__(
+                                'webhook.url_placeholder',
+                                'https://example.com/webhook',
+                            )}
                         />
                         <InputError message={errors.url} />
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">
+                            {__('webhook.field_description', 'Description')}
+                        </Label>
                         <Textarea
                             id="description"
                             value={data.description}
                             onChange={(e) =>
                                 setData('description', e.target.value)
                             }
-                            placeholder="Optional description"
+                            placeholder={__(
+                                'webhook.description_placeholder',
+                                'Optional description',
+                            )}
                             rows={3}
                         />
                         <InputError message={errors.description} />
                     </div>
 
                     <div className="grid gap-2">
-                        <Label>Signing Secret</Label>
+                        <Label>
+                            {__('webhook.signing_secret', 'Signing Secret')}
+                        </Label>
                         <div className="flex items-center gap-2">
                             <code className="flex-1 rounded-md border bg-muted px-3 py-2 font-mono text-sm">
                                 {showSecret ? webhook!.secret : maskedSecret}
@@ -117,11 +141,16 @@ export default function EditWebhook({ webhook, available_events }: FormProps) {
                                 onClick={() => setShowSecret((v) => !v)}
                             >
                                 <EyeOffIcon className="h-4 w-4" />
-                                {showSecret ? 'Hide' : 'Show'}
+                                {showSecret
+                                    ? __('action.hide', 'Hide')
+                                    : __('action.show', 'Show')}
                             </Button>
                         </div>
                         <p className="text-xs text-muted-foreground">
-                            Use this secret to verify webhook signatures (
+                            {__(
+                                'webhook.signing_secret_hint',
+                                'Use this secret to verify webhook signatures (',
+                            )}
                             <Badge
                                 variant="outline"
                                 className="font-mono text-xs"
@@ -133,7 +162,7 @@ export default function EditWebhook({ webhook, available_events }: FormProps) {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label>Events *</Label>
+                        <Label>{__('webhook.events', 'Events')} *</Label>
                         <div className="space-y-2 rounded-md border p-3">
                             {available_events.map((event) => (
                                 <div
@@ -166,12 +195,17 @@ export default function EditWebhook({ webhook, available_events }: FormProps) {
                             onCheckedChange={(v) => setData('is_active', v)}
                         />
                         <Label htmlFor="is_active" className="font-normal">
-                            Active (webhook will receive events)
+                            {__(
+                                'webhook.active_label',
+                                'Active (webhook will receive events)',
+                            )}
                         </Label>
                     </div>
 
                     <Button type="submit" disabled={processing}>
-                        {processing ? 'Saving...' : 'Save Changes'}
+                        {processing
+                            ? __('action.saving', 'Saving...')
+                            : __('action.save_changes', 'Save Changes')}
                     </Button>
                 </form>
             </Wrapper>

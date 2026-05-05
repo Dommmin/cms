@@ -16,6 +16,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { ActivityLog, IndexProps } from './index.types';
@@ -68,6 +69,7 @@ export default function ActivityLogIndex({
     log_names,
     filters,
 }: IndexProps) {
+    const __ = useTranslation();
     const [localFilters, setLocalFilters] = useState(filters);
 
     const applyFilters = () => {
@@ -93,7 +95,7 @@ export default function ActivityLogIndex({
     const columns: ColumnDef<ActivityLog>[] = [
         {
             accessorKey: 'created_at',
-            header: 'Date',
+            header: __('table.date', 'Date'),
             cell: ({ row }) => (
                 <span className="text-xs whitespace-nowrap text-muted-foreground">
                     {new Date(row.original.created_at).toLocaleString()}
@@ -102,7 +104,7 @@ export default function ActivityLogIndex({
         },
         {
             accessorKey: 'causer',
-            header: 'User',
+            header: __('table.user', 'User'),
             cell: ({ row }) =>
                 row.original.causer ? (
                     <div>
@@ -115,13 +117,13 @@ export default function ActivityLogIndex({
                     </div>
                 ) : (
                     <span className="text-xs text-muted-foreground">
-                        System
+                        {__('activity_log.system', 'System')}
                     </span>
                 ),
         },
         {
             accessorKey: 'event',
-            header: 'Action',
+            header: __('table.action', 'Action'),
             cell: ({ row }) => (
                 <Badge
                     variant={
@@ -134,7 +136,7 @@ export default function ActivityLogIndex({
         },
         {
             accessorKey: 'log_name',
-            header: 'Model',
+            header: __('table.model', 'Model'),
             cell: ({ row }) => (
                 <div>
                     <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
@@ -150,7 +152,7 @@ export default function ActivityLogIndex({
         },
         {
             id: 'changes',
-            header: 'Changes',
+            header: __('activity_log.changes', 'Changes'),
             cell: ({ row }) => (
                 <ChangeDiff properties={row.original.properties} />
             ),
@@ -159,17 +161,22 @@ export default function ActivityLogIndex({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Activity Log" />
+            <Head title={__('activity_log.page_title', 'Activity Log')} />
             <Wrapper>
                 <PageHeader
-                    title="Activity Log"
-                    description="Track who created, modified, or deleted records."
+                    title={__('activity_log.heading', 'Activity Log')}
+                    description={__(
+                        'activity_log.description',
+                        'Track who created, modified, or deleted records.',
+                    )}
                 />
 
                 {/* Filters */}
                 <div className="mb-6 grid grid-cols-2 gap-3 rounded-xl border bg-card p-4 md:grid-cols-5">
                     <div className="space-y-1">
-                        <Label className="text-xs">User</Label>
+                        <Label className="text-xs">
+                            {__('table.user', 'User')}
+                        </Label>
                         <Select
                             value={localFilters.causer_id ?? 'all'}
                             onValueChange={(v) =>
@@ -180,10 +187,17 @@ export default function ActivityLogIndex({
                             }
                         >
                             <SelectTrigger className="h-8 text-xs">
-                                <SelectValue placeholder="All users" />
+                                <SelectValue
+                                    placeholder={__(
+                                        'activity_log.all_users',
+                                        'All users',
+                                    )}
+                                />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">All users</SelectItem>
+                                <SelectItem value="all">
+                                    {__('activity_log.all_users', 'All users')}
+                                </SelectItem>
                                 {users.map((u) => (
                                     <SelectItem key={u.id} value={String(u.id)}>
                                         {u.name}
@@ -194,7 +208,9 @@ export default function ActivityLogIndex({
                     </div>
 
                     <div className="space-y-1">
-                        <Label className="text-xs">Model</Label>
+                        <Label className="text-xs">
+                            {__('table.model', 'Model')}
+                        </Label>
                         <Select
                             value={localFilters.log_name ?? 'all'}
                             onValueChange={(v) =>
@@ -205,10 +221,20 @@ export default function ActivityLogIndex({
                             }
                         >
                             <SelectTrigger className="h-8 text-xs">
-                                <SelectValue placeholder="All models" />
+                                <SelectValue
+                                    placeholder={__(
+                                        'activity_log.all_models',
+                                        'All models',
+                                    )}
+                                />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">All models</SelectItem>
+                                <SelectItem value="all">
+                                    {__(
+                                        'activity_log.all_models',
+                                        'All models',
+                                    )}
+                                </SelectItem>
                                 {log_names.map((name) => (
                                     <SelectItem key={name} value={name}>
                                         {name}
@@ -219,7 +245,9 @@ export default function ActivityLogIndex({
                     </div>
 
                     <div className="space-y-1">
-                        <Label className="text-xs">Action</Label>
+                        <Label className="text-xs">
+                            {__('table.action', 'Action')}
+                        </Label>
                         <Select
                             value={localFilters.event ?? 'all'}
                             onValueChange={(v) =>
@@ -230,19 +258,46 @@ export default function ActivityLogIndex({
                             }
                         >
                             <SelectTrigger className="h-8 text-xs">
-                                <SelectValue placeholder="All actions" />
+                                <SelectValue
+                                    placeholder={__(
+                                        'activity_log.all_actions',
+                                        'All actions',
+                                    )}
+                                />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">All actions</SelectItem>
-                                <SelectItem value="created">Created</SelectItem>
-                                <SelectItem value="updated">Updated</SelectItem>
-                                <SelectItem value="deleted">Deleted</SelectItem>
+                                <SelectItem value="all">
+                                    {__(
+                                        'activity_log.all_actions',
+                                        'All actions',
+                                    )}
+                                </SelectItem>
+                                <SelectItem value="created">
+                                    {__(
+                                        'activity_log.event_created',
+                                        'Created',
+                                    )}
+                                </SelectItem>
+                                <SelectItem value="updated">
+                                    {__(
+                                        'activity_log.event_updated',
+                                        'Updated',
+                                    )}
+                                </SelectItem>
+                                <SelectItem value="deleted">
+                                    {__(
+                                        'activity_log.event_deleted',
+                                        'Deleted',
+                                    )}
+                                </SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
 
                     <div className="space-y-1">
-                        <Label className="text-xs">From</Label>
+                        <Label className="text-xs">
+                            {__('activity_log.filter_from', 'From')}
+                        </Label>
                         <Input
                             type="date"
                             className="h-8 text-xs"
@@ -257,7 +312,9 @@ export default function ActivityLogIndex({
                     </div>
 
                     <div className="space-y-1">
-                        <Label className="text-xs">To</Label>
+                        <Label className="text-xs">
+                            {__('activity_log.filter_to', 'To')}
+                        </Label>
                         <Input
                             type="date"
                             className="h-8 text-xs"
@@ -273,14 +330,14 @@ export default function ActivityLogIndex({
 
                     <div className="col-span-2 flex items-end gap-2 md:col-span-5">
                         <Button size="sm" onClick={applyFilters}>
-                            Apply Filters
+                            {__('activity_log.apply_filters', 'Apply Filters')}
                         </Button>
                         <Button
                             size="sm"
                             variant="outline"
                             onClick={resetFilters}
                         >
-                            Reset
+                            {__('action.reset', 'Reset')}
                         </Button>
                         <Button
                             size="sm"
@@ -298,10 +355,11 @@ export default function ActivityLogIndex({
                                         : '');
                             }}
                         >
-                            Export CSV
+                            {__('activity_log.export_csv', 'Export CSV')}
                         </Button>
                         <span className="ml-auto text-xs text-muted-foreground">
-                            {activities.total} entries
+                            {activities.total}{' '}
+                            {__('activity_log.entries', 'entries')}
                         </span>
                     </div>
                 </div>

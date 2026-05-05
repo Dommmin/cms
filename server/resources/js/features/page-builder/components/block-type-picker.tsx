@@ -13,6 +13,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { useTranslation } from '@/hooks/use-translation';
 import type { BlockTypeConfig } from '../types';
 import type { BlockTypePickerProps } from './block-type-picker.types';
 
@@ -487,6 +488,7 @@ export function BlockTypePicker({
     onSelect,
     onClose,
 }: BlockTypePickerProps) {
+    const __ = useTranslation();
     const [query, setQuery] = useState('');
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -518,9 +520,14 @@ export function BlockTypePicker({
         <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
             <DialogContent className="flex max-h-[80vh] max-w-2xl flex-col gap-0 p-0">
                 <DialogHeader className="border-b px-6 pt-6 pb-4">
-                    <DialogTitle>Add Block</DialogTitle>
+                    <DialogTitle>
+                        {__('builder.add_block', 'Add Block')}
+                    </DialogTitle>
                     <DialogDescription>
-                        Choose a block type to add to this section.
+                        {__(
+                            'builder.add_block_hint',
+                            'Choose a block type to add to this section.',
+                        )}
                     </DialogDescription>
                     <div className="relative mt-3">
                         <SearchIcon className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
@@ -528,7 +535,10 @@ export function BlockTypePicker({
                             ref={inputRef}
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
-                            placeholder="Search blocks..."
+                            placeholder={__(
+                                'builder.search_blocks',
+                                'Search blocks...',
+                            )}
                             className="pl-9"
                             autoFocus
                         />
@@ -538,7 +548,10 @@ export function BlockTypePicker({
                 <div className="flex-1 overflow-y-auto p-6">
                     {grouped.length === 0 && (
                         <p className="py-8 text-center text-sm text-muted-foreground">
-                            No blocks match your search.
+                            {__(
+                                'builder.no_blocks_match',
+                                'No blocks match your search.',
+                            )}
                         </p>
                     )}
                     {grouped.map(({ category, label, items }) => (

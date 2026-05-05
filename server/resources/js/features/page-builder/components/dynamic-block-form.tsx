@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { useTranslation } from '@/hooks/use-translation';
 import type {
     ArraySchemaProperty,
     Block,
@@ -225,6 +226,7 @@ function BooleanField({ fieldKey, schema, value, onChange }: FieldProps) {
 }
 
 function RepeaterField({ fieldKey, schema, value, onChange }: FieldProps) {
+    const __ = useTranslation();
     const s = schema as ArraySchemaProperty;
     const items = (value as Record<string, unknown>[] | undefined) ?? [];
     const subProperties = s.items?.properties ?? {};
@@ -261,13 +263,16 @@ function RepeaterField({ fieldKey, schema, value, onChange }: FieldProps) {
                     onClick={addItem}
                 >
                     <PlusIcon className="mr-1 h-3.5 w-3.5" />
-                    Add item
+                    {__('builder.add_item', 'Add item')}
                 </Button>
             </div>
 
             {items.length === 0 && (
                 <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-                    No items yet. Click "Add item" to get started.
+                    {__(
+                        'builder.no_items_yet',
+                        'No items yet. Click "Add item" to get started.',
+                    )}
                 </div>
             )}
 
@@ -275,7 +280,7 @@ function RepeaterField({ fieldKey, schema, value, onChange }: FieldProps) {
                 <div key={idx} className="rounded-lg border bg-muted/20 p-4">
                     <div className="mb-3 flex items-center justify-between">
                         <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                            Item {idx + 1}
+                            {__('builder.item', 'Item')} {idx + 1}
                         </span>
                         <Button
                             type="button"
@@ -365,6 +370,7 @@ export function DynamicBlockForm({
     onUpdateConfig,
     onUpdateRelations,
 }: DynamicBlockFormProps) {
+    const __ = useTranslation();
     const schema = blockTypeConfig.schema;
     const properties = schema?.properties ?? {};
     const allowedRelations = blockTypeConfig.allowed_relations ?? {};
@@ -453,7 +459,7 @@ export function DynamicBlockForm({
                 <div className="space-y-2">
                     <div className="border-t pt-4">
                         <p className="mb-3 text-sm font-medium text-foreground">
-                            Media
+                            {__('builder.media', 'Media')}
                         </p>
                         <BlockRelationManager
                             blockType={block.type}
@@ -475,7 +481,7 @@ export function DynamicBlockForm({
                 <div className="space-y-2">
                     <div className="border-t pt-4">
                         <p className="mb-3 text-sm font-medium text-foreground">
-                            Linked Content
+                            {__('builder.linked_content', 'Linked Content')}
                         </p>
                         <BlockRelationManager
                             blockType={block.type}
@@ -494,7 +500,10 @@ export function DynamicBlockForm({
 
             {!hasSchemaFields && Object.keys(allowedRelations).length === 0 && (
                 <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-                    No configurable fields for this block type.
+                    {__(
+                        'builder.no_configurable_fields',
+                        'No configurable fields for this block type.',
+                    )}
                 </div>
             )}
         </div>

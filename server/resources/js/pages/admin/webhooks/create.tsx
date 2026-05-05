@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { FormProps, WebhookFormData } from './form.types';
@@ -19,6 +20,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function CreateWebhook({ available_events }: FormProps) {
+    const __ = useTranslation();
     const { data, setData, post, processing, errors } =
         useForm<WebhookFormData>({
             name: '',
@@ -44,17 +46,20 @@ export default function CreateWebhook({ available_events }: FormProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Create Webhook" />
+            <Head title={__('webhook.create_title', 'Create Webhook')} />
             <Wrapper>
                 <PageHeader
-                    title="Create Webhook"
-                    description="Configure a new outgoing webhook endpoint."
+                    title={__('webhook.create_title', 'Create Webhook')}
+                    description={__(
+                        'webhook.create_description',
+                        'Configure a new outgoing webhook endpoint.',
+                    )}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
                             <Link href={WebhookController.index.url()}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                Back
+                                {__('action.back', 'Back')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -62,44 +67,59 @@ export default function CreateWebhook({ available_events }: FormProps) {
 
                 <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
                     <div className="grid gap-2">
-                        <Label htmlFor="name">Name *</Label>
+                        <Label htmlFor="name">
+                            {__('webhook.field_name', 'Name')} *
+                        </Label>
                         <Input
                             id="name"
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
-                            placeholder="e.g. Order Notifications"
+                            placeholder={__(
+                                'webhook.name_placeholder',
+                                'e.g. Order Notifications',
+                            )}
                         />
                         <InputError message={errors.name} />
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="url">URL *</Label>
+                        <Label htmlFor="url">
+                            {__('webhook.field_url', 'URL')} *
+                        </Label>
                         <Input
                             id="url"
                             type="url"
                             value={data.url}
                             onChange={(e) => setData('url', e.target.value)}
-                            placeholder="https://example.com/webhook"
+                            placeholder={__(
+                                'webhook.url_placeholder',
+                                'https://example.com/webhook',
+                            )}
                         />
                         <InputError message={errors.url} />
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">
+                            {__('webhook.field_description', 'Description')}
+                        </Label>
                         <Textarea
                             id="description"
                             value={data.description}
                             onChange={(e) =>
                                 setData('description', e.target.value)
                             }
-                            placeholder="Optional description"
+                            placeholder={__(
+                                'webhook.description_placeholder',
+                                'Optional description',
+                            )}
                             rows={3}
                         />
                         <InputError message={errors.description} />
                     </div>
 
                     <div className="grid gap-2">
-                        <Label>Events *</Label>
+                        <Label>{__('webhook.events', 'Events')} *</Label>
                         <div className="space-y-2 rounded-md border p-3">
                             {available_events.map((event) => (
                                 <div
@@ -132,12 +152,17 @@ export default function CreateWebhook({ available_events }: FormProps) {
                             onCheckedChange={(v) => setData('is_active', v)}
                         />
                         <Label htmlFor="is_active" className="font-normal">
-                            Active (webhook will receive events)
+                            {__(
+                                'webhook.active_label',
+                                'Active (webhook will receive events)',
+                            )}
                         </Label>
                     </div>
 
                     <Button type="submit" disabled={processing}>
-                        {processing ? 'Creating...' : 'Create Webhook'}
+                        {processing
+                            ? __('webhook.creating', 'Creating...')
+                            : __('webhook.create_submit', 'Create Webhook')}
                     </Button>
                 </form>
             </Wrapper>

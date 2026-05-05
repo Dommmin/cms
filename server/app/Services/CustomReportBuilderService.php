@@ -49,11 +49,12 @@ final class CustomReportBuilderService
             return [];
         }
 
+        $allowedFields = $dataSource['fields'];
         $query = $dataSource['model']::query();
 
-        $this->applyFilters($query, $report->filters ?? []);
+        $this->applyFilters($query, $report->filters ?? [], $allowedFields);
         $this->applyDimensions($query, $report->dimensions ?? []);
-        $this->applyGroupBy($query, $report->group_by ?? []);
+        $this->applyGroupBy($query, $report->group_by ?? [], $allowedFields);
 
         $selectFields = $this->buildSelectFields($report, $dataSource);
         $query->selectRaw($selectFields);
@@ -115,8 +116,10 @@ final class CustomReportBuilderService
         return $filters;
     }
 
-    private function applyFilters($query, array $filters): void
+    private function applyFilters($query, array $filters, array $allowedFields): void
     {
+        $allowedOperators = ['=', '!=', '>', '<', '>=', '<=', 'like', 'in', 'not_in'];
+
         foreach ($filters as $filter) {
             $field = $filter['field'] ?? null;
             $operator = $filter['operator'] ?? '=';
@@ -135,6 +138,14 @@ final class CustomReportBuilderService
                     Date::parse($value['end']),
                 ]);
 
+                continue;
+            }
+
+            if (! in_array($field, $allowedFields, true)) {
+                continue;
+            }
+
+            if (! in_array($operator, $allowedOperators, true)) {
                 continue;
             }
 
@@ -159,25 +170,28 @@ final class CustomReportBuilderService
         }
     }
 
-    private function applyGroupBy($query, array $groupBy): void
+    private function applyGroupBy($query, array $groupBy, array $allowedFields): void
     {
         foreach ($groupBy as $group) {
             $field = $group['field'] ?? null;
             $type = $group['type'] ?? null;
-
             if (! $field) {
                 continue;
             }
 
+            if (! in_array($field, $allowedFields, true)) {
+                continue;
+            }
+
             if ($type === 'date') {
-                $query->addSelect(DB::raw(sprintf('DATE(%s) as %s_group', $field, $field)));
-                $query->groupBy(DB::raw(sprintf('DATE(%s)', $field)));
+                $query->addSelect(DB::raw(sprintf('DATE(`%s`) as %s_group', $field, $field)));
+                $query->groupBy(DB::raw(sprintf('DATE(`%s`)', $field)));
             } elseif ($type === 'month') {
-                $query->addSelect(DB::raw(sprintf("DATE_FORMAT(%s, '%%Y-%%m') as %s_group", $field, $field)));
-                $query->groupBy(DB::raw(sprintf("DATE_FORMAT(%s, '%%Y-%%m')", $field)));
+                $query->addSelect(DB::raw(sprintf("DATE_FORMAT(`%s`, '%%Y-%%m') as %s_group", $field, $field)));
+                $query->groupBy(DB::raw(sprintf("DATE_FORMAT(`%s`, '%%Y-%%m')", $field)));
             } elseif ($type === 'week') {
-                $query->addSelect(DB::raw(sprintf('YEARWEEK(%s, 1) as %s_group', $field, $field)));
-                $query->groupBy(DB::raw(sprintf('YEARWEEK(%s, 1)', $field)));
+                $query->addSelect(DB::raw(sprintf('YEARWEEK(`%s`, 1) as %s_group', $field, $field)));
+                $query->groupBy(DB::raw(sprintf('YEARWEEK(`%s`, 1)', $field)));
             } else {
                 $query->addSelect($field);
                 $query->groupBy($field);

@@ -23,6 +23,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { useTranslation } from '@/hooks/use-translation';
 import type { Block, ReusableBlock } from '../types';
 import { BlockCard } from './block-card';
 import { BlockForm } from './block-form';
@@ -39,6 +40,7 @@ function LibraryModal({
     onClose: () => void;
     onSelect: (block: ReusableBlock) => void;
 }) {
+    const __ = useTranslation();
     const [blocks, setBlocks] = useState<ReusableBlock[]>([]);
     const [filtered, setFiltered] = useState<ReusableBlock[]>([]);
     const [query, setQuery] = useState('');
@@ -64,9 +66,16 @@ function LibraryModal({
                 setBlocks(items);
                 setFiltered(items);
             })
-            .catch(() => toast.error('Could not load library'))
+            .catch(() =>
+                toast.error(
+                    __(
+                        'builder.could_not_load_library',
+                        'Could not load library',
+                    ),
+                ),
+            )
             .finally(() => setLoading(false));
-    }, [open]);
+    }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         const q = query.toLowerCase();
@@ -84,10 +93,17 @@ function LibraryModal({
         <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
             <DialogContent className="max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Global Block Library</DialogTitle>
+                    <DialogTitle>
+                        {__(
+                            'builder.global_block_library',
+                            'Global Block Library',
+                        )}
+                    </DialogTitle>
                     <DialogDescription>
-                        Insert a previously saved reusable block into this
-                        section.
+                        {__(
+                            'builder.global_block_library_hint',
+                            'Insert a previously saved reusable block into this section.',
+                        )}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -97,7 +113,10 @@ function LibraryModal({
                         ref={inputRef}
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Search blocks..."
+                        placeholder={__(
+                            'builder.search_blocks',
+                            'Search blocks...',
+                        )}
                         className="pl-9"
                     />
                 </div>
@@ -105,12 +124,15 @@ function LibraryModal({
                 <div className="max-h-64 overflow-y-auto rounded-md border">
                     {loading && (
                         <p className="py-8 text-center text-sm text-muted-foreground">
-                            Loading...
+                            {__('builder.loading', 'Loading...')}
                         </p>
                     )}
                     {!loading && filtered.length === 0 && (
                         <p className="py-8 text-center text-sm text-muted-foreground">
-                            No blocks found in library.
+                            {__(
+                                'builder.no_blocks_in_library',
+                                'No blocks found in library.',
+                            )}
                         </p>
                     )}
                     {!loading &&
@@ -158,6 +180,7 @@ export function BlocksList({
     onMoveBlock,
     onToggleBlock,
 }: BlocksListProps) {
+    const __ = useTranslation();
     const [libraryOpen, setLibraryOpen] = useState(false);
     const [pickerOpen, setPickerOpen] = useState(false);
     const [hasClipboard, setHasClipboard] = useState(false);
@@ -181,7 +204,7 @@ export function BlocksList({
         };
         localStorage.setItem(CLIPBOARD_KEY, JSON.stringify(payload));
         setHasClipboard(true);
-        toast.success('Block copied to clipboard');
+        toast.success(__('builder.block_copied', 'Block copied to clipboard'));
     };
 
     const handlePasteBlock = () => {
@@ -195,9 +218,11 @@ export function BlocksList({
                 is_active: payload.is_active ?? true,
                 relations: payload.relations ?? [],
             });
-            toast.success('Block pasted');
+            toast.success(__('builder.block_pasted', 'Block pasted'));
         } catch {
-            toast.error('Failed to paste block');
+            toast.error(
+                __('builder.block_paste_failed', 'Failed to paste block'),
+            );
         }
     };
 
@@ -237,9 +262,20 @@ export function BlocksList({
                 reusable_block_name: data.name,
             });
 
-            toast.success(`"${name}" saved to Global Block Library`);
+            toast.success(
+                `"${name}" ` +
+                    __(
+                        'builder.saved_to_library',
+                        'saved to Global Block Library',
+                    ),
+            );
         } catch {
-            toast.error('Failed to save global block. Please try again.');
+            toast.error(
+                __(
+                    'builder.save_global_block_failed',
+                    'Failed to save global block. Please try again.',
+                ),
+            );
         }
     };
 
@@ -248,7 +284,10 @@ export function BlocksList({
             reusable_block_id: null,
             reusable_block_name: null,
         });
-        toast('Block unlinked from global library', { icon: '✂️' });
+        toast(
+            __('builder.block_unlinked', 'Block unlinked from global library'),
+            { icon: '✂️' },
+        );
     };
 
     const blockIds = blocks.map((_, index) => `block-${sectionIndex}-${index}`);
@@ -256,7 +295,9 @@ export function BlocksList({
     return (
         <div className="space-y-3">
             <div className="flex items-center justify-between">
-                <h4 className="text-sm font-medium">Blocks</h4>
+                <h4 className="text-sm font-medium">
+                    {__('builder.blocks', 'Blocks')}
+                </h4>
                 <div className="flex items-center gap-2">
                     {hasClipboard && (
                         <Button
@@ -265,7 +306,7 @@ export function BlocksList({
                             variant="outline"
                         >
                             <ClipboardPaste className="mr-2 h-4 w-4" />
-                            Paste Block
+                            {__('builder.paste_block', 'Paste Block')}
                         </Button>
                     )}
                     <Button
@@ -274,7 +315,7 @@ export function BlocksList({
                         variant="outline"
                     >
                         <BookOpen className="mr-2 h-4 w-4" />
-                        From Library
+                        {__('builder.from_library', 'From Library')}
                     </Button>
                     <Button
                         onClick={() => setPickerOpen(true)}
@@ -282,7 +323,7 @@ export function BlocksList({
                         variant="outline"
                     >
                         <Plus className="mr-2 h-4 w-4" />
-                        Add Block
+                        {__('builder.add_block', 'Add Block')}
                     </Button>
                 </div>
             </div>
@@ -290,7 +331,10 @@ export function BlocksList({
             {blocks.length === 0 ? (
                 <div className="rounded-lg border border-dashed p-8 text-center">
                     <p className="text-sm text-muted-foreground">
-                        No blocks yet. Click "Add Block" to get started.
+                        {__(
+                            'builder.no_blocks_yet',
+                            'No blocks yet. Click "Add Block" to get started.',
+                        )}
                     </p>
                 </div>
             ) : (
