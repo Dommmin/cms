@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { LocalizedField } from '@/components/ui/localized-field';
 import {
     Select,
     SelectContent,
@@ -20,7 +21,6 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { LocalizedField } from '@/components/ui/localized-field';
 import Wrapper from '@/components/wrapper';
 import { useAdminLocale } from '@/hooks/use-admin-locale';
 import { useTranslation } from '@/hooks/use-translation';
@@ -60,9 +60,9 @@ export default function Edit({ page, modules, pages }: EditProps) {
     const [contentValues, setContentValues] = useState<Record<string, string>>(
         page.content ?? { [defaultLocale]: '' },
     );
-    const [richContentValues, setRichContentValues] = useState<Record<string, string>>(
-        page.rich_content ?? { [defaultLocale]: '' },
-    );
+    const [richContentValues, setRichContentValues] = useState<
+        Record<string, string>
+    >(page.rich_content ?? { [defaultLocale]: '' });
     const [slugTranslations, setSlugTranslations] = useState<
         Record<string, string>
     >(page.slug_translations ?? {});
@@ -271,7 +271,9 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                         key={`rich_content-${locale.code}`}
                                         type="hidden"
                                         name={`rich_content[${locale.code}]`}
-                                        value={richContentValues[locale.code] ?? ''}
+                                        value={
+                                            richContentValues[locale.code] ?? ''
+                                        }
                                     />
                                 ))}
                                 {/* Hidden inputs for slug translations */}
@@ -674,7 +676,8 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                                             type="number"
                                                             defaultValue={
                                                                 /* eslint-disable @typescript-eslint/no-explicit-any */
-                                                                (page.module_config
+                                                                (page
+                                                                    .module_config
                                                                     ?.content_id as any) ??
                                                                 /* eslint-enable @typescript-eslint/no-explicit-any */
                                                                 ''
@@ -691,20 +694,34 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                                     </div>
                                                     <div className="grid gap-2">
                                                         <LocalizedField
-                                                            label={__('label.rich_content', 'Rich Content')}
+                                                            label={__(
+                                                                'label.rich_content',
+                                                                'Rich Content',
+                                                            )}
                                                             type="richtext"
                                                             name="rich_content"
-                                                            value={richContentValues}
-                                                            onChange={setRichContentValues}
+                                                            value={
+                                                                richContentValues
+                                                            }
+                                                            onChange={
+                                                                setRichContentValues
+                                                            }
                                                         />
                                                     </div>
                                                     <div className="grid gap-2">
                                                         <LocalizedField
-                                                            label={__('label.content_plain', 'Content (plain)')}
+                                                            label={__(
+                                                                'label.content_plain',
+                                                                'Content (plain)',
+                                                            )}
                                                             type="textarea"
                                                             name="content"
-                                                            value={contentValues}
-                                                            onChange={setContentValues}
+                                                            value={
+                                                                contentValues
+                                                            }
+                                                            onChange={
+                                                                setContentValues
+                                                            }
                                                         />
                                                     </div>
                                                 </div>

@@ -14,13 +14,13 @@ use Illuminate\Validation\Rule;
 
 class UpdatePageBuilderRequest extends FormRequest
 {
-    private const MAX_SECTIONS = 100;
+    private const int MAX_SECTIONS = 100;
 
-    private const MAX_BLOCKS_PER_SECTION = 100;
+    private const int MAX_BLOCKS_PER_SECTION = 100;
 
-    private const MAX_SNAPSHOT_BYTES = 1_048_576; // 1 MB
+    private const int MAX_SNAPSHOT_BYTES = 1_048_576; // 1 MB
 
-    private const MAX_CONFIG_BYTES = 65_536; // 64 KB per block
+    private const int MAX_CONFIG_BYTES = 65_536; // 64 KB per block
 
     public function authorize(): bool
     {
@@ -39,7 +39,7 @@ class UpdatePageBuilderRequest extends FormRequest
     public function rules(): array
     {
         $sectionTypes = array_keys((array) config('cms.sections', []));
-        $layoutsBySectionType = (array) config('cms.sections', []);
+        config('cms.sections', []);
         $blockTypes = array_column(PageBlockTypeEnum::cases(), 'value');
 
         return [
@@ -64,16 +64,16 @@ class UpdatePageBuilderRequest extends FormRequest
     /**
      * Sanitize HTML fields in block configurations after validation passes.
      */
-    public function passedValidation(): void
+    protected function passedValidation(): void
     {
         $snapshot = $this->input('snapshot', []);
         $richTextKeys = $this->richTextConfigKeys();
 
-        if (empty($richTextKeys) || empty($snapshot['sections'] ?? [])) {
+        if ($richTextKeys === [] || empty($snapshot['sections'] ?? [])) {
             return;
         }
 
-        $sanitizer = app(HtmlSanitizerService::class);
+        $sanitizer = resolve(HtmlSanitizerService::class);
         $sections = $snapshot['sections'];
 
         foreach ($sections as &$section) {

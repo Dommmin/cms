@@ -100,7 +100,7 @@ class PageBuilderController extends Controller
         }
 
         $this->syncService->sync($pageModel, $request->validated()['snapshot']);
-        $pageModel->increment('version');
+        Page::query()->where('id', $pageModel->id)->increment('version');
 
         return back();
     }
@@ -118,11 +118,11 @@ class PageBuilderController extends Controller
         }
 
         $this->syncService->sync($pageModel, $request->validated()['snapshot']);
-        $pageModel->increment('version');
+        Page::query()->where('id', $pageModel->id)->increment('version');
 
         return response()->json([
             'success' => true,
-            'version' => (int) $pageModel->version + 1,
+            'version' => $pageModel->version + 1,
             'saved_at' => now()->toIso8601String(),
         ]);
     }

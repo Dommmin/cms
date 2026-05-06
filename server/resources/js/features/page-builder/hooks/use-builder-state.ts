@@ -78,7 +78,9 @@ export function useBuilderState(initialSections: Section[]) {
     });
 
     const { sections } = state;
-    const historyDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const historyDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(
+        null,
+    );
 
     const [expandedSections, setExpandedSections] = useState<Set<number>>(
         new Set(),

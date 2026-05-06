@@ -38,8 +38,12 @@ export default function BuilderPage({
         (page.approval_status as ApprovalStatus) ?? 'draft',
     );
 
-    const autoSaveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const autoSaveMaxWaitRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const autoSaveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(
+        null,
+    );
+    const autoSaveMaxWaitRef = useRef<ReturnType<typeof setTimeout> | null>(
+        null,
+    );
     const isFirstRender = useRef(true);
     const localSectionsRef = useRef(localSections);
     localSectionsRef.current = localSections;
@@ -102,7 +106,10 @@ export default function BuilderPage({
                 expected_version: pageVersion,
             })
             .then((res) => {
-                const data = res.data as { version?: number; saved_at?: string };
+                const data = res.data as {
+                    version?: number;
+                    saved_at?: string;
+                };
                 setHasUnsavedChanges(false);
                 setLastSavedAt(new Date());
                 if (data.version !== undefined) {
@@ -164,16 +171,15 @@ export default function BuilderPage({
             e.preventDefault();
         };
         window.addEventListener('beforeunload', handleBeforeUnload);
-        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+        return () =>
+            window.removeEventListener('beforeunload', handleBeforeUnload);
     }, [hasUnsavedChanges]);
 
     // Block Inertia SPA navigation when there are unsaved changes
     useEffect(() => {
         const removeHandler = router.on('before', () => {
             if (!hasUnsavedChanges) return;
-            return window.confirm(
-                'You have unsaved changes. Leave this page?',
-            );
+            return window.confirm('You have unsaved changes. Leave this page?');
         });
         return removeHandler;
     }, [hasUnsavedChanges]);
@@ -188,8 +194,10 @@ export default function BuilderPage({
 
         router.put(
             PageBuilderController.update.url(page.id),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            { snapshot: { sections: updatedSections as any }, expected_version: pageVersion },
+            {
+                snapshot: { sections: updatedSections },
+                expected_version: pageVersion,
+            },
             {
                 preserveScroll: true,
                 onSuccess: () => {
@@ -199,13 +207,18 @@ export default function BuilderPage({
                     setPageVersion((v) => v + 1);
                 },
                 onError: (errors) => {
-                    if ((errors as Record<string, unknown>).status === 409 || Object.keys(errors).length === 0) {
+                    if (
+                        (errors as Record<string, unknown>).status === 409 ||
+                        Object.keys(errors).length === 0
+                    ) {
                         toast.error(
                             'Conflict: this page was modified by another editor. Please refresh.',
                             { duration: 8000 },
                         );
                     } else {
-                        toast.error('Failed to save page builder. Please try again.');
+                        toast.error(
+                            'Failed to save page builder. Please try again.',
+                        );
                     }
                     console.error('Save errors:', errors);
                 },
@@ -314,9 +327,13 @@ export default function BuilderPage({
     };
 
     const handlePreview = async () => {
-        const csrfMeta = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]');
+        const csrfMeta = document.querySelector<HTMLMetaElement>(
+            'meta[name="csrf-token"]',
+        );
         if (!csrfMeta?.content) {
-            toast.error('Preview unavailable: CSRF token missing. Please refresh.');
+            toast.error(
+                'Preview unavailable: CSRF token missing. Please refresh.',
+            );
             return;
         }
         const res = await fetch(PageBuilderController.previewUrl.url(page.id), {

@@ -26,6 +26,7 @@ use Spatie\Translatable\HasTranslations;
 
 /**
  * @property int $id
+ * @property int $version
  * @property int|null $parent_id
  * @property string $title
  * @property string $slug

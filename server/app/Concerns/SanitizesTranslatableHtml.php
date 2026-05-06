@@ -8,23 +8,43 @@ use App\Services\HtmlSanitizerService;
 
 /**
  * Sanitizes HTML for translatable model attributes before they are stored.
- * Requires the model to define `$htmlAttributes` array listing which fields need sanitization.
  *
- * Example:
+ * Uses Eloquent's boot hook (creating/updating) to sanitize all translations
+ * for keys listed in `$htmlAttributes` — no setTranslation() conflict with
+ * Spatie HasTranslations.
+ *
+ * Usage: declare in your model class (not the trait):
  *   protected array $htmlAttributes = ['description', 'short_description'];
  */
 trait SanitizesTranslatableHtml
 {
-    public function setTranslation(string $key, string $locale, mixed $value): static
+    public static function bootSanitizesTranslatableHtml(): void
     {
-        if (
-            is_string($value)
-            && isset($this->htmlAttributes)
-            && in_array($key, $this->htmlAttributes, true)
-        ) {
-            $value = app(HtmlSanitizerService::class)->sanitize($value);
-        }
+        $sanitize = static function (self $model): void {
+            $sanitizer = resolve(HtmlSanitizerService::class);
 
-        return parent::setTranslation($key, $locale, $value);
+            foreach ($model->htmlAttributes as $attribute) {
+                /** @var array<string, mixed> $translations */
+                $translations = $model->getTranslations($attribute);
+                $dirty = false;
+
+                foreach ($translations as $locale => $value) {
+                    if (is_string($value)) {
+                        $clean = $sanitizer->sanitize($value);
+                        if ($clean !== $value) {
+                            $translations[$locale] = $clean;
+                            $dirty = true;
+                        }
+                    }
+                }
+
+                if ($dirty) {
+                    $model->setTranslations($attribute, $translations);
+                }
+            }
+        };
+
+        static::creating($sanitize);
+        static::updating($sanitize);
     }
 }

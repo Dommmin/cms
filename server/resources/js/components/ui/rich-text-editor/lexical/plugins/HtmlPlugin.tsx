@@ -64,7 +64,6 @@ export default function HtmlPlugin({ value, onChange, instanceKey }: HtmlPluginP
         }
 
         lastSyncedValue.current = value;
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [editor, value, instanceKey]);
 
     const handleChange = useCallback(() => {

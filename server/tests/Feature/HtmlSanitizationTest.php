@@ -5,11 +5,13 @@ declare(strict_types=1);
 use App\Models\BlogPost;
 use App\Models\Page;
 use App\Models\Product;
+use App\Models\User;
 use App\Services\HtmlSanitizerService;
+use Spatie\Permission\Models\Role;
 
 describe('HtmlSanitizerService', function (): void {
     it('strips script tags from html', function (): void {
-        $sanitizer = app(HtmlSanitizerService::class);
+        $sanitizer = resolve(HtmlSanitizerService::class);
 
         $malicious = '<p>Hello</p><script>alert(1)</script>';
         $clean = $sanitizer->sanitize($malicious);
@@ -19,7 +21,7 @@ describe('HtmlSanitizerService', function (): void {
     });
 
     it('strips javascript: href', function (): void {
-        $sanitizer = app(HtmlSanitizerService::class);
+        $sanitizer = resolve(HtmlSanitizerService::class);
 
         $malicious = '<a href="javascript:alert(1)">click</a>';
         $clean = $sanitizer->sanitize($malicious);
@@ -28,7 +30,7 @@ describe('HtmlSanitizerService', function (): void {
     });
 
     it('strips onerror event handlers', function (): void {
-        $sanitizer = app(HtmlSanitizerService::class);
+        $sanitizer = resolve(HtmlSanitizerService::class);
 
         $malicious = '<img src="x" onerror="alert(1)">';
         $clean = $sanitizer->sanitize($malicious);
@@ -37,7 +39,7 @@ describe('HtmlSanitizerService', function (): void {
     });
 
     it('preserves allowed html tags', function (): void {
-        $sanitizer = app(HtmlSanitizerService::class);
+        $sanitizer = resolve(HtmlSanitizerService::class);
 
         $html = '<p><strong>Bold</strong> and <em>italic</em></p><ul><li>item</li></ul>';
         $clean = $sanitizer->sanitize($html);
@@ -47,13 +49,13 @@ describe('HtmlSanitizerService', function (): void {
     });
 
     it('returns null for null input', function (): void {
-        $sanitizer = app(HtmlSanitizerService::class);
+        $sanitizer = resolve(HtmlSanitizerService::class);
 
         expect($sanitizer->sanitize(null))->toBeNull();
     });
 
     it('sanitizes array values for given keys', function (): void {
-        $sanitizer = app(HtmlSanitizerService::class);
+        $sanitizer = resolve(HtmlSanitizerService::class);
 
         $data = [
             'title' => 'Safe title <script>alert(1)</script>',
@@ -71,11 +73,14 @@ describe('HtmlSanitizerService', function (): void {
 
 describe('Product model HTML sanitization', function (): void {
     it('sanitizes description on save via api', function (): void {
-        $user = \App\Models\User::factory()->admin()->create();
+        Role::query()->firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $user = User::factory()->create();
+        $user->assignRole('admin');
+
         $product = Product::factory()->create();
 
         $this->actingAs($user)
-            ->putJson("/api/v1/admin/products/{$product->id}", [
+            ->putJson('/api/v1/admin/products/'.$product->id, [
                 'name' => ['en' => 'Test'],
                 'description' => ['en' => '<p>Good</p><script>alert(1)</script>'],
                 'short_description' => ['en' => 'short'],
@@ -87,18 +92,42 @@ describe('Product model HTML sanitization', function (): void {
 });
 
 describe('BlogPost model HTML sanitization', function (): void {
-    it('strips script tags from content when set via setTranslation', function (): void {
-        $post = BlogPost::factory()->make();
-        $post->setTranslation('content', 'en', '<p>Text</p><script>alert(1)</script>');
+    it('strips script tags from content on create', function (): void {
+        $post = BlogPost::factory()->create([
+            'content' => ['en' => '<p>Text</p><script>alert(1)</script>'],
+        ]);
+
+        expect($post->getTranslation('content', 'en'))->not->toContain('<script>')
+            ->and($post->getTranslation('content', 'en'))->toContain('<p>Text</p>');
+    });
+
+    it('strips script tags from content on update', function (): void {
+        $post = BlogPost::factory()->create();
+        $post->setTranslations('content', ['en' => '<p>Text</p><script>alert(1)</script>']);
+        $post->save();
+
+        $post->refresh();
 
         expect($post->getTranslation('content', 'en'))->not->toContain('<script>');
     });
 });
 
 describe('Page model HTML sanitization', function (): void {
-    it('strips script tags from rich_content when set via setTranslation', function (): void {
-        $page = Page::factory()->make();
-        $page->setTranslation('rich_content', 'en', '<p>Text</p><script>alert(1)</script>');
+    it('strips script tags from rich_content on create', function (): void {
+        $page = Page::factory()->create([
+            'rich_content' => ['en' => '<p>Text</p><script>alert(1)</script>'],
+        ]);
+
+        expect($page->getTranslation('rich_content', 'en'))->not->toContain('<script>')
+            ->and($page->getTranslation('rich_content', 'en'))->toContain('<p>Text</p>');
+    });
+
+    it('strips script tags from rich_content on update', function (): void {
+        $page = Page::factory()->create();
+        $page->setTranslations('rich_content', ['en' => '<p>Text</p><script>alert(1)</script>']);
+        $page->save();
+
+        $page->refresh();
 
         expect($page->getTranslation('rich_content', 'en'))->not->toContain('<script>');
     });

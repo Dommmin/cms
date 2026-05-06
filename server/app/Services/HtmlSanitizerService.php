@@ -15,13 +15,13 @@ class HtmlSanitizerService
     /**
      * Full RTE output — articles, blog posts, products, page rich_content.
      */
-    public function sanitize(string|null $html): string|null
+    public function sanitize(?string $html): ?string
     {
         if ($html === null) {
             return null;
         }
 
-        if (trim($html) === '') {
+        if (mb_trim($html) === '') {
             return $html;
         }
 
@@ -31,13 +31,13 @@ class HtmlSanitizerService
     /**
      * Basic inline formatting — short descriptions in page builder.
      */
-    public function sanitizeBasic(string|null $html): string|null
+    public function sanitizeBasic(?string $html): ?string
     {
         if ($html === null) {
             return null;
         }
 
-        if (trim($html) === '') {
+        if (mb_trim($html) === '') {
             return $html;
         }
 
