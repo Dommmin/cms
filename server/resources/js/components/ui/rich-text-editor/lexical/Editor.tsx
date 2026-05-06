@@ -51,7 +51,7 @@ function EditablePlugin({ editable }: { editable: boolean }): null {
     return null;
 }
 
-export default function Editor({ value, onChange, placeholder = 'Start writing...', className, maxHeight, editable = true, showWordCount = true }: EditorProps): JSX.Element {
+export default function Editor({ value, onChange, placeholder = 'Start writing...', className, maxHeight, editable = true, showWordCount = true, instanceKey }: EditorProps): JSX.Element {
     const containerRef = useRef<HTMLDivElement>(null);
     const config = useRef(buildConfig(editable));
 
@@ -78,7 +78,7 @@ export default function Editor({ value, onChange, placeholder = 'Start writing..
                 <HistoryPlugin />
                 <ListPlugin />
                 <CheckListPlugin />
-                <LinkPlugin validateUrl={(url) => /^https?:\/\//.test(url) || /^mailto:/.test(url)} />
+                <LinkPlugin validateUrl={(url) => /^(https?:\/\/|mailto:|tel:|\/|#)/.test(url)} />
                 {editable && <AutoLinkPlugin />}
                 <CodePlugin />
                 <TablePlugin hasCellMerge hasCellBackgroundColor />
@@ -88,7 +88,7 @@ export default function Editor({ value, onChange, placeholder = 'Start writing..
                 {editable && <SlashCommandPlugin />}
                 {/* eslint-disable-next-line react-hooks/refs */}
                 {editable && <DraggableBlockPlugin anchorElem={containerRef.current ?? undefined} />}
-                <HtmlPlugin value={value} onChange={onChange} />
+                <HtmlPlugin value={value} onChange={onChange} instanceKey={instanceKey} />
                 <EditablePlugin editable={editable} />
                 <CopyCodePlugin />
                 {showWordCount && <WordCountPlugin />}

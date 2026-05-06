@@ -9,6 +9,7 @@ import type {
 export type SortableSectionProps = {
     section: Section;
     index: number;
+    pageId: number;
     isExpanded: boolean;
     expandedBlocks: Set<string>;
     availableSections: Record<string, AvailableSection>;

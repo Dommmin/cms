@@ -10,6 +10,8 @@ export type PageData = {
     slug: string;
     slug_translations: Record<string, string> | null;
     excerpt: Record<string, string> | null;
+    content: Record<string, string> | null;
+    rich_content: Record<string, string> | null;
     layout: string;
     page_type: string;
     module_name: string | null;

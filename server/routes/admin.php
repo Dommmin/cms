@@ -241,9 +241,6 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('admin')->name(
     Route::get('webhooks/{webhook}/deliveries', [WebhookController::class, 'deliveries'])->name('webhooks.deliveries');
     Route::post('webhooks/{webhook}/test', [WebhookController::class, 'test'])->name('webhooks.test');
 
-    // Editor playground
-    Route::get('editor', fn () => inertia('admin/editor'))->name('editor');
-
     // Support
     Route::prefix('support')->name('support.')->group(function (): void {
         Route::get('/', [SupportConversationController::class, 'index'])->name('index');

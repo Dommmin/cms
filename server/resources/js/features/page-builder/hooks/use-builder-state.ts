@@ -3,7 +3,7 @@
  * Manages page builder state and operations, with undo/redo history (up to 20 steps).
  */
 
-import { useCallback, useReducer, useState } from 'react';
+import { useCallback, useReducer, useRef, useState } from 'react';
 import type { Block, Section } from '../types';
 
 const MAX_HISTORY = 20;
@@ -18,6 +18,8 @@ type HistoryState = {
 
 type HistoryAction =
     | { type: 'SET'; sections: Section[] }
+    | { type: 'SET_SILENT'; sections: Section[] }
+    | { type: 'COMMIT_HISTORY'; sections: Section[] }
     | { type: 'UNDO' }
     | { type: 'REDO' };
 
@@ -30,6 +32,14 @@ function historyReducer(
             return {
                 sections: action.sections,
                 past: [...state.past, state.sections].slice(-MAX_HISTORY),
+                future: [],
+            };
+        case 'SET_SILENT':
+            return { ...state, sections: action.sections };
+        case 'COMMIT_HISTORY':
+            return {
+                sections: action.sections,
+                past: [...state.past, action.sections].slice(-MAX_HISTORY),
                 future: [],
             };
         case 'UNDO': {
@@ -56,6 +66,8 @@ function historyReducer(
     }
 }
 
+const HISTORY_DEBOUNCE_MS = 500;
+
 // ── Hook ────────────────────────────────────────────────────────────────────
 
 export function useBuilderState(initialSections: Section[]) {
@@ -66,6 +78,7 @@ export function useBuilderState(initialSections: Section[]) {
     });
 
     const { sections } = state;
+    const historyDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const [expandedSections, setExpandedSections] = useState<Set<number>>(
         new Set(),
@@ -174,18 +187,24 @@ export function useBuilderState(initialSections: Section[]) {
 
     const updateBlock = useCallback(
         (sectionIndex: number, blockIndex: number, patch: Partial<Block>) => {
-            dispatch({
-                type: 'SET',
-                sections: sections.map((section, si) => {
-                    if (si !== sectionIndex) return section;
-                    return {
-                        ...section,
-                        blocks: section.blocks.map((block, bi) =>
-                            bi === blockIndex ? { ...block, ...patch } : block,
-                        ),
-                    };
-                }),
+            const newSections = sections.map((section, si) => {
+                if (si !== sectionIndex) return section;
+                return {
+                    ...section,
+                    blocks: section.blocks.map((block, bi) =>
+                        bi === blockIndex ? { ...block, ...patch } : block,
+                    ),
+                };
             });
+            // Update sections immediately (responsive UI) but debounce history push.
+            dispatch({ type: 'SET_SILENT', sections: newSections });
+
+            if (historyDebounceRef.current) {
+                clearTimeout(historyDebounceRef.current);
+            }
+            historyDebounceRef.current = setTimeout(() => {
+                dispatch({ type: 'COMMIT_HISTORY', sections: newSections });
+            }, HISTORY_DEBOUNCE_MS);
         },
         [sections],
     );

@@ -10,6 +10,7 @@ import {
     LockIcon,
     UnlinkIcon,
 } from 'lucide-react';
+import { useMemo } from 'react';
 import { Label } from '@/components/ui/label';
 import {
     Select,
@@ -33,6 +34,19 @@ export function BlockForm({
     const __ = useTranslation();
     const currentBlockConfig = availableBlockTypes[block.type];
     const isLinkedGlobal = !!block.reusable_block_id;
+
+    const grouped = useMemo(
+        () =>
+            Object.entries(availableBlockTypes).reduce<
+                Record<string, Array<[string, BlockTypeConfig]>>
+            >((acc, entry) => {
+                const [, config] = entry;
+                const cat = config.category ?? 'other';
+                (acc[cat] ??= []).push(entry);
+                return acc;
+            }, {}),
+        [availableBlockTypes],
+    );
 
     // Locked block — show unlock banner and return early
     if (block.configuration._locked) {
@@ -69,16 +83,6 @@ export function BlockForm({
             </div>
         );
     }
-
-    // Group block types by category for the selector
-    const grouped = Object.entries(availableBlockTypes).reduce<
-        Record<string, Array<[string, BlockTypeConfig]>>
-    >((acc, entry) => {
-        const [, config] = entry;
-        const cat = config.category ?? 'other';
-        (acc[cat] ??= []).push(entry);
-        return acc;
-    }, {});
 
     return (
         <div className="space-y-5">

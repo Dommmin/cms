@@ -9,8 +9,9 @@ export type ApprovalStatus = 'draft' | 'in_review' | 'approved';
 export type BuilderPageProps = {
     page: {
         id: number;
-        title: string;
+        title: string | Record<string, string>;
         slug: string;
+        version?: number;
         is_published?: boolean;
         scheduled_publish_at?: string | null;
         scheduled_unpublish_at?: string | null;

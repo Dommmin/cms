@@ -1,4 +1,5 @@
 import { Head, router } from '@inertiajs/react';
+import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import * as PageApprovalController from '@/actions/App/Http/Controllers/Admin/Cms/PageApprovalController';
@@ -8,10 +9,12 @@ import * as SectionTemplateController from '@/actions/App/Http/Controllers/Admin
 import type { ApprovalStatus, Section } from '@/features/page-builder';
 import { PageBuilder } from '@/features/page-builder';
 import AppLayout from '@/layouts/app-layout';
+import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
 import type { BuilderPageProps } from './builder.types';
 
-const AUTO_SAVE_DELAY_MS = 30_000;
+const AUTO_SAVE_DEBOUNCE_MS = 5_000;
+const AUTO_SAVE_MAX_WAIT_MS = 60_000;
 
 export default function BuilderPage({
     page,
@@ -24,6 +27,7 @@ export default function BuilderPage({
     const [localSections, setLocalSections] = useState<Section[]>(sections);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+    const [pageVersion, setPageVersion] = useState<number>(page.version ?? 0);
     const [scheduledPublishAt, setScheduledPublishAt] = useState<string | null>(
         page.scheduled_publish_at ?? null,
     );
@@ -34,14 +38,18 @@ export default function BuilderPage({
         (page.approval_status as ApprovalStatus) ?? 'draft',
     );
 
-    const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    // Track whether sections have been changed since mount (skip first render)
+    const autoSaveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const autoSaveMaxWaitRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const isFirstRender = useRef(true);
+    const localSectionsRef = useRef(localSections);
+    localSectionsRef.current = localSections;
+
+    const displayTitle = resolveLocalizedText(page.title);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'CMS', href: PageController.index.url() },
         { title: 'Pages', href: PageController.index.url() },
-        { title: page.title, href: PageController.edit.url(page.id) },
+        { title: displayTitle, href: PageController.edit.url(page.id) },
         { title: 'Builder', href: '' },
     ];
 
@@ -70,7 +78,6 @@ export default function BuilderPage({
             return true;
         };
 
-        // Retry a few times — the block cards render after sections are mounted
         let attempts = 0;
         const interval = setInterval(() => {
             if (tryScroll() || ++attempts >= 10) clearInterval(interval);
@@ -87,39 +94,89 @@ export default function BuilderPage({
         setHasUnsavedChanges(true);
     }, [localSections]);
 
-    // Auto-save every 30s when there are unsaved changes
+    const runAutoSave = () => {
+        setIsAutoSaving(true);
+        axios
+            .put(PageBuilderController.autosave.url(page.id), {
+                snapshot: { sections: localSectionsRef.current },
+                expected_version: pageVersion,
+            })
+            .then((res) => {
+                const data = res.data as { version?: number; saved_at?: string };
+                setHasUnsavedChanges(false);
+                setLastSavedAt(new Date());
+                if (data.version !== undefined) {
+                    setPageVersion(data.version);
+                }
+            })
+            .catch((err) => {
+                if (axios.isAxiosError(err) && err.response?.status === 409) {
+                    toast.error(
+                        'Conflict: this page was edited by another user. Refresh to load the latest version.',
+                        { duration: 8000 },
+                    );
+                }
+            })
+            .finally(() => {
+                setIsAutoSaving(false);
+            });
+    };
+
+    // Auto-save: debounce 5s + maxWait 60s
     useEffect(() => {
         if (!hasUnsavedChanges) return;
 
-        if (autoSaveTimerRef.current) {
-            clearTimeout(autoSaveTimerRef.current);
+        // Debounce timer — resets on every change
+        if (autoSaveDebounceRef.current) {
+            clearTimeout(autoSaveDebounceRef.current);
+        }
+        autoSaveDebounceRef.current = setTimeout(() => {
+            if (autoSaveMaxWaitRef.current) {
+                clearTimeout(autoSaveMaxWaitRef.current);
+                autoSaveMaxWaitRef.current = null;
+            }
+            runAutoSave();
+        }, AUTO_SAVE_DEBOUNCE_MS);
+
+        // Max-wait timer — fires even if user keeps typing
+        if (!autoSaveMaxWaitRef.current) {
+            autoSaveMaxWaitRef.current = setTimeout(() => {
+                if (autoSaveDebounceRef.current) {
+                    clearTimeout(autoSaveDebounceRef.current);
+                    autoSaveDebounceRef.current = null;
+                }
+                runAutoSave();
+            }, AUTO_SAVE_MAX_WAIT_MS);
         }
 
-        autoSaveTimerRef.current = setTimeout(() => {
-            setIsAutoSaving(true);
-            router.put(
-                PageBuilderController.update.url(page.id),
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                { snapshot: { sections: localSections as any } },
-                {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        setHasUnsavedChanges(false);
-                        setLastSavedAt(new Date());
-                    },
-                    onFinish: () => {
-                        setIsAutoSaving(false);
-                    },
-                },
-            );
-        }, AUTO_SAVE_DELAY_MS);
-
         return () => {
-            if (autoSaveTimerRef.current) {
-                clearTimeout(autoSaveTimerRef.current);
+            if (autoSaveDebounceRef.current) {
+                clearTimeout(autoSaveDebounceRef.current);
             }
         };
-    }, [hasUnsavedChanges, localSections]); // eslint-disable-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hasUnsavedChanges, localSections]);
+
+    // Warn on browser close/refresh when there are unsaved changes
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (!hasUnsavedChanges) return;
+            e.preventDefault();
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [hasUnsavedChanges]);
+
+    // Block Inertia SPA navigation when there are unsaved changes
+    useEffect(() => {
+        const removeHandler = router.on('before', () => {
+            if (!hasUnsavedChanges) return;
+            return window.confirm(
+                'You have unsaved changes. Leave this page?',
+            );
+        });
+        return removeHandler;
+    }, [hasUnsavedChanges]);
 
     const handleSectionsChange = (updatedSections: Section[]) => {
         setLocalSections(updatedSections);
@@ -132,18 +189,24 @@ export default function BuilderPage({
         router.put(
             PageBuilderController.update.url(page.id),
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            { snapshot: { sections: updatedSections as any } },
+            { snapshot: { sections: updatedSections as any }, expected_version: pageVersion },
             {
                 preserveScroll: true,
                 onSuccess: () => {
                     toast.success('Page builder saved successfully');
                     setHasUnsavedChanges(false);
                     setLastSavedAt(new Date());
+                    setPageVersion((v) => v + 1);
                 },
                 onError: (errors) => {
-                    toast.error(
-                        'Failed to save page builder. Please try again.',
-                    );
+                    if ((errors as Record<string, unknown>).status === 409 || Object.keys(errors).length === 0) {
+                        toast.error(
+                            'Conflict: this page was modified by another editor. Please refresh.',
+                            { duration: 8000 },
+                        );
+                    } else {
+                        toast.error('Failed to save page builder. Please try again.');
+                    }
                     console.error('Save errors:', errors);
                 },
                 onFinish: () => {
@@ -251,12 +314,14 @@ export default function BuilderPage({
     };
 
     const handlePreview = async () => {
-        const token = (
-            document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement
-        )?.content;
+        const csrfMeta = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]');
+        if (!csrfMeta?.content) {
+            toast.error('Preview unavailable: CSRF token missing. Please refresh.');
+            return;
+        }
         const res = await fetch(PageBuilderController.previewUrl.url(page.id), {
             headers: {
-                'X-CSRF-TOKEN': token ?? '',
+                'X-CSRF-TOKEN': csrfMeta.content,
                 Accept: 'application/json',
             },
         });
@@ -266,7 +331,6 @@ export default function BuilderPage({
         }
     };
 
-    // Always use localSections so unsaved changes survive any state toggle
     const builderData = {
         page: { ...page, is_published: page.is_published ?? false },
         sections: localSections,
@@ -276,7 +340,7 @@ export default function BuilderPage({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Builder - ${page.title}`} />
+            <Head title={`Builder - ${displayTitle}`} />
 
             <div>
                 <PageBuilder

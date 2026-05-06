@@ -165,11 +165,13 @@ function LibraryModal({
     );
 }
 
-const CLIPBOARD_KEY = 'pb_clipboard';
+const CLIPBOARD_KEY_PREFIX = 'pb_clipboard:';
+const CLIPBOARD_MAX_BYTES = 1_048_576; // 1 MB
 
 export function BlocksList({
     blocks,
     sectionIndex,
+    pageId,
     expandedBlocks,
     availableBlockTypes,
     onAddBlock,
@@ -181,6 +183,7 @@ export function BlocksList({
     onToggleBlock,
 }: BlocksListProps) {
     const __ = useTranslation();
+    const clipboardKey = `${CLIPBOARD_KEY_PREFIX}${pageId}`;
     const [libraryOpen, setLibraryOpen] = useState(false);
     const [pickerOpen, setPickerOpen] = useState(false);
     const [hasClipboard, setHasClipboard] = useState(false);
@@ -188,11 +191,11 @@ export function BlocksList({
     // Check clipboard on mount and when storage changes
     useEffect(() => {
         const check = () =>
-            setHasClipboard(!!localStorage.getItem(CLIPBOARD_KEY));
+            setHasClipboard(!!localStorage.getItem(clipboardKey));
         check();
         window.addEventListener('storage', check);
         return () => window.removeEventListener('storage', check);
-    }, []);
+    }, [clipboardKey]);
 
     const handleCopyBlock = (blockIndex: number) => {
         const block = blocks[blockIndex];
@@ -202,13 +205,34 @@ export function BlocksList({
             is_active: block.is_active,
             relations: block.relations ?? [],
         };
-        localStorage.setItem(CLIPBOARD_KEY, JSON.stringify(payload));
-        setHasClipboard(true);
-        toast.success(__('builder.block_copied', 'Block copied to clipboard'));
+        const serialized = JSON.stringify(payload);
+        if (serialized.length > CLIPBOARD_MAX_BYTES) {
+            toast.error(
+                __(
+                    'builder.block_too_large_to_copy',
+                    'Block is too large to copy',
+                ),
+            );
+            return;
+        }
+        try {
+            localStorage.setItem(clipboardKey, serialized);
+            setHasClipboard(true);
+            toast.success(
+                __('builder.block_copied', 'Block copied to clipboard'),
+            );
+        } catch {
+            toast.error(
+                __(
+                    'builder.block_copy_failed',
+                    'Failed to copy block (storage full)',
+                ),
+            );
+        }
     };
 
     const handlePasteBlock = () => {
-        const raw = localStorage.getItem(CLIPBOARD_KEY);
+        const raw = localStorage.getItem(clipboardKey);
         if (!raw) return;
         try {
             const payload = JSON.parse(raw) as Partial<Block>;

@@ -65,6 +65,7 @@ class PageBuilderController extends Controller
                 'id' => $pageModel->id,
                 'title' => $pageModel->title,
                 'slug' => $pageModel->slug,
+                'version' => $pageModel->version ?? 0,
                 'approval_status' => $pageModel->approval_status ?? 'draft',
                 'review_note' => $pageModel->review_note,
                 'scheduled_publish_at' => $pageModel->scheduled_publish_at?->toIso8601String(),
@@ -86,12 +87,44 @@ class PageBuilderController extends Controller
         ]);
     }
 
-    public function update(UpdatePageBuilderRequest $request, int $page): RedirectResponse
+    public function update(UpdatePageBuilderRequest $request, int $page): RedirectResponse|JsonResponse
     {
         $pageModel = Page::query()->findOrFail($page);
+
+        $expectedVersion = $request->input('expected_version');
+        if ($expectedVersion !== null && (int) $expectedVersion !== (int) $pageModel->version) {
+            return response()->json([
+                'message' => 'The page has been modified by another editor. Please refresh and try again.',
+                'current_version' => $pageModel->version,
+            ], 409);
+        }
+
         $this->syncService->sync($pageModel, $request->validated()['snapshot']);
+        $pageModel->increment('version');
 
         return back();
+    }
+
+    public function autosave(UpdatePageBuilderRequest $request, int $page): JsonResponse
+    {
+        $pageModel = Page::query()->findOrFail($page);
+
+        $expectedVersion = $request->input('expected_version');
+        if ($expectedVersion !== null && (int) $expectedVersion !== (int) $pageModel->version) {
+            return response()->json([
+                'message' => 'Conflict: page was modified externally.',
+                'current_version' => $pageModel->version,
+            ], 409);
+        }
+
+        $this->syncService->sync($pageModel, $request->validated()['snapshot']);
+        $pageModel->increment('version');
+
+        return response()->json([
+            'success' => true,
+            'version' => (int) $pageModel->version + 1,
+            'saved_at' => now()->toIso8601String(),
+        ]);
     }
 
     public function schedule(SchedulePageRequest $request, int $page): RedirectResponse

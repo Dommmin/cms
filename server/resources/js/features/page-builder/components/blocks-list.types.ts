@@ -3,6 +3,7 @@ import type { Block, BlockTypeConfig, ReusableBlock } from '../types';
 export type BlocksListProps = {
     blocks: Block[];
     sectionIndex: number;
+    pageId: number;
     expandedBlocks: Set<string>;
     availableBlockTypes: Record<string, BlockTypeConfig>;
     onAddBlock: (type: string) => void;

@@ -12,6 +12,7 @@ import type { SortableSectionProps } from './sortable-section.types';
 export function SortableSection({
     section,
     index,
+    pageId,
     isExpanded,
     expandedBlocks,
     availableSections,
@@ -48,6 +49,7 @@ export function SortableSection({
                 <BlocksList
                     blocks={section.blocks}
                     sectionIndex={index}
+                    pageId={pageId}
                     expandedBlocks={expandedBlocks}
                     availableBlockTypes={availableBlockTypes}
                     onAddBlock={onAddBlock}

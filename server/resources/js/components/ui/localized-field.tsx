@@ -101,6 +101,7 @@ export function LocalizedField({
                     value={value[activeLocale] ?? ''}
                     onChange={update}
                     placeholder={placeholder ?? label}
+                    instanceKey={`${activeLocale}`}
                 />
             )}
 

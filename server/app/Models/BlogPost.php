@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Concerns\HasMetafields;
 use App\Concerns\HasTags;
 use App\Concerns\HasVersions;
+use App\Concerns\SanitizesTranslatableHtml;
 use App\Enums\BlogPostStatusEnum;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -48,9 +49,13 @@ class BlogPost extends Model
     use HasTranslations;
     use HasVersions;
     use LogsActivity;
+    use SanitizesTranslatableHtml;
 
     /** @var array<int, string> */
     public array $translatable = ['title', 'excerpt', 'content'];
+
+    /** @var array<int, string> */
+    protected array $htmlAttributes = ['content', 'excerpt'];
 
     /** @var array<int, string> */
     protected array $versionedAttributes = [

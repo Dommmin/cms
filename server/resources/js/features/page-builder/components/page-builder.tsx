@@ -197,6 +197,7 @@ export function PageBuilder({
                                         key={index}
                                         section={section}
                                         index={index}
+                                        pageId={data.page.id}
                                         isExpanded={expandedSections.has(index)}
                                         expandedBlocks={expandedBlocks}
                                         availableSections={

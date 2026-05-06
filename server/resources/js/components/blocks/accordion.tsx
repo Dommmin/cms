@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import type { AccordionProps } from './accordion.types';
 
 // Simple accessible accordion block
@@ -21,7 +22,9 @@ export default function AccordionBlock({ heading, items }: AccordionProps) {
                         </summary>
                         <div
                             className="px-2 pb-2 text-sm text-gray-700"
-                            dangerouslySetInnerHTML={{ __html: it.content }}
+                            dangerouslySetInnerHTML={{
+                                __html: DOMPurify.sanitize(it.content ?? ''),
+                            }}
                         />
                     </details>
                 ))}

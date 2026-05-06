@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { LocalizedField } from '@/components/ui/localized-field';
 import Wrapper from '@/components/wrapper';
 import { useAdminLocale } from '@/hooks/use-admin-locale';
 import { useTranslation } from '@/hooks/use-translation';
@@ -55,6 +56,12 @@ export default function Edit({ page, modules, pages }: EditProps) {
     );
     const [excerptValues, setExcerptValues] = useState<Record<string, string>>(
         page.excerpt ?? { [defaultLocale]: '' },
+    );
+    const [contentValues, setContentValues] = useState<Record<string, string>>(
+        page.content ?? { [defaultLocale]: '' },
+    );
+    const [richContentValues, setRichContentValues] = useState<Record<string, string>>(
+        page.rich_content ?? { [defaultLocale]: '' },
     );
     const [slugTranslations, setSlugTranslations] = useState<
         Record<string, string>
@@ -249,6 +256,22 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                         type="hidden"
                                         name={`excerpt[${locale.code}]`}
                                         value={excerptValues[locale.code] ?? ''}
+                                    />
+                                ))}
+                                {locales.map((locale) => (
+                                    <input
+                                        key={`content-${locale.code}`}
+                                        type="hidden"
+                                        name={`content[${locale.code}]`}
+                                        value={contentValues[locale.code] ?? ''}
+                                    />
+                                ))}
+                                {locales.map((locale) => (
+                                    <input
+                                        key={`rich_content-${locale.code}`}
+                                        type="hidden"
+                                        name={`rich_content[${locale.code}]`}
+                                        value={richContentValues[locale.code] ?? ''}
                                     />
                                 ))}
                                 {/* Hidden inputs for slug translations */}
@@ -637,33 +660,53 @@ export default function Edit({ page, modules, pages }: EditProps) {
 
                                         {pageType === 'module' &&
                                             moduleName === 'content' && (
-                                                <div className="grid gap-2">
-                                                    <Label htmlFor="content_id">
-                                                        {__(
-                                                            'label.content_entry_id',
-                                                            'Content entry ID',
-                                                        )}
-                                                    </Label>
-                                                    <Input
-                                                        id="content_id"
-                                                        name="module_config[content_id]"
-                                                        type="number"
-                                                        defaultValue={
-                                                            /* eslint-disable @typescript-eslint/no-explicit-any */
-                                                            (page.module_config
-                                                                ?.content_id as any) ??
-                                                            /* eslint-enable @typescript-eslint/no-explicit-any */
-                                                            ''
-                                                        }
-                                                    />
-                                                    <InputError
-                                                        message={
-                                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                            (errors as any)[
-                                                                'module_config.content_id'
-                                                            ]
-                                                        }
-                                                    />
+                                                <div className="space-y-4">
+                                                    <div className="grid gap-2">
+                                                        <Label htmlFor="content_id">
+                                                            {__(
+                                                                'label.content_entry_id',
+                                                                'Content entry ID',
+                                                            )}
+                                                        </Label>
+                                                        <Input
+                                                            id="content_id"
+                                                            name="module_config[content_id]"
+                                                            type="number"
+                                                            defaultValue={
+                                                                /* eslint-disable @typescript-eslint/no-explicit-any */
+                                                                (page.module_config
+                                                                    ?.content_id as any) ??
+                                                                /* eslint-enable @typescript-eslint/no-explicit-any */
+                                                                ''
+                                                            }
+                                                        />
+                                                        <InputError
+                                                            message={
+                                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                                (errors as any)[
+                                                                    'module_config.content_id'
+                                                                ]
+                                                            }
+                                                        />
+                                                    </div>
+                                                    <div className="grid gap-2">
+                                                        <LocalizedField
+                                                            label={__('label.rich_content', 'Rich Content')}
+                                                            type="richtext"
+                                                            name="rich_content"
+                                                            value={richContentValues}
+                                                            onChange={setRichContentValues}
+                                                        />
+                                                    </div>
+                                                    <div className="grid gap-2">
+                                                        <LocalizedField
+                                                            label={__('label.content_plain', 'Content (plain)')}
+                                                            type="textarea"
+                                                            name="content"
+                                                            value={contentValues}
+                                                            onChange={setContentValues}
+                                                        />
+                                                    </div>
                                                 </div>
                                             )}
 

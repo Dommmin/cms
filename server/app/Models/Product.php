@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Concerns\HasMetafields;
 use App\Concerns\HasTags;
 use App\Concerns\HasVersions;
+use App\Concerns\SanitizesTranslatableHtml;
 use App\Enums\ReviewStatusEnum;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -43,10 +44,14 @@ class Product extends Model implements HasMedia
     use HasVersions;
     use InteractsWithMedia;
     use LogsActivity;
+    use SanitizesTranslatableHtml;
     use Searchable;
 
     /** @var array<int, string> */
     public array $translatable = ['name', 'description', 'short_description'];
+
+    /** @var array<int, string> */
+    protected array $htmlAttributes = ['description', 'short_description'];
 
     /** @var array<int, string> */
     protected array $versionedAttributes = [

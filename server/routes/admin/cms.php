@@ -38,6 +38,7 @@ Route::prefix('cms')->name('cms.')->group(function (): void {
     Route::get('pages/{page}/preview-url', [PageBuilderController::class, 'previewUrl'])->name('pages.builder.preview-url');
     Route::get('pages/{page}/builder', [PageBuilderController::class, 'show'])->name('pages.builder');
     Route::put('pages/{page}/builder', [PageBuilderController::class, 'update'])->name('pages.builder.update');
+    Route::put('pages/{page}/builder/autosave', [PageBuilderController::class, 'autosave'])->middleware('throttle:60,1')->name('pages.builder.autosave');
     Route::put('pages/{page}/builder/schedule', [PageBuilderController::class, 'schedule'])->name('pages.builder.schedule');
     Route::get('pages/{page}/builder/export', [PageBuilderController::class, 'export'])->name('pages.builder.export');
     Route::post('pages/{page}/builder/import', [PageBuilderController::class, 'import'])->name('pages.builder.import');

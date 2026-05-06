@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Concerns\HasMetafields;
 use App\Concerns\HasTags;
+use App\Concerns\SanitizesTranslatableHtml;
 use App\Enums\PageLayoutEnum;
 use App\Enums\PageTypeEnum;
 use Carbon\CarbonInterface;
@@ -81,9 +82,13 @@ class Page extends Model
     use HasTags;
     use HasTranslations;
     use LogsActivity;
+    use SanitizesTranslatableHtml;
 
     /** @var array<int, string> */
     public array $translatable = ['title', 'excerpt', 'content', 'rich_content'];
+
+    /** @var array<int, string> */
+    protected array $htmlAttributes = ['content', 'rich_content', 'excerpt'];
 
     /**
      * Find a published page by path segments (e.g. ['parent', 'child'] for URL /parent/child).
