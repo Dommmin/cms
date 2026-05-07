@@ -1,8 +1,9 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import type { Metadata } from 'next';
 
+import { getBlogCategories, getBlogPosts } from '@/api/cms';
 import { BlogListClient } from '@/components/blog-list-client';
-import { blogKeys, getBlogCategories, getBlogPosts } from '@/hooks/use-blog';
+import { blogKeys } from '@/hooks/blog-keys';
 import { getServerQueryClient } from '@/lib/query-client';
 import { generateAlternates } from '@/lib/seo';
 import type { PageProps } from './page.types';

@@ -3,28 +3,13 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { getBlogCategories, getBlogPost, getBlogPosts } from '@/api/cms';
+import type { BlogPostParams } from '@/hooks/blog-keys';
+import { blogKeys } from '@/hooks/blog-keys';
 import { apiGet, apiGetMany, apiGetPage } from '@/lib/api';
 import type { BlogCategory, BlogPost, PaginatedResponse } from '@/types/api';
 
-export interface BlogPostParams {
-    page?: number;
-    per_page?: number;
-    category?: string;
-    locale?: string;
-    sort?: string;
-    search?: string;
-}
-
-// ── Query key factory ─────────────────────────────────────────────────────────
-
-export const blogKeys = {
-    all: ['blog'] as const,
-    posts: (params: BlogPostParams) => ['blog', 'posts', params] as const,
-    post: (slug: string, locale: string) =>
-        ['blog', 'post', slug, locale] as const,
-    categories: () => ['blog', 'categories'] as const,
-    comments: (slug: string) => ['blog', 'comments', slug] as const,
-};
+export { blogKeys };
+export type { BlogPostParams };
 
 // ── Client-side API functions (axios, sends auth header) ──────────────────────
 

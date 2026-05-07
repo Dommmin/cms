@@ -1,10 +1,10 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import type { Metadata } from 'next';
 
-import { getBlogPosts } from '@/api/cms';
+import { getBlogPost, getBlogPosts } from '@/api/cms';
 import { getBlogPostMetadata } from '@/app/blog/_blog-metadata';
 import { BlogPostClient } from '@/components/blog-post-client';
-import { blogKeys, getBlogPost } from '@/hooks/use-blog';
+import { blogKeys } from '@/hooks/blog-keys';
 import { DEFAULT_LOCALE } from '@/lib/i18n';
 import { getServerQueryClient } from '@/lib/query-client';
 import { generateAlternates } from '@/lib/seo';
