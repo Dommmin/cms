@@ -1,9 +1,11 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { getBlogCategories, getBlogPosts } from '@/api/cms';
-import { BackToTop } from '@/components/back-to-top';
-import { localePath } from '@/lib/i18n';
+import { useBlogCategories, useBlogPosts } from '@/hooks/use-blog';
+import { useLocalePath } from '@/hooks/use-locale';
+import type { BlogListClientProps } from './blog-list-client.types';
 
 const SORT_OPTIONS = [
     { value: '-created_at', label: 'Newest' },
@@ -11,38 +13,57 @@ const SORT_OPTIONS = [
     { value: 'top_rated', label: 'Top rated' },
 ];
 
-export async function BlogListView({
-    locale,
-    page,
-    category,
-    sort = '-created_at',
-}: {
-    locale: string;
-    page: string;
-    category?: string;
-    sort?: string;
-}) {
-    const lp = (path: string) => localePath(locale, path);
+export function BlogListClient({ params }: BlogListClientProps) {
+    const lp = useLocalePath();
+    const { page = 1, category, sort = '-created_at', locale } = params;
 
-    const buildUrl = (overrides: Record<string, string | undefined>) => {
-        const params = new URLSearchParams();
+    const { data: posts, isLoading: postsLoading } = useBlogPosts(params);
+    const { data: categories = [] } = useBlogCategories();
+
+    const buildUrl = (
+        overrides: Record<string, string | number | undefined>,
+    ) => {
+        const urlParams = new URLSearchParams();
         const merged = { page, category, sort, ...overrides };
-        if (merged.page && merged.page !== '1') params.set('page', merged.page);
-        if (merged.category) params.set('category', merged.category);
+        if (merged.page && merged.page !== 1 && merged.page !== '1')
+            urlParams.set('page', String(merged.page));
+        if (merged.category) urlParams.set('category', String(merged.category));
         if (merged.sort && merged.sort !== '-created_at')
-            params.set('sort', merged.sort);
-        const qs = params.toString();
+            urlParams.set('sort', String(merged.sort));
+        const qs = urlParams.toString();
         return lp(`/blog${qs ? `?${qs}` : ''}`);
     };
 
-    let posts;
-    let categories;
-    try {
-        [posts, categories] = await Promise.all([
-            getBlogPosts({ page: Number(page), category, locale, sort }),
-            getBlogCategories(),
-        ]);
-    } catch {
+    if (postsLoading && !posts) {
+        return (
+            <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+                <div className="mb-10 text-center">
+                    <h1 className="text-4xl font-bold">Blog</h1>
+                    <p className="text-muted-foreground mt-2">
+                        Articles, news and inspiration
+                    </p>
+                </div>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                        <div
+                            key={i}
+                            className="border-border bg-card overflow-hidden rounded-xl border"
+                        >
+                            <div className="bg-muted aspect-video animate-pulse" />
+                            <div className="flex flex-col gap-2 p-4">
+                                <div className="bg-muted h-3 w-16 animate-pulse rounded" />
+                                <div className="bg-muted h-5 w-full animate-pulse rounded" />
+                                <div className="bg-muted h-5 w-3/4 animate-pulse rounded" />
+                                <div className="bg-muted mt-2 h-3 w-24 animate-pulse rounded" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    if (!posts) {
         return (
             <div className="text-muted-foreground py-24 text-center">
                 Could not load blog posts.
@@ -63,7 +84,7 @@ export async function BlogListView({
                 {categories.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                         <Link
-                            href={buildUrl({ category: undefined, page: '1' })}
+                            href={buildUrl({ category: undefined, page: 1 })}
                             className={`rounded-full border px-4 py-1 text-sm font-medium transition-colors ${
                                 !category
                                     ? 'border-primary bg-primary text-primary-foreground'
@@ -77,7 +98,7 @@ export async function BlogListView({
                                 key={cat.id}
                                 href={buildUrl({
                                     category: cat.slug,
-                                    page: '1',
+                                    page: 1,
                                 })}
                                 className={`rounded-full border px-4 py-1 text-sm font-medium transition-colors ${
                                     category === cat.slug
@@ -97,7 +118,7 @@ export async function BlogListView({
                         {SORT_OPTIONS.map((opt) => (
                             <Link
                                 key={opt.value}
-                                href={buildUrl({ sort: opt.value, page: '1' })}
+                                href={buildUrl({ sort: opt.value, page: 1 })}
                                 className={`rounded-md px-3 py-1 transition-colors ${
                                     sort === opt.value
                                         ? 'bg-primary text-primary-foreground'
@@ -168,14 +189,22 @@ export async function BlogListView({
                     </div>
 
                     {posts.meta.last_page > 1 && (
-                        <div className="mt-10 flex justify-center gap-2">
+                        <nav
+                            aria-label="Blog pagination"
+                            className="mt-10 flex justify-center gap-2"
+                        >
                             {Array.from(
                                 { length: posts.meta.last_page },
                                 (_, i) => i + 1,
                             ).map((p) => (
                                 <Link
                                     key={p}
-                                    href={buildUrl({ page: String(p) })}
+                                    href={buildUrl({ page: p })}
+                                    aria-current={
+                                        p === posts.meta.current_page
+                                            ? 'page'
+                                            : undefined
+                                    }
                                     className={`inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium ${
                                         p === posts.meta.current_page
                                             ? 'bg-primary text-primary-foreground'
@@ -185,11 +214,10 @@ export async function BlogListView({
                                     {p}
                                 </Link>
                             ))}
-                        </div>
+                        </nav>
                     )}
                 </>
             )}
-            <BackToTop />
         </div>
     );
 }

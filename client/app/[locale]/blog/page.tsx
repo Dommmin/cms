@@ -1,10 +1,13 @@
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import type { Metadata } from 'next';
 
-import { BlogListView } from '@/app/blog/_blog-list';
+import { BlogListClient } from '@/components/blog-list-client';
+import { blogKeys, getBlogCategories, getBlogPosts } from '@/hooks/use-blog';
+import { getServerQueryClient } from '@/lib/query-client';
 import { generateAlternates } from '@/lib/seo';
 import type { PageProps } from './page.types';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 120;
 
 export async function generateMetadata({}: PageProps): Promise<Metadata> {
     return {
@@ -16,13 +19,29 @@ export async function generateMetadata({}: PageProps): Promise<Metadata> {
 
 export default async function BlogPage({ params, searchParams }: PageProps) {
     const { locale } = await params;
-    const { page = '1', category, sort } = await searchParams;
+    const { page = '1', category, sort = '-created_at' } = await searchParams;
+    const blogParams = {
+        page: Number(page),
+        category,
+        sort,
+        locale,
+    };
+
+    const queryClient = getServerQueryClient();
+    await Promise.all([
+        queryClient.prefetchQuery({
+            queryKey: blogKeys.posts(blogParams),
+            queryFn: () => getBlogPosts(blogParams),
+        }),
+        queryClient.prefetchQuery({
+            queryKey: blogKeys.categories(),
+            queryFn: () => getBlogCategories(),
+        }),
+    ]);
+
     return (
-        <BlogListView
-            locale={locale}
-            page={page}
-            category={category}
-            sort={sort}
-        />
+        <HydrationBoundary state={dehydrate(queryClient)}>
+            <BlogListClient params={blogParams} />
+        </HydrationBoundary>
     );
 }

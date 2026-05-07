@@ -17,9 +17,9 @@ class BlogPostResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'title' => $this->title,
+            'title' => $this->getTranslation('title', app()->getLocale(), true),
             'slug' => $this->slug,
-            'excerpt' => $this->excerpt,
+            'excerpt' => $this->getTranslation('excerpt', app()->getLocale(), true),
             'content' => $this->content,
             'content_type' => $this->content_type,
             'status' => $this->status,

@@ -103,9 +103,24 @@ final class ApiCacheHeaders
             return 'public, s-maxage=3600, stale-while-revalidate=86400';
         }
 
-        // Blog posts — cache 10 minutes
+        // Blog post detail — short cache, votes/comments change frequently
+        if (preg_match('#^api/v1/blog/posts/[^/]+$#', $path)) {
+            return 'public, s-maxage=30, stale-while-revalidate=60';
+        }
+
+        // Blog post comments — never cache, always fresh
+        if (str_contains($path, '/comments')) {
+            return 'no-store';
+        }
+
+        // Blog categories — rarely change
+        if ($path === 'api/v1/blog/categories') {
+            return 'public, s-maxage=600, stale-while-revalidate=3600';
+        }
+
+        // Blog post list — short enough so new posts appear quickly
         if (str_starts_with($path, 'api/v1/blog')) {
-            return 'public, s-maxage=600, stale-while-revalidate=7200';
+            return 'public, s-maxage=60, stale-while-revalidate=300';
         }
 
         // Products — cache 5 minutes

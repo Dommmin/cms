@@ -91,7 +91,7 @@ export async function getBlogPost(
 ): Promise<BlogPost> {
     return serverFetch<BlogPost>(`/blog/posts/${slug}`, {
         locale,
-        revalidate: 300,
+        revalidate: 30,
         tags: [`blog-post:${slug}`],
     });
 }

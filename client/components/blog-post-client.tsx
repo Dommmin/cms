@@ -1,50 +1,52 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
-import { getBlogPost } from '@/api/cms';
+import { BlogViewTracker } from '@/app/blog/_blog-view-tracker';
 import { BlogComments } from '@/components/blog-comments';
 import { BlogVotes } from '@/components/blog-votes';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { JsonLd } from '@/components/json-ld';
-import { localePath } from '@/lib/i18n';
+import { useBlogPost } from '@/hooks/use-blog';
+import { useLocalePath } from '@/hooks/use-locale';
 import { sanitizeHtml } from '@/lib/sanitize';
 import { buildBlogPosting, buildBreadcrumbList } from '@/lib/schema';
 import { generateCanonical } from '@/lib/seo';
-import { BlogViewTracker } from './_blog-view-tracker';
+import type { BlogPostClientProps } from './blog-post-client.types';
 
-export async function getBlogPostMetadata(slug: string, locale: string) {
-    const post = await getBlogPost(slug, locale);
-    return {
-        title: post.seo_title ?? post.title,
-        description: post.seo_description ?? post.excerpt ?? undefined,
-        robots: post.meta_robots ?? 'index, follow',
-        openGraph: {
-            title: post.seo_title ?? post.title,
-            description: post.seo_description ?? post.excerpt ?? undefined,
-            images: post.og_image
-                ? [post.og_image]
-                : post.featured_image
-                  ? [post.featured_image]
-                  : [],
-            type: 'article' as const,
-        },
-        twitter: { card: 'summary_large_image' as const },
-    };
-}
+export function BlogPostClient({ slug, locale }: BlogPostClientProps) {
+    const lp = useLocalePath();
+    const router = useRouter();
+    const { data: post, isLoading, error } = useBlogPost(slug, locale);
 
-export async function BlogPostView({
-    slug,
-    locale,
-}: {
-    slug: string;
-    locale: string;
-}) {
-    let post;
-    try {
-        post = await getBlogPost(slug, locale);
-    } catch {
-        redirect(localePath(locale, '/blog'));
+    if (isLoading && !post) {
+        return (
+            <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+                <div className="space-y-4">
+                    <div className="bg-muted h-6 w-32 animate-pulse rounded" />
+                    <div className="bg-muted h-10 w-full animate-pulse rounded" />
+                    <div className="bg-muted h-10 w-3/4 animate-pulse rounded" />
+                    <div className="bg-muted h-4 w-48 animate-pulse rounded" />
+                    <div className="bg-muted aspect-video animate-pulse rounded-xl" />
+                    <div className="space-y-2 pt-4">
+                        {Array.from({ length: 6 }).map((_, i) => (
+                            <div
+                                key={i}
+                                className="bg-muted h-4 animate-pulse rounded"
+                                style={{ width: `${85 + Math.random() * 15}%` }}
+                            />
+                        ))}
+                    </div>
+                </div>
+            </article>
+        );
+    }
+
+    if (error || !post) {
+        router.replace(lp('/blog'));
+        return null;
     }
 
     return (
@@ -61,15 +63,14 @@ export async function BlogPostView({
             />
 
             <Breadcrumb
-                homeHref={localePath(locale, '/')}
+                homeHref={lp('/')}
                 items={[
-                    { label: 'Blog', href: localePath(locale, '/blog') },
+                    { label: 'Blog', href: lp('/blog') },
                     ...(post.category
                         ? [
                               {
                                   label: post.category.name,
-                                  href: localePath(
-                                      locale,
+                                  href: lp(
                                       `/blog?category=${post.category.slug}`,
                                   ),
                               },
@@ -82,10 +83,7 @@ export async function BlogPostView({
             {post.category && (
                 <div className="mb-3">
                     <Link
-                        href={localePath(
-                            locale,
-                            `/blog?category=${post.category.slug}`,
-                        )}
+                        href={lp(`/blog?category=${post.category.slug}`)}
                         className="border-input text-muted-foreground hover:bg-accent rounded-full border px-3 py-0.5 text-xs font-medium"
                     >
                         {post.category.name}

@@ -47,9 +47,14 @@ export function BlogVotes({ post }: BlogVotesProps) {
         startTransition(() => {
             setVotesUp(post.votes_up ?? 0);
             setVotesDown(post.votes_down ?? 0);
-            setUserVote(post.user_vote ?? null);
+            // Server never returns user_vote (no auth in serverFetch); use localStorage
+            const stored = localStorage.getItem(`vote_${post.slug}`);
+            setUserVote(
+                post.user_vote ??
+                    (stored === 'up' || stored === 'down' ? stored : null),
+            );
         });
-    }, [post.votes_up, post.votes_down, post.user_vote]);
+    }, [post.votes_up, post.votes_down, post.user_vote, post.slug]);
 
     function handleVote(direction: 'up' | 'down') {
         if (!user) {
@@ -62,6 +67,13 @@ export function BlogVotes({ post }: BlogVotesProps) {
                 setVotesUp(result.votes_up);
                 setVotesDown(result.votes_down);
                 setUserVote(result.user_vote);
+                // Persist vote so it survives page refresh
+                const key = `vote_${post.slug}`;
+                if (result.user_vote) {
+                    localStorage.setItem(key, result.user_vote);
+                } else {
+                    localStorage.removeItem(key);
+                }
             },
             onError: () =>
                 toast.error(t('common.error', 'Something went wrong')),
