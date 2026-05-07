@@ -3,6 +3,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { PlusIcon, PowerIcon, Trash2Icon } from 'lucide-react';
 
 import * as AutomationController from '@/actions/App/Http/Controllers/Admin/Marketing/AutomationController';
+import * as NewsletterCampaignController from '@/actions/App/Http/Controllers/Admin/NewsletterCampaignController';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +14,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { AutomationCampaign, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Newsletter', href: '/panel/newsletter/campaigns' },
+    { title: 'Newsletter', href: NewsletterCampaignController.index.url() },
     { title: 'Marketing Automations', href: AutomationController.index.url() },
 ];
 

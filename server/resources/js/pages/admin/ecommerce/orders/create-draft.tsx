@@ -2,6 +2,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { Minus, Plus, Search, ShoppingCart, Trash2, User } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as AdminOrderCreateController from '@/actions/App/Http/Controllers/Admin/Ecommerce/AdminOrderCreateController';
+import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,7 +41,7 @@ type Props = {
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Orders', href: '/panel/ecommerce/orders' },
+    { title: 'Orders', href: OrderController.index.url() },
     { title: 'Create Draft Order', href: '#' },
 ];
 
