@@ -118,9 +118,9 @@ final class ApiCacheHeaders
             return 'public, s-maxage=600, stale-while-revalidate=3600';
         }
 
-        // Blog post list — short enough so new posts appear quickly
+        // Blog post list
         if (str_starts_with($path, 'api/v1/blog')) {
-            return 'public, s-maxage=60, stale-while-revalidate=300';
+            return 'public, s-maxage=600, stale-while-revalidate=7200';
         }
 
         // Products — cache 5 minutes

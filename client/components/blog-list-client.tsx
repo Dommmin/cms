@@ -25,7 +25,7 @@ export function BlogListClient({ params }: BlogListClientProps) {
     ) => {
         const urlParams = new URLSearchParams();
         const merged = { page, category, sort, ...overrides };
-        if (merged.page && merged.page !== 1 && merged.page !== '1')
+        if (merged.page && Number(merged.page) !== 1)
             urlParams.set('page', String(merged.page));
         if (merged.category) urlParams.set('category', String(merged.category));
         if (merged.sort && merged.sort !== '-created_at')
