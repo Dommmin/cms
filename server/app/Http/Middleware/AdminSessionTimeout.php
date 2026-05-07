@@ -31,7 +31,7 @@ final class AdminSessionTimeout
         }
 
         // Only apply to admin routes
-        if (! $request->is('admin*')) {
+        if (! $request->is('panel*')) {
             return $next($request);
         }
 

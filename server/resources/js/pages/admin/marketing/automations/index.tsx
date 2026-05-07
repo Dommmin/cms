@@ -13,7 +13,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { AutomationCampaign, IndexProps } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Newsletter', href: '/admin/newsletter/campaigns' },
+    { title: 'Newsletter', href: '/panel/newsletter/campaigns' },
     { title: 'Marketing Automations', href: AutomationController.index.url() },
 ];
 

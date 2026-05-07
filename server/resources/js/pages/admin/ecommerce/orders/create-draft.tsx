@@ -40,7 +40,7 @@ type Props = {
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Orders', href: '/admin/ecommerce/orders' },
+    { title: 'Orders', href: '/panel/ecommerce/orders' },
     { title: 'Create Draft Order', href: '#' },
 ];
 

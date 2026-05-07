@@ -49,7 +49,7 @@ class FormSubmissionNotification extends Notification
 
         $message->line('**IP:** '.$this->submission->ip)
             ->line('**Data:** '.$this->submission->created_at->format('Y-m-d H:i:s'))
-            ->action('Zobacz zgłoszenie', url(sprintf('/admin/forms/%s/edit?submission=%s', $this->form->id, $this->submission->id)));
+            ->action('Zobacz zgłoszenie', url(sprintf('/panel/forms/%s/edit?submission=%s', $this->form->id, $this->submission->id)));
 
         return $message;
     }

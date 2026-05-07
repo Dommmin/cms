@@ -37,7 +37,7 @@ class AdminSearchController extends Controller
                     'group' => 'Products',
                     'label' => $p->name,
                     'meta' => $p->is_active ? null : 'inactive',
-                    'url' => sprintf('/admin/ecommerce/products/%s/edit', $p->id),
+                    'url' => sprintf('/panel/ecommerce/products/%s/edit', $p->id),
                 ];
             });
 
@@ -52,7 +52,7 @@ class AdminSearchController extends Controller
                     'group' => 'Blog Posts',
                     'label' => $p->title,
                     'meta' => is_string($p->status) ? $p->status : $p->status?->value,
-                    'url' => sprintf('/admin/blog/posts/%s/edit', $p->id),
+                    'url' => sprintf('/panel/blog/posts/%s/edit', $p->id),
                 ];
             });
 
@@ -67,7 +67,7 @@ class AdminSearchController extends Controller
                     'group' => 'Pages',
                     'label' => $p->title,
                     'meta' => $p->slug,
-                    'url' => sprintf('/admin/cms/pages/%d/edit', $p->id),
+                    'url' => sprintf('/panel/cms/pages/%d/edit', $p->id),
                 ];
             });
 
@@ -81,7 +81,7 @@ class AdminSearchController extends Controller
                     'group' => 'Orders',
                     'label' => '#'.$o->reference_number,
                     'meta' => $o->status->getValue(),
-                    'url' => '/admin/ecommerce/orders/'.$o->id,
+                    'url' => '/panel/ecommerce/orders/'.$o->id,
                 ];
             });
 
@@ -96,7 +96,7 @@ class AdminSearchController extends Controller
                     'group' => 'Users',
                     'label' => $u->name,
                     'meta' => $u->email,
-                    'url' => sprintf('/admin/users/%s/edit', $u->id),
+                    'url' => sprintf('/panel/users/%s/edit', $u->id),
                 ];
             });
 
