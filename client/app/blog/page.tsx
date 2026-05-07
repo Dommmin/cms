@@ -5,7 +5,7 @@ import { generateAlternates } from '@/lib/seo';
 import { BlogListView } from './_blog-list';
 import type { PageProps } from './page.types';
 
-export const revalidate = 600;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
     title: 'Blog',

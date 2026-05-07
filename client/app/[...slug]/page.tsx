@@ -9,7 +9,7 @@ import { buildFaqPage, buildWebPage } from '@/lib/schema';
 import { generateCanonical } from '@/lib/seo';
 import type { PageData, PageProps } from './page.types';
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
     params,

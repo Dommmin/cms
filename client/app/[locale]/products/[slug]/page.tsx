@@ -7,7 +7,7 @@ import type { Product } from '@/types/api';
 
 import type { PageProps } from './page.types';
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
     params,

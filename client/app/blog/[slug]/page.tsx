@@ -6,7 +6,7 @@ import { generateAlternates } from '@/lib/seo';
 import { BlogPostView, getBlogPostMetadata } from '../_blog-post';
 import type { PageProps } from './page.types';
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export async function generateStaticParams() {
     try {

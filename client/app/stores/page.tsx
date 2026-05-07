@@ -1,7 +1,7 @@
 import { Clock, Mail, MapPin, Phone } from 'lucide-react';
 import type { Metadata } from 'next';
 
-export const revalidate = 86400;
+export const dynamic = 'force-dynamic';
 
 import { getStores } from '@/api/stores';
 import { JsonLd } from '@/components/json-ld';

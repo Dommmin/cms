@@ -4,7 +4,7 @@ import { BlogListView } from '@/app/blog/_blog-list';
 import { generateAlternates } from '@/lib/seo';
 import type { PageProps } from './page.types';
 
-export const revalidate = 600;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({}: PageProps): Promise<Metadata> {
     return {

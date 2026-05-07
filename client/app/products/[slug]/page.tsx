@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 import ProductDetailClient from './ProductDetailClient';
 import type { PageProps } from './page.types';
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
     params,

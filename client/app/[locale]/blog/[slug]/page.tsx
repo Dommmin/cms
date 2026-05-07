@@ -6,7 +6,7 @@ import { DEFAULT_LOCALE, LOCALES } from '@/lib/i18n';
 import { generateAlternates } from '@/lib/seo';
 import type { PageProps } from './page.types';
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export async function generateStaticParams() {
     const nonDefaultLocales = LOCALES.filter((l) => l !== DEFAULT_LOCALE);

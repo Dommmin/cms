@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 import { getPage } from '@/api/cms';
 import { PageRenderer } from '@/components/page-builder/page-renderer';
