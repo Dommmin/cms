@@ -1,8 +1,10 @@
 /**
  * Server-side fetch utility for Next.js Server Components.
  *
- * Uses API_URL (Docker internal, e.g. http://nginx/api/v1) when running
- * server-side, falling back to NEXT_PUBLIC_API_URL or the default local URL.
+ * Resolution order:
+ *  1. API_URL — Docker/k8s internal URL (e.g. http://cms-server.cms-prod.svc.cluster.local/api/v1)
+ *  2. NEXT_PUBLIC_API_URL — public backend URL, baked in at build time
+ *  3. Fallback for local dev without Docker
  *
  * Never import this file in Client Components ("use client").
  */
@@ -10,7 +12,7 @@
 const BASE_URL =
     process.env.API_URL ??
     process.env.NEXT_PUBLIC_API_URL ??
-    'http://localhost:8000/api/v1';
+    'http://localhost/api/v1';
 
 export async function serverFetch<T>(
     path: string,

@@ -443,6 +443,15 @@ jobs:
           PROD_ENV: ${{ vars.PROD_ENV }}
 
       # --------------------------------------------------------------------------
+      # 0b. Apply Ingress and Traefik middleware manifests
+      #     Keeps cluster in sync with repo — safe to apply on every deploy.
+      # --------------------------------------------------------------------------
+      - name: Apply infrastructure manifests
+        run: |
+          kubectl apply -f k8s/ingress.yaml
+          kubectl apply -f k8s/traefik/middleware.yaml
+
+      # --------------------------------------------------------------------------
       # 1. Run database migrations (Job with new image, wait for completion)
       # --------------------------------------------------------------------------
       - name: Run migrations
