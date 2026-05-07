@@ -443,13 +443,17 @@ jobs:
           PROD_ENV: ${{ vars.PROD_ENV }}
 
       # --------------------------------------------------------------------------
-      # 0b. Apply Ingress and Traefik middleware manifests
-      #     Keeps cluster in sync with repo — safe to apply on every deploy.
+      # 0b. Apply networking and config manifests (always, safe to re-apply)
       # --------------------------------------------------------------------------
       - name: Apply infrastructure manifests
         run: |
           kubectl apply -f k8s/ingress.yaml
           kubectl apply -f k8s/traefik/middleware.yaml
+          kubectl apply -f k8s/traefik/config.yaml
+          kubectl apply -f k8s/server/service.yaml
+          kubectl apply -f k8s/server/hpa.yaml
+          kubectl apply -f k8s/client/service.yaml
+          kubectl apply -f k8s/client/hpa.yaml
 
       # --------------------------------------------------------------------------
       # 1. Run database migrations (Job with new image, wait for completion)
@@ -469,39 +473,39 @@ jobs:
             --timeout=120s
 
       # --------------------------------------------------------------------------
-      # 2. Roll out server (web)
+      # 2. Roll out server (web) — apply full manifest with correct image tag
       # --------------------------------------------------------------------------
       - name: Deploy server
         run: |
-          kubectl -n cms-prod set image deployment/cms-server \
-            app="${{ steps.images.outputs.server }}"
+          sed "s|ghcr.io/dommmin/cms-server:latest|${{ steps.images.outputs.server }}|g" \
+            k8s/server/deployment.yaml | kubectl apply -f -
           kubectl -n cms-prod rollout status deployment/cms-server \
             --timeout=5m
 
       # --------------------------------------------------------------------------
-      # 3. Roll out queue workers (same image)
+      # 3. Roll out queue workers
       # --------------------------------------------------------------------------
       - name: Deploy queue workers
         run: |
-          kubectl -n cms-prod set image deployment/cms-queue \
-            queue="${{ steps.images.outputs.server }}"
+          sed "s|ghcr.io/dommmin/cms-server:latest|${{ steps.images.outputs.server }}|g" \
+            k8s/server/deployment-queue.yaml | kubectl apply -f -
           kubectl -n cms-prod rollout status deployment/cms-queue \
             --timeout=5m
 
       # --------------------------------------------------------------------------
-      # 4. Update scheduler CronJob image
+      # 4. Update scheduler CronJob
       # --------------------------------------------------------------------------
-      - name: Update scheduler image
+      - name: Deploy scheduler
         run: |
-          kubectl -n cms-prod set image cronjob/cms-scheduler \
-            scheduler="${{ steps.images.outputs.server }}"
+          sed "s|ghcr.io/dommmin/cms-server:latest|${{ steps.images.outputs.server }}|g" \
+            k8s/server/cronjob-scheduler.yaml | kubectl apply -f -
 
       # --------------------------------------------------------------------------
       # 5. Roll out Next.js frontend
       # --------------------------------------------------------------------------
       - name: Deploy client
         run: |
-          kubectl -n cms-prod set image deployment/cms-client \
-            frontend="${{ steps.images.outputs.client }}"
+          sed "s|ghcr.io/dommmin/cms-client:latest|${{ steps.images.outputs.client }}|g" \
+            k8s/client/deployment.yaml | kubectl apply -f -
           kubectl -n cms-prod rollout status deployment/cms-client \
             --timeout=5m
