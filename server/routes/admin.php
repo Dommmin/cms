@@ -45,7 +45,7 @@ use App\Http\Controllers\Admin\WebhookController;
 use App\Http\Middleware\AdminSessionTimeout;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['admin', AdminSessionTimeout::class])->prefix('admin')->name('admin.')->group(function (): void {
+Route::middleware(['admin', AdminSessionTimeout::class])->prefix('panel')->name('admin.')->group(function (): void {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('dashboard/widgets', [DashboardWidgetController::class, 'store'])->name('dashboard.widgets.store');
     Route::patch('dashboard/widgets/{dashboardWidget}', [DashboardWidgetController::class, 'update'])->name('dashboard.widgets.update');

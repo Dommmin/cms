@@ -36,7 +36,7 @@ class FormController extends Controller
 
         Form::query()->create($data);
 
-        return redirect('/admin/forms')->with('success', 'Form created');
+        return redirect('/panel/forms')->with('success', 'Form created');
     }
 
     public function edit(Form $form): Response
@@ -80,6 +80,6 @@ class FormController extends Controller
     {
         $form->delete();
 
-        return redirect('/admin/forms')->with('success', 'Form deleted');
+        return redirect('/panel/forms')->with('success', 'Form deleted');
     }
 }

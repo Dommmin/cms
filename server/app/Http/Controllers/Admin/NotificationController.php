@@ -89,7 +89,7 @@ class NotificationController extends Controller
                 'title' => 'New order #'.$order->reference_number,
                 'message' => 'A new order was placed.',
                 'created_at' => $order->created_at->toISOString(),
-                'url' => '/admin/ecommerce/orders/'.$order->id,
+                'url' => '/panel/ecommerce/orders/'.$order->id,
             ]);
         }
 
@@ -105,7 +105,7 @@ class NotificationController extends Controller
                 'title' => 'Review awaiting approval',
                 'message' => sprintf('"%s" — %s/5', $review->title, $review->rating),
                 'created_at' => $review->created_at->toISOString(),
-                'url' => '/admin/ecommerce/reviews',
+                'url' => '/panel/ecommerce/reviews',
             ]);
         }
 
@@ -125,7 +125,7 @@ class NotificationController extends Controller
                 'title' => 'Low stock alert',
                 'message' => ($variant->product?->name ?? 'Variant #'.$variant->id).sprintf(' — %s left', $variant->stock_quantity),
                 'created_at' => now()->toISOString(),
-                'url' => '/admin/ecommerce/products',
+                'url' => '/panel/ecommerce/products',
             ]);
         }
 
@@ -142,7 +142,7 @@ class NotificationController extends Controller
                 'title' => 'New support message',
                 'message' => $conversation->subject,
                 'created_at' => ($conversation->last_reply_at ?? $conversation->created_at)->toISOString(),
-                'url' => '/admin/support/'.$conversation->id,
+                'url' => '/panel/support/'.$conversation->id,
             ]);
         }
 

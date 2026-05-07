@@ -39,7 +39,7 @@ class LowStockNotification extends Notification implements ShouldQueue
         }
 
         return $mail
-            ->action('Manage Inventory', url('/admin/ecommerce/products'))
+            ->action('Manage Inventory', url('/panel/ecommerce/products'))
             ->line('Please restock these items soon to avoid out-of-stock situations.');
     }
 
