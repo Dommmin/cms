@@ -197,7 +197,7 @@ export default function BuilderPage({
             {
                 snapshot: { sections: updatedSections },
                 expected_version: pageVersion,
-            },
+            } as Parameters<typeof router.put>[1],
             {
                 preserveScroll: true,
                 onSuccess: () => {
@@ -349,7 +349,11 @@ export default function BuilderPage({
     };
 
     const builderData = {
-        page: { ...page, is_published: page.is_published ?? false },
+        page: {
+            ...page,
+            title: resolveLocalizedText(page.title),
+            is_published: page.is_published ?? false,
+        },
         sections: localSections,
         available_sections,
         available_block_relations,
