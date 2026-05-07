@@ -32,8 +32,8 @@ class BlogPostController extends ApiController
             ))
             ->when($request->featured, fn ($q) => $q->featured())
             ->when($request->search, fn ($q, $search) => $q->where(function ($q) use ($search, $locale): void {
-                $q->where("title->{$locale}", 'like', sprintf('%%%s%%', $search))
-                    ->orWhere("excerpt->{$locale}", 'like', sprintf('%%%s%%', $search));
+                $q->where('title->'.$locale, 'like', sprintf('%%%s%%', $search))
+                    ->orWhere('excerpt->'.$locale, 'like', sprintf('%%%s%%', $search));
             }))
             ->when($sort === 'popular', fn ($q) => $q->orderBy('views_count', 'desc'))
             ->when($sort === 'top_rated', fn ($q) => $q->orderByRaw(

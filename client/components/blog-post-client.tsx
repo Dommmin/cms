@@ -31,11 +31,17 @@ export function BlogPostClient({ slug, locale }: BlogPostClientProps) {
                     <div className="bg-muted h-4 w-48 animate-pulse rounded" />
                     <div className="bg-muted aspect-video animate-pulse rounded-xl" />
                     <div className="space-y-2 pt-4">
-                        {Array.from({ length: 6 }).map((_, i) => (
+                        {[
+                            'w-full',
+                            'w-11/12',
+                            'w-full',
+                            'w-10/12',
+                            'w-full',
+                            'w-9/12',
+                        ].map((w, i) => (
                             <div
                                 key={i}
-                                className="bg-muted h-4 animate-pulse rounded"
-                                style={{ width: `${85 + Math.random() * 15}%` }}
+                                className={`bg-muted h-4 animate-pulse rounded ${w}`}
                             />
                         ))}
                     </div>

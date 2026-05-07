@@ -15,7 +15,7 @@ const SORT_OPTIONS = [
 
 export function BlogListClient({ params }: BlogListClientProps) {
     const lp = useLocalePath();
-    const { page = 1, category, sort = '-created_at', locale } = params;
+    const { page = 1, category, sort = '-created_at' } = params;
 
     const { data: posts, isLoading: postsLoading } = useBlogPosts(params);
     const { data: categories = [] } = useBlogCategories();
