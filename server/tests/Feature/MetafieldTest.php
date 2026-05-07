@@ -205,7 +205,7 @@ it('admin can sync metafields for a blog post', function (): void {
     $post = BlogPost::factory()->create();
 
     actingAs($this->user)
-        ->post(sprintf('/admin/metafields/blog-post/%s/sync', $post->id), [
+        ->post(route('admin.metafields.sync', ['type' => 'blog-post', 'id' => $post->id]), [
             'metafields' => [
                 ['namespace' => 'seo', 'key' => 'title', 'type' => 'string', 'value' => 'My Title'],
                 ['namespace' => 'seo', 'key' => 'robots', 'type' => 'string', 'value' => 'noindex'],
@@ -220,13 +220,13 @@ it('admin can sync metafields for a blog post', function (): void {
 
 it('admin can list metafield definitions', function (): void {
     actingAs($this->user)
-        ->get('/admin/metafield-definitions')
+        ->get(route('admin.metafield-definitions.index'))
         ->assertSuccessful();
 });
 
 it('admin can create a metafield definition', function (): void {
     actingAs($this->user)
-        ->post('/admin/metafield-definitions', [
+        ->post(route('admin.metafield-definitions.store'), [
             'owner_type' => Product::class,
             'namespace' => 'specs',
             'key' => 'material',
@@ -252,7 +252,7 @@ it('admin can update a metafield definition', function (): void {
     ]);
 
     actingAs($this->user)
-        ->put('/admin/metafield-definitions/'.$definition->id, [
+        ->put(route('admin.metafield-definitions.update', $definition), [
             'owner_type' => Product::class,
             'namespace' => 'specs',
             'key' => 'color',
@@ -275,7 +275,7 @@ it('admin can delete a metafield definition', function (): void {
     ]);
 
     actingAs($this->user)
-        ->delete('/admin/metafield-definitions/'.$definition->id)
+        ->delete(route('admin.metafield-definitions.destroy', $definition))
         ->assertRedirect();
 
     $this->assertDatabaseMissing('metafield_definitions', ['id' => $definition->id]);
@@ -283,7 +283,7 @@ it('admin can delete a metafield definition', function (): void {
 
 it('validates namespace and key format on create', function (): void {
     actingAs($this->user)
-        ->post('/admin/metafield-definitions', [
+        ->post(route('admin.metafield-definitions.store'), [
             'owner_type' => Product::class,
             'namespace' => 'Invalid Namespace!',
             'key' => 'Invalid Key!',
