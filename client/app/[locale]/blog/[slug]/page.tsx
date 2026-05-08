@@ -39,10 +39,12 @@ export async function generateMetadata({
 export default async function BlogPostPage({ params }: PageProps) {
     const { locale, slug } = await params;
 
+    let post;
     try {
-        const post = await getBlogPost(slug, locale);
-        return <BlogPostClient post={post} locale={locale} />;
+        post = await getBlogPost(slug, locale);
     } catch {
         notFound();
     }
+
+    return <BlogPostClient post={post} locale={locale} />;
 }

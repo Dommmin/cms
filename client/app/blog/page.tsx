@@ -28,5 +28,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
         getBlogCategories(),
     ]);
 
-    return <BlogListClient posts={posts} categories={categories} params={params} />;
+    return (
+        <BlogListClient posts={posts} categories={categories} params={params} />
+    );
 }

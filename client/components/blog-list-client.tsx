@@ -12,7 +12,11 @@ const SORT_OPTIONS = [
     { value: 'top_rated', label: 'Top rated' },
 ];
 
-export function BlogListClient({ posts, categories, params }: BlogListClientProps) {
+export function BlogListClient({
+    posts,
+    categories,
+    params,
+}: BlogListClientProps) {
     const lp = useLocalePath();
     const { page = 1, category, sort = '-created_at' } = params;
 
