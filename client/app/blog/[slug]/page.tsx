@@ -1,12 +1,10 @@
-import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 import { getBlogPost, getBlogPosts } from '@/api/cms';
 import { getBlogPostMetadata } from '@/app/blog/_blog-metadata';
 import { BlogPostClient } from '@/components/blog-post-client';
-import { blogKeys } from '@/hooks/blog-keys';
 import { DEFAULT_LOCALE } from '@/lib/i18n';
-import { getServerQueryClient } from '@/lib/query-client';
 import { generateAlternates } from '@/lib/seo';
 import type { PageProps } from './page.types';
 
@@ -38,15 +36,10 @@ export async function generateMetadata({
 export default async function BlogPostPage({ params }: PageProps) {
     const { slug } = await params;
 
-    const queryClient = getServerQueryClient();
-    await queryClient.prefetchQuery({
-        queryKey: blogKeys.post(slug, DEFAULT_LOCALE),
-        queryFn: () => getBlogPost(slug, DEFAULT_LOCALE),
-    });
-
-    return (
-        <HydrationBoundary state={dehydrate(queryClient)}>
-            <BlogPostClient slug={slug} locale={DEFAULT_LOCALE} />
-        </HydrationBoundary>
-    );
+    try {
+        const post = await getBlogPost(slug, DEFAULT_LOCALE);
+        return <BlogPostClient post={post} locale={DEFAULT_LOCALE} />;
+    } catch {
+        notFound();
+    }
 }

@@ -1,4 +1,6 @@
+import type { BlogPost } from '@/types/api';
+
 export interface BlogPostClientProps {
-    slug: string;
+    post: BlogPost;
     locale: string;
 }
