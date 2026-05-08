@@ -34,10 +34,11 @@ Nie zakładam, że znasz Kubernetes. Zakładam, że znasz Dockera i nie boisz si
 18. [Codzienna obsługa — logi, restarty, aktualizacje](#18-codzienna-obsługa--logi-restarty-aktualizacje)
 19. [Backup MySQL](#19-backup-mysql)
 20. [Najczęstsze problemy (troubleshooting)](#20-najczęstsze-problemy-troubleshooting)
-21. [Rancher — zarządzanie klastrem przez UI](#21-rancher--zarządzanie-klastrem-przez-ui)
-22. [Czyszczenie dysku](#22-czyszczenie-dysku)
-23. [k9s — terminalowy panel zarządzania](#23-k9s--terminalowy-panel-zarządzania)
-24. [Rotacja secretów — aktualizacja .env i haseł bez downtime'u](#24-rotacja-secretów--aktualizacja-env-i-haseł-bez-downtimeu)
+21. [GlitchTip — śledzenie błędów](#21-glitchtip--śledzenie-błędów)
+22. [Rancher — zarządzanie klastrem przez UI](#22-rancher--zarządzanie-klastrem-przez-ui)
+23. [Czyszczenie dysku](#23-czyszczenie-dysku)
+24. [k9s — terminalowy panel zarządzania](#24-k9s--terminalowy-panel-zarządzania)
+25. [Rotacja secretów — aktualizacja .env i haseł bez downtime'u](#25-rotacja-secretów--aktualizacja-env-i-haseł-bez-downtimeu)
 
 ---
 
@@ -1439,7 +1440,35 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 
 ---
 
-## 21. Rancher — zarządzanie klastrem przez UI
+## 21. GlitchTip — śledzenie błędów
+
+GlitchTip to self-hosted, open-source alternatywa dla Sentry. Używa tego samego SDK co Sentry — nie trzeba zmieniać kodu, wystarczy podmienić DSN na adres własnej instancji.
+
+Uruchom GlitchTip w **osobnym namespace** na tym samym klastrze, używając oficjalnego chart Helma:
+
+```bash
+helm repo add glitchtip https://glitchtip.github.io/helm-charts
+helm repo update
+helm upgrade --install glitchtip glitchtip/glitchtip \
+  --namespace glitchtip \
+  --create-namespace \
+  -f k8s/glitchtip/values.example.yaml
+```
+
+Przed zastosowaniem edytuj `k8s/glitchtip/values.example.yaml` — ustaw domenę, email, SMTP i hasło bazy danych.
+
+Po instalacji:
+1. Utwórz organizację w UI GlitchTip
+2. Utwórz projekty `cms-api` i `cms-frontend`
+3. Skopiuj DSN do sekretów produkcyjnych:
+   - Laravel: `GLITCHTIP_DSN=https://...@glitchtip.yourdomain.com/1`
+   - Next.js (build arg): `NEXT_PUBLIC_GLITCHTIP_DSN=https://...@glitchtip.yourdomain.com/2`
+
+> **Uwaga:** `values.example.yaml` używa `ingressClassName: nginx` — zmień na `traefik` jeśli chcesz żeby GlitchTip działał za tym samym Traefikiem.
+
+---
+
+## 22. Rancher — zarządzanie klastrem przez UI
 
 Jeśli w pracy korzystasz z Ranchera, możesz go postawić na tym samym VPS. Dostaniesz dokładnie to samo środowisko — podgląd podów, logi, shell do kontenera, zarządzanie secretami — wszystko przez przeglądarkę.
 
@@ -1516,11 +1545,11 @@ ufw enable
 
 ---
 
-## 22. Czyszczenie dysku
+## 23. Czyszczenie dysku
 
 k3s akumuluje stare obrazy kontenerów przy każdym deploymencie. Po kilku miesiącach możesz stracić kilkanaście GB — warto to zautomatyzować.
 
-### 22.1 Sprawdź zajętość dysku
+### 23.1 Sprawdź zajętość dysku
 
 ```bash
 df -h /
@@ -1529,7 +1558,7 @@ df -h /
 du -sh /var/lib/rancher/k3s/agent/containerd/
 ```
 
-### 22.2 Ręczne czyszczenie
+### 23.2 Ręczne czyszczenie
 
 k3s używa `containerd` (nie Dockera). Do zarządzania obrazami służy `crictl`:
 
@@ -1547,7 +1576,7 @@ Jeśli masz też Dockera na serwerze (Rancher, Uptime Kuma):
 docker system prune -af
 ```
 
-### 22.3 Automatyczne czyszczenie — CronJob
+### 23.3 Automatyczne czyszczenie — CronJob
 
 ```bash
 kubectl apply -f k8s/maintenance/cronjob-image-cleanup.yaml
@@ -1557,11 +1586,11 @@ CronJob uruchamia się co niedzielę o 2:00 i usuwa nieużywane obrazy z `contai
 
 ---
 
-## 23. k9s — terminalowy panel zarządzania
+## 24. k9s — terminalowy panel zarządzania
 
 k9s to terminalowy UI dla Kubernetes — jak Rancher, ale w konsoli. Przydatny gdy jesteś już połączony SSH i nie chcesz otwierać przeglądarki.
 
-### 23.1 Instalacja
+### 24.1 Instalacja
 
 macOS:
 ```bash
@@ -1580,7 +1609,7 @@ Windows:
 winget install k9s
 ```
 
-### 23.2 Uruchomienie
+### 24.2 Uruchomienie
 
 ```bash
 k9s
@@ -1588,7 +1617,7 @@ k9s
 k9s -n app
 ```
 
-### 23.3 Najważniejsze skróty
+### 24.3 Najważniejsze skróty
 
 | Klawisz   | Akcja                     |
 |-----------|---------------------------|
@@ -1606,9 +1635,9 @@ k9s -n app
 
 ---
 
-## 24. Rotacja secretów — aktualizacja .env i haseł bez downtime'u
+## 25. Rotacja secretów — aktualizacja .env i haseł bez downtime'u
 
-### 24.1 Aktualizacja Laravel .env
+### 25.1 Aktualizacja Laravel .env
 
 Zmodyfikuj `k8s/server/secret.yaml`, a następnie:
 
@@ -1620,7 +1649,7 @@ kubectl -n app rollout restart deployment/app-server
 kubectl -n app rollout restart deployment/app-queue
 ```
 
-### 24.2 Zmiana hasła MySQL
+### 25.2 Zmiana hasła MySQL
 
 **Krok 1** — zmień hasło w bazie:
 
@@ -1644,7 +1673,7 @@ kubectl -n app rollout restart deployment/app-server
 kubectl -n app rollout restart deployment/app-queue
 ```
 
-### 24.3 Zmiana hasła Redis
+### 25.3 Zmiana hasła Redis
 
 ```bash
 # Zaktualizuj k8s/redis/secret.yaml i k8s/server/secret.yaml (REDIS_PASSWORD)
