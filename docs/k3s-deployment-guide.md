@@ -340,10 +340,10 @@ ssh deployer@<IP_SERWERA>
 sudo -i
 ```
 
-Uruchom instalator k3s:
+Uruchom instalator k3s z flagą `K3S_KUBECONFIG_MODE="644"` — dzięki temu plik kubeconfig będzie czytelny dla wszystkich użytkowników serwera (potrzebne w sekcji 4.2, żeby skopiować go bez `sudo`):
 
 ```bash
-curl -sfL https://get.k3s.io | sh -s - --disable=servicelb
+curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" sh -s - --disable=servicelb
 ```
 
 > **Dlaczego wyłączamy tylko servicelb?**  
@@ -361,21 +361,18 @@ Status `Ready` — możesz wyjść z SSH.
 
 ### 4.2 Skopiuj kubeconfig na lokalny komputer
 
-Na **lokalnym komputerze** (nie na serwerze). Polecenie różni się zależnie od tego, jakiego użytkownika wybrałeś w sekcji 3.6:
+Na **lokalnym komputerze** (nie na serwerze). Komenda jest taka sama niezależnie od tego, czy używasz `root` czy `deployer` — dzięki `K3S_KUBECONFIG_MODE="644"` z poprzedniego kroku plik jest czytelny bez `sudo`:
 
 ```bash
 mkdir -p ~/.kube
 
-# Opcja A — root:
-ssh root@<IP_SERWERA> "cat /etc/rancher/k3s/k3s.yaml" \
-  | sed "s/127.0.0.1/<IP_SERWERA>/g" \
-  > ~/.kube/config-hetzner
-
-# Opcja B — deployer (sudo potrzebne, bo plik należy do roota):
-ssh deployer@<IP_SERWERA> "sudo cat /etc/rancher/k3s/k3s.yaml" \
+# root lub deployer — ta sama komenda:
+ssh <USER>@<IP_SERWERA> "cat /etc/rancher/k3s/k3s.yaml" \
   | sed "s/127.0.0.1/<IP_SERWERA>/g" \
   > ~/.kube/config-hetzner
 ```
+
+Gdzie `<USER>` to `root` (Opcja A) lub `deployer` (Opcja B).
 
 ```bash
 chmod 600 ~/.kube/config-hetzner
