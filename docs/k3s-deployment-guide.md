@@ -17,6 +17,7 @@ Nie zakładam, że znasz Kubernetes. Zakładam, że znasz Dockera i nie boisz si
 2. [Architektura tego wdrożenia](#2-architektura-tego-wdrożenia)
 3. [Przygotowanie serwera (Hetzner)](#3-przygotowanie-serwera-hetzner)
 4. [Instalacja k3s](#4-instalacja-k3s)
+   - [4.4 Automatyczna konfiguracja klastra — bootstrap.sh](#44-automatyczna-konfiguracja-klastra--bootstrapsh) ← **zalecane po instalacji k3s**
 5. [Instalacja cert-manager (SSL Let's Encrypt)](#5-instalacja-cert-manager-ssl-lets-encrypt)
 6. [Konfiguracja Traefik (HTTPS + przekierowanie)](#6-konfiguracja-traefik-https--przekierowanie)
 7. [Przygotowanie klastra — namespace i sekrety](#7-przygotowanie-klastra--namespace-i-sekrety)
@@ -396,6 +397,51 @@ kubectl -n kube-system get pods --watch | grep traefik
 Wyjdź z `--watch` przez `Ctrl+C` gdy zobaczysz `Running`.
 
 > Middleware (`k8s/traefik/middleware.yaml`) aplikujemy dopiero w **sekcji 7.1** — po utworzeniu namespace. Middleware musi należeć do istniejącego namespace.
+
+### 4.4 Automatyczna konfiguracja klastra — bootstrap.sh
+
+Po zainstalowaniu k3s i skopiowaniu kubeconfig (sekcje 4.1–4.2) masz dwie opcje:
+
+| Opcja | Kiedy wybrać |
+|-------|-------------|
+| **A: `bootstrap.sh`** (zalecana) | Nowy klaster, chcesz przejść szybko — skrypt wykona sekcje 5–12 automatycznie |
+| **B: Ręcznie** (sekcje 5–12) | Uczysz się Kubernetes, chcesz pełną kontrolę nad każdym krokiem |
+
+#### Opcja A — uruchom bootstrap.sh
+
+Wymagania przed uruchomieniem:
+- `KUBECONFIG` wskazuje na klaster (sekcja 4.2)
+- Repozytorium jest sklonowane lokalnie (katalog `k8s/` musi istnieć)
+- Rekordy DNS wskazują na IP serwera (sekcja 3.4)
+
+Z **katalogu głównego repozytorium** na lokalnym komputerze:
+
+```bash
+chmod +x k8s/bootstrap.sh
+./k8s/bootstrap.sh
+```
+
+Skrypt interaktywnie zapyta o:
+
+| Pytanie | Co wpisać |
+|---------|-----------|
+| Hasło MySQL root | Silne hasło, min. 16 znaków |
+| Nazwa użytkownika MySQL | Domyślnie `cms` |
+| Hasło MySQL app | Silne hasło, min. 16 znaków |
+| Hasło Redis | Silne hasło, min. 16 znaków |
+| Typesense API key | Losowy klucz, min. 16 znaków |
+| Typ CI/CD | `1` = GitHub Actions, `2` = GitLab CI, Enter = pomiń |
+| GitHub/GitLab token | Do pull secret dla prywatnego rejestru obrazów |
+| E-mail Let's Encrypt | Powiadomienia o wygasaniu certyfikatów |
+| Ingress deweloperski (HTTP) | `y` jeśli nie masz domeny — używa sslip.io |
+| Ingress produkcyjny (HTTPS) | `Y` (domyślnie) — wymaga DNS + cert-manager |
+| GlitchTip | `y` jeśli chcesz self-hosted śledzenie błędów |
+
+**Czas wykonania:** ~5–10 minut (większość to oczekiwanie na MySQL i cert-manager).
+
+Po zakończeniu skrypt wyświetli listę podów w namespace `cms-prod` oraz dalsze kroki — konfigurację sekretów CI/CD.
+
+> **Jeśli wybrałeś Opcję A — przejdź do [sekcji 13 (Jak CI/CD łączy się z k3s?)](#13-jak-cicd-łączy-się-z-k3s).** Sekcje 5–12 poniżej opisują to samo co robi skrypt — przydatne jako dokumentacja lub przy ręcznej rekonfiguracji.
 
 ---
 
