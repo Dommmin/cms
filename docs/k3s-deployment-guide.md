@@ -329,7 +329,18 @@ Host app
 
 ### 4.1 Zainstaluj k3s
 
-Na serwerze uruchom jedną komendę:
+Zaloguj się na serwer i uruchom instalator. **k3s musi być zainstalowany jako root** — niezależnie od tego, czy wybrałeś Opcję A czy B w sekcji 3.6.
+
+```bash
+# Opcja A (root): jesteś już zalogowany jako root
+ssh root@<IP_SERWERA>
+
+# Opcja B (deployer): zaloguj się i przejdź na roota
+ssh deployer@<IP_SERWERA>
+sudo -i
+```
+
+Uruchom instalator k3s:
 
 ```bash
 curl -sfL https://get.k3s.io | sh -s - --disable=servicelb
@@ -338,33 +349,40 @@ curl -sfL https://get.k3s.io | sh -s - --disable=servicelb
 > **Dlaczego wyłączamy tylko servicelb?**  
 > `servicelb` to wewnętrzny load balancer k3s — wyłączamy go, bo Traefik sam obsługuje ruch przychodzący. Traefiku **nie wyłączamy** — k3s instaluje go automatycznie, a `HelmChartConfig` z sekcji 4.3 dostroi jego konfigurację (HTTP→HTTPS redirect).
 
-Poczekaj ~30 sekund, a następnie sprawdź:
+Poczekaj ~30 sekund, a następnie sprawdź (nadal jako root na serwerze):
 
 ```bash
 kubectl get nodes
-# NAME       STATUS   ROLES                  AGE   VERSION
-# app   Ready    control-plane,master   1m    v1.31.x+k3s1
+# NAME   STATUS   ROLES                  AGE   VERSION
+# app    Ready    control-plane,master   1m    v1.31.x+k3s1
 ```
 
-Status `Ready` — jesteś w domu.
+Status `Ready` — możesz wyjść z SSH.
 
 ### 4.2 Skopiuj kubeconfig na lokalny komputer
 
-Na **lokalnym komputerze** (nie na serwerze):
+Na **lokalnym komputerze** (nie na serwerze). Polecenie różni się zależnie od tego, jakiego użytkownika wybrałeś w sekcji 3.6:
 
 ```bash
 mkdir -p ~/.kube
 
-# Kopiuje config z serwera i podmienia adres na publiczny IP
+# Opcja A — root:
 ssh root@<IP_SERWERA> "cat /etc/rancher/k3s/k3s.yaml" \
   | sed "s/127.0.0.1/<IP_SERWERA>/g" \
   > ~/.kube/config-hetzner
 
+# Opcja B — deployer (sudo potrzebne, bo plik należy do roota):
+ssh deployer@<IP_SERWERA> "sudo cat /etc/rancher/k3s/k3s.yaml" \
+  | sed "s/127.0.0.1/<IP_SERWERA>/g" \
+  > ~/.kube/config-hetzner
+```
+
+```bash
 chmod 600 ~/.kube/config-hetzner
 export KUBECONFIG=~/.kube/config-hetzner
 ```
 
-Teraz możesz sterować klastrem z lokalnego komputera:
+Zweryfikuj połączenie:
 
 ```bash
 kubectl get nodes
@@ -374,6 +392,8 @@ kubectl get nodes
 > **Dodaj do ~/.bashrc lub ~/.zshrc:**  
 > `export KUBECONFIG=~/.kube/config-hetzner`  
 > żeby nie musieć ustawiać za każdym razem.
+
+Od teraz **nie potrzebujesz już SSH** — wszystkie dalsze komendy `kubectl` wykonujesz lokalnie przez port 6443.
 
 ### 4.3 Zainstaluj Traefik i ServiceLB przez Helm
 
@@ -403,10 +423,10 @@ Wyjdź z `--watch` przez `Ctrl+C` gdy zobaczysz `Running`.
 
 Po zainstalowaniu k3s i skopiowaniu kubeconfig (sekcje 4.1–4.2) masz dwie opcje:
 
-| Opcja | Kiedy wybrać |
-|-------|-------------|
+| Opcja                            | Kiedy wybrać                                                                  |
+|----------------------------------|-------------------------------------------------------------------------------|
 | **A: `bootstrap.sh`** (zalecana) | Nowy klaster, chcesz przejść szybko — skrypt wykona sekcje 5–12 automatycznie |
-| **B: Ręcznie** (sekcje 5–12) | Uczysz się Kubernetes, chcesz pełną kontrolę nad każdym krokiem |
+| **B: Ręcznie** (sekcje 5–12)     | Uczysz się Kubernetes, chcesz pełną kontrolę nad każdym krokiem               |
 
 #### Opcja A — uruchom bootstrap.sh
 
@@ -424,19 +444,19 @@ chmod +x k8s/bootstrap.sh
 
 Skrypt interaktywnie zapyta o:
 
-| Pytanie | Co wpisać |
-|---------|-----------|
-| Hasło MySQL root | Silne hasło, min. 16 znaków |
-| Nazwa użytkownika MySQL | Domyślnie `cms` |
-| Hasło MySQL app | Silne hasło, min. 16 znaków |
-| Hasło Redis | Silne hasło, min. 16 znaków |
-| Typesense API key | Losowy klucz, min. 16 znaków |
-| Typ CI/CD | `1` = GitHub Actions, `2` = GitLab CI, Enter = pomiń |
-| GitHub/GitLab token | Do pull secret dla prywatnego rejestru obrazów |
-| E-mail Let's Encrypt | Powiadomienia o wygasaniu certyfikatów |
-| Ingress deweloperski (HTTP) | `y` jeśli nie masz domeny — używa sslip.io |
-| Ingress produkcyjny (HTTPS) | `Y` (domyślnie) — wymaga DNS + cert-manager |
-| GlitchTip | `y` jeśli chcesz self-hosted śledzenie błędów |
+| Pytanie                     | Co wpisać                                            |
+|-----------------------------|------------------------------------------------------|
+| Hasło MySQL root            | Silne hasło, min. 16 znaków                          |
+| Nazwa użytkownika MySQL     | Domyślnie `cms`                                      |
+| Hasło MySQL app             | Silne hasło, min. 16 znaków                          |
+| Hasło Redis                 | Silne hasło, min. 16 znaków                          |
+| Typesense API key           | Losowy klucz, min. 16 znaków                         |
+| Typ CI/CD                   | `1` = GitHub Actions, `2` = GitLab CI, Enter = pomiń |
+| GitHub/GitLab token         | Do pull secret dla prywatnego rejestru obrazów       |
+| E-mail Let's Encrypt        | Powiadomienia o wygasaniu certyfikatów               |
+| Ingress deweloperski (HTTP) | `y` jeśli nie masz domeny — używa sslip.io           |
+| Ingress produkcyjny (HTTPS) | `Y` (domyślnie) — wymaga DNS + cert-manager          |
+| GlitchTip                   | `y` jeśli chcesz self-hosted śledzenie błędów        |
 
 **Czas wykonania:** ~5–10 minut (większość to oczekiwanie na MySQL i cert-manager).
 
@@ -1065,11 +1085,11 @@ W GitLab: **Settings → CI/CD → Variables → Add variable**
 
 #### Wymagane zmienne
 
-| Zmienna           | Typ      | Masked | Protected | Opis                                      |
-|-------------------|----------|--------|-----------|-------------------------------------------|
-| `KUBECONFIG`      | Variable | ✅      | ✅         | Surowa treść kubeconfig — patrz sekcja 13 |
-| `SERVER_ENV`      | Variable | ✅      | ✅         | Pełna treść `server/.env.production`      |
-| `ENV_CLIENT_PROD` | Variable | ❌      | ❌         | Build-time zmienne dla Next.js (multiline)|
+| Zmienna           | Typ      | Masked | Protected | Opis                                       |
+|-------------------|----------|--------|-----------|--------------------------------------------|
+| `KUBECONFIG`      | Variable | ✅      | ✅         | Surowa treść kubeconfig — patrz sekcja 13  |
+| `SERVER_ENV`      | Variable | ✅      | ✅         | Pełna treść `server/.env.production`       |
+| `ENV_CLIENT_PROD` | Variable | ❌      | ❌         | Build-time zmienne dla Next.js (multiline) |
 
 **Nie musisz** ustawiać zmiennych rejestru — GitLab dostarcza je automatycznie:
 - `CI_REGISTRY` — adres rejestru
