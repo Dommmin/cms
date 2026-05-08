@@ -1,10 +1,7 @@
-import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import type { Metadata } from 'next';
 
 import { getBlogCategories, getBlogPosts } from '@/api/cms';
 import { BlogListClient } from '@/components/blog-list-client';
-import { blogKeys } from '@/hooks/blog-keys';
-import { getServerQueryClient } from '@/lib/query-client';
 import { generateAlternates } from '@/lib/seo';
 import type { PageProps } from './page.types';
 
@@ -28,21 +25,10 @@ export default async function BlogPage({ params, searchParams }: PageProps) {
         locale,
     };
 
-    const queryClient = getServerQueryClient();
-    await Promise.all([
-        queryClient.prefetchQuery({
-            queryKey: blogKeys.posts(blogParams),
-            queryFn: () => getBlogPosts(blogParams),
-        }),
-        queryClient.prefetchQuery({
-            queryKey: blogKeys.categories(),
-            queryFn: () => getBlogCategories(),
-        }),
+    const [posts, categories] = await Promise.all([
+        getBlogPosts(blogParams),
+        getBlogCategories(),
     ]);
 
-    return (
-        <HydrationBoundary state={dehydrate(queryClient)}>
-            <BlogListClient params={blogParams} />
-        </HydrationBoundary>
-    );
+    return <BlogListClient posts={posts} categories={categories} params={blogParams} />;
 }

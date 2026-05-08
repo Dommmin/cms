@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { useBlogCategories, useBlogPosts } from '@/hooks/use-blog';
 import { useLocalePath } from '@/hooks/use-locale';
 import type { BlogListClientProps } from './blog-list-client.types';
 
@@ -13,12 +12,9 @@ const SORT_OPTIONS = [
     { value: 'top_rated', label: 'Top rated' },
 ];
 
-export function BlogListClient({ params }: BlogListClientProps) {
+export function BlogListClient({ posts, categories, params }: BlogListClientProps) {
     const lp = useLocalePath();
     const { page = 1, category, sort = '-created_at' } = params;
-
-    const { data: posts, isLoading: postsLoading } = useBlogPosts(params);
-    const { data: categories = [] } = useBlogCategories();
 
     const buildUrl = (
         overrides: Record<string, string | number | undefined>,
@@ -33,43 +29,6 @@ export function BlogListClient({ params }: BlogListClientProps) {
         const qs = urlParams.toString();
         return lp(`/blog${qs ? `?${qs}` : ''}`);
     };
-
-    if (postsLoading && !posts) {
-        return (
-            <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-                <div className="mb-10 text-center">
-                    <h1 className="text-4xl font-bold">Blog</h1>
-                    <p className="text-muted-foreground mt-2">
-                        Articles, news and inspiration
-                    </p>
-                </div>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {Array.from({ length: 6 }).map((_, i) => (
-                        <div
-                            key={i}
-                            className="border-border bg-card overflow-hidden rounded-xl border"
-                        >
-                            <div className="bg-muted aspect-video animate-pulse" />
-                            <div className="flex flex-col gap-2 p-4">
-                                <div className="bg-muted h-3 w-16 animate-pulse rounded" />
-                                <div className="bg-muted h-5 w-full animate-pulse rounded" />
-                                <div className="bg-muted h-5 w-3/4 animate-pulse rounded" />
-                                <div className="bg-muted mt-2 h-3 w-24 animate-pulse rounded" />
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        );
-    }
-
-    if (!posts) {
-        return (
-            <div className="text-muted-foreground py-24 text-center">
-                Could not load blog posts.
-            </div>
-        );
-    }
 
     return (
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">

@@ -2,58 +2,20 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 import { BlogViewTracker } from '@/app/blog/_blog-view-tracker';
 import { BlogComments } from '@/components/blog-comments';
 import { BlogVotes } from '@/components/blog-votes';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { JsonLd } from '@/components/json-ld';
-import { useBlogPost } from '@/hooks/use-blog';
 import { useLocalePath } from '@/hooks/use-locale';
 import { sanitizeHtml } from '@/lib/sanitize';
 import { buildBlogPosting, buildBreadcrumbList } from '@/lib/schema';
 import { generateCanonical } from '@/lib/seo';
 import type { BlogPostClientProps } from './blog-post-client.types';
 
-export function BlogPostClient({ slug, locale }: BlogPostClientProps) {
+export function BlogPostClient({ post, locale }: BlogPostClientProps) {
     const lp = useLocalePath();
-    const router = useRouter();
-    const { data: post, isLoading, error } = useBlogPost(slug, locale);
-
-    if (isLoading && !post) {
-        return (
-            <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-                <div className="space-y-4">
-                    <div className="bg-muted h-6 w-32 animate-pulse rounded" />
-                    <div className="bg-muted h-10 w-full animate-pulse rounded" />
-                    <div className="bg-muted h-10 w-3/4 animate-pulse rounded" />
-                    <div className="bg-muted h-4 w-48 animate-pulse rounded" />
-                    <div className="bg-muted aspect-video animate-pulse rounded-xl" />
-                    <div className="space-y-2 pt-4">
-                        {[
-                            'w-full',
-                            'w-11/12',
-                            'w-full',
-                            'w-10/12',
-                            'w-full',
-                            'w-9/12',
-                        ].map((w, i) => (
-                            <div
-                                key={i}
-                                className={`bg-muted h-4 animate-pulse rounded ${w}`}
-                            />
-                        ))}
-                    </div>
-                </div>
-            </article>
-        );
-    }
-
-    if (error || !post) {
-        router.replace(lp('/blog'));
-        return null;
-    }
 
     return (
         <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
