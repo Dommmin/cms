@@ -33,10 +33,11 @@ Nie zakładam, że znasz Kubernetes. Zakładam, że znasz Dockera i nie boisz si
 18. [Codzienna obsługa — logi, restarty, aktualizacje](#18-codzienna-obsługa--logi-restarty-aktualizacje)
 19. [Backup MySQL](#19-backup-mysql)
 20. [Najczęstsze problemy (troubleshooting)](#20-najczęstsze-problemy-troubleshooting)
-21. [Rancher — zarządzanie klastrem przez UI](#21-rancher--zarządzanie-klastrem-przez-ui)
-22. [Czyszczenie dysku](#22-czyszczenie-dysku)
-23. [k9s — terminalowy panel zarządzania](#23-k9s--terminalowy-panel-zarządzania)
-24. [Rotacja secretów — aktualizacja .env i haseł bez downtime'u](#24-rotacja-secretów--aktualizacja-env-i-haseł-bez-downtimeu)
+21. [GlitchTip — śledzenie błędów](#21-glitchtip--śledzenie-błędów)
+22. [Rancher — zarządzanie klastrem przez UI](#22-rancher--zarządzanie-klastrem-przez-ui)
+23. [Czyszczenie dysku](#23-czyszczenie-dysku)
+24. [k9s — terminalowy panel zarządzania](#24-k9s--terminalowy-panel-zarządzania)
+25. [Rotacja secretów — aktualizacja .env i haseł bez downtime'u](#25-rotacja-secretów--aktualizacja-env-i-haseł-bez-downtimeu)
 
 ---
 
@@ -78,15 +79,21 @@ Internet
 [ Traefik ] ← wbudowany w k3s, zajmuje się TLS + routing
     │
     ├──► cms-client (Next.js :3000)       ← publiczny frontend
+    │      yourdomain.com
+    │      www.yourdomain.com
     │
     └──► cms-server (Laravel/Nginx :80)   ← API + admin panel
+           admin.yourdomain.com
               │
               ├── cms-mysql (MySQL 8)     ← StatefulSet + PVC
               ├── cms-redis (Redis 7)     ← Deployment + PVC
-              └── cms-gotenberg           ← generowanie PDF
+              ├── cms-gotenberg           ← generowanie PDF
+              └── cms-typesense          ← full-text search
 ```
 
-Wszystko działa w namespace `cms-prod`. MySQL i Redis mają persystentne wolumeny na dysku serwera (k3s `local-path` storage class). Obrazy Docker buduje GitLab CI i pushuje do GitLab Container Registry.
+Wszystko działa w namespace `cms-prod`. MySQL i Redis mają persystentne wolumeny na dysku serwera (k3s `local-path` storage class). Obrazy Docker buduje CI i pushuje do rejestru kontenerów.
+
+> **Struktura domen:** Publiczny frontend Next.js działa na głównej domenie (`yourdomain.com`). Panel admina Laravel jest dostępny przez osobną subdomenę (`admin.yourdomain.com`) — to upraszcza routing Ingress i oddziela API od interfejsu publicznego.
 
 ---
 
@@ -135,7 +142,7 @@ W panelu swojego rejestratora domen ustaw rekordy A:
 ```
 yourdomain.com        A  <IP_SERWERA>
 www.yourdomain.com    A  <IP_SERWERA>
-api.yourdomain.com    A  <IP_SERWERA>
+admin.yourdomain.com  A  <IP_SERWERA>
 ```
 
 Poczekaj ~5-15 minut na propagację DNS. Możesz sprawdzić:
@@ -304,12 +311,12 @@ kubectl get nodes
 > `export KUBECONFIG=~/.kube/config-hetzner`  
 > żeby nie musieć ustawiać za każdym razem.
 
-### 4.3 Zainstaluj Traefik i ServiceLB przez Helm
+### 4.3 Skonfiguruj Traefik przez Helm
 
 > **Lokalny komputer — od tej chwili wszystkie komendy `kubectl` wykonujesz u siebie.**  
 > `kubectl` to klient HTTP — wysyła polecenia do serwera przez port 6443. Nie musisz być zalogowany przez SSH. Upewnij się, że masz ustawione `export KUBECONFIG=~/.kube/config-hetzner` (sekcja 4.2).
 
-Instalacja Traefiku składa się z **dwóch kroków** — Middleware musi być aplikowany dopiero po tym, jak Traefik zainstaluje swoje CRD (Custom Resource Definitions).
+Konfiguracja Traefiku składa się z **dwóch kroków** — Middleware musi być aplikowany dopiero po tym, jak Traefik zainstaluje swoje CRD (Custom Resource Definitions), **i** po tym jak namespace zostanie utworzony.
 
 **Krok 1** — zastosuj konfigurację Traefiku (tylko HelmChartConfig):
 
@@ -326,7 +333,13 @@ kubectl -n kube-system get pods --watch | grep traefik
 
 Wyjdź z `--watch` przez `Ctrl+C` gdy zobaczysz `Running`.
 
-> Middleware (`k8s/traefik/middleware.yaml`) aplikujemy dopiero w **sekcji 7.1** — po utworzeniu namespace. Middleware musi należeć do istniejącego namespace.
+**Krok 2** — Middleware aplikujemy dopiero w **sekcji 7.1** — po utworzeniu namespace `cms-prod`:
+
+```bash
+kubectl apply -f k8s/traefik/middleware.yaml
+```
+
+> **Dlaczego dwa kroki?** `Middleware` to zasób CRD Traefiku — jeśli go zastosujemy przed instalacją Traefiku, kubectl zwróci `no matches for kind "Middleware"`. Ponadto Middleware musi należeć do istniejącego namespace.
 
 ---
 
@@ -391,12 +404,14 @@ kubectl get clusterissuer letsencrypt-prod
 
 ## 6. Konfiguracja Traefik (HTTPS + przekierowanie)
 
-Plik `k8s/traefik/config.yaml` zawiera dwie rzeczy:
+Plik `k8s/traefik/config.yaml` zawiera `HelmChartConfig`, który konfiguruje Traefik tak, żeby przekierowywał HTTP (port 80) na HTTPS (port 443) i ustawia zewnętrzny IP serwera.
 
-1. **HelmChartConfig** — konfiguruje Traefik tak, żeby ruch HTTP (port 80) był automatycznie przekierowywany na HTTPS (port 443)
-2. **Middleware** — ustawia limit rozmiaru ciała żądania na 100 MB (potrzebne do uploadów plików)
+Plik `k8s/traefik/middleware.yaml` definiuje dwa middleware Traefiku:
 
-Jeśli wcześniej zastosowałeś ten plik, Traefik już jest skonfigurowany. Zweryfikuj:
+1. **`redirect-https`** — permanentne przekierowanie HTTP → HTTPS
+2. **`body-size`** — limit rozmiaru ciała żądania 100 MB (potrzebne do uploadów plików)
+
+Jeśli wcześniej zastosowałeś `config.yaml`, Traefik jest już skonfigurowany. Zweryfikuj:
 
 ```bash
 kubectl -n kube-system get helmchartconfig traefik
@@ -404,13 +419,15 @@ kubectl -n kube-system get helmchartconfig traefik
 # traefik   5m
 ```
 
+Middleware aplikujemy w sekcji 7.1 po utworzeniu namespace.
+
 ---
 
 ## 7. Przygotowanie klastra — namespace i sekrety
 
 > **Uwaga o nazwie namespace:** Przykłady w tym przewodniku używają `cms-prod` jako nazwy namespace. Zastąp ją własną — np. `my-blog-prod`, `shop-prod`, `api-prod`. Użyj jej konsekwentnie we wszystkich plikach YAML i komendach `kubectl -n`.
 
-### 7.1 Utwórz namespace
+### 7.1 Utwórz namespace i zastosuj Middleware
 
 Namespace to izolowana przestrzeń w klastrze — jak osobny folder dla naszej aplikacji.
 
@@ -421,7 +438,7 @@ kubectl get namespace cms-prod
 # cms-prod   Active   5s
 ```
 
-Teraz zastosuj Traefik Middleware — wymaga istniejącego namespace (dlatego nie robiliśmy tego w sekcji 4):
+Teraz zastosuj Traefik Middleware — wymaga istniejącego namespace (dlatego nie robiliśmy tego wcześniej):
 
 ```bash
 kubectl apply -f k8s/traefik/middleware.yaml
@@ -464,12 +481,16 @@ kubectl apply -f k8s/redis/secret.yaml
 ### 7.4 Sekret aplikacji Laravel — opcjonalne przy CI/CD
 
 > **Jeśli używasz GitHub Actions lub GitLab CI/CD — pomiń ten krok.**  
-> Pipeline automatycznie tworzy i aktualizuje ten sekret z zmiennej `PROD_ENV` przy każdym deploymencie (krok 0 w pipeline). Ręczne tworzenie jest potrzebne tylko jeśli chcesz uruchomić aplikację przed pierwszym CI/CD.
+> Pipeline automatycznie tworzy i aktualizuje ten sekret z zmiennej `PROD_ENV` / `SERVER_ENV` przy każdym deploymencie (krok 0 w pipeline). Ręczne tworzenie jest potrzebne tylko jeśli chcesz uruchomić aplikację przed pierwszym CI/CD.
 
-Jeśli jednak chcesz skonfigurować sekret ręcznie (np. przed pierwszym CI/CD run), użyj szablonu `server/.env.production.example`:
+Jeśli jednak chcesz skonfigurować sekret ręcznie, użyj szablonu `k8s/server/secret.yaml.example`:
 
 ```bash
-# Uzupełnij server/.env.production.example swoimi wartościami, a następnie:
+# Skopiuj i wypełnij wszystkie CHANGE_ME
+cp k8s/server/secret.yaml.example k8s/server/secret.yaml
+# edytuj k8s/server/secret.yaml
+
+# Lub utwórz z istniejącego pliku .env:
 kubectl create secret generic cms-server-env \
   --from-file=.env=server/.env.production \
   --namespace=cms-prod \
@@ -478,6 +499,8 @@ kubectl create secret generic cms-server-env \
 
 > **Skąd wziąć APP_KEY?**  
 > `docker compose exec php php artisan key:generate --show`
+
+Sekret zawiera cały produkcyjny `.env` — dane bazy, hasło Redis, konfigurację S3/storage, bramki płatności i DSN monitoringu.
 
 ### 7.5 Sekret klienta Next.js
 
@@ -558,16 +581,15 @@ Typesense to szybki silnik full-text search. Aplikacja używa go przez Laravel S
 
 ### 10.1 Utwórz sekret z kluczem API
 
-Typesense wymaga klucza API do autoryzacji zapytań. Użyj losowego, silnego klucza (min. 16 znaków):
+Skopiuj i edytuj przykładowy plik:
 
 ```bash
-kubectl create secret generic cms-typesense \
-  --from-literal=api-key=<TWÓJ_KLUCZ_API> \
-  --namespace=cms-prod \
-  --dry-run=client -o yaml | kubectl apply -f -
+cp k8s/typesense/secret.yaml.example k8s/typesense/secret.yaml
+# edytuj — zamień CHANGE_ME na silny, losowy klucz (min. 16 znaków)
+kubectl apply -f k8s/typesense/secret.yaml
 ```
 
-> Ten sam klucz wpisz w PROD_ENV jako `TYPESENSE_API_KEY=<TWÓJ_KLUCZ_API>`.  
+> Ten sam klucz wpisz w produkcyjnym `.env` jako `TYPESENSE_API_KEY=<TWÓJ_KLUCZ_API>`.  
 > **Ważne:** Nie dodawaj komentarzy (`#`) za wartością — Laravel odczyta je jako część klucza.
 
 ### 10.2 Wdróż Typesense
@@ -592,9 +614,9 @@ kubectl -n cms-prod exec deployment/cms-typesense -- wget -qO- http://localhost:
 # {"ok":true}
 ```
 
-### 10.3 Konfiguracja w PROD_ENV
+### 10.3 Konfiguracja w produkcyjnym .env
 
-Upewnij się, że w `PROD_ENV` (zmienna CI/CD) masz:
+Upewnij się, że w produkcyjnym `.env` masz:
 
 ```dotenv
 SCOUT_DRIVER=typesense
@@ -679,7 +701,7 @@ Przed pierwszym deployem przez CI/CD musimy ręcznie zastosować manifesty infra
 
 ### 12.1 Persistent storage dla uploadsów i logów
 
-Zanim uruchomisz serwer, utwórz PVC (PersistentVolumeClaim) — wolumen na dysku VPS, który przechowa uploadowane pliki i logi Laravel.
+Zanim uruchomisz serwer, utwórz PVC (PersistentVolumeClaim) — wolumen na dysku VPS.
 
 ```bash
 kubectl apply -f k8s/server/pvc-storage.yaml
@@ -695,24 +717,9 @@ kubectl -n cms-prod get pvc
 
 `STATUS: Bound` oznacza że wolumen jest gotowy. `local-path` to wbudowany w k3s mechanizm przechowywania danych na lokalnym dysku VPS.
 
-> **Co przechowuje PVC?**
-> ```
-> PVC (20Gi na dysku VPS)
->   ├── storage/app/    ← uploadowane pliki (zdjęcia, PDF-y, załączniki)
->   └── storage/logs/   ← logi Laravel (gdy LOG_CHANNEL=daily lub stack)
-> ```
-> Dane przeżywają restarty podów i deploye. Giną tylko jeśli ręcznie usuniesz PVC.
+> **Ograniczenie PVC:** działa tylko przy `replicas: 1`. Przy skalowaniu do 2+ podów przejdź na zewnętrzne storage zgodne z S3 (AWS S3, MinIO, Cloudflare R2) — ustaw `FILESYSTEM_DISK=s3` w `.env`.
 
-W pliku `.env` produkcyjnym ustaw:
-
-```dotenv
-FILESYSTEM_DISK=public   # pliki na lokalny dysk (przez PVC)
-LOG_CHANNEL=stderr       # logi do kubectl logs (najwygodniejsze w k8s)
-# LOG_CHANNEL=stack      # lub oba: stderr + plik
-# LOG_STACK=stderr,daily
-```
-
-> **Ograniczenie PVC:** działa tylko przy `replicas: 1`. Przy skalowaniu do 2+ podów przejdź na MinIO — patrz sekcja z bonusami na końcu przewodnika.
+Domyślny `k8s/server/secret.yaml.example` używa `FILESYSTEM_DISK=s3` — zewnętrzne object storage jest zalecaną konfiguracją produkcyjną. Ustaw `FILESYSTEM_DISK=public` tylko jeśli celowo chcesz lokalny dysk PVC z jedną repliką.
 
 ### 12.2 Wdrożenie serwerów
 
@@ -745,17 +752,33 @@ Powinieneś zobaczyć:
 NAME                               READY   STATUS
 pod/cms-server-xxxxxxxxx-xxxxx     1/1     Running
 pod/cms-queue-xxxxxxxxx-xxxxx      1/1     Running
+pod/cms-queue-xxxxxxxxx-yyyyy      1/1     Running
 pod/cms-client-xxxxxxxxx-xxxxx     1/1     Running
 pod/cms-mysql-0                    1/1     Running
 pod/cms-redis-xxxxxxxxx-xxxxx      1/1     Running
 pod/cms-gotenberg-xxxxxxxxx-xxxxx  1/1     Running
+```
 
-NAME                TYPE        CLUSTER-IP
-service/cms-server  ClusterIP   10.43.x.x
-service/cms-client  ClusterIP   10.43.x.x
-service/cms-mysql   ClusterIP   None
-service/cms-redis   ClusterIP   10.43.x.x
-service/cms-gotenberg ClusterIP 10.43.x.x
+> **Uwaga:** `cms-queue` domyślnie uruchamia 2 repliki (skonfigurowane w `k8s/server/deployment-queue.yaml`). Każdy worker restartuje się co godzinę (`--max-time=3600`), żeby zapobiec wyciekom pamięci.
+
+### 12.3 Testowanie bez domeny (sslip.io)
+
+Jeśli nie masz jeszcze prawdziwej domeny, użyj development ingressu — tylko HTTP, bez TLS:
+
+```bash
+# Edytuj k8s/ingress-dev.yaml i zamień 1.2.3.4 na IP swojego serwera
+kubectl apply -f k8s/ingress-dev.yaml
+```
+
+Serwis `sslip.io` rozwiązuje subdomeny automatycznie:
+- `app.1.2.3.4.sslip.io` → IP serwera (frontend Next.js)
+- `api.1.2.3.4.sslip.io` → IP serwera (admin Laravel)
+
+Gdy domena będzie gotowa, przełącz na produkcyjny ingress:
+
+```bash
+kubectl delete -f k8s/ingress-dev.yaml
+kubectl apply -f k8s/ingress.yaml
 ```
 
 ---
@@ -784,8 +807,8 @@ W podejściu z Kubernetes pipeline **nie wysyła kodu** — kod jest już w obra
 ```
 GitHub/GitLab Actions → HTTPS (port 6443) → k8s API → k3s
                                                  ↓
-                                    "zmień obraz w deployment na :abc1234"
-                                    k8s sam robi rolling update
+                         sed podmienia tag obrazu w manifeście → kubectl apply
+                         k8s sam robi rolling update
 ```
 
 ### Co to jest KUBECONFIG?
@@ -823,8 +846,6 @@ Na lokalnym komputerze (masz już skonfigurowany kubectl z sekcji 4.2):
 cat ~/.kube/config-hetzner
 ```
 
-Skopiuj cały wynik (zaczyna się od `apiVersion: v1`) i wklej jako wartość sekretu `KUBECONFIG_PROD` (GitHub) lub `KUBECONFIG` (GitLab). GitHub i GitLab obsługują wieloliniowe wartości — **nie koduj do base64**.
-
 > **Upewnij się**, że kubeconfig wskazuje na publiczny IP serwera (nie `127.0.0.1`). Jeśli skopiowałeś go komendą z sekcji 4.2 (z `sed`), jest już poprawny.
 
 ### Co musisz otworzyć na serwerze?
@@ -844,39 +865,41 @@ Repozytorium zawiera plik `.github/workflows/deploy.yml` z pełnym pipeline'em. 
 
 ### 14.1 Zmienne i sekrety
 
-W GitHub: **Settings → Secrets and Actions → Secrets / Variables**
+W GitHub: **Settings → Secrets and variables → Actions → Secrets / Variables**
 
 #### Secrets (write-only, maskowane w logach)
 
-| Secret            | Opis                                      |
-|-------------------|-------------------------------------------|
-| `KUBECONFIG_PROD` | Surowa treść kubeconfig — patrz sekcja 13 |
+| Secret            | Opis                                                    |
+|-------------------|---------------------------------------------------------|
+| `KUBECONFIG_PROD` | Surowa treść kubeconfig (plain text, **nie base64**)    |
 
 ```bash
-# Jak uzyskać wartość (bez base64):
+# Jak uzyskać wartość:
 cat ~/.kube/config-hetzner
+# Skopiuj cały wynik (zaczyna się od "apiVersion: v1") i wklej jako wartość sekretu.
+# NIE koduj do base64.
 ```
 
 #### Variables (widoczne i edytowalne w UI)
 
 | Variable          | Przykład                            | Opis                                       |
 |-------------------|-------------------------------------|--------------------------------------------|
-| `PROD_ENV`        | *(pełna treść .env produkcyjnego)*  | Automatycznie sync do k8s Secret           |
+| `PROD_ENV`        | *(pełna treść .env produkcyjnego)*  | Automatycznie sync do k8s Secret na deploy |
 | `ENV_CLIENT_PROD` | *(pełna treść .env frontendowego)*  | Build-time zmienne dla Next.js (multiline) |
 
 > **Dlaczego `PROD_ENV` jako Variable, a nie Secret?**  
-> Secrets są write-only — raz wklejonego nie możesz odczytać ani edytować linijka po linijce. Variables są widoczne w UI, więc łatwo sprawdzisz co jest ustawione. Pipeline i tak sync'uje wartość do k8s Secret przed deployem.
+> Secrets są write-only — raz wklejonego nie możesz odczytać ani edytować linijka po linijce. Variables są widoczne w UI, więc łatwo sprawdzisz co jest ustawione i zaktualizujesz pojedyncze wartości. Pipeline i tak synchronizuje wartość do k8s Secret przed deployem.
 
 #### Jak ustawić PROD_ENV
 
-Treść to dosłownie zawartość Twojego `server/.env.production`:
+Treść to dosłownie zawartość Twojego produkcyjnego `.env`. Zobacz `k8s/server/secret.yaml.example` dla pełnej listy wymaganych zmiennych:
 
 ```dotenv
 APP_NAME="MyCMS"
 APP_ENV=production
 APP_KEY=base64:...
 APP_DEBUG=false
-APP_URL=https://api.yourdomain.com
+APP_URL=https://admin.yourdomain.com
 FRONTEND_URL=https://yourdomain.com
 
 DB_HOST=cms-mysql.cms-prod.svc.cluster.local
@@ -885,7 +908,18 @@ DB_PASSWORD=SuperTajneHaslo456!
 REDIS_HOST=cms-redis.cms-prod.svc.cluster.local
 REDIS_PASSWORD=SuperTajneHasloRedis789!
 
+FILESYSTEM_DISK=s3
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+AWS_BUCKET=cms
+AWS_ENDPOINT=...
+
 GOTENBERG_URL=http://cms-gotenberg.cms-prod.svc.cluster.local:3000
+
+TYPESENSE_API_KEY=...
+TYPESENSE_HOST=cms-typesense.cms-prod.svc.cluster.local
+
+GLITCHTIP_DSN=https://...@glitchtip.yourdomain.com/1
 ...
 ```
 
@@ -893,11 +927,12 @@ GitHub obsługuje wieloliniowe Variables — wklej całą treść.
 
 #### Jak ustawić ENV_CLIENT_PROD
 
-Treść to `.env` dla frontendu Next.js — tylko zmienne build-time potrzebne przy budowaniu obrazu:
+Treść to `.env` dla frontendu Next.js — tylko zmienne build-time:
 
 ```dotenv
-NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+NEXT_PUBLIC_API_URL=https://admin.yourdomain.com
 NEXT_PUBLIC_APP_NAME=MyCMS
+NEXT_PUBLIC_GLITCHTIP_DSN=https://...@glitchtip.yourdomain.com/2
 ```
 
 Dodaj tyle zmiennych `NEXT_PUBLIC_*` ile potrzebujesz. Pipeline automatycznie przekaże je wszystkie do `docker buildx build` jako wpisy `--build-arg`.
@@ -907,34 +942,63 @@ Dodaj tyle zmiennych `NEXT_PUBLIC_*` ile potrzebujesz. Pipeline automatycznie pr
 ```
 push → master/main
         │
-        ├── lint-server    (Pint, Rector, PHPStan, ESLint, Prettier)
-        ├── lint-client    (TypeScript, ESLint, Prettier)
-        ├── security       (composer audit, npm audit)
-        ├── test           (Pest PHP — matrix 8.4 + 8.5)
+        ├── changes        (wykryj: server/ czy client/ się zmieniło?)
         │
-        ├── build-server   → ghcr.io/<owner>/cms-server:abc1234
-        ├── build-client   → ghcr.io/<owner>/cms-client:abc1234
+        ├── lint-server    (Pint, Rector, Larastan, typy Wayfinder, ESLint, Prettier)
+        ├── lint-client    (typy TypeScript, ESLint, Prettier)
+        ├── security       (composer audit, npm audit — server + client)
+        ├── test           (Pest PHP — matrix 8.4 + 8.5, z serwisem Gotenberg)
+        │
+        ├── build-server   → ghcr.io/<owner>/cms-server:abc1234   (tylko jeśli server/ zmienione)
+        ├── build-client   → ghcr.io/<owner>/cms-client:abc1234   (tylko jeśli client/ zmienione)
         │
         └── deploy
-              ├── 0. kubectl create secret cms-server-env (sync PROD_ENV)
-              ├── 1. kubectl apply job-migrate (migracje DB, wait 2 min)
-              ├── 2. kubectl set image deployment/cms-server
-              ├── 3. kubectl set image deployment/cms-queue
-              ├── 4. kubectl set image cronjob/cms-scheduler
-              └── 5. kubectl set image deployment/cms-client
+              ├── 0.  kubectl create secret cms-server-env (sync PROD_ENV)
+              ├── 0b. kubectl apply ingress, traefik, services, hpa (manifesty infrastruktury)
+              ├── 1.  kubectl apply job-migrate (migracje DB, wait 2 min)
+              ├── 2.  kubectl apply deployment/cms-server (z nowym tagiem obrazu)
+              ├── 3.  kubectl apply deployment/cms-queue  (z nowym tagiem obrazu)
+              ├── 4.  kubectl apply cronjob/cms-scheduler (z nowym tagiem obrazu)
+              └── 5.  kubectl apply deployment/cms-client (z nowym tagiem obrazu)
 ```
+
+**Smart change detection:** Pipeline wykrywa które katalogi się zmieniły (`server/` lub `client/`). Jeśli zmieniło się tylko kod frontendowy, obraz serwera nie jest przebudowywany (i odwrotnie). Krok deploy zawsze się uruchamia jeśli cokolwiek zostało zbudowane lub pipeline jest triggierowany ręcznie.
+
+**Podmiana tagu obrazu przez sed:** Krok deploy używa `sed` do zamiany placeholdera w manifestach YAML i stosuje pełny manifest — nie `kubectl set image`. Dzięki temu manifest w gicie zawsze odpowiada temu co działa w klastrze:
+
+```bash
+sed "s|ghcr.io/owner/cms-server:latest|ghcr.io/owner/cms-server:abc1234|g" \
+  k8s/server/deployment.yaml | kubectl apply -f -
+```
+
+**Fallback do :latest:** Jeśli build został pominięty (komponent się nie zmienił), deploy używa tagu `:latest` już w rejestrze.
+
+**Ręczne wyzwalanie:** Pipeline obsługuje `workflow_dispatch` z dwiema opcjami:
+- `skip_deploy`: uruchom lint/test/build bez deployu do k8s
+- `deploy_only`: pomiń lint/test/build i deployuj istniejące obrazy `:latest`
 
 Każdy deploy:
 1. Najpierw aktualizuje k8s Secret z `PROD_ENV` — żaden restart nie jest potrzebny dla migracji
-2. Uruchamia `php artisan migrate --force` jako jednorazowy Job z **nowym** obrazem
-3. Czeka na jego zakończenie (max 2 minuty)
-4. Dopiero potem robi rolling update deploymentów
+2. Stosuje manifesty infrastruktury (bezpieczne do ponownego stosowania — idempotentne)
+3. Uruchamia `php artisan migrate --force` jako jednorazowy Job z **nowym** obrazem
+4. Czeka na jego zakończenie (max 2 minuty)
+5. Dopiero potem robi rolling update deploymentów
 
 Dzięki temu migracje zawsze są przed nowym kodem — żadnych „column does not exist".
 
 ### 14.3 Obrazy bez serwera rejestru
 
 GitHub Container Registry (GHCR) jest wbudowany w GitHub — nie musisz konfigurować żadnego zewnętrznego rejestru. Pipeline automatycznie loguje się z `GITHUB_TOKEN` (dostępny automatycznie w każdym workflow).
+
+### 14.4 GitHub Environments i ochrona deployów
+
+Job `deploy` używa `environment: production`. Możesz skonfigurować reguły ochrony w **Settings → Environments → production**:
+
+- Wymagani recenzenci przed deployem
+- Timer oczekiwania (np. 5-minutowe opóźnienie)
+- Białą lista gałęzi deploymentu
+
+Job używa też grupy `concurrency` (`production-deploy`) z `cancel-in-progress: false` — trwający deploy **nigdy** nie jest anulowany przez kolejny push.
 
 ---
 
@@ -944,16 +1008,15 @@ Repozytorium zawiera plik `.gitlab-ci.yml` z pełnym pipeline'em. Musisz tylko s
 
 ### 15.1 Zmienne CI/CD
 
-
 W GitLab: **Settings → CI/CD → Variables → Add variable**
 
 #### Wymagane zmienne
 
-| Zmienna           | Typ      | Masked | Protected | Opis                                      |
-|-------------------|----------|--------|-----------|-------------------------------------------|
-| `KUBECONFIG`      | Variable | ✅      | ✅         | Surowa treść kubeconfig — patrz sekcja 13 |
-| `SERVER_ENV`      | Variable | ✅      | ✅         | Pełna treść `server/.env.production`      |
-| `ENV_CLIENT_PROD` | Variable | ❌      | ❌         | Build-time zmienne dla Next.js (multiline)|
+| Zmienna           | Typ      | Masked | Protected | Opis                                           |
+|-------------------|----------|--------|-----------|------------------------------------------------|
+| `KUBECONFIG`      | Variable | ✅      | ✅         | Kubeconfig **zakodowany w base64**             |
+| `SERVER_ENV`      | Variable | ✅      | ✅         | Pełna treść produkcyjnego `.env`               |
+| `ENV_CLIENT_PROD` | Variable | ❌      | ❌         | Build-time zmienne dla Next.js (multiline)     |
 
 **Nie musisz** ustawiać zmiennych rejestru — GitLab dostarcza je automatycznie:
 - `CI_REGISTRY` — adres rejestru
@@ -962,22 +1025,24 @@ W GitLab: **Settings → CI/CD → Variables → Add variable**
 
 #### Jak uzyskać KUBECONFIG
 
-```bash
-cat ~/.kube/config-hetzner
-```
+> ⚠️ **GitLab wymaga kubeconfig zakodowanego w base64.** Pipeline dekoduje go przez `base64 -d`.
 
-Skopiuj cały wynik i wklej jako wartość zmiennej `KUBECONFIG` w GitLab. **Nie koduj do base64** — GitLab obsługuje wieloliniowe wartości.
+```bash
+# Na lokalnym komputerze:
+cat ~/.kube/config-hetzner | base64 | tr -d '\n'
+# Skopiuj cały wynik i wklej jako wartość zmiennej KUBECONFIG w GitLab.
+```
 
 #### Jak uzyskać SERVER_ENV
 
-Treść zmiennej `SERVER_ENV` to dosłownie zawartość twojego `server/.env.production`:
+Treść zmiennej `SERVER_ENV` to dosłownie zawartość twojego produkcyjnego `.env`:
 
 ```dotenv
 APP_NAME="MyCMS"
 APP_ENV=production
 APP_KEY=base64:...
 APP_DEBUG=false
-APP_URL=https://api.yourdomain.com
+APP_URL=https://admin.yourdomain.com
 FRONTEND_URL=https://yourdomain.com
 ...
 ```
@@ -989,21 +1054,28 @@ Wklej całą treść jako wartość zmiennej (GitLab obsługuje wieloliniowe zmi
 ```
 push → master
         │
-        ├── lint-server    (Pint, Rector, PHPStan, ESLint, Prettier)
-        ├── lint-client    (TypeScript, ESLint, Prettier)
+        ├── lint-server    (Pint, Rector, Larastan, typy Wayfinder, ESLint, Prettier)
+        ├── lint-client    (typy TypeScript, ESLint, Prettier)
         ├── security       (composer audit, npm audit)
-        ├── test           (Pest PHP)
+        ├── test           (Pest PHP, z serwisem Gotenberg)
         │
         ├── build-server   → registry.gitlab.com/.../server:abc1234
         ├── build-client   → registry.gitlab.com/.../client:abc1234
         │
         └── deploy
-              ├── 1. kubectl apply job-migrate (migracje DB)
+              ├── 1. kubectl apply job-migrate (migracje DB, wait 2 min)
               ├── 2. kubectl set image deployment/cms-server
               ├── 3. kubectl set image deployment/cms-queue
               ├── 4. kubectl set image cronjob/cms-scheduler
               └── 5. kubectl set image deployment/cms-client
 ```
+
+Dyrektywa `resource_group: production` zapobiega równoległym deployom — tak samo jak grupa concurrency w GitHub Actions.
+
+Każdy deploy:
+1. Uruchamia `php artisan migrate --force` jako jednorazowy Job z nowym obrazem
+2. Czeka na jego zakończenie (max 2 minuty)
+3. Dopiero potem robi rolling update deploymentów
 
 ---
 
@@ -1012,8 +1084,16 @@ push → master
 Zrób push do gałęzi `master`:
 
 ```bash
+# GitHub Actions
 git add .github/ k8s/
-git commit -m "ci: add CI/CD pipeline and k3s manifests"
+git commit -m "ci: add GitHub Actions CI/CD and k3s manifests"
+git push origin master
+```
+
+```bash
+# GitLab CI
+git add .gitlab-ci.yml k8s/
+git commit -m "ci: add GitLab CI/CD and k3s manifests"
 git push origin master
 ```
 
@@ -1045,8 +1125,8 @@ kubectl -n cms-prod describe certificate cms-tls
 
 Wejdź w przeglądarkę:
 - `https://yourdomain.com` — frontend Next.js
-- `https://api.yourdomain.com/admin` — panel administracyjny
-- `https://api.yourdomain.com/health` — health check Laravel (powinien zwrócić `{"status":"ok"}`)
+- `https://admin.yourdomain.com` — panel administracyjny (Laravel + Inertia)
+- `https://admin.yourdomain.com/health` — health check Laravel (powinien zwrócić `{"status":"ok"}`)
 
 ---
 
@@ -1065,11 +1145,11 @@ kubectl -n cms-prod get certificate
 
 # Ingress ma adres IP
 kubectl -n cms-prod get ingress
-# NAME          CLASS     HOSTS              ADDRESS       PORTS
-# cms-ingress   traefik   yourdomain.com...  <IP>          80, 443
+# NAME          CLASS     HOSTS                              ADDRESS       PORTS
+# cms-ingress   traefik   yourdomain.com,admin...            <IP>          80, 443
 
 # Laravel odpowiada
-curl -s https://api.yourdomain.com/health
+curl -s https://admin.yourdomain.com/health
 # {"status":"ok","timestamp":"..."}
 
 # Frontend odpowiada
@@ -1080,9 +1160,15 @@ curl -I https://yourdomain.com
 kubectl -n cms-prod exec -it deployment/cms-server -- \
   php artisan migrate:status | tail -5
 
-# Queue workers działają
+# Queue workers działają (2 repliki)
 kubectl -n cms-prod logs deployment/cms-queue --tail=20
 ```
+
+### Health probe'y serwera
+
+Deployment serwera ma dwa probe'y:
+- **Liveness** (`/healthz`): poziom nginx — Kubernetes restartuje pod jeśli proces jest martwy
+- **Readiness** (`/health`): endpoint Laravel — Kubernetes nie kieruje ruchu dopóki aplikacja nie jest gotowa
 
 ### Test uploadów
 
@@ -1136,6 +1222,7 @@ kubectl -n cms-prod top pods
 # NAME                        CPU(cores)   MEMORY(bytes)
 # cms-server-xxx              45m          210Mi
 # cms-queue-xxx               12m          128Mi
+# cms-queue-yyy               10m          121Mi
 # cms-client-xxx              8m           95Mi
 # cms-mysql-0                 35m          480Mi
 # cms-redis-xxx               3m           28Mi
@@ -1325,11 +1412,39 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 
 ---
 
-## 21. Rancher — zarządzanie klastrem przez UI
+## 21. GlitchTip — śledzenie błędów
+
+GlitchTip to self-hosted, open-source alternatywa dla Sentry. Używa tego samego SDK co Sentry — nie trzeba zmieniać kodu, wystarczy podmienić DSN na adres własnej instancji.
+
+Uruchom GlitchTip w **osobnym namespace** na tym samym klastrze, używając oficjalnego chart Helma:
+
+```bash
+helm repo add glitchtip https://glitchtip.github.io/helm-charts
+helm repo update
+helm upgrade --install glitchtip glitchtip/glitchtip \
+  --namespace glitchtip \
+  --create-namespace \
+  -f k8s/glitchtip/values.example.yaml
+```
+
+Przed zastosowaniem edytuj `k8s/glitchtip/values.example.yaml` — ustaw domenę, email, SMTP i hasło bazy danych.
+
+Po instalacji:
+1. Utwórz organizację w UI GlitchTip
+2. Utwórz projekty `cms-api` i `cms-frontend`
+3. Skopiuj DSN do sekretów produkcyjnych:
+   - Laravel: `GLITCHTIP_DSN=https://...@glitchtip.yourdomain.com/1`
+   - Next.js (build arg): `NEXT_PUBLIC_GLITCHTIP_DSN=https://...@glitchtip.yourdomain.com/2`
+
+> **Uwaga:** `values.example.yaml` używa `ingressClassName: nginx` — zmień na `traefik` jeśli chcesz żeby GlitchTip działał za tym samym Traefikiem.
+
+---
+
+## 22. Rancher — zarządzanie klastrem przez UI
 
 Jeśli w pracy korzystasz z Ranchera, możesz go postawić na tym samym VPS. Dostaniesz dokładnie to samo środowisko — podgląd podów, logi, shell do kontenera, zarządzanie secretami — wszystko przez przeglądarkę.
 
-### 21.1 Instalacja Ranchera
+### 22.1 Instalacja Ranchera
 
 Rancher działa jako kontener Docker — niezależnie od k3s. Na serwerze:
 
@@ -1351,7 +1466,7 @@ https://<IP_SERWERA>:8443
 
 > **Uwaga:** Rancher używa self-signed certyfikatu przy pierwszym uruchomieniu — przeglądarka pokaże ostrzeżenie, kliknij "Proceed anyway".
 
-### 21.2 Pierwsze logowanie
+### 22.2 Pierwsze logowanie
 
 Pobierz hasło bootstrapowe:
 
@@ -1361,7 +1476,7 @@ docker logs rancher 2>&1 | grep "Bootstrap Password"
 
 Zaloguj się i ustaw nowe hasło.
 
-### 21.3 Importuj klaster k3s
+### 22.3 Importuj klaster k3s
 
 1. W Rancherze kliknij **Import Existing** → **Generic**
 2. Nadaj nazwę klastrowi, np. `cms-prod`
@@ -1373,7 +1488,7 @@ kubectl apply -f https://<IP_RANCHERA>:8443/v3/import/xxxxx.yaml
 
 Po ~1 minucie klaster pojawi się w Rancherze ze statusem `Active`.
 
-### 21.4 Co możesz robić w UI
+### 22.4 Co możesz robić w UI
 
 | Funkcja                  | Gdzie w Rancherze                      |
 |--------------------------|----------------------------------------|
@@ -1386,7 +1501,7 @@ Po ~1 minucie klaster pojawi się w Rancherze ze statusem `Active`.
 | Zużycie CPU / RAM        | Cluster → Metrics                      |
 | CronJoby i Joby          | Workloads → CronJobs / Jobs            |
 
-### 21.5 Zabezpieczenie panelu Ranchera
+### 22.5 Zabezpieczenie panelu Ranchera
 
 Domyślnie Rancher jest dostępny publicznie na porcie 8443. Ogranicz dostęp przez firewall Hetzner (panel → Firewall) lub bezpośrednio na serwerze:
 
@@ -1402,11 +1517,11 @@ ufw enable
 
 ---
 
-## 22. Czyszczenie dysku
+## 23. Czyszczenie dysku
 
 k3s akumuluje stare obrazy kontenerów przy każdym deploymencie. Po kilku miesiącach możesz stracić kilkanaście GB — warto to zautomatyzować.
 
-### 22.1 Sprawdź zajętość dysku
+### 23.1 Sprawdź zajętość dysku
 
 ```bash
 df -h /
@@ -1415,7 +1530,7 @@ df -h /
 du -sh /var/lib/rancher/k3s/agent/containerd/
 ```
 
-### 22.2 Ręczne czyszczenie
+### 23.2 Ręczne czyszczenie
 
 k3s używa `containerd` (nie Dockera). Do zarządzania obrazami służy `crictl`:
 
@@ -1433,7 +1548,7 @@ Jeśli masz też Dockera na serwerze (Rancher, Uptime Kuma):
 docker system prune -af
 ```
 
-### 22.3 Automatyczne czyszczenie — CronJob
+### 23.3 Automatyczne czyszczenie — CronJob
 
 ```bash
 kubectl apply -f k8s/maintenance/cronjob-image-cleanup.yaml
@@ -1443,11 +1558,11 @@ CronJob uruchamia się co niedzielę o 2:00 i usuwa nieużywane obrazy z `contai
 
 ---
 
-## 23. k9s — terminalowy panel zarządzania
+## 24. k9s — terminalowy panel zarządzania
 
 k9s to terminalowy UI dla Kubernetes — jak Rancher, ale w konsoli. Przydatny gdy jesteś już połączony SSH i nie chcesz otwierać przeglądarki.
 
-### 23.1 Instalacja
+### 24.1 Instalacja
 
 macOS:
 ```bash
@@ -1466,7 +1581,7 @@ Windows:
 winget install k9s
 ```
 
-### 23.2 Uruchomienie
+### 24.2 Uruchomienie
 
 ```bash
 k9s
@@ -1474,7 +1589,7 @@ k9s
 k9s -n cms-prod
 ```
 
-### 23.3 Najważniejsze skróty
+### 24.3 Najważniejsze skróty
 
 | Klawisz   | Akcja                     |
 |-----------|---------------------------|
@@ -1492,21 +1607,28 @@ k9s -n cms-prod
 
 ---
 
-## 24. Rotacja secretów — aktualizacja .env i haseł bez downtime'u
+## 25. Rotacja secretów — aktualizacja .env i haseł bez downtime'u
 
-### 24.1 Aktualizacja Laravel .env
+### 25.1 Aktualizacja Laravel .env
 
-Zmodyfikuj `k8s/server/secret.yaml`, a następnie:
+Zalecany sposób to zaktualizowanie `PROD_ENV` w GitHub Variables (lub `SERVER_ENV` w GitLab) i push — pipeline zsynchronizuje sekret automatycznie przy następnym deploymencie.
+
+Aby zaktualizować ręcznie bez pełnego deployu:
 
 ```bash
-kubectl apply -f k8s/server/secret.yaml
+printf '%s' "$NOWY_ENV_CONTENT" > /tmp/prod.env
+kubectl create secret generic cms-server-env \
+  --from-file=.env=/tmp/prod.env \
+  --namespace=cms-prod \
+  --dry-run=client -o yaml | kubectl apply -f -
+rm /tmp/prod.env
 
 # Rolling restart — nowe pody startują z nowym secretem zanim stare padną
 kubectl -n cms-prod rollout restart deployment/cms-server
 kubectl -n cms-prod rollout restart deployment/cms-queue
 ```
 
-### 24.2 Zmiana hasła MySQL
+### 25.2 Zmiana hasła MySQL
 
 **Krok 1** — zmień hasło w bazie:
 
@@ -1520,22 +1642,20 @@ FLUSH PRIVILEGES;
 EXIT;
 ```
 
-**Krok 2** — zaktualizuj oba sekrety i zrestartuj:
+**Krok 2** — zaktualizuj sekret i zrestartuj:
 
 ```bash
-# Zaktualizuj k8s/mysql/secret.yaml i k8s/server/secret.yaml
 kubectl apply -f k8s/mysql/secret.yaml
-kubectl apply -f k8s/server/secret.yaml
+# Zaktualizuj PROD_ENV / SERVER_ENV w CI/CD z nowym DB_PASSWORD
 kubectl -n cms-prod rollout restart deployment/cms-server
 kubectl -n cms-prod rollout restart deployment/cms-queue
 ```
 
-### 24.3 Zmiana hasła Redis
+### 25.3 Zmiana hasła Redis
 
 ```bash
-# Zaktualizuj k8s/redis/secret.yaml i k8s/server/secret.yaml (REDIS_PASSWORD)
 kubectl apply -f k8s/redis/secret.yaml
-kubectl apply -f k8s/server/secret.yaml
+# Zaktualizuj PROD_ENV / SERVER_ENV w CI/CD z nowym REDIS_PASSWORD
 
 kubectl -n cms-prod rollout restart deployment/cms-redis
 kubectl -n cms-prod rollout restart deployment/cms-server
@@ -1569,8 +1689,8 @@ deploy-staging:
   steps:
     - name: Deploy server to staging
       run: |
-        kubectl -n cms-staging set image deployment/cms-server \
-          app="ghcr.io/${{ github.repository_owner }}/cms-server:${{ github.sha }}"
+        sed "s|ghcr.io/owner/cms-server:latest|ghcr.io/owner/cms-server:${{ github.sha }}|g" \
+          k8s/server/deployment.yaml | kubectl apply -n cms-staging -f -
         kubectl -n cms-staging rollout status deployment/cms-server --timeout=5m
 ```
 
@@ -1604,8 +1724,8 @@ docker run -d \
 
 Wejdź na `https://<IP_SERWERA>:3001` i dodaj monitory dla:
 - `https://yourdomain.com` — frontend
-- `https://api.yourdomain.com/health` — Laravel API
-- `https://api.yourdomain.com/admin` — panel admina
+- `https://admin.yourdomain.com/health` — Laravel API
+- `https://admin.yourdomain.com/admin` — panel admina
 
 Wysyła powiadomienia przez Slack, email, Telegram i wiele innych kanałów.
 
@@ -1617,17 +1737,6 @@ Wysyła powiadomienia przez Slack, email, Telegram i wiele innych kanałów.
 
 Gdy chcesz skalować do `replicas: 2+`, PVC z `ReadWriteOnce` nie wystarczy — dwa pody nie mogą jednocześnie zapisywać do tego samego wolumenu. Rozwiązaniem jest **MinIO** — self-hosted storage kompatybilny z API Amazon S3.
 
-```
-replicas: 2
-
-Pod A ──► MinIO API (port 9000) ──► /data (PVC)
-Pod B ──►
-```
-
-Oba pody piszą do MinIO przez HTTP — MinIO sam zarządza dyskiem.
-
-### Wdrożenie MinIO
-
 ```bash
 # Sekret (skopiuj i uzupełnij)
 cp k8s/minio/secret.yaml.example k8s/minio/secret.yaml
@@ -1638,33 +1747,9 @@ kubectl apply -f k8s/minio/secret.yaml
 kubectl apply -f k8s/minio/pvc.yaml
 kubectl apply -f k8s/minio/deployment.yaml
 kubectl apply -f k8s/minio/service.yaml
-
-# Sprawdź
-kubectl -n cms-prod get pods | grep minio
-# cms-minio-xxxxxxxxx-xxxxx   1/1   Running   0   1m
 ```
 
-### Utwórz bucket
-
-MinIO ma panel webowy na porcie 9001. Utwórz tymczasowe przekierowanie:
-
-```bash
-kubectl -n cms-prod port-forward svc/cms-minio 9001:9001
-```
-
-Wejdź na `http://localhost:9001`, zaloguj się danymi z sekretu i utwórz bucket `cms`.
-
-Lub przez CLI bez UI:
-
-```bash
-kubectl -n cms-prod exec deployment/cms-minio -- \
-  mc alias set local http://localhost:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
-
-kubectl -n cms-prod exec deployment/cms-minio -- \
-  mc mb local/cms
-```
-
-### Konfiguracja Laravel (.env)
+Utwórz bucket i skonfiguruj Laravel:
 
 ```dotenv
 FILESYSTEM_DISK=s3
@@ -1674,23 +1759,7 @@ AWS_DEFAULT_REGION=us-east-1
 AWS_BUCKET=cms
 AWS_ENDPOINT=http://cms-minio.cms-prod.svc.cluster.local:9000
 AWS_USE_PATH_STYLE_ENDPOINT=true   # wymagane dla MinIO
-AWS_URL=https://api.yourdomain.com/storage   # publiczny URL przez Nginx proxy
-```
-
-> **Publiczny dostęp do plików:** MinIO działa wewnątrz klastra. Żeby pliki były dostępne publicznie, dodaj regułę w Ingress lub skonfiguruj MinIO bucket jako publiczny i wystaw port 9000 przez Ingress na osobnej subdomenie (np. `storage.yourdomain.com`).
-
-### Migracja z PVC na MinIO
-
-Jeśli masz już pliki na PVC i chcesz przenieść na MinIO:
-
-```bash
-# Skopiuj pliki z poda serwera do MinIO
-kubectl -n cms-prod exec deployment/cms-server -- \
-  aws s3 sync storage/app/public s3://cms/public \
-  --endpoint-url http://cms-minio.cms-prod.svc.cluster.local:9000
-
-# Następnie zmień FILESYSTEM_DISK=s3 w .env i zrestartuj
-kubectl -n cms-prod rollout restart deployment/cms-server
+AWS_URL=https://admin.yourdomain.com/storage
 ```
 
 ---
@@ -1701,14 +1770,17 @@ Masz teraz pełny klaster k3s z:
 
 - ✅ Automatycznym TLS (Let's Encrypt przez cert-manager)
 - ✅ HTTP → HTTPS redirect (Traefik)
-- ✅ Zero-downtime deployów (rolling update)
-- ✅ Migracjami przed deployem (Job)
+- ✅ Zero-downtime deployów (rolling update z liveness + readiness probe)
+- ✅ Migracjami przed deployem (Job z podmianą IMAGE_PLACEHOLDER przez sed)
 - ✅ Automatycznym restartem po awarii (Kubernetes)
 - ✅ HPA — autoskalowaniem przy obciążeniu
-- ✅ CI/CD (GitHub Actions lub GitLab) — lintowanie, testy, build, deploy
+- ✅ CI/CD (GitHub Actions lub GitLab) — lintowanie (Pint, Rector, Larastan), testy, build, deploy
+- ✅ Smart change detection — przebudowa tylko tego co się zmieniło
 - ✅ MySQL z persystentnym wolumenem
 - ✅ Redis z persystentnym wolumenem
+- ✅ Queue workers (2 repliki, restartowanie co godzinę zapobiegające wyciekom pamięci)
 - ✅ Codziennymi backupami MySQL
+- ✅ Śledzeniem błędów (GlitchTip)
 
 Całość za ~$10-12/miesiąc na Hetzner CX33.
 
