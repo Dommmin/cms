@@ -14,11 +14,14 @@ use App\Models\ProductType;
 use App\Models\ProductTypeAttribute;
 use App\Models\ProductVariant;
 use App\Models\VariantAttributeValue;
+use Database\Seeders\Concerns\CachesImages;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 class ElectronicsSeeder extends Seeder
 {
+    use CachesImages;
+
     private array $categories = [];
 
     private array $brands = [];
@@ -1628,6 +1631,8 @@ class ElectronicsSeeder extends Seeder
             'is_active' => true,
             'is_saleable' => true,
         ]);
+
+        $this->addProductImages($product, 'electronics-'.Str::slug($config['name']), count: random_int(3, 5));
 
         $variantPosition = 1;
         foreach ($config['variants'] as $variant) {

@@ -1,6 +1,6 @@
 # k3s — ściągawka komend
 
-> Zastąp `app` nazwą swojego namespace (tą co podałeś w `bootstrap.sh`).  
+> Zastąp `app` nazwą swojego namespace (tą, co podałeś w `bootstrap.sh`).  
 > Ustaw raz: `export KUBECONFIG=~/.kube/config-hetzner`
 
 ---
