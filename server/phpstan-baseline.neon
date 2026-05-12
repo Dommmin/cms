@@ -49,12 +49,6 @@ parameters:
 			path: app/Console/Commands/GenerateSitemap.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Console/Commands/GenerateSitemap.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Product\:\:\$updated_at\.$#'
 			identifier: property.notFound
 			count: 1
@@ -115,12 +109,6 @@ parameters:
 			path: app/Data/AdminProductData.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Data/AdminProductData.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Product\:\:\$images\.$#'
 			identifier: property.notFound
 			count: 1
@@ -152,12 +140,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Product\:\:\$sku_prefix\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Data/AdminProductData.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$slug\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Data/AdminProductData.php
@@ -199,12 +181,6 @@ parameters:
 			path: app/Exports/CustomersExport.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Customer\:\:\$email\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Exports/CustomersExport.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Customer\:\:\$first_name\.$#'
 			identifier: property.notFound
 			count: 1
@@ -221,12 +197,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Exports/CustomersExport.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Customer\:\:\$email\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Exports/OrdersExport.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Customer\:\:\$first_name\.$#'
@@ -295,30 +265,6 @@ parameters:
 			path: app/Exports/ProductsExport.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Exports/ProductsExport.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$is_featured\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Exports/ProductsExport.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Exports/ProductsExport.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Exports/ProductsExport.php
-
-		-
 			message: '#^Using nullsafe property access "\?\-\>price" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
 			identifier: nullsafe.neverNull
 			count: 1
@@ -379,18 +325,6 @@ parameters:
 			path: app/Http/Controllers/Admin/AdminSearchController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/AdminSearchController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/AdminSearchController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\User\:\:\$email\.$#'
 			identifier: property.notFound
 			count: 1
@@ -399,12 +333,6 @@ parameters:
 		-
 			message: '#^Access to an undefined property App\\Models\\User\:\:\$name\.$#'
 			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/AdminSearchController.php
-
-		-
-			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
 			count: 1
 			path: app/Http/Controllers/Admin/AdminSearchController.php
 
@@ -439,22 +367,10 @@ parameters:
 			path: app/Http/Controllers/Admin/AdminSearchController.php
 
 		-
-			message: '#^Using nullsafe property access on non\-nullable type \*NEVER\*\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 1
-			path: app/Http/Controllers/Admin/AdminSearchController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\AffiliateCode\:\:\$is_active\.$#'
 			identifier: property.notFound
 			count: 2
 			path: app/Http/Controllers/Admin/AffiliateCodeController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\AppNotification\:\:\$status\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/AppNotificationController.php
 
 		-
 			message: '#^Cannot call method getTranslation\(\) on stdClass\.$#'
@@ -597,7 +513,7 @@ parameters:
 		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:allBlocks\(\)\.$#'
 			identifier: method.notFound
-			count: 2
+			count: 1
 			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
 
 		-
@@ -835,18 +751,6 @@ parameters:
 			path: app/Http/Controllers/Admin/Ecommerce/CategoryController.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Contracts\\Auth\\Authenticatable\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/CustomerController.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Contracts\\Auth\\Authenticatable\:\:can\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/CustomerController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Discount\:\:\$is_active\.$#'
 			identifier: property.notFound
 			count: 2
@@ -898,12 +802,6 @@ parameters:
 			message: '#^Access to an undefined property App\\Models\\AttributeValue\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/ProductVariantController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 4
 			path: app/Http/Controllers/Admin/Ecommerce/ProductVariantController.php
 
 		-
@@ -985,18 +883,6 @@ parameters:
 			path: app/Http/Controllers/Admin/Ecommerce/ShippingMethodController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Http/Controllers/Admin/Ecommerce/ShippingMethodController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/ShippingMethodController.php
-
-		-
 			message: '#^Parameter \#1 \$array of function reset is passed by reference, so it expects variables only\.$#'
 			identifier: argument.byRef
 			count: 2
@@ -1005,18 +891,6 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,stdClass\>\:\:map\(\) contains unresolvable type\.$#'
 			identifier: argument.unresolvableType
-			count: 4
-			path: app/Http/Controllers/Admin/Ecommerce/ShippingMethodController.php
-
-		-
-			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,stdClass\>\:\:map\(\) expects callable\(stdClass, int\)\: array\{id\: mixed, name\: mixed\}, Closure\(App\\Models\\Category\)\: array\{id\: mixed, name\: mixed\} given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/Http/Controllers/Admin/Ecommerce/ShippingMethodController.php
-
-		-
-			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,stdClass\>\:\:map\(\) expects callable\(stdClass, int\)\: array\{id\: mixed, name\: mixed\}, Closure\(App\\Models\\Product\)\: array\{id\: mixed, name\: mixed\} given\.$#'
-			identifier: argument.type
 			count: 2
 			path: app/Http/Controllers/Admin/Ecommerce/ShippingMethodController.php
 
@@ -1615,24 +1489,6 @@ parameters:
 			path: app/Http/Controllers/Api/V1/FaqController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Http/Controllers/Api/V1/FlashSaleController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/FlashSaleController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/FlashSaleController.php
-
-		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\FlashSale\>\:\:active\(\)\.$#'
 			identifier: method.notFound
 			count: 2
@@ -1701,25 +1557,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 2
-			path: app/Http/Controllers/Api/V1/OrderController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$quantity\.$#'
-			identifier: property.notFound
-			count: 3
-			path: app/Http/Controllers/Api/V1/OrderController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$variant\.$#'
-			identifier: property.notFound
 			count: 1
-			path: app/Http/Controllers/Api/V1/OrderController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$variant_id\.$#'
-			identifier: property.notFound
-			count: 2
 			path: app/Http/Controllers/Api/V1/OrderController.php
 
 		-
@@ -1783,25 +1621,7 @@ parameters:
 			path: app/Http/Controllers/Api/V1/ProductController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/ProductController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/ProductController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Product\:\:\$short_description\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/ProductController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$slug\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Controllers/Api/V1/ProductController.php
@@ -1881,7 +1701,7 @@ parameters:
 		-
 			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
 			identifier: nullsafe.neverNull
-			count: 2
+			count: 3
 			path: app/Http/Controllers/Api/V1/ProductController.php
 
 		-
@@ -1893,36 +1713,6 @@ parameters:
 		-
 			message: '#^Access to an undefined property App\\Models\\Setting\:\:\$value\.$#'
 			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/ProfileController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$product_name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/ProfileController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$quantity\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/ProfileController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$unit_price\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/ProfileController.php
-
-		-
-			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\),Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
-			identifier: argument.unresolvableType
-			count: 1
-			path: app/Http/Controllers/Api/V1/ProfileController.php
-
-		-
-			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\Order\>\:\:map\(\) contains unresolvable type\.$#'
-			identifier: argument.unresolvableType
 			count: 1
 			path: app/Http/Controllers/Api/V1/ProfileController.php
 
@@ -1957,32 +1747,8 @@ parameters:
 			path: app/Http/Controllers/Api/V1/SearchController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/SearchController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/SearchController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/SearchController.php
-
-		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Query\\Builder\:\:with\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/SearchController.php
-
-		-
-			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\Product\>\:\:map\(\) contains unresolvable type\.$#'
-			identifier: argument.unresolvableType
 			count: 1
 			path: app/Http/Controllers/Api/V1/SearchController.php
 
@@ -2521,12 +2287,6 @@ parameters:
 			path: app/Http/Resources/Api/V1/BlogPostResource.php
 
 		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$excerpt\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/BlogPostResource.php
-
-		-
 			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$featured_image\.$#'
 			identifier: property.notFound
 			count: 1
@@ -2594,12 +2354,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$tags\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/BlogPostResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$title\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Resources/Api/V1/BlogPostResource.php
@@ -2861,48 +2615,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Resources/Api/V1/MetafieldResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\OrderItem\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/OrderItemResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\OrderItem\:\:\$product_name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/OrderItemResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\OrderItem\:\:\$quantity\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/OrderItemResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\OrderItem\:\:\$sku\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/OrderItemResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\OrderItem\:\:\$total_price\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/OrderItemResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\OrderItem\:\:\$unit_price\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/OrderItemResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\OrderItem\:\:\$variant_name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/OrderItemResource.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Order\:\:\$billingAddress\.$#'
@@ -3409,12 +3121,6 @@ parameters:
 			path: app/Imports/ProductsImport.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Imports/ProductsImport.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\ProductType\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
@@ -3523,12 +3229,6 @@ parameters:
 			path: app/Infrastructure/Payments/P24/P24Gateway.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Customer\:\:\$email\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Infrastructure/Payments/PayU/PayUGateway.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Order\:\:\$shippingAddress\.$#'
 			identifier: property.notFound
 			count: 1
@@ -3571,18 +3271,6 @@ parameters:
 			path: app/Infrastructure/Payments/PayU/PayUGateway.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$quantity\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Infrastructure/Payments/PayU/PayUGateway.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$unit_price\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Infrastructure/Payments/PayU/PayUGateway.php
-
-		-
 			message: '#^Using nullsafe property access "\?\-\>email" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
 			identifier: nullsafe.neverNull
 			count: 1
@@ -3605,12 +3293,6 @@ parameters:
 			identifier: nullsafe.neverNull
 			count: 1
 			path: app/Infrastructure/Payments/PayU/PayUGateway.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Customer\:\:\$email\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Infrastructure/Shipping/Furgonetka/FurgonetkaCarrier.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Order\:\:\$billingAddress\.$#'
@@ -3683,12 +3365,6 @@ parameters:
 			identifier: nullsafe.neverNull
 			count: 1
 			path: app/Infrastructure/Shipping/Furgonetka/FurgonetkaCarrier.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Customer\:\:\$email\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Infrastructure/Shipping/InPost/InPostLockerCarrier.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Order\:\:\$billingAddress\.$#'
@@ -4261,12 +3937,6 @@ parameters:
 			path: app/Models/MenuItem.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Product\>\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/MenuItem.php
-
-		-
 			message: '#^Method App\\Models\\MenuItem\:\:children\(\) should return Illuminate\\Database\\Eloquent\\Relations\\HasMany but returns Illuminate\\Database\\Query\\Builder\.$#'
 			identifier: return.type
 			count: 1
@@ -4315,18 +3985,6 @@ parameters:
 			path: app/Models/NewsletterSubscriber.php
 
 		-
-			message: '#^Cannot call method transitionTo\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Models/Order.php
-
-		-
-			message: '#^Instanceof between string and App\\States\\Order\\OrderState will always evaluate to false\.$#'
-			identifier: instanceof.alwaysFalse
-			count: 1
-			path: app/Models/Order.php
-
-		-
 			message: '#^Method App\\Models\\Order\:\:enumToStateClass\(\) has Spatie\\ModelStates\\Exceptions\\TransitionNotAllowed in PHPDoc @throws tag but it''s not thrown\.$#'
 			identifier: throws.unusedType
 			count: 1
@@ -4337,12 +3995,6 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: app/Models/Order.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/OrderItem.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Page\:\:\$tags\.$#'
@@ -4526,24 +4178,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Product\:\:\$created_at\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Product.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Product.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Product.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$slug\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Models/Product.php
@@ -5011,12 +4645,6 @@ parameters:
 			path: app/Notifications/FormSubmissionNotification.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Notifications/LowStockNotification.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\NewsletterSubscriber\:\:\$first_name\.$#'
 			identifier: property.notFound
 			count: 1
@@ -5045,18 +4673,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Notifications/OrderStatusChangedNotification.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$product_name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Notifications/ReviewRequestNotification.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$variant\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Notifications/ReviewRequestNotification.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\NewsletterClick\:\:\$tracking_token\.$#'
@@ -5449,31 +5065,13 @@ parameters:
 			path: app/Queries/Admin/ProductIndexQuery.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Queries/Admin/ProductIndexQuery.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Product\:\:\$is_saleable\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Queries/Admin/ProductIndexQuery.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Queries/Admin/ProductIndexQuery.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Product\:\:\$productType\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Queries/Admin/ProductIndexQuery.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$slug\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Queries/Admin/ProductIndexQuery.php
@@ -5671,12 +5269,6 @@ parameters:
 			path: app/Services/Admin/Ecommerce/ProductService.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Services/Admin/Ecommerce/ProductService.php
-
-		-
 			message: '#^Method App\\Services\\Admin\\Ecommerce\\ProductService\:\:createVariant\(\) should return App\\Models\\ProductVariant but returns Illuminate\\Database\\Eloquent\\Model\.$#'
 			identifier: return.type
 			count: 1
@@ -5827,24 +5419,6 @@ parameters:
 			path: app/Services/CloneSiteService.php
 
 		-
-			message: '#^Cannot access property \$value on string\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Services/DashboardService.php
-
-		-
-			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,stdClass\>\:\:map\(\) contains unresolvable type\.$#'
-			identifier: argument.unresolvableType
-			count: 1
-			path: app/Services/DashboardService.php
-
-		-
-			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,stdClass\>\:\:map\(\) expects callable\(stdClass, int\)\: array\{id\: int, reference_number\: string, status\: mixed, total\: int, items_count\: int\<0, max\>, customer_name\: string\|null, created_at\: string\}, Closure\(App\\Models\\Order\)\: array\{id\: int, reference_number\: string, status\: mixed, total\: int, items_count\: int\<0, max\>, customer_name\: string\|null, created_at\: string\} given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Services/DashboardService.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\NewsletterSubscriber\:\:\$email\.$#'
 			identifier: property.notFound
 			count: 1
@@ -5852,12 +5426,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$customer\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/MarketingAutomationService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$product_id\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Services/MarketingAutomationService.php
@@ -6157,12 +5725,6 @@ parameters:
 			path: app/Services/PromotionService.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Services/PromotionService.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Product\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Product\>\:\:\$price\.$#'
 			identifier: property.notFound
 			count: 1
@@ -6289,18 +5851,6 @@ parameters:
 			path: database/seeders/EcommerceDemoSeeder.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: database/seeders/EcommerceDemoSeeder.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: database/seeders/EcommerceDemoSeeder.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\ProductFlag\:\:\$slug\.$#'
 			identifier: property.notFound
 			count: 1
@@ -6364,12 +5914,6 @@ parameters:
 			message: '#^Access to an undefined property App\\Models\\Category\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 2
-			path: database/seeders/ElectronicsSeeder.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
 			path: database/seeders/ElectronicsSeeder.php
 
 		-

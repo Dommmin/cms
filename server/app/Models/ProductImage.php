@@ -12,8 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
- * Product Image Model
- * Moved to Ecommerce module
+ * @property-read ?Media $media
  */
 #[Fillable([
     'product_id', 'variant_id', 'media_id', 'is_thumbnail', 'position',
@@ -40,5 +39,10 @@ class ProductImage extends Model
     public function media(): BelongsTo
     {
         return $this->belongsTo(Media::class, 'media_id');
+    }
+
+    protected function getPathAttribute(): string
+    {
+        return $this->media?->getUrl() ?? '';
     }
 }

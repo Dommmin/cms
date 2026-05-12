@@ -64,7 +64,7 @@ class ProductController extends Controller
 
     public function edit(Product $product): Response
     {
-        $product->load(['category', 'categories', 'images', 'defaultVariant.priceHistory', 'brand', 'flags']);
+        $product->load(['category', 'categories', 'images.media', 'defaultVariant.priceHistory', 'brand', 'flags']);
 
         $priceHistory = $product->defaultVariant?->priceHistory
             ->map(fn ($ph): array => [

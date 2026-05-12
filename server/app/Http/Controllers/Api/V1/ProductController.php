@@ -46,6 +46,7 @@ class ProductController extends ApiController
                 AllowedFilter::custom('min_price', new MinPriceFilter),
                 AllowedFilter::custom('max_price', new MaxPriceFilter),
                 AllowedFilter::custom('in_stock', new InStockFilter),
+                AllowedFilter::exact('is_featured'),
             ])
             ->allowedSorts([
                 'name',
@@ -61,7 +62,7 @@ class ProductController extends ApiController
 
         $products = $query
             ->with([
-                'thumbnail',
+                'thumbnail.media',
                 'category',
                 'brand',
                 'activeVariants:id,product_id,price,compare_at_price,stock_quantity,is_active',
@@ -179,7 +180,7 @@ class ProductController extends ApiController
             ->available()
             ->whereIn('id', $ids)
             ->with([
-                'thumbnail',
+                'thumbnail.media',
                 'category',
                 'brand',
                 'activeVariants.attributeValues.attribute',
@@ -226,8 +227,8 @@ class ProductController extends ApiController
             'price_min' => $product->priceRange()['min'],
             'price_max' => $product->priceRange()['max'],
             'thumbnail' => $product->thumbnail ? [
-                'url' => $product->thumbnail->getUrl(),
-                'alt' => $product->thumbnail->name,
+                'url' => $product->thumbnail->media?->getUrl() ?? '',
+                'alt' => $product->thumbnail->media?->name ?? $product->name,
             ] : null,
             'category' => $product->category ? [
                 'id' => $product->category->id,
@@ -276,7 +277,7 @@ class ProductController extends ApiController
                     $q->orWhere('brand_id', $product->brand_id);
                 }
             })
-            ->with(['thumbnail', 'brand', 'activeVariants:id,product_id,price,compare_at_price'])
+            ->with(['thumbnail.media', 'brand', 'activeVariants:id,product_id,price,compare_at_price'])
             ->inRandomOrder()
             ->limit(8)
             ->get();
@@ -304,7 +305,7 @@ class ProductController extends ApiController
                 AllowedSort::custom('price', new VariantPriceSort),
             ])
             ->defaultSort('name')
-            ->with(['thumbnail', 'brand'])
+            ->with(['thumbnail.media', 'brand'])
             ->paginate(24)
             ->withQueryString();
 

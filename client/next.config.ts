@@ -27,6 +27,16 @@ const nextConfig: NextConfig = {
                 hostname: apiHostname,
                 pathname: '/**',
             },
+            // Dev fallback: when API runs behind nginx but media URLs use localhost
+            ...(apiHostname !== 'localhost'
+                ? [
+                      {
+                          protocol: 'http' as const,
+                          hostname: 'localhost',
+                          pathname: '/**',
+                      },
+                  ]
+                : []),
             {
                 // Spatie media-library often serves from a CDN or S3
                 protocol: 'https',
