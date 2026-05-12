@@ -41,11 +41,11 @@ function generateNonce(): string {
 function getCspHeader(nonce: string): string {
     const isDev = process.env.NODE_ENV === 'development';
 
-    const csp = [
+    return [
         `default-src 'self'`,
         `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://www.googletagmanager.com ${isDev ? "'unsafe-eval'" : ''}`,
         `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
-        `img-src 'self' data: blob: https:`,
+        `img-src 'self' data: blob: https: ${isDev ? 'http:' : ''}`,
         `font-src 'self' https://fonts.gstatic.com`,
         `connect-src 'self' https: ${isDev ? 'http://localhost:*' : ''}`,
         `frame-src 'self' https://www.google.com`,
@@ -57,8 +57,6 @@ function getCspHeader(nonce: string): string {
     ]
         .filter(Boolean)
         .join('; ');
-
-    return csp;
 }
 
 export function middleware(request: NextRequest) {

@@ -15,10 +15,6 @@ const nextConfig: NextConfig = {
     // Skip redundant checks in Docker builds — lint job already runs these
     typescript: { ignoreBuildErrors: process.env.DOCKER_BUILD === '1' },
     images: {
-        // In dev (localhost), Next.js can't fetch images server-side from localhost
-        // (that resolves to the node container, not nginx). Unoptimized means the
-        // browser fetches the original URL directly, which works fine via nginx:80.
-        unoptimized: apiHostname === 'localhost',
         remotePatterns: [
             {
                 // Laravel API / storage (nginx on default port 80)
@@ -145,8 +141,6 @@ const nextConfig: NextConfig = {
 };
 
 const sentryConfig = {
-    // Keep the Sentry-compatible build wrapper for GlitchTip, but avoid
-    // requiring Sentry SaaS-specific org/project settings.
     silent: !errorTrackingDsn,
     disableLogger: true,
 };

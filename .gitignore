@@ -168,3 +168,4 @@ Homestead.json
 # k8s
 /k8s/*/secret.yaml
 /letsencrypt-prod.yaml
+server/storage/media-library/temp
