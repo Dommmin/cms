@@ -366,7 +366,6 @@ Na **lokalnym komputerze** (nie na serwerze). Komenda jest taka sama niezależni
 ```bash
 mkdir -p ~/.kube
 
-# root lub deployer — ta sama komenda:
 ssh <USER>@<IP_SERWERA> "cat /etc/rancher/k3s/k3s.yaml" \
   | sed "s/127.0.0.1/<IP_SERWERA>/g" \
   > ~/.kube/config-hetzner

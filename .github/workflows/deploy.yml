@@ -18,6 +18,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  # Namespace and resource prefix — set KUBE_NAMESPACE in GitHub Settings → Variables → Actions
+  KUBE_NS: ${{ vars.KUBE_NAMESPACE || 'app' }}
   # Opt in to Node.js 24 runner for Docker actions (removes deprecation warnings)
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
@@ -291,7 +293,7 @@ jobs:
 
       - name: Lowercase image name
         id: images
-        run: echo "server=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/cms-server" >> "$GITHUB_OUTPUT"
+        run: echo "server=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${KUBE_NS}-server" >> "$GITHUB_OUTPUT"
 
       - name: Log in to GHCR
         uses: docker/login-action@v4
@@ -340,7 +342,7 @@ jobs:
 
       - name: Lowercase image name
         id: images
-        run: echo "client=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/cms-client" >> "$GITHUB_OUTPUT"
+        run: echo "client=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${KUBE_NS}-client" >> "$GITHUB_OUTPUT"
 
       - name: Log in to GHCR
         uses: docker/login-action@v4
@@ -395,15 +397,15 @@ jobs:
 
           # Use SHA-tagged image if just built; fall back to :latest if build was skipped
           if [ "${{ needs.build-server.result }}" = "success" ]; then
-            echo "server=ghcr.io/${OWNER}/cms-server:${SHA}" >> "$GITHUB_OUTPUT"
+            echo "server=ghcr.io/${OWNER}/${KUBE_NS}-server:${SHA}" >> "$GITHUB_OUTPUT"
           else
-            echo "server=ghcr.io/${OWNER}/cms-server:latest" >> "$GITHUB_OUTPUT"
+            echo "server=ghcr.io/${OWNER}/${KUBE_NS}-server:latest" >> "$GITHUB_OUTPUT"
           fi
 
           if [ "${{ needs.build-client.result }}" = "success" ]; then
-            echo "client=ghcr.io/${OWNER}/cms-client:${SHA}" >> "$GITHUB_OUTPUT"
+            echo "client=ghcr.io/${OWNER}/${KUBE_NS}-client:${SHA}" >> "$GITHUB_OUTPUT"
           else
-            echo "client=ghcr.io/${OWNER}/cms-client:latest" >> "$GITHUB_OUTPUT"
+            echo "client=ghcr.io/${OWNER}/${KUBE_NS}-client:latest" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Set up kubectl
@@ -432,12 +434,12 @@ jobs:
             echo "::warning::PROD_ENV variable is not set — skipping secret sync."
           else
             printf '%s' "$PROD_ENV" > /tmp/prod.env
-            kubectl create secret generic cms-server-env \
+            kubectl create secret generic "${KUBE_NS}-server-env" \
               --from-file=.env=/tmp/prod.env \
-              --namespace=cms-prod \
+              --namespace="${KUBE_NS}" \
               --dry-run=client -o yaml | kubectl apply -f -
             rm /tmp/prod.env
-            echo "✓ cms-server-env secret updated"
+            echo "✓ ${KUBE_NS}-server-env secret updated"
           fi
         env:
           PROD_ENV: ${{ vars.PROD_ENV }}
@@ -447,13 +449,14 @@ jobs:
       # --------------------------------------------------------------------------
       - name: Apply infrastructure manifests
         run: |
-          kubectl apply -f k8s/ingress.yaml
-          kubectl apply -f k8s/traefik/middleware.yaml
+          kapply() { sed -e "s|cms-prod|${KUBE_NS}|g" -e "s|cms-|${KUBE_NS}-|g" "$1" | kubectl apply -f -; }
+          kapply k8s/ingress.yaml
+          kapply k8s/traefik/middleware.yaml
           kubectl apply -f k8s/traefik/config.yaml
-          kubectl apply -f k8s/server/service.yaml
-          kubectl apply -f k8s/server/hpa.yaml
-          kubectl apply -f k8s/client/service.yaml
-          kubectl apply -f k8s/client/hpa.yaml
+          kapply k8s/server/service.yaml
+          kapply k8s/server/hpa.yaml
+          kapply k8s/client/service.yaml
+          kapply k8s/client/hpa.yaml
 
       # --------------------------------------------------------------------------
       # 1. Run database migrations (Job with new image, wait for completion)
@@ -466,9 +469,11 @@ jobs:
           sed \
             -e "s|IMAGE_PLACEHOLDER|${IMAGE}|g" \
             -e "s|REVISION_PLACEHOLDER|${SHA}|g" \
+            -e "s|cms-prod|${KUBE_NS}|g" \
+            -e "s|cms-|${KUBE_NS}-|g" \
             k8s/server/job-migrate.yaml | kubectl apply --validate=false -f -
 
-          kubectl -n cms-prod wait job/cms-migrate-${SHA} \
+          kubectl -n "${KUBE_NS}" wait job/"${KUBE_NS}-migrate-${SHA}" \
             --for=condition=complete \
             --timeout=120s
 
@@ -477,9 +482,13 @@ jobs:
       # --------------------------------------------------------------------------
       - name: Deploy server
         run: |
-          sed "s|ghcr.io/dommmin/cms-server:latest|${{ steps.images.outputs.server }}|g" \
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          sed \
+            -e "s|cms-prod|${KUBE_NS}|g" \
+            -e "s|cms-|${KUBE_NS}-|g" \
+            -e "s|ghcr.io/${OWNER}/${KUBE_NS}-server:latest|${{ steps.images.outputs.server }}|g" \
             k8s/server/deployment.yaml | kubectl apply -f -
-          kubectl -n cms-prod rollout status deployment/cms-server \
+          kubectl -n "${KUBE_NS}" rollout status deployment/"${KUBE_NS}-server" \
             --timeout=5m
 
       # --------------------------------------------------------------------------
@@ -487,9 +496,13 @@ jobs:
       # --------------------------------------------------------------------------
       - name: Deploy queue workers
         run: |
-          sed "s|ghcr.io/dommmin/cms-server:latest|${{ steps.images.outputs.server }}|g" \
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          sed \
+            -e "s|cms-prod|${KUBE_NS}|g" \
+            -e "s|cms-|${KUBE_NS}-|g" \
+            -e "s|ghcr.io/${OWNER}/${KUBE_NS}-server:latest|${{ steps.images.outputs.server }}|g" \
             k8s/server/deployment-queue.yaml | kubectl apply -f -
-          kubectl -n cms-prod rollout status deployment/cms-queue \
+          kubectl -n "${KUBE_NS}" rollout status deployment/"${KUBE_NS}-queue" \
             --timeout=5m
 
       # --------------------------------------------------------------------------
@@ -497,7 +510,11 @@ jobs:
       # --------------------------------------------------------------------------
       - name: Deploy scheduler
         run: |
-          sed "s|ghcr.io/dommmin/cms-server:latest|${{ steps.images.outputs.server }}|g" \
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          sed \
+            -e "s|cms-prod|${KUBE_NS}|g" \
+            -e "s|cms-|${KUBE_NS}-|g" \
+            -e "s|ghcr.io/${OWNER}/${KUBE_NS}-server:latest|${{ steps.images.outputs.server }}|g" \
             k8s/server/cronjob-scheduler.yaml | kubectl apply -f -
 
       # --------------------------------------------------------------------------
@@ -505,7 +522,11 @@ jobs:
       # --------------------------------------------------------------------------
       - name: Deploy client
         run: |
-          sed "s|ghcr.io/dommmin/cms-client:latest|${{ steps.images.outputs.client }}|g" \
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          sed \
+            -e "s|cms-prod|${KUBE_NS}|g" \
+            -e "s|cms-|${KUBE_NS}-|g" \
+            -e "s|ghcr.io/${OWNER}/${KUBE_NS}-client:latest|${{ steps.images.outputs.client }}|g" \
             k8s/client/deployment.yaml | kubectl apply -f -
-          kubectl -n cms-prod rollout status deployment/cms-client \
+          kubectl -n "${KUBE_NS}" rollout status deployment/"${KUBE_NS}-client" \
             --timeout=5m

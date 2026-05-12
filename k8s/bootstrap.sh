@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# k3s Bootstrap Script — CMS Production Cluster
+# k3s Bootstrap Script — Production Cluster
 #
 # Automates the full cluster setup from scratch.
 # Run this ONCE on a fresh server, then configure CI/CD secrets.
@@ -31,6 +31,15 @@ warn()    { echo -e "${YELLOW}[WARN]${NC} $*"; }
 error()   { echo -e "${RED}[ERROR]${NC} $*" >&2; }
 section() { echo -e "\n${BOLD}══════════════════════════════════════════${NC}"; echo -e "${BOLD} $*${NC}"; echo -e "${BOLD}══════════════════════════════════════════${NC}"; }
 prompt()  { echo -e "${YELLOW}[INPUT]${NC} $*"; }
+
+# ─── Apply k8s manifest with name substitution ───────────────────────────────
+# Replaces cms-prod → $APP_NAME and cms-* → $APP_NAME-* before applying.
+kapply() {
+  sed \
+    -e "s/cms-prod/${APP_NAME}/g" \
+    -e "s/cms-/${APP_NAME}-/g" \
+    "$1" | kubectl apply -f -
+}
 
 # ─── Prereq check ────────────────────────────────────────────────────────────
 check_prereqs() {
@@ -70,10 +79,14 @@ check_prereqs() {
 collect_inputs() {
   section "Configuration"
 
+  prompt "App name / namespace [app]:"
+  read -r APP_NAME; APP_NAME="${APP_NAME:-app}"
+
+  echo
   prompt "MySQL root password (strong, at least 16 chars):"
   read -rs MYSQL_ROOT_PASSWORD; echo
-  prompt "MySQL app username [cms]:"
-  read -r MYSQL_USERNAME; MYSQL_USERNAME="${MYSQL_USERNAME:-cms}"
+  prompt "MySQL app username [app]:"
+  read -r MYSQL_USERNAME; MYSQL_USERNAME="${MYSQL_USERNAME:-app}"
   prompt "MySQL app password (strong, at least 16 chars):"
   read -rs MYSQL_PASSWORD; echo
   prompt "Redis password (strong, at least 16 chars):"
@@ -105,7 +118,7 @@ collect_inputs() {
   prompt "Install cert-manager + create ClusterIssuer? [Y/n]:"
   read -r INSTALL_CERT; INSTALL_CERT="${INSTALL_CERT:-Y}"
 
-  if [[ "${INSTALL_CERT^^}" == "Y" ]]; then
+  if [[ "$INSTALL_CERT" == [Yy] ]]; then
     prompt "Your email for Let's Encrypt (certificate expiry alerts):"
     read -r LETSENCRYPT_EMAIL
   fi
@@ -113,7 +126,7 @@ collect_inputs() {
   prompt "Apply ingress-dev.yaml (HTTP only, for testing without a domain)? [y/N]:"
   read -r APPLY_DEV_INGRESS; APPLY_DEV_INGRESS="${APPLY_DEV_INGRESS:-N}"
 
-  if [[ "${APPLY_DEV_INGRESS^^}" != "Y" ]]; then
+  if [[ "$APPLY_DEV_INGRESS" != [Yy] ]]; then
     prompt "Apply production ingress.yaml (requires DNS + cert-manager)? [Y/n]:"
     read -r APPLY_PROD_INGRESS; APPLY_PROD_INGRESS="${APPLY_PROD_INGRESS:-Y}"
   fi
@@ -122,6 +135,7 @@ collect_inputs() {
   read -r INSTALL_GLITCHTIP; INSTALL_GLITCHTIP="${INSTALL_GLITCHTIP:-N}"
 
   echo
+  info "App name / namespace: ${APP_NAME}"
   info "Configuration collected. Starting setup..."
 }
 
@@ -139,7 +153,7 @@ step_traefik_config() {
 
 # ─── Step 2: cert-manager ────────────────────────────────────────────────────
 step_cert_manager() {
-  if [[ "${INSTALL_CERT^^}" != "Y" ]]; then
+  if [[ "$INSTALL_CERT" != [Yy] ]]; then
     warn "Skipping cert-manager installation"
     return
   fi
@@ -179,10 +193,10 @@ EOF
 step_namespace() {
   section "Step 3 — Namespace + Traefik Middleware"
 
-  kubectl apply -f k8s/namespace.yaml
-  ok "Namespace cms-prod created"
+  kapply k8s/namespace.yaml
+  ok "Namespace ${APP_NAME} created"
 
-  kubectl apply -f k8s/traefik/middleware.yaml
+  kapply k8s/traefik/middleware.yaml
   ok "Traefik Middleware applied (redirect-https, body-size)"
 }
 
@@ -191,35 +205,35 @@ step_secrets() {
   section "Step 4 — Kubernetes Secrets"
 
   # MySQL secret
-  kubectl create secret generic cms-mysql \
-    --namespace=cms-prod \
+  kubectl create secret generic "${APP_NAME}-mysql" \
+    --namespace="${APP_NAME}" \
     --from-literal=root-password="${MYSQL_ROOT_PASSWORD}" \
     --from-literal=username="${MYSQL_USERNAME}" \
     --from-literal=password="${MYSQL_PASSWORD}" \
     --dry-run=client -o yaml | kubectl apply -f -
-  ok "cms-mysql secret created"
+  ok "${APP_NAME}-mysql secret created"
 
   # Redis secret
-  kubectl create secret generic cms-redis \
-    --namespace=cms-prod \
+  kubectl create secret generic "${APP_NAME}-redis" \
+    --namespace="${APP_NAME}" \
     --from-literal=password="${REDIS_PASSWORD}" \
     --dry-run=client -o yaml | kubectl apply -f -
-  ok "cms-redis secret created"
+  ok "${APP_NAME}-redis secret created"
 
   # Typesense secret
-  kubectl create secret generic cms-typesense \
-    --namespace=cms-prod \
+  kubectl create secret generic "${APP_NAME}-typesense" \
+    --namespace="${APP_NAME}" \
     --from-literal=api-key="${TYPESENSE_API_KEY}" \
     --dry-run=client -o yaml | kubectl apply -f -
-  ok "cms-typesense secret created"
+  ok "${APP_NAME}-typesense secret created"
 
   # Client API URL secret
-  kubectl apply -f k8s/client/secret.yaml.example
-  ok "cms-client secret applied (API_URL → internal cluster address)"
+  kapply k8s/client/secret.yaml.example
+  ok "${APP_NAME}-client secret applied (API_URL → internal cluster address)"
 
   info "Server .env secret: skipped — CI/CD will create it from PROD_ENV / SERVER_ENV."
   info "If you need it now, run:"
-  info "  kubectl create secret generic cms-server-env --from-file=.env=server/.env.production --namespace=cms-prod --dry-run=client -o yaml | kubectl apply -f -"
+  info "  kubectl create secret generic ${APP_NAME}-server-env --from-file=.env=server/.env.production --namespace=${APP_NAME} --dry-run=client -o yaml | kubectl apply -f -"
 }
 
 # ─── Step 5: Pull secret ─────────────────────────────────────────────────────
@@ -236,7 +250,7 @@ step_pull_secret() {
       --docker-server=ghcr.io \
       --docker-username="${REGISTRY_USER}" \
       --docker-password="${REGISTRY_TOKEN}" \
-      --namespace=cms-prod \
+      --namespace="${APP_NAME}" \
       --dry-run=client -o yaml | kubectl apply -f -
     ok "ghcr-pull-secret created (ghcr.io)"
   elif [[ "$REGISTRY_TYPE" == "gitlab" ]]; then
@@ -244,7 +258,7 @@ step_pull_secret() {
       --docker-server=registry.gitlab.com \
       --docker-username="${REGISTRY_USER}" \
       --docker-password="${REGISTRY_TOKEN}" \
-      --namespace=cms-prod \
+      --namespace="${APP_NAME}" \
       --dry-run=client -o yaml | kubectl apply -f -
     ok "ghcr-pull-secret created (registry.gitlab.com)"
   fi
@@ -254,21 +268,21 @@ step_pull_secret() {
 step_databases() {
   section "Step 6 — MySQL + Redis"
 
-  kubectl apply -f k8s/mysql/statefulset.yaml
-  kubectl apply -f k8s/mysql/service.yaml
+  kapply k8s/mysql/statefulset.yaml
+  kapply k8s/mysql/service.yaml
   ok "MySQL StatefulSet + Service applied"
 
-  kubectl apply -f k8s/redis/pvc.yaml
-  kubectl apply -f k8s/redis/deployment.yaml
-  kubectl apply -f k8s/redis/service.yaml
+  kapply k8s/redis/pvc.yaml
+  kapply k8s/redis/deployment.yaml
+  kapply k8s/redis/service.yaml
   ok "Redis PVC + Deployment + Service applied"
 
   info "Waiting for MySQL to be ready (this may take ~2 minutes)..."
-  kubectl -n cms-prod rollout status statefulset/cms-mysql --timeout=5m
+  kubectl -n "${APP_NAME}" rollout status statefulset/"${APP_NAME}-mysql" --timeout=5m
   ok "MySQL is ready"
 
   info "Waiting for Redis..."
-  kubectl -n cms-prod rollout status deployment/cms-redis --timeout=3m
+  kubectl -n "${APP_NAME}" rollout status deployment/"${APP_NAME}-redis" --timeout=3m
   ok "Redis is ready"
 }
 
@@ -276,15 +290,15 @@ step_databases() {
 step_services() {
   section "Step 7 — Gotenberg + Typesense"
 
-  kubectl apply -f k8s/gotenberg/deployment.yaml
-  kubectl apply -f k8s/gotenberg/service.yaml
+  kapply k8s/gotenberg/deployment.yaml
+  kapply k8s/gotenberg/service.yaml
   ok "Gotenberg deployed"
 
-  kubectl apply -f k8s/typesense/pvc.yaml
-  kubectl apply -f k8s/typesense/deployment.yaml
-  kubectl apply -f k8s/typesense/service.yaml
+  kapply k8s/typesense/pvc.yaml
+  kapply k8s/typesense/deployment.yaml
+  kapply k8s/typesense/service.yaml
   info "Waiting for Typesense (~20s initialization)..."
-  kubectl -n cms-prod rollout status deployment/cms-typesense --timeout=3m
+  kubectl -n "${APP_NAME}" rollout status deployment/"${APP_NAME}-typesense" --timeout=3m
   ok "Typesense is ready"
 }
 
@@ -292,39 +306,25 @@ step_services() {
 step_storage() {
   section "Step 8 — Server Storage PVC"
 
-  kubectl apply -f k8s/server/pvc-storage.yaml
-  ok "cms-server-storage PVC created"
-
-  # Wait for PVC to bind
-  local retries=12
-  while [ "$retries" -gt 0 ]; do
-    local status
-    status=$(kubectl -n cms-prod get pvc cms-server-storage -o jsonpath='{.status.phase}' 2>/dev/null || echo "Pending")
-    if [ "$status" = "Bound" ]; then
-      ok "PVC cms-server-storage is Bound"
-      return
-    fi
-    info "PVC status: $status — waiting..."
-    sleep 5
-    retries=$((retries - 1))
-  done
-  warn "PVC did not bind within 60s — check: kubectl -n cms-prod describe pvc cms-server-storage"
+  kapply k8s/server/pvc-storage.yaml
+  ok "${APP_NAME}-server-storage PVC created"
+  info "PVC will bind automatically when the server pod is scheduled (WaitForFirstConsumer)."
 }
 
 # ─── Step 9: Application ─────────────────────────────────────────────────────
 step_application() {
   section "Step 9 — Application (server + client)"
 
-  kubectl apply -f k8s/server/service.yaml
-  kubectl apply -f k8s/server/deployment.yaml
-  kubectl apply -f k8s/server/deployment-queue.yaml
-  kubectl apply -f k8s/server/cronjob-scheduler.yaml
-  kubectl apply -f k8s/server/hpa.yaml
+  kapply k8s/server/service.yaml
+  kapply k8s/server/deployment.yaml
+  kapply k8s/server/deployment-queue.yaml
+  kapply k8s/server/cronjob-scheduler.yaml
+  kapply k8s/server/hpa.yaml
   ok "Server (Laravel) manifests applied"
 
-  kubectl apply -f k8s/client/service.yaml
-  kubectl apply -f k8s/client/deployment.yaml
-  kubectl apply -f k8s/client/hpa.yaml
+  kapply k8s/client/service.yaml
+  kapply k8s/client/deployment.yaml
+  kapply k8s/client/hpa.yaml
   ok "Client (Next.js) manifests applied"
 
   info "Note: pods may be in ImagePullBackOff until CI/CD pushes the first image."
@@ -334,12 +334,12 @@ step_application() {
 step_ingress() {
   section "Step 10 — Ingress"
 
-  if [[ "${APPLY_DEV_INGRESS^^}" == "Y" ]]; then
-    kubectl apply -f k8s/ingress-dev.yaml
+  if [[ "$APPLY_DEV_INGRESS" == [Yy] ]]; then
+    kapply k8s/ingress-dev.yaml
     ok "Development ingress applied (HTTP only, sslip.io)"
     warn "Remember: edit k8s/ingress-dev.yaml and replace the IP with your actual server IP!"
-  elif [[ "${APPLY_PROD_INGRESS^^}" == "Y" ]]; then
-    kubectl apply -f k8s/ingress.yaml
+  elif [[ "$APPLY_PROD_INGRESS" == [Yy] ]]; then
+    kapply k8s/ingress.yaml
     ok "Production ingress applied (HTTPS + TLS)"
     info "TLS certificate will be issued by cert-manager (may take 1-2 minutes after DNS is ready)"
   else
@@ -352,13 +352,13 @@ step_ingress() {
 step_maintenance() {
   section "Step 11 — Maintenance (image cleanup)"
 
-  kubectl apply -f k8s/maintenance/cronjob-image-cleanup.yaml
+  kapply k8s/maintenance/cronjob-image-cleanup.yaml
   ok "Image cleanup CronJob applied (runs every Sunday 2:00 AM)"
 }
 
 # ─── Step 12: GlitchTip (optional) ───────────────────────────────────────────
 step_glitchtip() {
-  if [[ "${INSTALL_GLITCHTIP^^}" != "Y" ]]; then
+  if [[ "$INSTALL_GLITCHTIP" != [Yy] ]]; then
     return
   fi
 
@@ -375,7 +375,7 @@ step_glitchtip() {
   prompt "Have you edited values.example.yaml? [y/N]:"
   read -r EDITED; EDITED="${EDITED:-N}"
 
-  if [[ "${EDITED^^}" != "Y" ]]; then
+  if [[ "$EDITED" != [Yy] ]]; then
     warn "Skipping GlitchTip — edit the file and run manually:"
     warn "  helm repo add glitchtip https://glitchtip.github.io/helm-charts && helm repo update"
     warn "  helm upgrade --install glitchtip glitchtip/glitchtip --namespace glitchtip --create-namespace -f k8s/glitchtip/values.example.yaml"
@@ -397,13 +397,13 @@ print_summary() {
 
   echo -e "${GREEN}Cluster is set up. Here's what was deployed:${NC}"
   echo ""
-  kubectl -n cms-prod get pods 2>/dev/null || true
+  kubectl -n "${APP_NAME}" get pods 2>/dev/null || true
   echo ""
   echo -e "${BOLD}Next steps:${NC}"
   echo ""
   echo "  1. Configure CI/CD secrets:"
   echo "     GitHub: KUBECONFIG_PROD (plain text), PROD_ENV (Variable), ENV_CLIENT_PROD (Variable)"
-  echo "     GitLab: KUBECONFIG (base64-encoded), SERVER_ENV (masked), ENV_CLIENT_PROD"
+  echo "     GitLab: KUBECONFIG (plain text), SERVER_ENV (masked), ENV_CLIENT_PROD"
   echo ""
   echo "  2. Push to master — the pipeline will:"
   echo "     - Build Docker images"
@@ -412,25 +412,25 @@ print_summary() {
   echo "     - Roll out server + client"
   echo ""
   echo "  3. After first deploy, import search indexes:"
-  echo "     kubectl -n cms-prod exec deployment/cms-server -- php artisan scout:import 'App\\Models\\Product'"
-  echo "     kubectl -n cms-prod exec deployment/cms-server -- php artisan scout:import 'App\\Models\\BlogPost'"
+  echo "     kubectl -n ${APP_NAME} exec deployment/${APP_NAME}-server -- php artisan scout:import 'App\\Models\\Product'"
+  echo "     kubectl -n ${APP_NAME} exec deployment/${APP_NAME}-server -- php artisan scout:import 'App\\Models\\BlogPost'"
   echo ""
   echo "  4. (Optional) Set up MySQL backup CronJob:"
-  echo "     mkdir -p /opt/cms-backups  # on the server"
+  echo "     mkdir -p /opt/${APP_NAME}-backups  # on the server"
   echo "     kubectl apply -f k8s/mysql/cronjob-backup.yaml"
   echo ""
   echo -e "${BOLD}Useful commands:${NC}"
-  echo "  kubectl -n cms-prod get pods          # check pod status"
-  echo "  kubectl -n cms-prod get ingress        # check ingress + IP"
-  echo "  kubectl -n cms-prod get certificate    # check TLS cert"
-  echo "  kubectl -n cms-prod logs -f deployment/cms-server"
-  echo "  k9s -n cms-prod                        # terminal UI"
+  echo "  kubectl -n ${APP_NAME} get pods          # check pod status"
+  echo "  kubectl -n ${APP_NAME} get ingress        # check ingress + IP"
+  echo "  kubectl -n ${APP_NAME} get certificate    # check TLS cert"
+  echo "  kubectl -n ${APP_NAME} logs -f deployment/${APP_NAME}-server"
+  echo "  k9s -n ${APP_NAME}                        # terminal UI"
   echo ""
 
-  if [[ "${INSTALL_CERT^^}" == "Y" ]]; then
-    echo -e "${BOLD}CI/CD kubeconfig (paste into KUBECONFIG_PROD / base64 for GitLab):${NC}"
+  if [[ "$INSTALL_CERT" == [Yy] ]]; then
+    echo -e "${BOLD}CI/CD kubeconfig (paste into KUBECONFIG_PROD / KUBECONFIG):${NC}"
     echo "  GitHub:  cat ~/.kube/config-hetzner"
-    echo "  GitLab:  cat ~/.kube/config-hetzner | base64 | tr -d '\\n'"
+    echo "  GitLab:  cat ~/.kube/config-hetzner"
     echo ""
   fi
 }
@@ -439,7 +439,7 @@ print_summary() {
 main() {
   echo -e "${BOLD}"
   echo "╔══════════════════════════════════════════════╗"
-  echo "║     k3s Bootstrap — CMS Production Cluster  ║"
+  echo "║        k3s Bootstrap — Production Cluster   ║"
   echo "╚══════════════════════════════════════════════╝"
   echo -e "${NC}"
 
