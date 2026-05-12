@@ -175,16 +175,20 @@ export function AppSidebar() {
             href: StoreController.index.url(),
             icon: MapPin,
         },
-        {
-            title: __('nav.blog_posts', 'Blog Posts'),
-            href: BlogPostController.index.url(),
-            icon: BookOpen,
-        },
-        {
-            title: __('nav.blog_categories', 'Blog Categories'),
-            href: BlogCategoryController.index.url(),
-            icon: FolderOpen,
-        },
+        ...(modules?.blog
+            ? [
+                  {
+                      title: __('nav.blog_posts', 'Blog Posts'),
+                      href: BlogPostController.index.url(),
+                      icon: BookOpen,
+                  },
+                  {
+                      title: __('nav.blog_categories', 'Blog Categories'),
+                      href: BlogCategoryController.index.url(),
+                      icon: FolderOpen,
+                  },
+              ]
+            : []),
     ];
 
     const shopNavItems: NavItem[] = modules?.ecommerce
@@ -332,27 +336,6 @@ export function AppSidebar() {
                   },
               ]
             : []),
-        {
-            title: __('nav.search_synonyms', 'Search Synonyms'),
-            href: SearchSynonymController.index.url(),
-            icon: Search,
-        },
-        {
-            title: __('nav.support', 'Support'),
-            icon: MessageCircle,
-            children: [
-                {
-                    title: __('nav.conversations', 'Conversations'),
-                    href: SupportConversationController.index.url(),
-                    icon: MessageSquare,
-                },
-                {
-                    title: __('nav.canned_responses', 'Canned Responses'),
-                    href: SupportCannedResponseController.index.url(),
-                    icon: ClipboardList,
-                },
-            ],
-        },
     ];
 
     const analyticsNavItems: NavItem[] = [
@@ -435,6 +418,27 @@ export function AppSidebar() {
                     title: __('nav.translations', 'Translations'),
                     href: TranslationController.index.url(),
                     icon: Languages,
+                },
+            ],
+        },
+        {
+            title: __('nav.search_synonyms', 'Search Synonyms'),
+            href: SearchSynonymController.index.url(),
+            icon: Search,
+        },
+        {
+            title: __('nav.support', 'Support'),
+            icon: MessageCircle,
+            children: [
+                {
+                    title: __('nav.conversations', 'Conversations'),
+                    href: SupportConversationController.index.url(),
+                    icon: MessageSquare,
+                },
+                {
+                    title: __('nav.canned_responses', 'Canned Responses'),
+                    href: SupportCannedResponseController.index.url(),
+                    icon: ClipboardList,
                 },
             ],
         },

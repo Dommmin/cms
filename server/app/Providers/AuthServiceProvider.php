@@ -7,8 +7,11 @@ namespace App\Providers;
 use App\Models\Page;
 use App\Models\User;
 use App\Policies\PagePolicy;
+use App\Policies\RolePolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
+use Spatie\Permission\Models\Role;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -20,10 +23,13 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         User::class => UserPolicy::class,
         Page::class => PagePolicy::class,
+        Role::class => RolePolicy::class,
     ];
 
     public function boot(): void
     {
         $this->registerPolicies();
+
+        Gate::before(fn (User $user, string $ability): ?bool => $user->hasRole('super-admin') ? true : null);
     }
 }

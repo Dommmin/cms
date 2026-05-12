@@ -73,8 +73,8 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('panel')->name(
     Route::resource('search/synonyms', SearchSynonymController::class)->names('search.synonyms')->parameters(['synonyms' => 'synonym']);
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/stream', [NotificationController::class, 'stream'])->name('notifications.stream');
-    Route::get('/activity-log', [ActivityLogController::class, 'index'])->middleware('role:admin')->name('activity-log.index');
-    Route::get('/activity-log/export', [ActivityLogController::class, 'export'])->middleware('role:admin')->name('activity-log.export');
+    Route::get('/activity-log', [ActivityLogController::class, 'index'])->middleware('role:admin|super-admin')->name('activity-log.index');
+    Route::get('/activity-log/export', [ActivityLogController::class, 'export'])->middleware('role:admin|super-admin')->name('activity-log.export');
     Route::get('/preview', PreviewController::class)->name('preview');
 
     // Model Versioning
@@ -125,7 +125,7 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('panel')->name(
     });
 
     // Currency & Exchange Rates (admin only)
-    Route::middleware('role:admin')->group(function (): void {
+    Route::middleware('role:admin|super-admin')->group(function (): void {
         Route::resource('currencies', CurrencyController::class)->except(['show']);
         Route::resource('exchange-rates', ExchangeRateController::class)->except(['show']);
     });
@@ -164,10 +164,10 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('panel')->name(
     });
 
     // Cookie Consents (read-only, admin only)
-    Route::resource('cookie-consents', CookieConsentController::class)->only(['index', 'show'])->middleware('role:admin');
+    Route::resource('cookie-consents', CookieConsentController::class)->only(['index', 'show'])->middleware('role:admin|super-admin');
 
     // Users (admin only)
-    Route::middleware('role:admin')->group(function (): void {
+    Route::middleware('role:admin|super-admin')->group(function (): void {
         Route::resource('users', UserController::class)
             ->except(['show'])
             ->names([
@@ -212,7 +212,7 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('panel')->name(
     Route::delete('forms/{form}/submissions/{submission}', [FormSubmissionController::class, 'destroy'])->name('forms.submissions.destroy');
 
     // Settings (admin only)
-    Route::middleware('role:admin')->group(function (): void {
+    Route::middleware('role:admin|super-admin')->group(function (): void {
         Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
         Route::post('settings/mail/test', [SettingsController::class, 'testMail'])->name('settings.mail.test');
@@ -225,7 +225,7 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('panel')->name(
     Route::resource('translations', AdminTranslationController::class)->except(['show', 'create', 'edit']);
 
     // Affiliates & Referrals (admin only)
-    Route::prefix('affiliates')->name('affiliates.')->middleware('role:admin')->group(function (): void {
+    Route::prefix('affiliates')->name('affiliates.')->middleware('role:admin|super-admin')->group(function (): void {
         Route::resource('codes', AffiliateCodeController::class)->except(['show']);
         Route::post('codes/{code}/toggle-active', [AffiliateCodeController::class, 'toggleActive'])->name('codes.toggle-active');
 
