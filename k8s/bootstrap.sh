@@ -149,6 +149,31 @@ step_traefik_config() {
   info "Waiting for Traefik to be Running..."
   kubectl -n kube-system rollout status deployment/traefik --timeout=3m
   ok "Traefik is running"
+
+  # Give klipper/cloud LB a moment to assign an external IP
+  sleep 5
+  local ext_ip
+  ext_ip=$(kubectl -n kube-system get svc traefik \
+    -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
+
+  if [ -n "$ext_ip" ]; then
+    ok "Traefik external IP: ${ext_ip} (LoadBalancer ready)"
+  else
+    warn "Traefik has no external IP — ports 80/443 are NOT reachable from the internet."
+    warn ""
+    warn "  Hetzner Cloud:  install hcloud-controller-manager and it provisions a real LB."
+    warn "  Other providers (OVHcloud, Vultr, DigitalOcean, bare metal, etc.):"
+    warn "    k3s ships with a built-in LB (servicelb/klipper) that binds port 80/443"
+    warn "    directly on the host. It must NOT be disabled."
+    warn ""
+    warn "  If k3s was installed with '--disable=servicelb', fix it now on the server:"
+    warn "    sudo nano /etc/systemd/system/k3s.service"
+    warn "    Remove the line:  '--disable=servicelb' \\"
+    warn "    sudo systemctl daemon-reload && sudo systemctl restart k3s"
+    warn ""
+    warn "  Without this, TLS certificates (Let's Encrypt HTTP-01) will never be issued."
+    info "Continuing bootstrap — fix servicelb before running the first deploy."
+  fi
 }
 
 # ─── Step 2: cert-manager ────────────────────────────────────────────────────

@@ -267,12 +267,22 @@ Host cms
 
 On the server, run a single command:
 
+**Hetzner Cloud** (with hcloud-controller-manager) — the CCM provisions a real Load Balancer, so k3s's built-in LB is unnecessary:
+
 ```bash
-curl -sfL https://get.k3s.io | sh -s - --disable=servicelb
+curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" sh -s - --disable=servicelb
 ```
 
-> **Why only disable servicelb?**  
-> `servicelb` is k3s's built-in load balancer — we disable it because Traefik handles incoming traffic directly. We do **not** disable Traefik — k3s installs it automatically, and the `HelmChartConfig` from section 4.3 will tune its configuration (HTTP→HTTPS redirect).
+**Other providers** (OVHcloud, DigitalOcean, Vultr, bare metal, etc.) — without a cloud LB you need k3s's built-in servicelb, which binds ports 80/443 directly on the host. **Do not add** `--disable=servicelb`:
+
+```bash
+curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" sh -s -
+```
+
+> **What is servicelb?**  
+> `servicelb` (klipper) is k3s's built-in load balancer. It creates DaemonSet pods that listen on ports 80/443 of the host and forward traffic to Traefik. Without it — and without a cloud LB — ports 80/443 are unreachable from the internet, Let's Encrypt HTTP-01 challenges will never pass, and the TLS certificate will never be issued.
+>
+> We do **not** disable Traefik — k3s installs it automatically, and the `HelmChartConfig` from section 4.3 will tune its configuration (HTTP→HTTPS redirect).
 
 Wait ~30 seconds, then verify:
 
@@ -904,26 +914,35 @@ APP_DEBUG=false
 APP_URL=https://admin.yourdomain.com
 FRONTEND_URL=https://yourdomain.com
 
-DB_HOST=cms-mysql.cms-prod.svc.cluster.local
-DB_PASSWORD=SuperSecretPassword456!
+# Internal service hostnames follow the pattern:
+# <APP_NAME>-<service>.<NAMESPACE>.svc.cluster.local
+# If your namespace is "cms-prod", it's cms-mysql.cms-prod.svc.cluster.local
+# If your namespace is "app",      it's app-mysql.app.svc.cluster.local
+DB_HOST=<APP_NAME>-mysql.<NAMESPACE>.svc.cluster.local
+DB_DATABASE=<NAMESPACE>
+DB_USERNAME=<from bootstrap secret>
+DB_PASSWORD=<from bootstrap secret>
 
-REDIS_HOST=cms-redis.cms-prod.svc.cluster.local
-REDIS_PASSWORD=SuperSecretRedisPassword789!
+REDIS_HOST=<APP_NAME>-redis.<NAMESPACE>.svc.cluster.local
+REDIS_PASSWORD=<from bootstrap secret>
 
 FILESYSTEM_DISK=s3
 AWS_ACCESS_KEY_ID=...
 AWS_SECRET_ACCESS_KEY=...
-AWS_BUCKET=cms
+AWS_BUCKET=...
 AWS_ENDPOINT=...
 
-GOTENBERG_URL=http://cms-gotenberg.cms-prod.svc.cluster.local:3000
+GOTENBERG_URL=http://<APP_NAME>-gotenberg.<NAMESPACE>.svc.cluster.local:3000
 
-TYPESENSE_API_KEY=...
-TYPESENSE_HOST=cms-typesense.cms-prod.svc.cluster.local
+TYPESENSE_API_KEY=<from bootstrap secret>
+TYPESENSE_HOST=<APP_NAME>-typesense.<NAMESPACE>.svc.cluster.local
 
 GLITCHTIP_DSN=https://...@glitchtip.yourdomain.com/1
 ...
 ```
+
+> **Where do I find the namespace and service names?**  
+> They depend on the app name you chose during `bootstrap.sh`. Check with `kubectl -n <NAMESPACE> get svc`.
 
 GitHub supports multiline Variables — paste the entire content.
 
@@ -1369,6 +1388,7 @@ kubectl -n cert-manager logs deployment/cert-manager | grep ERROR
 Common causes:
 - DNS hasn't propagated yet (wait 15 min)
 - Port 80 is blocked by the firewall (Let's Encrypt uses HTTP challenge)
+- **servicelb disabled without a cloud LB** — ports 80/443 not bound on the host; check `sudo ss -tlnp | grep :80` on the server; if nothing is listening — see section 4.1
 - You've hit Let's Encrypt's rate limit (5 certificates per week per domain)
 
 ### Laravel returning 500

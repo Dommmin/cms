@@ -206,8 +206,10 @@ W panelu swojego rejestratora domen ustaw rekordy A:
 ```
 yourdomain.com        A  <IP_SERWERA>
 www.yourdomain.com    A  <IP_SERWERA>
-api.yourdomain.com    A  <IP_SERWERA>
+admin.yourdomain.com  A  <IP_SERWERA>
 ```
+
+> Panel admina i API Laravel działają pod tą samą domeną `admin.yourdomain.com` — serwer obsługuje zarówno `/admin/*` (Inertia SPA) jak i `/api/v1/*` (REST API).
 
 Poczekaj ~5-15 minut na propagację DNS. Możesz sprawdzić:
 
@@ -342,12 +344,22 @@ sudo -i
 
 Uruchom instalator k3s z flagą `K3S_KUBECONFIG_MODE="644"` — dzięki temu plik kubeconfig będzie czytelny dla wszystkich użytkowników serwera (potrzebne w sekcji 4.2, żeby skopiować go bez `sudo`):
 
+**Hetzner Cloud** (z hcloud-controller-manager) — CCM sam prowizjonuje prawdziwy Load Balancer, więc wewnętrzny LB k3s jest zbędny:
+
 ```bash
 curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" sh -s - --disable=servicelb
 ```
 
-> **Dlaczego wyłączamy tylko servicelb?**  
-> `servicelb` to wewnętrzny load balancer k3s — wyłączamy go, bo Traefik sam obsługuje ruch przychodzący. Traefiku **nie wyłączamy** — k3s instaluje go automatycznie, a `HelmChartConfig` z sekcji 4.3 dostroi jego konfigurację (HTTP→HTTPS redirect).
+**Inne providery** (OVHcloud, DigitalOcean, Vultr, bare metal itp.) — bez chmurowego LB potrzebujesz wbudowanego servicelb k3s, który binduje porty 80/443 bezpośrednio na hoście. **Nie dodawaj** `--disable=servicelb`:
+
+```bash
+curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" sh -s -
+```
+
+> **Co to jest servicelb?**  
+> `servicelb` (klipper) to wewnętrzny load balancer k3s. Tworzy pody DaemonSet, które nasłuchują na portach 80/443 hosta i przekazują ruch do Traefika. Bez niego — i bez chmurowego LB — porty 80/443 są niedostępne z internetu, Let's Encrypt HTTP-01 challenge nigdy nie przejdzie i certyfikat TLS nie zostanie wystawiony.
+>
+> Traefiku **nie wyłączamy** — k3s instaluje go automatycznie, a `HelmChartConfig` z sekcji 4.3 dostroi jego konfigurację (HTTP→HTTPS redirect).
 
 Poczekaj ~30 sekund, a następnie sprawdź (nadal jako root na serwerze):
 
@@ -366,6 +378,7 @@ Na **lokalnym komputerze** (nie na serwerze). Komenda jest taka sama niezależni
 ```bash
 mkdir -p ~/.kube
 
+# root lub deployer — ta sama komenda:
 ssh <USER>@<IP_SERWERA> "cat /etc/rancher/k3s/k3s.yaml" \
   | sed "s/127.0.0.1/<IP_SERWERA>/g" \
   > ~/.kube/config-hetzner
@@ -443,7 +456,7 @@ Skrypt interaktywnie zapyta o:
 | Pytanie                     | Co wpisać                                            |
 |-----------------------------|------------------------------------------------------|
 | Hasło MySQL root            | Silne hasło, min. 16 znaków                          |
-| Nazwa użytkownika MySQL     | Domyślnie `cms`                                      |
+| Nazwa użytkownika MySQL     | Domyślnie `app`                                      |
 | Hasło MySQL app             | Silne hasło, min. 16 znaków                          |
 | Hasło Redis                 | Silne hasło, min. 16 znaków                          |
 | Typesense API key           | Losowy klucz, min. 16 znaków                         |
@@ -1411,6 +1424,7 @@ kubectl -n cert-manager logs deployment/cert-manager | grep ERROR
 Najczęstsze przyczyny:
 - DNS jeszcze nie propagował (poczekaj 15 min)
 - Port 80 zablokowany przez firewall (Let's Encrypt używa HTTP challenge)
+- **servicelb wyłączone bez chmurowego LB** — porty 80/443 niedostępne na hoście; sprawdź `sudo ss -tlnp | grep :80` na serwerze; jeśli nic nie nasłuchuje — patrz sekcja 4.1
 - Przekroczyłeś limit certyfikatów Let's Encrypt (5 na tydzień na domenę)
 
 ### Laravel zwraca błąd 500
