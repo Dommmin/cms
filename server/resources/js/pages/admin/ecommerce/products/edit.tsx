@@ -84,6 +84,8 @@ const tabFieldMap: Record<TabKey, string[]> = {
         'flags',
         'is_active',
         'is_saleable',
+        'is_search_promoted',
+        'is_featured',
     ],
     pricing: [
         'variant',
@@ -169,6 +171,7 @@ export default function Edit({
         is_active: boolean;
         is_saleable: boolean;
         is_search_promoted?: boolean;
+        is_featured?: boolean;
         seo_title?: string;
         seo_description?: string;
         meta_robots?: string;
@@ -209,6 +212,7 @@ export default function Edit({
         is_active: product.is_active,
         is_saleable: product.is_saleable,
         is_search_promoted: product.is_search_promoted ?? false,
+        is_featured: product.is_featured ?? false,
         seo_title: product.seo_title ?? '',
         seo_description: product.seo_description ?? '',
         meta_robots: product.meta_robots ?? 'index, follow',
@@ -1064,6 +1068,41 @@ export default function Edit({
                                                                 >
                                                                     Promoted in
                                                                     Search
+                                                                </Label>
+                                                            </div>
+
+                                                            <div className="flex items-center gap-2">
+                                                                <input
+                                                                    type="hidden"
+                                                                    name="is_featured"
+                                                                    value="0"
+                                                                />
+                                                                <input
+                                                                    type="checkbox"
+                                                                    id="is_featured"
+                                                                    name="is_featured"
+                                                                    value="1"
+                                                                    checked={
+                                                                        formData.is_featured
+                                                                    }
+                                                                    onChange={(
+                                                                        e,
+                                                                    ) =>
+                                                                        handleFormChange(
+                                                                            'is_featured',
+                                                                            e
+                                                                                .target
+                                                                                .checked,
+                                                                        )
+                                                                    }
+                                                                    className="h-4 w-4 rounded border-input"
+                                                                />
+                                                                <Label
+                                                                    htmlFor="is_featured"
+                                                                    className="font-normal"
+                                                                >
+                                                                    Featured
+                                                                    Product
                                                                 </Label>
                                                             </div>
                                                         </div>

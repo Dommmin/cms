@@ -39,6 +39,9 @@ class ProductIndexQuery
             ->when($this->request->has('is_active'), function ($query): void {
                 $query->where('is_active', $this->request->boolean('is_active'));
             })
+            ->when($this->request->has('is_featured'), function ($query): void {
+                $query->where('is_featured', $this->request->boolean('is_featured'));
+            })
             ->orderBy('name')
             ->paginate($perPage)
             ->through(fn (Product $product): array => [

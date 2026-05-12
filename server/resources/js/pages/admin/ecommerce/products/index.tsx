@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { DownloadIcon, PlusIcon, UploadIcon } from 'lucide-react';
 import { useState } from 'react';
 import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
@@ -7,6 +7,13 @@ import { useProductColumns } from '@/components/columns/product-columns';
 import DataTable from '@/components/data-table';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -23,7 +30,7 @@ export default function ProductsIndex({
     filters,
 }: {
     products: ProductData;
-    filters: { search?: string };
+    filters: { search?: string; is_featured?: string };
 }) {
     const __ = useTranslation();
     const productColumns = useProductColumns();
@@ -66,6 +73,38 @@ export default function ProductsIndex({
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
+
+                <div className="flex items-center gap-2">
+                    <Select
+                        value={filters.is_featured ?? 'all'}
+                        onValueChange={(value) => {
+                            const params = Object.fromEntries(
+                                new URLSearchParams(
+                                    window.location.search,
+                                ).entries(),
+                            );
+                            router.get(
+                                ProductController.index.url(),
+                                {
+                                    ...params,
+                                    is_featured:
+                                        value === 'all' ? undefined : value,
+                                    page: 1,
+                                },
+                                { replace: true, preserveState: true },
+                            );
+                        }}
+                    >
+                        <SelectTrigger className="w-[160px]">
+                            <SelectValue placeholder="Featured..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All products</SelectItem>
+                            <SelectItem value="1">Featured only</SelectItem>
+                            <SelectItem value="0">Not featured</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
 
                 <DataTable
                     columns={productColumns}

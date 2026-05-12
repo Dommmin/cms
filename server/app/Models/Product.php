@@ -31,6 +31,7 @@ use Spatie\Translatable\HasTranslations;
  * @property string $name
  * @property string $slug
  * @property bool $is_search_promoted
+ * @property bool $is_featured
  * @property bool $is_active
  */
 #[Guarded(['id'])]
@@ -65,6 +66,7 @@ class Product extends Model implements HasMedia
         'is_active' => 'boolean',
         'is_saleable' => 'boolean',
         'is_search_promoted' => 'boolean',
+        'is_featured' => 'boolean',
         'available_from' => 'datetime',
         'available_until' => 'datetime',
         'sitemap_exclude' => 'boolean',

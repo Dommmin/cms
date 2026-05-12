@@ -59,6 +59,8 @@ const defaultFormData = (defaultLocale: string): FormData => ({
     brand_id: null,
     is_active: true,
     is_saleable: true,
+    is_search_promoted: false,
+    is_featured: false,
     seo_title: '',
     seo_description: '',
     flags: [],
@@ -89,6 +91,8 @@ const tabFieldMap: Record<TabKey, string[]> = {
         'flags',
         'is_active',
         'is_saleable',
+        'is_search_promoted',
+        'is_featured',
     ],
     pricing: [
         'variant',
@@ -873,6 +877,68 @@ export default function Create({
                                                             className="font-normal"
                                                         >
                                                             Available for sale
+                                                        </Label>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-2">
+                                                        <input
+                                                            type="hidden"
+                                                            name="is_search_promoted"
+                                                            value="0"
+                                                        />
+                                                        <input
+                                                            type="checkbox"
+                                                            id="is_search_promoted"
+                                                            name="is_search_promoted"
+                                                            value="1"
+                                                            checked={
+                                                                formData.is_search_promoted
+                                                            }
+                                                            onChange={(e) =>
+                                                                handleFormChange(
+                                                                    'is_search_promoted',
+                                                                    e.target
+                                                                        .checked,
+                                                                )
+                                                            }
+                                                            className="h-4 w-4 rounded border-input"
+                                                        />
+                                                        <Label
+                                                            htmlFor="is_search_promoted"
+                                                            className="font-normal"
+                                                        >
+                                                            Promoted in Search
+                                                        </Label>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-2">
+                                                        <input
+                                                            type="hidden"
+                                                            name="is_featured"
+                                                            value="0"
+                                                        />
+                                                        <input
+                                                            type="checkbox"
+                                                            id="is_featured"
+                                                            name="is_featured"
+                                                            value="1"
+                                                            checked={
+                                                                formData.is_featured
+                                                            }
+                                                            onChange={(e) =>
+                                                                handleFormChange(
+                                                                    'is_featured',
+                                                                    e.target
+                                                                        .checked,
+                                                                )
+                                                            }
+                                                            className="h-4 w-4 rounded border-input"
+                                                        />
+                                                        <Label
+                                                            htmlFor="is_featured"
+                                                            className="font-normal"
+                                                        >
+                                                            Featured Product
                                                         </Label>
                                                     </div>
                                                 </div>

@@ -151,6 +151,7 @@ export interface Product {
     /** max price across variants, in cents */
     price_max: number;
     is_active: boolean;
+    is_featured: boolean;
     is_on_sale: boolean;
     discount_percentage?: number | null;
     /** lowest compare_at_price among on-sale variants, in cents */

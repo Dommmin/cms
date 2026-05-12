@@ -197,6 +197,13 @@ return [
             'schema' => [
                 'type' => 'object',
                 'properties' => [
+                    'filter_mode' => [
+                        'type' => 'string',
+                        'label' => 'Product Source',
+                        'enum' => ['manual', 'featured'],
+                        'enumLabels' => ['Manual selection', 'Featured products'],
+                        'default' => 'manual',
+                    ],
                     'title' => [
                         'type' => 'string',
                         'label' => 'Section Title',

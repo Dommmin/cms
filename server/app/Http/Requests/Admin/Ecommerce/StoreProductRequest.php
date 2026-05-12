@@ -31,6 +31,7 @@ class StoreProductRequest extends FormRequest
             'brand_id' => ['nullable', 'exists:brands,id'],
             'is_active' => ['boolean'],
             'is_saleable' => ['boolean'],
+            'is_featured' => ['boolean'],
             'seo_title' => ['nullable', 'string', 'max:255'],
             'seo_description' => ['nullable', 'string', 'max:500'],
             'available_from' => ['nullable', 'date'],
