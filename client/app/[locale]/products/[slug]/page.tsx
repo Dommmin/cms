@@ -14,9 +14,7 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
     try {
         const { slug } = await params;
-        const { data: product } = await serverFetch<{ data: Product }>(
-            `/products/${slug}`,
-        );
+        const product = await serverFetch<Product>(`/products/${slug}`);
         return {
             title: product.seo_title ?? product.name,
             description:

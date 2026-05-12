@@ -33,6 +33,7 @@ use Spatie\Translatable\HasTranslations;
  * @property bool $is_search_promoted
  * @property bool $is_featured
  * @property bool $is_active
+ * @property-read ProductImage|null $thumbnail
  */
 #[Guarded(['id'])]
 #[Table(name: 'products')]

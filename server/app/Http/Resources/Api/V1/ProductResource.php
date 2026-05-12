@@ -39,6 +39,21 @@ class ProductResource extends JsonResource
 
             $data = ProductData::from($product)->toArray();
 
+            // Override thumbnail to match the ProductImage TS interface (url/alt/thumb_url)
+            // ProductData maps to ProductImageData which uses path/alt_text — wrong shape for the frontend.
+            if ($product->thumbnail) {
+                $url = $product->thumbnail->path; // getPathAttribute() returns media URL
+                $data['thumbnail'] = [
+                    'id' => $product->thumbnail->id,
+                    'url' => $url,
+                    'thumb_url' => $url,
+                    'alt' => $product->thumbnail->alt_text ?? $product->name,
+                    'position' => $product->thumbnail->position,
+                ];
+            } else {
+                $data['thumbnail'] = null;
+            }
+
             if ($product->relationLoaded('activeVariants')) {
                 $variants = $product->activeVariants;
                 $data['variants'] = $variants->map(fn ($v): array => [

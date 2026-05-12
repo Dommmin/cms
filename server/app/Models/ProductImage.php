@@ -12,7 +12,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
+ * @property int $id
+ * @property int $product_id
+ * @property ?int $variant_id
+ * @property ?int $media_id
+ * @property bool $is_thumbnail
+ * @property int $position
+ * @property ?string $alt_text
  * @property-read ?Media $media
+ * @property-read string $path
  */
 #[Fillable([
     'product_id', 'variant_id', 'media_id', 'is_thumbnail', 'position',

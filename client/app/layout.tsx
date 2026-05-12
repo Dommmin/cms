@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Playfair_Display } from 'next/font/google';
 import { cookies } from 'next/headers';
+import Script from 'next/script';
 import { cache } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -136,14 +137,18 @@ export default async function RootLayout({
                         href="https://challenges.cloudflare.com"
                     />
                 )}
-                {/* Theme: prevent flash */}
-                <script
+                {/* Theme: prevent flash — must run before hydration to avoid dark-mode flash */}
+                <Script
+                    id="theme-init"
+                    strategy="beforeInteractive"
                     dangerouslySetInnerHTML={{
                         __html: `(function(){var t=localStorage.getItem('theme')||'system';if(t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}})();`,
                     }}
                 />
                 {/* Consent Mode v2: default DENIED — must run synchronously before GTM */}
-                <script
+                <Script
+                    id="consent-default"
+                    strategy="beforeInteractive"
                     dangerouslySetInnerHTML={{
                         __html: `window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:"consent_default",analytics_storage:"denied",ad_storage:"denied",ad_user_data:"denied",ad_personalization:"denied",functionality_storage:"denied",security_storage:"granted"});`,
                     }}
