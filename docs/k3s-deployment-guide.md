@@ -26,6 +26,11 @@ Nie zakładam, że znasz Kubernetes. Zakładam, że znasz Dockera i nie boisz si
 10. [Wdrożenie Typesense (full-text search)](#10-wdrożenie-typesense-full-text-search)
 11. [Pull Secret dla Container Registry (GHCR / GitLab)](#11-pull-secret-dla-container-registry-ghcr--gitlab)
 12. [Wdrożenie aplikacji (serwer + klient)](#12-wdrożenie-aplikacji-serwer--klient)
+    - [12.3 Queue worker (joby w tle)](#123-queue-worker-joby-w-tle)
+    - [12.4 Scheduler (cron joby Laravel)](#124-scheduler-cron-joby-laravel)
+    - [12.5 Mail (SMTP)](#125-mail-smtp)
+    - [12.6 Reverb / broadcasting (realtime — chat, notyfikacje)](#126-reverb--broadcasting-realtime--chat-notyfikacje)
+    - [12.7 Laravel Excel — gotchas](#127-laravel-excel--gotchas)
 13. [Jak CI/CD łączy się z k3s?](#13-jak-cicd-łączy-się-z-k3s)
 14. [Konfiguracja GitHub Actions](#14-konfiguracja-github-actions)
 15. [Konfiguracja GitLab CI/CD](#15-konfiguracja-gitlab-cicd)
@@ -466,6 +471,7 @@ Skrypt interaktywnie zapyta o:
 | Ingress deweloperski (HTTP) | `y` jeśli nie masz domeny — używa sslip.io           |
 | Ingress produkcyjny (HTTPS) | `Y` (domyślnie) — wymaga DNS + cert-manager          |
 | GlitchTip                   | `y` jeśli chcesz self-hosted śledzenie błędów        |
+| Ops tooling (Rancher + Uptime Kuma) | `y` jeśli chcesz panel UI klastra i monitoring dostępności — odpala `docker-compose.ops.yml` na serwerze |
 
 **Czas wykonania:** ~5–10 minut (większość to oczekiwanie na MySQL i cert-manager).
 
@@ -843,10 +849,28 @@ kubectl -n app get pvc
 > **Co przechowuje PVC?**
 > ```
 > PVC (20Gi na dysku VPS)
->   ├── storage/app/    ← uploadowane pliki (zdjęcia, PDF-y, załączniki)
->   └── storage/logs/   ← logi Laravel (gdy LOG_CHANNEL=daily lub stack)
+>   ├── storage/app/                   ← uploadowane pliki (zdjęcia, PDF-y, załączniki)
+>   ├── storage/logs/                  ← logi Laravel (gdy LOG_CHANNEL=daily lub stack)
+>   └── storage/framework/             ← cache widoków, sesje, kolejki, eksporty Excela
+>       ├── cache/data/                  ← cache aplikacji (gdy CACHE_STORE=file)
+>       ├── cache/laravel-excel/         ← tymczasowe pliki dla queued Excel exports
+>       ├── sessions/                    ← sesje (gdy SESSION_DRIVER=file)
+>       └── views/                       ← skompilowane Blade-y
 > ```
 > Dane przeżywają restarty podów i deploye. Giną tylko jeśli ręcznie usuniesz PVC.
+
+> **Ważne:** Katalogi `storage/framework/*` muszą istnieć **zanim** uruchomi się pod — inaczej:
+> - `php artisan view:cache` wywala się przy starcie
+> - queued Excel exports padają z `fopen(... laravel-excel/...): No such file or directory`
+> - sesje filesowe fail-ują
+>
+> Jeśli Twój `Dockerfile` nie tworzy tych katalogów w obrazie, **dodaj je do `command`/`entrypoint`** poda lub do migration joba:
+> ```bash
+> mkdir -p storage/framework/{cache/data,cache/laravel-excel,sessions,views} \
+>          storage/app/{public,private} storage/logs \
+>   && chown -R www-data:www-data storage bootstrap/cache
+> ```
+> Najlepsza praktyka: dodaj tę linię do `Dockerfile` (warstwa zaraz przed `USER www-data`) — wtedy każdy nowy obraz ma poprawną strukturę.
 
 W pliku `.env` produkcyjnym ustaw:
 
@@ -902,6 +926,282 @@ service/app-mysql   ClusterIP   None
 service/app-redis   ClusterIP   10.43.x.x
 service/app-gotenberg ClusterIP 10.43.x.x
 ```
+
+### 12.3 Queue worker (joby w tle)
+
+Queue worker to **osobny Deployment** (`app-queue`), który nieprzerwanie czyta kolejkę Redis i wykonuje joby z aplikacji. Bez niego:
+
+- maile, notyfikacje SSE, indeksacja Scout → wszystko leci do kolejki i nikt tego nie przetworzy
+- konwersje obrazów Spatie MediaLibrary → uploadowane zdjęcia nie dostają thumbów
+- queued Excel exports → użytkownik nigdy nie dostaje pliku
+- powiadomienia e-mail po zakupie / rejestracji → nigdy nie wychodzą
+
+Manifest `k8s/server/deployment-queue.yaml` startuje 2 repliki (HA) i uruchamia:
+
+```
+php artisan queue:work redis --tries=3 --timeout=300 --max-jobs=1000 --max-time=3600
+```
+
+`--max-time=3600` i `--max-jobs=1000` powodują, że worker sam się restartuje co godzinę / co 1000 jobów — to chroni przed wyciekami pamięci w długich procesach.
+
+**Sprawdź że workery działają:**
+
+```bash
+kubectl -n app get pods -l component=queue
+# NAME                       READY   STATUS    RESTARTS   AGE
+# app-queue-xxxxx-aaaaa      1/1     Running   0          12m
+# app-queue-xxxxx-bbbbb      1/1     Running   0          12m
+
+kubectl -n app logs deployment/app-queue --tail=30
+```
+
+**Failed jobs — co z nimi robić:**
+
+Joby, które wywaliły się 3 razy, trafiają do tabeli `failed_jobs`. Sprawdź je regularnie:
+
+```bash
+# Lista
+kubectl -n app exec deployment/app-server -- php artisan queue:failed
+
+# Szczegóły konkretnego joba (exception)
+kubectl -n app exec deployment/app-server -- \
+  php artisan queue:failed | grep "ProductsExport"
+
+# Retry pojedynczego joba
+kubectl -n app exec deployment/app-server -- \
+  php artisan queue:retry <UUID>
+
+# Retry wszystkich
+kubectl -n app exec deployment/app-server -- php artisan queue:retry all
+
+# Wywal wszystkie failed jobs (czyszczenie)
+kubectl -n app exec deployment/app-server -- php artisan queue:flush
+```
+
+**Skalowanie:** Jeśli kolejka rośnie szybciej niż workerzy ją przetwarzają, zwiększ repliki:
+
+```bash
+kubectl -n app scale deployment/app-queue --replicas=4
+```
+
+Pamiętaj że każdy worker pobiera ten sam `.env` — duża ilość workerów = większe zużycie pamięci i połączeń do Redis/MySQL.
+
+### 12.4 Scheduler (cron joby Laravel)
+
+Laravel ma wbudowany scheduler — w `routes/console.php` definiujesz zadania, które mają chodzić cyklicznie (np. publikacja zaplanowanych postów, czyszczenie koszyków). Lista zadań:
+
+```bash
+kubectl -n app exec deployment/app-server -- php artisan schedule:list
+```
+
+W tradycyjnym serwerze ustawiasz w `crontab` jeden wpis:
+```
+* * * * * php artisan schedule:run >> /dev/null 2>&1
+```
+
+W k3s odpowiednikiem tego jest **`CronJob`** (`k8s/server/cronjob-scheduler.yaml`) — Kubernetes co minutę startuje krótkotrwały pod, który odpala `php artisan schedule:run`, i go zabija.
+
+```yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: app-scheduler
+spec:
+  schedule: "* * * * *"          # co minutę
+  concurrencyPolicy: Forbid       # nie startuj nowego, jeśli poprzedni jeszcze leci
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: scheduler
+              image: ghcr.io/<user>/app-server:latest
+              command: ["php", "artisan", "schedule:run"]
+```
+
+**Weryfikacja:**
+
+```bash
+# CronJob istnieje
+kubectl -n app get cronjob app-scheduler
+# NAME            SCHEDULE    LAST SCHEDULE   AGE
+# app-scheduler   * * * * *   39s             1d
+
+# Ostatnie kilka wywołań (pody z statusem Completed)
+kubectl -n app get pods | grep app-scheduler | tail -5
+
+# Logi z ostatniego runa
+LAST=$(kubectl -n app get pods -o name | grep scheduler | tail -1)
+kubectl -n app logs $LAST
+# Running ['artisan' blog:publish-scheduled] . 2 sek. DONE
+# Running ['artisan' cms:process-scheduled-pages]  2 sek. DONE
+```
+
+**Częsta pomyłka:** CronJob używa tego samego obrazu co `app-server`. Pipeline aktualizuje obraz w obu (`kubectl set image deployment/app-server` **i** `kubectl set image cronjob/app-scheduler`) — sprawdź swój `.github/workflows/deploy.yml`, bo łatwo o tym zapomnieć.
+
+### 12.5 Mail (SMTP)
+
+Laravel wysyła maile transactional przez SMTP. W k3s masz dwie opcje:
+
+#### Opcja A — zewnętrzny SMTP (rekomendowane na produkcję)
+
+Mailgun, SendGrid, Resend, Postmark, Amazon SES, własny SMTP. Wpisz dane w `PROD_ENV`:
+
+```dotenv
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.resend.com         # lub smtp.mailgun.org, smtp.eu.mailgun.org, ...
+MAIL_PORT=587
+MAIL_USERNAME=resend
+MAIL_PASSWORD=re_xxxxxxxxxxxxxxxx
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="no-reply@yourdomain.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+> **Najczęstsza pomyłka:** `MAIL_HOST=smtp.yourdomain.com` jako placeholder — wszystkie maile fail-ują z `getaddrinfo failed`. Sprawdź realny config:
+> ```bash
+> kubectl -n app exec deployment/app-server -- \
+>   php artisan config:show mail.mailers.smtp.host
+> ```
+
+#### Opcja B — mailpit na klastrze (do testów / staging)
+
+[Mailpit](https://mailpit.axllent.org/) to lekki SMTP server z webowym UI — łapie wszystkie maile w pamięci i pokazuje je w przeglądarce, nic nie wychodzi na zewnątrz. Idealny do staging i developerskich smoke-testów.
+
+Zapisz manifest `k8s/mailpit/deployment.yaml`:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-mailpit
+  namespace: app
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: app-mailpit } }
+  template:
+    metadata: { labels: { app: app-mailpit } }
+    spec:
+      containers:
+        - name: mailpit
+          image: axllent/mailpit:latest
+          ports:
+            - { name: smtp, containerPort: 1025 }
+            - { name: http, containerPort: 8025 }
+          resources:
+            requests: { cpu: 10m, memory: 32Mi }
+            limits:   { cpu: 100m, memory: 128Mi }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: mailpit, namespace: app }
+spec:
+  selector: { app: app-mailpit }
+  ports:
+    - { name: smtp, port: 1025, targetPort: 1025 }
+    - { name: http, port: 8025, targetPort: 8025 }
+```
+
+```bash
+kubectl apply -f k8s/mailpit/deployment.yaml
+```
+
+W `PROD_ENV` (lub `STAGING_ENV`) ustaw:
+
+```dotenv
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit            # usługa DNS w klastrze
+MAIL_PORT=1025
+MAIL_USERNAME=
+MAIL_PASSWORD=
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="no-reply@yourdomain.test"
+```
+
+Webowe UI (port 8025) wyeksponuj przez Ingress albo `kubectl port-forward`:
+
+```bash
+kubectl -n app port-forward svc/mailpit 8025:8025
+# otwórz http://localhost:8025
+```
+
+**Test wysyłki:**
+
+```bash
+kubectl -n app exec deployment/app-server -- \
+  php artisan tinker --execute='Mail::raw("test ".now(), fn($m) => $m->to("test@example.com")->subject("ping"));'
+```
+
+### 12.6 Reverb / broadcasting (realtime — chat, notyfikacje)
+
+Jeśli aplikacja używa WebSocket-ów (Laravel Reverb, Pusher, Soketi) — np. live chat support, push notyfikacji w panelu admina — potrzebujesz osobnego deploya.
+
+Najprościej z **Laravel Reverb** (oficjalny, dołączony do Laravel ≥11):
+
+```yaml
+# k8s/reverb/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: app-reverb, namespace: app }
+spec:
+  replicas: 1                     # Reverb trzyma WS in-memory; HA wymaga zewnętrznego state (Redis pub/sub działa, ale klienci są sticky)
+  selector: { matchLabels: { app: app-reverb } }
+  template:
+    metadata: { labels: { app: app-reverb } }
+    spec:
+      imagePullSecrets: [{ name: ghcr-pull-secret }]
+      containers:
+        - name: reverb
+          image: ghcr.io/<user>/app-server:latest
+          command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+          envFrom: [{ secretRef: { name: app-server-env } }]
+          ports: [{ containerPort: 8080 }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: app-reverb, namespace: app }
+spec:
+  selector: { app: app-reverb }
+  ports: [{ port: 8080, targetPort: 8080 }]
+```
+
+Wymagane zmienne w `PROD_ENV`:
+
+```dotenv
+BROADCAST_CONNECTION=reverb
+REVERB_APP_ID=<losowy_id>
+REVERB_APP_KEY=<losowy_key>
+REVERB_APP_SECRET=<losowy_secret>
+REVERB_HOST=app-reverb           # serwerowo, w klastrze
+REVERB_PORT=8080
+REVERB_SCHEME=http
+
+# Frontend / build args klienta:
+NEXT_PUBLIC_REVERB_APP_KEY=<ten sam key>
+NEXT_PUBLIC_REVERB_HOST=ws.yourdomain.com   # publiczny host, przez Ingress
+NEXT_PUBLIC_REVERB_PORT=443
+NEXT_PUBLIC_REVERB_SCHEME=https
+```
+
+W Ingressie dodaj host `ws.yourdomain.com` ze ścieżką `/app` → `app-reverb:8080`. Traefik **z definicji** obsługuje WebSocket upgrade — nic dodatkowo nie ustawiasz.
+
+**Bez Reverba:** w `.env` zostaw `BROADCAST_CONNECTION=log` (eventy będą tylko logowane) lub `redis` (eventy lecą do Redis pub/sub, ale frontend nie ma jak ich odebrać). Chat / SSE notyfikacje będą działać tylko przez polling.
+
+### 12.7 Laravel Excel — gotchas
+
+Eksporty `Maatwebsite\Excel` w tym projekcie (`ProductsExport`, `OrdersExport`, `CustomersExport`, `CustomReportExport`) **implementują `ShouldQueue`** — to znaczy że `Excel::store(...)` natychmiast wraca, a faktyczny zapis pliku dzieje się w workerze.
+
+Konsekwencje:
+
+1. **Wymagany queue worker** — bez `app-queue` Running eksporty nigdy nie powstaną.
+2. **Wymagany katalog cache** — worker pisze pliki tymczasowe do `storage/framework/cache/laravel-excel/`. Jeśli katalog nie istnieje, queue job fail-uje z:
+   ```
+   ErrorException: fopen(.../storage/framework/cache/laravel-excel/laravel-excel-XXX.xlsx): No such file or directory
+   ```
+   Patrz "Co przechowuje PVC?" wyżej — `mkdir -p storage/framework/cache/laravel-excel`.
+3. **Disk = `local`** w `config/excel.php` celuje w `storage/app` (lub `storage/app/private` od Laravel 11). Jeśli chcesz że pliki przeżyją restart poda — to PVC obsługuje, jeśli `replicas: 1`. Przy 2+ replikach przerzuć eksporty na MinIO/S3 (`Excel::store(..., 's3')`).
 
 ---
 
@@ -1452,6 +1752,66 @@ kubectl -n app exec -it deployment/app-server -- \
 
 Sprawdź czy `DB_HOST` w sekrecie zgadza się z `app-mysql.app.svc.cluster.local`.
 
+### Typesense: kolekcja istnieje, ale `num_documents=0`
+
+Po `scout:import` w logach kolekcja jest, ale dokumenty się nie indeksują. Sprawdź workera:
+
+```bash
+kubectl -n app logs deployment/app-queue --tail=50 | grep -A3 -i scout
+```
+
+Typowy błąd: `Error importing document: Field 'is_featured' must be a bool` — to znaczy że `toSearchableArray()` w modelu zwraca **int** zamiast **bool** (bo brakuje `'is_featured' => 'boolean'` w `$casts`). Pomóc może rebuild obrazu z poprawnego commita lub dodanie jawnego rzutowania `(bool) $this->is_featured` w `toSearchableArray()`.
+
+Po naprawie:
+
+```bash
+# Wyczyść starą kolekcję i zaimportuj ponownie
+kubectl -n app exec deployment/app-server -- php artisan scout:flush "App\Models\Product"
+kubectl -n app exec deployment/app-server -- php artisan scout:import "App\Models\Product"
+```
+
+### Excel export wywala `fopen(.../laravel-excel/...): No such file or directory`
+
+Queued export Maatwebsite/Excel próbuje pisać do `storage/framework/cache/laravel-excel/`, a katalog nie istnieje na PVC. Utwórz go w każdym podzie korzystającym z tego volume (server + queue):
+
+```bash
+for pod in $(kubectl -n app get pods -l 'component in (server,queue)' -o name); do
+  kubectl -n app exec $pod -- sh -c \
+    'mkdir -p storage/framework/cache/laravel-excel && chown www-data:www-data storage/framework/cache/laravel-excel'
+done
+```
+
+Trwałe rozwiązanie: dodaj `mkdir -p` do `Dockerfile` (warstwa przed `USER www-data`) — patrz sekcja 12.1.
+
+### Maile nie wychodzą — `Name does not resolve`
+
+```bash
+kubectl -n app exec deployment/app-server -- \
+  php artisan tinker --execute='try{ Mail::raw("t",fn($m)=>$m->to("x@x")->subject("p")); echo "OK"; }catch(\Throwable $e){echo $e->getMessage();}'
+# Connection could not be established with host "smtp.yourdomain.com:587": getaddrinfo failed
+```
+
+Najczęstsze przyczyny:
+1. `MAIL_HOST` w `PROD_ENV` to placeholder (`smtp.yourdomain.com`) — wpisz prawdziwy SMTP albo postaw mailpita (sekcja 12.5).
+2. `MAIL_HOST=mailpit` ale brak Service `mailpit` w klastrze — `kubectl -n app get svc mailpit`.
+3. Firewall serwera blokuje wyjściowy 587/465 — sprawdź `nc -zv smtp.host 587` z poda.
+
+### Failed jobs rosną (queue:failed → setki rekordów)
+
+Często widoczne po: zmianie schematu DB, refactorze nazw klas jobów, błędach Scout/Media. Workflow:
+
+```bash
+# 1. zobacz typy padających jobów
+kubectl -n app exec deployment/app-server -- php artisan queue:failed | awk '{print $5}' | sort | uniq -c
+
+# 2. zobacz jeden exception
+kubectl -n app exec deployment/app-server -- php artisan tinker --execute='echo DB::table("failed_jobs")->latest("failed_at")->value("exception");' | head -c 500
+
+# 3. po naprawie kodu — retry albo wyrzuć
+kubectl -n app exec deployment/app-server -- php artisan queue:retry all
+# lub: queue:flush  (kasuje wszystkie failed)
+```
+
 ### HPA nie skaluje
 
 ```bash
@@ -1502,9 +1862,30 @@ Po instalacji:
 
 Jeśli w pracy korzystasz z Ranchera, możesz go postawić na tym samym VPS. Dostaniesz dokładnie to samo środowisko — podgląd podów, logi, shell do kontenera, zarządzanie secretami — wszystko przez przeglądarkę.
 
-### 21.1 Instalacja Ranchera
+> **🚀 Najprościej: postaw Rancher i Uptime Kuma jednym poleceniem przez `docker-compose.ops.yml`.**
+>
+> W repo jest gotowy plik `docker-compose.ops.yml` (root projektu), który zawiera Rancher (porty 8080/8443) i Uptime Kuma (port 3001) z trwałymi wolumenami `/opt/rancher` i `/opt/uptime-kuma`.
+>
+> ```bash
+> # Na serwerze (tam gdzie chodzi k3s):
+> sudo mkdir -p /opt/rancher /opt/uptime-kuma
+> sudo chown -R 1000:1000 /opt/uptime-kuma     # Uptime Kuma działa jako uid 1000
+>
+> # Skopiuj plik na serwer (albo zclone'uj repo)
+> scp docker-compose.ops.yml root@<IP_SERWERA>:/opt/
+>
+> # Uruchom (Docker, NIE k3s — to są narzędzia operacyjne obok klastra)
+> ssh root@<IP_SERWERA> "cd /opt && docker compose -f docker-compose.ops.yml up -d"
+>
+> # Status:
+> ssh root@<IP_SERWERA> "docker compose -f /opt/docker-compose.ops.yml ps"
+> ```
+>
+> Reszta tej sekcji opisuje co dalej: pierwsze logowanie do Ranchera (22.2), import klastra k3s (22.3), zabezpieczenie portów (22.5). Konfiguracja Uptime Kuma jest w sekcji "💡 Bonus: Uptime Kuma" niżej.
 
-Rancher działa jako kontener Docker — niezależnie od k3s. Na serwerze:
+### 22.1 Instalacja Ranchera (ręcznie, bez compose)
+
+Jeśli wolisz nie używać compose:
 
 ```bash
 docker run -d \
@@ -1524,7 +1905,7 @@ https://<IP_SERWERA>:8443
 
 > **Uwaga:** Rancher używa self-signed certyfikatu przy pierwszym uruchomieniu — przeglądarka pokaże ostrzeżenie, kliknij "Proceed anyway".
 
-### 21.2 Pierwsze logowanie
+### 22.2 Pierwsze logowanie
 
 Pobierz hasło bootstrapowe:
 
@@ -1534,7 +1915,7 @@ docker logs rancher 2>&1 | grep "Bootstrap Password"
 
 Zaloguj się i ustaw nowe hasło.
 
-### 21.3 Importuj klaster k3s
+### 22.3 Importuj klaster k3s
 
 1. W Rancherze kliknij **Import Existing** → **Generic**
 2. Nadaj nazwę klastrowi, np. `app`
@@ -1546,7 +1927,7 @@ kubectl apply -f https://<IP_RANCHERA>:8443/v3/import/xxxxx.yaml
 
 Po ~1 minucie klaster pojawi się w Rancherze ze statusem `Active`.
 
-### 21.4 Co możesz robić w UI
+### 22.4 Co możesz robić w UI
 
 | Funkcja                  | Gdzie w Rancherze                      |
 |--------------------------|----------------------------------------|
@@ -1559,7 +1940,7 @@ Po ~1 minucie klaster pojawi się w Rancherze ze statusem `Active`.
 | Zużycie CPU / RAM        | Cluster → Metrics                      |
 | CronJoby i Joby          | Workloads → CronJobs / Jobs            |
 
-### 21.5 Zabezpieczenie panelu Ranchera
+### 22.5 Zabezpieczenie panelu Ranchera
 
 Domyślnie Rancher jest dostępny publicznie na porcie 8443. Ogranicz dostęp przez firewall Hetzner (panel → Firewall) lub bezpośrednio na serwerze:
 
@@ -1764,7 +2145,16 @@ Dla stagingowego ingressu użyj subdomeny `staging.yourdomain.com`.
 
 ## 💡 Bonus: Uptime Kuma — monitoring dostępności
 
-Uptime Kuma to self-hosted alternatywa dla UptimeRobot. Działa jako kontener Docker obok Ranchera:
+Uptime Kuma to self-hosted alternatywa dla UptimeRobot.
+
+**Zalecane:** uruchom przez `docker-compose.ops.yml` razem z Rancherem (patrz sekcja 22 wyżej):
+
+```bash
+# Na serwerze
+cd /opt && docker compose -f docker-compose.ops.yml up -d uptime-kuma
+```
+
+Alternatywnie samodzielnie:
 
 ```bash
 docker run -d \
@@ -1775,7 +2165,7 @@ docker run -d \
   louislam/uptime-kuma:latest
 ```
 
-Wejdź na `https://<IP_SERWERA>:3001` i dodaj monitory dla:
+Wejdź na `http://<IP_SERWERA>:3001` i dodaj monitory dla:
 - `https://yourdomain.com` — frontend
 - `https://api.yourdomain.com/health` — Laravel API
 - `https://api.yourdomain.com/admin` — panel admina
