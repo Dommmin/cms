@@ -137,6 +137,7 @@ services:
 
   mailpit:
     image: axllent/mailpit
+    container_name: ${COMPOSE_PROJECT_NAME}_mailpit
     ports:
       - "1025:1025"
       - "8025:8025"
