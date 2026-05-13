@@ -199,7 +199,8 @@ class SearchController extends ApiController
         ];
 
         if (in_array($sort, $allowedSorts, true)) {
-            $builder->orderBy($sort);
+            [$column, $direction] = explode(':', $sort);
+            $builder->orderBy($column, $direction);
         }
     }
 
