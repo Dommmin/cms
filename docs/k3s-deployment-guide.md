@@ -1834,7 +1834,30 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 
 GlitchTip to self-hosted, open-source alternatywa dla Sentry. Używa tego samego SDK co Sentry — nie trzeba zmieniać kodu, wystarczy podmienić DSN na adres własnej instancji.
 
-Uruchom GlitchTip w **osobnym namespace** na tym samym klastrze, używając oficjalnego chart Helma:
+### 21.1 Przygotuj `values.yaml`
+
+W repo jest `k8s/glitchtip/values.example.yaml` jako szablon. **Nigdy nie commituj** plików z prawdziwymi sekretami — `.gitignore` już ignoruje `k8s/glitchtip/values.yaml`:
+
+```bash
+cp k8s/glitchtip/values.example.yaml k8s/glitchtip/values.yaml
+```
+
+Edytuj `k8s/glitchtip/values.yaml` i ustaw:
+
+| Klucz | Czym wypełnić |
+|---|---|
+| `glitchtip.env.SECRET_KEY` | Losowy 50-znakowy hex: `openssl rand -hex 25` |
+| `glitchtip.env.GLITCHTIP_DOMAIN` | Domena/subdomena Glitchtip, np. `glitchtip.laravel-test.site` (musi mieć rekord DNS A na IP serwera) |
+| `glitchtip.env.DEFAULT_FROM_EMAIL` | Adres "Od" w mailach z alertami, np. `noreply@laravel-test.site` |
+| `glitchtip.env.EMAIL_URL` | URL SMTP do wysyłki alertów: `smtp://USER:APP_PASSWORD@smtp.gmail.com:587` (dla Gmail — wygeneruj [App Password](https://myaccount.google.com/apppasswords)) |
+| `glitchtip.ingress.className` | **Zmień `nginx` → `traefik`** (k3s domyślnie używa Traefika) |
+| `glitchtip.ingress.hosts[0].host` | Ta sama domena co `GLITCHTIP_DOMAIN` |
+| `glitchtip.ingress.tls[0].hosts[0]` | Ta sama domena |
+| `postgresql.auth.password` | Silne hasło do wbudowanej bazy Postgres (Glitchtip używa Postgres, nie MySQL) |
+
+> **Uwaga:** Po wygenerowaniu SECRET_KEY zachowaj go — zmiana po starcie unieważnia wszystkie sesje i tokeny w Glitchtip.
+
+### 21.2 Instalacja Helm
 
 ```bash
 helm repo add glitchtip https://glitchtip.github.io/helm-charts
@@ -1842,19 +1865,28 @@ helm repo update
 helm upgrade --install glitchtip glitchtip/glitchtip \
   --namespace glitchtip \
   --create-namespace \
-  -f k8s/glitchtip/values.example.yaml
+  -f k8s/glitchtip/values.yaml
 ```
 
-Przed zastosowaniem edytuj `k8s/glitchtip/values.example.yaml` — ustaw domenę, email, SMTP i hasło bazy danych.
+`bootstrap.sh` **wykrywa automatycznie** czy istnieje `values.yaml` — jeśli tak, używa go; jeśli nie, ostrzega żebyś go najpierw stworzył.
 
-Po instalacji:
-1. Utwórz organizację w UI GlitchTip
-2. Utwórz projekty `cms-api` i `cms-frontend`
-3. Skopiuj DSN do sekretów produkcyjnych:
-   - Laravel: `GLITCHTIP_DSN=https://...@glitchtip.yourdomain.com/1`
-   - Next.js (build arg): `NEXT_PUBLIC_GLITCHTIP_DSN=https://...@glitchtip.yourdomain.com/2`
+### 21.3 Konfiguracja po instalacji
 
-> **Uwaga:** `values.example.yaml` używa `ingressClassName: nginx` — zmień na `traefik` jeśli chcesz żeby GlitchTip działał za tym samym Traefikiem.
+1. Otwórz `https://glitchtip.laravel-test.site` (poczekaj 1–2 min na certyfikat TLS od cert-manager)
+2. Utwórz organizację (np. `cms`)
+3. Utwórz dwa projekty: `cms-api` (platform: PHP/Laravel) i `cms-frontend` (platform: Next.js)
+4. Skopiuj DSN-y z **Settings → Client Keys (DSN)** każdego projektu
+5. Wpisz do CI/CD:
+   - Laravel: `GLITCHTIP_DSN=https://...@glitchtip.laravel-test.site/1` (w `PROD_ENV`)
+   - Next.js (build arg): `NEXT_PUBLIC_GLITCHTIP_DSN=https://...@glitchtip.laravel-test.site/2` (w `ENV_CLIENT_PROD`)
+6. Triggernij deploy — od następnego rolloutu błędy lecą do Glitchtip.
+
+**Test:** w Laravel pod admin shell:
+```bash
+kubectl -n app exec deployment/app-server -- \
+  php artisan tinker --execute='throw new \Exception("glitchtip test event");'
+```
+Po ~30 sek event pojawi się w UI Glitchtip → Issues.
 
 ---
 

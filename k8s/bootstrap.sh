@@ -399,18 +399,33 @@ step_glitchtip() {
   if ! command -v helm &>/dev/null; then
     warn "helm not found — skipping GlitchTip. Install helm and run manually:"
     warn "  helm repo add glitchtip https://glitchtip.github.io/helm-charts"
-    warn "  helm upgrade --install glitchtip glitchtip/glitchtip --namespace glitchtip --create-namespace -f k8s/glitchtip/values.example.yaml"
+    warn "  helm upgrade --install glitchtip glitchtip/glitchtip --namespace glitchtip --create-namespace -f k8s/glitchtip/values.yaml"
     return
   fi
 
-  info "Edit k8s/glitchtip/values.example.yaml first (domain, email, passwords)."
-  prompt "Have you edited values.example.yaml? [y/N]:"
-  read -r EDITED; EDITED="${EDITED:-N}"
-
-  if [[ "$EDITED" != [Yy] ]]; then
-    warn "Skipping GlitchTip — edit the file and run manually:"
-    warn "  helm repo add glitchtip https://glitchtip.github.io/helm-charts && helm repo update"
-    warn "  helm upgrade --install glitchtip glitchtip/glitchtip --namespace glitchtip --create-namespace -f k8s/glitchtip/values.example.yaml"
+  # Prefer values.yaml (gitignored, real secrets) over values.example.yaml (template).
+  local VALUES_FILE
+  if [ -f "k8s/glitchtip/values.yaml" ]; then
+    VALUES_FILE="k8s/glitchtip/values.yaml"
+    ok "Found k8s/glitchtip/values.yaml — using it."
+  elif [ -f "k8s/glitchtip/values.example.yaml" ]; then
+    warn "k8s/glitchtip/values.yaml not found — only the template values.example.yaml exists."
+    warn "Copy it and fill in real secrets BEFORE installing GlitchTip:"
+    warn "  cp k8s/glitchtip/values.example.yaml k8s/glitchtip/values.yaml"
+    warn "  # then edit k8s/glitchtip/values.yaml — set SECRET_KEY, GLITCHTIP_DOMAIN,"
+    warn "  # DEFAULT_FROM_EMAIL, EMAIL_URL, postgresql.auth.password, ingress.className=traefik"
+    prompt "Skip GlitchTip for now? [Y/n]:"
+    read -r SKIP_GLITCHTIP; SKIP_GLITCHTIP="${SKIP_GLITCHTIP:-Y}"
+    if [[ "$SKIP_GLITCHTIP" == [Yy] ]]; then
+      warn "Skipping GlitchTip — re-run manually after editing values.yaml:"
+      warn "  helm repo add glitchtip https://glitchtip.github.io/helm-charts && helm repo update"
+      warn "  helm upgrade --install glitchtip glitchtip/glitchtip --namespace glitchtip --create-namespace -f k8s/glitchtip/values.yaml"
+      return
+    fi
+    warn "Proceeding with template values.example.yaml — GlitchTip will use placeholder secrets (do NOT use in production)."
+    VALUES_FILE="k8s/glitchtip/values.example.yaml"
+  else
+    error "Neither values.yaml nor values.example.yaml found in k8s/glitchtip/ — skipping."
     return
   fi
 
@@ -419,8 +434,8 @@ step_glitchtip() {
   helm upgrade --install glitchtip glitchtip/glitchtip \
     --namespace glitchtip \
     --create-namespace \
-    -f k8s/glitchtip/values.example.yaml
-  ok "GlitchTip deployed to namespace glitchtip"
+    -f "$VALUES_FILE"
+  ok "GlitchTip deployed to namespace glitchtip (values: $VALUES_FILE)"
 }
 
 # ─── Step 13: Ops tooling (Rancher + Uptime Kuma via docker-compose) ─────────

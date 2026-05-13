@@ -167,5 +167,6 @@ Homestead.json
 
 # k8s
 /k8s/*/secret.yaml
+/k8s/glitchtip/values.yaml
 /letsencrypt-prod.yaml
 server/storage/media-library/temp
