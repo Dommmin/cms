@@ -28,19 +28,29 @@ spec:
         - name: queue
           image: ghcr.io/dommmin/cms-server:latest  # replaced by CI
           imagePullPolicy: Always
+          # mkdir ensures storage/framework subdirs exist before worker starts
+          # (required for queued Excel exports, file sessions, view cache)
           # --max-time restarts worker hourly to prevent memory leaks
           command:
-            - php
-            - artisan
-            - queue:work
-            - --tries=3
-            - --sleep=3
-            - --max-time=3600
-            - --no-ansi
+            - sh
+            - -c
+            - |
+              mkdir -p storage/framework/cache/laravel-excel \
+                       storage/framework/cache/data \
+                       storage/framework/sessions \
+                       storage/framework/views \
+                && chown -R www-data:www-data storage 2>/dev/null || true
+              exec php artisan queue:work --tries=3 --sleep=3 --max-time=3600 --no-ansi
           volumeMounts:
             - name: env-file
               mountPath: /var/www/html/.env
               subPath: .env
+            - name: storage
+              mountPath: /var/www/html/storage/app
+              subPath: app
+            - name: storage
+              mountPath: /var/www/html/storage/logs
+              subPath: logs
           resources:
             requests:
               cpu: 100m
@@ -58,5 +68,11 @@ spec:
         - name: env-file
           secret:
             secretName: cms-server-env
+        # Shared with cms-server so queued exports (Excel) are visible to web pod.
+        # PVC is ReadWriteOnce — works on single-node k3s (all pods land on same node).
+        # For multi-node clusters: switch exports to S3/MinIO disk.
+        - name: storage
+          persistentVolumeClaim:
+            claimName: cms-server-storage
       imagePullSecrets:
         - name: ghcr-pull-secret
