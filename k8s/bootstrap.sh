@@ -446,7 +446,7 @@ step_glitchtip() {
     warn "Install helm, then re-run this script (or run the 3 commands manually):"
     warn "  macOS:  brew install helm"
     warn "  Linux:  curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash"
-    warn "  then:   helm repo add glitchtip https://glitchtip.github.io/helm-charts && helm repo update"
+    warn "  then:   helm repo add glitchtip https://gitlab.com/api/v4/projects/16325141/packages/helm/stable && helm repo update"
     warn "          helm upgrade --install glitchtip glitchtip/glitchtip --namespace glitchtip --create-namespace -f k8s/glitchtip/values.yaml"
     return
   fi
@@ -466,7 +466,7 @@ step_glitchtip() {
     read -r SKIP_GLITCHTIP; SKIP_GLITCHTIP="${SKIP_GLITCHTIP:-Y}"
     if [[ "$SKIP_GLITCHTIP" == [Yy] ]]; then
       warn "Skipping GlitchTip — re-run manually after editing values.yaml:"
-      warn "  helm repo add glitchtip https://glitchtip.github.io/helm-charts && helm repo update"
+      warn "  helm repo add glitchtip https://gitlab.com/api/v4/projects/16325141/packages/helm/stable && helm repo update"
       warn "  helm upgrade --install glitchtip glitchtip/glitchtip --namespace glitchtip --create-namespace -f k8s/glitchtip/values.yaml"
       return
     fi
@@ -477,8 +477,12 @@ step_glitchtip() {
     return
   fi
 
-  helm repo add glitchtip https://glitchtip.github.io/helm-charts 2>/dev/null || true
-  helm repo update
+  # --force-update makes `helm repo add` idempotent (succeeds whether the repo
+  # is new or already present, and refreshes the URL if it changed). No more
+  # `2>/dev/null || true`, which used to hide a failed add and then surface as
+  # a confusing "helm repo update: no repositories found".
+  helm repo add glitchtip https://gitlab.com/api/v4/projects/16325141/packages/helm/stable --force-update
+  helm repo update glitchtip
   helm upgrade --install glitchtip glitchtip/glitchtip \
     --namespace glitchtip \
     --create-namespace \

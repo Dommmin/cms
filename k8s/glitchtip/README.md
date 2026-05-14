@@ -22,7 +22,7 @@ cp k8s/glitchtip/values.example.yaml k8s/glitchtip/values.yaml
 #      postgresql.auth.password
 
 # 3. Install (or upgrade) the chart
-helm repo add glitchtip https://glitchtip.github.io/helm-charts
+helm repo add glitchtip https://gitlab.com/api/v4/projects/16325141/packages/helm/stable
 helm repo update
 helm upgrade --install glitchtip glitchtip/glitchtip \
   --namespace glitchtip \

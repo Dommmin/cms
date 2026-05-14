@@ -1916,7 +1916,7 @@ Edytuj `k8s/glitchtip/values.yaml` i ustaw:
 ### 21.2 Instalacja Helm
 
 ```bash
-helm repo add glitchtip https://glitchtip.github.io/helm-charts
+helm repo add glitchtip https://gitlab.com/api/v4/projects/16325141/packages/helm/stable
 helm repo update
 helm upgrade --install glitchtip glitchtip/glitchtip \
   --namespace glitchtip \
