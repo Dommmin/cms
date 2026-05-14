@@ -61,7 +61,7 @@ COPY --from=vendor /app/vendor ./vendor
 COPY --from=assets /app/public/build ./public/build
 
 # PHP config
-COPY .docker/php/php.ini /usr/local/etc/php/conf.d/app.ini
+COPY .docker/php/php.prod.ini /usr/local/etc/php/conf.d/app.ini
 COPY .docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 # Nginx: production config (HTTP only — TLS terminated at ingress)
