@@ -107,6 +107,38 @@ Everything runs in the `cms-prod` namespace. MySQL and Redis have persistent vol
 
 ### 3.1 Create the server
 
+#### If you don't have an SSH key yet
+
+You create the SSH key on your **local machine**, not on the server. If the file `~/.ssh/id_ed25519.pub` already exists, you can skip this step.
+
+Check whether you already have a key:
+
+```bash
+ls -la ~/.ssh/id_ed25519 ~/.ssh/id_ed25519.pub
+```
+
+If the files don't exist, generate a new key:
+
+```bash
+ssh-keygen -t ed25519 -C "your-email@example.com"
+```
+
+When `ssh-keygen` asks for a path, keep the default:
+
+```bash
+~/.ssh/id_ed25519
+```
+
+A passphrase is optional but recommended. If you set one, the system will ask for the key's password on first use in a session.
+
+Print the public key:
+
+```bash
+cat ~/.ssh/id_ed25519.pub
+```
+
+Copy the entire output starting with `ssh-ed25519`. That **public** key is what you paste into the Hetzner panel. Never copy or send the `~/.ssh/id_ed25519` file — that's the private key.
+
 In the Hetzner Cloud panel ([console.hetzner.cloud](https://console.hetzner.cloud)):
 
 1. **Location:** Falkenstein (EU — low latency)
@@ -124,6 +156,43 @@ In the Hetzner Cloud panel ([console.hetzner.cloud](https://console.hetzner.clou
 | Inbound | TCP      | 6443 | Your IP (kubectl API)               |
 
 > Port 6443 is the Kubernetes API server. Restrict it to your IP — there's no reason for it to be public.
+
+#### If you forgot to add the SSH key when creating the server
+
+The easiest fix is to do it before you disable password login.
+
+If you can log in as `root` with a password, add the key from your local machine:
+
+```bash
+ssh-copy-id -i ~/.ssh/id_ed25519.pub root@<SERVER_IP>
+```
+
+Then verify key-based login:
+
+```bash
+ssh -i ~/.ssh/id_ed25519 root@<SERVER_IP>
+```
+
+If `ssh-copy-id` isn't available, do it manually:
+
+```bash
+# On your local machine
+cat ~/.ssh/id_ed25519.pub
+```
+
+Copy the output, log into the server with a password via SSH or the Hetzner console, then run:
+
+```bash
+# On the server
+mkdir -p ~/.ssh
+nano ~/.ssh/authorized_keys
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+```
+
+Paste the public key into `authorized_keys`, save the file, and test the new login from a second terminal.
+
+If you can log in with neither a password nor a key, use the Hetzner console or Rescue mode, add the key to `/root/.ssh/authorized_keys`, and in the worst case rebuild the server with the key added correctly. Don't disable `PasswordAuthentication` until you've confirmed key-based login works.
 
 ### 3.2 Log in and update the system
 
@@ -2283,6 +2352,17 @@ Sends notifications via Slack, email, Telegram, and many other channels.
 
 When you want to scale to `replicas: 2+`, a PVC with `ReadWriteOnce` is not enough — two pods cannot write to the same volume simultaneously. The solution is **MinIO** — self-hosted storage compatible with the Amazon S3 API.
 
+```
+replicas: 2
+
+Pod A ──► MinIO API (port 9000) ──► /data (PVC)
+Pod B ──►
+```
+
+Both pods write to MinIO over HTTP — MinIO manages the disk itself.
+
+### Deploying MinIO
+
 ```bash
 # Secret (copy and fill in)
 cp k8s/minio/secret.yaml.example k8s/minio/secret.yaml
@@ -2293,9 +2373,33 @@ kubectl apply -f k8s/minio/secret.yaml
 kubectl apply -f k8s/minio/pvc.yaml
 kubectl apply -f k8s/minio/deployment.yaml
 kubectl apply -f k8s/minio/service.yaml
+
+# Check
+kubectl -n cms-prod get pods | grep minio
+# cms-minio-xxxxxxxxx-xxxxx   1/1   Running   0   1m
 ```
 
-Create a bucket and configure Laravel:
+### Create a bucket
+
+MinIO has a web panel on port 9001. Create a temporary port-forward:
+
+```bash
+kubectl -n cms-prod port-forward svc/cms-minio 9001:9001
+```
+
+Open `http://localhost:9001`, log in with the credentials from the secret, and create a bucket named `cms`.
+
+Or via the CLI without the UI:
+
+```bash
+kubectl -n cms-prod exec deployment/cms-minio -- \
+  mc alias set local http://localhost:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
+
+kubectl -n cms-prod exec deployment/cms-minio -- \
+  mc mb local/cms
+```
+
+### Laravel configuration (.env)
 
 ```dotenv
 FILESYSTEM_DISK=s3
@@ -2305,7 +2409,23 @@ AWS_DEFAULT_REGION=us-east-1
 AWS_BUCKET=cms
 AWS_ENDPOINT=http://cms-minio.cms-prod.svc.cluster.local:9000
 AWS_USE_PATH_STYLE_ENDPOINT=true   # required for MinIO
-AWS_URL=https://admin.yourdomain.com/storage
+AWS_URL=https://admin.yourdomain.com/storage   # public URL via the Nginx proxy
+```
+
+> **Public file access:** MinIO runs inside the cluster. To make files publicly available, add an Ingress rule, or configure the MinIO bucket as public and expose port 9000 via Ingress on a separate subdomain (e.g. `storage.yourdomain.com`).
+
+### Migrating from PVC to MinIO
+
+If you already have files on the PVC and want to move them to MinIO:
+
+```bash
+# Copy files from the server pod to MinIO
+kubectl -n cms-prod exec deployment/cms-server -- \
+  aws s3 sync storage/app/public s3://cms/public \
+  --endpoint-url http://cms-minio.cms-prod.svc.cluster.local:9000
+
+# Then set FILESYSTEM_DISK=s3 in .env and restart
+kubectl -n cms-prod rollout restart deployment/cms-server
 ```
 
 ---

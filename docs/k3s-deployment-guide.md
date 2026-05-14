@@ -1401,6 +1401,16 @@ Dzięki temu migracje zawsze są przed nowym kodem — żadnych „column does n
 
 GitHub Container Registry (GHCR) jest wbudowany w GitHub — nie musisz konfigurować żadnego zewnętrznego rejestru. Pipeline automatycznie loguje się z `GITHUB_TOKEN` (dostępny automatycznie w każdym workflow).
 
+### 14.4 GitHub Environments i ochrona deploymentu
+
+Job `deploy` używa `environment: production`. Reguły ochrony skonfigurujesz w **Settings → Environments → production**:
+
+- Wymagani recenzenci przed deployem
+- Wait timer (np. 5-minutowe opóźnienie)
+- Whitelist gałęzi deploymentu
+
+Job używa też grupy `concurrency` (`production-deploy`) z `cancel-in-progress: false` — trwający deploy **nigdy** nie jest anulowany przez kolejny push.
+
 ---
 
 ## 15. Konfiguracja GitLab CI/CD
@@ -1547,6 +1557,12 @@ kubectl -n app exec -it deployment/app-server -- \
 # Queue workers działają
 kubectl -n app logs deployment/app-queue --tail=20
 ```
+
+### Health probes
+
+Deployment serwera ma dwa probe'y:
+- **Liveness** (`/healthz`): poziom nginx — Kubernetes restartuje poda, jeśli proces jest martwy
+- **Readiness** (`/health`): endpoint health Laravela — Kubernetes nie kieruje ruchu, dopóki aplikacja nie jest gotowa
 
 ### Test uploadów
 
