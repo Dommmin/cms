@@ -481,13 +481,28 @@ step_glitchtip() {
   # is new or already present, and refreshes the URL if it changed). No more
   # `2>/dev/null || true`, which used to hide a failed add and then surface as
   # a confusing "helm repo update: no repositories found".
-  helm repo add glitchtip https://gitlab.com/api/v4/projects/16325141/packages/helm/stable --force-update
-  helm repo update glitchtip
-  helm upgrade --install glitchtip glitchtip/glitchtip \
-    --namespace glitchtip \
-    --create-namespace \
-    -f "$VALUES_FILE"
-  ok "GlitchTip deployed to namespace glitchtip (values: $VALUES_FILE)"
+  #
+  # GlitchTip is OPTIONAL — a helm failure here must NOT abort the whole
+  # bootstrap (Step 13 and the summary still need to run). Wrap in a subshell
+  # guarded against `set -e` so a bad values file / missing dependency just
+  # warns and moves on.
+  if (
+    set -e
+    helm repo add glitchtip https://gitlab.com/api/v4/projects/16325141/packages/helm/stable --force-update
+    helm repo update glitchtip
+    helm upgrade --install glitchtip glitchtip/glitchtip \
+      --namespace glitchtip \
+      --create-namespace \
+      -f "$VALUES_FILE"
+  ); then
+    ok "GlitchTip deployed to namespace glitchtip (values: $VALUES_FILE)"
+  else
+    warn "GlitchTip install failed — continuing bootstrap without it (it's optional)."
+    warn "Most common cause: values file written for an older chart version."
+    warn "Check the current schema:  helm show values glitchtip/glitchtip"
+    warn "Or skip self-hosting entirely — use a hosted DSN (app.glitchtip.com)"
+    warn "and just set GLITCHTIP_DSN in PROD_ENV."
+  fi
 }
 
 # ─── Step 13: Ops tooling (Rancher + Uptime Kuma via docker-compose) ─────────
