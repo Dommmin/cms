@@ -2006,10 +2006,15 @@ If you use Rancher at work, you can run it on the same VPS. You'll get the exact
 >
 > The repo ships a ready-made `docker-compose.ops.yml` (project root) containing Rancher (ports 8080/8443) and Uptime Kuma (port 3001) with persistent volumes `/opt/rancher` and `/opt/uptime-kuma`.
 >
+> **⚠️ Docker is required on the server.** These tools run as **Docker containers alongside k3s** (the monitor-the-monitor pattern — see above). A pure k3s server only has `containerd`, **not Docker**. `bootstrap.sh` (Step 13) detects this and installs Docker automatically (`curl -fsSL https://get.docker.com | sudo sh`). If you do it manually — install Docker first. Docker and k3s/containerd coexist fine (separate sockets).
+>
 > **SSH user:** use an account with **passwordless sudo** — `ssh host "sudo …"` has no TTY, so password-prompting sudo will hang. Default cloud accounts usually have it (`root` on Hetzner, `ubuntu` on OVHcloud/AWS). If you use your own account (e.g. `deployer`), see the "The `deployer` account for ops operations" box below.
 >
 > ```bash
 > # Assume SSH_HOST=ubuntu@<SERVER_IP>  (on Hetzner: root@<SERVER_IP>)
+>
+> # 0. Install Docker if missing (k3s has its own containerd — this is separate)
+> ssh $SSH_HOST "command -v docker || (curl -fsSL https://get.docker.com -o /tmp/d.sh && sudo sh /tmp/d.sh)"
 >
 > # 1. Host directories (scp can't sudo — /opt is root-owned)
 > ssh $SSH_HOST "sudo mkdir -p /opt/rancher /opt/uptime-kuma && sudo chown -R 1000:1000 /opt/uptime-kuma"
@@ -2025,7 +2030,7 @@ If you use Rancher at work, you can run it on the same VPS. You'll get the exact
 > ssh $SSH_HOST "cd /opt && sudo docker compose -f docker-compose.ops.yml ps"
 > ```
 >
-> `bootstrap.sh` (Step 13) does exactly this automatically — it prompts for `user@ip`.
+> `bootstrap.sh` (Step 13) does exactly this automatically — it prompts for `user@ip` and installs Docker if needed.
 >
 > The rest of this section covers what comes next: the first Rancher login (22.2), importing the k3s cluster (22.3), securing the ports (22.5). Uptime Kuma configuration is in the "💡 Bonus: Uptime Kuma" section below.
 

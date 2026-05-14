@@ -1954,10 +1954,15 @@ Jeśli w pracy korzystasz z Ranchera, możesz go postawić na tym samym VPS. Dos
 >
 > W repo jest gotowy plik `docker-compose.ops.yml` (root projektu), który zawiera Rancher (porty 8080/8443) i Uptime Kuma (port 3001) z trwałymi wolumenami `/opt/rancher` i `/opt/uptime-kuma`.
 >
+> **⚠️ Wymagany Docker na serwerze.** Te narzędzia działają jako kontenery **Docker obok k3s** (wzorzec monitor-the-monitor — patrz wcześniej). Czysty serwer k3s ma tylko `containerd`, **nie ma Dockera**. `bootstrap.sh` (Krok 13) wykrywa to i instaluje Docker automatycznie (`curl -fsSL https://get.docker.com | sudo sh`). Jeśli robisz to ręcznie — zainstaluj Docker najpierw. Docker i k3s/containerd współistnieją bez problemu (osobne sockety).
+>
 > **Użytkownik SSH:** użyj konta, które ma **passwordless sudo** — `ssh host "sudo …"` nie ma TTY, więc sudo z hasłem zawiśnie. Domyślne konta chmurowe zwykle to mają (`root` na Hetzner, `ubuntu` na OVHcloud/AWS). Jeśli używasz własnego konta (np. `deployer`) — patrz ramka "Konto `deployer` do operacji ops" niżej.
 >
 > ```bash
 > # Załóżmy SSH_HOST=ubuntu@<IP_SERWERA>  (na Hetzner: root@<IP_SERWERA>)
+>
+> # 0. Zainstaluj Docker jeśli go nie ma (k3s ma własny containerd — to osobna sprawa)
+> ssh $SSH_HOST "command -v docker || (curl -fsSL https://get.docker.com -o /tmp/d.sh && sudo sh /tmp/d.sh)"
 >
 > # 1. Katalogi na hoście (scp nie umie sudo — /opt jest root-owned)
 > ssh $SSH_HOST "sudo mkdir -p /opt/rancher /opt/uptime-kuma && sudo chown -R 1000:1000 /opt/uptime-kuma"
@@ -1973,7 +1978,7 @@ Jeśli w pracy korzystasz z Ranchera, możesz go postawić na tym samym VPS. Dos
 > ssh $SSH_HOST "cd /opt && sudo docker compose -f docker-compose.ops.yml ps"
 > ```
 >
-> `bootstrap.sh` (Krok 13) robi dokładnie to samo automatycznie — pyta o `user@ip`.
+> `bootstrap.sh` (Krok 13) robi dokładnie to samo automatycznie — pyta o `user@ip`, instaluje Docker jeśli trzeba.
 >
 > Reszta tej sekcji opisuje co dalej: pierwsze logowanie do Ranchera (22.2), import klastra k3s (22.3), zabezpieczenie portów (22.5). Konfiguracja Uptime Kuma jest w sekcji "💡 Bonus: Uptime Kuma" niżej.
 

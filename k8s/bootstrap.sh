@@ -67,6 +67,14 @@ check_prereqs() {
     ok "k8s/ manifests: found"
   fi
 
+  # Soft checks — not fatal, the related steps just get skipped.
+  if command -v helm &>/dev/null; then
+    ok "helm: present (GlitchTip step available)"
+  else
+    warn "helm: not found — the GlitchTip step (12) will be skipped."
+    warn "      Install now if you want it: macOS 'brew install helm'."
+  fi
+
   if [ "$missing" -eq 1 ]; then
     error "Prerequisites not met. Fix the issues above and re-run."
     exit 1
@@ -434,9 +442,12 @@ step_glitchtip() {
   section "Step 12 — GlitchTip (error tracking)"
 
   if ! command -v helm &>/dev/null; then
-    warn "helm not found — skipping GlitchTip. Install helm and run manually:"
-    warn "  helm repo add glitchtip https://glitchtip.github.io/helm-charts"
-    warn "  helm upgrade --install glitchtip glitchtip/glitchtip --namespace glitchtip --create-namespace -f k8s/glitchtip/values.yaml"
+    warn "helm not found — skipping GlitchTip."
+    warn "Install helm, then re-run this script (or run the 3 commands manually):"
+    warn "  macOS:  brew install helm"
+    warn "  Linux:  curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash"
+    warn "  then:   helm repo add glitchtip https://glitchtip.github.io/helm-charts && helm repo update"
+    warn "          helm upgrade --install glitchtip glitchtip/glitchtip --namespace glitchtip --create-namespace -f k8s/glitchtip/values.yaml"
     return
   fi
 
@@ -488,6 +499,10 @@ step_ops_tooling() {
     return
   fi
 
+  # Rancher + Uptime Kuma run as plain Docker containers ALONGSIDE k3s — not
+  # inside it (monitor-the-monitor pattern). A pure k3s server has only
+  # containerd, NOT Docker, so we install Docker first if it's missing.
+  #
   # Works with a non-root, sudo-capable SSH user (e.g. OVHcloud's `ubuntu`,
   # or a hand-made `deployer`). `scp` runs as that user and CANNOT write to
   # root-owned /opt — so we stage the file in the user's home, then `sudo mv`.
@@ -496,6 +511,16 @@ step_ops_tooling() {
   local _ssh=""
   if [ -n "${OPS_SSH_HOST:-}" ]; then
     _ssh="ssh ${OPS_SSH_HOST}"
+
+    if $_ssh "command -v docker" >/dev/null 2>&1; then
+      ok "Docker already installed on the server"
+    else
+      info "Docker not found on the server — installing (k3s uses its own"
+      info "containerd; Docker is separate, for the ops tools only)..."
+      $_ssh "curl -fsSL https://get.docker.com -o /tmp/get-docker.sh && sudo sh /tmp/get-docker.sh && rm -f /tmp/get-docker.sh"
+      ok "Docker installed"
+    fi
+
     info "Provisioning host dirs on ${OPS_SSH_HOST}..."
     $_ssh "sudo mkdir -p /opt/rancher /opt/uptime-kuma && sudo chown -R 1000:1000 /opt/uptime-kuma"
     info "Copying docker-compose.ops.yml to the server (staged in home, then moved)..."
@@ -506,6 +531,11 @@ step_ops_tooling() {
     $_ssh "cd /opt && sudo docker compose -f docker-compose.ops.yml ps"
   else
     info "Running locally (assuming this script is on the server)..."
+    if ! command -v docker >/dev/null 2>&1; then
+      info "Docker not found — installing..."
+      curl -fsSL https://get.docker.com -o /tmp/get-docker.sh && sudo sh /tmp/get-docker.sh && rm -f /tmp/get-docker.sh
+      ok "Docker installed"
+    fi
     sudo mkdir -p /opt/rancher /opt/uptime-kuma
     sudo chown -R 1000:1000 /opt/uptime-kuma
     sudo cp docker-compose.ops.yml /opt/docker-compose.ops.yml
