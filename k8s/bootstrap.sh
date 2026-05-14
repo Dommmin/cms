@@ -199,7 +199,44 @@ step_cert_manager() {
   kubectl -n cert-manager rollout status deployment/cert-manager --timeout=3m
   kubectl -n cert-manager rollout status deployment/cert-manager-webhook --timeout=3m
   kubectl -n cert-manager rollout status deployment/cert-manager-cainjector --timeout=3m
-  ok "cert-manager is ready"
+  ok "cert-manager pods are running"
+
+  # `rollout status` is NOT enough — the webhook's serving cert is injected by
+  # cainjector AFTER the pod reports ready. Hitting the API too early fails with
+  # 'tls: failed to verify certificate: x509: certificate signed by unknown
+  # authority'. Probe the webhook with a server-side dry-run until it answers.
+  info "Waiting for cert-manager webhook to be reachable (server-side probe)..."
+  local webhook_ok=0
+  for i in $(seq 1 36); do
+    if kubectl apply --dry-run=server -f - >/dev/null 2>&1 <<EOF
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: bootstrap-webhook-probe
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: ${LETSENCRYPT_EMAIL}
+    privateKeySecretRef:
+      name: bootstrap-webhook-probe
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: traefik
+EOF
+    then
+      webhook_ok=1
+      ok "cert-manager webhook is reachable (after ${i} attempt(s))"
+      break
+    fi
+    sleep 5
+  done
+
+  if [ "$webhook_ok" -ne 1 ]; then
+    error "cert-manager webhook did not become reachable after 180s."
+    error "Check: kubectl -n cert-manager get pods; kubectl -n cert-manager logs deploy/cert-manager-webhook"
+    exit 1
+  fi
 
   info "Creating ClusterIssuer for Let's Encrypt..."
   kubectl apply -f - <<EOF

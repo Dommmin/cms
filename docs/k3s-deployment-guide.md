@@ -1727,6 +1727,27 @@ Najczęstsze przyczyny:
 - **servicelb wyłączone bez chmurowego LB** — porty 80/443 niedostępne na hoście; sprawdź `sudo ss -tlnp | grep :80` na serwerze; jeśli nic nie nasłuchuje — patrz sekcja 4.1
 - Przekroczyłeś limit certyfikatów Let's Encrypt (5 na tydzień na domenę)
 
+### cert-manager: `x509: certificate signed by unknown authority` przy tworzeniu ClusterIssuer
+
+```
+Error from server (InternalError): error when creating "STDIN": Internal error
+occurred: failed calling webhook "webhook.cert-manager.io": ... tls: failed to
+verify certificate: x509: certificate signed by unknown authority
+```
+
+Race condition: pody cert-managera są `Running`, ale `cainjector` nie zdążył jeszcze wstrzyknąć certyfikatu serwującego do webhooka. `kubectl rollout status` tego **nie** wykrywa — pod jest "ready" zanim webhook faktycznie odpowiada.
+
+`bootstrap.sh` ma na to probe (server-side dry-run w pętli, do 180 s). Jeśli mimo to trafisz na ten błąd przy ręcznej instalacji — po prostu poczekaj ~30 s i ponów `kubectl apply` ClusterIssuera:
+
+```bash
+# sprawdź że webhook faktycznie odpowiada
+kubectl -n cert-manager get pods
+until kubectl apply --dry-run=server -f k8s/cert-manager/cluster-issuer.yaml >/dev/null 2>&1; do
+  echo "webhook not ready yet, retrying in 5s..."; sleep 5
+done
+kubectl apply -f k8s/cert-manager/cluster-issuer.yaml
+```
+
 ### Laravel zwraca błąd 500
 
 ```bash
