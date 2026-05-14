@@ -171,9 +171,9 @@ enum PageBlockTypeEnum: string
     // Relations: which external models can be attached to this block
     // Keys are arbitrary relation slot names used in block_relations.relation_key
     'allowed_relations' => [
-        'background_image' => ['media.image'],          // single media
-        'linked_products'  => ['product'],              // product models
-        'linked_form'      => ['form'],                 // a Form model
+        'background_image' => ['types' => ['media.image'], 'multiple' => false],
+        'linked_products'  => ['types' => ['product'], 'multiple' => true],
+        'linked_form'      => ['types' => ['form'], 'multiple' => false],
     ],
 
     // Schema: drives the auto-generated form. No frontend changes needed.
@@ -226,6 +226,12 @@ enum PageBlockTypeEnum: string
 ```
 
 That's it. The `DynamicBlockForm` component reads the schema and renders fields automatically.
+
+Server-side saves validate the same schema before anything is written. Unknown
+configuration keys, wrong primitive types, invalid enum values, oversized payloads,
+and relations outside `allowed_relations` are rejected with validation errors. Fields
+declared as `format: richtext` or `format: html` are sanitized recursively, including
+inside repeater items.
 
 ### Step 3: Add the block to the frontend preview
 
@@ -460,10 +466,15 @@ This renders only active sections and blocks, without the admin sidebar.
 ### How changes are saved
 
 1. User edits a section or block → `useBuilderState` updates local React state.
-2. User clicks **Save** → `router.put('/admin/cms/pages/{id}/builder', { sections })`.
-3. `PageBuilderController::update()` deletes all existing sections/blocks for the
+2. User clicks **Save** → `router.put('/admin/cms/pages/{id}/builder', { snapshot })`.
+3. `UpdatePageBuilderRequest` delegates to `PageBuilderSnapshotValidator`.
+4. The validator checks section types, block types, block configuration schemas,
+   relation contracts, relation model existence, payload limits, and sanitizes
+   rich HTML fields.
+5. `PageBuilderController::update()` passes the sanitized snapshot to
+   `PageBuilderSyncService::sync()`, which deletes existing sections/blocks for the
    page and re-creates them from the submitted snapshot.
-4. Inertia redirects back → page refreshes with fresh server data.
+6. Inertia redirects back → page refreshes with fresh server data.
 
 ### Important: Delete-and-recreate pattern
 
@@ -479,8 +490,22 @@ When Split View is active, a 1.5 s debounce timer triggers a **silent save** whe
 `localSections` changes. The iframe is reloaded on success. No toast is shown for
 auto-saves.
 
-### Snapshot mode
+### Shared snapshot validation
 
-If a `snapshot` key is present in the request payload, `PageBuilderController::update()`
-delegates to `PageBuilderSyncService::sync()` which performs a smarter diff-based
-sync instead of delete-and-recreate.
+Manual save, autosave, JSON import, reusable blocks, and section templates all use the
+same Page Builder validation services:
+
+- `App\Services\PageBuilder\BlockConfigurationValidator`
+- `App\Services\PageBuilder\PageBuilderSnapshotValidator`
+
+Relations must use the persisted contract:
+
+```json
+{
+  "relation_type": "product",
+  "relation_id": 123,
+  "relation_key": "products",
+  "position": 0,
+  "metadata": null
+}
+```

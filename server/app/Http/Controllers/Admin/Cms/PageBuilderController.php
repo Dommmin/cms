@@ -14,11 +14,13 @@ use App\Http\Requests\Admin\Cms\UpdateSectionRequest;
 use App\Models\Page;
 use App\Models\PageBlock;
 use App\Models\PageSection;
+use App\Services\PageBuilder\PageBuilderSnapshotValidator;
 use App\Services\PageBuilderSyncService;
 use App\Services\PagePreviewService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -27,6 +29,7 @@ class PageBuilderController extends Controller
     public function __construct(
         private readonly PageBuilderSyncService $syncService,
         private readonly PagePreviewService $pagePreviewService,
+        private readonly PageBuilderSnapshotValidator $snapshotValidator,
     ) {}
 
     public function show(int $page)
@@ -99,7 +102,7 @@ class PageBuilderController extends Controller
             ], 409);
         }
 
-        $this->syncService->sync($pageModel, $request->validated()['snapshot']);
+        $this->syncService->sync($pageModel, $request->input('snapshot'));
         Page::query()->where('id', $pageModel->id)->increment('version');
 
         return back();
@@ -117,7 +120,7 @@ class PageBuilderController extends Controller
             ], 409);
         }
 
-        $this->syncService->sync($pageModel, $request->validated()['snapshot']);
+        $this->syncService->sync($pageModel, $request->input('snapshot'));
         Page::query()->where('id', $pageModel->id)->increment('version');
 
         return response()->json([
@@ -240,7 +243,7 @@ class PageBuilderController extends Controller
 
     public function export(Page $page): SymfonyResponse
     {
-        $sections = $page->allSections()->with(['allBlocks'])->orderBy('position')->get();
+        $sections = $page->allSections()->with(['allBlocks.relations'])->orderBy('position')->get();
 
         $data = [
             'version' => '1.0',
@@ -258,6 +261,13 @@ class PageBuilderController extends Controller
                     'configuration' => $b->configuration,
                     'position' => $b->position,
                     'is_active' => $b->is_active,
+                    'relations' => $b->relations->map(fn ($rel): array => [
+                        'relation_type' => $rel->relation_type,
+                        'relation_id' => $rel->relation_id,
+                        'relation_key' => $rel->relation_key,
+                        'position' => $rel->position,
+                        'metadata' => $rel->metadata,
+                    ])->values()->all(),
                 ])->values()->all(),
             ])->values()->all(),
         ];
@@ -277,33 +287,19 @@ class PageBuilderController extends Controller
         $content = (string) file_get_contents((string) $request->file('file')->getRealPath());
         $data = json_decode($content, true);
 
-        if (! isset($data['sections']) || ! is_array($data['sections'])) {
+        if (! is_array($data) || ! isset($data['sections']) || ! is_array($data['sections'])) {
             return back()->withErrors(['file' => 'Invalid page export file.']);
         }
 
-        $page->allBlocks()->delete();
-        $page->allSections()->delete();
-
-        foreach ($data['sections'] as $sectionData) {
-            $section = $page->allSections()->create([
-                'section_type' => $sectionData['section_type'] ?? 'content',
-                'layout' => $sectionData['layout'] ?? 'contained',
-                'variant' => $sectionData['variant'] ?? null,
-                'settings' => $sectionData['settings'] ?? null,
-                'position' => $sectionData['position'] ?? 0,
-                'is_active' => $sectionData['is_active'] ?? true,
+        try {
+            $snapshot = $this->snapshotValidator->validateAndSanitize([
+                'sections' => $data['sections'],
             ]);
-
-            foreach ($sectionData['blocks'] ?? [] as $blockData) {
-                $section->allBlocks()->create([
-                    'page_id' => $page->id,
-                    'type' => $blockData['type'],
-                    'configuration' => $blockData['configuration'] ?? [],
-                    'position' => $blockData['position'] ?? 0,
-                    'is_active' => $blockData['is_active'] ?? true,
-                ]);
-            }
+        } catch (ValidationException $exception) {
+            return back()->withErrors($exception->errors());
         }
+
+        $this->syncService->sync($page, $snapshot);
 
         return back()->with('success', 'Page imported successfully.');
     }

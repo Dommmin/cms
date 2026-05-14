@@ -324,6 +324,20 @@ sync(Page $page, array $snapshot): void
 
 Deletes all existing sections and blocks for the page and recreates them from the snapshot. Also handles block relations (polymorphic links to Products, Categories, etc.).
 
+Snapshots must be validated before calling `sync()`. Manual saves, autosaves, imports,
+reusable blocks, and section templates use the shared Page Builder validators:
+
+- `App\Services\PageBuilder\BlockConfigurationValidator` validates block
+  `configuration` against `config/blocks.php`, rejects unknown fields, wrong types,
+  invalid enums and min/max violations, and sanitizes recursive `richtext`/`html`
+  fields.
+- `App\Services\PageBuilder\PageBuilderSnapshotValidator` validates section/block
+  limits, block types, relation contracts, allowed relation slots and related model
+  existence.
+
+Block relations in snapshots use `relation_type`, `relation_id`, `relation_key`,
+`position`, and `metadata`. Do not use the older `type`/`id` shape in save payloads.
+
 ### PageVersionService
 
 Creates and restores versioned snapshots of a page's full structure.
@@ -1467,9 +1481,10 @@ Page (page_type = 'blocks')
 ### Sync Flow
 
 1. The React page builder holds the entire page structure in component state (reducer-based with undo/redo).
-2. On save, the full structure is serialised to a JSON snapshot and `POST`-ed to the `PageBuilderController`.
-3. `PageBuilderSyncService::sync(Page, array $snapshot)` atomically deletes the old structure and recreates it.
-4. A `PageVersion` snapshot is also created by `PageVersionService`.
+2. On save, the full structure is serialised to a JSON snapshot and submitted to the `PageBuilderController`.
+3. `UpdatePageBuilderRequest` passes the snapshot through `PageBuilderSnapshotValidator`; import, reusable block and section template saves use the same validation services.
+4. `PageBuilderSyncService::sync(Page, array $snapshot)` deletes the old structure and recreates it from the sanitized snapshot.
+5. A `PageVersion` snapshot can also be created by `PageVersionService` when versioning flows call it.
 
 ### Undo/Redo
 

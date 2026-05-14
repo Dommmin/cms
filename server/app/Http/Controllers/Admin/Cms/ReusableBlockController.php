@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin\Cms;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Cms\StoreReusableBlockRequest;
+use App\Http\Requests\Admin\Cms\UpdateReusableBlockRequest;
 use App\Models\ReusableBlock;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -36,15 +37,11 @@ class ReusableBlockController extends Controller
         ]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreReusableBlockRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:500'],
-            'type' => ['required', 'string'],
-            'configuration' => ['nullable', 'array'],
-            'relations_config' => ['nullable', 'array'],
-        ]);
+        $validated = $request->validated();
+        $validated['configuration'] = $request->input('configuration', []);
+        $validated['relations_config'] = $request->input('relations_config', []);
 
         $block = ReusableBlock::query()->create([
             'name' => $validated['name'],
@@ -74,15 +71,11 @@ class ReusableBlockController extends Controller
         ]);
     }
 
-    public function update(Request $request, ReusableBlock $reusableBlock): RedirectResponse
+    public function update(UpdateReusableBlockRequest $request, ReusableBlock $reusableBlock): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:500'],
-            'configuration' => ['nullable', 'array'],
-            'relations_config' => ['nullable', 'array'],
-            'is_active' => ['boolean'],
-        ]);
+        $validated = $request->validated();
+        $validated['configuration'] = $request->input('configuration', []);
+        $validated['relations_config'] = $request->input('relations_config', []);
 
         $reusableBlock->update($validated);
 
