@@ -477,7 +477,7 @@ The PAT needs the `read:packages` scope only. Create one at GitHub → Settings 
 
 ### 4. Server environment secret
 
-Copy `k8s/server/secret.yaml.example`, fill in all `CHANGE_ME` values, save as `server/.env.production` (never commit this file), then apply:
+Copy `server/.env.production.example` to `server/.env.production` (gitignored), fill in all `CHANGE_ME` values, then apply as a k8s Secret:
 
 ```bash
 kubectl create secret generic cms-server-env \

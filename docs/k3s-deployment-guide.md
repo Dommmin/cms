@@ -2080,14 +2080,21 @@ k9s -n app
 
 ## 25. Rotacja secretów — aktualizacja .env i haseł bez downtime'u
 
+> **Najprościej (zalecane):** zaktualizuj wartości w `PROD_ENV` (GitHub Variables / GitLab CI Variables) i triggernij deploy — pipeline sam zsynchronizuje sekret `app-server-env` i zrobi rolling restart. Sekcje poniżej są dla operacji wykonywanych ręcznie z `kubectl` (bez CI/CD).
+
 ### 25.1 Aktualizacja Laravel .env
 
-Zmodyfikuj `k8s/server/secret.yaml`, a następnie:
+Single source of truth dla Laravel `.env` w klastrze to sekret `app-server-env`. Bez CI/CD wygeneruj go z lokalnego `server/.env.production`:
 
 ```bash
-kubectl apply -f k8s/server/secret.yaml
+# 1) zaktualizuj wartości w server/.env.production (gitignored)
+# 2) re-create secret (idempotentne — nadpisuje istniejący):
+kubectl create secret generic app-server-env \
+  --from-file=.env=server/.env.production \
+  --namespace=app \
+  --dry-run=client -o yaml | kubectl apply -f -
 
-# Rolling restart — nowe pody startują z nowym secretem zanim stare padną
+# 3) rolling restart — nowe pody startują z nowym sekretem zanim stare padną
 kubectl -n app rollout restart deployment/app-server
 kubectl -n app rollout restart deployment/app-queue
 ```
@@ -2109,9 +2116,21 @@ EXIT;
 **Krok 2** — zaktualizuj oba sekrety i zrestartuj:
 
 ```bash
-# Zaktualizuj k8s/mysql/secret.yaml i k8s/server/secret.yaml
-kubectl apply -f k8s/mysql/secret.yaml
-kubectl apply -f k8s/server/secret.yaml
+# Sekret MySQL — odśwież wartością z --from-literal (bootstrap nigdy nie tworzy
+# pliku k8s/mysql/secret.yaml — używa kubectl CLI bezpośrednio).
+kubectl create secret generic app-mysql \
+  --from-literal=root-password='<NOWE_ROOT>' \
+  --from-literal=username='app' \
+  --from-literal=password='NoweHaslo123!' \
+  --namespace=app \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# Zaktualizuj DB_PASSWORD w server/.env.production, potem:
+kubectl create secret generic app-server-env \
+  --from-file=.env=server/.env.production \
+  --namespace=app \
+  --dry-run=client -o yaml | kubectl apply -f -
+
 kubectl -n app rollout restart deployment/app-server
 kubectl -n app rollout restart deployment/app-queue
 ```
@@ -2119,9 +2138,17 @@ kubectl -n app rollout restart deployment/app-queue
 ### 25.3 Zmiana hasła Redis
 
 ```bash
-# Zaktualizuj k8s/redis/secret.yaml i k8s/server/secret.yaml (REDIS_PASSWORD)
-kubectl apply -f k8s/redis/secret.yaml
-kubectl apply -f k8s/server/secret.yaml
+# Sekret Redis
+kubectl create secret generic app-redis \
+  --from-literal=password='<NOWE_HASLO_REDIS>' \
+  --namespace=app \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# Zaktualizuj REDIS_PASSWORD w server/.env.production, potem:
+kubectl create secret generic app-server-env \
+  --from-file=.env=server/.env.production \
+  --namespace=app \
+  --dry-run=client -o yaml | kubectl apply -f -
 
 kubectl -n app rollout restart deployment/app-redis
 kubectl -n app rollout restart deployment/app-server
@@ -2140,8 +2167,20 @@ Możesz postawić środowisko stagingowe w osobnym namespace `app-staging` na ty
 # Utwórz namespace staging
 sed 's/app/app-staging/g' k8s/namespace.yaml | kubectl apply -f -
 
-# Zastosuj sekrety ze stagingowymi wartościami
-sed 's/app/app-staging/g' k8s/server/secret.yaml | kubectl apply -f -
+# Stwórz sekret z osobnego pliku .env dla stagingu
+# (np. server/.env.staging — gitignored razem z .env.production)
+kubectl create secret generic app-staging-server-env \
+  --from-file=.env=server/.env.staging \
+  --namespace=app-staging \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# MySQL / Redis sekrety analogicznie:
+kubectl create secret generic app-staging-mysql \
+  --from-literal=root-password='<STAGING_ROOT>' \
+  --from-literal=username='app' \
+  --from-literal=password='<STAGING_APP>' \
+  --namespace=app-staging \
+  --dry-run=client -o yaml | kubectl apply -f -
 ```
 
 W CI/CD dodaj job uruchamiany na branchu `develop`:

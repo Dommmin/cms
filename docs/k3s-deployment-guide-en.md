@@ -495,14 +495,14 @@ kubectl apply -f k8s/redis/secret.yaml
 > **If you are using GitHub Actions or GitLab CI/CD — skip this step.**  
 > The pipeline automatically creates and updates this secret from the `PROD_ENV` / `SERVER_ENV` variable on every deployment (step 0 in the pipeline). Manual creation is only needed if you want to run the app before the first CI/CD run.
 
-If you want to configure the secret manually (e.g. before the first CI/CD run), use the `k8s/server/secret.yaml.example` template:
+If you want to configure the secret manually (e.g. before the first CI/CD run), use the `server/.env.production.example` template:
 
 ```bash
 # Copy and edit the example — fill in all CHANGE_ME values
-cp k8s/server/secret.yaml.example k8s/server/secret.yaml
-# edit k8s/server/secret.yaml with your production values
+cp server/.env.production.example server/.env.production
+# edit server/.env.production with your production values
 
-# Or create from an existing .env file:
+# Create the secret from the file:
 kubectl create secret generic cms-server-env \
   --from-file=.env=server/.env.production \
   --namespace=cms-prod \
@@ -593,12 +593,13 @@ Typesense is a fast full-text search engine. The application uses it via Laravel
 
 ### 10.1 Create the API key secret
 
-Copy and edit the example file:
+Typesense needs an API key. Use a strong random key (min. 16 characters):
 
 ```bash
-cp k8s/typesense/secret.yaml.example k8s/typesense/secret.yaml
-# edit — replace CHANGE_ME with a strong random key (min. 16 characters)
-kubectl apply -f k8s/typesense/secret.yaml
+kubectl create secret generic cms-typesense \
+  --from-literal=api-key='<YOUR_API_KEY>' \
+  --namespace=cms-prod \
+  --dry-run=client -o yaml | kubectl apply -f -
 ```
 
 > Use this same key in your production `.env` as `TYPESENSE_API_KEY=<YOUR_API_KEY>`.  
@@ -731,7 +732,7 @@ kubectl -n cms-prod get pvc
 
 > **PVC limitation:** works only with `replicas: 1`. When scaling to 2+ pods, switch to external S3-compatible storage (AWS S3, MinIO, Cloudflare R2) — set `FILESYSTEM_DISK=s3` in your `.env`.
 
-The default `k8s/server/secret.yaml.example` uses `FILESYSTEM_DISK=s3` — external object storage is the recommended setup for production. Set `FILESYSTEM_DISK=public` only if you intentionally want local PVC storage with a single replica.
+The default `server/.env.production.example` uses `FILESYSTEM_DISK=s3` — external object storage is the recommended setup for production. Set `FILESYSTEM_DISK=public` only if you intentionally want local PVC storage with a single replica.
 
 ### 12.2 Deploying the servers
 
@@ -904,7 +905,7 @@ cat ~/.kube/config-hetzner
 
 #### How to set PROD_ENV
 
-The value is literally the contents of your production `.env`. See `k8s/server/secret.yaml.example` for the full list of required variables:
+The value is literally the contents of your production `.env`. See `server/.env.production.example` for the full list of required variables:
 
 ```dotenv
 APP_NAME="MyCMS"
@@ -1696,8 +1697,11 @@ You can run a staging environment in a separate `cms-staging` namespace on the s
 # Create the staging namespace
 sed 's/cms-prod/cms-staging/g' k8s/namespace.yaml | kubectl apply -f -
 
-# Apply secrets with staging values
-sed 's/cms-prod/cms-staging/g' k8s/server/secret.yaml | kubectl apply -f -
+# Create the secret from a separate staging .env file (gitignored)
+kubectl create secret generic cms-staging-server-env \
+  --from-file=.env=server/.env.staging \
+  --namespace=cms-staging \
+  --dry-run=client -o yaml | kubectl apply -f -
 ```
 
 In CI/CD add a job triggered on the `develop` branch:
