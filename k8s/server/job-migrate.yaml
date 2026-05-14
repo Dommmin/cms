@@ -3,10 +3,10 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cms-migrate-REVISION_PLACEHOLDER
-  namespace: cms-prod
+  name: app-migrate-REVISION_PLACEHOLDER
+  namespace: app
   labels:
-    app: cms-server
+    app: app-server
     component: migrate
 spec:
   ttlSecondsAfterFinished: 3600
@@ -31,7 +31,7 @@ spec:
       volumes:
         - name: env-file
           secret:
-            secretName: cms-server-env
+            secretName: app-server-env
       restartPolicy: Never
       imagePullSecrets:
         - name: ghcr-pull-secret

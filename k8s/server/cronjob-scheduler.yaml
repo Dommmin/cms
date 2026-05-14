@@ -1,10 +1,10 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: cms-scheduler
-  namespace: cms-prod
+  name: app-scheduler
+  namespace: app
   labels:
-    app: cms-server
+    app: app-server
     component: scheduler
 spec:
   schedule: "* * * * *"
@@ -17,7 +17,7 @@ spec:
         spec:
           containers:
             - name: scheduler
-              image: ghcr.io/dommmin/cms-server:latest  # replaced by CI
+              image: ghcr.io/dommmin/app-server:latest  # replaced by CI
               imagePullPolicy: IfNotPresent
               command: ["php", "artisan", "schedule:run", "--no-ansi"]
               volumeMounts:
@@ -34,7 +34,7 @@ spec:
           volumes:
             - name: env-file
               secret:
-                secretName: cms-server-env
+                secretName: app-server-env
           restartPolicy: OnFailure
           imagePullSecrets:
             - name: ghcr-pull-secret

@@ -32,13 +32,11 @@ error()   { echo -e "${RED}[ERROR]${NC} $*" >&2; }
 section() { echo -e "\n${BOLD}══════════════════════════════════════════${NC}"; echo -e "${BOLD} $*${NC}"; echo -e "${BOLD}══════════════════════════════════════════${NC}"; }
 prompt()  { echo -e "${YELLOW}[INPUT]${NC} $*"; }
 
-# ─── Apply k8s manifest with name substitution ───────────────────────────────
-# Replaces cms-prod → $APP_NAME and cms-* → $APP_NAME-* before applying.
+# ─── Apply a k8s manifest ────────────────────────────────────────────────────
+# Manifests are hardcoded to the `app` namespace / `app-*` resource names,
+# so no substitution is needed — this is a thin wrapper for consistency.
 kapply() {
-  sed \
-    -e "s/cms-prod/${APP_NAME}/g" \
-    -e "s/cms-/${APP_NAME}-/g" \
-    "$1" | kubectl apply -f -
+  kubectl apply -f "$1"
 }
 
 # ─── Prereq check ────────────────────────────────────────────────────────────
@@ -79,8 +77,10 @@ check_prereqs() {
 collect_inputs() {
   section "Configuration"
 
-  prompt "App name / namespace [app]:"
-  read -r APP_NAME; APP_NAME="${APP_NAME:-app}"
+  # The k8s manifests are hardcoded to the `app` namespace and `app-*`
+  # resource names — this is not configurable without editing every file.
+  APP_NAME="app"
+  info "Namespace / resource prefix: ${APP_NAME} (fixed — manifests hardcode it)"
 
   echo
   prompt "MySQL root password (strong, at least 16 chars):"
@@ -296,15 +296,8 @@ step_secrets() {
     --dry-run=client -o yaml | kubectl apply -f -
   ok "${APP_NAME}-typesense secret created"
 
-  # Client API URL secret — internal URL Next.js uses for server-side fetches.
-  # Created via CLI (consistent with the secrets above). The .example file
-  # uses an APP_NAME placeholder that kapply's cms-prod/cms- substitution
-  # does NOT touch — so it must NOT be applied through kapply.
-  kubectl create secret generic "${APP_NAME}-client-env" \
-    --namespace="${APP_NAME}" \
-    --from-literal=API_URL="http://${APP_NAME}-server.${APP_NAME}.svc.cluster.local/api/v1" \
-    --dry-run=client -o yaml | kubectl apply -f -
-  ok "${APP_NAME}-client-env secret created (API_URL → internal cluster address)"
+  # No client secret — the Next.js internal API URL is not sensitive, it's a
+  # plain env var (API_URL) baked into k8s/client/deployment.yaml.
 
   info "Server .env secret: skipped — CI/CD will create it from PROD_ENV / SERVER_ENV."
   info "If you need it now, run:"

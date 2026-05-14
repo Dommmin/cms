@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cms-typesense
-  namespace: cms-prod
+  name: app-typesense
+  namespace: app
   labels:
-    app: cms-typesense
+    app: app-typesense
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: cms-typesense
+      app: app-typesense
   template:
     metadata:
       labels:
-        app: cms-typesense
+        app: app-typesense
     spec:
       containers:
         - name: typesense
@@ -27,7 +27,7 @@ spec:
             - name: TYPESENSE_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: cms-typesense
+                  name: app-typesense
                   key: api-key
           ports:
             - containerPort: 8108
@@ -58,4 +58,4 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: cms-typesense-data
+            claimName: app-typesense-data

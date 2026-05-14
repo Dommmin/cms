@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cms-mysql
-  namespace: cms-prod
+  name: app-mysql
+  namespace: app
   labels:
-    app: cms-mysql
+    app: app-mysql
 spec:
   selector:
-    app: cms-mysql
+    app: app-mysql
   ports:
     - port: 3306
       targetPort: 3306

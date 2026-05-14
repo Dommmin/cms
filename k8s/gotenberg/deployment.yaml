@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cms-gotenberg
-  namespace: cms-prod
+  name: app-gotenberg
+  namespace: app
   labels:
-    app: cms-gotenberg
+    app: app-gotenberg
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: cms-gotenberg
+      app: app-gotenberg
   template:
     metadata:
       labels:
-        app: cms-gotenberg
+        app: app-gotenberg
     spec:
       containers:
         - name: gotenberg

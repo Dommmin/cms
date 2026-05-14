@@ -1,13 +1,13 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: cms-client
-  namespace: cms-prod
+  name: app-client
+  namespace: app
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: cms-client
+    name: app-client
   minReplicas: 1
   maxReplicas: 8
   metrics:

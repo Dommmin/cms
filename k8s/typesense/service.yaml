@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cms-typesense
-  namespace: cms-prod
+  name: app-typesense
+  namespace: app
   labels:
-    app: cms-typesense
+    app: app-typesense
 spec:
   selector:
-    app: cms-typesense
+    app: app-typesense
   ports:
     - port: 8108
       targetPort: 8108

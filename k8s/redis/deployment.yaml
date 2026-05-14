@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cms-redis
-  namespace: cms-prod
+  name: app-redis
+  namespace: app
   labels:
-    app: cms-redis
+    app: app-redis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: cms-redis
+      app: app-redis
   template:
     metadata:
       labels:
-        app: cms-redis
+        app: app-redis
     spec:
       containers:
         - name: redis
@@ -31,7 +31,7 @@ spec:
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: cms-redis
+                  name: app-redis
                   key: password
           ports:
             - containerPort: 6379
@@ -54,4 +54,4 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: cms-redis-data
+            claimName: app-redis-data

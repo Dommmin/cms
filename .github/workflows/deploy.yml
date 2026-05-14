@@ -449,14 +449,15 @@ jobs:
       # --------------------------------------------------------------------------
       - name: Apply infrastructure manifests
         run: |
-          kapply() { sed -e "s|cms-prod|${KUBE_NS}|g" -e "s|cms-|${KUBE_NS}-|g" "$1" | kubectl apply -f -; }
-          kapply k8s/ingress.yaml
-          kapply k8s/traefik/middleware.yaml
+          # Manifests are hardcoded to the `app` namespace / `app-*` names —
+          # no substitution needed.
+          kubectl apply -f k8s/ingress.yaml
+          kubectl apply -f k8s/traefik/middleware.yaml
           kubectl apply -f k8s/traefik/config.yaml
-          kapply k8s/server/service.yaml
-          kapply k8s/server/hpa.yaml
-          kapply k8s/client/service.yaml
-          kapply k8s/client/hpa.yaml
+          kubectl apply -f k8s/server/service.yaml
+          kubectl apply -f k8s/server/hpa.yaml
+          kubectl apply -f k8s/client/service.yaml
+          kubectl apply -f k8s/client/hpa.yaml
 
       # --------------------------------------------------------------------------
       # 1. Run database migrations (Job with new image, wait for completion)
@@ -469,8 +470,6 @@ jobs:
           sed \
             -e "s|IMAGE_PLACEHOLDER|${IMAGE}|g" \
             -e "s|REVISION_PLACEHOLDER|${SHA}|g" \
-            -e "s|cms-prod|${KUBE_NS}|g" \
-            -e "s|cms-|${KUBE_NS}-|g" \
             k8s/server/job-migrate.yaml | kubectl apply --validate=false -f -
 
           kubectl -n "${KUBE_NS}" wait job/"${KUBE_NS}-migrate-${SHA}" \
@@ -484,8 +483,6 @@ jobs:
         run: |
           OWNER="${GITHUB_REPOSITORY_OWNER,,}"
           sed \
-            -e "s|cms-prod|${KUBE_NS}|g" \
-            -e "s|cms-|${KUBE_NS}-|g" \
             -e "s|ghcr.io/${OWNER}/${KUBE_NS}-server:latest|${{ steps.images.outputs.server }}|g" \
             k8s/server/deployment.yaml | kubectl apply -f -
           kubectl -n "${KUBE_NS}" rollout status deployment/"${KUBE_NS}-server" \
@@ -498,8 +495,6 @@ jobs:
         run: |
           OWNER="${GITHUB_REPOSITORY_OWNER,,}"
           sed \
-            -e "s|cms-prod|${KUBE_NS}|g" \
-            -e "s|cms-|${KUBE_NS}-|g" \
             -e "s|ghcr.io/${OWNER}/${KUBE_NS}-server:latest|${{ steps.images.outputs.server }}|g" \
             k8s/server/deployment-queue.yaml | kubectl apply -f -
           kubectl -n "${KUBE_NS}" rollout status deployment/"${KUBE_NS}-queue" \
@@ -512,8 +507,6 @@ jobs:
         run: |
           OWNER="${GITHUB_REPOSITORY_OWNER,,}"
           sed \
-            -e "s|cms-prod|${KUBE_NS}|g" \
-            -e "s|cms-|${KUBE_NS}-|g" \
             -e "s|ghcr.io/${OWNER}/${KUBE_NS}-server:latest|${{ steps.images.outputs.server }}|g" \
             k8s/server/cronjob-scheduler.yaml | kubectl apply -f -
 
@@ -524,8 +517,6 @@ jobs:
         run: |
           OWNER="${GITHUB_REPOSITORY_OWNER,,}"
           sed \
-            -e "s|cms-prod|${KUBE_NS}|g" \
-            -e "s|cms-|${KUBE_NS}-|g" \
             -e "s|ghcr.io/${OWNER}/${KUBE_NS}-client:latest|${{ steps.images.outputs.client }}|g" \
             k8s/client/deployment.yaml | kubectl apply -f -
           kubectl -n "${KUBE_NS}" rollout status deployment/"${KUBE_NS}-client" \

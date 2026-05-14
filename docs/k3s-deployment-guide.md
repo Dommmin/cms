@@ -475,7 +475,7 @@ Skrypt interaktywnie zapyta o:
 
 **Czas wykonania:** ~5–10 minut (większość to oczekiwanie na MySQL i cert-manager).
 
-Po zakończeniu skrypt wyświetli listę podów w namespace `cms-prod` oraz dalsze kroki — konfigurację sekretów CI/CD.
+Po zakończeniu skrypt wyświetli listę podów w namespace `app` oraz dalsze kroki — konfigurację sekretów CI/CD.
 
 > **Jeśli wybrałeś Opcję A — przejdź do [sekcji 13 (Jak CI/CD łączy się z k3s?)](#13-jak-cicd-łączy-się-z-k3s).** Sekcje 5–12 poniżej opisują to samo co robi skrypt — przydatne jako dokumentacja lub przy ręcznej rekonfiguracji.
 
@@ -559,7 +559,7 @@ kubectl -n kube-system get helmchartconfig traefik
 
 ## 7. Przygotowanie klastra — namespace i sekrety
 
-> **Uwaga o nazwie namespace:** Przykłady w tym przewodniku używają `app` jako nazwy namespace. Zastąp ją własną — np. `my-blog-prod`, `shop-prod`, `api-prod`. Użyj jej konsekwentnie we wszystkich plikach YAML i komendach `kubectl -n`.
+> **Uwaga o nazwie namespace:** Wszystkie manifesty w `k8s/` mają na stałe wpisany namespace `app` i prefiks zasobów `app-*` (`app-server`, `app-mysql`, `app-redis`, …). To **nie jest** konfigurowalne bez edycji każdego pliku — `bootstrap.sh` i pipeline CI/CD zakładają `app`. Jeśli naprawdę potrzebujesz innej nazwy, zrób globalny `sed` po `k8s/` i zaktualizuj `KUBE_NAMESPACE` w CI.
 
 ### 7.1 Utwórz namespace
 
@@ -630,20 +630,13 @@ kubectl create secret generic app-server-env \
 > **Skąd wziąć APP_KEY?**  
 > `docker compose exec php php artisan key:generate --show`
 
-### 7.5 Sekret klienta Next.js
+### 7.5 Konfiguracja klienta Next.js — brak sekretu
 
-Ten sekret zawiera wewnętrzny URL API (używany przez Next.js server-side do fetchowania danych z pominięciem publicznego internetu). **CI/CD go nie tworzy** — wymagany raz, ręcznie.
+Next.js po stronie serwera fetchuje dane z API pod wewnętrznym adresem klastra. Ten adres (`API_URL=http://app-server.app.svc.cluster.local/api/v1`) **nie jest wrażliwy** — to po prostu nazwa DNS wewnątrz klastra — więc **nie ma tu żadnego sekretu do utworzenia**.
 
-Plik `k8s/client/secret.yaml.example` to tylko szablon referencyjny — utwórz sekret przez CLI (podstawiając swoją nazwę namespace za `app`):
+`API_URL` jest wpisany na stałe jako zwykła zmienna `env:` w [`k8s/client/deployment.yaml`](../k8s/client/deployment.yaml). Nic nie musisz robić ręcznie.
 
-```bash
-kubectl create secret generic app-client-env \
-  --namespace=app \
-  --from-literal=API_URL="http://app-server.app.svc.cluster.local/api/v1" \
-  --dry-run=client -o yaml | kubectl apply -f -
-```
-
-> `bootstrap.sh` tworzy ten sekret automatycznie w Kroku 4.
+> Zmienne `NEXT_PUBLIC_*` (publiczne, widoczne w przeglądarce) to osobna sprawa — są wstrzykiwane przy buildzie obrazu jako `--build-arg` z `ENV_CLIENT_PROD` (patrz sekcja 14).
 
 ---
 

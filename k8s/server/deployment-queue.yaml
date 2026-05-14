@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cms-queue
-  namespace: cms-prod
+  name: app-queue
+  namespace: app
   labels:
-    app: cms-server
+    app: app-server
     component: queue
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: cms-server
+      app: app-server
       component: queue
   strategy:
     type: RollingUpdate
@@ -20,13 +20,13 @@ spec:
   template:
     metadata:
       labels:
-        app: cms-server
+        app: app-server
         component: queue
     spec:
       terminationGracePeriodSeconds: 120  # allow current job to finish
       containers:
         - name: queue
-          image: ghcr.io/dommmin/cms-server:latest  # replaced by CI
+          image: ghcr.io/dommmin/app-server:latest  # replaced by CI
           imagePullPolicy: Always
           # mkdir ensures storage/framework subdirs exist before worker starts
           # (required for queued Excel exports, file sessions, view cache)
@@ -67,12 +67,12 @@ spec:
       volumes:
         - name: env-file
           secret:
-            secretName: cms-server-env
-        # Shared with cms-server so queued exports (Excel) are visible to web pod.
+            secretName: app-server-env
+        # Shared with app-server so queued exports (Excel) are visible to web pod.
         # PVC is ReadWriteOnce — works on single-node k3s (all pods land on same node).
         # For multi-node clusters: switch exports to S3/MinIO disk.
         - name: storage
           persistentVolumeClaim:
-            claimName: cms-server-storage
+            claimName: app-server-storage
       imagePullSecrets:
         - name: ghcr-pull-secret

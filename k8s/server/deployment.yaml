@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cms-server
-  namespace: cms-prod
+  name: app-server
+  namespace: app
   labels:
-    app: cms-server
+    app: app-server
     component: web
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: cms-server
+      app: app-server
       component: web
   strategy:
     type: RollingUpdate
@@ -20,13 +20,13 @@ spec:
   template:
     metadata:
       labels:
-        app: cms-server
+        app: app-server
         component: web
     spec:
       terminationGracePeriodSeconds: 60
       containers:
         - name: app
-          image: ghcr.io/dommmin/cms-server:latest  # replaced by CI
+          image: ghcr.io/dommmin/app-server:latest  # replaced by CI
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -76,9 +76,9 @@ spec:
       volumes:
         - name: env-file
           secret:
-            secretName: cms-server-env
+            secretName: app-server-env
         - name: storage
           persistentVolumeClaim:
-            claimName: cms-server-storage
+            claimName: app-server-storage
       imagePullSecrets:
         - name: ghcr-pull-secret
