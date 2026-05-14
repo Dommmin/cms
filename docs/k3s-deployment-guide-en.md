@@ -2006,22 +2006,39 @@ If you use Rancher at work, you can run it on the same VPS. You'll get the exact
 >
 > The repo ships a ready-made `docker-compose.ops.yml` (project root) containing Rancher (ports 8080/8443) and Uptime Kuma (port 3001) with persistent volumes `/opt/rancher` and `/opt/uptime-kuma`.
 >
+> **SSH user:** use an account with **passwordless sudo** — `ssh host "sudo …"` has no TTY, so password-prompting sudo will hang. Default cloud accounts usually have it (`root` on Hetzner, `ubuntu` on OVHcloud/AWS). If you use your own account (e.g. `deployer`), see the "The `deployer` account for ops operations" box below.
+>
 > ```bash
-> # On the server (where k3s runs):
-> sudo mkdir -p /opt/rancher /opt/uptime-kuma
-> sudo chown -R 1000:1000 /opt/uptime-kuma     # Uptime Kuma runs as uid 1000
+> # Assume SSH_HOST=ubuntu@<SERVER_IP>  (on Hetzner: root@<SERVER_IP>)
 >
-> # Copy the file to the server (or clone the repo there)
-> scp docker-compose.ops.yml root@<SERVER_IP>:/opt/
+> # 1. Host directories (scp can't sudo — /opt is root-owned)
+> ssh $SSH_HOST "sudo mkdir -p /opt/rancher /opt/uptime-kuma && sudo chown -R 1000:1000 /opt/uptime-kuma"
 >
-> # Start it (Docker, NOT k3s — these are operational tools running alongside the cluster)
-> ssh root@<SERVER_IP> "cd /opt && docker compose -f docker-compose.ops.yml up -d"
+> # 2. Copy the file to the user's home, then sudo-move it into /opt
+> scp docker-compose.ops.yml $SSH_HOST:docker-compose.ops.yml
+> ssh $SSH_HOST "sudo mv ~/docker-compose.ops.yml /opt/docker-compose.ops.yml"
+>
+> # 3. Start it (Docker, NOT k3s — operational tools running alongside the cluster)
+> ssh $SSH_HOST "cd /opt && sudo docker compose -f docker-compose.ops.yml up -d"
 >
 > # Status:
-> ssh root@<SERVER_IP> "docker compose -f /opt/docker-compose.ops.yml ps"
+> ssh $SSH_HOST "cd /opt && sudo docker compose -f docker-compose.ops.yml ps"
 > ```
 >
+> `bootstrap.sh` (Step 13) does exactly this automatically — it prompts for `user@ip`.
+>
 > The rest of this section covers what comes next: the first Rancher login (22.2), importing the k3s cluster (22.3), securing the ports (22.5). Uptime Kuma configuration is in the "💡 Bonus: Uptime Kuma" section below.
+
+> **The `deployer` account for ops operations**
+>
+> If — per section 3.6 Option B — you have a `deployer` account and want to use it for Step 13 / `docker-compose.ops.yml`, it needs **passwordless sudo** (because `ssh host "sudo …"` has no TTY for a password). One-time, on the server:
+>
+> ```bash
+> echo 'deployer ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/deployer
+> sudo chmod 440 /etc/sudoers.d/deployer
+> ```
+>
+> This is the only place in the whole deployment where SSH to the server is needed at all — `kubectl` operations (Steps 1–12) go through `KUBECONFIG`, not SSH. The `deployer` account does not need to be in the `docker` group — we use `sudo docker compose`.
 
 ### 22.1 Installing Rancher (manually, without compose)
 
@@ -2321,7 +2338,7 @@ Uptime Kuma is a self-hosted alternative to UptimeRobot.
 
 ```bash
 # On the server
-cd /opt && docker compose -f docker-compose.ops.yml up -d uptime-kuma
+cd /opt && sudo docker compose -f docker-compose.ops.yml up -d uptime-kuma
 ```
 
 Alternatively, standalone:

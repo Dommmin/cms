@@ -137,7 +137,8 @@ collect_inputs() {
   prompt "Deploy ops tooling (Rancher + Uptime Kuma) via docker-compose.ops.yml? [y/N]:"
   read -r INSTALL_OPS; INSTALL_OPS="${INSTALL_OPS:-N}"
   if [[ "$INSTALL_OPS" == [Yy] ]]; then
-    prompt "  Server IP or SSH host (e.g. root@1.2.3.4) — leave empty if running this script ON the server:"
+    prompt "  SSH host as user@ip (e.g. ubuntu@1.2.3.4 — must have PASSWORDLESS sudo;"
+    prompt "  leave empty if running this script ON the server):"
     read -r OPS_SSH_HOST
   fi
 
@@ -487,28 +488,35 @@ step_ops_tooling() {
     return
   fi
 
+  # Works with a non-root, sudo-capable SSH user (e.g. OVHcloud's `ubuntu`,
+  # or a hand-made `deployer`). `scp` runs as that user and CANNOT write to
+  # root-owned /opt — so we stage the file in the user's home, then `sudo mv`.
+  # `sudo docker compose` avoids needing the user in the `docker` group.
+  # Requires the SSH user to have passwordless sudo (no TTY over `ssh host cmd`).
   local _ssh=""
   if [ -n "${OPS_SSH_HOST:-}" ]; then
     _ssh="ssh ${OPS_SSH_HOST}"
     info "Provisioning host dirs on ${OPS_SSH_HOST}..."
     $_ssh "sudo mkdir -p /opt/rancher /opt/uptime-kuma && sudo chown -R 1000:1000 /opt/uptime-kuma"
-    info "Copying docker-compose.ops.yml to remote /opt/ ..."
-    scp docker-compose.ops.yml "${OPS_SSH_HOST}:/opt/docker-compose.ops.yml"
+    info "Copying docker-compose.ops.yml to the server (staged in home, then moved)..."
+    scp docker-compose.ops.yml "${OPS_SSH_HOST}:docker-compose.ops.yml"
+    $_ssh "sudo mv ~/docker-compose.ops.yml /opt/docker-compose.ops.yml"
     info "Starting ops containers..."
-    $_ssh "cd /opt && docker compose -f docker-compose.ops.yml up -d"
-    $_ssh "cd /opt && docker compose -f docker-compose.ops.yml ps"
+    $_ssh "cd /opt && sudo docker compose -f docker-compose.ops.yml up -d"
+    $_ssh "cd /opt && sudo docker compose -f docker-compose.ops.yml ps"
   else
     info "Running locally (assuming this script is on the server)..."
     sudo mkdir -p /opt/rancher /opt/uptime-kuma
     sudo chown -R 1000:1000 /opt/uptime-kuma
-    docker compose -f docker-compose.ops.yml up -d
-    docker compose -f docker-compose.ops.yml ps
+    sudo cp docker-compose.ops.yml /opt/docker-compose.ops.yml
+    (cd /opt && sudo docker compose -f docker-compose.ops.yml up -d)
+    (cd /opt && sudo docker compose -f docker-compose.ops.yml ps)
   fi
 
   ok "Ops tooling started"
-  info "  Rancher:      https://<SERVER_IP>:8443   (run: docker logs rancher | grep 'Bootstrap Password')"
+  info "  Rancher:      https://<SERVER_IP>:8443   (run: sudo docker logs rancher | grep 'Bootstrap Password')"
   info "  Uptime Kuma:  http://<SERVER_IP>:3001"
-  warn "  Restrict ports 8443 and 3001 to your IP via UFW or Hetzner Firewall."
+  warn "  Restrict ports 8443 and 3001 to your IP via UFW or the cloud firewall."
 }
 
 # ─── Summary ─────────────────────────────────────────────────────────────────
