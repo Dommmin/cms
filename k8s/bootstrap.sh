@@ -441,66 +441,56 @@ step_glitchtip() {
 
   section "Step 12 — GlitchTip (error tracking)"
 
+  # GlitchTip is OPTIONAL — nothing here may abort the bootstrap. Every early
+  # return is just a `warn` + `return`, and the helm install itself runs in a
+  # `set -e` subshell so a failure is caught, not fatal.
+
   if ! command -v helm &>/dev/null; then
-    warn "helm not found — skipping GlitchTip."
-    warn "Install helm, then re-run this script (or run the 3 commands manually):"
+    warn "helm not found — skipping GlitchTip. Install helm, then re-run:"
     warn "  macOS:  brew install helm"
     warn "  Linux:  curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash"
-    warn "  then:   helm repo add glitchtip https://gitlab.com/api/v4/projects/16325141/packages/helm/stable && helm repo update"
-    warn "          helm upgrade --install glitchtip glitchtip/glitchtip --namespace glitchtip --create-namespace -f k8s/glitchtip/values.yaml"
     return
   fi
 
-  # Prefer values.yaml (gitignored, real secrets) over values.example.yaml (template).
-  local VALUES_FILE
-  if [ -f "k8s/glitchtip/values.yaml" ]; then
-    VALUES_FILE="k8s/glitchtip/values.yaml"
-    ok "Found k8s/glitchtip/values.yaml — using it."
-  elif [ -f "k8s/glitchtip/values.example.yaml" ]; then
-    warn "k8s/glitchtip/values.yaml not found — only the template values.example.yaml exists."
-    warn "Copy it and fill in real secrets BEFORE installing GlitchTip:"
+  # values.yaml (Helm config) and secret.yaml (SECRET_KEY/POSTGRES_PASSWORD/
+  # DATABASE_URL) are both gitignored — the user must create them from the
+  # *.example templates first.
+  if [ ! -f "k8s/glitchtip/values.yaml" ]; then
+    warn "k8s/glitchtip/values.yaml not found — skipping GlitchTip."
     warn "  cp k8s/glitchtip/values.example.yaml k8s/glitchtip/values.yaml"
-    warn "  # then edit k8s/glitchtip/values.yaml — set SECRET_KEY, GLITCHTIP_DOMAIN,"
-    warn "  # DEFAULT_FROM_EMAIL, EMAIL_URL, postgresql.auth.password, ingress.className=traefik"
-    prompt "Skip GlitchTip for now? [Y/n]:"
-    read -r SKIP_GLITCHTIP; SKIP_GLITCHTIP="${SKIP_GLITCHTIP:-Y}"
-    if [[ "$SKIP_GLITCHTIP" == [Yy] ]]; then
-      warn "Skipping GlitchTip — re-run manually after editing values.yaml:"
-      warn "  helm repo add glitchtip https://gitlab.com/api/v4/projects/16325141/packages/helm/stable && helm repo update"
-      warn "  helm upgrade --install glitchtip glitchtip/glitchtip --namespace glitchtip --create-namespace -f k8s/glitchtip/values.yaml"
-      return
-    fi
-    warn "Proceeding with template values.example.yaml — GlitchTip will use placeholder secrets (do NOT use in production)."
-    VALUES_FILE="k8s/glitchtip/values.example.yaml"
-  else
-    error "Neither values.yaml nor values.example.yaml found in k8s/glitchtip/ — skipping."
+    warn "  # then edit it — set the domain + SMTP"
+    return
+  fi
+  if [ ! -f "k8s/glitchtip/secret.yaml" ]; then
+    warn "k8s/glitchtip/secret.yaml not found — skipping GlitchTip."
+    warn "  cp k8s/glitchtip/secret.yaml.example k8s/glitchtip/secret.yaml"
+    warn "  # then edit it — set SECRET_KEY, POSTGRES_PASSWORD, DATABASE_URL"
     return
   fi
 
-  # --force-update makes `helm repo add` idempotent (succeeds whether the repo
-  # is new or already present, and refreshes the URL if it changed). No more
-  # `2>/dev/null || true`, which used to hide a failed add and then surface as
-  # a confusing "helm repo update: no repositories found".
-  #
-  # GlitchTip is OPTIONAL — a helm failure here must NOT abort the whole
-  # bootstrap (Step 13 and the summary still need to run). Wrap in a subshell
-  # guarded against `set -e` so a bad values file / missing dependency just
-  # warns and moves on.
+  # GlitchTip needs Postgres. The chart's bundled option requires the
+  # CloudNativePG operator, so we run a standalone Postgres (postgresql.yaml)
+  # and point the chart at it via DATABASE_URL in the secret. Order matters:
+  # namespace → secret → Postgres (wait ready) → helm.
   if (
     set -e
+    kubectl create namespace glitchtip --dry-run=client -o yaml | kubectl apply -f -
+    kubectl apply -f k8s/glitchtip/secret.yaml
+    kubectl apply -f k8s/glitchtip/postgresql.yaml
+    info "Waiting for GlitchTip Postgres to be ready..."
+    kubectl -n glitchtip rollout status statefulset/glitchtip-postgresql --timeout=3m
+
     helm repo add glitchtip https://gitlab.com/api/v4/projects/16325141/packages/helm/stable --force-update
     helm repo update glitchtip
     helm upgrade --install glitchtip glitchtip/glitchtip \
       --namespace glitchtip \
-      --create-namespace \
-      -f "$VALUES_FILE"
+      -f k8s/glitchtip/values.yaml
   ); then
-    ok "GlitchTip deployed to namespace glitchtip (values: $VALUES_FILE)"
+    ok "GlitchTip deployed to namespace glitchtip"
   else
     warn "GlitchTip install failed — continuing bootstrap without it (it's optional)."
-    warn "Most common cause: values file written for an older chart version."
-    warn "Check the current schema:  helm show values glitchtip/glitchtip"
-    warn "Or skip self-hosting entirely — use a hosted DSN (app.glitchtip.com)"
+    warn "Debug: kubectl -n glitchtip get pods; helm -n glitchtip status glitchtip"
+    warn "Alternative: skip self-hosting, use a hosted DSN (app.glitchtip.com)"
     warn "and just set GLITCHTIP_DSN in PROD_ENV."
   fi
 }

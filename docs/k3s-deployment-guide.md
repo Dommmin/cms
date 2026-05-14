@@ -1890,41 +1890,58 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 
 GlitchTip to self-hosted, open-source alternatywa dla Sentry. Używa tego samego SDK co Sentry — nie trzeba zmieniać kodu, wystarczy podmienić DSN na adres własnej instancji.
 
-### 21.1 Przygotuj `values.yaml`
+> **Wersja chartu:** poniższe dotyczy oficjalnego chartu **8.2.0** (app v6.1.4). Chart 8.x **nie ma już wbudowanego Postgresa** — `postgresql.enabled: true` wymaga operatora CloudNativePG. Dlatego stawiamy własnego, standalone Postgresa (`k8s/glitchtip/postgresql.yaml`) i wskazujemy chartowi przez `DATABASE_URL`. Valkey (zamiennik Redisa) chart nadal dostarcza sam.
 
-W repo jest `k8s/glitchtip/values.example.yaml` jako szablon. **Nigdy nie commituj** plików z prawdziwymi sekretami — `.gitignore` już ignoruje `k8s/glitchtip/values.yaml`:
+### 21.1 Przygotuj `values.yaml` i `secret.yaml`
+
+W repo są dwa szablony. **Nigdy nie commituj** plików z sekretami — `.gitignore` ignoruje `k8s/glitchtip/values.yaml` i `k8s/glitchtip/secret.yaml`:
 
 ```bash
 cp k8s/glitchtip/values.example.yaml k8s/glitchtip/values.yaml
+cp k8s/glitchtip/secret.yaml.example k8s/glitchtip/secret.yaml
+
+# wygeneruj sekrety:
+openssl rand -hex 25                     # → SECRET_KEY
+openssl rand -base64 24 | tr -d '/+='    # → POSTGRES_PASSWORD
 ```
 
-Edytuj `k8s/glitchtip/values.yaml` i ustaw:
+**`k8s/glitchtip/secret.yaml`** — jeden Secret `glitchtip-secrets`, trzy klucze:
 
 | Klucz | Czym wypełnić |
 |---|---|
-| `glitchtip.env.SECRET_KEY` | Losowy 50-znakowy hex: `openssl rand -hex 25` |
-| `glitchtip.env.GLITCHTIP_DOMAIN` | Domena/subdomena Glitchtip, np. `glitchtip.laravel-test.site` (musi mieć rekord DNS A na IP serwera) |
-| `glitchtip.env.DEFAULT_FROM_EMAIL` | Adres "Od" w mailach z alertami, np. `noreply@laravel-test.site` |
-| `glitchtip.env.EMAIL_URL` | URL SMTP do wysyłki alertów: `smtp://USER:APP_PASSWORD@smtp.gmail.com:587` (dla Gmail — wygeneruj [App Password](https://myaccount.google.com/apppasswords)) |
-| `glitchtip.ingress.className` | **Zmień `nginx` → `traefik`** (k3s domyślnie używa Traefika) |
-| `glitchtip.ingress.hosts[0].host` | Ta sama domena co `GLITCHTIP_DOMAIN` |
-| `glitchtip.ingress.tls[0].hosts[0]` | Ta sama domena |
-| `postgresql.auth.password` | Silne hasło do wbudowanej bazy Postgres (Glitchtip używa Postgres, nie MySQL) |
+| `SECRET_KEY` | Wygenerowany 50-znakowy hex. **Po starcie nie zmieniaj** — unieważnia sesje i tokeny. |
+| `POSTGRES_PASSWORD` | Wygenerowane silne hasło do Postgresa. |
+| `DATABASE_URL` | `postgres://glitchtip:<POSTGRES_PASSWORD>@glitchtip-postgresql:5432/glitchtip` — hasło **musi** być takie samo jak `POSTGRES_PASSWORD`. |
 
-> **Uwaga:** Po wygenerowaniu SECRET_KEY zachowaj go — zmiana po starcie unieważnia wszystkie sesje i tokeny w Glitchtip.
+**`k8s/glitchtip/values.yaml`** — konfiguracja Helm (bez sekretów):
 
-### 21.2 Instalacja Helm
+| Klucz | Czym wypełnić |
+|---|---|
+| `glitchtip.domain` | Pełny URL instancji, np. `https://glitchtip.laravel-test.site` (subdomena musi mieć rekord DNS A na IP serwera) |
+| `web.ingress.hosts[0].host` + `web.ingress.tls[0].hosts[0]` | Ta sama domena (bez `https://`) |
+| `web.extraEnvVars` → `EMAIL_URL` | SMTP do alertów: `smtp://USER%40gmail.com:APP_PASSWORD@smtp.gmail.com:587` — znaki specjalne URL-encoded (`@` w loginie → `%40`). Gmail wymaga [App Password](https://myaccount.google.com/apppasswords). |
+| `web.extraEnvVars` → `DEFAULT_FROM_EMAIL` | Adres "Od" w mailach z alertami |
+
+Pozostałe pola (`glitchtip.existingSecret`, `glitchtip.database.existingSecret`, `valkey.enabled`, `postgresql.enabled: false`, `web.ingress.className: traefik`) są już ustawione poprawnie w szablonie — nie ruszaj.
+
+### 21.2 Instalacja
+
+Kolejność jest istotna: namespace → secret → Postgres → chart.
 
 ```bash
-helm repo add glitchtip https://gitlab.com/api/v4/projects/16325141/packages/helm/stable
-helm repo update
+kubectl create namespace glitchtip --dry-run=client -o yaml | kubectl apply -f -
+kubectl apply -f k8s/glitchtip/secret.yaml
+kubectl apply -f k8s/glitchtip/postgresql.yaml
+kubectl -n glitchtip rollout status statefulset/glitchtip-postgresql --timeout=3m
+
+helm repo add glitchtip https://gitlab.com/api/v4/projects/16325141/packages/helm/stable --force-update
+helm repo update glitchtip
 helm upgrade --install glitchtip glitchtip/glitchtip \
   --namespace glitchtip \
-  --create-namespace \
   -f k8s/glitchtip/values.yaml
 ```
 
-`bootstrap.sh` **wykrywa automatycznie** czy istnieje `values.yaml` — jeśli tak, używa go; jeśli nie, ostrzega żebyś go najpierw stworzył.
+`bootstrap.sh` (Krok 12) robi dokładnie to samo automatycznie — pod warunkiem że `values.yaml` **i** `secret.yaml` istnieją. Jeśli ich nie ma, Krok 12 jest pomijany (bootstrap leci dalej — GlitchTip jest opcjonalny).
 
 ### 21.3 Konfiguracja po instalacji
 
