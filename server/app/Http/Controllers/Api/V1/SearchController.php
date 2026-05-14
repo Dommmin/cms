@@ -7,8 +7,10 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Api\V1\ProductResource;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\SearchLog;
 use App\Models\SearchSynonym;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Laravel\Scout\Builder;
@@ -264,17 +266,16 @@ class SearchController extends ApiController
 
     private function getPriceRanges(): array
     {
-        $minPrice = Product::query()
-            ->where('is_active', true)
-            ->min('price') ?? 0;
-
-        $maxPrice = Product::query()
-            ->where('is_active', true)
-            ->max('price') ?? 0;
+        // Price lives on product_variants, not products — aggregate there,
+        // scoped to variants whose parent product is active.
+        $prices = ProductVariant::query()
+            ->whereHas('product', fn (EloquentBuilder $q) => $q->where('is_active', true))
+            ->selectRaw('MIN(price) AS min_price, MAX(price) AS max_price')
+            ->first();
 
         return [
-            'min' => $minPrice,
-            'max' => $maxPrice,
+            'min' => (int) ($prices->min_price ?? 0),
+            'max' => (int) ($prices->max_price ?? 0),
         ];
     }
 }
