@@ -17,6 +17,7 @@ use App\Models\VariantAttributeValue;
 use Database\Seeders\Concerns\CachesImages;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\Facades\Activity;
 
 class ElectronicsSeeder extends Seeder
 {
@@ -86,7 +87,7 @@ class ElectronicsSeeder extends Seeder
         $this->createProductTypes();
 
         $this->command->info('Creating products (1000+)...');
-        $this->createProducts();
+        Activity::withoutLogs(fn () => Product::withoutSyncingToSearch(fn () => $this->createProducts()));
 
         $this->command->info('Electronics seeding completed!');
     }

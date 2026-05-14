@@ -65,6 +65,15 @@ return [
     'queue_conversions_after_database_commit' => env('QUEUE_CONVERSIONS_AFTER_DB_COMMIT', true),
 
     /*
+     * Product seeders attach thousands of placeholder images. By default they
+     * skip derived image conversions to keep local database setup fast.
+     */
+    'generate_seed_conversions' => env('MEDIA_GENERATE_SEED_CONVERSIONS', false),
+    'download_seed_images' => env('MEDIA_DOWNLOAD_SEED_IMAGES', false),
+    'seed_images_per_product' => (int) env('MEDIA_SEED_IMAGES_PER_PRODUCT', 1),
+    'skip_seed_conversions' => false,
+
+    /*
      * The fully qualified class name of the media model.
      */
     'media_model' => Media::class,

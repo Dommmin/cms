@@ -1,5 +1,3 @@
-'use client';
-
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -8,14 +6,14 @@ import { BlogComments } from '@/components/blog-comments';
 import { BlogVotes } from '@/components/blog-votes';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { JsonLd } from '@/components/json-ld';
-import { useLocalePath } from '@/hooks/use-locale';
+import { localePath } from '@/lib/i18n';
 import { sanitizeHtml } from '@/lib/sanitize';
 import { buildBlogPosting, buildBreadcrumbList } from '@/lib/schema';
 import { generateCanonical } from '@/lib/seo';
 import type { BlogPostClientProps } from './blog-post-client.types';
 
 export function BlogPostClient({ post, locale }: BlogPostClientProps) {
-    const lp = useLocalePath();
+    const lp = (path: string) => localePath(locale, path);
 
     return (
         <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">

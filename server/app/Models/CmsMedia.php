@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Table;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
@@ -15,7 +14,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 #[Table(name: 'cms_media')]
 class CmsMedia extends Model implements HasMedia
 {
-    use HasFactory;
     use InteractsWithMedia;
 
     protected $fillable = [];
@@ -28,6 +26,10 @@ class CmsMedia extends Model implements HasMedia
 
     public function registerMediaConversions(?Media $media = null): void
     {
+        if (config('media-library.skip_seed_conversions', false)) {
+            return;
+        }
+
         // Only generate image conversions for image files
         if ($media instanceof Media && ! str_starts_with($media->mime_type ?? '', 'image/')) {
             return;
