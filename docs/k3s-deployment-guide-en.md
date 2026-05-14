@@ -17,6 +17,7 @@ I don't assume you know Kubernetes. I do assume you know Docker and aren't afrai
 2. [Deployment architecture](#2-deployment-architecture)
 3. [Server setup (Hetzner)](#3-server-setup-hetzner)
 4. [Installing k3s](#4-installing-k3s)
+   - [4.4 Automated cluster setup — bootstrap.sh](#44-automated-cluster-setup--bootstrapsh) ← **recommended after installing k3s**
 5. [Installing cert-manager (SSL Let's Encrypt)](#5-installing-cert-manager-ssl-lets-encrypt)
 6. [Configuring Traefik (HTTPS + redirect)](#6-configuring-traefik-https--redirect)
 7. [Cluster preparation — namespace and secrets](#7-cluster-preparation--namespace-and-secrets)
@@ -25,6 +26,11 @@ I don't assume you know Kubernetes. I do assume you know Docker and aren't afrai
 10. [Deploying Typesense (full-text search)](#10-deploying-typesense-full-text-search)
 11. [Pull Secret for Container Registry (GHCR / GitLab)](#11-pull-secret-for-container-registry-ghcr--gitlab)
 12. [Deploying the application (server + client)](#12-deploying-the-application-server--client)
+    - [12.3 Queue worker (background jobs)](#123-queue-worker-background-jobs)
+    - [12.4 Scheduler (Laravel cron jobs)](#124-scheduler-laravel-cron-jobs)
+    - [12.5 Mail (SMTP)](#125-mail-smtp)
+    - [12.6 Reverb / broadcasting (realtime — chat, notifications)](#126-reverb--broadcasting-realtime--chat-notifications)
+    - [12.7 Laravel Excel — gotchas](#127-laravel-excel--gotchas)
 13. [How Does CI/CD Connect to k3s?](#13-how-does-cicd-connect-to-k3s)
 14. [Configuring GitHub Actions](#14-configuring-github-actions)
 15. [Configuring GitLab CI/CD](#15-configuring-gitlab-cicd)
@@ -352,6 +358,53 @@ kubectl apply -f k8s/traefik/middleware.yaml
 ```
 
 > **Why two steps?** `Middleware` is a Traefik CRD resource. If you apply it before Traefik is installed, kubectl returns `no matches for kind "Middleware"` — because the CRD doesn't exist yet. Additionally, the Middleware must belong to an existing namespace.
+
+### 4.4 Automated cluster setup — bootstrap.sh
+
+After installing k3s and copying the kubeconfig (sections 4.1–4.2), you have two options:
+
+| Option                           | When to choose it                                                              |
+|----------------------------------|--------------------------------------------------------------------------------|
+| **A: `bootstrap.sh`** (recommended) | New cluster, you want to move fast — the script runs sections 5–12 for you  |
+| **B: Manually** (sections 5–12)  | You're learning Kubernetes, you want full control over every step              |
+
+#### Option A — run bootstrap.sh
+
+Prerequisites before running:
+- `KUBECONFIG` points at the cluster (section 4.2)
+- The repository is cloned locally (the `k8s/` directory must exist)
+- DNS records point at the server IP (section 3.4)
+
+From the **repository root** on your local machine:
+
+```bash
+chmod +x k8s/bootstrap.sh
+./k8s/bootstrap.sh
+```
+
+The script will interactively ask for:
+
+| Question                    | What to enter                                        |
+|-----------------------------|------------------------------------------------------|
+| App name / namespace        | e.g. `app` (used as a prefix for all resources)      |
+| MySQL root password         | Strong password, min. 16 characters                  |
+| MySQL username              | Defaults to `app`                                    |
+| MySQL app password          | Strong password, min. 16 characters                  |
+| Redis password              | Strong password, min. 16 characters                  |
+| Typesense API key           | Random key, min. 16 characters                       |
+| CI/CD type                  | `1` = GitHub Actions, `2` = GitLab CI, Enter = skip  |
+| GitHub/GitLab token         | For the pull secret of your private image registry   |
+| Let's Encrypt email         | Certificate expiry notifications                     |
+| Dev ingress (HTTP)          | `y` if you have no domain — uses sslip.io            |
+| Production ingress (HTTPS)  | `Y` (default) — requires DNS + cert-manager          |
+| GlitchTip                   | `y` if you want self-hosted error tracking           |
+| Ops tooling (Rancher + Uptime Kuma) | `y` if you want a cluster UI panel and uptime monitoring — runs `docker-compose.ops.yml` on the server |
+
+**Run time:** ~5–10 minutes (mostly waiting for MySQL and cert-manager).
+
+When finished, the script prints the list of pods in the namespace plus the next steps — configuring CI/CD secrets.
+
+> **If you chose Option A — jump to [section 13 (How Does CI/CD Connect to k3s?)](#13-how-does-cicd-connect-to-k3s).** Sections 5–12 below describe the same thing the script does — useful as documentation or for manual reconfiguration.
 
 ---
 
@@ -730,6 +783,32 @@ kubectl -n cms-prod get pvc
 
 `STATUS: Bound` means the volume is ready. `local-path` is k3s's built-in mechanism for storing data on the local VPS disk.
 
+> **What does the PVC store?**
+> ```
+> PVC (20Gi on the VPS disk)
+>   ├── storage/app/                   ← uploaded files (images, PDFs, attachments)
+>   ├── storage/logs/                  ← Laravel logs (when LOG_CHANNEL=daily or stack)
+>   └── storage/framework/             ← view cache, sessions, queues, Excel exports
+>       ├── cache/data/                  ← application cache (when CACHE_STORE=file)
+>       ├── cache/laravel-excel/         ← temp files for queued Excel exports
+>       ├── sessions/                    ← sessions (when SESSION_DRIVER=file)
+>       └── views/                       ← compiled Blade templates
+> ```
+> Data survives pod restarts and deploys. It is lost only if you manually delete the PVC.
+
+> **Important:** The `storage/framework/*` directories must exist **before** the pod starts — otherwise:
+> - `php artisan view:cache` fails on startup
+> - queued Excel exports fail with `fopen(... laravel-excel/...): No such file or directory`
+> - file-based sessions fail
+>
+> If your `Dockerfile` doesn't create these directories in the image, **add them to the pod's `command`/`entrypoint`** or to the migration job:
+> ```bash
+> mkdir -p storage/framework/{cache/data,cache/laravel-excel,sessions,views} \
+>          storage/app/{public,private} storage/logs \
+>   && chown -R www-data:www-data storage bootstrap/cache
+> ```
+> Best practice: add this line to the `Dockerfile` (a layer just before `USER www-data`) — that way every new image has the correct structure.
+
 > **PVC limitation:** works only with `replicas: 1`. When scaling to 2+ pods, switch to external S3-compatible storage (AWS S3, MinIO, Cloudflare R2) — set `FILESYSTEM_DISK=s3` in your `.env`.
 
 The default `server/.env.production.example` uses `FILESYSTEM_DISK=s3` — external object storage is the recommended setup for production. Set `FILESYSTEM_DISK=public` only if you intentionally want local PVC storage with a single replica.
@@ -774,7 +853,283 @@ pod/cms-gotenberg-xxxxxxxxx-xxxxx  1/1     Running
 
 > **Note:** `cms-queue` runs 2 replicas by default (configured in `k8s/server/deployment-queue.yaml`). Each worker restarts itself after 1 hour (`--max-time=3600`) to prevent memory leaks.
 
-### 12.3 Testing without a domain (sslip.io)
+### 12.3 Queue worker (background jobs)
+
+The queue worker is a **separate Deployment** (`cms-queue`) that continuously reads the Redis queue and runs the application's jobs. Without it:
+
+- mail, SSE notifications, Scout indexing → everything goes to the queue and nobody processes it
+- Spatie MediaLibrary image conversions → uploaded images never get thumbnails
+- queued Excel exports → the user never receives the file
+- post-purchase / post-registration emails → never go out
+
+The `k8s/server/deployment-queue.yaml` manifest starts 2 replicas (HA) and runs:
+
+```
+php artisan queue:work redis --tries=3 --timeout=300 --max-jobs=1000 --max-time=3600
+```
+
+`--max-time=3600` and `--max-jobs=1000` make the worker restart itself every hour / every 1000 jobs — this guards against memory leaks in long-running processes.
+
+**Check that the workers are running:**
+
+```bash
+kubectl -n cms-prod get pods -l component=queue
+# NAME                       READY   STATUS    RESTARTS   AGE
+# cms-queue-xxxxx-aaaaa      1/1     Running   0          12m
+# cms-queue-xxxxx-bbbbb      1/1     Running   0          12m
+
+kubectl -n cms-prod logs deployment/cms-queue --tail=30
+```
+
+**Failed jobs — what to do with them:**
+
+Jobs that fail 3 times land in the `failed_jobs` table. Check them regularly:
+
+```bash
+# List
+kubectl -n cms-prod exec deployment/cms-server -- php artisan queue:failed
+
+# Details of a specific job (exception)
+kubectl -n cms-prod exec deployment/cms-server -- \
+  php artisan queue:failed | grep "ProductsExport"
+
+# Retry a single job
+kubectl -n cms-prod exec deployment/cms-server -- \
+  php artisan queue:retry <UUID>
+
+# Retry all
+kubectl -n cms-prod exec deployment/cms-server -- php artisan queue:retry all
+
+# Flush all failed jobs (cleanup)
+kubectl -n cms-prod exec deployment/cms-server -- php artisan queue:flush
+```
+
+**Scaling:** If the queue grows faster than the workers can drain it, add replicas:
+
+```bash
+kubectl -n cms-prod scale deployment/cms-queue --replicas=4
+```
+
+Remember that every worker pulls the same `.env` — more workers means more memory usage and more connections to Redis/MySQL.
+
+### 12.4 Scheduler (Laravel cron jobs)
+
+Laravel has a built-in scheduler — in `routes/console.php` you define tasks that should run periodically (e.g. publishing scheduled posts, clearing carts). List the tasks:
+
+```bash
+kubectl -n cms-prod exec deployment/cms-server -- php artisan schedule:list
+```
+
+On a traditional server you'd add a single `crontab` entry:
+```
+* * * * * php artisan schedule:run >> /dev/null 2>&1
+```
+
+In k3s the equivalent is a **`CronJob`** (`k8s/server/cronjob-scheduler.yaml`) — every minute Kubernetes starts a short-lived pod that runs `php artisan schedule:run`, then kills it.
+
+```yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cms-scheduler
+spec:
+  schedule: "* * * * *"          # every minute
+  concurrencyPolicy: Forbid       # don't start a new one if the previous is still running
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: scheduler
+              image: ghcr.io/<user>/cms-server:latest
+              command: ["php", "artisan", "schedule:run"]
+```
+
+**Verification:**
+
+```bash
+# The CronJob exists
+kubectl -n cms-prod get cronjob cms-scheduler
+# NAME            SCHEDULE    LAST SCHEDULE   AGE
+# cms-scheduler   * * * * *   39s             1d
+
+# The last few invocations (pods with Completed status)
+kubectl -n cms-prod get pods | grep cms-scheduler | tail -5
+
+# Logs from the last run
+LAST=$(kubectl -n cms-prod get pods -o name | grep scheduler | tail -1)
+kubectl -n cms-prod logs $LAST
+# Running ['artisan' blog:publish-scheduled] . 2 sec DONE
+# Running ['artisan' cms:process-scheduled-pages]  2 sec DONE
+```
+
+**Common mistake:** The CronJob uses the same image as `cms-server`. The pipeline updates the image in both (`kubectl set image deployment/cms-server` **and** `kubectl set image cronjob/cms-scheduler`) — check your `.github/workflows/deploy.yml`, it's easy to forget.
+
+### 12.5 Mail (SMTP)
+
+Laravel sends transactional email over SMTP. In k3s you have two options:
+
+#### Option A — external SMTP (recommended for production)
+
+Mailgun, SendGrid, Resend, Postmark, Amazon SES, your own SMTP. Put the credentials in `PROD_ENV`:
+
+```dotenv
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.resend.com         # or smtp.mailgun.org, smtp.eu.mailgun.org, ...
+MAIL_PORT=587
+MAIL_USERNAME=resend
+MAIL_PASSWORD=re_xxxxxxxxxxxxxxxx
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="no-reply@yourdomain.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+> **Most common mistake:** `MAIL_HOST=smtp.yourdomain.com` left as a placeholder — all mail fails with `getaddrinfo failed`. Check the actual config:
+> ```bash
+> kubectl -n cms-prod exec deployment/cms-server -- \
+>   php artisan config:show mail.mailers.smtp.host
+> ```
+
+#### Option B — mailpit in the cluster (for testing / staging)
+
+[Mailpit](https://mailpit.axllent.org/) is a lightweight SMTP server with a web UI — it catches all mail in memory and shows it in the browser, nothing leaves the cluster. Perfect for staging and developer smoke tests.
+
+Save the manifest `k8s/mailpit/deployment.yaml`:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cms-mailpit
+  namespace: cms-prod
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: cms-mailpit } }
+  template:
+    metadata: { labels: { app: cms-mailpit } }
+    spec:
+      containers:
+        - name: mailpit
+          image: axllent/mailpit:latest
+          ports:
+            - { name: smtp, containerPort: 1025 }
+            - { name: http, containerPort: 8025 }
+          resources:
+            requests: { cpu: 10m, memory: 32Mi }
+            limits:   { cpu: 100m, memory: 128Mi }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: mailpit, namespace: cms-prod }
+spec:
+  selector: { app: cms-mailpit }
+  ports:
+    - { name: smtp, port: 1025, targetPort: 1025 }
+    - { name: http, port: 8025, targetPort: 8025 }
+```
+
+```bash
+kubectl apply -f k8s/mailpit/deployment.yaml
+```
+
+In `PROD_ENV` (or `STAGING_ENV`) set:
+
+```dotenv
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit            # the in-cluster DNS service
+MAIL_PORT=1025
+MAIL_USERNAME=
+MAIL_PASSWORD=
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="no-reply@yourdomain.test"
+```
+
+Expose the web UI (port 8025) via Ingress or `kubectl port-forward`:
+
+```bash
+kubectl -n cms-prod port-forward svc/mailpit 8025:8025
+# open http://localhost:8025
+```
+
+**Send test:**
+
+```bash
+kubectl -n cms-prod exec deployment/cms-server -- \
+  php artisan tinker --execute='Mail::raw("test ".now(), fn($m) => $m->to("test@example.com")->subject("ping"));'
+```
+
+### 12.6 Reverb / broadcasting (realtime — chat, notifications)
+
+If the application uses WebSockets (Laravel Reverb, Pusher, Soketi) — e.g. live support chat, admin panel push notifications — you need a separate deployment.
+
+The simplest is **Laravel Reverb** (official, bundled with Laravel ≥11):
+
+```yaml
+# k8s/reverb/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: cms-reverb, namespace: cms-prod }
+spec:
+  replicas: 1                     # Reverb keeps WS state in-memory; HA needs external state (Redis pub/sub works, but clients are sticky)
+  selector: { matchLabels: { app: cms-reverb } }
+  template:
+    metadata: { labels: { app: cms-reverb } }
+    spec:
+      imagePullSecrets: [{ name: ghcr-pull-secret }]
+      containers:
+        - name: reverb
+          image: ghcr.io/<user>/cms-server:latest
+          command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+          envFrom: [{ secretRef: { name: cms-server-env } }]
+          ports: [{ containerPort: 8080 }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: cms-reverb, namespace: cms-prod }
+spec:
+  selector: { app: cms-reverb }
+  ports: [{ port: 8080, targetPort: 8080 }]
+```
+
+Required variables in `PROD_ENV`:
+
+```dotenv
+BROADCAST_CONNECTION=reverb
+REVERB_APP_ID=<random_id>
+REVERB_APP_KEY=<random_key>
+REVERB_APP_SECRET=<random_secret>
+REVERB_HOST=cms-reverb           # server-side, in-cluster
+REVERB_PORT=8080
+REVERB_SCHEME=http
+
+# Frontend / client build args:
+NEXT_PUBLIC_REVERB_APP_KEY=<same key>
+NEXT_PUBLIC_REVERB_HOST=ws.yourdomain.com   # public host, via Ingress
+NEXT_PUBLIC_REVERB_PORT=443
+NEXT_PUBLIC_REVERB_SCHEME=https
+```
+
+In the Ingress add the host `ws.yourdomain.com` with path `/app` → `cms-reverb:8080`. Traefik handles WebSocket upgrade **out of the box** — nothing extra to configure.
+
+**Without Reverb:** in `.env` leave `BROADCAST_CONNECTION=log` (events are only logged) or `redis` (events go to Redis pub/sub, but the frontend has no way to receive them). Chat / SSE notifications will only work via polling.
+
+### 12.7 Laravel Excel — gotchas
+
+The `Maatwebsite\Excel` exports in this project (`ProductsExport`, `OrdersExport`, `CustomersExport`, `CustomReportExport`) **implement `ShouldQueue`** — meaning `Excel::store(...)` returns immediately and the actual file write happens in the worker.
+
+Consequences:
+
+1. **A queue worker is required** — without `cms-queue` Running, exports are never produced.
+2. **A cache directory is required** — the worker writes temp files to `storage/framework/cache/laravel-excel/`. If the directory doesn't exist, the queue job fails with:
+   ```
+   ErrorException: fopen(.../storage/framework/cache/laravel-excel/laravel-excel-XXX.xlsx): No such file or directory
+   ```
+   See "What does the PVC store?" above — `mkdir -p storage/framework/cache/laravel-excel`.
+3. **Disk = `local`** in `config/excel.php` targets `storage/app` (or `storage/app/private` since Laravel 11). If you want files to survive pod restarts — the PVC handles that, if `replicas: 1`. With 2+ replicas, move exports to MinIO/S3 (`Excel::store(..., 's3')`).
+
+### 12.8 Testing without a domain (sslip.io)
 
 If you don't have a real domain yet, use the development ingress — HTTP only, no TLS needed:
 
@@ -1392,6 +1747,27 @@ Common causes:
 - **servicelb disabled without a cloud LB** — ports 80/443 not bound on the host; check `sudo ss -tlnp | grep :80` on the server; if nothing is listening — see section 4.1
 - You've hit Let's Encrypt's rate limit (5 certificates per week per domain)
 
+### cert-manager: `x509: certificate signed by unknown authority` when creating ClusterIssuer
+
+```
+Error from server (InternalError): error when creating "STDIN": Internal error
+occurred: failed calling webhook "webhook.cert-manager.io": ... tls: failed to
+verify certificate: x509: certificate signed by unknown authority
+```
+
+Race condition: the cert-manager pods are `Running`, but `cainjector` hasn't yet injected the serving certificate into the webhook. `kubectl rollout status` does **not** detect this — the pod is "ready" before the webhook actually answers.
+
+`bootstrap.sh` has a probe for this (a server-side dry-run in a loop, up to 180s). If you still hit this error during a manual install — just wait ~30s and retry the ClusterIssuer `kubectl apply`:
+
+```bash
+# confirm the webhook actually answers
+kubectl -n cert-manager get pods
+until kubectl apply --dry-run=server -f letsencrypt-prod.yaml >/dev/null 2>&1; do
+  echo "webhook not ready yet, retrying in 5s..."; sleep 5
+done
+kubectl apply -f letsencrypt-prod.yaml
+```
+
 ### Laravel returning 500
 
 ```bash
@@ -1417,6 +1793,66 @@ kubectl -n cms-prod exec -it deployment/cms-server -- \
 
 Check that `DB_HOST` in the secret matches `cms-mysql.cms-prod.svc.cluster.local`.
 
+### Typesense: the collection exists but `num_documents=0`
+
+After `scout:import` the collection shows up in the logs, but documents aren't indexed. Check the worker:
+
+```bash
+kubectl -n cms-prod logs deployment/cms-queue --tail=50 | grep -A3 -i scout
+```
+
+Typical error: `Error importing document: Field 'is_featured' must be a bool` — this means `toSearchableArray()` in the model returns an **int** instead of a **bool** (because `'is_featured' => 'boolean'` is missing from `$casts`). Fix it by rebuilding the image from the correct commit, or by adding an explicit `(bool) $this->is_featured` cast in `toSearchableArray()`.
+
+After the fix:
+
+```bash
+# Flush the old collection and re-import
+kubectl -n cms-prod exec deployment/cms-server -- php artisan scout:flush "App\Models\Product"
+kubectl -n cms-prod exec deployment/cms-server -- php artisan scout:import "App\Models\Product"
+```
+
+### Excel export fails with `fopen(.../laravel-excel/...): No such file or directory`
+
+A queued Maatwebsite/Excel export tries to write to `storage/framework/cache/laravel-excel/` and the directory doesn't exist on the PVC. Create it in every pod that uses the volume (server + queue):
+
+```bash
+for pod in $(kubectl -n cms-prod get pods -l 'component in (server,queue)' -o name); do
+  kubectl -n cms-prod exec $pod -- sh -c \
+    'mkdir -p storage/framework/cache/laravel-excel && chown www-data:www-data storage/framework/cache/laravel-excel'
+done
+```
+
+Permanent fix: add `mkdir -p` to the `Dockerfile` (a layer before `USER www-data`) — see section 12.1.
+
+### Mail doesn't go out — `Name does not resolve`
+
+```bash
+kubectl -n cms-prod exec deployment/cms-server -- \
+  php artisan tinker --execute='try{ Mail::raw("t",fn($m)=>$m->to("x@x")->subject("p")); echo "OK"; }catch(\Throwable $e){echo $e->getMessage();}'
+# Connection could not be established with host "smtp.yourdomain.com:587": getaddrinfo failed
+```
+
+Most common causes:
+1. `MAIL_HOST` in `PROD_ENV` is a placeholder (`smtp.yourdomain.com`) — set a real SMTP host or deploy mailpit (section 12.5).
+2. `MAIL_HOST=mailpit` but there is no `mailpit` Service in the cluster — `kubectl -n cms-prod get svc mailpit`.
+3. The server firewall blocks outbound 587/465 — check `nc -zv smtp.host 587` from the pod.
+
+### Failed jobs piling up (queue:failed → hundreds of records)
+
+Often visible after a DB schema change, a job class rename refactor, or Scout/Media errors. Workflow:
+
+```bash
+# 1. see which job types are failing
+kubectl -n cms-prod exec deployment/cms-server -- php artisan queue:failed | awk '{print $5}' | sort | uniq -c
+
+# 2. inspect one exception
+kubectl -n cms-prod exec deployment/cms-server -- php artisan tinker --execute='echo DB::table("failed_jobs")->latest("failed_at")->value("exception");' | head -c 500
+
+# 3. after fixing the code — retry or flush
+kubectl -n cms-prod exec deployment/cms-server -- php artisan queue:retry all
+# or: queue:flush  (deletes all failed jobs)
+```
+
 ### HPA not scaling
 
 ```bash
@@ -1439,7 +1875,30 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 
 GlitchTip is a self-hosted, open-source alternative to Sentry. It uses the same Sentry SDK — no code changes needed, just point the DSN to your GlitchTip instance.
 
-Run GlitchTip in a **separate namespace** on the same cluster using the official Helm chart:
+### 21.1 Prepare `values.yaml`
+
+The repo ships `k8s/glitchtip/values.example.yaml` as a template. **Never commit** files with real secrets — `.gitignore` already ignores `k8s/glitchtip/values.yaml`:
+
+```bash
+cp k8s/glitchtip/values.example.yaml k8s/glitchtip/values.yaml
+```
+
+Edit `k8s/glitchtip/values.yaml` and set:
+
+| Key | What to fill in |
+|---|---|
+| `glitchtip.env.SECRET_KEY` | A random 50-char hex string: `openssl rand -hex 25` |
+| `glitchtip.env.GLITCHTIP_DOMAIN` | The GlitchTip domain/subdomain, e.g. `glitchtip.yourdomain.com` (must have a DNS A record pointing at the server IP) |
+| `glitchtip.env.DEFAULT_FROM_EMAIL` | The "From" address for alert emails, e.g. `noreply@yourdomain.com` |
+| `glitchtip.env.EMAIL_URL` | SMTP URL for sending alerts: `smtp://USER:APP_PASSWORD@smtp.gmail.com:587` (for Gmail — generate an [App Password](https://myaccount.google.com/apppasswords)) |
+| `glitchtip.ingress.className` | **Change `nginx` → `traefik`** (k3s uses Traefik by default) |
+| `glitchtip.ingress.hosts[0].host` | The same domain as `GLITCHTIP_DOMAIN` |
+| `glitchtip.ingress.tls[0].hosts[0]` | The same domain |
+| `postgresql.auth.password` | A strong password for the bundled Postgres database (GlitchTip uses Postgres, not MySQL) |
+
+> **Note:** Once you generate the SECRET_KEY, keep it — changing it after startup invalidates all sessions and tokens in GlitchTip.
+
+### 21.2 Helm install
 
 ```bash
 helm repo add glitchtip https://glitchtip.github.io/helm-charts
@@ -1447,19 +1906,28 @@ helm repo update
 helm upgrade --install glitchtip glitchtip/glitchtip \
   --namespace glitchtip \
   --create-namespace \
-  -f k8s/glitchtip/values.example.yaml
+  -f k8s/glitchtip/values.yaml
 ```
 
-Edit `k8s/glitchtip/values.example.yaml` before applying — set your domain, email, SMTP, and database password.
+`bootstrap.sh` **auto-detects** whether `values.yaml` exists — if so, it uses it; if not, it warns you to create it first.
 
-After install:
-1. Create an organization in the GlitchTip UI
-2. Create `cms-api` and `cms-frontend` projects
-3. Copy the DSNs into your production secrets:
-   - Laravel: `GLITCHTIP_DSN=https://...@glitchtip.yourdomain.com/1`
-   - Next.js (build arg): `NEXT_PUBLIC_GLITCHTIP_DSN=https://...@glitchtip.yourdomain.com/2`
+### 21.3 Post-install configuration
 
-> **Note:** The `values.example.yaml` uses `ingressClassName: nginx` — change to `traefik` if you want GlitchTip behind the same Traefik ingress.
+1. Open `https://glitchtip.yourdomain.com` (wait 1–2 min for the TLS certificate from cert-manager)
+2. Create an organization (e.g. `cms`)
+3. Create two projects: `cms-api` (platform: PHP/Laravel) and `cms-frontend` (platform: Next.js)
+4. Copy the DSNs from **Settings → Client Keys (DSN)** of each project
+5. Wire them into CI/CD:
+   - Laravel: `GLITCHTIP_DSN=https://...@glitchtip.yourdomain.com/1` (in `PROD_ENV`)
+   - Next.js (build arg): `NEXT_PUBLIC_GLITCHTIP_DSN=https://...@glitchtip.yourdomain.com/2` (in `ENV_CLIENT_PROD`)
+6. Trigger a deploy — from the next rollout, errors are reported to GlitchTip.
+
+**Test:** in a Laravel admin shell:
+```bash
+kubectl -n cms-prod exec deployment/cms-server -- \
+  php artisan tinker --execute='throw new \Exception("glitchtip test event");'
+```
+After ~30s the event appears in the GlitchTip UI → Issues.
 
 ---
 
@@ -1467,9 +1935,30 @@ After install:
 
 If you use Rancher at work, you can run it on the same VPS. You'll get the exact same environment — pod overview, logs, shell into containers, secret management — all from the browser.
 
-### 22.1 Installing Rancher
+> **🚀 Easiest: bring up Rancher and Uptime Kuma with a single command via `docker-compose.ops.yml`.**
+>
+> The repo ships a ready-made `docker-compose.ops.yml` (project root) containing Rancher (ports 8080/8443) and Uptime Kuma (port 3001) with persistent volumes `/opt/rancher` and `/opt/uptime-kuma`.
+>
+> ```bash
+> # On the server (where k3s runs):
+> sudo mkdir -p /opt/rancher /opt/uptime-kuma
+> sudo chown -R 1000:1000 /opt/uptime-kuma     # Uptime Kuma runs as uid 1000
+>
+> # Copy the file to the server (or clone the repo there)
+> scp docker-compose.ops.yml root@<SERVER_IP>:/opt/
+>
+> # Start it (Docker, NOT k3s — these are operational tools running alongside the cluster)
+> ssh root@<SERVER_IP> "cd /opt && docker compose -f docker-compose.ops.yml up -d"
+>
+> # Status:
+> ssh root@<SERVER_IP> "docker compose -f /opt/docker-compose.ops.yml ps"
+> ```
+>
+> The rest of this section covers what comes next: the first Rancher login (22.2), importing the k3s cluster (22.3), securing the ports (22.5). Uptime Kuma configuration is in the "💡 Bonus: Uptime Kuma" section below.
 
-Rancher runs as a Docker container — independently from k3s. On the server:
+### 22.1 Installing Rancher (manually, without compose)
+
+If you prefer not to use compose:
 
 ```bash
 docker run -d \
@@ -1632,21 +2121,21 @@ k9s -n cms-prod
 
 ## 25. Secret rotation — updating .env and passwords with no downtime
 
+> **Easiest (recommended):** update the values in `PROD_ENV` (GitHub Variables / GitLab CI Variables) and trigger a deploy — the pipeline syncs the `cms-server-env` secret and does a rolling restart for you. The sections below are for operations done manually with `kubectl` (without CI/CD).
+
 ### 25.1 Updating the Laravel .env
 
-The recommended way is to update `PROD_ENV` in GitHub Variables (or `SERVER_ENV` in GitLab) and push — the pipeline will sync the secret automatically on the next deploy.
-
-To update manually without triggering a full deploy:
+The single source of truth for the Laravel `.env` in the cluster is the `cms-server-env` secret. Without CI/CD, regenerate it from your local `server/.env.production`:
 
 ```bash
-printf '%s' "$NEW_ENV_CONTENT" > /tmp/prod.env
+# 1) update the values in server/.env.production (gitignored)
+# 2) re-create the secret (idempotent — overwrites the existing one):
 kubectl create secret generic cms-server-env \
-  --from-file=.env=/tmp/prod.env \
+  --from-file=.env=server/.env.production \
   --namespace=cms-prod \
   --dry-run=client -o yaml | kubectl apply -f -
-rm /tmp/prod.env
 
-# Rolling restart — new pods start with the new secret before old ones stop
+# 3) rolling restart — new pods start with the new secret before old ones stop
 kubectl -n cms-prod rollout restart deployment/cms-server
 kubectl -n cms-prod rollout restart deployment/cms-queue
 ```
@@ -1665,11 +2154,24 @@ FLUSH PRIVILEGES;
 EXIT;
 ```
 
-**Step 2** — update the k8s secret and restart:
+**Step 2** — update both secrets and restart:
 
 ```bash
-kubectl apply -f k8s/mysql/secret.yaml
-# Update PROD_ENV / SERVER_ENV in CI/CD with the new DB_PASSWORD
+# MySQL secret — refresh it with --from-literal (bootstrap never creates a
+# k8s/mysql/secret.yaml file — it uses kubectl CLI directly).
+kubectl create secret generic cms-mysql \
+  --from-literal=root-password='<NEW_ROOT>' \
+  --from-literal=username='cms' \
+  --from-literal=password='NewPassword123!' \
+  --namespace=cms-prod \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# Update DB_PASSWORD in server/.env.production, then:
+kubectl create secret generic cms-server-env \
+  --from-file=.env=server/.env.production \
+  --namespace=cms-prod \
+  --dry-run=client -o yaml | kubectl apply -f -
+
 kubectl -n cms-prod rollout restart deployment/cms-server
 kubectl -n cms-prod rollout restart deployment/cms-queue
 ```
@@ -1677,8 +2179,17 @@ kubectl -n cms-prod rollout restart deployment/cms-queue
 ### 25.3 Changing the Redis password
 
 ```bash
-kubectl apply -f k8s/redis/secret.yaml
-# Update PROD_ENV / SERVER_ENV in CI/CD with the new REDIS_PASSWORD
+# Redis secret
+kubectl create secret generic cms-redis \
+  --from-literal=password='<NEW_REDIS_PASSWORD>' \
+  --namespace=cms-prod \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# Update REDIS_PASSWORD in server/.env.production, then:
+kubectl create secret generic cms-server-env \
+  --from-file=.env=server/.env.production \
+  --namespace=cms-prod \
+  --dry-run=client -o yaml | kubectl apply -f -
 
 kubectl -n cms-prod rollout restart deployment/cms-redis
 kubectl -n cms-prod rollout restart deployment/cms-server
@@ -1737,7 +2248,16 @@ Use the subdomain `staging.yourdomain.com` for the staging ingress.
 
 ## 💡 Bonus: Uptime Kuma — uptime monitoring
 
-Uptime Kuma is a self-hosted alternative to UptimeRobot. It runs as a Docker container alongside Rancher:
+Uptime Kuma is a self-hosted alternative to UptimeRobot.
+
+**Recommended:** run it via `docker-compose.ops.yml` together with Rancher (see section 22 above):
+
+```bash
+# On the server
+cd /opt && docker compose -f docker-compose.ops.yml up -d uptime-kuma
+```
+
+Alternatively, standalone:
 
 ```bash
 docker run -d \
@@ -1748,7 +2268,7 @@ docker run -d \
   louislam/uptime-kuma:latest
 ```
 
-Open `https://<SERVER_IP>:3001` and add monitors for:
+Open `http://<SERVER_IP>:3001` and add monitors for:
 - `https://yourdomain.com` — frontend
 - `https://admin.yourdomain.com/health` — Laravel API
 - `https://admin.yourdomain.com/admin` — admin panel

@@ -1203,6 +1203,26 @@ Konsekwencje:
    Patrz "Co przechowuje PVC?" wyżej — `mkdir -p storage/framework/cache/laravel-excel`.
 3. **Disk = `local`** w `config/excel.php` celuje w `storage/app` (lub `storage/app/private` od Laravel 11). Jeśli chcesz że pliki przeżyją restart poda — to PVC obsługuje, jeśli `replicas: 1`. Przy 2+ replikach przerzuć eksporty na MinIO/S3 (`Excel::store(..., 's3')`).
 
+### 12.8 Testowanie bez domeny (sslip.io)
+
+Jeśli nie masz jeszcze prawdziwej domeny, użyj ingressu deweloperskiego — tylko HTTP, bez TLS:
+
+```bash
+# Edytuj k8s/ingress-dev.yaml i zamień 1.2.3.4 na IP swojego serwera
+kubectl apply -f k8s/ingress-dev.yaml
+```
+
+Usługa `sslip.io` automatycznie rozwiązuje subdomeny:
+- `app.1.2.3.4.sslip.io` → IP Twojego serwera (frontend Next.js)
+- `api.1.2.3.4.sslip.io` → IP Twojego serwera (admin Laravel)
+
+Przełącz na ingress produkcyjny, gdy domena będzie gotowa:
+
+```bash
+kubectl delete -f k8s/ingress-dev.yaml
+kubectl apply -f k8s/ingress.yaml
+```
+
 ---
 
 ## 13. Jak CI/CD łączy się z k3s?
