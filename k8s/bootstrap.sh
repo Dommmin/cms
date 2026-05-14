@@ -296,9 +296,15 @@ step_secrets() {
     --dry-run=client -o yaml | kubectl apply -f -
   ok "${APP_NAME}-typesense secret created"
 
-  # Client API URL secret
-  kapply k8s/client/secret.yaml.example
-  ok "${APP_NAME}-client secret applied (API_URL → internal cluster address)"
+  # Client API URL secret — internal URL Next.js uses for server-side fetches.
+  # Created via CLI (consistent with the secrets above). The .example file
+  # uses an APP_NAME placeholder that kapply's cms-prod/cms- substitution
+  # does NOT touch — so it must NOT be applied through kapply.
+  kubectl create secret generic "${APP_NAME}-client-env" \
+    --namespace="${APP_NAME}" \
+    --from-literal=API_URL="http://${APP_NAME}-server.${APP_NAME}.svc.cluster.local/api/v1" \
+    --dry-run=client -o yaml | kubectl apply -f -
+  ok "${APP_NAME}-client-env secret created (API_URL → internal cluster address)"
 
   info "Server .env secret: skipped — CI/CD will create it from PROD_ENV / SERVER_ENV."
   info "If you need it now, run:"

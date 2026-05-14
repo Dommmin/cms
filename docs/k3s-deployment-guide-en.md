@@ -640,10 +640,16 @@ The secret contains your full production `.env`, including database credentials,
 
 This secret contains the internal API URL used by Next.js server-side fetches (bypassing the public internet). **CI/CD does not create this** — required once, manually.
 
+The `k8s/client/secret.yaml.example` file is just a reference template — create the secret via the CLI (substituting your namespace name for `cms-prod`):
+
 ```bash
-kubectl apply -f k8s/client/secret.yaml.example
-# API_URL=http://cms-server.cms-prod.svc.cluster.local/api/v1  (value is already correct)
+kubectl create secret generic cms-client-env \
+  --namespace=cms-prod \
+  --from-literal=API_URL="http://cms-server.cms-prod.svc.cluster.local/api/v1" \
+  --dry-run=client -o yaml | kubectl apply -f -
 ```
+
+> `bootstrap.sh` creates this secret automatically in Step 4.
 
 ---
 

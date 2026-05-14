@@ -634,10 +634,16 @@ kubectl create secret generic app-server-env \
 
 Ten sekret zawiera wewnętrzny URL API (używany przez Next.js server-side do fetchowania danych z pominięciem publicznego internetu). **CI/CD go nie tworzy** — wymagany raz, ręcznie.
 
+Plik `k8s/client/secret.yaml.example` to tylko szablon referencyjny — utwórz sekret przez CLI (podstawiając swoją nazwę namespace za `app`):
+
 ```bash
-kubectl apply -f k8s/client/secret.yaml.example
-# API_URL=http://app-server.app.svc.cluster.local/api/v1  (wartość już jest poprawna)
+kubectl create secret generic app-client-env \
+  --namespace=app \
+  --from-literal=API_URL="http://app-server.app.svc.cluster.local/api/v1" \
+  --dry-run=client -o yaml | kubectl apply -f -
 ```
+
+> `bootstrap.sh` tworzy ten sekret automatycznie w Kroku 4.
 
 ---
 
