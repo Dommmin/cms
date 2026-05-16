@@ -127,7 +127,7 @@ After every feature, update ALL of these:
 
 | File                             | What to update                                             |
 |----------------------------------|------------------------------------------------------------|
-| `ai/guide.md`                    | Add to "Implemented Features" section                      |
+| `.ai/guide.md`                    | Add to "Implemented Features" section                      |
 | `server/docs/USER_GUIDE.md`      | Non-technical editor instructions for using the feature    |
 | `server/docs/DEVELOPER_GUIDE.md` | Technical details: extension points, services, conventions |
 | `docs/backend.md`                | If new service or architectural pattern introduced         |

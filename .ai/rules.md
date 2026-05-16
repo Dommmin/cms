@@ -1,6 +1,52 @@
 # AI Rules
 
-Rules that AI must follow automatically in this project.
+Rules every AI tool (Claude Code, Codex, Gemini, Copilot, Cursor, Junie, Cline, OpenCode) must follow in this project.
+
+> This is the canonical rules file. Entry points (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `.junie/guidelines.md`, `.github/copilot-instructions.md`, `.cursor/rules/global.mdc`) carry a compact copy and point here for depth.
+
+---
+
+## Core Rules — MUST
+
+1. **MUST** run every command inside Docker — never on the host (`docker compose exec php ...` / `docker compose exec node ...`)
+2. **MUST** read 2-3 similar existing files before writing new code, and match the local style
+3. **MUST** touch only files related to the current task — minimal diff
+4. **MUST** plan before coding when a task has 3+ steps
+5. **MUST** use Form Request classes for all validation — never inline in controllers
+6. **MUST** put business logic in the API (Controllers/Services/Resources) — the view receives ready-to-display data
+7. **MUST** write Pest tests for every feature and keep the whole suite green
+8. **MUST** run `make fix && make check` before proposing a commit — `make check` mirrors CI
+9. **MUST** update `.ai/guide.md` (+ `server/docs/*`) when a feature is added or changed
+10. **MUST** ask before any git branch / commit / push (see Git section)
+11. **MUST** verify: "would a staff engineer approve this diff?"
+
+## Core Rules — FORBIDDEN
+
+- **NEVER** run `php artisan`, `pint`, `npm`, etc. directly on the host — no DB/Redis there
+- **NEVER** use `env()` outside `config/` files — use `config('key')`
+- **NEVER** use `DB::` raw queries when Eloquent suffices
+- **NEVER** skip `declare(strict_types=1)` on a PHP file
+- **NEVER** hard-delete users — always go through `App\Actions\AnonymizeUserData`
+- **NEVER** define `type`/`interface` inside `.tsx` files — types live in `.ts` files
+- **NEVER** hardcode admin route strings — use Wayfinder (`@/actions/`, `@/routes/`)
+- **NEVER** hardcode locale in client links — use `useLocalePath()` / `localePath()`
+- **NEVER** refactor code unrelated to the current change, or "normalize" style drive-by
+- **NEVER** introduce new patterns, libraries, or top-level directories without approval
+- **NEVER** add comments that describe WHAT the code does — only non-obvious WHY
+- **NEVER** create branches, commits, or pushes without explicit user consent
+- **NEVER** stage unrelated or auto-generated files (Wayfinder output, other people's work)
+
+---
+
+## Task Routing
+
+| Task type | Approach |
+|-----------|----------|
+| **Bug fix** | Reproduce / locate the root cause first. Fix only what is broken. No drive-by refactors. |
+| **New endpoint / feature** | Find the nearest existing example, copy its structure: migration → model → FormRequest → Controller → Resource → route → test. |
+| **Refactoring** | Only when explicitly requested — never as a side effect of another change. |
+| **Cross-project change (server + client)** | One side at a time, verify each independently before moving on. |
+| **3+ step task** | Plan before coding. State the steps, then execute. |
 
 ---
 
@@ -29,26 +75,60 @@ To see why a container is failing: `docker compose logs <service> --tail=30`
 
 ---
 
+## Git — Requires Explicit Consent
+
+- **NEVER** create a branch without the user's explicit approval
+- **NEVER** commit without the user's explicit approval
+- **NEVER** push without the user's explicit approval
+- Read-only git is always fine: `git status`, `git diff`, `git log`, `git show`
+- Commit **only files you explicitly modified** — never stage unrelated changes, auto-generated files (Wayfinder, migrations you did not write), or other developers' work
+- Always review `git diff --staged` before committing
+- Atomic commits — one concern per commit. See `.ai/commit-rules.md` for the full convention (feature/tests/types/docs split, conventional-commit types)
+- `make fix && make check` must both pass before any commit; tests must pass before committing PHP changes
+
+---
+
+## Skills (Claude Code)
+
+Project skills live in `.claude/skills/` — committed to the repo, shared with the team.
+
+| Skill | Purpose |
+|-------|---------|
+| `commit` | Conventional commit; runs `make fix` + `make check` first |
+| `fix` | Run `make fix` (pint + rector + eslint + prettier) |
+| `review` | Code review of current-branch changes or a given file |
+| `test` | Write or run Pest tests |
+| `deploy-check` | Pre-deployment checklist (tests, build, debug calls, vulnerabilities) |
+| `audit-update` | Refresh `.ai/audit-plan.md` — verify gap/feature status, recalc scores |
+| `a11y-check` | WCAG 2.2 AA check + fixes for a view/component |
+| `ux-review` | UI/UX analysis of a screen or flow |
+| `seo-review` | Technical + content SEO analysis of the storefront |
+
+> Only **Claude Code** executes these as skills. Other tools (Codex, Gemini, Copilot…) should treat this table as a reference to available workflows and run the equivalent commands directly.
+> **Global / personal skills** (`~/.claude/skills/`, installed plugins) are NOT part of this project — never rely on them in shared work, and never list them in committed files.
+
+---
+
 ## Auto-Update Rules
 
 ### After implementing a new feature:
-1. Update `ai/guide.md` → add to the relevant section under "Implemented Features"
+1. Update `.ai/guide.md` → add to the relevant section under "Implemented Features"
 2. Update `docs/backend.md` or `docs/frontend.md` if architecture changed
 3. Update `server/docs/USER_GUIDE.md` — non-technical editor instructions
 4. Update `server/docs/DEVELOPER_GUIDE.md` — technical extension patterns
 
 ### After adding a new package:
-- Add to the "Packages" section in `ai/guide.md`
+- Add to the "Packages" section in `.ai/guide.md`
 - Add to `docs/backend.md` or `docs/frontend.md` under dependencies
 - If the package requires new env variables: add them to `server/.env.production.example` (with empty value) and to `server/.env.example` (with local dev default)
 
 ### After adding/changing routes:
-- Note in `ai/guide.md` under the relevant feature
+- Note in `.ai/guide.md` under the relevant feature
 - Run `docker compose exec php php artisan wayfinder:generate --no-interaction` if admin routes changed
 
 ### After adding a new model:
 - Add factory if one doesn't exist
-- Note soft-delete status in `ai/guide.md` if applicable
+- Note soft-delete status in `.ai/guide.md` if applicable
 
 ### When editing GitHub Actions workflows (`.github/workflows/`):
 - Always use the latest major version of each action — see the pinned versions table in `docs/deployment.md`

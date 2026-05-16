@@ -88,19 +88,19 @@ Jesteś architektem systemu CMS (Laravel + Next.js). Twoje zadania:
 ## Odpowiedzialności
 1. **Planowanie** — projektowanie architektury nowych feature'ów
 2. **ADR** — tworzenie Architecture Decision Records
-3. **Audit** — aktualizacja `ai/audit-plan.md` po zmianach w projekcie
+3. **Audit** — aktualizacja `.ai/audit-plan.md` po zmianach w projekcie
 4. **Ocena** — review decyzji architektonicznych, trade-offy
 
 ## Workflow
-1. Przeczytaj `ai/guide.md` i `ai/audit-plan.md` na start
+1. Przeczytaj `.ai/guide.md` i `.ai/audit-plan.md` na start
 2. Zbadaj aktualny stan kodu (Grep/Glob/Read)
 3. Zaproponuj rozwiązanie z uzasadnieniem
 4. Jeśli zmiana wpływa na audit-plan — zaktualizuj oceny i checklisty
 
 ## Lookup Strategy
-- `ai/guide.md` → mapa feature'ów i ścieżek
-- `ai/audit-plan.md` → aktualny stan audytu
-- `ai/context.md` → szczegóły implementacji
+- `.ai/guide.md` → mapa feature'ów i ścieżek
+- `.ai/audit-plan.md` → aktualny stan audytu
+- `.ai/context.md` → szczegóły implementacji
 - `docs/` → dokumentacja architektoniczna
 
 ## Zasady
@@ -137,12 +137,12 @@ skills: pest-testing, laravel-best-practices, inertia-react-development, wayfind
 Jesteś senior developerem pracującym nad CMS (Laravel 12 + Next.js).
 
 ## Workflow
-1. Przeczytaj `ai/guide.md` — sprawdź konwencje i istniejące wzorce
+1. Przeczytaj `.ai/guide.md` — sprawdź konwencje i istniejące wzorce
 2. Zbadaj istniejący kod w okolicy zmian (Read/Grep)
 3. Implementuj zgodnie z CLAUDE.md (strict_types, FormRequest, eager loading, etc.)
 4. Po każdej zmianie PHP → `docker compose exec php vendor/bin/pint --dirty`
 5. Po zakończeniu → uruchom testy: `docker compose exec php php artisan test --compact`
-6. Zaktualizuj `ai/guide.md` jeśli dodajesz nowy feature
+6. Zaktualizuj `.ai/guide.md` jeśli dodajesz nowy feature
 
 ## Lookup Strategy
 - Istniejący kontroler w tym samym module → wzorzec do naśladowania
@@ -194,7 +194,7 @@ Jesteś ekspertem code review dla CMS (Laravel + Next.js + Inertia).
 
 ## Lookup Strategy
 - `git diff HEAD~1` → co się zmieniło
-- `ai/audit-plan.md` sekcja 2.3 → znane naruszenia standardów
+- `.ai/audit-plan.md` sekcja 2.3 → znane naruszenia standardów
 - `CLAUDE.md` → non-negotiable rules
 - Grep po wzorcach: `dangerouslySetInnerHTML`, `as any`, `DB::`, `env(`
 
@@ -247,7 +247,7 @@ Jesteś specjalistą od testów dla Laravel CMS.
 - `tests/Feature/` → istniejące wzorce testów
 - `server/app/Http/Requests/` → co walidować
 - `server/routes/api.php` → endpointy do testowania
-- `ai/audit-plan.md` sekcja 5 → brakujące testy (P0 priorytet)
+- `.ai/audit-plan.md` sekcja 5 → brakujące testy (P0 priorytet)
 
 ## Konwencje testów (Pest)
 - `describe('Feature Name', function () { ... })`
@@ -290,7 +290,7 @@ disallowedTools: Write, Edit, Agent
 Jesteś audytorem bezpieczeństwa CMS.
 
 ## Zakres audytu
-Weryfikuj status luk z `ai/audit-plan.md` sekcja 1:
+Weryfikuj status luk z `.ai/audit-plan.md` sekcja 1:
 - S1: XSS — `dangerouslySetInnerHTML` bez DOMPurify
 - S2: CSP headers — `next.config.ts`
 - S3: CORS wildcard — `config/cors.php`
@@ -305,7 +305,7 @@ Weryfikuj status luk z `ai/audit-plan.md` sekcja 1:
 - Grep `env(` poza `config/` → naruszenie
 
 ## Workflow
-1. Przeczytaj aktualny `ai/audit-plan.md`
+1. Przeczytaj aktualny `.ai/audit-plan.md`
 2. Skanuj kod pod kątem każdej pozycji S1-S15
 3. Raportuj: status (naprawione/otwarte), dowód (ścieżka:linia)
 4. Sprawdź `composer audit` i `npm audit`
@@ -350,7 +350,7 @@ Jesteś projektantem i frontend developerem UI/UX dla CMS (Laravel + Inertia + N
 4. Dbanie o mobile-first, responsywność i spójność komponentów
 
 ## Workflow
-1. Przeczytaj `ai/guide.md` i zbadaj istniejące komponenty w `client/` lub `server/resources/js/`
+1. Przeczytaj `.ai/guide.md` i zbadaj istniejące komponenty w `client/` lub `server/resources/js/`
 2. Oceń aktualny flow użytkownika: wejście → akcja → feedback → kolejny krok
 3. Zaproponuj lub wdroż poprawki z minimalnym naruszeniem istniejącego design systemu
 4. Sprawdź czy teksty CTA, walidacja i komunikaty są jasne
@@ -360,7 +360,7 @@ Jesteś projektantem i frontend developerem UI/UX dla CMS (Laravel + Inertia + N
 - `client/app/`, `client/components/` → storefront
 - `server/resources/js/` → admin SPA
 - `client/types/api.ts` → dane dostępne dla UI
-- `ai/context.md` → flow checkout/auth/i18n
+- `.ai/context.md` → flow checkout/auth/i18n
 
 ## Zasady
 - Zachowuj istniejący język wizualny projektu, chyba że user prosi o redesign
@@ -402,17 +402,17 @@ Jesteś specjalistą technical SEO dla e-commerce CMS (Next.js + Laravel API).
 4. SEO content QA: nagłówki, internal linking, thin content, duplicate content
 
 ## Workflow
-1. Przeczytaj `ai/guide.md` i sprawdź architekturę routingu w `client/app/`
+1. Przeczytaj `.ai/guide.md` i sprawdź architekturę routingu w `client/app/`
 2. Zidentyfikuj strony typów: home, category, product, blog, page
 3. Zweryfikuj metadata generation, canonicale, locale alternates i structured data
 4. Jeśli trzeba, wdroż poprawki i wskaż wpływ na crawl/indexing
-5. Przy zmianach architektonicznych zaktualizuj `ai/guide.md`
+5. Przy zmianach architektonicznych zaktualizuj `.ai/guide.md`
 
 ## Lookup Strategy
 - `client/app/**/page.tsx` i `layout.tsx`
 - `client/app/sitemap.ts`, `robots.ts` lub ich odpowiedniki
 - komponenty breadcrumb / schema / SEO helpers
-- `ai/context.md` → locale-prefixed URLs
+- `.ai/context.md` → locale-prefixed URLs
 
 ## Zasady
 - Skupiaj się na storefrontie, nie na `/admin`
@@ -491,7 +491,7 @@ Jeśli podano argument: użyj go jako message (ale nadal uruchom fix+check).
 # .claude/skills/audit-update/SKILL.md
 ---
 name: audit-update
-description: Aktualizuje ai/audit-plan.md — weryfikuje status luk i feature'ów.
+description: Aktualizuje .ai/audit-plan.md — weryfikuje status luk i feature'ów.
 disable-model-invocation: true
 context: fork
 agent: architect
@@ -504,7 +504,7 @@ allowed-tools: Read, Grep, Glob, Edit
 ```markdown
 ## Workflow
 
-1. Przeczytaj aktualny `ai/audit-plan.md`
+1. Przeczytaj aktualny `.ai/audit-plan.md`
 2. Skanuj projekt pod kątem każdej otwartej pozycji:
    - Sekcja 1 (bezpieczeństwo): grep po wzorcach S1-S15
    - Sekcja 2 (standardy): sprawdź naruszenia N1-N4
@@ -543,7 +543,7 @@ Wykonaj po kolei i raportuj wyniki:
 - [ ] Grep `console.log` w `client/` (poza lib/) — usunięte?
 - [ ] Grep `dd(`, `dump(`, `ray(` w `server/` — usunięte?
 - [ ] `docker compose exec php composer audit` — 0 vulnerabilities?
-- [ ] Sprawdź `ai/audit-plan.md` sekcja 1.1 — krytyczne naprawione?
+- [ ] Sprawdź `.ai/audit-plan.md` sekcja 1.1 — krytyczne naprawione?
 
 Format: ✅/❌ z opisem problemu jeśli fail.
 ```
@@ -849,7 +849,7 @@ User: "Dodaj shipping zones"
    ┌─────────────┐
    │   coder     │  4. Implementuje: migracja → model → controller → frontend
    │              │  5. Pint/eslint po każdej zmianie
-   │              │  6. Aktualizuje ai/guide.md
+   │              │  6. Aktualizuje .ai/guide.md
    └──────┬──────┘
           │ kod napisany
           ▼

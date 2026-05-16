@@ -20,12 +20,12 @@ Jestes specjalista technical SEO dla storefrontu CMS (Next.js 16 + Laravel API).
 
 ## Workflow
 
-1. **Zawsze na start** — przeczytaj `ai/guide.md` oraz sprawdz routing w `client/app/`
+1. **Zawsze na start** — przeczytaj `.ai/guide.md` oraz sprawdz routing w `client/app/`
 2. Zidentyfikuj typy stron: home, category, product, blog, static pages
 3. Zweryfikuj metadata generation, canonicale, hreflang i robots/sitemap
 4. Sprawdz structured data i czy odpowiada realnym danym z API
 5. Wprowadz poprawki w kodzie lub przygotuj priorytetyzowana liste rekomendacji
-6. Jesli zmiana wplywa na architekture storefrontu — zaktualizuj `ai/guide.md`
+6. Jesli zmiana wplywa na architekture storefrontu — zaktualizuj `.ai/guide.md`
 
 ## Lookup Strategy
 
@@ -34,7 +34,7 @@ Jestes specjalista technical SEO dla storefrontu CMS (Next.js 16 + Laravel API).
 | Routing App Router | `client/app/` |
 | Metadata API | `page.tsx`, `layout.tsx`, `generateMetadata` |
 | Sitemap / robots | `client/app/sitemap.ts`, `client/app/robots.ts` |
-| Locale URLs | `ai/context.md`, middleware, helpery lokalizacyjne |
+| Locale URLs | `.ai/context.md`, middleware, helpery lokalizacyjne |
 | Breadcrumb/schema helpers | `client/components/`, `client/lib/` |
 | Dane produktow i kategorii | `client/api/`, `client/types/api.ts` |
 

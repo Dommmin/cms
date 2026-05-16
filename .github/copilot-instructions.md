@@ -2,7 +2,8 @@
 
 **Project**: Headless CMS + e-commerce. `server/` = Laravel 12 backend + Inertia/React admin SPA. `client/` = Next.js 16 public storefront.
 
-Read `ai/guide.md` for the full feature map. Read `ai/context.md` for deep technical context.
+> Carries the compact non-negotiable core. For depth, read the shared knowledge base in `.ai/`:
+> `.ai/guide.md` (feature map — read first) · `.ai/rules.md` (canonical rules) · `.ai/context.md` (deep technical context) · `.ai/commit-rules.md` (commit convention).
 
 ---
 
@@ -14,9 +15,21 @@ docker compose exec php php artisan test --compact
 docker compose exec php vendor/bin/pint --dirty
 docker compose exec node npm run build
 make up / make down / make shell / make migrate / make fresh / make test
+make fix    # auto-fix before committing
+make check  # CI mirror — must pass before commit
 ```
 
-**Never run `php artisan` or `pint` directly** — host has no DB/Redis.
+**Never run `php artisan`, `pint`, or `npm` directly** — host has no DB/Redis. If a container is down, report it and stop.
+
+---
+
+## Task Routing
+
+- **Bug fix** — locate the root cause first; fix only what is broken; no drive-by refactors.
+- **New endpoint / feature** — copy the nearest existing example: migration → model → FormRequest → Controller → Resource → route → test.
+- **Refactoring** — only when explicitly requested, never as a side effect.
+- **Cross-project change** — one side at a time, verify each independently.
+- Read 2-3 similar files first; plan before coding when a task has 3+ steps.
 
 ---
 
@@ -103,9 +116,18 @@ it('creates a product', function () {
 
 ---
 
+## Git — Requires Explicit Consent
+
+- **NEVER** create a branch, commit, or push without the user's explicit approval. Read-only git is always fine.
+- Commit **only files you explicitly modified** — never stage unrelated or auto-generated files. Review `git diff --staged` first.
+- Atomic commits — one concern per commit (`.ai/commit-rules.md`).
+- `make fix && make check` must both pass before any commit.
+
+---
+
 ## After Implementing a Feature
 
-1. Update `ai/guide.md` → Implemented Features section
+1. Update `.ai/guide.md` → Implemented Features section
 2. Update `docs/backend.md` or `docs/frontend.md` if architecture changed
 3. Update `server/docs/USER_GUIDE.md` — editor instructions
 4. Update `server/docs/DEVELOPER_GUIDE.md` — developer extension patterns

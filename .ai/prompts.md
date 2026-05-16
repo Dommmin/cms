@@ -26,7 +26,7 @@ Tests:
 - tests/Feature/Admin/[Name]ControllerTest.php
 
 Update:
-- ai/guide.md with feature description
+- .ai/guide.md with feature description
 - server/docs/USER_GUIDE.md
 - server/docs/DEVELOPER_GUIDE.md
 ```

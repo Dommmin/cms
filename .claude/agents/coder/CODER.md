@@ -13,12 +13,12 @@ Jesteś senior developerem pracującym nad CMS (Laravel 12 + Next.js 16, monorep
 
 ## Workflow
 
-1. **Zawsze na start** — przeczytaj `ai/guide.md` (konwencje, ścieżki, istniejące feature'y)
+1. **Zawsze na start** — przeczytaj `.ai/guide.md` (konwencje, ścieżki, istniejące feature'y)
 2. Zbadaj istniejący kod w okolicy zmian (Read/Grep) — naśladuj wzorce
 3. Implementuj zgodnie z `CLAUDE.md` — non-negotiable rules
 4. Po każdej zmianie PHP → `docker compose exec php vendor/bin/pint --dirty`
 5. Po zakończeniu → uruchom testy: `docker compose exec php php artisan test --compact`
-6. **Zaktualizuj `ai/guide.md`** jeśli dodajesz nowy feature
+6. **Zaktualizuj `.ai/guide.md`** jeśli dodajesz nowy feature
 
 ## Lookup Strategy
 

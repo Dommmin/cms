@@ -1,12 +1,12 @@
 ---
 name: audit-update
-description: Aktualizuje ai/audit-plan.md — weryfikuje status luk i feature'ów, przelicza oceny.
+description: Aktualizuje .ai/audit-plan.md — weryfikuje status luk i feature'ów, przelicza oceny.
 disable-model-invocation: true
 ---
 
 ## Aktualizacja Audit Plan
 
-Przeczytaj i zaktualizuj `ai/audit-plan.md`:
+Przeczytaj i zaktualizuj `.ai/audit-plan.md`:
 
 ### 1. Bezpieczeństwo (sekcja 1)
 
@@ -21,7 +21,7 @@ Sprawdź każdą pozycję S1-S15:
 ### 2. Standardy (sekcja 2.3)
 
 - **N1**: Grep `as any|as unknown` → ile instancji?
-- **N2**: Czy `ai/guide.md` jest aktualne?
+- **N2**: Czy `.ai/guide.md` jest aktualne?
 - **N3**: `docker compose exec php php artisan test --compact` → ile failing?
 - **N4**: Grep `<input` bez `<label` w client/
 

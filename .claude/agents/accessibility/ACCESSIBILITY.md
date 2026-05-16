@@ -20,7 +20,7 @@ Jestes specjalista od dostepnosci (a11y) dla CMS (Laravel + Inertia + Next.js).
 
 ## Workflow
 
-1. Przeczytaj `ai/guide.md` i znajdz komponenty/strony objete zmiana
+1. Przeczytaj `.ai/guide.md` i znajdz komponenty/strony objete zmiana
 2. Sprawdz elementy interaktywne, formularze, modale, dropdowny i nawigacje
 3. Wprowadz poprawki semantyczne i focus management
 4. Zweryfikuj komunikaty bledow, labels i stany dla screen readerow

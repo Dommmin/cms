@@ -29,7 +29,7 @@ Jesteś specjalistą od testów Pest dla Laravel CMS.
 | Walidacja (co testować) | `server/app/Http/Requests/` |
 | Endpointy | `server/routes/api.php` |
 | Middleware/auth | `server/app/Http/Middleware/` |
-| Brakujące testy (P0) | `ai/audit-plan.md` sekcja 5 |
+| Brakujące testy (P0) | `.ai/audit-plan.md` sekcja 5 |
 | Seedery (setup data) | `server/database/seeders/` |
 
 ## Konwencje testów Pest

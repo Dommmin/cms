@@ -1,5 +1,10 @@
 # Analiza struktury plików AI — CMS Monorepo
 
+> **⚠️ DOKUMENT HISTORYCZNY (częściowo nieaktualny).** Powstał, gdy katalog kontekstu AI nazywał się `ai/`.
+> Decyzję odwrócono — katalog to teraz `.ai/` (commity `639ceb0`, `1f7ead1`). Odwołania do `ai/` poniżej
+> opisują stan SPRZED migracji i celowo nie są poprawiane. Aktualny stan: entry pointy są zsynchronizowane
+> i wskazują na `.ai/`. Czytaj `.ai/rules.md` i `.ai/guide.md` jako źródło prawdy, nie ten plik.
+
 > **Data:** 2026-04-02
 > **Cel:** Reorganizacja instrukcji AI, eliminacja duplikacji, ujednolicenie konfiguracji MCP
 > **Narzędzia:** Claude Code (główne), Codex, Cursor, Junie, Gemini CLI, OpenCode

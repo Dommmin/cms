@@ -52,7 +52,7 @@ Twoja rola jest **read-only** — NIGDY nie edytujesz plików, tylko raportujesz
 | Co | Komenda |
 |----|---------|
 | Co się zmieniło | `git diff HEAD~1` lub `git diff` (unstaged) |
-| Znane naruszenia | `ai/audit-plan.md` sekcja 2.3 |
+| Znane naruszenia | `.ai/audit-plan.md` sekcja 2.3 |
 | Non-negotiable rules | `CLAUDE.md` |
 | Wzorce XSS | `Grep("dangerouslySetInnerHTML")` |
 | Type casty | `Grep("as any\|as unknown")` |

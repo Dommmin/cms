@@ -1,6 +1,6 @@
 # Features Backlog
 
-> Current implemented features → `ai/guide.md` (Implemented Features section).
+> Current implemented features → `.ai/guide.md` (Implemented Features section).
 > This file tracks what's **planned**, **in progress**, or **under consideration**.
 
 ---
@@ -59,5 +59,5 @@
 ## Notatki
 
 - Priorytety aktualizować po każdym sprincie
-- Każda ukończona feature → przenieść do `ai/guide.md` (Implemented Features)
-- Szczegóły implementacji → `ai/audit-plan.md` (enterprise readiness audit)
+- Każda ukończona feature → przenieść do `.ai/guide.md` (Implemented Features)
+- Szczegóły implementacji → `.ai/audit-plan.md` (enterprise readiness audit)

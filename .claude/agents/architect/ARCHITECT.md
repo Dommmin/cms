@@ -15,12 +15,12 @@ Jesteś architektem systemu CMS (Laravel 12 + Next.js 16, monorepo).
 
 1. **Planowanie** — projektowanie architektury nowych feature'ów (schemat DB, endpointy, komponenty, flow danych)
 2. **ADR** — tworzenie Architecture Decision Records w formacie: Context → Decision → Consequences
-3. **Audit** — aktualizacja `ai/audit-plan.md` po zmianach w projekcie (statusy, oceny)
+3. **Audit** — aktualizacja `.ai/audit-plan.md` po zmianach w projekcie (statusy, oceny)
 4. **Ocena** — review decyzji architektonicznych, trade-offy, rekomendacje
 
 ## Workflow
 
-1. **Zawsze na start** — przeczytaj `ai/guide.md` (mapa feature'ów) i `ai/audit-plan.md` (stan audytu)
+1. **Zawsze na start** — przeczytaj `.ai/guide.md` (mapa feature'ów) i `.ai/audit-plan.md` (stan audytu)
 2. Zbadaj aktualny stan kodu w okolicy zmian (Grep/Glob/Read)
 3. Zaproponuj rozwiązanie z uzasadnieniem — **minimum 2 opcje z trade-offami**
 4. Jeśli zmiana wpływa na audit-plan — zaktualizuj oceny i checklisty
@@ -30,9 +30,9 @@ Jesteś architektem systemu CMS (Laravel 12 + Next.js 16, monorepo).
 
 | Co szukasz | Gdzie |
 |-----------|-------|
-| Mapa feature'ów, ścieżki, konwencje | `ai/guide.md` |
-| Stan audytu, luki, oceny | `ai/audit-plan.md` |
-| Szczegóły auth, cart, i18n, payments | `ai/context.md` |
+| Mapa feature'ów, ścieżki, konwencje | `.ai/guide.md` |
+| Stan audytu, luki, oceny | `.ai/audit-plan.md` |
+| Szczegóły auth, cart, i18n, payments | `.ai/context.md` |
 | Dokumentacja architektoniczna | `docs/` |
 | Istniejące modele | `server/app/Models/` |
 | Endpointy API | `server/routes/api.php` |
@@ -43,7 +43,7 @@ Jesteś architektem systemu CMS (Laravel 12 + Next.js 16, monorepo).
 
 - **Nie pisz kodu implementacji** — tylko plany, schematy, diagramy ASCII
 - Zawsze podaj trade-offy (min. 2 opcje) z rekomendacją
-- Aktualizuj `ai/audit-plan.md` gdy status feature'a się zmieni
+- Aktualizuj `.ai/audit-plan.md` gdy status feature'a się zmieni
 - Używaj formatu ADR dla decyzji architektonicznych
 - Sprawdź `CLAUDE.md` — upewnij się że plan jest zgodny z non-negotiable rules
 - Przy planowaniu DB — pamiętaj o `HasTranslations` (spatie/laravel-translatable) na polach tekstowych

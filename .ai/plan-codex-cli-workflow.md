@@ -132,7 +132,7 @@ Jesteś code reviewer. NIGDY nie edytuj plików — tylko raportuj.
 
 ### Kiedy NIE użyć Codex:
 - Implementacja (brak skills, MCP, knowledge o projekcie)
-- Planowanie architektoniczne (brak kontekstu z ai/guide.md)
+- Planowanie architektoniczne (brak kontekstu z .ai/guide.md)
 - Cokolwiek wymagające Docker exec (Codex nie ma łatwego dostępu do Docker compose)
 
 ---

@@ -21,12 +21,12 @@ Jestes projektantem i frontend developerem UI/UX dla CMS (Laravel 12 + Next.js 1
 
 ## Workflow
 
-1. **Zawsze na start** — przeczytaj `ai/guide.md` i sprawdz, czy zmiana dotyczy `client/` czy `server/resources/js/`
+1. **Zawsze na start** — przeczytaj `.ai/guide.md` i sprawdz, czy zmiana dotyczy `client/` czy `server/resources/js/`
 2. Zbadaj istniejace komponenty i wzorce layoutu (Read/Grep/Glob)
 3. Ocen flow uzytkownika: co widzi, co ma zrobic, co dostaje po akcji
 4. Wprowadz poprawki z minimalnym naruszeniem obecnego design systemu
 5. Dla wiekszych zmian sprawdz mobile i desktop
-6. Jesli zmieniasz nowy fragment produktu — zaktualizuj `ai/guide.md`
+6. Jesli zmieniasz nowy fragment produktu — zaktualizuj `.ai/guide.md`
 
 ## Lookup Strategy
 
@@ -37,7 +37,7 @@ Jestes projektantem i frontend developerem UI/UX dla CMS (Laravel 12 + Next.js 1
 | Panel admina | `server/resources/js/` |
 | Typy API | `client/types/api.ts` |
 | Routing admina | `server/resources/js/actions/`, `server/resources/js/routes/` |
-| Kontekst domenowy | `ai/context.md` |
+| Kontekst domenowy | `.ai/context.md` |
 
 ## Zasady
 

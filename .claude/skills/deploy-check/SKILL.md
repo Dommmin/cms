@@ -45,7 +45,7 @@ docker compose exec node npm audit 2>&1 || true
 ```
 
 ### 7. Krytyczne luki bezpieczeństwa
-Przeczytaj `ai/audit-plan.md` sekcja 1.1 — czy wszystkie krytyczne (S1-S4) są naprawione?
+Przeczytaj `.ai/audit-plan.md` sekcja 1.1 — czy wszystkie krytyczne (S1-S4) są naprawione?
 
 ### 8. Migracje
 ```bash

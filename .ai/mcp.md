@@ -2,7 +2,7 @@
 
 Dokumentacja serwerów MCP używanych w projekcie.
 
-> Konfiguracja source of truth: `ai/mcp/mcp.json`
+> Konfiguracja source of truth: `.ai/mcp/mcp.json`
 > Konfiguracje per-tool: `server/.ai/mcp/mcp.json`, `server/.mcp.json`, `server/.cursor/mcp.json`, `server/.junie/mcp/mcp.json`
 
 ---
@@ -64,7 +64,7 @@ Powód: laravel-boost potrzebuje dostępu do bazy danych i Redis, które są dos
 
 | Plik | Narzędzie | Status |
 |------|-----------|--------|
-| `ai/mcp/mcp.json` | Claude Code (source of truth) | OK — Docker |
+| `.ai/mcp/mcp.json` | Claude Code (source of truth) | OK — Docker |
 | `server/.ai/mcp/mcp.json` | Anthropic SDK / Claude Code | OK — Docker (`-T`) |
 | `server/.mcp.json` | Multi-tool fallback | OK — Docker (`-T`) |
 | `server/.cursor/mcp.json` | Cursor IDE | OK — Docker (`-T`) |
@@ -90,7 +90,7 @@ Permissions allow-list zawiera m.in.:
 
 ## Dodawanie nowego MCP serwera
 
-1. Dodaj konfigurację do `ai/mcp/mcp.json` (source of truth)
+1. Dodaj konfigurację do `.ai/mcp/mcp.json` (source of truth)
 2. Skopiuj do `server/.ai/mcp/mcp.json`, `server/.mcp.json`, `server/.cursor/mcp.json`, `server/.junie/mcp/mcp.json`, `server/opencode.json`
 3. Upewnij się że komenda używa `docker compose exec` (Docker-first!)
 4. Dodaj wpis do tej dokumentacji

@@ -141,7 +141,7 @@ git add server/tests/
 git commit -m "test: add tests for barcode functionality"
 
 # 7. Docs
-git add ai/guide.md
+git add .ai/guide.md
 git commit -m "docs: update guide.md with barcode feature"
 
 # 8. Sprawdzenie

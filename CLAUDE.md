@@ -2,8 +2,11 @@
 
 Monorepo: **Laravel backend + admin SPA** (`server/`) · **Next.js public frontend** (`client/`)
 
-> **Read `ai/guide.md` first** — feature map, key paths, conventions.
-> Deep context: `ai/context.md` · Quality gates & Docker rules: `ai/rules.md` · MCP: `ai/mcp.md`
+> **Read `.ai/guide.md` first** — feature map, key paths, conventions.
+> Deep context: `.ai/context.md` · Canonical rules (MUST/FORBIDDEN, task routing, quality gates): `.ai/rules.md` · MCP: `.ai/mcp.md`
+>
+> All AI tools (Claude, Codex, Gemini, Copilot, Cursor, Junie) share the same core — this file, `AGENTS.md`,
+> `GEMINI.md`, `.junie/guidelines.md`, `.github/copilot-instructions.md`, `.cursor/rules/global.mdc` are kept in sync.
 
 ---
 
@@ -24,7 +27,7 @@ docker compose exec php vendor/bin/pint --dirty
 docker compose exec node npm run build
 ```
 
-> **Never run `php artisan` or `pint` directly** — host has no DB/Redis access.
+> **Never run `php artisan` or `pint` directly** — host has no DB/Redis access. If a container is down, report it and stop.
 > **Before every commit:** `make fix && make check` — if `check` passes, the code is safe to push.
 
 ---
@@ -40,6 +43,16 @@ REST API: `/api/v1/*` · Admin: `/admin/*` (Inertia SPA)
 
 ---
 
+## Task Routing
+
+- **Bug fix** — locate the root cause first; fix only what is broken; no drive-by refactors.
+- **New endpoint / feature** — copy the nearest existing example: migration → model → FormRequest → Controller → Resource → route → test.
+- **Refactoring** — only when explicitly requested, never as a side effect.
+- **Cross-project change (server + client)** — one side at a time, verify each independently.
+- Read 2-3 similar files before writing new code; plan before coding when a task has 3+ steps.
+
+---
+
 ## Non-Negotiable Rules
 
 **PHP (`server/`):**
@@ -48,6 +61,7 @@ REST API: `/api/v1/*` · Admin: `/admin/*` (Inertia SPA)
 - Eager-load relations (no N+1 in loops)
 - Form Request classes for all validation — never inline
 - `env()` only inside `config/` files
+- Business logic in `app/Services/` — controllers stay thin
 - After any PHP change: `docker compose exec php vendor/bin/pint --dirty`
 
 **API Controllers (`server/app/Http/Controllers/Api/`):**
@@ -65,29 +79,46 @@ REST API: `/api/v1/*` · Admin: `/admin/*` (Inertia SPA)
 **Always:**
 - Pest tests for every feature — `docker compose exec php php artisan make:test --pest Name`
 - All tests must pass: `docker compose exec php php artisan test --compact`
-- Update `ai/guide.md` when adding or changing features
+- Update `.ai/guide.md` when adding or changing features
+
+---
+
+## Git — Requires Explicit Consent
+
+- **NEVER** create a branch, commit, or push without the user's explicit approval. Read-only git (`status`, `diff`, `log`) is always fine.
+- Commit **only files you explicitly modified** — never stage unrelated changes, auto-generated files (Wayfinder, migrations you did not write), or other developers' work. Review `git diff --staged` first.
+- Atomic commits — one concern per commit. See `.ai/commit-rules.md` for the full convention.
+- `make fix && make check` must both pass before any commit; tests must pass before committing PHP changes.
 
 ---
 
 ## AI Context Files
 
 ```
-ai/guide.md        ← feature map, key paths (PRIMARY — read every session)
-ai/context.md      ← auth, cart, i18n, payments, page builder (deep tasks)
-ai/rules.md        ← quality gates, auto-update rules, GDPR, Docker-first
-ai/prompts.md      ← copy-paste task templates
-ai/mcp.md          ← MCP server documentation
-ai/mcp/mcp.json    ← MCP config (source of truth)
+.ai/guide.md        ← feature map, key paths (PRIMARY — read every session)
+.ai/context.md      ← auth, cart, i18n, payments, page builder (deep tasks)
+.ai/rules.md        ← canonical rules: MUST/FORBIDDEN, task routing, quality gates, GDPR, Docker-first
+.ai/prompts.md      ← copy-paste task templates
+.ai/commit-rules.md ← atomic-commit convention
+.ai/humanizer.md    ← communication style & language rules
+.ai/mcp.md          ← MCP server documentation
+.ai/mcp/mcp.json    ← MCP config (source of truth)
 
-server/CLAUDE.md   ← Laravel rules — auto-managed by laravel-boost (do not edit)
-client/CLAUDE.md   ← Next.js rules
+server/CLAUDE.md    ← Laravel rules — auto-managed by laravel-boost (do not edit)
+client/CLAUDE.md    ← Next.js rules
 ```
+
+---
+
+## Skills & Workflows
+
+Project skills live in `.claude/skills/` (committed, shared): `commit`, `fix`, `review`, `test`, `deploy-check`, `audit-update`, `a11y-check`, `ux-review`, `seo-review`. Project subagents live in `.claude/agents/`. Personal/plugin skills are not part of this project — don't rely on them in shared work.
 
 ---
 
 ## MCP Servers
 
-See `ai/mcp.md` for full documentation.
+See `.ai/mcp.md` for full documentation.
 
 | Server | Purpose |
 |--------|---------|

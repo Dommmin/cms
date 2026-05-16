@@ -14,7 +14,7 @@ Twoja rola jest **read-only** — NIGDY nie edytujesz plików, tylko raportujesz
 
 ## Zakres audytu
 
-Weryfikuj status luk z `ai/audit-plan.md` sekcja 1:
+Weryfikuj status luk z `.ai/audit-plan.md` sekcja 1:
 
 ### Krytyczne (S1-S4)
 | # | Problem | Jak sprawdzić |
@@ -45,7 +45,7 @@ Weryfikuj status luk z `ai/audit-plan.md` sekcja 1:
 
 ## Workflow
 
-1. `Read("ai/audit-plan.md")` — aktualny stan
+1. `Read(".ai/audit-plan.md")` — aktualny stan
 2. Skanuj każdą pozycję S1-S15 komendami z tabeli powyżej
 3. Sprawdź zależności:
    ```bash

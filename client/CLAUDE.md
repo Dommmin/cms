@@ -1,6 +1,7 @@
 # client/CLAUDE.md — Next.js 16 Public Frontend
 
-Part of the monorepo. See root `CLAUDE.md` + `ai/guide.md` for full project context.
+Part of the monorepo. See root `CLAUDE.md` + `.ai/guide.md` for full project context, and `.ai/rules.md` for the canonical rules.
+Codex and other `AGENTS.md`-aware tools: see `client/AGENTS.md` (mirrors this file).
 
 ---
 

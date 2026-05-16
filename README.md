@@ -113,10 +113,10 @@ docker compose exec node npm run build
 ```
 server/   — Laravel backend + admin SPA
 client/   — Next.js public frontend
-ai/       — AI context files (guide.md, context.md, rules.md)
+.ai/      — AI context files (guide.md, context.md, rules.md)
 docs/     — Architecture and developer documentation
 k8s/      — Kubernetes manifests
 scripts/  — Utility scripts
 ```
 
-See [`ai/guide.md`](.ai/guide.md) for the full feature map, key paths, and conventions.
+See [`.ai/guide.md`](.ai/guide.md) for the full feature map, key paths, and conventions.
