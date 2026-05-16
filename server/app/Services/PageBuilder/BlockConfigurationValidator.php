@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\PageBuilder;
 
+use App\Models\User;
+use App\Services\CssSanitizerService;
 use App\Services\HtmlSanitizerService;
 use Illuminate\Validation\ValidationException;
 
@@ -13,6 +15,7 @@ class BlockConfigurationValidator
 
     public function __construct(
         private readonly HtmlSanitizerService $htmlSanitizer,
+        private readonly CssSanitizerService $cssSanitizer,
     ) {}
 
     /**
@@ -21,7 +24,7 @@ class BlockConfigurationValidator
      *
      * @throws ValidationException
      */
-    public function validateAndSanitize(string $blockType, ?array $configuration, string $attribute): array
+    public function validateAndSanitize(string $blockType, ?array $configuration, string $attribute, ?User $user = null): array
     {
         $configuration ??= [];
         $errors = [];
@@ -37,6 +40,12 @@ class BlockConfigurationValidator
         if (! is_array($blockConfig)) {
             throw ValidationException::withMessages([
                 $attribute => 'The selected block type is invalid.',
+            ]);
+        }
+
+        if ($blockType === 'custom_html' && ! $user?->can('cms.custom_html.manage')) {
+            throw ValidationException::withMessages([
+                $attribute => 'You are not allowed to manage custom HTML blocks.',
             ]);
         }
 
@@ -109,7 +118,15 @@ class BlockConfigurationValidator
             default => null,
         };
 
+        if (is_string($value) && $this->shouldSanitizeCss($attribute, $blockType)) {
+            return $this->cssSanitizer->sanitize($value);
+        }
+
         if (is_string($value) && $this->shouldSanitizeHtml($schema, $attribute, $blockType)) {
+            if ($blockType === 'custom_html') {
+                return $this->htmlSanitizer->sanitizeCustomHtml($value);
+            }
+
             return $this->htmlSanitizer->sanitize($value);
         }
 
@@ -282,5 +299,10 @@ class BlockConfigurationValidator
         }
 
         return $blockType === 'custom_html' && str_ends_with($attribute, '.html');
+    }
+
+    private function shouldSanitizeCss(string $attribute, ?string $blockType): bool
+    {
+        return $blockType === 'custom_html' && str_ends_with($attribute, '.css');
     }
 }

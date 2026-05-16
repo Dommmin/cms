@@ -27,6 +27,7 @@ class RolePermissionSeeder extends Seeder
             'reviews' => ['view', 'moderate', 'delete'],
             'blog' => ['view', 'create', 'edit', 'delete'],
             'pages' => ['view', 'create', 'edit', 'delete'],
+            'cms.custom_html' => ['manage'],
             'discounts' => ['view', 'create', 'edit', 'delete'],
             'promotions' => ['view', 'create', 'edit', 'delete'],
             'settings' => ['view', 'edit'],

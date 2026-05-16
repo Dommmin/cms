@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
-    'page_id', 'version_number', 'snapshot', 'created_by', 'change_note',
+    'page_id', 'version_number', 'snapshot', 'created_by', 'change_note', 'is_autosave', 'source',
 ])]
 #[Table(name: 'page_versions')]
 class PageVersion extends Model
@@ -20,6 +20,7 @@ class PageVersion extends Model
 
     protected $casts = [
         'snapshot' => 'array',
+        'is_autosave' => 'boolean',
     ];
 
     public function page(): BelongsTo

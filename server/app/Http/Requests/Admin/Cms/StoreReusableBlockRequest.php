@@ -51,6 +51,7 @@ class StoreReusableBlockRequest extends FormRequest
                 $this->string('type')->toString(),
                 $this->input('configuration', []),
                 'configuration',
+                $this->user(),
             );
 
             app(PageBuilderSnapshotValidator::class)->validateRelationsForBlock(

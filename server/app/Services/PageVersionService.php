@@ -15,8 +15,13 @@ class PageVersionService
     /**
      * Create a new version snapshot of a page
      */
-    public function createVersion(Page $page, ?int $userId = null, ?string $changeNote = null): PageVersion
-    {
+    public function createVersion(
+        Page $page,
+        ?int $userId = null,
+        ?string $changeNote = null,
+        bool $isAutosave = false,
+        string $source = 'manual',
+    ): PageVersion {
         $versionNumber = $this->getNextVersionNumber($page);
 
         /** @var Collection<int, \App\Modules\Core\Domain\Models\PageSection> $sections */
@@ -43,6 +48,8 @@ class PageVersionService
             'snapshot' => $snapshot,
             'created_by' => $userId ?? Auth::id(),
             'change_note' => $changeNote,
+            'is_autosave' => $isAutosave,
+            'source' => $source,
         ]);
     }
 

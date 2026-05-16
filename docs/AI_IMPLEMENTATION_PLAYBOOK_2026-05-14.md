@@ -595,3 +595,40 @@ Testy:
 Pozostało:
 - Transakcyjne zapisy i atomowy optimistic locking z Epic 1.
 - Osobny server-side CSS sanitizer i permission gate dla custom HTML/CSS z Epic 2.
+
+### 2026-05-16 - Epic 1 - transakcyjne zapisy buildera
+
+Status: Partial
+
+Zmiany:
+- Manual save, autosave i import działają przez `DB::transaction()`.
+- Strona jest pobierana w transakcji przez `lockForUpdate()`, a `expected_version` jest sprawdzane po założeniu locka.
+- Wersja strony jest inkrementowana dopiero po udanym `PageBuilderSyncService::sync()`.
+- `PageVersion` dostaje metadane `is_autosave` i `source` (`manual`, `autosave`, `import`).
+- Awaria w trakcie sync rollbackuje usunięte sekcje i bloki.
+
+Testy:
+- `docker compose exec php php artisan test --compact tests/Feature/Admin/Cms/PageBuilderTransactionalSaveTest.php tests/Feature/Admin/Cms/PageBuilderSnapshotValidationTest.php tests/Feature/Admin/Cms/ReusableBlockValidationTest.php tests/Feature/Admin/Cms/SectionTemplateValidationTest.php`
+
+Pozostało:
+- UI: rozdzielić `isManualSaving` i `isAutoSaving`.
+- UI: dodać kolejkę/cancel autosave oraz dialog konfliktu zamiast `window.confirm()`.
+- Długofalowo: zastąpić delete/recreate diff/upsert, żeby zachować stabilne ID.
+
+### 2026-05-16 - Epic 2 - server-side custom HTML/CSS hardening
+
+Status: Partial
+
+Zmiany:
+- Dodano `CssSanitizerService` dla pól `custom_html.css`.
+- `custom_html.html` przechodzi przez osobny profil HTMLPurifier `custom_html`.
+- Dodano profile HTMLPurifier `basic`, `strict` i `custom_html`.
+- Dodano permission `cms.custom_html.manage` i blokadę zapisu custom HTML bez tego uprawnienia.
+- Custom CSS usuwa `@import`, `expression()`, script URLs, unsafe `data:` URLs i `</style`.
+
+Testy:
+- `docker compose exec php php artisan test --compact tests/Feature/Admin/Cms/CustomHtmlSanitizationTest.php tests/Feature/Admin/Cms/PageBuilderTransactionalSaveTest.php tests/Feature/Admin/Cms/PageBuilderSnapshotValidationTest.php tests/Feature/Admin/Cms/ReusableBlockValidationTest.php tests/Feature/Admin/Cms/SectionTemplateValidationTest.php`
+
+Pozostało:
+- UI: ukryć lub zablokować edycję Custom HTML dla użytkowników bez `cms.custom_html.manage`.
+- Site-level feature flag dla custom HTML enabled/disabled.

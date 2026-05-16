@@ -41,6 +41,7 @@ class StoreSectionTemplateRequest extends FormRequest
             try {
                 $snapshot = app(PageBuilderSnapshotValidator::class)->validateAndSanitize(
                     $this->input('snapshot'),
+                    user: $this->user(),
                 );
             } catch (ValidationException $exception) {
                 foreach ($exception->errors() as $attribute => $messages) {

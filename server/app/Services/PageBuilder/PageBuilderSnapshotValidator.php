@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\PageBuilder;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
 
@@ -25,7 +26,7 @@ class PageBuilderSnapshotValidator
      *
      * @throws ValidationException
      */
-    public function validateAndSanitize(array $snapshot, string $attribute = 'snapshot'): array
+    public function validateAndSanitize(array $snapshot, string $attribute = 'snapshot', ?User $user = null): array
     {
         $errors = [];
 
@@ -90,7 +91,7 @@ class PageBuilderSnapshotValidator
 
                 try {
                     $snapshot['sections'][$sectionIndex]['blocks'][$blockIndex]['configuration'] = $this->configurationValidator
-                        ->validateAndSanitize($blockType, $block['configuration'] ?? [], $blockAttribute.'.configuration');
+                        ->validateAndSanitize($blockType, $block['configuration'] ?? [], $blockAttribute.'.configuration', $user);
                 } catch (ValidationException $exception) {
                     $this->mergeErrors($errors, $exception->errors());
                 }

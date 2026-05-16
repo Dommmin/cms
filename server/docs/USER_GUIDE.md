@@ -191,6 +191,10 @@ A page is made up of **sections**. Each section contains one or more **blocks**.
 | Map                | Content    | Location map                                                              |
 | Custom HTML        | Advanced   | Raw HTML for advanced users / developers                                  |
 
+Custom HTML is restricted to users with the custom HTML permission. The server
+sanitizes custom HTML and CSS before saving; unsafe scripts, script URLs, imports, and
+similar payloads are removed or rejected.
+
 **Useful features:**
 
 - **Undo / Redo** — up to 20 steps of history with the undo/redo buttons in the toolbar

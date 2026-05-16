@@ -334,18 +334,25 @@ reusable blocks, and section templates use the shared Page Builder validators:
 - `App\Services\PageBuilder\PageBuilderSnapshotValidator` validates section/block
   limits, block types, relation contracts, allowed relation slots and related model
   existence.
+- `App\Services\CssSanitizerService` sanitizes `custom_html.css` and strips
+  `@import`, `expression()`, script URLs, unsafe `data:` URLs, and `</style`.
 
 Block relations in snapshots use `relation_type`, `relation_id`, `relation_key`,
 `position`, and `metadata`. Do not use the older `type`/`id` shape in save payloads.
+Custom HTML blocks require `cms.custom_html.manage`; users without that permission get
+a validation error before any snapshot data is written.
 
 ### PageVersionService
 
 Creates and restores versioned snapshots of a page's full structure.
 
 ```php
-createVersion(Page $page, ?int $userId, ?string $changeNote): PageVersion
+createVersion(Page $page, ?int $userId, ?string $changeNote, bool $isAutosave = false, string $source = 'manual'): PageVersion
 restorePage(Page $page, PageVersion $version): void
 ```
+
+Builder saves create versions with `source` set to `manual`, `autosave`, or `import`.
+Autosave versions also set `is_autosave = true`.
 
 Snapshots include page attributes, all sections, and all blocks.
 
@@ -1483,8 +1490,9 @@ Page (page_type = 'blocks')
 1. The React page builder holds the entire page structure in component state (reducer-based with undo/redo).
 2. On save, the full structure is serialised to a JSON snapshot and submitted to the `PageBuilderController`.
 3. `UpdatePageBuilderRequest` passes the snapshot through `PageBuilderSnapshotValidator`; import, reusable block and section template saves use the same validation services.
-4. `PageBuilderSyncService::sync(Page, array $snapshot)` deletes the old structure and recreates it from the sanitized snapshot.
-5. A `PageVersion` snapshot can also be created by `PageVersionService` when versioning flows call it.
+4. The controller opens a transaction, locks the page row with `lockForUpdate()`, and checks `expected_version` inside that lock.
+5. `PageBuilderSyncService::sync(Page, array $snapshot)` deletes the old structure and recreates it from the sanitized snapshot.
+6. The page `version` is incremented only after `sync()` succeeds, and `PageVersionService` records a version snapshot with builder source metadata.
 
 ### Undo/Redo
 

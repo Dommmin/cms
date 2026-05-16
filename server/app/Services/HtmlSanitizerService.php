@@ -45,6 +45,22 @@ class HtmlSanitizerService
     }
 
     /**
+     * Locked-down custom HTML for Page Builder advanced blocks.
+     */
+    public function sanitizeCustomHtml(?string $html): ?string
+    {
+        if ($html === null) {
+            return null;
+        }
+
+        if (mb_trim($html) === '') {
+            return $html;
+        }
+
+        return Purifier::clean($html, 'custom_html');
+    }
+
+    /**
      * Sanitizes all string values in a nested array that match the given keys.
      * Used for page builder configuration blocks.
      *

@@ -233,6 +233,13 @@ and relations outside `allowed_relations` are rejected with validation errors. F
 declared as `format: richtext` or `format: html` are sanitized recursively, including
 inside repeater items.
 
+The `custom_html` block is additionally protected:
+
+- users must have `cms.custom_html.manage`,
+- `html` is purified with the `custom_html` HTMLPurifier profile,
+- `css` is sanitized by `App\Services\CssSanitizerService`,
+- `@import`, `expression()`, script URLs, unsafe `data:` URLs, and `</style` are removed.
+
 ### Step 3: Add the block to the frontend preview
 
 If you have a Split View or standalone Preview page, add a case in
@@ -471,10 +478,12 @@ This renders only active sections and blocks, without the admin sidebar.
 4. The validator checks section types, block types, block configuration schemas,
    relation contracts, relation model existence, payload limits, and sanitizes
    rich HTML fields.
-5. `PageBuilderController::update()` passes the sanitized snapshot to
-   `PageBuilderSyncService::sync()`, which deletes existing sections/blocks for the
-   page and re-creates them from the submitted snapshot.
-6. Inertia redirects back → page refreshes with fresh server data.
+5. `PageBuilderController::update()` opens a database transaction, locks the page row
+   with `lockForUpdate()`, checks `expected_version`, then passes the sanitized
+   snapshot to `PageBuilderSyncService::sync()`.
+6. After a successful sync, the page `version` is incremented and a `PageVersion`
+   record is created with `source` metadata (`manual`, `autosave`, or `import`).
+7. Inertia redirects back → page refreshes with fresh server data.
 
 ### Important: Delete-and-recreate pattern
 
@@ -483,6 +492,8 @@ This means:
 - Block `id` values change on every save.
 - Relations are also recreated.
 - `reusable_block_id` is preserved in the save payload so global links survive.
+- The delete/recreate work runs inside the same transaction as version increment and
+  version snapshot creation, so a failed sync rolls back to the previous page tree.
 
 ### Auto-save (Split View only)
 
@@ -497,6 +508,7 @@ same Page Builder validation services:
 
 - `App\Services\PageBuilder\BlockConfigurationValidator`
 - `App\Services\PageBuilder\PageBuilderSnapshotValidator`
+- `App\Services\CssSanitizerService` for `custom_html.css`
 
 Relations must use the persisted contract:
 

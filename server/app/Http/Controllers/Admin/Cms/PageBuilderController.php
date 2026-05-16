@@ -17,9 +17,11 @@ use App\Models\PageSection;
 use App\Services\PageBuilder\PageBuilderSnapshotValidator;
 use App\Services\PageBuilderSyncService;
 use App\Services\PagePreviewService;
+use App\Services\PageVersionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -30,6 +32,7 @@ class PageBuilderController extends Controller
         private readonly PageBuilderSyncService $syncService,
         private readonly PagePreviewService $pagePreviewService,
         private readonly PageBuilderSnapshotValidator $snapshotValidator,
+        private readonly PageVersionService $pageVersionService,
     ) {}
 
     public function show(int $page)
@@ -92,40 +95,46 @@ class PageBuilderController extends Controller
 
     public function update(UpdatePageBuilderRequest $request, int $page): RedirectResponse|JsonResponse
     {
-        $pageModel = Page::query()->findOrFail($page);
+        $result = $this->persistBuilderSnapshot(
+            pageId: $page,
+            snapshot: $request->input('snapshot'),
+            expectedVersion: $request->has('expected_version') ? (int) $request->input('expected_version') : null,
+            source: 'manual',
+            changeNote: 'Manual builder save',
+            isAutosave: false,
+        );
 
-        $expectedVersion = $request->input('expected_version');
-        if ($expectedVersion !== null && (int) $expectedVersion !== (int) $pageModel->version) {
+        if (isset($result['conflict'])) {
             return response()->json([
                 'message' => 'The page has been modified by another editor. Please refresh and try again.',
-                'current_version' => $pageModel->version,
+                'current_version' => $result['current_version'],
             ], 409);
         }
-
-        $this->syncService->sync($pageModel, $request->input('snapshot'));
-        Page::query()->where('id', $pageModel->id)->increment('version');
 
         return back();
     }
 
     public function autosave(UpdatePageBuilderRequest $request, int $page): JsonResponse
     {
-        $pageModel = Page::query()->findOrFail($page);
+        $result = $this->persistBuilderSnapshot(
+            pageId: $page,
+            snapshot: $request->input('snapshot'),
+            expectedVersion: $request->has('expected_version') ? (int) $request->input('expected_version') : null,
+            source: 'autosave',
+            changeNote: 'Autosave',
+            isAutosave: true,
+        );
 
-        $expectedVersion = $request->input('expected_version');
-        if ($expectedVersion !== null && (int) $expectedVersion !== (int) $pageModel->version) {
+        if (isset($result['conflict'])) {
             return response()->json([
                 'message' => 'Conflict: page was modified externally.',
-                'current_version' => $pageModel->version,
+                'current_version' => $result['current_version'],
             ], 409);
         }
 
-        $this->syncService->sync($pageModel, $request->input('snapshot'));
-        Page::query()->where('id', $pageModel->id)->increment('version');
-
         return response()->json([
             'success' => true,
-            'version' => $pageModel->version + 1,
+            'version' => $result['version'],
             'saved_at' => now()->toIso8601String(),
         ]);
     }
@@ -294,13 +303,62 @@ class PageBuilderController extends Controller
         try {
             $snapshot = $this->snapshotValidator->validateAndSanitize([
                 'sections' => $data['sections'],
-            ]);
+            ], user: $request->user());
         } catch (ValidationException $exception) {
             return back()->withErrors($exception->errors());
         }
 
-        $this->syncService->sync($page, $snapshot);
+        $this->persistBuilderSnapshot(
+            pageId: $page->id,
+            snapshot: $snapshot,
+            expectedVersion: null,
+            source: 'import',
+            changeNote: 'Builder import',
+            isAutosave: false,
+        );
 
         return back()->with('success', 'Page imported successfully.');
+    }
+
+    /**
+     * @param  array<string, mixed>  $snapshot
+     * @return array{version?: int, current_version?: int, conflict?: true}
+     */
+    private function persistBuilderSnapshot(
+        int $pageId,
+        array $snapshot,
+        ?int $expectedVersion,
+        string $source,
+        string $changeNote,
+        bool $isAutosave,
+    ): array {
+        return DB::transaction(function () use ($pageId, $snapshot, $expectedVersion, $source, $changeNote, $isAutosave): array {
+            $page = Page::query()
+                ->whereKey($pageId)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($expectedVersion !== null && $expectedVersion !== (int) $page->version) {
+                return [
+                    'conflict' => true,
+                    'current_version' => (int) $page->version,
+                ];
+            }
+
+            $this->syncService->sync($page, $snapshot);
+
+            $page->forceFill(['version' => (int) $page->version + 1])->save();
+            $page->refresh();
+
+            $this->pageVersionService->createVersion(
+                page: $page,
+                userId: auth()->id(),
+                changeNote: $changeNote,
+                isAutosave: $isAutosave,
+                source: $source,
+            );
+
+            return ['version' => (int) $page->version];
+        });
     }
 }

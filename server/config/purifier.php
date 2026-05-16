@@ -32,6 +32,25 @@ return [
             'AutoFormat.AutoParagraph' => true,
             'AutoFormat.RemoveEmpty' => true,
         ],
+        'basic' => [
+            'HTML.Doctype' => 'HTML 4.01 Transitional',
+            'HTML.Allowed' => 'b,strong,i,em,u,a[href|title],ul,ol,li,p,br,span',
+            'AutoFormat.AutoParagraph' => true,
+            'AutoFormat.RemoveEmpty' => true,
+        ],
+        'strict' => [
+            'HTML.Doctype' => 'HTML 4.01 Transitional',
+            'HTML.Allowed' => 'b,strong,i,em,a[href|title],br',
+            'AutoFormat.AutoParagraph' => false,
+            'AutoFormat.RemoveEmpty' => true,
+        ],
+        'custom_html' => [
+            'HTML.Doctype' => 'HTML 4.01 Transitional',
+            'HTML.Allowed' => 'div[class|id],section[class|id],article[class|id],header[class|id],footer[class|id],p[class],br,span[class],b,strong,i,em,u,a[href|title|target|rel|class],ul[class],ol[class],li[class],h1[class],h2[class],h3[class],h4[class],h5[class],h6[class],img[src|alt|width|height|class]',
+            'Attr.AllowedFrameTargets' => ['_blank', '_self'],
+            'AutoFormat.AutoParagraph' => false,
+            'AutoFormat.RemoveEmpty' => true,
+        ],
         'test' => [
             'Attr.EnableID' => 'true',
         ],
