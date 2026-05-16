@@ -41,7 +41,7 @@ export function SectionCard({
         transform,
         transition,
         isDragging,
-    } = useSortable({ id: `section-${index}` });
+    } = useSortable({ id: section.client_id ?? `section-${index}` });
 
     const style = {
         transform: CSS.Transform.toString(transform),

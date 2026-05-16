@@ -7,6 +7,34 @@ import { useCallback, useReducer, useRef, useState } from 'react';
 import type { Block, Section } from '../types';
 
 const MAX_HISTORY = 20;
+const CLIENT_ID_PREFIX = 'pb';
+
+function createClientId(kind: 'section' | 'block'): string {
+    if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+        return `${CLIENT_ID_PREFIX}-${kind}-${crypto.randomUUID()}`;
+    }
+
+    return `${CLIENT_ID_PREFIX}-${kind}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function withBlockClientIds(blocks: Block[]): Block[] {
+    return blocks.map((block) => ({
+        ...block,
+        client_id:
+            block.client_id ??
+            (block.id ? `block-${block.id}` : createClientId('block')),
+    }));
+}
+
+function withSectionClientIds(sections: Section[]): Section[] {
+    return sections.map((section) => ({
+        ...section,
+        client_id:
+            section.client_id ??
+            (section.id ? `section-${section.id}` : createClientId('section')),
+        blocks: withBlockClientIds(section.blocks),
+    }));
+}
 
 // ── History reducer ─────────────────────────────────────────────────────────
 
@@ -19,7 +47,7 @@ type HistoryState = {
 type HistoryAction =
     | { type: 'SET'; sections: Section[] }
     | { type: 'SET_SILENT'; sections: Section[] }
-    | { type: 'COMMIT_HISTORY'; sections: Section[] }
+    | { type: 'COMMIT_HISTORY'; before: Section[]; sections: Section[] }
     | { type: 'UNDO' }
     | { type: 'REDO' };
 
@@ -39,7 +67,7 @@ function historyReducer(
         case 'COMMIT_HISTORY':
             return {
                 sections: action.sections,
-                past: [...state.past, action.sections].slice(-MAX_HISTORY),
+                past: [...state.past, action.before].slice(-MAX_HISTORY),
                 future: [],
             };
         case 'UNDO': {
@@ -71,8 +99,14 @@ const HISTORY_DEBOUNCE_MS = 500;
 // ── Hook ────────────────────────────────────────────────────────────────────
 
 export function useBuilderState(initialSections: Section[]) {
+    const initializedSectionsRef = useRef<Section[] | null>(null);
+
+    if (initializedSectionsRef.current === null) {
+        initializedSectionsRef.current = withSectionClientIds(initialSections);
+    }
+
     const [state, dispatch] = useReducer(historyReducer, {
-        sections: initialSections,
+        sections: initializedSectionsRef.current,
         past: [],
         future: [],
     });
@@ -81,8 +115,9 @@ export function useBuilderState(initialSections: Section[]) {
     const historyDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(
         null,
     );
+    const pendingHistoryBaseRef = useRef<Section[] | null>(null);
 
-    const [expandedSections, setExpandedSections] = useState<Set<number>>(
+    const [expandedSections, setExpandedSections] = useState<Set<string>>(
         new Set(),
     );
     const [expandedBlocks, setExpandedBlocks] = useState<Set<string>>(
@@ -101,6 +136,7 @@ export function useBuilderState(initialSections: Section[]) {
     const addSection = useCallback(
         (defaultSectionType?: string) => {
             const newSection: Section = {
+                client_id: createClientId('section'),
                 section_type: defaultSectionType ?? '',
                 layout: 'contained',
                 variant: null,
@@ -128,18 +164,17 @@ export function useBuilderState(initialSections: Section[]) {
 
     const deleteSection = useCallback(
         (index: number) => {
+            const sectionClientId = sections[index]?.client_id;
             dispatch({
                 type: 'SET',
                 sections: sections.filter((_, i) => i !== index),
             });
             setExpandedSections((prev) => {
                 const newSet = new Set(prev);
-                newSet.delete(index);
-                const adjusted = new Set<number>();
-                newSet.forEach((idx) => {
-                    adjusted.add(idx > index ? idx - 1 : idx);
-                });
-                return adjusted;
+                if (sectionClientId) {
+                    newSet.delete(sectionClientId);
+                }
+                return newSet;
             });
         },
         [sections],
@@ -170,6 +205,7 @@ export function useBuilderState(initialSections: Section[]) {
                 sections: sections.map((section, i) => {
                     if (i !== sectionIndex) return section;
                     const newBlock: Block = {
+                        client_id: createClientId('block'),
                         type: '',
                         configuration: {},
                         position: section.blocks.length,
@@ -201,11 +237,22 @@ export function useBuilderState(initialSections: Section[]) {
             // Update sections immediately (responsive UI) but debounce history push.
             dispatch({ type: 'SET_SILENT', sections: newSections });
 
+            pendingHistoryBaseRef.current ??= sections;
+
             if (historyDebounceRef.current) {
                 clearTimeout(historyDebounceRef.current);
             }
             historyDebounceRef.current = setTimeout(() => {
-                dispatch({ type: 'COMMIT_HISTORY', sections: newSections });
+                const before = pendingHistoryBaseRef.current;
+                pendingHistoryBaseRef.current = null;
+
+                if (before) {
+                    dispatch({
+                        type: 'COMMIT_HISTORY',
+                        before,
+                        sections: newSections,
+                    });
+                }
             }, HISTORY_DEBOUNCE_MS);
         },
         [sections],
@@ -213,6 +260,8 @@ export function useBuilderState(initialSections: Section[]) {
 
     const deleteBlock = useCallback(
         (sectionIndex: number, blockIndex: number) => {
+            const blockClientId =
+                sections[sectionIndex]?.blocks[blockIndex]?.client_id;
             dispatch({
                 type: 'SET',
                 sections: sections.map((section, si) => {
@@ -225,10 +274,11 @@ export function useBuilderState(initialSections: Section[]) {
                     };
                 }),
             });
-            const blockKey = `${sectionIndex}-${blockIndex}`;
             setExpandedBlocks((prev) => {
                 const newSet = new Set(prev);
-                newSet.delete(blockKey);
+                if (blockClientId) {
+                    newSet.delete(blockClientId);
+                }
                 return newSet;
             });
         },
@@ -259,33 +309,29 @@ export function useBuilderState(initialSections: Section[]) {
 
     // ── Expand/collapse ──────────────────────────────────────────────────────
 
-    const toggleSection = useCallback((index: number) => {
+    const toggleSection = useCallback((clientId: string) => {
         setExpandedSections((prev) => {
             const newSet = new Set(prev);
-            if (newSet.has(index)) {
-                newSet.delete(index);
+            if (newSet.has(clientId)) {
+                newSet.delete(clientId);
             } else {
-                newSet.add(index);
+                newSet.add(clientId);
             }
             return newSet;
         });
     }, []);
 
-    const toggleBlock = useCallback(
-        (sectionIndex: number, blockIndex: number) => {
-            const key = `${sectionIndex}-${blockIndex}`;
-            setExpandedBlocks((prev) => {
-                const newSet = new Set(prev);
-                if (newSet.has(key)) {
-                    newSet.delete(key);
-                } else {
-                    newSet.add(key);
-                }
-                return newSet;
-            });
-        },
-        [],
-    );
+    const toggleBlock = useCallback((clientId: string) => {
+        setExpandedBlocks((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(clientId)) {
+                newSet.delete(clientId);
+            } else {
+                newSet.add(clientId);
+            }
+            return newSet;
+        });
+    }, []);
 
     /**
      * Insert one or more fully-formed sections (with their blocks) in a single undo step.
@@ -295,8 +341,13 @@ export function useBuilderState(initialSections: Section[]) {
         (newSections: Omit<Section, 'id' | 'position'>[]) => {
             const positioned: Section[] = newSections.map((s, i) => ({
                 ...s,
+                client_id: createClientId('section'),
                 position: sections.length + i,
-                blocks: s.blocks.map((b, bi) => ({ ...b, position: bi })),
+                blocks: s.blocks.map((b, bi) => ({
+                    ...b,
+                    client_id: createClientId('block'),
+                    position: bi,
+                })),
             }));
             dispatch({ type: 'SET', sections: [...sections, ...positioned] });
         },

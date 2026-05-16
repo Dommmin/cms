@@ -108,8 +108,14 @@ export function PageBuilder({
 
         if (!over || active.id === over.id) return;
 
-        const oldIndex = Number(String(active.id).split('-')[1]);
-        const newIndex = Number(String(over.id).split('-')[1]);
+        const oldIndex = sections.findIndex(
+            (section) => section.client_id === active.id,
+        );
+        const newIndex = sections.findIndex(
+            (section) => section.client_id === over.id,
+        );
+
+        if (oldIndex === -1 || newIndex === -1) return;
 
         moveSection(oldIndex, newIndex);
     };
@@ -124,7 +130,9 @@ export function PageBuilder({
 
     const firstSectionType = Object.keys(data.available_sections)[0] ?? '';
 
-    const sectionIds = sections.map((_, index) => `section-${index}`);
+    const sectionIds = sections.map(
+        (section) => section.client_id ?? `section-${section.id}`,
+    );
 
     return (
         <div className="min-h-screen bg-muted/30">
@@ -194,11 +202,13 @@ export function PageBuilder({
                             <div className="space-y-4">
                                 {sections.map((section, index) => (
                                     <SortableSection
-                                        key={index}
+                                        key={section.client_id}
                                         section={section}
                                         index={index}
                                         pageId={data.page.id}
-                                        isExpanded={expandedSections.has(index)}
+                                        isExpanded={expandedSections.has(
+                                            section.client_id ?? '',
+                                        )}
                                         expandedBlocks={expandedBlocks}
                                         availableSections={
                                             data.available_sections
@@ -206,7 +216,11 @@ export function PageBuilder({
                                         availableBlockTypes={
                                             data.available_block_relations
                                         }
-                                        onToggle={() => toggleSection(index)}
+                                        onToggle={() =>
+                                            toggleSection(
+                                                section.client_id ?? '',
+                                            )
+                                        }
                                         onDelete={() => deleteSection(index)}
                                         onUpdate={(patch) =>
                                             updateSection(index, patch)
@@ -243,7 +257,10 @@ export function PageBuilder({
                                             moveBlock(index, oldIdx, newIdx)
                                         }
                                         onToggleBlock={(blockIndex) =>
-                                            toggleBlock(index, blockIndex)
+                                            toggleBlock(
+                                                section.blocks[blockIndex]
+                                                    ?.client_id ?? '',
+                                            )
                                         }
                                     />
                                 ))}

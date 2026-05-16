@@ -59,7 +59,7 @@ export function BlockCard({
         transition,
         isDragging,
     } = useSortable({
-        id: `block-${sectionIndex}-${blockIndex}`,
+        id: block.client_id ?? `block-${sectionIndex}-${blockIndex}`,
     });
 
     const style = {

@@ -167,6 +167,8 @@ function LibraryModal({
 
 const CLIPBOARD_KEY_PREFIX = 'pb_clipboard:';
 const CLIPBOARD_MAX_BYTES = 1_048_576; // 1 MB
+const CLIPBOARD_SCHEMA = 'page-builder:block';
+const CLIPBOARD_VERSION = 1;
 
 export function BlocksList({
     blocks,
@@ -200,10 +202,15 @@ export function BlocksList({
     const handleCopyBlock = (blockIndex: number) => {
         const block = blocks[blockIndex];
         const payload = {
-            type: block.type,
-            configuration: block.configuration,
-            is_active: block.is_active,
-            relations: block.relations ?? [],
+            schema: CLIPBOARD_SCHEMA,
+            version: CLIPBOARD_VERSION,
+            copied_at: new Date().toISOString(),
+            block: {
+                type: block.type,
+                configuration: block.configuration,
+                is_active: block.is_active,
+                relations: block.relations ?? [],
+            },
         };
         const serialized = JSON.stringify(payload);
         if (serialized.length > CLIPBOARD_MAX_BYTES) {
@@ -235,12 +242,39 @@ export function BlocksList({
         const raw = localStorage.getItem(clipboardKey);
         if (!raw) return;
         try {
-            const payload = JSON.parse(raw) as Partial<Block>;
+            const payload = JSON.parse(raw) as Record<string, unknown>;
+            const block = payload.block as Partial<Block> | undefined;
+
+            if (
+                payload.schema !== CLIPBOARD_SCHEMA ||
+                payload.version !== CLIPBOARD_VERSION ||
+                !block ||
+                typeof block.type !== 'string' ||
+                !Object.prototype.hasOwnProperty.call(
+                    availableBlockTypes,
+                    block.type,
+                ) ||
+                (block.configuration !== undefined &&
+                    (typeof block.configuration !== 'object' ||
+                        block.configuration === null ||
+                        Array.isArray(block.configuration))) ||
+                (block.relations !== undefined &&
+                    !Array.isArray(block.relations))
+            ) {
+                toast.error(
+                    __(
+                        'builder.block_paste_invalid',
+                        'Clipboard block is not valid for this page.',
+                    ),
+                );
+                return;
+            }
+
             onPasteBlock({
-                type: payload.type ?? '',
-                configuration: payload.configuration ?? {},
-                is_active: payload.is_active ?? true,
-                relations: payload.relations ?? [],
+                type: block.type,
+                configuration: block.configuration ?? {},
+                is_active: block.is_active ?? true,
+                relations: block.relations ?? [],
             });
             toast.success(__('builder.block_pasted', 'Block pasted'));
         } catch {
@@ -255,8 +289,14 @@ export function BlocksList({
 
         if (!over || active.id === over.id) return;
 
-        const oldIndex = Number(String(active.id).split('-')[2]);
-        const newIndex = Number(String(over.id).split('-')[2]);
+        const oldIndex = blocks.findIndex(
+            (block) => block.client_id === active.id,
+        );
+        const newIndex = blocks.findIndex(
+            (block) => block.client_id === over.id,
+        );
+
+        if (oldIndex === -1 || newIndex === -1) return;
 
         onMoveBlock(oldIndex, newIndex);
     };
@@ -314,7 +354,9 @@ export function BlocksList({
         );
     };
 
-    const blockIds = blocks.map((_, index) => `block-${sectionIndex}-${index}`);
+    const blockIds = blocks.map(
+        (block) => block.client_id ?? `block-${block.id}`,
+    );
 
     return (
         <div className="space-y-3">
@@ -372,14 +414,15 @@ export function BlocksList({
                     >
                         <div className="space-y-2">
                             {blocks.map((block, blockIndex) => {
-                                const blockKey = `${sectionIndex}-${blockIndex}`;
-                                const isExpanded = expandedBlocks.has(blockKey);
+                                const isExpanded = expandedBlocks.has(
+                                    block.client_id ?? '',
+                                );
                                 const blockTypeName =
                                     availableBlockTypes[block.type]?.name;
 
                                 return (
                                     <BlockCard
-                                        key={blockIndex}
+                                        key={block.client_id}
                                         block={block}
                                         blockIndex={blockIndex}
                                         sectionIndex={sectionIndex}

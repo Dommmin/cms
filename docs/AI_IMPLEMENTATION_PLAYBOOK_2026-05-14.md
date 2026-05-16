@@ -632,3 +632,23 @@ Testy:
 Pozostało:
 - UI: ukryć lub zablokować edycję Custom HTML dla użytkowników bez `cms.custom_html.manage`.
 - Site-level feature flag dla custom HTML enabled/disabled.
+
+### 2026-05-16 - Epic 3 - stabilne identyfikatory w builderze
+
+Status: Partial
+
+Zmiany:
+- Sekcje i bloki w admin Page Builderze dostają stabilne `client_id`.
+- React keys, DnD ids i expanded state używają `client_id` zamiast indeksów.
+- Usunięcie/reorder sekcji lub bloków nie powinno już rozwijać złego elementu.
+- Clipboard bloków ma namespace per page, `schema`, `version`, `copied_at` i walidację payloadu przed paste.
+- Debounced history dla edycji pól zapisuje stan sprzed serii zmian, żeby undo po typing miało sensowny krok.
+
+Testy:
+- `docker compose exec php npm run format`
+- `docker compose exec php npm run types`
+- `docker compose exec php npm run format:check`
+
+Pozostało:
+- Rozbicie `builder-toolbar.tsx` i `dynamic-block-form.tsx` na mniejsze komponenty.
+- Osobny etap dla navigatora i inspectora.

@@ -14,6 +14,7 @@ export type BlockRelation = {
 
 export type Block = {
     id?: number;
+    client_id?: string;
     type: string;
     configuration: Record<string, unknown>;
     position: number;
@@ -25,6 +26,7 @@ export type Block = {
 
 export type Section = {
     id?: number;
+    client_id?: string;
     section_type: string;
     layout: string;
     variant: string | null;
