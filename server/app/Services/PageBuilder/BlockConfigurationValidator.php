@@ -43,10 +43,18 @@ class BlockConfigurationValidator
             ]);
         }
 
-        if ($blockType === 'custom_html' && ! $user?->can('cms.custom_html.manage')) {
-            throw ValidationException::withMessages([
-                $attribute => 'You are not allowed to manage custom HTML blocks.',
-            ]);
+        if ($blockType === 'custom_html') {
+            if (! config('blocks.custom_html_enabled', true)) {
+                throw ValidationException::withMessages([
+                    $attribute => 'Custom HTML blocks are disabled.',
+                ]);
+            }
+
+            if (! $user?->can('cms.custom_html.manage')) {
+                throw ValidationException::withMessages([
+                    $attribute => 'You are not allowed to manage custom HTML blocks.',
+                ]);
+            }
         }
 
         $schema = $blockConfig['schema'] ?? ['type' => 'object', 'properties' => []];
@@ -109,7 +117,7 @@ class BlockConfigurationValidator
         $type = $schema['type'] ?? 'string';
 
         match ($type) {
-            'string' => $this->validateString($value, $schema, $attribute, $errors, $blockType),
+            'string' => $this->validateString($value, $schema, $attribute, $errors),
             'integer' => $this->validateInteger($value, $schema, $attribute, $errors),
             'number' => $this->validateNumber($value, $schema, $attribute, $errors),
             'boolean' => $this->validateBoolean($value, $attribute, $errors),
@@ -137,7 +145,7 @@ class BlockConfigurationValidator
      * @param  array<string, mixed>  $schema
      * @param  array<string, list<string>>  $errors
      */
-    private function validateString(mixed $value, array $schema, string $attribute, array &$errors, ?string $blockType): void
+    private function validateString(mixed $value, array $schema, string $attribute, array &$errors): void
     {
         if (! is_string($value)) {
             $errors[$attribute][] = 'The '.$attribute.' field must be a string.';

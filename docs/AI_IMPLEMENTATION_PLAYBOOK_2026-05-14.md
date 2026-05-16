@@ -611,8 +611,6 @@ Testy:
 - `docker compose exec php php artisan test --compact tests/Feature/Admin/Cms/PageBuilderTransactionalSaveTest.php tests/Feature/Admin/Cms/PageBuilderSnapshotValidationTest.php tests/Feature/Admin/Cms/ReusableBlockValidationTest.php tests/Feature/Admin/Cms/SectionTemplateValidationTest.php`
 
 Pozostało:
-- UI: rozdzielić `isManualSaving` i `isAutoSaving`.
-- UI: dodać kolejkę/cancel autosave oraz dialog konfliktu zamiast `window.confirm()`.
 - Długofalowo: zastąpić delete/recreate diff/upsert, żeby zachować stabilne ID.
 
 ### 2026-05-16 - Epic 2 - server-side custom HTML/CSS hardening
@@ -630,8 +628,7 @@ Testy:
 - `docker compose exec php php artisan test --compact tests/Feature/Admin/Cms/CustomHtmlSanitizationTest.php tests/Feature/Admin/Cms/PageBuilderTransactionalSaveTest.php tests/Feature/Admin/Cms/PageBuilderSnapshotValidationTest.php tests/Feature/Admin/Cms/ReusableBlockValidationTest.php tests/Feature/Admin/Cms/SectionTemplateValidationTest.php`
 
 Pozostało:
-- UI: ukryć lub zablokować edycję Custom HTML dla użytkowników bez `cms.custom_html.manage`.
-- Site-level feature flag dla custom HTML enabled/disabled.
+- Dalsze hardening tasks z kolejnych epików.
 
 ### 2026-05-16 - Epic 3 - stabilne identyfikatory w builderze
 
@@ -652,3 +649,61 @@ Testy:
 Pozostało:
 - Rozbicie `builder-toolbar.tsx` i `dynamic-block-form.tsx` na mniejsze komponenty.
 - Osobny etap dla navigatora i inspectora.
+
+### 2026-05-16 - Epic 3 - podział dużych komponentów buildera
+
+Status: Done
+
+Zmiany:
+- `builder-toolbar.tsx` został sprowadzony do orkiestratora akcji toolbara.
+- Wyciągnięto osobne komponenty dla statusu zapisu, undo/redo, harmonogramu, import/export, approval workflow i zapisu szablonu.
+- `dynamic-block-form.tsx` został rozdzielony na renderery pól schema-driven, repeater, sekcję relacji i helpery konwersji relacji.
+- `blocks-list.tsx` został rozdzielony na modal biblioteki, header akcji, hook clipboarda i sortable list.
+- Typy propsów nowych komponentów przeniesiono do plików `.types.ts`, zgodnie z regułą braku definicji typów w `.tsx`.
+
+Testy:
+- `docker compose exec php npm run format`
+- `docker compose exec php npm run types`
+- `docker compose exec php npm run format:check`
+
+Pozostało:
+- Osobny etap dla navigatora i inspectora.
+
+### 2026-05-16 - Epic 1 - autosave UI i dialog nawigacji
+
+Status: Partial
+
+Zmiany:
+- Page Builder rozdziela teraz manual save i autosave na osobne propsy/stany UI.
+- Ręczny zapis czyści zaplanowane timery autosave i abortuje aktywne żądanie autosave.
+- Autosave używa `AbortController` i ignoruje anulowane żądania.
+- Natywny `window.confirm()` dla Inertia navigation guard został zastąpiony dialogiem UI.
+
+Testy:
+- `docker compose exec php npm run format`
+- `docker compose exec php npm run types`
+- `docker compose exec php npm run format:check`
+
+Pozostało:
+- Długofalowo: zastąpić delete/recreate diff/upsert, żeby zachować stabilne ID.
+
+### 2026-05-16 - Epic 2 - Custom HTML UI gate i feature flag
+
+Status: Done
+
+Zmiany:
+- Widok Page Buildera dostaje capability `can_manage_custom_html`.
+- Użytkownicy bez `cms.custom_html.manage` nie widzą `custom_html` na liście dostępnych typów bloków.
+- Dodano flagę `CMS_CUSTOM_HTML_ENABLED` przez `config('blocks.custom_html_enabled')`.
+- Wyłączona flaga ukrywa Custom HTML w UI i odrzuca zapis po stronie backendu.
+- Backendowa walidacja uprawnień pozostaje twardą blokadą zapisu Custom HTML.
+
+Testy:
+- `docker compose exec php vendor/bin/pint --dirty`
+- `docker compose exec php php artisan test --compact tests/Feature/Admin/Cms/CustomHtmlSanitizationTest.php`
+- `docker compose exec php npm run format`
+- `docker compose exec php npm run types`
+- `docker compose exec php npm run format:check`
+
+Pozostało:
+- Dalsze hardening tasks z kolejnych epików.

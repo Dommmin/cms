@@ -97,3 +97,22 @@ it('rejects custom HTML blocks for users without custom HTML permission', functi
 
     expect(PageBlock::query()->where('page_id', $this->page->id)->count())->toBe(0);
 });
+
+it('rejects custom HTML blocks when custom HTML is disabled', function (): void {
+    config()->set('blocks.custom_html_enabled', false);
+
+    $user = User::factory()->create();
+    $user->assignRole('super-admin');
+
+    $this->actingAs($user)
+        ->putJson(route('admin.cms.pages.builder.update', $this->page), [
+            'snapshot' => customHtmlSnapshot([
+                'html' => '<div>Safe</div>',
+                'css' => '.safe { color: red; }',
+            ]),
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['snapshot.sections.0.blocks.0.configuration']);
+
+    expect(PageBlock::query()->where('page_id', $this->page->id)->count())->toBe(0);
+});

@@ -15,6 +15,8 @@ use App\Models\Product;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 return [
+    'custom_html_enabled' => env('CMS_CUSTOM_HTML_ENABLED', true),
+
     'relation_types' => [
         'media.image' => [
             'model' => Media::class,

@@ -21,4 +21,11 @@ export type BuilderPageProps = {
     sections: Section[];
     available_sections: Record<string, AvailableSection>;
     available_block_relations: Record<string, BlockTypeConfig>;
+    capabilities: {
+        can_manage_custom_html: boolean;
+    };
+};
+
+export type PendingNavigation = {
+    url: string;
 };

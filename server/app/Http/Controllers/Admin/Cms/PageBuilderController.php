@@ -35,7 +35,7 @@ class PageBuilderController extends Controller
         private readonly PageVersionService $pageVersionService,
     ) {}
 
-    public function show(int $page)
+    public function show(Request $request, int $page)
     {
         $pageModel = Page::with(['sections.blocks', 'sections.allBlocks', 'sections.blocks.relations', 'sections.blocks.reusableBlock'])->findOrFail($page);
 
@@ -66,6 +66,8 @@ class PageBuilderController extends Controller
             ]),
         ]);
 
+        $customHtmlEnabled = (bool) config('blocks.custom_html_enabled', true);
+
         return Inertia::render('admin/cms/pages/builder', [
             'page' => [
                 'id' => $pageModel->id,
@@ -80,6 +82,9 @@ class PageBuilderController extends Controller
             'sections' => $sections,
             'available_sections' => config('cms.sections', []),
             'available_block_relations' => config('blocks.block_types', []),
+            'capabilities' => [
+                'can_manage_custom_html' => $customHtmlEnabled && ($request->user()?->can('cms.custom_html.manage') ?? false),
+            ],
         ]);
     }
 
@@ -304,8 +309,8 @@ class PageBuilderController extends Controller
             $snapshot = $this->snapshotValidator->validateAndSanitize([
                 'sections' => $data['sections'],
             ], user: $request->user());
-        } catch (ValidationException $exception) {
-            return back()->withErrors($exception->errors());
+        } catch (ValidationException $validationException) {
+            return back()->withErrors($validationException->errors());
         }
 
         $this->persistBuilderSnapshot(

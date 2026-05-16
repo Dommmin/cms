@@ -4,404 +4,34 @@
  * Follows Interface Segregation Principle - minimal props
  */
 
-import { router } from '@inertiajs/react';
 import { Link } from '@inertiajs/react';
 import {
     ArrowLeft,
     BookmarkPlus,
-    Calendar,
-    Check,
     Eye,
-    FileDown,
-    FileUp,
     LayoutTemplate,
-    Loader2,
     Plus,
-    Redo2,
     Save,
-    Undo2,
-    X,
 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import {
-    exportMethod as pbExport,
-    importMethod as pbImport,
-} from '@/actions/App/Http/Controllers/Admin/Cms/PageBuilderController';
+import { useState } from 'react';
 import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from '@/hooks/use-translation';
+import { ApprovalGroup } from './builder-toolbar/approval-group';
+import { HistoryGroup } from './builder-toolbar/history-group';
+import { ImportExportGroup } from './builder-toolbar/import-export-group';
+import { SaveAsTemplateDialog } from './builder-toolbar/save-as-template-dialog';
+import { SaveStatus } from './builder-toolbar/save-status';
+import { SchedulePopover } from './builder-toolbar/schedule-popover';
 import type { BuilderToolbarProps } from './builder-toolbar.types';
-
-// ── Auto-save indicator ────────────────────────────────────────────────────
-
-function formatTimeSince(date: Date): string {
-    const diffMs = Date.now() - date.getTime();
-    const diffMin = Math.floor(diffMs / 60_000);
-    if (diffMin < 1) return 'just now';
-    if (diffMin === 1) return '1 min ago';
-    return `${diffMin} min ago`;
-}
-
-function AutoSaveIndicator({
-    isSaving,
-    hasUnsavedChanges,
-    lastSavedAt,
-}: {
-    isSaving: boolean;
-    hasUnsavedChanges: boolean;
-    lastSavedAt: Date | null;
-}) {
-    const __ = useTranslation();
-    // Tick every 30s to recompute the "X min ago" label without storing derived state
-    const [, setTick] = useState(0);
-    useEffect(() => {
-        if (!lastSavedAt) return;
-        const id = setInterval(() => setTick((n) => n + 1), 30_000);
-        return () => clearInterval(id);
-    }, [lastSavedAt]);
-
-    const timeSince = lastSavedAt ? formatTimeSince(lastSavedAt) : null;
-
-    if (isSaving) {
-        return (
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Loader2 className="h-3 w-3 animate-spin" />
-                <span>{__('builder.saving', 'Saving...')}</span>
-            </div>
-        );
-    }
-
-    if (hasUnsavedChanges) {
-        return (
-            <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
-                <span className="h-2 w-2 rounded-full bg-amber-500" />
-                <span>{__('builder.unsaved_changes', 'Unsaved changes')}</span>
-            </div>
-        );
-    }
-
-    if (lastSavedAt) {
-        return (
-            <div className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400">
-                <span className="h-2 w-2 rounded-full bg-green-500" />
-                <span>
-                    {__('builder.saved', 'Saved')}{' '}
-                    {timeSince ?? __('builder.just_now', 'just now')}
-                </span>
-            </div>
-        );
-    }
-
-    return null;
-}
-
-// ── Schedule popover ──────────────────────────────────────────────────────
-
-function SchedulePopover({
-    scheduledPublishAt,
-    scheduledUnpublishAt,
-    onSave,
-}: {
-    scheduledPublishAt: string | null;
-    scheduledUnpublishAt: string | null;
-    onSave: (publishAt: string | null, unpublishAt: string | null) => void;
-}) {
-    const __ = useTranslation();
-    const toLocalDateTimeValue = (iso: string | null): string => {
-        if (!iso) return '';
-        // Convert ISO to datetime-local format (YYYY-MM-DDTHH:mm)
-        const d = new Date(iso);
-        if (isNaN(d.getTime())) return '';
-        return d.toISOString().slice(0, 16);
-    };
-
-    const [publishAt, setPublishAt] = useState(
-        toLocalDateTimeValue(scheduledPublishAt),
-    );
-    const [unpublishAt, setUnpublishAt] = useState(
-        toLocalDateTimeValue(scheduledUnpublishAt),
-    );
-    const [open, setOpen] = useState(false);
-
-    const handleSave = () => {
-        onSave(publishAt || null, unpublishAt || null);
-        setOpen(false);
-    };
-
-    const hasSchedule = !!scheduledPublishAt || !!scheduledUnpublishAt;
-
-    return (
-        <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <Button
-                    variant={hasSchedule ? 'secondary' : 'outline'}
-                    size="sm"
-                    title={__(
-                        'builder.schedule_publishing',
-                        'Schedule publishing',
-                    )}
-                >
-                    <Calendar className="mr-2 h-4 w-4" />
-                    {__('builder.schedule', 'Schedule')}
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80" align="end">
-                <div className="space-y-4">
-                    <h4 className="text-sm font-semibold">
-                        {__(
-                            'builder.schedule_publishing',
-                            'Schedule Publishing',
-                        )}
-                    </h4>
-
-                    <div className="space-y-1.5">
-                        <Label htmlFor="scheduled-publish-at">
-                            {__('builder.publish_at', 'Publish at')}
-                        </Label>
-                        <input
-                            id="scheduled-publish-at"
-                            type="datetime-local"
-                            value={publishAt}
-                            onChange={(e) => setPublishAt(e.target.value)}
-                            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            {__(
-                                'builder.publish_at_hint',
-                                'Page will be automatically published at this time.',
-                            )}
-                        </p>
-                    </div>
-
-                    <div className="space-y-1.5">
-                        <Label htmlFor="scheduled-unpublish-at">
-                            {__('builder.unpublish_at', 'Unpublish at')}
-                        </Label>
-                        <input
-                            id="scheduled-unpublish-at"
-                            type="datetime-local"
-                            value={unpublishAt}
-                            onChange={(e) => setUnpublishAt(e.target.value)}
-                            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            {__(
-                                'builder.unpublish_at_hint',
-                                'Page will be automatically unpublished at this time.',
-                            )}
-                        </p>
-                    </div>
-
-                    <div className="flex justify-between gap-2">
-                        {hasSchedule && (
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-destructive hover:text-destructive"
-                                onClick={() => {
-                                    setPublishAt('');
-                                    setUnpublishAt('');
-                                    onSave(null, null);
-                                    setOpen(false);
-                                }}
-                            >
-                                {__('builder.clear_schedule', 'Clear schedule')}
-                            </Button>
-                        )}
-                        <Button
-                            size="sm"
-                            className="ml-auto"
-                            onClick={handleSave}
-                        >
-                            {__('builder.save_schedule', 'Save schedule')}
-                        </Button>
-                    </div>
-                </div>
-            </PopoverContent>
-        </Popover>
-    );
-}
-
-// ── Save as template dialog ────────────────────────────────────────────────
-
-function SaveAsTemplateDialog({
-    open,
-    onClose,
-    onSave,
-}: {
-    open: boolean;
-    onClose: () => void;
-    onSave: (
-        name: string,
-        description: string,
-        category: string,
-        isGlobal: boolean,
-    ) => void;
-}) {
-    const __ = useTranslation();
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
-    const [category, setCategory] = useState('custom');
-    const [isGlobal, setIsGlobal] = useState(false);
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!name.trim()) return;
-        onSave(name, description, category, isGlobal);
-        setName('');
-        setDescription('');
-        setCategory('custom');
-        setIsGlobal(false);
-        onClose();
-    };
-
-    return (
-        <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                        <BookmarkPlus className="h-5 w-5" />
-                        {__('builder.save_as_template', 'Save as Template')}
-                    </DialogTitle>
-                </DialogHeader>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="space-y-1.5">
-                        <Label htmlFor="tpl-name">
-                            {__('builder.name', 'Name')}
-                        </Label>
-                        <Input
-                            id="tpl-name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder={__(
-                                'builder.template_name_placeholder',
-                                'My Template',
-                            )}
-                            required
-                        />
-                    </div>
-
-                    <div className="space-y-1.5">
-                        <Label htmlFor="tpl-description">
-                            {__('builder.description', 'Description')}{' '}
-                            <span className="text-muted-foreground">
-                                ({__('builder.optional', 'optional')})
-                            </span>
-                        </Label>
-                        <Textarea
-                            id="tpl-description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            placeholder={__(
-                                'builder.template_description_placeholder',
-                                'Describe what this template is for…',
-                            )}
-                            rows={3}
-                        />
-                    </div>
-
-                    <div className="space-y-1.5">
-                        <Label htmlFor="tpl-category">
-                            {__('builder.category', 'Category')}
-                        </Label>
-                        <Select value={category} onValueChange={setCategory}>
-                            <SelectTrigger id="tpl-category">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="custom">
-                                    {__('builder.category_custom', 'Custom')}
-                                </SelectItem>
-                                <SelectItem value="landing">
-                                    {__('builder.category_landing', 'Landing')}
-                                </SelectItem>
-                                <SelectItem value="product">
-                                    {__('builder.category_product', 'Product')}
-                                </SelectItem>
-                                <SelectItem value="blog">
-                                    {__('builder.category_blog', 'Blog')}
-                                </SelectItem>
-                                <SelectItem value="portfolio">
-                                    {__(
-                                        'builder.category_portfolio',
-                                        'Portfolio',
-                                    )}
-                                </SelectItem>
-                                <SelectItem value="other">
-                                    {__('builder.category_other', 'Other')}
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <Checkbox
-                            id="tpl-global"
-                            checked={isGlobal}
-                            onCheckedChange={(checked) =>
-                                setIsGlobal(checked === true)
-                            }
-                        />
-                        <Label
-                            htmlFor="tpl-global"
-                            className="cursor-pointer text-sm font-normal"
-                        >
-                            {__(
-                                'builder.make_visible_to_all_admins',
-                                'Make visible to all admins',
-                            )}
-                        </Label>
-                    </div>
-
-                    <DialogFooter>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={onClose}
-                        >
-                            {__('builder.cancel', 'Cancel')}
-                        </Button>
-                        <Button type="submit" disabled={!name.trim()}>
-                            {__('builder.save_template', 'Save Template')}
-                        </Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-        </Dialog>
-    );
-}
-
-// ── Toolbar ────────────────────────────────────────────────────────────────
 
 export function BuilderToolbar({
     pageId,
     pageTitle,
     isPublished: _isPublished,
     isSaving,
+    isManualSaving,
+    isAutoSaving,
     canUndo,
     canRedo,
     hasUnsavedChanges,
@@ -423,32 +53,10 @@ export function BuilderToolbar({
 }: BuilderToolbarProps) {
     const __ = useTranslation();
     const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
-    const [rejectNoteOpen, setRejectNoteOpen] = useState(false);
-    const [rejectNote, setRejectNote] = useState('');
-    const importInputRef = useRef<HTMLInputElement>(null);
-
-    const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        const formData = new FormData();
-        formData.append('file', file);
-        router.post(pbImport.url(pageId), formData, {
-            forceFormData: true,
-            preserveScroll: true,
-        });
-        e.target.value = '';
-    };
-
-    const handleRejectSubmit = () => {
-        onReject(rejectNote);
-        setRejectNote('');
-        setRejectNoteOpen(false);
-    };
 
     return (
         <div className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="flex h-16 items-center justify-between px-6">
-                {/* Left: Back button and title */}
                 <div className="flex items-center gap-4">
                     <Button variant="ghost" size="sm" asChild>
                         <Link href={PageController.index.url()}>
@@ -464,36 +72,17 @@ export function BuilderToolbar({
                     </div>
                 </div>
 
-                {/* Right: Actions */}
                 <div className="flex items-center gap-2">
-                    {/* Undo / Redo */}
-                    <div className="flex items-center">
-                        <Button
-                            onClick={onUndo}
-                            disabled={!canUndo}
-                            variant="ghost"
-                            size="sm"
-                            title={__('builder.undo', 'Undo (Ctrl+Z)')}
-                            className="h-8 w-8 p-0"
-                        >
-                            <Undo2 className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            onClick={onRedo}
-                            disabled={!canRedo}
-                            variant="ghost"
-                            size="sm"
-                            title={__('builder.redo', 'Redo (Ctrl+Shift+Z)')}
-                            className="h-8 w-8 p-0"
-                        >
-                            <Redo2 className="h-4 w-4" />
-                        </Button>
-                    </div>
+                    <HistoryGroup
+                        canUndo={canUndo}
+                        canRedo={canRedo}
+                        onUndo={onUndo}
+                        onRedo={onRedo}
+                    />
 
-                    {/* Auto-save indicator */}
                     <div className="px-2">
-                        <AutoSaveIndicator
-                            isSaving={isSaving}
+                        <SaveStatus
+                            isSaving={isSaving || isAutoSaving}
                             hasUnsavedChanges={hasUnsavedChanges}
                             lastSavedAt={lastSavedAt}
                         />
@@ -539,82 +128,22 @@ export function BuilderToolbar({
                         {__('builder.save_as_template', 'Save as Template')}
                     </Button>
 
-                    {/* Export / Import */}
-                    <a
-                        href={pbExport.url(pageId)}
-                        download
-                        className="inline-flex h-8 items-center gap-1.5 rounded-md border border-input bg-background px-3 text-xs font-medium shadow-sm hover:bg-accent"
-                        title={__('builder.export_hint', 'Export page as JSON')}
-                    >
-                        <FileDown className="h-3.5 w-3.5" />
-                        {__('builder.export', 'Export')}
-                    </a>
-                    <input
-                        ref={importInputRef}
-                        type="file"
-                        accept=".json"
-                        className="hidden"
-                        onChange={handleImportFile}
+                    <ImportExportGroup pageId={pageId} />
+
+                    <ApprovalGroup
+                        approvalStatus={approvalStatus}
+                        onSubmitForReview={onSubmitForReview}
+                        onApprove={onApprove}
+                        onReject={onReject}
                     />
+
                     <Button
-                        variant="outline"
+                        onClick={onSave}
+                        disabled={isManualSaving}
                         size="sm"
-                        onClick={() => importInputRef.current?.click()}
-                        title={__(
-                            'builder.import_hint',
-                            'Import page from JSON',
-                        )}
                     >
-                        <FileUp className="mr-1.5 h-3.5 w-3.5" />
-                        {__('builder.import', 'Import')}
-                    </Button>
-
-                    {/* Approval Workflow */}
-                    <div className="h-4 w-px bg-border" />
-                    {approvalStatus === 'draft' && (
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={onSubmitForReview}
-                        >
-                            {__(
-                                'builder.submit_for_review',
-                                'Submit for Review',
-                            )}
-                        </Button>
-                    )}
-                    {approvalStatus === 'in_review' && (
-                        <>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="border-green-300 text-green-700 hover:bg-green-50 dark:border-green-700 dark:text-green-400"
-                                onClick={onApprove}
-                            >
-                                <Check className="mr-1.5 h-3.5 w-3.5" />
-                                {__('builder.approve', 'Approve')}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="border-destructive text-destructive hover:bg-destructive/10"
-                                onClick={() => setRejectNoteOpen(true)}
-                            >
-                                <X className="mr-1.5 h-3.5 w-3.5" />
-                                {__('builder.reject', 'Reject')}
-                            </Button>
-                        </>
-                    )}
-                    {approvalStatus === 'approved' && (
-                        <span className="flex items-center gap-1.5 rounded-md border border-green-300 px-2.5 py-1 text-xs font-medium text-green-700 dark:border-green-700 dark:text-green-400">
-                            <Check className="h-3 w-3" />
-                            {__('builder.approved', 'Approved')}
-                        </span>
-                    )}
-
-                    <Button onClick={onSave} disabled={isSaving} size="sm">
                         <Save className="mr-2 h-4 w-4" />
-                        {isSaving
+                        {isManualSaving
                             ? __('builder.saving', 'Saving...')
                             : __('builder.save', 'Save')}
                     </Button>
@@ -626,51 +155,6 @@ export function BuilderToolbar({
                 onClose={() => setSaveTemplateOpen(false)}
                 onSave={onSaveTemplate}
             />
-
-            {/* Reject note dialog */}
-            <Dialog
-                open={rejectNoteOpen}
-                onOpenChange={(o) => !o && setRejectNoteOpen(false)}
-            >
-                <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                        <DialogTitle>
-                            {__('builder.reject_page', 'Reject Page')}
-                        </DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-3 py-2">
-                        <p className="text-sm text-muted-foreground">
-                            {__(
-                                'builder.reject_note_hint',
-                                'Optionally leave a note for the author explaining what needs to be changed.',
-                            )}
-                        </p>
-                        <Textarea
-                            value={rejectNote}
-                            onChange={(e) => setRejectNote(e.target.value)}
-                            placeholder={__(
-                                'builder.reject_note_placeholder',
-                                'Describe what needs to be changed...',
-                            )}
-                            rows={4}
-                        />
-                    </div>
-                    <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => setRejectNoteOpen(false)}
-                        >
-                            {__('builder.cancel', 'Cancel')}
-                        </Button>
-                        <Button
-                            variant="destructive"
-                            onClick={handleRejectSubmit}
-                        >
-                            {__('builder.reject', 'Reject')}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </div>
     );
 }

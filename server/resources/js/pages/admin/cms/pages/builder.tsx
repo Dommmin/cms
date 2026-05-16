@@ -6,12 +6,22 @@ import * as PageApprovalController from '@/actions/App/Http/Controllers/Admin/Cm
 import * as PageBuilderController from '@/actions/App/Http/Controllers/Admin/Cms/PageBuilderController';
 import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import * as SectionTemplateController from '@/actions/App/Http/Controllers/Admin/Cms/SectionTemplateController';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import type { ApprovalStatus, Section } from '@/features/page-builder';
 import { PageBuilder } from '@/features/page-builder';
 import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
-import type { BuilderPageProps } from './builder.types';
+import type { BuilderPageProps, PendingNavigation } from './builder.types';
 
 const AUTO_SAVE_DEBOUNCE_MS = 5_000;
 const AUTO_SAVE_MAX_WAIT_MS = 60_000;
@@ -21,6 +31,7 @@ export default function BuilderPage({
     sections,
     available_sections,
     available_block_relations,
+    capabilities,
 }: BuilderPageProps) {
     const [isSaving, setIsSaving] = useState(false);
     const [isAutoSaving, setIsAutoSaving] = useState(false);
@@ -37,6 +48,9 @@ export default function BuilderPage({
     const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus>(
         (page.approval_status as ApprovalStatus) ?? 'draft',
     );
+    const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
+    const [pendingNavigation, setPendingNavigation] =
+        useState<PendingNavigation | null>(null);
 
     const autoSaveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(
         null,
@@ -44,9 +58,13 @@ export default function BuilderPage({
     const autoSaveMaxWaitRef = useRef<ReturnType<typeof setTimeout> | null>(
         null,
     );
+    const autoSaveAbortRef = useRef<AbortController | null>(null);
+    const allowNavigationRef = useRef(false);
     const isFirstRender = useRef(true);
     const localSectionsRef = useRef(localSections);
+    const pageVersionRef = useRef(pageVersion);
     localSectionsRef.current = localSections;
+    pageVersionRef.current = pageVersion;
 
     const displayTitle = resolveLocalizedText(page.title);
 
@@ -98,13 +116,40 @@ export default function BuilderPage({
         setHasUnsavedChanges(true);
     }, [localSections]);
 
+    const clearAutoSaveTimers = () => {
+        if (autoSaveDebounceRef.current) {
+            clearTimeout(autoSaveDebounceRef.current);
+            autoSaveDebounceRef.current = null;
+        }
+
+        if (autoSaveMaxWaitRef.current) {
+            clearTimeout(autoSaveMaxWaitRef.current);
+            autoSaveMaxWaitRef.current = null;
+        }
+    };
+
+    const cancelAutoSave = () => {
+        clearAutoSaveTimers();
+        autoSaveAbortRef.current?.abort();
+        autoSaveAbortRef.current = null;
+        setIsAutoSaving(false);
+    };
+
     const runAutoSave = () => {
+        autoSaveAbortRef.current?.abort();
+
+        const controller = new AbortController();
+        autoSaveAbortRef.current = controller;
         setIsAutoSaving(true);
         axios
-            .put(PageBuilderController.autosave.url(page.id), {
-                snapshot: { sections: localSectionsRef.current },
-                expected_version: pageVersion,
-            })
+            .put(
+                PageBuilderController.autosave.url(page.id),
+                {
+                    snapshot: { sections: localSectionsRef.current },
+                    expected_version: pageVersionRef.current,
+                },
+                { signal: controller.signal },
+            )
             .then((res) => {
                 const data = res.data as {
                     version?: number;
@@ -117,6 +162,8 @@ export default function BuilderPage({
                 }
             })
             .catch((err) => {
+                if (axios.isCancel(err)) return;
+
                 if (axios.isAxiosError(err) && err.response?.status === 409) {
                     toast.error(
                         'Conflict: this page was edited by another user. Refresh to load the latest version.',
@@ -125,7 +172,10 @@ export default function BuilderPage({
                 }
             })
             .finally(() => {
-                setIsAutoSaving(false);
+                if (autoSaveAbortRef.current === controller) {
+                    autoSaveAbortRef.current = null;
+                    setIsAutoSaving(false);
+                }
             });
     };
 
@@ -164,6 +214,15 @@ export default function BuilderPage({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [hasUnsavedChanges, localSections]);
 
+    useEffect(
+        () => () => {
+            clearAutoSaveTimers();
+            autoSaveAbortRef.current?.abort();
+            autoSaveAbortRef.current = null;
+        },
+        [],
+    );
+
     // Warn on browser close/refresh when there are unsaved changes
     useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -177,12 +236,34 @@ export default function BuilderPage({
 
     // Block Inertia SPA navigation when there are unsaved changes
     useEffect(() => {
-        const removeHandler = router.on('before', () => {
+        const removeHandler = router.on('before', (event) => {
             if (!hasUnsavedChanges) return;
-            return window.confirm('You have unsaved changes. Leave this page?');
+
+            if (allowNavigationRef.current) {
+                allowNavigationRef.current = false;
+                return;
+            }
+
+            const url = event.detail.visit.url?.toString();
+            setPendingNavigation(url ? { url } : null);
+            setLeaveDialogOpen(true);
+
+            return false;
         });
         return removeHandler;
     }, [hasUnsavedChanges]);
+
+    const handleConfirmLeave = () => {
+        const target = pendingNavigation?.url;
+
+        setLeaveDialogOpen(false);
+        setPendingNavigation(null);
+
+        if (!target) return;
+
+        allowNavigationRef.current = true;
+        router.visit(target);
+    };
 
     const handleSectionsChange = (updatedSections: Section[]) => {
         setLocalSections(updatedSections);
@@ -190,6 +271,7 @@ export default function BuilderPage({
 
     const handleSave = async (updatedSections: Section[]) => {
         setLocalSections(updatedSections);
+        cancelAutoSave();
         setIsSaving(true);
 
         router.put(
@@ -348,6 +430,14 @@ export default function BuilderPage({
         }
     };
 
+    const availableBlockRelations = capabilities.can_manage_custom_html
+        ? available_block_relations
+        : Object.fromEntries(
+              Object.entries(available_block_relations).filter(
+                  ([type]) => type !== 'custom_html',
+              ),
+          );
+
     const builderData = {
         page: {
             ...page,
@@ -356,7 +446,7 @@ export default function BuilderPage({
         },
         sections: localSections,
         available_sections,
-        available_block_relations,
+        available_block_relations: availableBlockRelations,
     };
 
     return (
@@ -370,6 +460,8 @@ export default function BuilderPage({
                     onPreview={handlePreview}
                     onChange={handleSectionsChange}
                     isSaving={isSaving || isAutoSaving}
+                    isManualSaving={isSaving}
+                    isAutoSaving={isAutoSaving}
                     hasUnsavedChanges={hasUnsavedChanges}
                     lastSavedAt={lastSavedAt}
                     scheduledPublishAt={scheduledPublishAt}
@@ -382,6 +474,31 @@ export default function BuilderPage({
                     onReject={handleReject}
                 />
             </div>
+
+            <AlertDialog
+                open={leaveDialogOpen}
+                onOpenChange={setLeaveDialogOpen}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Unsaved changes</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            You have unsaved page builder changes. Leaving now
+                            will discard edits that have not been saved yet.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel
+                            onClick={() => setPendingNavigation(null)}
+                        >
+                            Stay
+                        </AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirmLeave}>
+                            Leave page
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </AppLayout>
     );
 }

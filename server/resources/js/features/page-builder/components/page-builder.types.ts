@@ -7,6 +7,8 @@ export type PageBuilderProps = {
     onPreview: () => void;
     onChange?: (sections: Section[]) => void;
     isSaving?: boolean;
+    isManualSaving?: boolean;
+    isAutoSaving?: boolean;
     hasUnsavedChanges?: boolean;
     lastSavedAt?: Date | null;
     scheduledPublishAt?: string | null;

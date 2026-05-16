@@ -33,6 +33,8 @@ export function PageBuilder({
     onPreview,
     onChange,
     isSaving = false,
+    isManualSaving = isSaving,
+    isAutoSaving = false,
     hasUnsavedChanges = false,
     lastSavedAt = null,
     scheduledPublishAt = null,
@@ -141,6 +143,8 @@ export function PageBuilder({
                 pageTitle={data.page.title}
                 isPublished={data.page.is_published}
                 isSaving={isSaving}
+                isManualSaving={isManualSaving}
+                isAutoSaving={isAutoSaving}
                 canUndo={canUndo}
                 canRedo={canRedo}
                 hasUnsavedChanges={hasUnsavedChanges}
