@@ -69,9 +69,9 @@ trait CachesImages
 
     private function placeholderSvg(string $seed, int $width, int $height): string
     {
-        $hash = substr(sha1($seed), 0, 12);
-        $primary = '#'.substr($hash, 0, 6);
-        $secondary = '#'.substr($hash, 6, 6);
+        $hash = mb_substr(sha1($seed), 0, 12);
+        $primary = '#'.mb_substr($hash, 0, 6);
+        $secondary = '#'.mb_substr($hash, 6, 6);
         $label = htmlspecialchars(str_replace('-', ' ', $seed), ENT_XML1 | ENT_QUOTES, 'UTF-8');
         $innerWidth = $width - 96;
         $innerHeight = $height - 96;

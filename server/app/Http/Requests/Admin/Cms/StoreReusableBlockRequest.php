@@ -47,20 +47,20 @@ class StoreReusableBlockRequest extends FormRequest
     private function validateBlockPayload(Validator $validator): void
     {
         try {
-            $configuration = app(BlockConfigurationValidator::class)->validateAndSanitize(
+            $configuration = resolve(BlockConfigurationValidator::class)->validateAndSanitize(
                 $this->string('type')->toString(),
                 $this->input('configuration', []),
                 'configuration',
                 $this->user(),
             );
 
-            app(PageBuilderSnapshotValidator::class)->validateRelationsForBlock(
+            resolve(PageBuilderSnapshotValidator::class)->validateRelationsForBlock(
                 $this->string('type')->toString(),
                 $this->input('relations_config', []),
                 'relations_config',
             );
-        } catch (ValidationException $exception) {
-            foreach ($exception->errors() as $attribute => $messages) {
+        } catch (ValidationException $validationException) {
+            foreach ($validationException->errors() as $attribute => $messages) {
                 foreach ($messages as $message) {
                     $validator->errors()->add($attribute, $message);
                 }

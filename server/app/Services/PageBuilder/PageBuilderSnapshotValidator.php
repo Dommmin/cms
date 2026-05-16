@@ -142,6 +142,7 @@ class PageBuilderSnapshotValidator
 
         $allowedRelations = config('blocks.block_types.'.$blockType.'.allowed_relations', []);
         $allowedRelations = is_array($allowedRelations) ? $allowedRelations : [];
+
         $relationTypes = (array) config('blocks.relation_types', []);
         $singleRelationCounts = [];
 

@@ -21,11 +21,11 @@ docker compose exec node npx playwright test # E2E tests
 
 ## Server vs Client Components
 
-| Situation | Use | Import from |
-|-----------|-----|-------------|
-| SSR page, initial data fetch | Server component | `lib/server-fetch.ts` → `serverFetch()` |
-| Interactive, hooks, browser APIs | Client component (`"use client"`) | `lib/axios.ts` → `api` |
-| Locale-aware server fetch | Pass `locale` cookie | `cookies()` from `next/headers` |
+| Situation                        | Use                               | Import from                             |
+| -------------------------------- | --------------------------------- | --------------------------------------- |
+| SSR page, initial data fetch     | Server component                  | `lib/server-fetch.ts` → `serverFetch()` |
+| Interactive, hooks, browser APIs | Client component (`"use client"`) | `lib/axios.ts` → `api`                  |
+| Locale-aware server fetch        | Pass `locale` cookie              | `cookies()` from `next/headers`         |
 
 Server components by default. Add `"use client"` only when you need hooks, event handlers, or browser APIs.
 
@@ -37,8 +37,8 @@ All public URLs are locale-prefixed (`/en/products`, `/pl/blog`).
 
 ```ts
 // Client components
-const lp = useLocalePath();  // (path) => `/${locale}${path}`
-const locale = useLocale();  // extracts locale from pathname
+const lp = useLocalePath(); // (path) => `/${locale}${path}`
+const locale = useLocale(); // extracts locale from pathname
 
 // Server components
 import { localePath } from '@/lib/i18n';
@@ -54,14 +54,14 @@ const locale = (await cookies()).get('locale')?.value ?? 'en';
 
 Always check `client/types/api.ts` first. Common gotchas:
 
-| Type | Field | Note |
-|------|-------|------|
-| `CartItem` | `unit_price`, `subtotal` | `product` is direct (not `variant.product`) |
-| `ProductVariant` | `attributes: Record<string, string>` | not `attribute_values` |
-| `ProductReview` | `author`, `body` | not `reviewer_name` |
-| `OrderItem` | `unit_price`, `subtotal`, `variant_sku`, `product_name` | |
-| `Order` | use `items?.length` | no `items_count` field |
-| `BlogPost` | `featured_image: string\|null`, `author: {id,name}\|null` | not `cover_image_url` |
+| Type             | Field                                                     | Note                                        |
+| ---------------- | --------------------------------------------------------- | ------------------------------------------- |
+| `CartItem`       | `unit_price`, `subtotal`                                  | `product` is direct (not `variant.product`) |
+| `ProductVariant` | `attributes: Record<string, string>`                      | not `attribute_values`                      |
+| `ProductReview`  | `author`, `body`                                          | not `reviewer_name`                         |
+| `OrderItem`      | `unit_price`, `subtotal`, `variant_sku`, `product_name`   |                                             |
+| `Order`          | use `items?.length`                                       | no `items_count` field                      |
+| `BlogPost`       | `featured_image: string\|null`, `author: {id,name}\|null` | not `cover_image_url`                       |
 
 ---
 
@@ -93,19 +93,19 @@ Every public page needs `generateMetadata()`. Add JSON-LD via `<JsonLd data={bui
 
 ## Key Paths
 
-| What | Where |
-|------|-------|
-| Pages (App Router) | `app/` |
-| API functions | `api/` |
-| React hooks | `hooks/` |
-| Reusable components | `components/` |
-| API types | `types/api.ts` |
-| Server fetch | `lib/server-fetch.ts` |
-| Client fetch (axios) | `lib/axios.ts` |
-| i18n helpers | `lib/i18n.ts` |
-| Schema.org builders | `lib/schema.ts` |
-| Middleware (locale) | `middleware.ts` |
-| E2E tests | `tests/e2e/` |
+| What                 | Where                 |
+| -------------------- | --------------------- |
+| Pages (App Router)   | `app/`                |
+| API functions        | `api/`                |
+| React hooks          | `hooks/`              |
+| Reusable components  | `components/`         |
+| API types            | `types/api.ts`        |
+| Server fetch         | `lib/server-fetch.ts` |
+| Client fetch (axios) | `lib/axios.ts`        |
+| i18n helpers         | `lib/i18n.ts`         |
+| Schema.org builders  | `lib/schema.ts`       |
+| Middleware (locale)  | `middleware.ts`       |
+| E2E tests            | `tests/e2e/`          |
 
 ---
 

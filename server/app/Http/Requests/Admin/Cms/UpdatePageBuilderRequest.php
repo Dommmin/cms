@@ -46,12 +46,12 @@ class UpdatePageBuilderRequest extends FormRequest
             }
 
             try {
-                $snapshot = app(PageBuilderSnapshotValidator::class)->validateAndSanitize(
+                $snapshot = resolve(PageBuilderSnapshotValidator::class)->validateAndSanitize(
                     $this->input('snapshot'),
                     user: $this->user(),
                 );
-            } catch (ValidationException $exception) {
-                foreach ($exception->errors() as $attribute => $messages) {
+            } catch (ValidationException $validationException) {
+                foreach ($validationException->errors() as $attribute => $messages) {
                     foreach ($messages as $message) {
                         $validator->errors()->add($attribute, $message);
                     }

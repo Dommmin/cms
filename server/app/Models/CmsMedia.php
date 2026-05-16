@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
@@ -14,6 +15,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 #[Table(name: 'cms_media')]
 class CmsMedia extends Model implements HasMedia
 {
+    use HasFactory;
     use InteractsWithMedia;
 
     protected $fillable = [];

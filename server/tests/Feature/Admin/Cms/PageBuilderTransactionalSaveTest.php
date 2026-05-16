@@ -16,6 +16,7 @@ beforeEach(function (): void {
 
     $this->user = User::factory()->create();
     $this->user->assignRole('super-admin');
+
     $this->page = Page::factory()->create(['version' => 0]);
 });
 
