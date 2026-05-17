@@ -13,6 +13,7 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { useEffect, useRef, type JSX } from 'react';
 import type { EditorProps } from './Editor.types';
+import { isAllowedEditorLinkUrl } from './link-url';
 import { nodes } from './nodes';
 import AutoLinkPlugin from './plugins/AutoLinkPlugin';
 import CopyCodePlugin from './plugins/CopyCodePlugin';
@@ -78,7 +79,7 @@ export default function Editor({ value, onChange, placeholder = 'Start writing..
                 <HistoryPlugin />
                 <ListPlugin />
                 <CheckListPlugin />
-                <LinkPlugin validateUrl={(url) => /^(https?:\/\/|mailto:|tel:|\/|#)/.test(url)} />
+                <LinkPlugin validateUrl={isAllowedEditorLinkUrl} />
                 {editable && <AutoLinkPlugin />}
                 <CodePlugin />
                 <TablePlugin hasCellMerge hasCellBackgroundColor />

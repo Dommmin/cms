@@ -722,6 +722,10 @@ Zmiany:
 - Bazowe kontrolki toolbara zostały wydzielone do `ToolbarPlugin.controls.tsx`.
 - Dialogi wstawiania YouTube, tabeli, emoji i znaków specjalnych zostały wydzielone do `ToolbarPlugin.dialogs.tsx`.
 - Menu typu bloku i menu wstawiania zostały wydzielone do `ToolbarPlugin.menus.tsx`.
+- Grupy historii, formatowania inline, fontów/koloru, wyrównania i linku zostały wydzielone do `ToolbarPlugin.groups.tsx`.
+- Widoczne teksty toolbara i dialogów RTE używają `useTranslation()` z angielskimi fallbackami.
+- Link insertion używa dialogu z walidacją `https://`, `mailto:`, `tel:`, `/relative` i `#anchor`.
+- Walidacja linków została ujednolicona w `lexical/link-url.ts` dla `LinkPlugin`, toolbara i floating link editora.
 
 Testy:
 - `docker compose exec php npm run format`
@@ -729,6 +733,5 @@ Testy:
 - `docker compose exec php npm run format:check`
 
 Pozostało:
-- Rozbić pozostałe grupy inline `ToolbarPlugin.tsx` na mniejsze komponenty: format tekstu, fonty/kolory, wyrównanie.
-- Przenieść teksty tooltipów/dialogów przez `useTranslation()`.
+- Opcjonalnie przenieść `ToolbarPlugin.tsx` do folderu `ToolbarPlugin/index.tsx` w osobnym porządkowym kroku.
 - Dodać testy interakcji RTE dla trybów `simple` i `full`.

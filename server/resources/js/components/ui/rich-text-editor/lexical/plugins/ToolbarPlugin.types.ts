@@ -36,6 +36,15 @@ export type YouTubeDialogProps = {
     onInsert: () => void;
 };
 
+export type LinkDialogProps = {
+    open: boolean;
+    url: string;
+    isInvalid: boolean;
+    onOpenChange: (open: boolean) => void;
+    onUrlChange: (url: string) => void;
+    onInsert: () => void;
+};
+
 export type TableDialogProps = {
     open: boolean;
     rows: number;
@@ -66,6 +75,59 @@ export type InsertMenuProps = {
     onInsertCollapsible: () => void;
     onOpenEmojiDialog: () => void;
     onOpenSpecialCharactersDialog: () => void;
+};
+
+export type HistoryGroupProps = {
+    canUndo: boolean;
+    canRedo: boolean;
+    onUndo: () => void;
+    onRedo: () => void;
+};
+
+export type InlineFormatGroupProps = {
+    showAdvanced: boolean;
+    isBold: boolean;
+    isItalic: boolean;
+    isUnderline: boolean;
+    isStrikethrough: boolean;
+    isCode: boolean;
+    isSubscript: boolean;
+    isSuperscript: boolean;
+    isHighlight: boolean;
+    onBold: () => void;
+    onItalic: () => void;
+    onUnderline: () => void;
+    onStrikethrough: () => void;
+    onCode: () => void;
+    onSubscript: () => void;
+    onSuperscript: () => void;
+    onHighlight: () => void;
+    onClearFormatting: () => void;
+};
+
+export type FontStyleGroupProps = {
+    fontSize: string;
+    fontFamily: string;
+    fontColor: string;
+    spellcheck: boolean;
+    onFontSizeChange: (fontSize: string) => void;
+    onFontFamilyChange: (fontFamily: string) => void;
+    onFontColorChange: (fontColor: string) => void;
+    onResetColor: () => void;
+    onToggleSpellcheck: () => void;
+};
+
+export type AlignmentGroupProps = {
+    elementFormat: ElementFormatType;
+    onAlignLeft: () => void;
+    onAlignCenter: () => void;
+    onAlignRight: () => void;
+    onJustify: () => void;
+};
+
+export type LinkGroupProps = {
+    isLink: boolean;
+    onToggleLink: () => void;
 };
 
 export interface ToolbarState {

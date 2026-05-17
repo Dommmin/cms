@@ -30,40 +30,20 @@ import {
     SELECTION_CHANGE_COMMAND,
     UNDO_COMMAND,
 } from 'lexical';
-import {
-    AlignCenter,
-    AlignJustify,
-    AlignLeft,
-    AlignRight,
-    Baseline,
-    Bold,
-    Code2,
-    Eraser,
-    Highlighter,
-    Italic,
-    Link2,
-    Link2Off,
-    Redo2,
-    SpellCheck,
-    Strikethrough,
-    Subscript,
-    Superscript,
-    Underline,
-    Undo2,
-} from 'lucide-react';
 import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import { MediaPickerModal } from '@/components/media-picker-modal';
-import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useTranslation } from '@/hooks/use-translation';
 import { $createImageNode } from '../../image-node';
 import { $createYouTubeNode, extractYouTubeId } from '../../youtube-node';
 import { $createCollapsibleContainerNode, $createCollapsibleTitleNode, $createCollapsibleContentNode } from '../collapsible-nodes';
 import { $createLayoutContainerNode, $createLayoutItemNode } from '../layout-nodes';
-import { CODE_LANGUAGES, ELEMENT_FORMAT_NUM_TO_TYPE, FONT_FAMILIES, FONT_SIZES, TEXT_COLORS } from './ToolbarPlugin.constants';
-import { ToolbarButton as Btn, ToolbarSeparator as Sep, ToolbarToggle as Tog } from './ToolbarPlugin.controls';
-import { EmojiDialog, SpecialCharactersDialog, TableDialog, YouTubeDialog } from './ToolbarPlugin.dialogs';
+import { getEditorLinkTarget, isAllowedEditorLinkUrl, normalizeEditorLinkUrl } from '../link-url';
+import { CODE_LANGUAGES, ELEMENT_FORMAT_NUM_TO_TYPE } from './ToolbarPlugin.constants';
+import { ToolbarSeparator as Sep } from './ToolbarPlugin.controls';
+import { EmojiDialog, LinkDialog, SpecialCharactersDialog, TableDialog, YouTubeDialog } from './ToolbarPlugin.dialogs';
+import { AlignmentGroup, FontStyleGroup, HistoryGroup, InlineFormatGroup, LinkGroup } from './ToolbarPlugin.groups';
 import { BlockTypeMenu, InsertMenu } from './ToolbarPlugin.menus';
 import type { BlockType, InsertDialog, ToolbarPluginProps, ToolbarState } from './ToolbarPlugin.types';
 
@@ -71,6 +51,7 @@ import type { BlockType, InsertDialog, ToolbarPluginProps, ToolbarState } from '
 
 export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JSX.Element {
     const [editor] = useLexicalComposerContext();
+    const __ = useTranslation();
     const isFullMode = mode === 'full';
 
     const [state, setState] = useState<ToolbarState>({
@@ -95,6 +76,8 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
 
     const [insertDialog, setInsertDialog] = useState<InsertDialog>(null);
     const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
+    const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+    const [linkUrl, setLinkUrl] = useState('');
     const [ytUrl, setYtUrl] = useState('');
     const [tableRows, setTableRows] = useState(3);
     const [tableCols, setTableCols] = useState(3);
@@ -296,11 +279,25 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
 
     const toggleLink = useCallback(() => {
         if (!state.isLink) {
-            editor.dispatchCommand(TOGGLE_LINK_COMMAND, { url: 'https://', target: '_blank' });
+            setLinkUrl('');
+            setLinkDialogOpen(true);
         } else {
             editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
         }
     }, [editor, state.isLink]);
+
+    const handleInsertLink = useCallback(() => {
+        const normalizedUrl = normalizeEditorLinkUrl(linkUrl);
+
+        if (!isAllowedEditorLinkUrl(normalizedUrl)) return;
+
+        editor.dispatchCommand(TOGGLE_LINK_COMMAND, {
+            url: normalizedUrl,
+            target: getEditorLinkTarget(normalizedUrl),
+        });
+        setLinkDialogOpen(false);
+        setLinkUrl('');
+    }, [editor, linkUrl]);
 
     // ─── Insert ────────────────────────────────────────────────────────────────
 
@@ -385,15 +382,14 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
 
     return (
         <TooltipProvider delayDuration={300}>
-            <div className="editor-toolbar" role="toolbar" aria-label="Editor toolbar">
+            <div className="editor-toolbar" role="toolbar" aria-label={__('rte.toolbar.label', 'Editor toolbar')}>
 
-                {/* History */}
-                <Btn onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)} disabled={!canUndo} tooltip="Undo (Ctrl+Z)">
-                    <Undo2 size={14} />
-                </Btn>
-                <Btn onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)} disabled={!canRedo} tooltip="Redo (Ctrl+Shift+Z)">
-                    <Redo2 size={14} />
-                </Btn>
+                <HistoryGroup
+                    canUndo={canUndo}
+                    canRedo={canRedo}
+                    onUndo={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
+                    onRedo={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
+                />
 
                 <Sep />
 
@@ -408,10 +404,10 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <SelectTrigger className="h-7 w-28 text-xs">
-                                        <SelectValue placeholder="Language" />
+                                        <SelectValue placeholder={__('rte.toolbar.language', 'Language')} />
                                     </SelectTrigger>
                                 </TooltipTrigger>
-                                <TooltipContent side="bottom" className="text-xs">Code language</TooltipContent>
+                                <TooltipContent side="bottom" className="text-xs">{__('rte.toolbar.code_language', 'Code language')}</TooltipContent>
                             </Tooltip>
                             <SelectContent>
                                 {CODE_LANGUAGES.map(([lang, label]) => (
@@ -424,145 +420,57 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
 
                 <Sep />
 
-                {/* Text format */}
-                <Tog pressed={isBold} onPressedChange={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')} tooltip="Bold (Ctrl+B)">
-                    <Bold size={13} />
-                </Tog>
-                <Tog pressed={isItalic} onPressedChange={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')} tooltip="Italic (Ctrl+I)">
-                    <Italic size={13} />
-                </Tog>
-                <Tog pressed={isUnderline} onPressedChange={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')} tooltip="Underline (Ctrl+U)">
-                    <Underline size={13} />
-                </Tog>
-                <Tog pressed={isStrikethrough} onPressedChange={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')} tooltip="Strikethrough">
-                    <Strikethrough size={13} />
-                </Tog>
+                <InlineFormatGroup
+                    showAdvanced={isFullMode}
+                    isBold={isBold}
+                    isItalic={isItalic}
+                    isUnderline={isUnderline}
+                    isStrikethrough={isStrikethrough}
+                    isCode={isCode}
+                    isSubscript={isSubscript}
+                    isSuperscript={isSuperscript}
+                    isHighlight={isHighlight}
+                    onBold={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
+                    onItalic={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}
+                    onUnderline={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')}
+                    onStrikethrough={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')}
+                    onCode={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code')}
+                    onSubscript={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'subscript')}
+                    onSuperscript={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'superscript')}
+                    onHighlight={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'highlight')}
+                    onClearFormatting={clearFormatting}
+                />
                 {isFullMode && (
                     <>
-                        <Tog pressed={isCode} onPressedChange={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code')} tooltip="Inline code">
-                            <Code2 size={13} />
-                        </Tog>
-                        <Tog pressed={isSubscript} onPressedChange={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'subscript')} tooltip="Subscript">
-                            <Subscript size={13} />
-                        </Tog>
-                        <Tog pressed={isSuperscript} onPressedChange={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'superscript')} tooltip="Superscript">
-                            <Superscript size={13} />
-                        </Tog>
-                        <Tog pressed={isHighlight} onPressedChange={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'highlight')} tooltip="Highlight">
-                            <Highlighter size={13} />
-                        </Tog>
-                        <Btn onClick={clearFormatting} tooltip="Clear formatting">
-                            <Eraser size={13} />
-                        </Btn>
+                        <Sep />
+
+                        <FontStyleGroup
+                            fontSize={fontSize}
+                            fontFamily={fontFamily}
+                            fontColor={fontColor}
+                            spellcheck={spellcheck}
+                            onFontSizeChange={(val) => applyStyleText({ 'font-size': val })}
+                            onFontFamilyChange={(val) => applyStyleText({ 'font-family': val === '__default__' ? '' : val })}
+                            onFontColorChange={(color) => applyStyleText({ color })}
+                            onResetColor={() => applyStyleText({ color: '' })}
+                            onToggleSpellcheck={toggleSpellcheck}
+                        />
 
                         <Sep />
 
-                        {/* Font size */}
-                        <Select value={fontSize} onValueChange={(val) => applyStyleText({ 'font-size': val })}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <SelectTrigger className="h-7 w-14 px-1.5 text-xs">
-                                        <SelectValue placeholder="Size" />
-                                    </SelectTrigger>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" className="text-xs">Font size</TooltipContent>
-                            </Tooltip>
-                            <SelectContent>
-                                {FONT_SIZES.map((size) => (
-                                    <SelectItem key={size} value={`${size}px`} className="text-xs">{size}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-
-                        {/* Font family */}
-                        <Select
-                            value={fontFamily || '__default__'}
-                            onValueChange={(val) => applyStyleText({ 'font-family': val === '__default__' ? '' : val })}
-                        >
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <SelectTrigger className="h-7 w-20 px-1.5 text-xs">
-                                        <SelectValue placeholder="Font" />
-                                    </SelectTrigger>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" className="text-xs">Font family</TooltipContent>
-                            </Tooltip>
-                            <SelectContent>
-                                {FONT_FAMILIES.map(([value, label]) => (
-                                    <SelectItem key={value || '__default__'} value={value || '__default__'} className="text-xs">{label}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-
-                        {/* Text color */}
-                        <DropdownMenu>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button type="button" variant="ghost" size="sm" className="relative h-7 w-7 p-0">
-                                            <Baseline size={13} />
-                                            <span
-                                                className="absolute right-1 bottom-0.5 left-1 h-0.5 rounded-full"
-                                                style={{ backgroundColor: fontColor || 'currentColor' }}
-                                            />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" className="text-xs">Text color</TooltipContent>
-                            </Tooltip>
-                            <DropdownMenuContent className="p-2">
-                                <div className="grid grid-cols-8 gap-1">
-                                    {TEXT_COLORS.map((color) => (
-                                        <button
-                                            key={color}
-                                            type="button"
-                                            className="h-5 w-5 rounded border border-border transition-transform hover:scale-110"
-                                            style={{ backgroundColor: color }}
-                                            onClick={() => applyStyleText({ color })}
-                                            title={color}
-                                        />
-                                    ))}
-                                </div>
-                                <DropdownMenuSeparator className="my-1.5" />
-                                <button
-                                    type="button"
-                                    className="w-full py-0.5 text-center text-xs text-muted-foreground hover:text-foreground"
-                                    onClick={() => applyStyleText({ color: '' })}
-                                >
-                                    Reset color
-                                </button>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-
-                        {/* Spellcheck */}
-                        <Tog pressed={spellcheck} onPressedChange={toggleSpellcheck} tooltip="Spellcheck">
-                            <SpellCheck size={13} />
-                        </Tog>
-
-                        <Sep />
-
-                        {/* Alignment */}
-                        <Tog pressed={elementFormat === 'left'} onPressedChange={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left')} tooltip="Align left">
-                            <AlignLeft size={13} />
-                        </Tog>
-                        <Tog pressed={elementFormat === 'center'} onPressedChange={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center')} tooltip="Align center">
-                            <AlignCenter size={13} />
-                        </Tog>
-                        <Tog pressed={elementFormat === 'right'} onPressedChange={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right')} tooltip="Align right">
-                            <AlignRight size={13} />
-                        </Tog>
-                        <Tog pressed={elementFormat === 'justify'} onPressedChange={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify')} tooltip="Justify">
-                            <AlignJustify size={13} />
-                        </Tog>
+                        <AlignmentGroup
+                            elementFormat={elementFormat}
+                            onAlignLeft={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left')}
+                            onAlignCenter={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center')}
+                            onAlignRight={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right')}
+                            onJustify={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify')}
+                        />
 
                         <Sep />
                     </>
                 )}
 
-                {/* Link */}
-                <Tog pressed={isLink} onPressedChange={toggleLink} tooltip={isLink ? 'Remove link' : 'Insert link'}>
-                    {isLink ? <Link2Off size={13} /> : <Link2 size={13} />}
-                </Tog>
+                <LinkGroup isLink={isLink} onToggleLink={toggleLink} />
 
                 {isFullMode && (
                     <>
@@ -599,6 +507,18 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
                 onSetThumbnail={() => {}}
                 selectedImages={[]}
                 multiple={false}
+            />
+
+            <LinkDialog
+                open={linkDialogOpen}
+                url={linkUrl}
+                isInvalid={linkUrl.trim() !== '' && !isAllowedEditorLinkUrl(linkUrl)}
+                onOpenChange={(open) => {
+                    setLinkDialogOpen(open);
+                    if (!open) setLinkUrl('');
+                }}
+                onUrlChange={setLinkUrl}
+                onInsert={handleInsertLink}
             />
 
             <YouTubeDialog

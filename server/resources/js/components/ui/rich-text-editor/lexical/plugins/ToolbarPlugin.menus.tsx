@@ -3,12 +3,15 @@ import { Fragment, type JSX } from 'react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useTranslation } from '@/hooks/use-translation';
 import { BLOCK_ICONS, BLOCK_LABELS } from './ToolbarPlugin.constants';
 import type { BlockType, BlockTypeMenuProps, InsertMenuProps } from './ToolbarPlugin.types';
 
 const BLOCK_TYPES: BlockType[] = ['paragraph', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'quote', 'code', 'bullet', 'number', 'check'];
 
 export function BlockTypeMenu({ blockType, onSelect }: BlockTypeMenuProps): JSX.Element {
+    const __ = useTranslation();
+
     return (
         <DropdownMenu>
             <Tooltip>
@@ -16,13 +19,13 @@ export function BlockTypeMenu({ blockType, onSelect }: BlockTypeMenuProps): JSX.
                     <DropdownMenuTrigger asChild>
                         <Button type="button" variant="ghost" size="sm" className="h-7 gap-1 px-2 text-xs font-normal">
                             {BLOCK_ICONS[blockType]}
-                            <span className="hidden sm:inline">{BLOCK_LABELS[blockType]}</span>
+                            <span className="hidden sm:inline">{__(`rte.block_type.${blockType}`, BLOCK_LABELS[blockType])}</span>
                             <ChevronDown size={12} className="opacity-50" />
                         </Button>
                     </DropdownMenuTrigger>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="text-xs">
-                    Block type
+                    {__('rte.toolbar.block_type', 'Block type')}
                 </TooltipContent>
             </Tooltip>
             <DropdownMenuContent className="w-44">
@@ -31,7 +34,7 @@ export function BlockTypeMenu({ blockType, onSelect }: BlockTypeMenuProps): JSX.
                         {(type === 'quote' || type === 'bullet') && <DropdownMenuSeparator />}
                         <DropdownMenuItem onClick={() => onSelect(type)} className={`gap-2 text-xs ${blockType === type ? 'bg-accent' : ''}`}>
                             <span className="flex w-4 items-center justify-center">{BLOCK_ICONS[type]}</span>
-                            {BLOCK_LABELS[type]}
+                            {__(`rte.block_type.${type}`, BLOCK_LABELS[type])}
                         </DropdownMenuItem>
                     </Fragment>
                 ))}
@@ -50,6 +53,8 @@ export function InsertMenu({
     onOpenEmojiDialog,
     onOpenSpecialCharactersDialog,
 }: InsertMenuProps): JSX.Element {
+    const __ = useTranslation();
+
     return (
         <DropdownMenu>
             <Tooltip>
@@ -57,46 +62,46 @@ export function InsertMenu({
                     <DropdownMenuTrigger asChild>
                         <Button type="button" variant="ghost" size="sm" className="h-7 gap-1 px-2 text-xs font-normal">
                             <Plus size={13} />
-                            <span className="hidden sm:inline">Insert</span>
+                            <span className="hidden sm:inline">{__('rte.toolbar.insert', 'Insert')}</span>
                             <ChevronDown size={12} className="opacity-50" />
                         </Button>
                     </DropdownMenuTrigger>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="text-xs">
-                    Insert element
+                    {__('rte.toolbar.insert_element', 'Insert element')}
                 </TooltipContent>
             </Tooltip>
             <DropdownMenuContent>
                 <DropdownMenuItem className="gap-2 text-xs" onClick={onInsertHorizontalRule}>
-                    <Minus size={14} /> Horizontal Rule
+                    <Minus size={14} /> {__('rte.insert.horizontal_rule', 'Horizontal Rule')}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="gap-2 text-xs" onClick={onOpenMediaPicker}>
-                    <Image size={14} /> Image
+                    <Image size={14} /> {__('rte.insert.image', 'Image')}
                 </DropdownMenuItem>
                 <DropdownMenuItem className="gap-2 text-xs" onClick={onOpenYouTubeDialog}>
-                    <Youtube size={14} /> YouTube Video
+                    <Youtube size={14} /> {__('rte.insert.youtube_video', 'YouTube Video')}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="gap-2 text-xs" onClick={onOpenTableDialog}>
-                    <Table size={14} /> Table
+                    <Table size={14} /> {__('rte.insert.table', 'Table')}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="gap-2 text-xs" onClick={() => onInsertColumns('1fr 1fr')}>
-                    <Columns2 size={14} /> 2 Columns
+                    <Columns2 size={14} /> {__('rte.insert.two_columns', '2 Columns')}
                 </DropdownMenuItem>
                 <DropdownMenuItem className="gap-2 text-xs" onClick={() => onInsertColumns('1fr 1fr 1fr')}>
-                    <Columns3 size={14} /> 3 Columns
+                    <Columns3 size={14} /> {__('rte.insert.three_columns', '3 Columns')}
                 </DropdownMenuItem>
                 <DropdownMenuItem className="gap-2 text-xs" onClick={onInsertCollapsible}>
-                    <ChevronRight size={14} /> Collapsible Section
+                    <ChevronRight size={14} /> {__('rte.insert.collapsible_section', 'Collapsible Section')}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="gap-2 text-xs" onClick={onOpenEmojiDialog}>
-                    <Smile size={14} /> Emoji
+                    <Smile size={14} /> {__('rte.insert.emoji', 'Emoji')}
                 </DropdownMenuItem>
                 <DropdownMenuItem className="gap-2 text-xs" onClick={onOpenSpecialCharactersDialog}>
-                    <Hash size={14} /> Special Characters
+                    <Hash size={14} /> {__('rte.insert.special_characters', 'Special Characters')}
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

@@ -15,6 +15,8 @@ import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useTranslation } from '@/hooks/use-translation';
+import { getEditorLinkTarget, isAllowedEditorLinkUrl, normalizeEditorLinkUrl } from '../link-url';
 
 function getSelectedNode(selection: ReturnType<typeof $getSelection>) {
     if (!$isRangeSelection(selection)) return null;
@@ -27,6 +29,7 @@ function getSelectedNode(selection: ReturnType<typeof $getSelection>) {
 }
 
 function FloatingLinkEditor({ editor, anchorElem }: { editor: ReturnType<typeof useLexicalComposerContext>[0]; anchorElem: HTMLElement }): JSX.Element {
+    const __ = useTranslation();
     const ref = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const [url, setUrl] = useState('');
@@ -88,10 +91,12 @@ function FloatingLinkEditor({ editor, anchorElem }: { editor: ReturnType<typeof 
     }, [isEdit]);
 
     const handleSave = () => {
-        if (editUrl.trim()) {
-            editor.dispatchCommand(TOGGLE_LINK_COMMAND, { url: editUrl.trim(), target: '_blank' });
+        const normalizedUrl = normalizeEditorLinkUrl(editUrl);
+
+        if (isAllowedEditorLinkUrl(normalizedUrl)) {
+            editor.dispatchCommand(TOGGLE_LINK_COMMAND, { url: normalizedUrl, target: getEditorLinkTarget(normalizedUrl) });
+            setIsEdit(false);
         }
-        setIsEdit(false);
     };
 
     if (!isVisible) return <></>;
@@ -114,31 +119,35 @@ function FloatingLinkEditor({ editor, anchorElem }: { editor: ReturnType<typeof 
                             if (e.key === 'Enter') { e.preventDefault(); handleSave(); }
                             if (e.key === 'Escape') { e.preventDefault(); setIsEdit(false); }
                         }}
-                        placeholder="https://"
+                        placeholder="https://, mailto:, tel:, /relative, #anchor"
                     />
-                    <Button size="sm" className="h-7 px-2 text-xs" onClick={handleSave}>Save</Button>
-                    <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setIsEdit(false)}><X size={12} /></Button>
+                    <Button size="sm" className="h-7 px-2 text-xs" onClick={handleSave} disabled={editUrl.trim() !== '' && !isAllowedEditorLinkUrl(editUrl)}>
+                        {__('common.save', 'Save')}
+                    </Button>
+                    <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setIsEdit(false)}>
+                        <X size={12} />
+                    </Button>
                 </>
             ) : (
                 <>
                     <a href={url} target="_blank" rel="noopener noreferrer" className="max-w-52 truncate px-1 text-xs text-primary hover:underline">{url}</a>
                     <Button
                         size="icon" variant="ghost" className="h-7 w-7"
-                        title="Edit link"
+                        title={__('rte.link.edit', 'Edit link')}
                         onClick={() => { setEditUrl(url); setIsEdit(true); }}
                     >
                         <Pencil size={12} />
                     </Button>
                     <Button
                         size="icon" variant="ghost" className="h-7 w-7"
-                        title="Open in new tab"
+                        title={__('rte.link.open_new_tab', 'Open in new tab')}
                         onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
                     >
                         <ExternalLink size={12} />
                     </Button>
                     <Button
                         size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive"
-                        title="Remove link"
+                        title={__('rte.link.remove', 'Remove link')}
                         onClick={() => { editor.dispatchCommand(TOGGLE_LINK_COMMAND, null); setIsVisible(false); }}
                     >
                         <Link2Off size={12} />
