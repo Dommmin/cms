@@ -707,3 +707,28 @@ Testy:
 
 Pozostało:
 - Dalsze hardening tasks z kolejnych epików.
+
+### 2026-05-16 - Epic 4 - tryby Rich Text Editor
+
+Status: Partial
+
+Zmiany:
+- `RichTextEditor` i Lexical `Editor` przyjmują teraz `mode="simple" | "full"`.
+- Domyślny tryb pozostaje `full`, żeby nie zmieniać long-form editorów.
+- Page Builder używa `mode="simple"` dla pól rich text w blokach.
+- Prosty toolbar ukrywa zaawansowane grupy: code language, inline code, sub/superscript, highlight, font size/family/color, spellcheck, alignment i insert menu.
+- Typy propsów toolbara zostały przeniesione do `ToolbarPlugin.types.ts`.
+- Stałe toolbara zostały wydzielone do `ToolbarPlugin.constants.tsx`.
+- Bazowe kontrolki toolbara zostały wydzielone do `ToolbarPlugin.controls.tsx`.
+- Dialogi wstawiania YouTube, tabeli, emoji i znaków specjalnych zostały wydzielone do `ToolbarPlugin.dialogs.tsx`.
+- Menu typu bloku i menu wstawiania zostały wydzielone do `ToolbarPlugin.menus.tsx`.
+
+Testy:
+- `docker compose exec php npm run format`
+- `docker compose exec php npm run types`
+- `docker compose exec php npm run format:check`
+
+Pozostało:
+- Rozbić pozostałe grupy inline `ToolbarPlugin.tsx` na mniejsze komponenty: format tekstu, fonty/kolory, wyrównanie.
+- Przenieść teksty tooltipów/dialogów przez `useTranslation()`.
+- Dodać testy interakcji RTE dla trybów `simple` i `full`.

@@ -53,7 +53,7 @@ export function StringField({ fieldKey, schema, value, onChange }: FieldProps) {
                         {s.description}
                     </p>
                 )}
-                <RichTextEditor value={str} onChange={onChange} />
+                <RichTextEditor value={str} onChange={onChange} mode="simple" />
             </div>
         );
     }

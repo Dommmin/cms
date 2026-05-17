@@ -51,7 +51,7 @@ function EditablePlugin({ editable }: { editable: boolean }): null {
     return null;
 }
 
-export default function Editor({ value, onChange, placeholder = 'Start writing...', className, maxHeight, editable = true, showWordCount = true, instanceKey }: EditorProps): JSX.Element {
+export default function Editor({ value, onChange, placeholder = 'Start writing...', className, maxHeight, editable = true, mode = 'full', showWordCount = true, instanceKey }: EditorProps): JSX.Element {
     const containerRef = useRef<HTMLDivElement>(null);
     const config = useRef(buildConfig(editable));
 
@@ -63,7 +63,7 @@ export default function Editor({ value, onChange, placeholder = 'Start writing..
         <div ref={containerRef} className={`editor-container ${className ?? ''}`.trim()}>
             {/* eslint-disable-next-line react-hooks/refs */}
             <LexicalComposer initialConfig={config.current}>
-                {editable && <ToolbarPlugin />}
+                {editable && <ToolbarPlugin mode={mode} />}
                 <div className="editor-input group" style={{ position: 'relative', ...contentStyle }}>
                     <RichTextPlugin
                         contentEditable={<ContentEditable className="editor-content" />}
