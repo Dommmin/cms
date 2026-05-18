@@ -1411,6 +1411,7 @@ export default function Create({
                 onRemove={handleMediaRemove}
                 onSetThumbnail={handleMediaSetThumbnail}
                 selectedImages={selectedImages}
+                mode="gallery"
                 multiple
             />
         </AppLayout>

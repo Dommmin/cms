@@ -16,6 +16,7 @@ import * as BlockRelationController from '@/actions/App/Http/Controllers/Admin/B
 import {
     MediaPickerModal,
     type MediaItem,
+    type MediaPickerMode,
 } from '@/components/media-picker-modal';
 import { Button } from '@/components/ui/button';
 import {
@@ -72,6 +73,14 @@ const MODEL_TYPE_LABELS: Record<string, string> = {
 
 function isMediaType(type: RelationType): boolean {
     return type.startsWith('media.');
+}
+
+function mediaPickerModeFor(type: RelationType): MediaPickerMode {
+    if (type === 'media.file') return 'file';
+    if (type === 'media.video') return 'video';
+    if (type === 'media.image' || type === 'media.icon') return 'image';
+
+    return 'any';
 }
 
 /** Modal for picking a model relation (category, product, brand, page, etc.) */
@@ -300,7 +309,11 @@ export function BlockRelationManager({
             handleAddRelation(pickerKey, {
                 type,
                 id: item.id,
-                metadata: { name: item.name, file_name: item.file_name },
+                metadata: {
+                    name: item.name,
+                    file_name: item.file_name,
+                    mime_type: item.mime_type,
+                },
             });
         });
 
@@ -335,7 +348,13 @@ export function BlockRelationManager({
 
     const getSelectedMedia = (
         key: string,
-    ): { id: number; url: string; name: string; is_thumbnail: boolean }[] => {
+    ): {
+        id: number;
+        url: string;
+        name: string;
+        mime_type?: string;
+        is_thumbnail: boolean;
+    }[] => {
         const relation = value[key];
         if (!relation) return [];
 
@@ -344,6 +363,7 @@ export function BlockRelationManager({
             id: rel.id,
             url: '',
             name: String(rel.metadata?.name || `Item ${rel.id}`),
+            mime_type: String(rel.metadata?.mime_type ?? ''),
             is_thumbnail: false,
         }));
     };
@@ -360,6 +380,10 @@ export function BlockRelationManager({
               (t) => !t.startsWith('media.'),
           ) ?? 'category')
         : 'category';
+    const activeMediaRelationType = pickerKey
+        ? (allowedRelations[pickerKey]?.types.find(isMediaType) ??
+          'media.image')
+        : 'media.image';
 
     if (Object.keys(allowedRelations).length === 0) {
         return (
@@ -537,7 +561,12 @@ export function BlockRelationManager({
                 onRemove={() => {}}
                 onSetThumbnail={() => {}}
                 selectedImages={getSelectedMedia(pickerKey)}
-                multiple={true}
+                mode={mediaPickerModeFor(activeMediaRelationType)}
+                multiple={
+                    pickerKey
+                        ? (allowedRelations[pickerKey]?.multiple ?? false)
+                        : false
+                }
             />
 
             {/* Model picker (categories, products, brands, pages, etc.) */}

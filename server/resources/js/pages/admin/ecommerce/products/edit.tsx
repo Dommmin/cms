@@ -1901,6 +1901,7 @@ export default function Edit({
                 onRemove={handleMediaRemove}
                 onSetThumbnail={handleMediaSetThumbnail}
                 selectedImages={selectedImages}
+                mode="gallery"
                 multiple
             />
         </AppLayout>

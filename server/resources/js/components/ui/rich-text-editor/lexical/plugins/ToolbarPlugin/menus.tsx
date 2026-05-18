@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, Columns2, Columns3, Hash, Image, Minus, Plus, Smile, Table, Youtube } from 'lucide-react';
+import { ChevronDown, ChevronRight, Columns2, Columns3, FileText, Hash, Image, Images, Minus, Plus, Smile, Table, Youtube } from 'lucide-react';
 import { Fragment, type JSX } from 'react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -46,6 +46,8 @@ export function BlockTypeMenu({ blockType, onSelect }: BlockTypeMenuProps): JSX.
 export function InsertMenu({
     onInsertHorizontalRule,
     onOpenMediaPicker,
+    onOpenGalleryPicker,
+    onOpenFilePicker,
     onOpenYouTubeDialog,
     onOpenTableDialog,
     onInsertColumns,
@@ -78,6 +80,12 @@ export function InsertMenu({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="gap-2 text-xs" onClick={onOpenMediaPicker}>
                     <Image size={14} /> {__('rte.insert.image', 'Image')}
+                </DropdownMenuItem>
+                <DropdownMenuItem className="gap-2 text-xs" onClick={onOpenGalleryPicker}>
+                    <Images size={14} /> {__('rte.insert.gallery', 'Gallery')}
+                </DropdownMenuItem>
+                <DropdownMenuItem className="gap-2 text-xs" onClick={onOpenFilePicker}>
+                    <FileText size={14} /> {__('rte.insert.file', 'File')}
                 </DropdownMenuItem>
                 <DropdownMenuItem className="gap-2 text-xs" onClick={onOpenYouTubeDialog}>
                     <Youtube size={14} /> {__('rte.insert.youtube_video', 'YouTube Video')}

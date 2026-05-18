@@ -16,8 +16,23 @@ final readonly class MediaIndexQuery
     {
         $media = Media::query()
             ->when($this->request->search, function ($query): void {
-                $query->where('name', 'like', '%'.$this->request->search.'%')
-                    ->orWhere('file_name', 'like', '%'.$this->request->search.'%');
+                $query->where(function ($query): void {
+                    $query->where('name', 'like', '%'.$this->request->search.'%')
+                        ->orWhere('file_name', 'like', '%'.$this->request->search.'%');
+                });
+            })
+            ->when($this->mimeTypes() !== [], function ($query): void {
+                $query->where(function ($query): void {
+                    foreach ($this->mimeTypes() as $mimeType) {
+                        if (str_ends_with($mimeType, '/*')) {
+                            $query->orWhere('mime_type', 'like', str_replace('/*', '/%', $mimeType));
+
+                            continue;
+                        }
+
+                        $query->orWhere('mime_type', $mimeType);
+                    }
+                });
             })
             ->when($this->request->extension, function ($query): void {
                 $query->where('file_name', 'like', '%.'.$this->request->extension);
@@ -34,8 +49,23 @@ final readonly class MediaIndexQuery
     {
         $media = Media::query()
             ->when($this->request->search, function ($query): void {
-                $query->where('name', 'like', '%'.$this->request->search.'%')
-                    ->orWhere('file_name', 'like', '%'.$this->request->search.'%');
+                $query->where(function ($query): void {
+                    $query->where('name', 'like', '%'.$this->request->search.'%')
+                        ->orWhere('file_name', 'like', '%'.$this->request->search.'%');
+                });
+            })
+            ->when($this->mimeTypes() !== [], function ($query): void {
+                $query->where(function ($query): void {
+                    foreach ($this->mimeTypes() as $mimeType) {
+                        if (str_ends_with($mimeType, '/*')) {
+                            $query->orWhere('mime_type', 'like', str_replace('/*', '/%', $mimeType));
+
+                            continue;
+                        }
+
+                        $query->orWhere('mime_type', $mimeType);
+                    }
+                });
             })
             ->when($this->request->extension, function ($query): void {
                 $query->where('file_name', 'like', '%.'.$this->request->extension);
@@ -54,7 +84,32 @@ final readonly class MediaIndexQuery
         $item->thumbnail_url = $item->hasGeneratedConversion('thumbnail')
             ? $item->getUrl('thumbnail')
             : null;
+        $item->thumb_url = $item->thumbnail_url;
+        $item->alt = (string) $item->getCustomProperty('alt', '');
+        $item->caption = $item->getCustomProperty('caption');
+        $item->description = $item->getCustomProperty('description');
+        $item->credit = $item->getCustomProperty('author');
+        $item->width = $item->getCustomProperty('width');
+        $item->height = $item->getCustomProperty('height');
 
         return $item;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function mimeTypes(): array
+    {
+        $mimeTypes = $this->request->input('mime_types', []);
+
+        if (is_string($mimeTypes)) {
+            return [$mimeTypes];
+        }
+
+        if (! is_array($mimeTypes)) {
+            return [];
+        }
+
+        return array_values(array_filter($mimeTypes, is_string(...)));
     }
 }

@@ -19,6 +19,7 @@ import {
     $getSelection,
     $isRangeSelection,
     $isTextNode,
+    $insertNodes,
     KEY_ESCAPE_COMMAND,
     KEY_ARROW_UP_COMMAND,
     KEY_ARROW_DOWN_COMMAND,
@@ -35,6 +36,8 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
+import { $createAttachmentNode } from '../../attachment-node';
+import { $createImageGalleryNode } from '../../image-gallery-node';
 import type { CommandItem } from './SlashCommandPlugin.types';
 
 // ─── Command definitions ──────────────────────────────────────────────────────
@@ -51,6 +54,8 @@ const COMMANDS: CommandItem[] = [
     { id: 'number', label: 'Numbered List', description: 'Ordered list', keywords: ['number', 'ordered', 'ol', 'list'], icon: '1.' },
     { id: 'check', label: 'Check List', description: 'Todo checklist', keywords: ['check', 'todo', 'task'], icon: '✓' },
     { id: 'hr', label: 'Divider', description: 'Horizontal rule', keywords: ['divider', 'hr', 'line', 'rule', 'separator'], icon: '—' },
+    { id: 'gallery', label: 'Gallery', description: 'Image grid', keywords: ['gallery', 'images', 'grid'], icon: '▦' },
+    { id: 'file', label: 'File', description: 'Attachment link', keywords: ['file', 'attachment', 'download', 'pdf'], icon: '□' },
     { id: 'table', label: 'Table', description: '3×3 table', keywords: ['table', 'grid'], icon: '⊞' },
 ];
 
@@ -207,6 +212,22 @@ export default function SlashCommandPlugin(): JSX.Element | null {
                     break;
                 case 'hr':
                     editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined);
+                    break;
+                case 'gallery':
+                    editor.update(() => {
+                        $insertNodes([$createImageGalleryNode([], 3)]);
+                    });
+                    break;
+                case 'file':
+                    editor.update(() => {
+                        $insertNodes([
+                            $createAttachmentNode({
+                                url: '#',
+                                name: 'File attachment',
+                                fileName: 'file',
+                            }),
+                        ]);
+                    });
                     break;
                 case 'table':
                     editor.dispatchCommand(INSERT_TABLE_COMMAND, { rows: '3', columns: '3', includeHeaders: true });

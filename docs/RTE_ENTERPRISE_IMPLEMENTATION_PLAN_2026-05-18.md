@@ -261,7 +261,7 @@ Testy:
 
 ### Epic RTE-1 - Media Picker Modes
 
-Status: Ready
+Status: Implemented 2026-05-18
 
 Zmiany:
 
@@ -279,7 +279,7 @@ Testy:
 
 ### Epic RTE-2 - Image Node 2.0
 
-Status: Ready
+Status: Implemented 2026-05-18
 
 Zmiany:
 
@@ -299,7 +299,7 @@ Testy:
 
 ### Epic RTE-3 - Gallery Insert
 
-Status: Ready
+Status: Implemented 2026-05-18
 
 Zmiany:
 
@@ -320,7 +320,7 @@ Testy:
 
 ### Epic RTE-4 - Attachment Node
 
-Status: Ready
+Status: Implemented 2026-05-18
 
 Zmiany:
 
@@ -339,7 +339,7 @@ Testy:
 
 ### Epic RTE-5 - Paste Cleanup
 
-Status: Ready
+Status: Implemented 2026-05-18
 
 Zmiany:
 

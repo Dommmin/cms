@@ -106,6 +106,17 @@ export default function Page({ heavyData }) {
 shadcn/ui pattern with Radix UI primitives. Components in `resources/js/components/ui/`:
 `Button`, `Input`, `Label`, `Select`, `Dialog`, `Sheet`, `Tabs`, `Badge`, `Card`, `Table`, `Form`, `Checkbox`, `Switch`, `Textarea`, `Separator`, `Tooltip`, `Popover`, `Command`, `DropdownMenu`, `AlertDialog`
 
+### Rich Text Editor
+
+The admin Lexical editor lives in `server/resources/js/components/ui/rich-text-editor/`.
+It supports enterprise media workflows:
+
+- `MediaPickerModal` modes: `image`, `gallery`, `file`, `video`, `any`
+- `ImageNode` v2: media ID, alt/decorative state, caption, credit, layout, wrap, size preset, link URL, loading hint
+- `ImageGalleryNode`: multi-image grid with ordered assets and `figure[data-rte-gallery]` HTML export
+- `AttachmentNode`: downloadable file link with MIME/size metadata and safe URL export
+- `PasteSanitizerPlugin`: cleans Word/Google Docs HTML and strips unsafe links, event handlers, styles, and data images before import
+
 ### Styling
 
 Tailwind CSS v4. Dark mode via `.dark` class on `<html>` element.

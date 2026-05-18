@@ -6,36 +6,32 @@ import type {
     LexicalEditor,
     LexicalNode,
     NodeKey,
-    SerializedLexicalNode,
-    Spread,
 } from 'lexical';
 import { $applyNodeReplacement, $getNodeByKey, DecoratorNode } from 'lexical';
 import { Plus, X } from 'lucide-react';
 import type { JSX } from 'react';
 import { useState } from 'react';
 import { MediaPickerModal, type MediaItem } from '@/components/media-picker-modal';
+import type { GalleryImage, ImageGalleryComponentProps, SerializedImageGalleryNode } from './image-gallery-node.types';
 
-interface GalleryImage {
-    src: string;
-    alt: string;
+function galleryImageFromMedia(media: MediaItem): GalleryImage {
+    return {
+        mediaId: media.id,
+        src: media.url,
+        alt: media.alt || media.name,
+        caption: media.caption ?? null,
+        width: media.width ?? null,
+        height: media.height ?? null,
+        focalPoint: null,
+    };
 }
-
-export type SerializedImageGalleryNode = Spread<
-    { images: GalleryImage[]; columns: number },
-    SerializedLexicalNode
->;
 
 function ImageGalleryComponent({
     images,
     columns,
     nodeKey,
     editor,
-}: {
-    images: GalleryImage[];
-    columns: number;
-    nodeKey: NodeKey;
-    editor: LexicalEditor;
-}) {
+}: ImageGalleryComponentProps) {
     const [showPicker, setShowPicker] = useState(false);
 
     const updateNode = (changes: Partial<{ images: GalleryImage[]; columns: number }>) => {
@@ -49,8 +45,7 @@ function ImageGalleryComponent({
     };
 
     const handleMediaSelect = (media: MediaItem) => {
-        updateNode({ images: [...images, { src: media.url, alt: media.name }] });
-        setShowPicker(false);
+        updateNode({ images: [...images, galleryImageFromMedia(media)] });
     };
 
     const removeImage = (index: number) => {
@@ -94,6 +89,11 @@ function ImageGalleryComponent({
                 {images.map((img, i) => (
                     <div key={i} className="group relative">
                         <img src={img.src} alt={img.alt} className="h-32 w-full rounded object-cover" />
+                        {img.caption && (
+                            <p className="mt-1 truncate text-[11px] text-muted-foreground">
+                                {img.caption}
+                            </p>
+                        )}
                         <button
                             type="button"
                             onClick={() => removeImage(i)}
@@ -117,11 +117,9 @@ function ImageGalleryComponent({
                 open={showPicker}
                 onClose={() => setShowPicker(false)}
                 onSelect={handleMediaSelect}
-                onReorder={() => {}}
-                onRemove={() => {}}
-                onSetThumbnail={() => {}}
                 selectedImages={[]}
-                multiple={false}
+                mode="gallery"
+                multiple
             />
         </div>
     );
@@ -152,7 +150,7 @@ export class ImageGalleryNode extends DecoratorNode<JSX.Element> {
     exportJSON(): SerializedImageGalleryNode {
         return {
             type: 'image-gallery',
-            version: 1,
+            version: 2,
             images: this.__images,
             columns: this.__columns,
         };
@@ -160,27 +158,43 @@ export class ImageGalleryNode extends DecoratorNode<JSX.Element> {
 
     static importDOM(): DOMConversionMap | null {
         return {
+            figure: (domNode: HTMLElement) => {
+                if (domNode.getAttribute('data-rte-gallery') !== 'true') return null;
+
+                return { conversion: convertGalleryElement, priority: 2 };
+            },
             div: (domNode: HTMLElement) => {
-                if (domNode.getAttribute('data-type') !== 'image-gallery') return null;
+                if (domNode.getAttribute('data-type') !== 'image-gallery' && domNode.getAttribute('data-gallery') !== 'true') return null;
                 return { conversion: convertGalleryElement, priority: 1 };
             },
         };
     }
 
     exportDOM(): DOMExportOutput {
-        const wrapper = document.createElement('div');
-        wrapper.setAttribute('data-type', 'image-gallery');
+        const wrapper = document.createElement('figure');
+        wrapper.setAttribute('data-rte-gallery', 'true');
+        wrapper.setAttribute('data-gallery', 'true');
         wrapper.setAttribute('data-images', JSON.stringify(this.__images));
         wrapper.setAttribute('data-columns', String(this.__columns));
+        wrapper.className = 'rte-gallery';
         wrapper.style.display = 'grid';
         wrapper.style.gridTemplateColumns = `repeat(${this.__columns}, 1fr)`;
         wrapper.style.gap = '8px';
         for (const img of this.__images) {
+            const item = document.createElement('figure');
+            item.setAttribute('data-gallery-item', 'true');
+            if (img.mediaId !== null) item.setAttribute('data-media-id', String(img.mediaId));
             const imgEl = document.createElement('img');
             imgEl.setAttribute('src', img.src);
             imgEl.setAttribute('alt', img.alt);
             imgEl.style.cssText = 'width:100%;height:200px;object-fit:cover;border-radius:4px;';
-            wrapper.appendChild(imgEl);
+            item.appendChild(imgEl);
+            if (img.caption) {
+                const caption = document.createElement('figcaption');
+                caption.textContent = img.caption;
+                item.appendChild(caption);
+            }
+            wrapper.appendChild(item);
         }
         return { element: wrapper };
     }
@@ -224,6 +238,17 @@ function convertGalleryElement(domNode: HTMLElement): DOMConversionOutput | null
     } catch {
         images = [];
     }
+    if (images.length === 0) {
+        images = Array.from(domNode.querySelectorAll('img')).map((img) => ({
+            mediaId: parseInt(img.closest('[data-media-id]')?.getAttribute('data-media-id') ?? '', 10) || null,
+            src: img.getAttribute('src') ?? '',
+            alt: img.getAttribute('alt') ?? '',
+            caption: img.closest('figure')?.querySelector('figcaption')?.textContent ?? null,
+            width: null,
+            height: null,
+            focalPoint: null,
+        }));
+    }
     const columns = parseInt(domNode.getAttribute('data-columns') ?? '3', 10);
     return { node: $createImageGalleryNode(images, columns) };
 }
@@ -235,3 +260,5 @@ export function $createImageGalleryNode(images: GalleryImage[] = [], columns = 3
 export function $isImageGalleryNode(node: LexicalNode | null | undefined): node is ImageGalleryNode {
     return node instanceof ImageGalleryNode;
 }
+
+export type { GalleryImage, SerializedImageGalleryNode };

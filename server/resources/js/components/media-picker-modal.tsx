@@ -21,9 +21,60 @@ import { Input } from '@/components/ui/input';
 import type {
     MediaData,
     MediaItem,
+    MediaPickerMode,
     MediaPickerModalProps,
+    RteMediaAsset,
     SelectedImage,
 } from './media-picker-modal.types';
+
+const IMAGE_MIME_PREFIX = 'image/';
+const VIDEO_MIME_PREFIX = 'video/';
+const FILE_MIME_TYPES = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/zip',
+    'application/x-zip-compressed',
+];
+
+const MODE_EXTENSIONS: Record<MediaPickerMode, string[]> = {
+    image: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'],
+    gallery: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'],
+    file: ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip'],
+    video: ['mp4', 'webm'],
+    any: [
+        'jpg',
+        'jpeg',
+        'png',
+        'gif',
+        'webp',
+        'svg',
+        'pdf',
+        'doc',
+        'docx',
+        'xls',
+        'xlsx',
+        'ppt',
+        'pptx',
+        'zip',
+        'mp4',
+        'webm',
+    ],
+};
+
+const MODE_ACCEPTS: Record<MediaPickerMode, string> = {
+    image: 'image/*',
+    gallery: 'image/*',
+    file: FILE_MIME_TYPES.join(','),
+    video: 'video/*',
+    any: 'image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/zip,application/x-zip-compressed,video/*',
+};
+
+const EMPTY_ACCEPTED_MIME_TYPES: string[] = [];
 
 const MIME_TYPE_ICONS: Record<string, React.ElementType> = {
     'image/': ImageIcon,
@@ -39,15 +90,60 @@ function getFileIcon(mimeType: string) {
     return FileIcon;
 }
 
+function modeAllowsMimeType(
+    mimeType: string,
+    mode: MediaPickerMode,
+    acceptedMimeTypes: string[],
+): boolean {
+    if (acceptedMimeTypes.length > 0) {
+        return acceptedMimeTypes.some((accepted) =>
+            accepted.endsWith('/*')
+                ? mimeType.startsWith(accepted.replace('/*', '/'))
+                : mimeType === accepted,
+        );
+    }
+
+    if (mode === 'any') return true;
+    if (mode === 'image' || mode === 'gallery') {
+        return mimeType.startsWith(IMAGE_MIME_PREFIX);
+    }
+    if (mode === 'video') {
+        return mimeType.startsWith(VIDEO_MIME_PREFIX);
+    }
+
+    return FILE_MIME_TYPES.includes(mimeType);
+}
+
+function selectedFromMediaItem(item: MediaItem): SelectedImage {
+    return {
+        id: item.id,
+        url: item.url,
+        name: item.name,
+        mime_type: item.mime_type,
+        alt: item.alt,
+        caption: item.caption,
+        file_name: item.file_name,
+        size: item.size,
+        width: item.width,
+        height: item.height,
+        thumb_url: item.thumb_url ?? item.thumbnail_url,
+        is_thumbnail: false,
+    };
+}
+
 export function MediaPickerModal({
     open,
     onClose,
     onSelect,
-    onReorder,
-    onRemove,
-    onSetThumbnail,
+    onConfirm,
+    onReorder = () => {},
+    onRemove = () => {},
+    onSetThumbnail = () => {},
     selectedImages = [],
-    multiple: _multiple = false,
+    selectedItems,
+    multiple,
+    mode = 'any',
+    acceptedMimeTypes = EMPTY_ACCEPTED_MIME_TYPES,
 }: MediaPickerModalProps) {
     const [media, setMedia] = useState<MediaData | null>(null);
     const [loading, setLoading] = useState(true);
@@ -61,6 +157,13 @@ export function MediaPickerModal({
     const uploadInputRef = useRef<HTMLInputElement>(null);
     const searchRef = useRef(search);
     const extensionRef = useRef(extension);
+    const effectiveMultiple = multiple ?? mode === 'gallery';
+    const selectedMediaItems = selectedItems ?? selectedImages;
+    const extensions = MODE_EXTENSIONS[mode];
+    const accept =
+        acceptedMimeTypes.length > 0
+            ? acceptedMimeTypes.join(',')
+            : MODE_ACCEPTS[mode];
 
     useEffect(() => {
         searchRef.current = search;
@@ -70,24 +173,31 @@ export function MediaPickerModal({
         extensionRef.current = extension;
     }, [extension]);
 
-    const fetchMedia = useCallback(async (page = 1) => {
-        setLoading(true);
-        const params = new URLSearchParams();
-        params.set('page', page.toString());
-        if (searchRef.current) params.set('search', searchRef.current);
-        if (extensionRef.current) params.set('extension', extensionRef.current);
+    const fetchMedia = useCallback(
+        async (page = 1) => {
+            setLoading(true);
+            const params = new URLSearchParams();
+            params.set('page', page.toString());
+            if (searchRef.current) params.set('search', searchRef.current);
+            if (extensionRef.current)
+                params.set('extension', extensionRef.current);
+            acceptedMimeTypes.forEach((mimeType) => {
+                params.append('mime_types[]', mimeType);
+            });
 
-        try {
-            const response = await axios.get(
-                `${MediaController.search.url()}?${params.toString()}`,
-            );
-            setMedia(response.data);
-        } catch (error) {
-            console.error('Failed to fetch media:', error);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+            try {
+                const response = await axios.get(
+                    `${MediaController.search.url()}?${params.toString()}`,
+                );
+                setMedia(response.data);
+            } catch (error) {
+                console.error('Failed to fetch media:', error);
+            } finally {
+                setLoading(false);
+            }
+        },
+        [acceptedMimeTypes],
+    );
 
     useEffect(() => {
         if (!open) return;
@@ -112,17 +222,25 @@ export function MediaPickerModal({
     };
 
     const handleMediaSelect = (item: MediaItem) => {
-        const isAlreadySelected = selectedImages.some(
+        if (!modeAllowsMimeType(item.mime_type, mode, acceptedMimeTypes)) {
+            return;
+        }
+
+        const isAlreadySelected = selectedMediaItems.some(
             (img) => img.id === item.id,
         );
         if (isAlreadySelected) {
             onRemove(item.id);
         } else {
             onSelect(item);
+            if (!effectiveMultiple) {
+                onClose();
+            }
         }
     };
 
     const handleConfirm = () => {
+        onConfirm?.(selectedMediaItems);
         onClose();
     };
 
@@ -138,7 +256,7 @@ export function MediaPickerModal({
         e.preventDefault();
         if (draggedIndex === null || draggedIndex === index) return;
 
-        const newImages = [...selectedImages];
+        const newImages = [...selectedMediaItems];
         const draggedImage = newImages[draggedIndex];
         newImages.splice(draggedIndex, 1);
         newImages.splice(index, 0, draggedImage);
@@ -168,7 +286,11 @@ export function MediaPickerModal({
             await fetchMedia(1);
             setCurrentPage(1);
             // Auto-select all newly uploaded items
-            response.data.forEach((item) => onSelect(item));
+            response.data
+                .filter((item) =>
+                    modeAllowsMimeType(item.mime_type, mode, acceptedMimeTypes),
+                )
+                .forEach((item) => onSelect(item));
         } catch (error) {
             console.error('Upload failed:', error);
         } finally {
@@ -206,27 +328,29 @@ export function MediaPickerModal({
         }
     };
 
-    const extensions = [
-        'jpg',
-        'jpeg',
-        'png',
-        'gif',
-        'webp',
-        'svg',
-        'pdf',
-        'mp4',
-        'webm',
-    ];
-
     const isSelected = (id: number) =>
-        selectedImages.some((img) => img.id === id);
+        selectedMediaItems.some((img) => img.id === id);
+
+    const visibleMedia = media?.data.filter((item) =>
+        modeAllowsMimeType(item.mime_type, mode, acceptedMimeTypes),
+    );
 
     return (
         <div className={`fixed inset-0 z-50 ${open ? 'block' : 'hidden'}`}>
             <div className="fixed inset-0 bg-black/80" onClick={onClose} />
             <div className="fixed inset-4 flex flex-col overflow-hidden rounded-xl bg-background shadow-2xl">
                 <div className="flex items-center justify-between border-b px-6 py-4">
-                    <h2 className="text-xl font-semibold">Select Media</h2>
+                    <h2 className="text-xl font-semibold">
+                        {mode === 'gallery'
+                            ? 'Select Gallery Images'
+                            : mode === 'image'
+                              ? 'Select Image'
+                              : mode === 'file'
+                                ? 'Select File'
+                                : mode === 'video'
+                                  ? 'Select Video'
+                                  : 'Select Media'}
+                    </h2>
                     <Button variant="ghost" size="icon" onClick={onClose}>
                         <XIcon className="h-5 w-5" />
                     </Button>
@@ -263,8 +387,8 @@ export function MediaPickerModal({
                             <input
                                 ref={uploadInputRef}
                                 type="file"
-                                multiple
-                                accept="image/*,application/pdf,video/*"
+                                multiple={effectiveMultiple}
+                                accept={accept}
                                 className="hidden"
                                 onChange={handleUploadInputChange}
                             />
@@ -306,7 +430,7 @@ export function MediaPickerModal({
                                         />
                                     ))}
                                 </div>
-                            ) : media?.data.length === 0 ? (
+                            ) : visibleMedia?.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-12 text-center">
                                     <ImageIcon className="h-12 w-12 text-muted-foreground" />
                                     <h3 className="mt-4 text-lg font-semibold">
@@ -319,7 +443,7 @@ export function MediaPickerModal({
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-                                    {media?.data.map((item) => {
+                                    {visibleMedia?.map((item) => {
                                         const selected = isSelected(item.id);
                                         const Icon = getFileIcon(
                                             item.mime_type,
@@ -411,15 +535,15 @@ export function MediaPickerModal({
                         )}
                     </div>
 
-                    {selectedImages.length > 0 && (
+                    {selectedMediaItems.length > 0 && (
                         <div className="flex w-80 flex-col border-l bg-muted/30">
                             <div className="border-b px-4 py-3">
                                 <h3 className="font-semibold">
-                                    Selected ({selectedImages.length})
+                                    Selected ({selectedMediaItems.length})
                                 </h3>
                             </div>
                             <div className="flex-1 space-y-2 overflow-y-auto p-4">
-                                {selectedImages.map((image, index) => (
+                                {selectedMediaItems.map((image, index) => (
                                     <div
                                         key={image.id}
                                         draggable
@@ -437,11 +561,27 @@ export function MediaPickerModal({
                                         }`}
                                     >
                                         <GripVerticalIcon className="h-4 w-4 cursor-grab text-muted-foreground" />
-                                        <img
-                                            src={image.url}
-                                            alt={image.name}
-                                            className="h-12 w-12 rounded object-cover"
-                                        />
+                                        {(image.mime_type?.startsWith(
+                                            'image/',
+                                        ) ?? true) ? (
+                                            <img
+                                                src={image.url}
+                                                alt={image.name}
+                                                className="h-12 w-12 rounded object-cover"
+                                            />
+                                        ) : (
+                                            <div className="flex h-12 w-12 items-center justify-center rounded bg-muted">
+                                                {(() => {
+                                                    const Icon = getFileIcon(
+                                                        image.mime_type ?? '',
+                                                    );
+
+                                                    return (
+                                                        <Icon className="h-5 w-5 text-muted-foreground" />
+                                                    );
+                                                })()}
+                                            </div>
+                                        )}
                                         <div className="min-w-0 flex-1">
                                             <p className="truncate text-sm">
                                                 {image.name}
@@ -482,11 +622,14 @@ export function MediaPickerModal({
                     <Button variant="outline" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button onClick={handleConfirm}>Done</Button>
+                    <Button onClick={handleConfirm}>
+                        {effectiveMultiple ? 'Done' : 'Close'}
+                    </Button>
                 </div>
             </div>
         </div>
     );
 }
 
-export type { MediaItem, SelectedImage };
+export { selectedFromMediaItem };
+export type { MediaItem, MediaPickerMode, RteMediaAsset, SelectedImage };

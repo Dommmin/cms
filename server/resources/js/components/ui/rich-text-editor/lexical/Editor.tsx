@@ -22,6 +22,7 @@ import FloatingLinkEditorPlugin from './plugins/FloatingLinkEditorPlugin';
 import FloatingTextFormatPlugin from './plugins/FloatingTextFormatPlugin';
 import HtmlPlugin from './plugins/HtmlPlugin';
 import MarkdownPlugin from './plugins/MarkdownPlugin';
+import PasteSanitizerPlugin from './plugins/PasteSanitizerPlugin';
 import SlashCommandPlugin from './plugins/SlashCommandPlugin';
 import TableActionMenuPlugin from './plugins/TableActionMenuPlugin';
 import ToolbarPlugin from './plugins/ToolbarPlugin';
@@ -86,6 +87,7 @@ export default function Editor({ value, onChange, placeholder = 'Start writing..
                 {editable && <TableActionMenuPlugin />}
                 <HorizontalRulePlugin />
                 {editable && <MarkdownPlugin />}
+                {editable && <PasteSanitizerPlugin />}
                 {editable && <SlashCommandPlugin />}
                 {/* eslint-disable-next-line react-hooks/refs */}
                 {editable && <DraggableBlockPlugin anchorElem={containerRef.current ?? undefined} />}

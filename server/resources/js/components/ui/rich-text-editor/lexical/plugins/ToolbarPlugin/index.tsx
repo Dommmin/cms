@@ -31,11 +31,13 @@ import {
     UNDO_COMMAND,
 } from 'lexical';
 import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
-import { MediaPickerModal } from '@/components/media-picker-modal';
+import { MediaPickerModal, selectedFromMediaItem, type MediaItem, type SelectedImage } from '@/components/media-picker-modal';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTranslation } from '@/hooks/use-translation';
+import { $createAttachmentNode } from '../../../attachment-node';
 import { $createImageNode } from '../../../image-node';
+import { $createImageGalleryNode } from '../../../image-gallery-node';
 import { $createYouTubeNode, extractYouTubeId } from '../../../youtube-node';
 import { $createCollapsibleContainerNode, $createCollapsibleTitleNode, $createCollapsibleContentNode } from '../../collapsible-nodes';
 import { $createLayoutContainerNode, $createLayoutItemNode } from '../../layout-nodes';
@@ -76,6 +78,9 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
 
     const [insertDialog, setInsertDialog] = useState<InsertDialog>(null);
     const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
+    const [galleryPickerOpen, setGalleryPickerOpen] = useState(false);
+    const [filePickerOpen, setFilePickerOpen] = useState(false);
+    const [selectedGalleryImages, setSelectedGalleryImages] = useState<SelectedImage[]>([]);
     const [linkDialogOpen, setLinkDialogOpen] = useState(false);
     const [linkUrl, setLinkUrl] = useState('');
     const [ytUrl, setYtUrl] = useState('');
@@ -311,12 +316,76 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
         setMediaPickerOpen(true);
     }, [editor]);
 
-    const handleMediaSelect = useCallback((media: { url: string; name: string }) => {
+    const handleMediaSelect = useCallback((media: MediaItem) => {
         editor.update(() => {
-            const node = $createImageNode({ src: media.url, altText: media.name });
+            const node = $createImageNode({
+                src: media.url,
+                altText: media.alt || media.name,
+                mediaId: media.id,
+                caption: media.caption ?? null,
+                credit: media.credit ?? null,
+                focalPoint: null,
+                loading: 'lazy',
+            });
             $insertNodes([node]);
         });
         setMediaPickerOpen(false);
+    }, [editor]);
+
+    const openGalleryPicker = useCallback(() => {
+        setSelectedGalleryImages([]);
+        setGalleryPickerOpen(true);
+    }, []);
+
+    const handleGalleryMediaSelect = useCallback((media: MediaItem) => {
+        setSelectedGalleryImages((images) => {
+            if (images.some((image) => image.id === media.id)) {
+                return images;
+            }
+
+            return [...images, selectedFromMediaItem(media)];
+        });
+    }, []);
+
+    const handleGalleryConfirm = useCallback((images: SelectedImage[]) => {
+        if (images.length === 0) {
+            return;
+        }
+
+        editor.update(() => {
+            $insertNodes([
+                $createImageGalleryNode(
+                    images.map((image) => ({
+                        mediaId: image.id,
+                        src: image.url,
+                        alt: image.alt || image.name,
+                        caption: image.caption ?? null,
+                        width: image.width ?? null,
+                        height: image.height ?? null,
+                        focalPoint: null,
+                    })),
+                    Math.min(4, Math.max(2, images.length)),
+                ),
+            ]);
+        });
+        setSelectedGalleryImages([]);
+    }, [editor]);
+
+    const handleFileSelect = useCallback((media: MediaItem) => {
+        editor.update(() => {
+            $insertNodes([
+                $createAttachmentNode({
+                    mediaId: media.id,
+                    url: media.url,
+                    name: media.name,
+                    fileName: media.file_name,
+                    mimeType: media.mime_type,
+                    size: media.size,
+                    description: media.description ?? null,
+                }),
+            ]);
+        });
+        setFilePickerOpen(false);
     }, [editor]);
 
     const handleInsertYoutube = () => {
@@ -479,6 +548,8 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
                         <InsertMenu
                             onInsertHorizontalRule={() => editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined)}
                             onOpenMediaPicker={openMediaPicker}
+                            onOpenGalleryPicker={openGalleryPicker}
+                            onOpenFilePicker={() => setFilePickerOpen(true)}
                             onOpenYouTubeDialog={() => {
                                 setYtUrl('');
                                 setInsertDialog('youtube');
@@ -501,12 +572,29 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
             <MediaPickerModal
                 open={mediaPickerOpen}
                 onClose={() => setMediaPickerOpen(false)}
-                onSelect={(media) => handleMediaSelect({ url: media.url, name: media.name })}
-                onReorder={() => {}}
-                onRemove={() => {}}
-                onSetThumbnail={() => {}}
+                onSelect={handleMediaSelect}
                 selectedImages={[]}
-                multiple={false}
+                mode="image"
+            />
+
+            <MediaPickerModal
+                open={galleryPickerOpen}
+                onClose={() => setGalleryPickerOpen(false)}
+                onSelect={handleGalleryMediaSelect}
+                onConfirm={handleGalleryConfirm}
+                onReorder={setSelectedGalleryImages}
+                onRemove={(id) => setSelectedGalleryImages((images) => images.filter((image) => image.id !== id))}
+                selectedImages={selectedGalleryImages}
+                mode="gallery"
+                multiple
+            />
+
+            <MediaPickerModal
+                open={filePickerOpen}
+                onClose={() => setFilePickerOpen(false)}
+                onSelect={handleFileSelect}
+                selectedImages={[]}
+                mode="file"
             />
 
             <LinkDialog

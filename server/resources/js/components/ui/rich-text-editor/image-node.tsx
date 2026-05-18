@@ -6,76 +6,185 @@ import type {
     LexicalEditor,
     LexicalNode,
     NodeKey,
-    SerializedLexicalNode,
-    Spread,
 } from 'lexical';
 import { $applyNodeReplacement, $getNodeByKey, DecoratorNode } from 'lexical';
-import { AlignCenter, AlignLeft, AlignRight } from 'lucide-react';
-import type { JSX } from 'react';
-import { useRef, useState } from 'react';
+import { AlignCenter, AlignLeft, AlignRight, Captions, LinkIcon, Maximize2, Pencil, Trash2 } from 'lucide-react';
+import type { CSSProperties, JSX, MouseEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { getEditorLinkTarget, isAllowedEditorLinkUrl, normalizeEditorLinkUrl } from './lexical/link-url';
+import type {
+    CreateImageNodePayload,
+    ImageAlign,
+    ImageComponentProps,
+    ImageFocalPoint,
+    ImageLayout,
+    ImageLoading,
+    ImageNodeState,
+    ImageSizePreset,
+    ImageWrap,
+    SerializedImageNode,
+} from './image-node.types';
 
-export type ImageAlign = 'none' | 'left' | 'center' | 'right';
+const WIDTH_PRESETS: Array<{ label: string; preset: ImageSizePreset; width: string }> = [
+    { label: 'S', preset: 'small', width: '25%' },
+    { label: 'M', preset: 'medium', width: '50%' },
+    { label: 'L', preset: 'large', width: '75%' },
+    { label: 'Full', preset: 'full', width: '100%' },
+];
 
-export type SerializedImageNode = Spread<
-    {
-        src: string;
-        altText: string;
-        width?: string;
-        align: ImageAlign;
-    },
-    SerializedLexicalNode
->;
+const DEFAULT_IMAGE_STATE: Omit<ImageNodeState, 'src' | 'altText'> = {
+    width: undefined,
+    align: 'none',
+    mediaId: null,
+    caption: null,
+    credit: null,
+    layout: 'block',
+    wrap: 'none',
+    sizePreset: 'custom',
+    focalPoint: null,
+    decorative: false,
+    linkUrl: null,
+    loading: 'lazy',
+};
 
-const WIDTH_PRESETS = ['25%', '50%', '75%', '100%'] as const;
+function normalizeImageState(payload: CreateImageNodePayload): ImageNodeState {
+    return {
+        ...DEFAULT_IMAGE_STATE,
+        ...payload,
+        mediaId: payload.mediaId ?? null,
+        caption: payload.caption ?? null,
+        credit: payload.credit ?? null,
+        focalPoint: payload.focalPoint ?? null,
+        linkUrl: payload.linkUrl ?? null,
+        decorative: payload.decorative ?? false,
+        loading: payload.loading ?? 'lazy',
+    };
+}
 
-function ImageComponent({
-    src,
-    altText,
-    width,
-    align,
-    nodeKey,
-    editor,
-}: {
-    src: string;
-    altText: string;
-    width?: string;
-    align: ImageAlign;
-    nodeKey: NodeKey;
-    editor: LexicalEditor;
-}) {
+function parseBoolean(value: string | null): boolean {
+    return value === 'true' || value === '1';
+}
+
+function parseNumber(value: string | null): number | null {
+    if (!value) return null;
+    const parsed = Number(value);
+
+    return Number.isFinite(parsed) ? parsed : null;
+}
+
+function parseFocalPoint(value: string | null): ImageFocalPoint | null {
+    if (!value) return null;
+
+    try {
+        const decoded = JSON.parse(value) as Partial<ImageFocalPoint>;
+        if (typeof decoded.x === 'number' && typeof decoded.y === 'number') {
+            return { x: decoded.x, y: decoded.y };
+        }
+    } catch {
+        return null;
+    }
+
+    return null;
+}
+
+function normalizeLinkUrl(value: string): string | null {
+    const normalized = normalizeEditorLinkUrl(value);
+
+    return isAllowedEditorLinkUrl(normalized) ? normalized : null;
+}
+
+function imageObjectPosition(focalPoint: ImageFocalPoint | null): string | undefined {
+    if (!focalPoint) return undefined;
+
+    return `${Math.round(focalPoint.x * 100)}% ${Math.round(focalPoint.y * 100)}%`;
+}
+
+function updateNode(editor: LexicalEditor, nodeKey: NodeKey, changes: Partial<ImageNodeState>): void {
+    editor.update(() => {
+        const node = $getNodeByKey(nodeKey);
+        if ($isImageNode(node)) {
+            node.update(changes);
+        }
+    });
+}
+
+function ImageComponent(props: ImageComponentProps): JSX.Element {
+    const {
+        src,
+        altText,
+        width,
+        align,
+        mediaId: _mediaId,
+        caption,
+        credit,
+        layout,
+        wrap,
+        sizePreset,
+        focalPoint,
+        decorative,
+        linkUrl,
+        loading,
+        nodeKey,
+        editor,
+    } = props;
     const imgRef = useRef<HTMLImageElement>(null);
     const dragRef = useRef<{ startX: number; startWidth: number } | null>(null);
     const [isSelected, setIsSelected] = useState(false);
+    const [isMetadataOpen, setIsMetadataOpen] = useState(false);
     const [localWidth, setLocalWidth] = useState<string | undefined>(width);
+    const [draftAlt, setDraftAlt] = useState(altText);
+    const [draftCaption, setDraftCaption] = useState(caption ?? '');
+    const [draftCredit, setDraftCredit] = useState(credit ?? '');
+    const [draftLinkUrl, setDraftLinkUrl] = useState(linkUrl ?? '');
+    const [draftDecorative, setDraftDecorative] = useState(decorative);
 
-    const update = (changes: Partial<{ width: string; align: ImageAlign }>) => {
-        editor.update(() => {
-            const node = $getNodeByKey(nodeKey);
-            if ($isImageNode(node)) {
-                if (changes.width !== undefined) node.setWidth(changes.width);
-                if (changes.align !== undefined) node.setAlign(changes.align);
-            }
-        });
+    useEffect(() => {
+        setLocalWidth(width);
+        setDraftAlt(altText);
+        setDraftCaption(caption ?? '');
+        setDraftCredit(credit ?? '');
+        setDraftLinkUrl(linkUrl ?? '');
+        setDraftDecorative(decorative);
+    }, [altText, caption, credit, decorative, linkUrl, width]);
+
+    const applyWidth = (nextWidth: string, nextPreset: ImageSizePreset) => {
+        setLocalWidth(nextWidth);
+        updateNode(editor, nodeKey, { width: nextWidth, sizePreset: nextPreset });
     };
 
-    const startResize = (e: React.MouseEvent) => {
-        e.preventDefault();
-        const startX = e.clientX;
+    const applyMetadata = () => {
+        const safeLinkUrl = draftLinkUrl.trim() === '' ? null : normalizeLinkUrl(draftLinkUrl);
+
+        updateNode(editor, nodeKey, {
+            altText: draftDecorative ? '' : draftAlt,
+            caption: draftCaption.trim() === '' ? null : draftCaption,
+            credit: draftCredit.trim() === '' ? null : draftCredit,
+            linkUrl: safeLinkUrl,
+            decorative: draftDecorative,
+        });
+        setIsMetadataOpen(false);
+    };
+
+    const startResize = (event: MouseEvent) => {
+        event.preventDefault();
+        const startX = event.clientX;
         const startWidth = imgRef.current?.offsetWidth ?? 300;
         dragRef.current = { startX, startWidth };
 
-        const onMove = (ev: MouseEvent) => {
+        const onMove = (moveEvent: globalThis.MouseEvent) => {
             if (!dragRef.current || !imgRef.current) return;
-            const newW = Math.max(50, dragRef.current.startWidth + (ev.clientX - dragRef.current.startX));
-            imgRef.current.style.width = `${newW}px`;
+            const maxWidth = imgRef.current.parentElement?.clientWidth ?? 1200;
+            const nextWidth = Math.min(maxWidth, Math.max(80, dragRef.current.startWidth + (moveEvent.clientX - dragRef.current.startX)));
+            imgRef.current.style.width = `${nextWidth}px`;
         };
 
-        const onUp = (ev: MouseEvent) => {
+        const onUp = (upEvent: globalThis.MouseEvent) => {
             if (!dragRef.current) return;
-            const newW = Math.max(50, dragRef.current.startWidth + (ev.clientX - dragRef.current.startX));
-            const newWidth = `${newW}px`;
-            setLocalWidth(newWidth);
-            update({ width: newWidth });
+            const maxWidth = imgRef.current?.parentElement?.clientWidth ?? 1200;
+            const nextWidth = Math.min(maxWidth, Math.max(80, dragRef.current.startWidth + (upEvent.clientX - dragRef.current.startX)));
+            const nextWidthValue = `${nextWidth}px`;
+            setLocalWidth(nextWidthValue);
+            updateNode(editor, nodeKey, { width: nextWidthValue, sizePreset: 'custom' });
             dragRef.current = null;
             document.removeEventListener('mousemove', onMove);
             document.removeEventListener('mouseup', onUp);
@@ -85,188 +194,362 @@ function ImageComponent({
         document.addEventListener('mouseup', onUp);
     };
 
-    const outerStyle: React.CSSProperties = { display: 'block', position: 'relative', marginBottom: '0.5em' };
-    if (align === 'left') {
-        outerStyle.float = 'left';
-        outerStyle.marginRight = '1em';
-    } else if (align === 'right') {
-        outerStyle.float = 'right';
-        outerStyle.marginLeft = '1em';
-    } else if (align === 'center') {
-        outerStyle.marginLeft = 'auto';
-        outerStyle.marginRight = 'auto';
+    const figureStyle: CSSProperties = {
+        display: layout === 'inline' ? 'inline-block' : 'block',
+        position: 'relative',
+        maxWidth: '100%',
+        marginBlock: '0.75rem',
+    };
+
+    if (layout === 'wide') {
+        figureStyle.width = 'min(100%, 960px)';
+    } else if (layout === 'full') {
+        figureStyle.width = '100%';
+    } else {
+        figureStyle.width = localWidth ?? undefined;
     }
 
-    const btnStyle = (active: boolean): React.CSSProperties => ({
-        padding: '2px 6px',
-        fontSize: '11px',
-        border: 'none',
-        borderRadius: '3px',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: active ? 'hsl(var(--primary))' : 'hsl(var(--muted))',
-        color: active ? 'hsl(var(--primary-foreground))' : 'hsl(var(--foreground))',
-        userSelect: 'none',
-    });
+    if (wrap === 'wrap-left' || align === 'left') {
+        figureStyle.float = 'left';
+        figureStyle.marginRight = '1rem';
+        figureStyle.maxWidth = 'min(100%, 50%)';
+    } else if (wrap === 'wrap-right' || align === 'right') {
+        figureStyle.float = 'right';
+        figureStyle.marginLeft = '1rem';
+        figureStyle.maxWidth = 'min(100%, 50%)';
+    } else if (align === 'center' || layout === 'wide' || layout === 'full') {
+        figureStyle.marginInline = 'auto';
+    }
+
+    const imageElement = (
+        <img
+            ref={imgRef}
+            src={src}
+            alt={decorative ? '' : altText}
+            loading={loading}
+            style={{
+                display: 'block',
+                height: 'auto',
+                width: layout === 'wide' || layout === 'full' ? '100%' : (localWidth ?? 'auto'),
+                maxWidth: '100%',
+                objectPosition: imageObjectPosition(focalPoint),
+            }}
+            draggable={false}
+            className={`rounded-lg transition-shadow ${isSelected ? 'ring-2 ring-primary ring-offset-1' : ''}`}
+        />
+    );
 
     return (
-        <span style={outerStyle} onClick={() => setIsSelected((s) => !s)}>
-            <img
-                ref={imgRef}
-                src={src}
-                alt={altText}
-                style={{ display: 'block', height: 'auto', width: localWidth ?? 'auto', maxWidth: '100%' }}
-                draggable={false}
-                className={`rounded-lg transition-shadow ${isSelected ? 'ring-2 ring-primary ring-offset-1' : ''}`}
-            />
+        <figure
+            contentEditable={false}
+            data-rte-image
+            data-wrap={wrap}
+            data-layout={layout}
+            style={figureStyle}
+            onClick={() => setIsSelected((selected) => !selected)}
+        >
+            {linkUrl ? (
+                <a href={linkUrl} target={getEditorLinkTarget(linkUrl) ?? undefined} rel={getEditorLinkTarget(linkUrl) === '_blank' ? 'noopener noreferrer' : undefined}>
+                    {imageElement}
+                </a>
+            ) : imageElement}
+
+            {(caption || credit) && (
+                <figcaption className="mt-1 text-center text-xs text-muted-foreground">
+                    {caption}
+                    {credit && <span className="block">Credit: {credit}</span>}
+                </figcaption>
+            )}
+
             {isSelected && (
                 <>
-                    <span
-                        contentEditable={false}
-                        style={{
-                            position: 'absolute',
-                            top: 'calc(100% + 6px)',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            zIndex: 20,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '2px',
-                            background: 'hsl(var(--popover))',
-                            border: '1px solid hsl(var(--border))',
-                            borderRadius: '6px',
-                            padding: '3px 4px',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                            whiteSpace: 'nowrap',
-                        }}
-                    >
-                        {WIDTH_PRESETS.map((w) => (
+                    <span className="absolute top-full left-1/2 z-20 mt-1 flex -translate-x-1/2 items-center gap-1 rounded-md border bg-popover px-1.5 py-1 text-xs shadow-lg">
+                        {WIDTH_PRESETS.map((preset) => (
                             <button
-                                key={w}
+                                key={preset.preset}
                                 type="button"
-                                onMouseDown={(e) => {
-                                    e.preventDefault();
-                                    setLocalWidth(w);
-                                    update({ width: w });
+                                onMouseDown={(event) => {
+                                    event.preventDefault();
+                                    applyWidth(preset.width, preset.preset);
                                 }}
-                                style={btnStyle(localWidth === w)}
-                                title={`Width ${w}`}
+                                className={`rounded px-1.5 py-0.5 ${sizePreset === preset.preset ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
+                                title={`Size ${preset.label}`}
                             >
-                                {w}
+                                {preset.label}
                             </button>
                         ))}
-                        <span style={{ width: 1, height: 16, background: 'hsl(var(--border))', margin: '0 2px' }} />
-                        {(
-                            [
-                                ['none', <AlignLeft key="none" size={12} />, 'None'],
-                                ['left', <AlignLeft key="left" size={12} />, 'Float left'],
-                                ['center', <AlignCenter key="center" size={12} />, 'Center'],
-                                ['right', <AlignRight key="right" size={12} />, 'Float right'],
-                            ] as const
-                        ).map(([a, icon, title]) => (
+                        <span className="mx-0.5 h-4 w-px bg-border" />
+                        {([
+                            ['none', <AlignLeft key="none" size={13} />, 'No alignment'],
+                            ['left', <AlignLeft key="left" size={13} />, 'Align left'],
+                            ['center', <AlignCenter key="center" size={13} />, 'Center'],
+                            ['right', <AlignRight key="right" size={13} />, 'Align right'],
+                        ] as const).map(([nextAlign, icon, title]) => (
                             <button
-                                key={a}
+                                key={nextAlign}
                                 type="button"
-                                onMouseDown={(e) => {
-                                    e.preventDefault();
-                                    update({ align: a });
+                                onMouseDown={(event) => {
+                                    event.preventDefault();
+                                    updateNode(editor, nodeKey, { align: nextAlign, wrap: 'none' });
                                 }}
-                                style={btnStyle(align === a)}
+                                className={`rounded p-1 ${align === nextAlign && wrap === 'none' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
                                 title={title}
                             >
                                 {icon}
                             </button>
                         ))}
+                        <button
+                            type="button"
+                            onMouseDown={(event) => {
+                                event.preventDefault();
+                                updateNode(editor, nodeKey, { align: 'left', wrap: 'wrap-left', layout: 'block' });
+                            }}
+                            className={`rounded px-1.5 py-0.5 ${wrap === 'wrap-left' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
+                            title="Wrap text right of image"
+                        >
+                            WL
+                        </button>
+                        <button
+                            type="button"
+                            onMouseDown={(event) => {
+                                event.preventDefault();
+                                updateNode(editor, nodeKey, { align: 'right', wrap: 'wrap-right', layout: 'block' });
+                            }}
+                            className={`rounded px-1.5 py-0.5 ${wrap === 'wrap-right' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
+                            title="Wrap text left of image"
+                        >
+                            WR
+                        </button>
+                        <button
+                            type="button"
+                            onMouseDown={(event) => {
+                                event.preventDefault();
+                                updateNode(editor, nodeKey, { layout: layout === 'wide' ? 'block' : 'wide', wrap: 'none', align: 'center' });
+                            }}
+                            className={`rounded p-1 ${layout === 'wide' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
+                            title="Wide image"
+                        >
+                            <Maximize2 size={13} />
+                        </button>
+                        <button
+                            type="button"
+                            onMouseDown={(event) => {
+                                event.preventDefault();
+                                setIsMetadataOpen((open) => !open);
+                            }}
+                            className={`rounded p-1 ${isMetadataOpen ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
+                            title="Edit image metadata"
+                        >
+                            <Pencil size={13} />
+                        </button>
+                        <button
+                            type="button"
+                            onMouseDown={(event) => {
+                                event.preventDefault();
+                                editor.update(() => $getNodeByKey(nodeKey)?.remove());
+                            }}
+                            className="rounded p-1 bg-muted text-destructive"
+                            title="Remove image"
+                        >
+                            <Trash2 size={13} />
+                        </button>
                     </span>
+
+                    {isMetadataOpen && (
+                        <span className="absolute top-full left-1/2 z-30 mt-10 grid w-80 -translate-x-1/2 gap-2 rounded-md border bg-popover p-3 text-xs shadow-xl">
+                            <label className="grid gap-1">
+                                <span className="font-medium">Alt text</span>
+                                <input
+                                    value={draftAlt}
+                                    disabled={draftDecorative}
+                                    onChange={(event) => setDraftAlt(event.target.value)}
+                                    className="h-8 rounded border bg-background px-2"
+                                />
+                            </label>
+                            <label className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    checked={draftDecorative}
+                                    onChange={(event) => setDraftDecorative(event.target.checked)}
+                                />
+                                Decorative image
+                            </label>
+                            <label className="grid gap-1">
+                                <span className="font-medium">Caption</span>
+                                <input value={draftCaption} onChange={(event) => setDraftCaption(event.target.value)} className="h-8 rounded border bg-background px-2" />
+                            </label>
+                            <label className="grid gap-1">
+                                <span className="font-medium">Credit</span>
+                                <input value={draftCredit} onChange={(event) => setDraftCredit(event.target.value)} className="h-8 rounded border bg-background px-2" />
+                            </label>
+                            <label className="grid gap-1">
+                                <span className="font-medium">Image link</span>
+                                <input value={draftLinkUrl} onChange={(event) => setDraftLinkUrl(event.target.value)} className="h-8 rounded border bg-background px-2" placeholder="https://, /relative or #anchor" />
+                            </label>
+                            {!draftDecorative && draftAlt.trim() === '' && (
+                                <span className="flex items-center gap-1 text-destructive">
+                                    <Captions size={13} />
+                                    Add alt text or mark this image as decorative.
+                                </span>
+                            )}
+                            {draftLinkUrl.trim() !== '' && normalizeLinkUrl(draftLinkUrl) === null && (
+                                <span className="flex items-center gap-1 text-destructive">
+                                    <LinkIcon size={13} />
+                                    Link must use https://, mailto:, tel:, /relative or #anchor.
+                                </span>
+                            )}
+                            <span className="flex justify-end gap-2">
+                                <button type="button" className="rounded border px-2 py-1" onClick={() => setIsMetadataOpen(false)}>
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    className="rounded bg-primary px-2 py-1 text-primary-foreground disabled:opacity-50"
+                                    disabled={!draftDecorative && draftAlt.trim() === ''}
+                                    onClick={applyMetadata}
+                                >
+                                    Apply
+                                </button>
+                            </span>
+                        </span>
+                    )}
+
                     <span
                         contentEditable={false}
                         onMouseDown={startResize}
-                        style={{
-                            position: 'absolute',
-                            bottom: -5,
-                            right: -5,
-                            width: 14,
-                            height: 14,
-                            borderRadius: 3,
-                            backgroundColor: 'hsl(var(--primary))',
-                            cursor: 'nwse-resize',
-                            zIndex: 10,
-                        }}
+                        className="absolute -right-1.5 -bottom-1.5 z-10 h-4 w-4 rounded bg-primary"
+                        style={{ cursor: 'nwse-resize' }}
                     />
                 </>
             )}
-        </span>
+        </figure>
     );
 }
 
 export class ImageNode extends DecoratorNode<JSX.Element> {
-    __src: string;
-    __altText: string;
-    __width?: string;
-    __align: ImageAlign;
+    __imageState: ImageNodeState;
 
     static getType(): string {
         return 'image';
     }
 
     static clone(node: ImageNode): ImageNode {
-        return new ImageNode(node.__src, node.__altText, node.__width, node.__align, node.__key);
+        return new ImageNode({ ...node.__imageState }, node.__key);
     }
 
-    constructor(src: string, altText: string, width?: string, align: ImageAlign = 'none', key?: NodeKey) {
+    constructor(payload: CreateImageNodePayload, key?: NodeKey) {
         super(key);
-        this.__src = src;
-        this.__altText = altText;
-        this.__width = width;
-        this.__align = align;
+        this.__imageState = normalizeImageState(payload);
     }
 
     static importJSON(serialized: SerializedImageNode): ImageNode {
-        return $createImageNode(serialized);
+        return $createImageNode({
+            src: serialized.src,
+            altText: serialized.altText,
+            width: serialized.width,
+            align: serialized.align,
+            mediaId: serialized.mediaId,
+            caption: serialized.caption,
+            credit: serialized.credit,
+            layout: serialized.layout,
+            wrap: serialized.wrap,
+            sizePreset: serialized.sizePreset,
+            focalPoint: serialized.focalPoint,
+            decorative: serialized.decorative,
+            linkUrl: serialized.linkUrl,
+            loading: serialized.loading,
+        });
     }
 
     exportJSON(): SerializedImageNode {
         return {
             type: 'image',
-            version: 1,
-            src: this.__src,
-            altText: this.__altText,
-            width: this.__width,
-            align: this.__align,
+            version: 2,
+            ...this.__imageState,
         };
     }
 
     static importDOM(): DOMConversionMap | null {
         return {
+            figure: (domNode: HTMLElement) => {
+                if (!domNode.querySelector('img')) return null;
+
+                return { conversion: convertFigureElement, priority: 2 };
+            },
             img: () => ({
                 conversion: convertImageElement,
-                priority: 0,
+                priority: 1,
             }),
         };
     }
 
     exportDOM(): DOMExportOutput {
-        const img = document.createElement('img');
-        img.setAttribute('src', this.__src);
-        img.setAttribute('alt', this.__altText);
-        img.setAttribute('class', 'rounded-lg');
-        if (this.__width) img.style.width = this.__width;
-        if (this.__align === 'left') {
-            img.style.float = 'left';
-            img.style.marginRight = '1em';
-            img.style.marginBottom = '0.5em';
-        } else if (this.__align === 'right') {
-            img.style.float = 'right';
-            img.style.marginLeft = '1em';
-            img.style.marginBottom = '0.5em';
-        } else if (this.__align === 'center') {
-            img.style.display = 'block';
-            img.style.marginLeft = 'auto';
-            img.style.marginRight = 'auto';
+        const state = this.__imageState;
+        const figure = document.createElement('figure');
+        figure.setAttribute('data-rte-image', 'true');
+        figure.setAttribute('data-align', state.align);
+        figure.setAttribute('data-layout', state.layout);
+        figure.setAttribute('data-wrap', state.wrap);
+        figure.setAttribute('data-size-preset', state.sizePreset);
+        figure.setAttribute('data-decorative', String(state.decorative));
+        if (state.mediaId !== null) figure.setAttribute('data-media-id', String(state.mediaId));
+        if (state.credit) figure.setAttribute('data-credit', state.credit);
+        if (state.focalPoint) figure.setAttribute('data-focal-point', JSON.stringify(state.focalPoint));
+        figure.className = `rte-image rte-image--${state.layout} rte-image--${state.wrap}`;
+        figure.style.maxWidth = '100%';
+        figure.style.marginBlock = '0.75rem';
+
+        if (state.width && state.layout !== 'wide' && state.layout !== 'full') {
+            figure.style.width = state.width;
         }
-        return { element: img };
+        if (state.wrap === 'wrap-left' || state.align === 'left') {
+            figure.style.cssFloat = 'left';
+            figure.style.marginRight = '1rem';
+        } else if (state.wrap === 'wrap-right' || state.align === 'right') {
+            figure.style.cssFloat = 'right';
+            figure.style.marginLeft = '1rem';
+        } else if (state.align === 'center' || state.layout === 'wide' || state.layout === 'full') {
+            figure.style.marginInline = 'auto';
+        }
+
+        const img = document.createElement('img');
+        img.setAttribute('src', state.src);
+        img.setAttribute('alt', state.decorative ? '' : state.altText);
+        img.setAttribute('loading', state.loading);
+        img.setAttribute('class', 'rounded-lg');
+        img.style.display = 'block';
+        img.style.height = 'auto';
+        img.style.maxWidth = '100%';
+        img.style.width = state.layout === 'wide' || state.layout === 'full' ? '100%' : (state.width ?? 'auto');
+        const objectPosition = imageObjectPosition(state.focalPoint);
+        if (objectPosition) img.style.objectPosition = objectPosition;
+
+        const safeLinkUrl = state.linkUrl ? normalizeLinkUrl(state.linkUrl) : null;
+        if (safeLinkUrl) {
+            const link = document.createElement('a');
+            link.setAttribute('href', safeLinkUrl);
+            const target = getEditorLinkTarget(safeLinkUrl);
+            if (target) link.setAttribute('target', target);
+            if (target === '_blank') link.setAttribute('rel', 'noopener noreferrer');
+            link.appendChild(img);
+            figure.appendChild(link);
+        } else {
+            figure.appendChild(img);
+        }
+
+        if (state.caption || state.credit) {
+            const figcaption = document.createElement('figcaption');
+            if (state.caption) figcaption.append(state.caption);
+            if (state.credit) {
+                const credit = document.createElement('span');
+                credit.setAttribute('data-credit', 'true');
+                credit.textContent = state.credit;
+                figcaption.append(credit);
+            }
+            figure.appendChild(figcaption);
+        }
+
+        return { element: figure };
     }
 
     createDOM(): HTMLElement {
@@ -281,53 +564,90 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
         return false;
     }
 
-    setWidth(width: string | undefined): void {
+    update(changes: Partial<ImageNodeState>): void {
         const writable = this.getWritable();
-        writable.__width = width;
+        writable.__imageState = { ...writable.__imageState, ...changes };
+    }
+
+    setWidth(width: string | undefined): void {
+        this.update({ width });
     }
 
     setAlign(align: ImageAlign): void {
-        const writable = this.getWritable();
-        writable.__align = align;
+        this.update({ align });
     }
 
     decorate(editor: LexicalEditor, _config: EditorConfig): JSX.Element {
-        return (
-            <ImageComponent
-                src={this.__src}
-                altText={this.__altText}
-                width={this.__width}
-                align={this.__align}
-                nodeKey={this.__key}
-                editor={editor}
-            />
-        );
+        return <ImageComponent {...this.__imageState} nodeKey={this.__key} editor={editor} />;
     }
+}
+
+function convertFigureElement(domNode: HTMLElement): DOMConversionOutput | null {
+    const img = domNode.querySelector('img');
+    if (!img) return null;
+    const link = img.closest('a');
+    const figcaption = domNode.querySelector('figcaption');
+    const creditElement = figcaption?.querySelector('[data-credit]');
+
+    return {
+        node: $createImageNode({
+            ...payloadFromImageElement(img),
+            mediaId: parseNumber(domNode.getAttribute('data-media-id')),
+            caption: figcaption?.childNodes[0]?.textContent?.trim() || null,
+            credit: domNode.getAttribute('data-credit') ?? creditElement?.textContent ?? null,
+            layout: (domNode.getAttribute('data-layout') as ImageLayout | null) ?? 'block',
+            wrap: (domNode.getAttribute('data-wrap') as ImageWrap | null) ?? 'none',
+            sizePreset: (domNode.getAttribute('data-size-preset') as ImageSizePreset | null) ?? 'custom',
+            focalPoint: parseFocalPoint(domNode.getAttribute('data-focal-point')),
+            decorative: parseBoolean(domNode.getAttribute('data-decorative')),
+            linkUrl: link?.getAttribute('href') ?? null,
+        }),
+    };
 }
 
 function convertImageElement(domNode: HTMLElement): DOMConversionOutput | null {
     const img = domNode as HTMLImageElement;
-    const src = img.getAttribute('src');
-    if (!src) return null;
-    const altText = img.getAttribute('alt') ?? '';
-    const width = img.style.width || img.getAttribute('width') || undefined;
-    return { node: $createImageNode({ src, altText, width }) };
+    const payload = payloadFromImageElement(img);
+
+    if (!payload.src) return null;
+
+    return { node: $createImageNode(payload) };
 }
 
-export function $createImageNode({
-    src,
-    altText,
-    width,
-    align,
-}: {
-    src: string;
-    altText: string;
-    width?: string;
-    align?: ImageAlign;
-}): ImageNode {
-    return $applyNodeReplacement(new ImageNode(src, altText, width, align));
+function payloadFromImageElement(img: HTMLImageElement): CreateImageNodePayload {
+    const src = img.getAttribute('src') ?? '';
+    const altText = img.getAttribute('alt') ?? '';
+    const width = img.style.width || img.getAttribute('width') || undefined;
+    const floatValue = img.style.float;
+    const align: ImageAlign = floatValue === 'left' ? 'left' : floatValue === 'right' ? 'right' : 'none';
+    const loading = img.getAttribute('loading') === 'eager' ? 'eager' : 'lazy';
+
+    return {
+        src,
+        altText,
+        width,
+        align,
+        wrap: align === 'left' ? 'wrap-left' : align === 'right' ? 'wrap-right' : 'none',
+        decorative: altText === '',
+        loading: loading as ImageLoading,
+    };
+}
+
+export function $createImageNode(payload: CreateImageNodePayload): ImageNode {
+    return $applyNodeReplacement(new ImageNode(payload));
 }
 
 export function $isImageNode(node: LexicalNode | null | undefined): node is ImageNode {
     return node instanceof ImageNode;
 }
+
+export type {
+    CreateImageNodePayload,
+    ImageAlign,
+    ImageFocalPoint,
+    ImageLayout,
+    ImageLoading,
+    ImageSizePreset,
+    ImageWrap,
+    SerializedImageNode,
+};

@@ -104,6 +104,18 @@ class MediaController extends Controller
                 'mime_type' => $media->mime_type,
                 'size' => $media->size,
                 'url' => $media->getUrl(),
+                'thumb_url' => $media->hasGeneratedConversion('thumbnail')
+                    ? $media->getUrl('thumbnail')
+                    : null,
+                'thumbnail_url' => $media->hasGeneratedConversion('thumbnail')
+                    ? $media->getUrl('thumbnail')
+                    : null,
+                'alt' => (string) $media->getCustomProperty('alt', ''),
+                'caption' => $media->getCustomProperty('caption'),
+                'description' => $media->getCustomProperty('description'),
+                'credit' => $media->getCustomProperty('author'),
+                'width' => $media->getCustomProperty('width'),
+                'height' => $media->getCustomProperty('height'),
                 'created_at' => $media->created_at,
             ];
         }

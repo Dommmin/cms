@@ -78,6 +78,7 @@ server/
 - Prefix: `/admin/`
 - Named: `admin.*`
 - Middleware: `auth`, `AdminAccess` (requires admin or editor role)
+- Media search: `admin.media.search` returns media library items for the admin SPA, including RTE metadata (`alt`, `caption`, `credit`, `width`, `height`, `thumb_url`) and supports `mime_types[]` filtering for image/gallery/file/video picker modes.
 
 ### Settings (`routes/settings.php`)
 - Prefix: `/settings/`

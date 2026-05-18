@@ -2016,8 +2016,19 @@ Errors:
 | `AutoLinkPlugin`           | Auto-converts typed URLs/emails to links                       |
 | `HtmlPlugin`               | Serializes/deserializes HTML                                   |
 | `MarkdownPlugin`           | Markdown shortcut transforms                                   |
+| `PasteSanitizerPlugin`     | Cleans pasted HTML before Lexical imports it                   |
 | `CopyCodePlugin`           | Injects "Copy" button on `<code>` blocks via MutationObserver  |
 | `WordCountPlugin`          | Shows word + character count in footer                         |
+
+### Enterprise media nodes
+
+RTE media nodes are registered in `lexical/nodes.ts`:
+
+- `ImageNode` stores `mediaId`, `src`, `altText`, `caption`, `credit`, `layout`, `wrap`, `sizePreset`, `decorative`, `linkUrl`, `loading`, and optional focal point metadata. HTML export uses `<figure data-rte-image>`.
+- `ImageGalleryNode` stores ordered image assets with captions and column count. HTML export uses `<figure data-rte-gallery data-columns="...">`.
+- `AttachmentNode` stores media ID, URL, public name, file name, MIME type, size, and optional description. HTML export uses `<a data-rte-attachment>`.
+
+`MediaPickerModal` supports explicit modes: `image`, `gallery`, `file`, `video`, and `any`. The admin media search endpoint returns RTE metadata fields (`alt`, `caption`, `credit`, `width`, `height`, `thumb_url`) and accepts `mime_types[]` filtering.
 
 ### Adding a new node type
 
