@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTranslation } from '@/hooks/use-translation';
-import { BLOCK_ICONS, BLOCK_LABELS } from './ToolbarPlugin.constants';
-import type { BlockType, BlockTypeMenuProps, InsertMenuProps } from './ToolbarPlugin.types';
+import { BLOCK_ICONS, BLOCK_LABELS } from './constants';
+import type { BlockType, BlockTypeMenuProps, InsertMenuProps } from './types';
 
 const BLOCK_TYPES: BlockType[] = ['paragraph', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'quote', 'code', 'bullet', 'number', 'check'];
 

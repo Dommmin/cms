@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Toggle } from '@/components/ui/toggle';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import type { ToolbarButtonProps, ToolbarToggleProps } from './ToolbarPlugin.types';
+import type { ToolbarButtonProps, ToolbarToggleProps } from './types';
 
 export function ToolbarButton({ onClick, disabled, tooltip, children, className = '' }: ToolbarButtonProps): JSX.Element {
     return (

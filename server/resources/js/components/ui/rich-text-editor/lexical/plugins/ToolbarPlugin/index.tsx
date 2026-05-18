@@ -35,17 +35,17 @@ import { MediaPickerModal } from '@/components/media-picker-modal';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTranslation } from '@/hooks/use-translation';
-import { $createImageNode } from '../../image-node';
-import { $createYouTubeNode, extractYouTubeId } from '../../youtube-node';
-import { $createCollapsibleContainerNode, $createCollapsibleTitleNode, $createCollapsibleContentNode } from '../collapsible-nodes';
-import { $createLayoutContainerNode, $createLayoutItemNode } from '../layout-nodes';
-import { getEditorLinkTarget, isAllowedEditorLinkUrl, normalizeEditorLinkUrl } from '../link-url';
-import { CODE_LANGUAGES, ELEMENT_FORMAT_NUM_TO_TYPE } from './ToolbarPlugin.constants';
-import { ToolbarSeparator as Sep } from './ToolbarPlugin.controls';
-import { EmojiDialog, LinkDialog, SpecialCharactersDialog, TableDialog, YouTubeDialog } from './ToolbarPlugin.dialogs';
-import { AlignmentGroup, FontStyleGroup, HistoryGroup, InlineFormatGroup, LinkGroup } from './ToolbarPlugin.groups';
-import { BlockTypeMenu, InsertMenu } from './ToolbarPlugin.menus';
-import type { BlockType, InsertDialog, ToolbarPluginProps, ToolbarState } from './ToolbarPlugin.types';
+import { $createImageNode } from '../../../image-node';
+import { $createYouTubeNode, extractYouTubeId } from '../../../youtube-node';
+import { $createCollapsibleContainerNode, $createCollapsibleTitleNode, $createCollapsibleContentNode } from '../../collapsible-nodes';
+import { $createLayoutContainerNode, $createLayoutItemNode } from '../../layout-nodes';
+import { getEditorLinkTarget, isAllowedEditorLinkUrl, normalizeEditorLinkUrl } from '../../link-url';
+import { CODE_LANGUAGES, ELEMENT_FORMAT_NUM_TO_TYPE } from './constants';
+import { ToolbarSeparator as Sep } from './controls';
+import { EmojiDialog, LinkDialog, SpecialCharactersDialog, TableDialog, YouTubeDialog } from './dialogs';
+import { AlignmentGroup, FontStyleGroup, HistoryGroup, InlineFormatGroup, LinkGroup } from './groups';
+import { BlockTypeMenu, InsertMenu } from './menus';
+import type { BlockType, InsertDialog, ToolbarPluginProps, ToolbarState } from './types';
 
 // ─── Main component ───────────────────────────────────────────────────────────
 

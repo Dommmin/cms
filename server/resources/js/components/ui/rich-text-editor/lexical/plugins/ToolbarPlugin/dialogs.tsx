@@ -4,9 +4,9 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslation } from '@/hooks/use-translation';
-import { extractYouTubeId } from '../../youtube-node';
-import { EMOJIS, SPECIAL_CHARS } from './ToolbarPlugin.constants';
-import type { CharacterDialogProps, LinkDialogProps, TableDialogProps, YouTubeDialogProps } from './ToolbarPlugin.types';
+import { extractYouTubeId } from '../../../youtube-node';
+import { EMOJIS, SPECIAL_CHARS } from './constants';
+import type { CharacterDialogProps, LinkDialogProps, TableDialogProps, YouTubeDialogProps } from './types';
 
 export function LinkDialog({ open, url, isInvalid, onOpenChange, onUrlChange, onInsert }: LinkDialogProps): JSX.Element {
     const __ = useTranslation();

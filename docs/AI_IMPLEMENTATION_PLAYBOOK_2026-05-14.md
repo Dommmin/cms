@@ -29,6 +29,7 @@ docker compose exec php php artisan test --compact tests/Feature/SomeTest.php
 docker compose exec php vendor/bin/pint --dirty
 docker compose exec php npm run format:check
 docker compose exec php npm run types
+docker compose exec php npm run test:ui
 docker compose exec node npx tsc
 docker compose exec node npm run build
 ```
@@ -726,12 +727,14 @@ Zmiany:
 - Widoczne teksty toolbara i dialogów RTE używają `useTranslation()` z angielskimi fallbackami.
 - Link insertion używa dialogu z walidacją `https://`, `mailto:`, `tel:`, `/relative` i `#anchor`.
 - Walidacja linków została ujednolicona w `lexical/link-url.ts` dla `LinkPlugin`, toolbara i floating link editora.
+- Toolbar został przeniesiony do folderu `ToolbarPlugin/index.tsx` z lokalnymi plikami `constants`, `controls`, `dialogs`, `groups`, `menus`, `types`.
+- Dodano Vitest + Testing Library dla admin SPA oraz testy URL linków i widoczności kontrolek toolbara w trybach `simple`/`full`.
 
 Testy:
 - `docker compose exec php npm run format`
 - `docker compose exec php npm run types`
 - `docker compose exec php npm run format:check`
+- `docker compose exec php npm run test:ui`
 
 Pozostało:
-- Opcjonalnie przenieść `ToolbarPlugin.tsx` do folderu `ToolbarPlugin/index.tsx` w osobnym porządkowym kroku.
-- Dodać testy interakcji RTE dla trybów `simple` i `full`.
+- Dalsze hardening tasks z kolejnych epików.

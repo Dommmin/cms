@@ -5,9 +5,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuT
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTranslation } from '@/hooks/use-translation';
-import { FONT_FAMILIES, FONT_SIZES, TEXT_COLORS } from './ToolbarPlugin.constants';
-import { ToolbarButton as Btn, ToolbarToggle as Tog } from './ToolbarPlugin.controls';
-import type { AlignmentGroupProps, FontStyleGroupProps, HistoryGroupProps, InlineFormatGroupProps, LinkGroupProps } from './ToolbarPlugin.types';
+import { FONT_FAMILIES, FONT_SIZES, TEXT_COLORS } from './constants';
+import { ToolbarButton as Btn, ToolbarToggle as Tog } from './controls';
+import type { AlignmentGroupProps, FontStyleGroupProps, HistoryGroupProps, InlineFormatGroupProps, LinkGroupProps } from './types';
 
 export function HistoryGroup({ canUndo, canRedo, onUndo, onRedo }: HistoryGroupProps): JSX.Element {
     const __ = useTranslation();
@@ -101,7 +101,7 @@ export function FontStyleGroup({
             <Select value={fontSize} onValueChange={onFontSizeChange}>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <SelectTrigger className="h-7 w-14 px-1.5 text-xs">
+                        <SelectTrigger className="h-7 w-14 px-1.5 text-xs" aria-label={__('rte.toolbar.font_size', 'Font size')}>
                             <SelectValue placeholder={__('rte.toolbar.font_size_short', 'Size')} />
                         </SelectTrigger>
                     </TooltipTrigger>
@@ -121,7 +121,7 @@ export function FontStyleGroup({
             <Select value={fontFamily || '__default__'} onValueChange={onFontFamilyChange}>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <SelectTrigger className="h-7 w-20 px-1.5 text-xs">
+                        <SelectTrigger className="h-7 w-20 px-1.5 text-xs" aria-label={__('rte.toolbar.font_family', 'Font family')}>
                             <SelectValue placeholder={__('rte.toolbar.font_family_short', 'Font')} />
                         </SelectTrigger>
                     </TooltipTrigger>

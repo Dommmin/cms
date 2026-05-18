@@ -2,7 +2,7 @@ import { CODE_LANGUAGE_FRIENDLY_NAME_MAP, CODE_LANGUAGE_MAP } from '@lexical/cod
 import type { ElementFormatType } from 'lexical';
 import { CheckSquare, Code2, List, ListOrdered, Pilcrow, Quote } from 'lucide-react';
 import type { JSX } from 'react';
-import type { BlockType } from './ToolbarPlugin.types';
+import type { BlockType } from './types';
 
 export const ELEMENT_FORMAT_NUM_TO_TYPE: Record<number, ElementFormatType> = {
     0: '',
