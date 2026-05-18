@@ -11,11 +11,14 @@ export type SortableSectionProps = {
     index: number;
     pageId: number;
     isExpanded: boolean;
+    isSelected?: boolean;
+    activeBlockId?: string | null;
     expandedBlocks: Set<string>;
     availableSections: Record<string, AvailableSection>;
     availableBlockTypes: Record<string, BlockTypeConfig>;
     onToggle: () => void;
     onDelete: () => void;
+    onSelect?: () => void;
     onUpdate: (patch: Partial<Section>) => void;
     onAddBlock: (type: string) => void;
     onAddReusableBlock: (block: ReusableBlock) => void;
@@ -24,4 +27,5 @@ export type SortableSectionProps = {
     onDeleteBlock: (blockIndex: number) => void;
     onMoveBlock: (oldIndex: number, newIndex: number) => void;
     onToggleBlock: (blockIndex: number) => void;
+    onSelectBlock?: (blockIndex: number) => void;
 };

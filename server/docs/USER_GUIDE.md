@@ -198,6 +198,7 @@ similar payloads are removed or rejected.
 **Useful features:**
 
 - **Undo / Redo** — up to 20 steps of history with the undo/redo buttons in the toolbar
+- **Navigator** — on desktop, use the left outline to jump to a section or block, hide/show items, or duplicate sections and blocks without scrolling through the full editor
 - **Copy / Paste blocks** — click the copy icon on any block to copy it to your clipboard, then paste it anywhere on the same or a different page
 - **Mobile preview** — switch to mobile preview mode in the toolbar to see how the page looks on a phone screen
 - **Split view** — view the editor and the page preview side by side

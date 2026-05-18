@@ -14,11 +14,14 @@ export function SortableSection({
     index,
     pageId,
     isExpanded,
+    isSelected = false,
+    activeBlockId = null,
     expandedBlocks,
     availableSections,
     availableBlockTypes,
     onToggle,
     onDelete,
+    onSelect,
     onUpdate,
     onAddBlock,
     onAddReusableBlock,
@@ -27,15 +30,18 @@ export function SortableSection({
     onDeleteBlock,
     onMoveBlock,
     onToggleBlock,
+    onSelectBlock,
 }: SortableSectionProps) {
     return (
         <SectionCard
             section={section}
             index={index}
             isExpanded={isExpanded}
+            isSelected={isSelected}
             availableSections={availableSections}
             onToggle={onToggle}
             onDelete={onDelete}
+            onSelect={onSelect}
         >
             <div className="space-y-6">
                 {/* Section Configuration Form */}
@@ -51,6 +57,7 @@ export function SortableSection({
                     sectionIndex={index}
                     pageId={pageId}
                     expandedBlocks={expandedBlocks}
+                    activeBlockId={activeBlockId}
                     availableBlockTypes={availableBlockTypes}
                     onAddBlock={onAddBlock}
                     onAddReusableBlock={onAddReusableBlock}
@@ -59,6 +66,7 @@ export function SortableSection({
                     onDeleteBlock={onDeleteBlock}
                     onMoveBlock={onMoveBlock}
                     onToggleBlock={onToggleBlock}
+                    onSelectBlock={onSelectBlock}
                 />
             </div>
         </SectionCard>

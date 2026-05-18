@@ -22,6 +22,7 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 
 ### CMS / Content
 - **Page Builder** — drag-and-drop blocks, sections, reusable blocks, draft/publish versioning, live preview, mobile preview, undo/redo, copy/paste blocks
+  - **Visual Navigator** — sticky left outline in the admin builder lists sections and blocks; supports active selection, scroll-to, hide/show, duplicate section and duplicate block actions; selection outline uses stable `client_id` anchors
   - **B1 Auto-save** — 30s debounced auto-save via `router.put` when `hasUnsavedChanges`; `AutoSaveIndicator` in toolbar shows Saving.../Unsaved changes/Saved X min ago with colored dots; split-view triggers 1.5s debounce save + iframe reload
   - **B2 Scheduled Publishing** — `scheduled_publish_at` + `scheduled_unpublish_at` on `pages` table; `cms:process-scheduled-pages` Artisan command run every minute; `PUT /admin/cms/pages/{page}/builder/schedule` endpoint; `SchedulePopover` in toolbar with datetime-local inputs
   - **B3 Custom CSS per Block** — `_custom_classes`, `_custom_id`, `_custom_css` keys in `block.configuration`; rendered in `SectionRenderer` with sanitized inline `<style>` tag + class/id attributes; Advanced panel in block form

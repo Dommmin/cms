@@ -5,6 +5,7 @@ export type BlocksListProps = {
     sectionIndex: number;
     pageId: number;
     expandedBlocks: Set<string>;
+    activeBlockId?: string | null;
     availableBlockTypes: Record<string, BlockTypeConfig>;
     onAddBlock: (type: string) => void;
     onAddReusableBlock: (block: ReusableBlock) => void;
@@ -13,6 +14,7 @@ export type BlocksListProps = {
     onDeleteBlock: (blockIndex: number) => void;
     onMoveBlock: (oldIndex: number, newIndex: number) => void;
     onToggleBlock: (blockIndex: number) => void;
+    onSelectBlock?: (blockIndex: number) => void;
 };
 
 export type LibraryModalProps = {
@@ -32,6 +34,7 @@ export type SortableBlocksProps = {
     blocks: Block[];
     sectionIndex: number;
     expandedBlocks: Set<string>;
+    activeBlockId?: string | null;
     availableBlockTypes: Record<string, BlockTypeConfig>;
     onMoveBlock: (oldIndex: number, newIndex: number) => void;
     onToggleBlock: (blockIndex: number) => void;
@@ -44,4 +47,5 @@ export type SortableBlocksProps = {
     ) => void;
     onUpdateBlock: (blockIndex: number, patch: Partial<Block>) => void;
     onUnlinkGlobal: (blockIndex: number) => void;
+    onSelectBlock?: (blockIndex: number) => void;
 };

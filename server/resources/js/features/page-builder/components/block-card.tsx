@@ -39,9 +39,11 @@ export function BlockCard({
     blockIndex,
     sectionIndex,
     isExpanded,
+    isSelected = false,
     blockTypeName,
     onToggle,
     onDelete,
+    onSelect,
     onCopy,
     onSaveAsGlobal,
     children,
@@ -88,6 +90,7 @@ export function BlockCard({
             <Card
                 ref={setNodeRef}
                 style={style}
+                id={`pb-block-${block.client_id}`}
                 data-block-id={block.id}
                 className={cn(
                     'border-l-4',
@@ -97,7 +100,12 @@ export function BlockCard({
                           ? 'border-l-primary'
                           : 'border-l-muted',
                     isDragging && 'shadow-lg',
+                    isSelected && 'ring-2 ring-primary ring-offset-2',
                 )}
+                onClick={(event) => {
+                    event.stopPropagation();
+                    onSelect?.();
+                }}
             >
                 <CardHeader className="p-3">
                     <div className="flex items-center gap-2">
@@ -126,7 +134,10 @@ export function BlockCard({
                         <Button
                             variant="ghost"
                             size="sm"
-                            onClick={onToggle}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onToggle();
+                            }}
                             className="h-6 w-6 p-0"
                         >
                             {isExpanded ? (
@@ -155,7 +166,10 @@ export function BlockCard({
                         {/* Block label */}
                         <div
                             className="flex-1 cursor-pointer"
-                            onClick={onToggle}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onToggle();
+                            }}
                         >
                             <span className="text-sm font-medium capitalize">
                                 {displayName}

@@ -12,6 +12,7 @@ export function SortableBlocks({
     blocks,
     sectionIndex,
     expandedBlocks,
+    activeBlockId = null,
     availableBlockTypes,
     onMoveBlock,
     onToggleBlock,
@@ -20,6 +21,7 @@ export function SortableBlocks({
     onSaveAsGlobal,
     onUpdateBlock,
     onUnlinkGlobal,
+    onSelectBlock,
 }: SortableBlocksProps) {
     const blockIds = blocks.map(
         (block) => block.client_id ?? `block-${block.id}`,
@@ -66,9 +68,11 @@ export function SortableBlocks({
                                 blockIndex={blockIndex}
                                 sectionIndex={sectionIndex}
                                 isExpanded={isExpanded}
+                                isSelected={activeBlockId === block.client_id}
                                 blockTypeName={blockTypeName}
                                 onToggle={() => onToggleBlock(blockIndex)}
                                 onDelete={() => onDeleteBlock(blockIndex)}
+                                onSelect={() => onSelectBlock?.(blockIndex)}
                                 onCopy={() => onCopyBlock(blockIndex)}
                                 onSaveAsGlobal={(name, desc) =>
                                     onSaveAsGlobal(blockIndex, name, desc)

@@ -24,9 +24,11 @@ export function SectionCard({
     section,
     index,
     isExpanded,
+    isSelected = false,
     availableSections,
     onToggle,
     onDelete,
+    onSelect,
     children,
 }: SectionCardProps) {
     const __ = useTranslation();
@@ -53,7 +55,12 @@ export function SectionCard({
         <Card
             ref={setNodeRef}
             style={style}
-            className={cn(isDragging && 'shadow-lg')}
+            id={`pb-section-${section.client_id}`}
+            className={cn(
+                isDragging && 'shadow-lg',
+                isSelected && 'ring-2 ring-primary ring-offset-2',
+            )}
+            onClick={onSelect}
         >
             <CardHeader className="p-4">
                 <div className="flex items-center gap-3">
@@ -70,7 +77,10 @@ export function SectionCard({
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={onToggle}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onToggle();
+                        }}
                         className="h-8 w-8 p-0"
                     >
                         {isExpanded ? (
@@ -84,7 +94,13 @@ export function SectionCard({
                     <Layers className="h-4 w-4 text-muted-foreground" />
 
                     {/* Section Title */}
-                    <div className="flex-1 cursor-pointer" onClick={onToggle}>
+                    <div
+                        className="flex-1 cursor-pointer"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onToggle();
+                        }}
+                    >
                         <h3 className="font-medium">{sectionLabel}</h3>
                         {section.layout && section.layout !== 'default' && (
                             <p className="text-sm text-muted-foreground">

@@ -631,6 +631,27 @@ Testy:
 Pozostało:
 - Dalsze hardening tasks z kolejnych epików.
 
+### 2026-05-18 - Epic 5 - navigator Page Buildera
+
+Status: Partial
+
+Zmiany:
+- Dodano desktopowy lewy navigator dla Page Buildera z listą sekcji i bloków.
+- Kliknięcie pozycji w navigatorze ustawia aktywny element, rozwija go i przewija do karty w builderze.
+- Sekcje i bloki mają wizualny active outline oparty o stabilne `client_id`.
+- Navigator pozwala ukrywać/pokazywać oraz duplikować sekcje i bloki.
+- `useBuilderState` dostał operacje `duplicateSection` i `duplicateBlock`, które tworzą nowe `client_id` i przeliczają pozycje.
+- Zaktualizowano `.ai/guide.md`, `server/docs/USER_GUIDE.md` i `server/docs/DEVELOPER_GUIDE.md`.
+
+Testy:
+- Do uruchomienia po implementacji: `docker compose exec php npm run format`
+- Do uruchomienia po implementacji: `docker compose exec php npm run types`
+- Do uruchomienia po implementacji: `docker compose exec php npm run format:check`
+
+Pozostało:
+- Inspector jako prawy panel konfiguracji aktywnego section/block.
+- Responsive preview desktop/tablet/mobile z informacją o aktualności preview.
+
 ### 2026-05-16 - Epic 3 - stabilne identyfikatory w builderze
 
 Status: Partial

@@ -20,6 +20,7 @@ export function BlocksList({
     sectionIndex,
     pageId,
     expandedBlocks,
+    activeBlockId = null,
     availableBlockTypes,
     onAddBlock,
     onAddReusableBlock,
@@ -28,6 +29,7 @@ export function BlocksList({
     onDeleteBlock,
     onMoveBlock,
     onToggleBlock,
+    onSelectBlock,
 }: BlocksListProps) {
     const __ = useTranslation();
     const [libraryOpen, setLibraryOpen] = useState(false);
@@ -114,6 +116,7 @@ export function BlocksList({
                     blocks={blocks}
                     sectionIndex={sectionIndex}
                     expandedBlocks={expandedBlocks}
+                    activeBlockId={activeBlockId}
                     availableBlockTypes={availableBlockTypes}
                     onMoveBlock={onMoveBlock}
                     onToggleBlock={onToggleBlock}
@@ -122,6 +125,7 @@ export function BlocksList({
                     onSaveAsGlobal={handleSaveAsGlobal}
                     onUpdateBlock={onUpdateBlock}
                     onUnlinkGlobal={handleUnlinkGlobal}
+                    onSelectBlock={onSelectBlock}
                 />
             )}
 

@@ -36,6 +36,25 @@ function withSectionClientIds(sections: Section[]): Section[] {
     }));
 }
 
+function cloneBlock(block: Block, position: number): Block {
+    return {
+        ...block,
+        id: undefined,
+        client_id: createClientId('block'),
+        position,
+    };
+}
+
+function cloneSection(section: Section, position: number): Section {
+    return {
+        ...section,
+        id: undefined,
+        client_id: createClientId('section'),
+        position,
+        blocks: section.blocks.map((block, index) => cloneBlock(block, index)),
+    };
+}
+
 // ── History reducer ─────────────────────────────────────────────────────────
 
 type HistoryState = {
@@ -196,6 +215,25 @@ export function useBuilderState(initialSections: Section[]) {
         [sections],
     );
 
+    const duplicateSection = useCallback(
+        (index: number) => {
+            const section = sections[index];
+            if (!section) return;
+
+            const newSections = [...sections];
+            newSections.splice(index + 1, 0, cloneSection(section, index + 1));
+
+            dispatch({
+                type: 'SET',
+                sections: newSections.map((item, itemIndex) => ({
+                    ...item,
+                    position: itemIndex,
+                })),
+            });
+        },
+        [sections],
+    );
+
     // ── Block operations ─────────────────────────────────────────────────────
 
     const addBlock = useCallback(
@@ -307,6 +345,36 @@ export function useBuilderState(initialSections: Section[]) {
         [sections],
     );
 
+    const duplicateBlock = useCallback(
+        (sectionIndex: number, blockIndex: number) => {
+            dispatch({
+                type: 'SET',
+                sections: sections.map((section, si) => {
+                    if (si !== sectionIndex) return section;
+
+                    const block = section.blocks[blockIndex];
+                    if (!block) return section;
+
+                    const newBlocks = [...section.blocks];
+                    newBlocks.splice(
+                        blockIndex + 1,
+                        0,
+                        cloneBlock(block, blockIndex + 1),
+                    );
+
+                    return {
+                        ...section,
+                        blocks: newBlocks.map((item, itemIndex) => ({
+                            ...item,
+                            position: itemIndex,
+                        })),
+                    };
+                }),
+            });
+        },
+        [sections],
+    );
+
     // ── Expand/collapse ──────────────────────────────────────────────────────
 
     const toggleSection = useCallback((clientId: string) => {
@@ -368,12 +436,14 @@ export function useBuilderState(initialSections: Section[]) {
         updateSection,
         deleteSection,
         moveSection,
+        duplicateSection,
         insertTemplateSections,
         // Block ops
         addBlock,
         updateBlock,
         deleteBlock,
         moveBlock,
+        duplicateBlock,
         // UI
         toggleSection,
         toggleBlock,
