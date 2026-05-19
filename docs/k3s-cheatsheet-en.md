@@ -267,6 +267,35 @@ kubectl -n app get pods -w
 
 ---
 
+## Reset the server for a new application
+
+> Destructive. Back up the database, uploaded files, secrets, and kubeconfig first. A full k3s uninstall removes cluster resources, secrets, PVCs, and local `local-path` volumes.
+
+```bash
+# Lighter option: remove only the current application from the cluster
+kubectl delete namespace app
+
+# Full option: remove k3s from the server
+sudo /usr/local/bin/k3s-uninstall.sh
+
+# If this was a worker/agent node, not the control-plane server:
+sudo /usr/local/bin/k3s-agent-uninstall.sh
+```
+
+After a full uninstall, you can run the installation again from section 4 of `k3s-deployment-guide-en.md`. SSH, firewall rules, system packages, and DNS remain on the server, so you do not need to rebuild the VPS from scratch.
+
+If you also ran tools outside k3s on the same server, such as Rancher/Uptime Kuma in Docker, remove them separately:
+
+```bash
+docker ps -a
+docker stop <container>
+docker rm <container>
+docker volume ls
+docker volume rm <volume>
+```
+
+---
+
 ## Common scenarios
 
 ### Application not responding

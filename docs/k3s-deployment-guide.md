@@ -44,6 +44,7 @@ Nie zakładam, że znasz Kubernetes. Zakładam, że znasz Dockera i nie boisz si
 23. [Czyszczenie dysku](#23-czyszczenie-dysku)
 24. [k9s — terminalowy panel zarządzania](#24-k9s--terminalowy-panel-zarządzania)
 25. [Rotacja secretów — aktualizacja .env i haseł bez downtime'u](#25-rotacja-secretów--aktualizacja-env-i-haseł-bez-downtimeu)
+26. [Reset serwera pod inną aplikację](#26-reset-serwera-pod-inną-aplikację)
 
 ---
 
@@ -2227,6 +2228,95 @@ kubectl -n app rollout restart deployment/app-queue
 ```
 
 > **Uwaga:** Restart Redis czyści cache i sesje — użytkownicy zostaną wylogowani. Planuj poza godzinami szczytu.
+
+---
+
+## 26. Reset serwera pod inną aplikację
+
+To nie jest codzienny workflow, ale przydaje się, gdy chcesz użyć tego samego VPS-a pod zupełnie inną aplikację bez reinstalacji systemu, ponownego ustawiania SSH, firewalla i podstawowych pakietów.
+
+Masz dwa poziomy czyszczenia:
+
+| Cel | Co zrobić | Co zostaje |
+|-----|-----------|------------|
+| Usunąć tylko tę aplikację | `kubectl delete namespace app` | k3s, Traefik, cert-manager, konfiguracja klastra |
+| Wyczyścić cały Kubernetes | `k3s-uninstall.sh` | system Linux, SSH, firewall, DNS, pakiety systemowe |
+
+### 26.1 Zanim usuniesz
+
+Pełny uninstall k3s usuwa zasoby klastra, sekrety, PVC i lokalne wolumeny `local-path`. Dla tej aplikacji oznacza to m.in. MySQL, Redis, Typesense, uploady trzymane w PVC i wszystkie sekrety Kubernetes.
+
+Przed resetem zrób minimum:
+
+```bash
+# Backup bazy
+kubectl -n app exec app-mysql-0 -- \
+  mysqldump -u root -p<ROOT_PASSWORD> app \
+  > backup_$(date +%Y%m%d_%H%M%S).sql
+
+# Eksport najważniejszych sekretów do audytu/odtworzenia
+kubectl -n app get secret app-server-env -o yaml > app-server-env.backup.yaml
+kubectl -n app get secret app-mysql -o yaml > app-mysql.backup.yaml
+
+# Lista zasobów przed skasowaniem
+kubectl -n app get all,ingress,certificate,pvc,secrets
+```
+
+Jeśli uploady są na S3/R2, zwykle wystarczy backup bazy i konfiguracji. Jeśli pliki są w PVC albo lokalnym storage, skopiuj je osobno z poda lub wolumenu przed uninstallacją.
+
+### 26.2 Opcja lżejsza — usuń tylko aplikację
+
+Jeśli chcesz postawić nową aplikację na tym samym działającym k3s, najczęściej wystarczy skasować namespace:
+
+```bash
+kubectl delete namespace app
+kubectl get namespace app
+```
+
+Po usunięciu namespace możesz uruchomić bootstrap/deploy nowej aplikacji z innym `APP_NAME` i `KUBE_NAMESPACE`. Ten wariant zostawia cert-manager, Traefika, Ranchera/k9s i całą konfigurację klastra.
+
+### 26.3 Opcja pełna — usuń cały k3s
+
+Na serwerze control-plane uruchom:
+
+```bash
+sudo /usr/local/bin/k3s-uninstall.sh
+```
+
+Jeśli czyścisz osobny node-agent, użyj:
+
+```bash
+sudo /usr/local/bin/k3s-agent-uninstall.sh
+```
+
+Skrypt zatrzymuje usługi k3s, usuwa binarki, konfigurację systemd, dane klastra i katalogi zarządzane przez k3s. Po nim `kubectl` nie będzie już działał z tym klastrem, a lokalny kubeconfig wskazujący na ten serwer stanie się nieaktualny.
+
+Sprawdzenie po uninstallu:
+
+```bash
+systemctl status k3s
+command -v k3s
+ls /etc/rancher/k3s
+ls /var/lib/rancher/k3s
+```
+
+Brak usługi/binarki/katalogów oznacza, że serwer jest gotowy na świeżą instalację k3s. Zacznij ponownie od sekcji [4. Instalacja k3s](#4-instalacja-k3s), a potem wykonaj bootstrap dla nowej aplikacji.
+
+### 26.4 Narzędzia uruchomione obok k3s
+
+Sekcje o Rancherze i Uptime Kuma pokazują wariant Dockerowy, czyli kontenery uruchomione obok k3s. `k3s-uninstall.sh` ich nie usuwa.
+
+Jeśli chcesz wyczyścić również te narzędzia:
+
+```bash
+docker ps -a
+docker stop <container>
+docker rm <container>
+docker volume ls
+docker volume rm <volume>
+```
+
+Nie usuwaj wolumenów Dockera, jeśli trzymasz tam dane, które mają przetrwać reset.
 
 ---
 
