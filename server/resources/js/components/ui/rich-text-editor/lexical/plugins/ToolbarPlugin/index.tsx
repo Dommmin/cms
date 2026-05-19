@@ -606,6 +606,14 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
                     if (!open) setLinkUrl('');
                 }}
                 onUrlChange={setLinkUrl}
+                onInternalSelect={(url) => {
+                    setLinkUrl(url);
+                    editor.dispatchCommand(TOGGLE_LINK_COMMAND, {
+                        url,
+                        target: getEditorLinkTarget(url),
+                    });
+                    setLinkDialogOpen(false);
+                }}
                 onInsert={handleInsertLink}
             />
 

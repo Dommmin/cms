@@ -79,6 +79,8 @@ server/
 - Named: `admin.*`
 - Middleware: `auth`, `AdminAccess` (requires admin or editor role)
 - Media search: `admin.media.search` returns media library items for the admin SPA, including RTE metadata (`alt`, `caption`, `credit`, `width`, `height`, `thumb_url`) and supports `mime_types[]` filtering for image/gallery/file/video picker modes.
+- RTE link search: `admin.rte.links.search` returns locale-aware internal targets for pages, products, categories and blog posts.
+- RTE sanitization: `HtmlSanitizerService` default profile allows safe figures, captions, images, attachment links and tables with explicit RTE `data-*` attributes.
 
 ### Settings (`routes/settings.php`)
 - Prefix: `/settings/`

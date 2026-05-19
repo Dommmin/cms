@@ -58,6 +58,7 @@ export default function EditBlogPost({
         slug: post.slug,
         excerpt: post.excerpt ?? { [defaultLocale]: '' },
         content: post.content ?? { [defaultLocale]: '' },
+        content_json: post.content_json ?? { [defaultLocale]: '' },
         content_type: post.content_type,
         status: post.status,
         blog_category_id: post.blog_category_id
@@ -359,6 +360,15 @@ export default function EditBlogPost({
                                                         ...prev,
                                                         content: {
                                                             ...prev.content,
+                                                            [activeLocale]: val,
+                                                        },
+                                                    }))
+                                                }
+                                                onJsonChange={(val) =>
+                                                    setData((prev) => ({
+                                                        ...prev,
+                                                        content_json: {
+                                                            ...prev.content_json,
                                                             [activeLocale]: val,
                                                         },
                                                     }))

@@ -16,6 +16,7 @@ import type { EditorProps } from './Editor.types';
 import { isAllowedEditorLinkUrl } from './link-url';
 import { nodes } from './nodes';
 import AutoLinkPlugin from './plugins/AutoLinkPlugin';
+import ContentHealthPlugin from './plugins/ContentHealthPlugin';
 import CopyCodePlugin from './plugins/CopyCodePlugin';
 import DraggableBlockPlugin from './plugins/DraggableBlockPlugin';
 import FloatingLinkEditorPlugin from './plugins/FloatingLinkEditorPlugin';
@@ -53,7 +54,7 @@ function EditablePlugin({ editable }: { editable: boolean }): null {
     return null;
 }
 
-export default function Editor({ value, onChange, placeholder = 'Start writing...', className, maxHeight, editable = true, mode = 'full', showWordCount = true, instanceKey }: EditorProps): JSX.Element {
+export default function Editor({ value, onChange, onJsonChange, placeholder = 'Start writing...', className, maxHeight, editable = true, mode = 'full', showWordCount = true, instanceKey }: EditorProps): JSX.Element {
     const containerRef = useRef<HTMLDivElement>(null);
     const config = useRef(buildConfig(editable));
 
@@ -91,9 +92,10 @@ export default function Editor({ value, onChange, placeholder = 'Start writing..
                 {editable && <SlashCommandPlugin />}
                 {/* eslint-disable-next-line react-hooks/refs */}
                 {editable && <DraggableBlockPlugin anchorElem={containerRef.current ?? undefined} />}
-                <HtmlPlugin value={value} onChange={onChange} instanceKey={instanceKey} />
+                <HtmlPlugin value={value} onChange={onChange} onJsonChange={onJsonChange} instanceKey={instanceKey} />
                 <EditablePlugin editable={editable} />
                 <CopyCodePlugin />
+                {editable && <ContentHealthPlugin />}
                 {showWordCount && <WordCountPlugin />}
             </LexicalComposer>
         </div>

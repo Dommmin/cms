@@ -5,6 +5,15 @@ import type { ReactNode } from 'react';
 
 export type BlockType = 'paragraph' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'quote' | 'code' | 'bullet' | 'number' | 'check';
 export type InsertDialog = 'image' | 'youtube' | 'table' | 'emoji' | 'special' | null;
+export type LinkDialogTab = 'url' | 'internal';
+
+export type InternalLinkSearchResult = {
+    type: 'page' | 'product' | 'category' | 'blog_post';
+    id: number;
+    label: string;
+    meta: string | null;
+    url: string;
+};
 
 export type ToolbarMode = 'simple' | 'full';
 
@@ -42,6 +51,7 @@ export type LinkDialogProps = {
     isInvalid: boolean;
     onOpenChange: (open: boolean) => void;
     onUrlChange: (url: string) => void;
+    onInternalSelect: (url: string) => void;
     onInsert: () => void;
 };
 

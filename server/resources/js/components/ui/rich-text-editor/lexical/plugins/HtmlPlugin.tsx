@@ -1,13 +1,13 @@
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
-import { CLEAR_HISTORY_COMMAND, $createParagraphNode, $getRoot, $isDecoratorNode, $isElementNode } from 'lexical';
+import { CLEAR_HISTORY_COMMAND, $createParagraphNode, $getRoot, $isDecoratorNode, $isElementNode, type EditorState } from 'lexical';
 import { useCallback, useEffect, useRef, type JSX } from 'react';
 import type { HtmlPluginProps } from './HtmlPlugin.types';
 
 const DEBOUNCE_MS = 200;
 
-export default function HtmlPlugin({ value, onChange, instanceKey }: HtmlPluginProps): JSX.Element {
+export default function HtmlPlugin({ value, onChange, onJsonChange, instanceKey }: HtmlPluginProps): JSX.Element {
     const [editor] = useLexicalComposerContext();
     const lastSyncedValue = useRef<string>('');
     const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -66,8 +66,8 @@ export default function HtmlPlugin({ value, onChange, instanceKey }: HtmlPluginP
         lastSyncedValue.current = value;
     }, [editor, value, instanceKey]);
 
-    const handleChange = useCallback(() => {
-        if (!onChange) {
+    const handleChange = useCallback((editorState: EditorState) => {
+        if (!onChange && !onJsonChange) {
             return;
         }
 
@@ -76,13 +76,14 @@ export default function HtmlPlugin({ value, onChange, instanceKey }: HtmlPluginP
         }
 
         debounceTimerRef.current = setTimeout(() => {
-            editor.read(() => {
+            editorState.read(() => {
                 const html = $generateHtmlFromNodes(editor);
                 lastSyncedValue.current = html;
-                onChange(html);
+                onChange?.(html);
+                onJsonChange?.(JSON.stringify(editorState.toJSON()));
             });
         }, DEBOUNCE_MS);
-    }, [editor, onChange]);
+    }, [editor, onChange, onJsonChange]);
 
     return (
         <OnChangePlugin

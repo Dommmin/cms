@@ -49,6 +49,7 @@ export default function CreateBlogPost({
         slug: '',
         excerpt: { [defaultLocale]: '' },
         content: { [defaultLocale]: '' },
+        content_json: { [defaultLocale]: '' },
         content_type: 'richtext',
         status: 'draft',
         published_at: '',
@@ -311,6 +312,15 @@ export default function CreateBlogPost({
                                                         ...prev,
                                                         content: {
                                                             ...prev.content,
+                                                            [activeLocale]: val,
+                                                        },
+                                                    }))
+                                                }
+                                                onJsonChange={(val) =>
+                                                    setData((prev) => ({
+                                                        ...prev,
+                                                        content_json: {
+                                                            ...prev.content_json,
                                                             [activeLocale]: val,
                                                         },
                                                     }))

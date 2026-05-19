@@ -2017,6 +2017,7 @@ Errors:
 | `HtmlPlugin`               | Serializes/deserializes HTML                                   |
 | `MarkdownPlugin`           | Markdown shortcut transforms                                   |
 | `PasteSanitizerPlugin`     | Cleans pasted HTML before Lexical imports it                   |
+| `ContentHealthPlugin`      | Analyzes serialized editor state and displays local warnings    |
 | `CopyCodePlugin`           | Injects "Copy" button on `<code>` blocks via MutationObserver  |
 | `WordCountPlugin`          | Shows word + character count in footer                         |
 
@@ -2025,10 +2026,16 @@ Errors:
 RTE media nodes are registered in `lexical/nodes.ts`:
 
 - `ImageNode` stores `mediaId`, `src`, `altText`, `caption`, `credit`, `layout`, `wrap`, `sizePreset`, `decorative`, `linkUrl`, `loading`, and optional focal point metadata. HTML export uses `<figure data-rte-image>`.
-- `ImageGalleryNode` stores ordered image assets with captions and column count. HTML export uses `<figure data-rte-gallery data-columns="...">`.
+- `ImageGalleryNode` stores ordered image assets with captions, desktop/mobile columns, gap, aspect ratio and lightbox metadata. HTML export uses `<figure data-rte-gallery data-columns="...">`.
 - `AttachmentNode` stores media ID, URL, public name, file name, MIME type, size, and optional description. HTML export uses `<a data-rte-attachment>`.
 
 `MediaPickerModal` supports explicit modes: `image`, `gallery`, `file`, `video`, and `any`. The admin media search endpoint returns RTE metadata fields (`alt`, `caption`, `credit`, `width`, `height`, `thumb_url`) and accepts `mime_types[]` filtering.
+
+`HtmlPlugin` can emit both rendered HTML (`onChange`) and canonical Lexical JSON (`onJsonChange`). Blog posts persist JSON in `blog_posts.content_json`; existing HTML-only content remains supported.
+
+Internal links use `RteLinkController::search` via the `admin.rte.links.search` route. Results include `type`, `id`, `label`, `meta`, and locale-aware public `url`.
+
+RTE HTML must remain inside the `HtmlSanitizerService` default allowlist. Add new public node attributes to `config/purifier.php` `HTML.Allowed` and `custom_attributes`, then cover them in `tests/Feature/HtmlSanitizationTest.php`.
 
 ### Adding a new node type
 

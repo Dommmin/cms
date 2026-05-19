@@ -9,6 +9,7 @@ export type FormData = {
     slug: string;
     excerpt: Record<string, string>;
     content: Record<string, string>;
+    content_json: Record<string, string>;
     content_type: 'richtext' | 'markdown';
     status: string;
     published_at: string;

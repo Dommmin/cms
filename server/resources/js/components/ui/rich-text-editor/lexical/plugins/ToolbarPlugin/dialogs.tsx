@@ -1,4 +1,7 @@
+import axios from 'axios';
 import type { JSX } from 'react';
+import { useEffect, useState } from 'react';
+import RteLinkController from '@/actions/App/Http/Controllers/Admin/RteLinkController';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -6,37 +9,123 @@ import { Label } from '@/components/ui/label';
 import { useTranslation } from '@/hooks/use-translation';
 import { extractYouTubeId } from '../../../youtube-node';
 import { EMOJIS, SPECIAL_CHARS } from './constants';
-import type { CharacterDialogProps, LinkDialogProps, TableDialogProps, YouTubeDialogProps } from './types';
+import type { CharacterDialogProps, InternalLinkSearchResult, LinkDialogProps, LinkDialogTab, TableDialogProps, YouTubeDialogProps } from './types';
 
-export function LinkDialog({ open, url, isInvalid, onOpenChange, onUrlChange, onInsert }: LinkDialogProps): JSX.Element {
+export function LinkDialog({ open, url, isInvalid, onOpenChange, onUrlChange, onInternalSelect, onInsert }: LinkDialogProps): JSX.Element {
     const __ = useTranslation();
+    const [activeTab, setActiveTab] = useState<LinkDialogTab>('url');
+    const [query, setQuery] = useState('');
+    const [results, setResults] = useState<InternalLinkSearchResult[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (!open || activeTab !== 'internal' || query.trim().length < 2) {
+            setResults([]);
+            return;
+        }
+
+        const controller = new AbortController();
+        const timeout = setTimeout(() => {
+            setLoading(true);
+            axios
+                .get<InternalLinkSearchResult[]>(
+                    RteLinkController.search.url({
+                        query: { q: query, locale: document.documentElement.lang || 'en' },
+                    }),
+                    { signal: controller.signal },
+                )
+                .then(({ data }) => setResults(data))
+                .catch((error: unknown) => {
+                    if (axios.isCancel(error)) return;
+                    setResults([]);
+                })
+                .finally(() => setLoading(false));
+        }, 250);
+
+        return () => {
+            controller.abort();
+            clearTimeout(timeout);
+        };
+    }, [activeTab, open, query]);
+
+    useEffect(() => {
+        if (!open) {
+            setActiveTab('url');
+            setQuery('');
+            setResults([]);
+        }
+    }, [open]);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-lg">
                 <DialogHeader>
                     <DialogTitle>{__('rte.dialog.link.title', 'Insert link')}</DialogTitle>
                 </DialogHeader>
+                <div className="flex rounded-md border p-1">
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('url')}
+                        className={`h-8 flex-1 rounded text-xs font-medium ${activeTab === 'url' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
+                    >
+                        {__('rte.dialog.link.url_tab', 'URL')}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('internal')}
+                        className={`h-8 flex-1 rounded text-xs font-medium ${activeTab === 'internal' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
+                    >
+                        {__('rte.dialog.link.internal_tab', 'Internal')}
+                    </button>
+                </div>
                 <div className="grid gap-3 py-2">
-                    <div className="grid gap-1.5">
-                        <Label htmlFor="link-url" className="text-xs">
-                            {__('rte.dialog.link.url', 'Link URL')}
-                        </Label>
-                        <Input
-                            id="link-url"
-                            placeholder="https://, mailto:, tel:, /relative, #anchor"
-                            value={url}
-                            onChange={(e) => onUrlChange(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    onInsert();
-                                }
-                            }}
-                            autoFocus
-                        />
-                    </div>
-                    {isInvalid && <p className="text-xs text-destructive">{__('rte.dialog.link.invalid_url', 'Use https://, mailto:, tel:, /relative or #anchor links.')}</p>}
+                    {activeTab === 'url' ? (
+                        <>
+                            <div className="grid gap-1.5">
+                                <Label htmlFor="link-url" className="text-xs">
+                                    {__('rte.dialog.link.url', 'Link URL')}
+                                </Label>
+                                <Input
+                                    id="link-url"
+                                    placeholder="https://, mailto:, tel:, /relative, #anchor"
+                                    value={url}
+                                    onChange={(e) => onUrlChange(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            onInsert();
+                                        }
+                                    }}
+                                    autoFocus
+                                />
+                            </div>
+                            {isInvalid && <p className="text-xs text-destructive">{__('rte.dialog.link.invalid_url', 'Use https://, mailto:, tel:, /relative or #anchor links.')}</p>}
+                        </>
+                    ) : (
+                        <div className="grid gap-2">
+                            <Label htmlFor="internal-link-search" className="text-xs">
+                                {__('rte.dialog.link.search_internal', 'Search pages, products, categories or blog posts')}
+                            </Label>
+                            <Input id="internal-link-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={__('rte.dialog.link.search_placeholder', 'Search internal content...')} autoFocus />
+                            <div className="max-h-64 overflow-y-auto rounded-md border">
+                                {loading && <p className="px-3 py-4 text-center text-xs text-muted-foreground">{__('common.loading', 'Loading...')}</p>}
+                                {!loading && query.trim().length >= 2 && results.length === 0 && <p className="px-3 py-4 text-center text-xs text-muted-foreground">{__('common.no_results', 'No results found.')}</p>}
+                                {!loading &&
+                                    results.map((result) => (
+                                        <button
+                                            key={`${result.type}-${result.id}`}
+                                            type="button"
+                                            onClick={() => onInternalSelect(result.url)}
+                                            className="grid w-full gap-0.5 px-3 py-2 text-left text-xs hover:bg-accent"
+                                        >
+                                            <span className="font-medium">{result.label}</span>
+                                            <span className="text-muted-foreground">{result.meta}</span>
+                                            <span className="truncate text-[11px] text-muted-foreground">{result.url}</span>
+                                        </button>
+                                    ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
                 <DialogFooter>
                     <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

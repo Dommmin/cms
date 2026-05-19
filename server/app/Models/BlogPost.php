@@ -28,6 +28,7 @@ use Spatie\Translatable\HasTranslations;
     'slug',
     'excerpt',
     'content',
+    'content_json',
     'content_type',
     'status',
     'featured_image',
@@ -59,7 +60,7 @@ class BlogPost extends Model
 
     /** @var array<int, string> */
     protected array $versionedAttributes = [
-        'title', 'slug', 'excerpt', 'content',
+        'title', 'slug', 'excerpt', 'content', 'content_json',
         'status', 'is_featured', 'available_locales',
     ];
 
@@ -138,6 +139,7 @@ class BlogPost extends Model
     {
         return [
             'available_locales' => 'array',
+            'content_json' => 'array',
             'is_featured' => 'boolean',
             'published_at' => 'datetime',
             'status' => BlogPostStatusEnum::class,

@@ -12,7 +12,20 @@ import { Plus, X } from 'lucide-react';
 import type { JSX } from 'react';
 import { useState } from 'react';
 import { MediaPickerModal, type MediaItem } from '@/components/media-picker-modal';
-import type { GalleryImage, ImageGalleryComponentProps, SerializedImageGalleryNode } from './image-gallery-node.types';
+import type { GalleryAspectRatio, GalleryGap, GalleryImage, ImageGalleryComponentProps, SerializedImageGalleryNode } from './image-gallery-node.types';
+
+const GAP_VALUES: Record<GalleryGap, string> = {
+    compact: '4px',
+    normal: '8px',
+    wide: '16px',
+};
+
+const ASPECT_RATIO_STYLES: Record<GalleryAspectRatio, string | undefined> = {
+    square: '1 / 1',
+    '4:3': '4 / 3',
+    '16:9': '16 / 9',
+    natural: undefined,
+};
 
 function galleryImageFromMedia(media: MediaItem): GalleryImage {
     return {
@@ -29,17 +42,29 @@ function galleryImageFromMedia(media: MediaItem): GalleryImage {
 function ImageGalleryComponent({
     images,
     columns,
+    mobileColumns,
+    gap,
+    aspectRatio,
+    lightbox,
     nodeKey,
     editor,
 }: ImageGalleryComponentProps) {
     const [showPicker, setShowPicker] = useState(false);
 
-    const updateNode = (changes: Partial<{ images: GalleryImage[]; columns: number }>) => {
+    const updateNode = (
+        changes: Partial<{
+            images: GalleryImage[];
+            columns: number;
+            mobileColumns: number;
+            gap: GalleryGap;
+            aspectRatio: GalleryAspectRatio;
+            lightbox: boolean;
+        }>,
+    ) => {
         editor.update(() => {
             const node = $getNodeByKey(nodeKey);
             if ($isImageGalleryNode(node)) {
-                if (changes.images !== undefined) node.setImages(changes.images);
-                if (changes.columns !== undefined) node.setColumns(changes.columns);
+                node.update(changes);
             }
         });
     };
@@ -60,7 +85,7 @@ function ImageGalleryComponent({
         >
             <div className="mb-3 flex items-center gap-2">
                 <span className="text-xs font-medium text-muted-foreground">Gallery</span>
-                <div className="ml-auto flex items-center gap-1">
+                <div className="ml-auto flex flex-wrap items-center gap-1">
                     <span className="text-xs text-muted-foreground">Cols:</span>
                     {[2, 3, 4].map((col) => (
                         <button
@@ -76,6 +101,32 @@ function ImageGalleryComponent({
                             {col}
                         </button>
                     ))}
+                    <span className="ml-2 text-xs text-muted-foreground">Mobile:</span>
+                    {[1, 2].map((col) => (
+                        <button
+                            key={col}
+                            type="button"
+                            onClick={() => updateNode({ mobileColumns: col })}
+                            className={`rounded px-2 py-0.5 text-xs transition-colors ${mobileColumns === col ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
+                        >
+                            {col}
+                        </button>
+                    ))}
+                    <select value={gap} onChange={(event) => updateNode({ gap: event.target.value as GalleryGap })} className="h-7 rounded border bg-background px-1 text-xs">
+                        <option value="compact">Compact</option>
+                        <option value="normal">Normal</option>
+                        <option value="wide">Wide</option>
+                    </select>
+                    <select value={aspectRatio} onChange={(event) => updateNode({ aspectRatio: event.target.value as GalleryAspectRatio })} className="h-7 rounded border bg-background px-1 text-xs">
+                        <option value="square">Square</option>
+                        <option value="4:3">4:3</option>
+                        <option value="16:9">16:9</option>
+                        <option value="natural">Natural</option>
+                    </select>
+                    <label className="flex items-center gap-1 text-xs">
+                        <input type="checkbox" checked={lightbox} onChange={(event) => updateNode({ lightbox: event.target.checked })} />
+                        Lightbox
+                    </label>
                 </div>
             </div>
 
@@ -83,12 +134,17 @@ function ImageGalleryComponent({
                 style={{
                     display: 'grid',
                     gridTemplateColumns: `repeat(${columns}, 1fr)`,
-                    gap: '8px',
+                    gap: GAP_VALUES[gap],
                 }}
             >
                 {images.map((img, i) => (
                     <div key={i} className="group relative">
-                        <img src={img.src} alt={img.alt} className="h-32 w-full rounded object-cover" />
+                        <img
+                            src={img.src}
+                            alt={img.alt}
+                            className="w-full rounded object-cover"
+                            style={{ aspectRatio: ASPECT_RATIO_STYLES[aspectRatio], height: aspectRatio === 'natural' ? 'auto' : undefined }}
+                        />
                         {img.caption && (
                             <p className="mt-1 truncate text-[11px] text-muted-foreground">
                                 {img.caption}
@@ -128,23 +184,31 @@ function ImageGalleryComponent({
 export class ImageGalleryNode extends DecoratorNode<JSX.Element> {
     __images: GalleryImage[];
     __columns: number;
+    __mobileColumns: number;
+    __gap: GalleryGap;
+    __aspectRatio: GalleryAspectRatio;
+    __lightbox: boolean;
 
     static getType(): string {
         return 'image-gallery';
     }
 
     static clone(node: ImageGalleryNode): ImageGalleryNode {
-        return new ImageGalleryNode([...node.__images], node.__columns, node.__key);
+        return new ImageGalleryNode([...node.__images], node.__columns, node.__mobileColumns, node.__gap, node.__aspectRatio, node.__lightbox, node.__key);
     }
 
-    constructor(images: GalleryImage[] = [], columns = 3, key?: NodeKey) {
+    constructor(images: GalleryImage[] = [], columns = 3, mobileColumns = 1, gap: GalleryGap = 'normal', aspectRatio: GalleryAspectRatio = 'square', lightbox = false, key?: NodeKey) {
         super(key);
         this.__images = images;
         this.__columns = columns;
+        this.__mobileColumns = mobileColumns;
+        this.__gap = gap;
+        this.__aspectRatio = aspectRatio;
+        this.__lightbox = lightbox;
     }
 
     static importJSON(serialized: SerializedImageGalleryNode): ImageGalleryNode {
-        return $createImageGalleryNode(serialized.images, serialized.columns);
+        return $createImageGalleryNode(serialized.images, serialized.columns, serialized.mobileColumns ?? 1, serialized.gap ?? 'normal', serialized.aspectRatio ?? 'square', serialized.lightbox ?? false);
     }
 
     exportJSON(): SerializedImageGalleryNode {
@@ -153,6 +217,10 @@ export class ImageGalleryNode extends DecoratorNode<JSX.Element> {
             version: 2,
             images: this.__images,
             columns: this.__columns,
+            mobileColumns: this.__mobileColumns,
+            gap: this.__gap,
+            aspectRatio: this.__aspectRatio,
+            lightbox: this.__lightbox,
         };
     }
 
@@ -176,10 +244,14 @@ export class ImageGalleryNode extends DecoratorNode<JSX.Element> {
         wrapper.setAttribute('data-gallery', 'true');
         wrapper.setAttribute('data-images', JSON.stringify(this.__images));
         wrapper.setAttribute('data-columns', String(this.__columns));
+        wrapper.setAttribute('data-mobile-columns', String(this.__mobileColumns));
+        wrapper.setAttribute('data-gap', this.__gap);
+        wrapper.setAttribute('data-aspect-ratio', this.__aspectRatio);
+        wrapper.setAttribute('data-lightbox', String(this.__lightbox));
         wrapper.className = 'rte-gallery';
         wrapper.style.display = 'grid';
         wrapper.style.gridTemplateColumns = `repeat(${this.__columns}, 1fr)`;
-        wrapper.style.gap = '8px';
+        wrapper.style.gap = GAP_VALUES[this.__gap];
         for (const img of this.__images) {
             const item = document.createElement('figure');
             item.setAttribute('data-gallery-item', 'true');
@@ -187,7 +259,8 @@ export class ImageGalleryNode extends DecoratorNode<JSX.Element> {
             const imgEl = document.createElement('img');
             imgEl.setAttribute('src', img.src);
             imgEl.setAttribute('alt', img.alt);
-            imgEl.style.cssText = 'width:100%;height:200px;object-fit:cover;border-radius:4px;';
+            const exportedAspectRatio = ASPECT_RATIO_STYLES[this.__aspectRatio];
+            imgEl.style.cssText = `width:100%;${exportedAspectRatio ? `aspect-ratio:${exportedAspectRatio};` : 'height:auto;'}object-fit:cover;border-radius:4px;`;
             item.appendChild(imgEl);
             if (img.caption) {
                 const caption = document.createElement('figcaption');
@@ -211,12 +284,14 @@ export class ImageGalleryNode extends DecoratorNode<JSX.Element> {
         return false;
     }
 
-    setImages(images: GalleryImage[]): void {
-        this.getWritable().__images = images;
-    }
-
-    setColumns(columns: number): void {
-        this.getWritable().__columns = columns;
+    update(changes: Partial<{ images: GalleryImage[]; columns: number; mobileColumns: number; gap: GalleryGap; aspectRatio: GalleryAspectRatio; lightbox: boolean }>): void {
+        const writable = this.getWritable();
+        if (changes.images !== undefined) writable.__images = changes.images;
+        if (changes.columns !== undefined) writable.__columns = changes.columns;
+        if (changes.mobileColumns !== undefined) writable.__mobileColumns = changes.mobileColumns;
+        if (changes.gap !== undefined) writable.__gap = changes.gap;
+        if (changes.aspectRatio !== undefined) writable.__aspectRatio = changes.aspectRatio;
+        if (changes.lightbox !== undefined) writable.__lightbox = changes.lightbox;
     }
 
     decorate(editor: LexicalEditor, _config: EditorConfig): JSX.Element {
@@ -224,6 +299,10 @@ export class ImageGalleryNode extends DecoratorNode<JSX.Element> {
             <ImageGalleryComponent
                 images={this.__images}
                 columns={this.__columns}
+                mobileColumns={this.__mobileColumns}
+                gap={this.__gap}
+                aspectRatio={this.__aspectRatio}
+                lightbox={this.__lightbox}
                 nodeKey={this.__key}
                 editor={editor}
             />
@@ -250,15 +329,25 @@ function convertGalleryElement(domNode: HTMLElement): DOMConversionOutput | null
         }));
     }
     const columns = parseInt(domNode.getAttribute('data-columns') ?? '3', 10);
-    return { node: $createImageGalleryNode(images, columns) };
+    const mobileColumns = parseInt(domNode.getAttribute('data-mobile-columns') ?? '1', 10);
+    return {
+        node: $createImageGalleryNode(
+            images,
+            columns,
+            mobileColumns,
+            (domNode.getAttribute('data-gap') as GalleryGap | null) ?? 'normal',
+            (domNode.getAttribute('data-aspect-ratio') as GalleryAspectRatio | null) ?? 'square',
+            domNode.getAttribute('data-lightbox') === 'true',
+        ),
+    };
 }
 
-export function $createImageGalleryNode(images: GalleryImage[] = [], columns = 3): ImageGalleryNode {
-    return $applyNodeReplacement(new ImageGalleryNode(images, columns));
+export function $createImageGalleryNode(images: GalleryImage[] = [], columns = 3, mobileColumns = 1, gap: GalleryGap = 'normal', aspectRatio: GalleryAspectRatio = 'square', lightbox = false): ImageGalleryNode {
+    return $applyNodeReplacement(new ImageGalleryNode(images, columns, mobileColumns, gap, aspectRatio, lightbox));
 }
 
 export function $isImageGalleryNode(node: LexicalNode | null | undefined): node is ImageGalleryNode {
     return node instanceof ImageGalleryNode;
 }
 
-export type { GalleryImage, SerializedImageGalleryNode };
+export type { GalleryAspectRatio, GalleryGap, GalleryImage, SerializedImageGalleryNode };

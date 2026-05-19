@@ -244,7 +244,7 @@ Backend musi zachować źródło prawdy:
 
 ### Epic RTE-0 - Audyt i Kontrakt
 
-Status: Ready
+Status: Implemented 2026-05-18
 
 Zmiany:
 
@@ -359,7 +359,7 @@ Testy:
 
 ### Epic RTE-6 - Link Picker
 
-Status: Ready
+Status: Implemented 2026-05-18
 
 Zmiany:
 
@@ -376,7 +376,7 @@ Testy:
 
 ### Epic RTE-7 - Content Health Panel
 
-Status: Ready
+Status: Implemented 2026-05-18
 
 Zmiany:
 
@@ -393,7 +393,7 @@ Testy:
 
 ### Epic RTE-8 - Canonical JSON Persistence
 
-Status: Needs backend design
+Status: Implemented 2026-05-18 for BlogPost rich text source; broader Page Builder JSON diff/versioning remains future work
 
 Zmiany:
 

@@ -31,6 +31,8 @@ class StoreBlogPostRequest extends FormRequest
             'content' => ['required', 'array'],
             'content.*' => ['nullable', 'string'],
             'content.'.$defaultLocale => ['required', 'string'],
+            'content_json' => ['nullable', 'array'],
+            'content_json.*' => ['nullable', 'string'],
             'content_type' => ['required', 'in:richtext,markdown'],
             'status' => ['required', 'in:draft,scheduled,published,archived'],
             'published_at' => ['nullable', 'date', 'required_if:status,scheduled'],

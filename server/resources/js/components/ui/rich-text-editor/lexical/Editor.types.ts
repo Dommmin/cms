@@ -1,6 +1,8 @@
 export type EditorProps = {
     value?: string;
     onChange?: (html: string) => void;
+    jsonValue?: string;
+    onJsonChange?: (json: string) => void;
     placeholder?: string;
     className?: string;
     maxHeight?: number | string;

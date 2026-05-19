@@ -1,4 +1,3 @@
-import type { DOMExportOutput } from 'lexical';
 import { createEditor } from 'lexical';
 import { describe, expect, it } from 'vitest';
 import { $createImageGalleryNode, ImageGalleryNode } from './image-gallery-node';
@@ -44,14 +43,6 @@ function withGalleryNode<T>(callback: () => T): T {
     return result as T;
 }
 
-function exportElement(images: GalleryImage[], columns: number): HTMLElement {
-    const { element } = withGalleryNode<DOMExportOutput>(() => $createImageGalleryNode(images, columns).exportDOM());
-
-    expect(element).toBeInstanceOf(HTMLElement);
-
-    return element as HTMLElement;
-}
-
 describe('ImageGalleryNode', () => {
     it('exports gallery JSON with media asset metadata', () => {
         const json = withGalleryNode<SerializedImageGalleryNode>(() => $createImageGalleryNode(galleryImages, 3).exportJSON());
@@ -65,11 +56,19 @@ describe('ImageGalleryNode', () => {
     });
 
     it('exports figure gallery HTML with captions and columns', () => {
-        const element = exportElement(galleryImages, 3);
+        const element = withGalleryNode<HTMLElement>(() => {
+            const { element } = $createImageGalleryNode(galleryImages, 3, 2, 'wide', '16:9', true).exportDOM();
+
+            return element as HTMLElement;
+        });
 
         expect(element.tagName).toBe('FIGURE');
         expect(element.getAttribute('data-rte-gallery')).toBe('true');
         expect(element.getAttribute('data-columns')).toBe('3');
+        expect(element.getAttribute('data-mobile-columns')).toBe('2');
+        expect(element.getAttribute('data-gap')).toBe('wide');
+        expect(element.getAttribute('data-aspect-ratio')).toBe('16:9');
+        expect(element.getAttribute('data-lightbox')).toBe('true');
         expect(element.querySelectorAll('[data-gallery-item]')).toHaveLength(2);
         expect(element.querySelector('img')?.getAttribute('alt')).toBe('One');
         expect(element.querySelector('figcaption')?.textContent).toBe('First caption');

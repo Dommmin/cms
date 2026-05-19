@@ -10,6 +10,9 @@ export type GalleryImage = {
     focalPoint: { x: number; y: number } | null;
 };
 
+export type GalleryGap = 'compact' | 'normal' | 'wide';
+export type GalleryAspectRatio = 'square' | '4:3' | '16:9' | 'natural';
+
 export type SerializedImageGalleryNode = Spread<
     {
         images: GalleryImage[];
@@ -25,6 +28,10 @@ export type SerializedImageGalleryNode = Spread<
 export type ImageGalleryComponentProps = {
     images: GalleryImage[];
     columns: number;
+    mobileColumns: number;
+    gap: GalleryGap;
+    aspectRatio: GalleryAspectRatio;
+    lightbox: boolean;
     nodeKey: NodeKey;
     editor: LexicalEditor;
 };

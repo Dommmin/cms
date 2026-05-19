@@ -9,7 +9,7 @@ import type {
 } from 'lexical';
 import { $applyNodeReplacement, $getNodeByKey, DecoratorNode } from 'lexical';
 import { AlignCenter, AlignLeft, AlignRight, Captions, LinkIcon, Maximize2, Pencil, Trash2 } from 'lucide-react';
-import type { CSSProperties, JSX, MouseEvent } from 'react';
+import type { CSSProperties, JSX, KeyboardEvent, MouseEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { getEditorLinkTarget, isAllowedEditorLinkUrl, normalizeEditorLinkUrl } from './lexical/link-url';
 import type {
@@ -99,6 +99,25 @@ function imageObjectPosition(focalPoint: ImageFocalPoint | null): string | undef
     return `${Math.round(focalPoint.x * 100)}% ${Math.round(focalPoint.y * 100)}%`;
 }
 
+function clampFocalPoint(value: number): number {
+    if (!Number.isFinite(value)) {
+        return 0.5;
+    }
+
+    return Math.min(1, Math.max(0, value));
+}
+
+function widthToPixels(widthValue: string | undefined, fallback: number): number {
+    if (!widthValue) return fallback;
+    if (widthValue.endsWith('px')) {
+        const parsed = Number.parseInt(widthValue, 10);
+
+        return Number.isFinite(parsed) ? parsed : fallback;
+    }
+
+    return fallback;
+}
+
 function updateNode(editor: LexicalEditor, nodeKey: NodeKey, changes: Partial<ImageNodeState>): void {
     editor.update(() => {
         const node = $getNodeByKey(nodeKey);
@@ -137,6 +156,9 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
     const [draftCredit, setDraftCredit] = useState(credit ?? '');
     const [draftLinkUrl, setDraftLinkUrl] = useState(linkUrl ?? '');
     const [draftDecorative, setDraftDecorative] = useState(decorative);
+    const [draftFocalX, setDraftFocalX] = useState(String(Math.round((focalPoint?.x ?? 0.5) * 100)));
+    const [draftFocalY, setDraftFocalY] = useState(String(Math.round((focalPoint?.y ?? 0.5) * 100)));
+    const [draftLoading, setDraftLoading] = useState<ImageLoading>(loading);
 
     useEffect(() => {
         setLocalWidth(width);
@@ -145,7 +167,10 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
         setDraftCredit(credit ?? '');
         setDraftLinkUrl(linkUrl ?? '');
         setDraftDecorative(decorative);
-    }, [altText, caption, credit, decorative, linkUrl, width]);
+        setDraftFocalX(String(Math.round((focalPoint?.x ?? 0.5) * 100)));
+        setDraftFocalY(String(Math.round((focalPoint?.y ?? 0.5) * 100)));
+        setDraftLoading(loading);
+    }, [altText, caption, credit, decorative, focalPoint, linkUrl, loading, width]);
 
     const applyWidth = (nextWidth: string, nextPreset: ImageSizePreset) => {
         setLocalWidth(nextWidth);
@@ -161,8 +186,27 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
             credit: draftCredit.trim() === '' ? null : draftCredit,
             linkUrl: safeLinkUrl,
             decorative: draftDecorative,
+            focalPoint: {
+                x: clampFocalPoint(Number(draftFocalX) / 100),
+                y: clampFocalPoint(Number(draftFocalY) / 100),
+            },
+            loading: draftLoading,
         });
         setIsMetadataOpen(false);
+    };
+
+    const resizeWithKeyboard = (event: KeyboardEvent<HTMLElement>) => {
+        if (!isSelected || (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight')) {
+            return;
+        }
+
+        event.preventDefault();
+        const currentWidth = widthToPixels(localWidth, imgRef.current?.offsetWidth ?? 300);
+        const delta = event.shiftKey ? 25 : 10;
+        const nextWidth = Math.max(80, currentWidth + (event.key === 'ArrowRight' ? delta : -delta));
+        const nextWidthValue = `${nextWidth}px`;
+        setLocalWidth(nextWidthValue);
+        updateNode(editor, nodeKey, { width: nextWidthValue, sizePreset: 'custom' });
     };
 
     const startResize = (event: MouseEvent) => {
@@ -246,7 +290,9 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
             data-wrap={wrap}
             data-layout={layout}
             style={figureStyle}
+            tabIndex={0}
             onClick={() => setIsSelected((selected) => !selected)}
+            onKeyDown={resizeWithKeyboard}
         >
             {linkUrl ? (
                 <a href={linkUrl} target={getEditorLinkTarget(linkUrl) ?? undefined} rel={getEditorLinkTarget(linkUrl) === '_blank' ? 'noopener noreferrer' : undefined}>
@@ -331,6 +377,24 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
                         >
                             <Maximize2 size={13} />
                         </button>
+                        {(['inline', 'block', 'full'] as const).map((nextLayout) => (
+                            <button
+                                key={nextLayout}
+                                type="button"
+                                onMouseDown={(event) => {
+                                    event.preventDefault();
+                                    updateNode(editor, nodeKey, {
+                                        layout: nextLayout,
+                                        wrap: 'none',
+                                        align: nextLayout === 'inline' ? 'none' : 'center',
+                                    });
+                                }}
+                                className={`rounded px-1.5 py-0.5 ${layout === nextLayout ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
+                                title={`${nextLayout} image`}
+                            >
+                                {nextLayout === 'inline' ? 'In' : nextLayout === 'block' ? 'B' : 'FW'}
+                            </button>
+                        ))}
                         <button
                             type="button"
                             onMouseDown={(event) => {
@@ -385,6 +449,23 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
                             <label className="grid gap-1">
                                 <span className="font-medium">Image link</span>
                                 <input value={draftLinkUrl} onChange={(event) => setDraftLinkUrl(event.target.value)} className="h-8 rounded border bg-background px-2" placeholder="https://, /relative or #anchor" />
+                            </label>
+                            <div className="grid grid-cols-2 gap-2">
+                                <label className="grid gap-1">
+                                    <span className="font-medium">Focal X (%)</span>
+                                    <input type="number" min={0} max={100} value={draftFocalX} onChange={(event) => setDraftFocalX(event.target.value)} className="h-8 rounded border bg-background px-2" />
+                                </label>
+                                <label className="grid gap-1">
+                                    <span className="font-medium">Focal Y (%)</span>
+                                    <input type="number" min={0} max={100} value={draftFocalY} onChange={(event) => setDraftFocalY(event.target.value)} className="h-8 rounded border bg-background px-2" />
+                                </label>
+                            </div>
+                            <label className="grid gap-1">
+                                <span className="font-medium">Loading</span>
+                                <select value={draftLoading} onChange={(event) => setDraftLoading(event.target.value as ImageLoading)} className="h-8 rounded border bg-background px-2">
+                                    <option value="lazy">Lazy</option>
+                                    <option value="eager">Eager</option>
+                                </select>
                             </label>
                             {!draftDecorative && draftAlt.trim() === '' && (
                                 <span className="flex items-center gap-1 text-destructive">

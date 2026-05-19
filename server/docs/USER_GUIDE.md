@@ -987,7 +987,7 @@ The admin panel uses a full-featured rich text editor (Lexical) for Blog Post co
 - **Block type** — switch between Paragraph, H1–H6, Quote, Code Block, Bullet/Numbered/Check list
 - **Text formatting** — Bold, Italic, Underline, Strikethrough, Inline Code, Subscript, Superscript, Highlight, Clear formatting
 - **Alignment** — Left, Center, Right, Justify
-- **Links** — click the link button; a floating editor lets you edit, open, or remove the link
+- **Links** — click the link button to add an external URL or search internal Pages, Products, Categories and Blog Posts
 - **Insert** — Horizontal Rule, Image (from Media Library), Gallery, File attachment, YouTube Video, Table (rows × columns)
 - **Code blocks** — language selector dropdown; "Copy" button appears on hover
 
@@ -996,6 +996,7 @@ The admin panel uses a full-featured rich text editor (Lexical) for Blog Post co
 - Use **Insert > Gallery** to select multiple images and reorder them before inserting a grid.
 - Use **Insert > File** for downloadable files such as PDFs, Office documents, spreadsheets, presentations, and ZIP archives.
 - When pasting from Word or Google Docs, the editor cleans unsafe styles and links before saving.
+- The editor shows content health warnings for common issues such as images without alt text, unsafe link metadata, skipped heading levels, long paragraphs, generic file names, or tables without headers.
 
 **Keyboard shortcuts:**
 `Ctrl+B` Bold · `Ctrl+I` Italic · `Ctrl+U` Underline · `Ctrl+Z` Undo · `Ctrl+Shift+Z` Redo

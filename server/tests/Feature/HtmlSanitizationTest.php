@@ -48,6 +48,21 @@ describe('HtmlSanitizerService', function (): void {
             ->and($clean)->toContain('<em>italic</em>');
     });
 
+    it('preserves enterprise RTE media, attachment and table markup while stripping unsafe attributes', function (): void {
+        $sanitizer = resolve(HtmlSanitizerService::class);
+
+        $html = '<figure data-rte-gallery="true" data-columns="3" onclick="alert(1)"><figure data-gallery-item="true" data-media-id="7"><img src="/storage/a.jpg" alt="A" loading="lazy" data-focal-point="{&quot;x&quot;:0.5,&quot;y&quot;:0.5}" onerror="bad()"><figcaption>Caption</figcaption></figure></figure><a href="/en/file.pdf" target="_blank" rel="noopener noreferrer" data-rte-attachment="true" data-file-name="file.pdf">Download</a><table><thead><tr><th scope="col">Name</th></tr></thead><tbody><tr><td>Value</td></tr></tbody></table>';
+        $clean = $sanitizer->sanitize($html);
+
+        expect($clean)->toContain('data-rte-gallery="true"')
+            ->and($clean)->toContain('data-gallery-item="true"')
+            ->and($clean)->toContain('loading="lazy"')
+            ->and($clean)->toContain('data-rte-attachment="true"')
+            ->and($clean)->toContain('<table>')
+            ->and($clean)->not->toContain('onclick')
+            ->and($clean)->not->toContain('onerror');
+    });
+
     it('returns null for null input', function (): void {
         $sanitizer = resolve(HtmlSanitizerService::class);
 
@@ -92,6 +107,17 @@ describe('Product model HTML sanitization', function (): void {
 });
 
 describe('BlogPost model HTML sanitization', function (): void {
+    it('stores canonical RTE JSON alongside rendered content', function (): void {
+        $json = ['en' => '{"root":{"type":"root","children":[]}}'];
+
+        $post = BlogPost::factory()->create([
+            'content' => ['en' => '<p>Text</p>'],
+            'content_json' => $json,
+        ]);
+
+        expect($post->content_json)->toBe($json);
+    });
+
     it('strips script tags from content on create', function (): void {
         $post = BlogPost::factory()->create([
             'content' => ['en' => '<p>Text</p><script>alert(1)</script>'],

@@ -85,6 +85,7 @@ class BlogPostController extends Controller
                 'title' => $post->getTranslations('title'),
                 'excerpt' => $post->getTranslations('excerpt'),
                 'content' => $post->getTranslations('content'),
+                'content_json' => $post->content_json,
                 'available_locales' => $post->available_locales,
                 'tag_list' => $post->tags->pluck('name')->values()->all(),
             ]),

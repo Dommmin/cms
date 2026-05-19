@@ -6,6 +6,7 @@ export type BlogPost = {
     slug: string;
     excerpt: Record<string, string> | null;
     content: Record<string, string>;
+    content_json: Record<string, string> | null;
     content_type: 'richtext' | 'markdown';
     status: string;
     blog_category_id: number | null;
@@ -30,6 +31,7 @@ export type FormData = {
     slug: string;
     excerpt: Record<string, string>;
     content: Record<string, string>;
+    content_json: Record<string, string>;
     content_type: 'richtext' | 'markdown';
     status: string;
     published_at: string;

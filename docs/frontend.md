@@ -113,9 +113,11 @@ It supports enterprise media workflows:
 
 - `MediaPickerModal` modes: `image`, `gallery`, `file`, `video`, `any`
 - `ImageNode` v2: media ID, alt/decorative state, caption, credit, layout, wrap, size preset, link URL, loading hint
-- `ImageGalleryNode`: multi-image grid with ordered assets and `figure[data-rte-gallery]` HTML export
+- `ImageGalleryNode`: multi-image grid with ordered assets, mobile columns, gap, aspect ratio, lightbox metadata and `figure[data-rte-gallery]` HTML export
 - `AttachmentNode`: downloadable file link with MIME/size metadata and safe URL export
 - `PasteSanitizerPlugin`: cleans Word/Google Docs HTML and strips unsafe links, event handlers, styles, and data images before import
+- Link dialog internal search: locale-aware pages, products, categories and blog posts
+- `ContentHealthPlugin`: local warnings for alt text, link metadata, headings, long paragraphs, inline styles, attachment labels and table headers
 
 ### Styling
 

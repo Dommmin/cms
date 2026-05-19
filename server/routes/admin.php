@@ -32,6 +32,7 @@ use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PreviewController;
 use App\Http\Controllers\Admin\ReferralController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\RteLinkController;
 use App\Http\Controllers\Admin\SearchAnalyticsController;
 use App\Http\Controllers\Admin\SearchSynonymController;
 use App\Http\Controllers\Admin\SettingsController;
@@ -196,6 +197,9 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('panel')->name(
 
     Route::post('media/upload', [MediaController::class, 'upload'])
         ->name('media.upload');
+
+    Route::get('rte/links/search', [RteLinkController::class, 'search'])
+        ->name('rte.links.search');
 
     Route::get('block-relations/search', [BlockRelationController::class, 'search'])
         ->name('block-relations.search');
