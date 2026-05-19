@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-server
-  namespace: app
+  name: ${APP_NAME}-server
+  namespace: ${KUBE_NAMESPACE}
   labels:
-    app: app-server
+    app: ${APP_NAME}-server
     component: web
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app-server
+      app: ${APP_NAME}-server
       component: web
   strategy:
     type: RollingUpdate
@@ -20,13 +20,13 @@ spec:
   template:
     metadata:
       labels:
-        app: app-server
+        app: ${APP_NAME}-server
         component: web
     spec:
       terminationGracePeriodSeconds: 60
       containers:
         - name: app
-          image: ghcr.io/dommmin/app-server:latest  # replaced by CI
+          image: ${IMAGE_SERVER}  # replaced by CI
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -76,9 +76,9 @@ spec:
       volumes:
         - name: env-file
           secret:
-            secretName: app-server-env
+            secretName: ${APP_NAME}-server-env
         - name: storage
           persistentVolumeClaim:
-            claimName: app-server-storage
+            claimName: ${APP_NAME}-server-storage
       imagePullSecrets:
         - name: ghcr-pull-secret

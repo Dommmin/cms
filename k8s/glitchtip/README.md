@@ -72,6 +72,7 @@ helm upgrade --install glitchtip glitchtip/glitchtip \
 Smoke test:
 
 ```bash
+# Defaults shown: APP_NAME=app, KUBE_NAMESPACE=app.
 kubectl -n app exec deployment/app-server -- \
   php artisan tinker --execute='throw new \Exception("glitchtip test event");'
 ```

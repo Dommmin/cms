@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-gotenberg
-  namespace: app
+  name: ${APP_NAME}-gotenberg
+  namespace: ${KUBE_NAMESPACE}
   labels:
-    app: app-gotenberg
+    app: ${APP_NAME}-gotenberg
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app-gotenberg
+      app: ${APP_NAME}-gotenberg
   template:
     metadata:
       labels:
-        app: app-gotenberg
+        app: ${APP_NAME}-gotenberg
     spec:
       containers:
         - name: gotenberg

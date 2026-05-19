@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-typesense
-  namespace: app
+  name: ${APP_NAME}-typesense
+  namespace: ${KUBE_NAMESPACE}
   labels:
-    app: app-typesense
+    app: ${APP_NAME}-typesense
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app-typesense
+      app: ${APP_NAME}-typesense
   template:
     metadata:
       labels:
-        app: app-typesense
+        app: ${APP_NAME}-typesense
     spec:
       containers:
         - name: typesense
@@ -27,7 +27,7 @@ spec:
             - name: TYPESENSE_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: app-typesense
+                  name: ${APP_NAME}-typesense
                   key: api-key
           ports:
             - containerPort: 8108
@@ -58,4 +58,4 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: app-typesense-data
+            claimName: ${APP_NAME}-typesense-data

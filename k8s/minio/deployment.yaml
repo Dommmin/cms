@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-minio
-  namespace: app
+  name: ${APP_NAME}-minio
+  namespace: ${KUBE_NAMESPACE}
   labels:
-    app: app-minio
+    app: ${APP_NAME}-minio
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app-minio
+      app: ${APP_NAME}-minio
   strategy:
     type: Recreate   # minio single-node nie obsługuje rolling update z RWO
   template:
     metadata:
       labels:
-        app: app-minio
+        app: ${APP_NAME}-minio
     spec:
       containers:
         - name: minio
@@ -29,12 +29,12 @@ spec:
             - name: MINIO_ROOT_USER
               valueFrom:
                 secretKeyRef:
-                  name: app-minio
+                  name: ${APP_NAME}-minio
                   key: root-user
             - name: MINIO_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: app-minio
+                  name: ${APP_NAME}-minio
                   key: root-password
           ports:
             - containerPort: 9000
@@ -66,4 +66,4 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: app-minio
+            claimName: ${APP_NAME}-minio

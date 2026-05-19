@@ -21,12 +21,12 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: app-ingress
-  namespace: app
+  name: ${APP_NAME}-ingress
+  namespace: ${KUBE_NAMESPACE}
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
-    traefik.ingress.kubernetes.io/router.middlewares: "app-redirect-https@kubernetescrd,app-body-size@kubernetescrd"
+    traefik.ingress.kubernetes.io/router.middlewares: "${KUBE_NAMESPACE}-redirect-https@kubernetescrd,${KUBE_NAMESPACE}-body-size@kubernetescrd"
 spec:
   ingressClassName: traefik
   tls:
@@ -34,7 +34,7 @@ spec:
         - laravel-test.site
         - www.laravel-test.site
         - admin.laravel-test.site
-      secretName: app-tls
+      secretName: ${APP_NAME}-tls
   rules:
     - host: laravel-test.site
       http:
@@ -43,7 +43,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: app-client
+                name: ${APP_NAME}-client
                 port:
                   number: 3000
     - host: www.laravel-test.site
@@ -53,7 +53,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: app-client
+                name: ${APP_NAME}-client
                 port:
                   number: 3000
     - host: admin.laravel-test.site
@@ -63,6 +63,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: app-server
+                name: ${APP_NAME}-server
                 port:
                   number: 80

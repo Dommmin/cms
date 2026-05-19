@@ -1,12 +1,12 @@
 # Applied by CI/CD before rolling out new deployments.
-# IMAGE is substituted by the pipeline: sed "s|IMAGE_PLACEHOLDER|$IMAGE|g; s|REVISION_PLACEHOLDER|$SHA|g"
+# Rendered by k8s/render.sh with IMAGE_SERVER and REVISION.
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: app-migrate-REVISION_PLACEHOLDER
-  namespace: app
+  name: ${APP_NAME}-migrate-${REVISION}
+  namespace: ${KUBE_NAMESPACE}
   labels:
-    app: app-server
+    app: ${APP_NAME}-server
     component: migrate
 spec:
   ttlSecondsAfterFinished: 3600
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: migrate
-          image: IMAGE_PLACEHOLDER
+          image: ${IMAGE_SERVER}
           command: ["php", "artisan", "migrate", "--force", "--no-ansi"]
           volumeMounts:
             - name: env-file
@@ -31,7 +31,7 @@ spec:
       volumes:
         - name: env-file
           secret:
-            secretName: app-server-env
+            secretName: ${APP_NAME}-server-env
       restartPolicy: Never
       imagePullSecrets:
         - name: ghcr-pull-secret

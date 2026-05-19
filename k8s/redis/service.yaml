@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: app-redis
-  namespace: app
+  name: ${APP_NAME}-redis
+  namespace: ${KUBE_NAMESPACE}
   labels:
-    app: app-redis
+    app: ${APP_NAME}-redis
 spec:
   selector:
-    app: app-redis
+    app: ${APP_NAME}-redis
   ports:
     - port: 6379
       targetPort: 6379

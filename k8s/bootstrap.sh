@@ -32,11 +32,9 @@ error()   { echo -e "${RED}[ERROR]${NC} $*" >&2; }
 section() { echo -e "\n${BOLD}══════════════════════════════════════════${NC}"; echo -e "${BOLD} $*${NC}"; echo -e "${BOLD}══════════════════════════════════════════${NC}"; }
 prompt()  { echo -e "${YELLOW}[INPUT]${NC} $*"; }
 
-# ─── Apply a k8s manifest ────────────────────────────────────────────────────
-# Manifests are hardcoded to the `app` namespace / `app-*` resource names,
-# so no substitution is needed — this is a thin wrapper for consistency.
+# ─── Apply a rendered k8s manifest ───────────────────────────────────────────
 kapply() {
-  kubectl apply -f "$1"
+  APP_NAME="$APP_NAME" KUBE_NAMESPACE="$KUBE_NAMESPACE" ./k8s/render.sh "$@" | kubectl apply -f -
 }
 
 # ─── Prereq check ────────────────────────────────────────────────────────────
@@ -85,10 +83,10 @@ check_prereqs() {
 collect_inputs() {
   section "Configuration"
 
-  # The k8s manifests are hardcoded to the `app` namespace and `app-*`
-  # resource names — this is not configurable without editing every file.
-  APP_NAME="app"
-  info "Namespace / resource prefix: ${APP_NAME} (fixed — manifests hardcode it)"
+  prompt "Application name / resource prefix [app]:"
+  read -r APP_NAME; APP_NAME="${APP_NAME:-app}"
+  prompt "Kubernetes namespace [${APP_NAME}]:"
+  read -r KUBE_NAMESPACE; KUBE_NAMESPACE="${KUBE_NAMESPACE:-$APP_NAME}"
 
   echo
   prompt "MySQL root password (strong, at least 16 chars):"
@@ -151,7 +149,8 @@ collect_inputs() {
   fi
 
   echo
-  info "App name / namespace: ${APP_NAME}"
+  info "Application name / resource prefix: ${APP_NAME}"
+  info "Kubernetes namespace: ${KUBE_NAMESPACE}"
   info "Configuration collected. Starting setup..."
 }
 
@@ -272,7 +271,7 @@ step_namespace() {
   section "Step 3 — Namespace + Traefik Middleware"
 
   kapply k8s/namespace.yaml
-  ok "Namespace ${APP_NAME} created"
+  ok "Namespace ${KUBE_NAMESPACE} created"
 
   kapply k8s/traefik/middleware.yaml
   ok "Traefik Middleware applied (redirect-https, body-size)"
@@ -284,7 +283,7 @@ step_secrets() {
 
   # MySQL secret
   kubectl create secret generic "${APP_NAME}-mysql" \
-    --namespace="${APP_NAME}" \
+    --namespace="${KUBE_NAMESPACE}" \
     --from-literal=root-password="${MYSQL_ROOT_PASSWORD}" \
     --from-literal=username="${MYSQL_USERNAME}" \
     --from-literal=password="${MYSQL_PASSWORD}" \
@@ -293,14 +292,14 @@ step_secrets() {
 
   # Redis secret
   kubectl create secret generic "${APP_NAME}-redis" \
-    --namespace="${APP_NAME}" \
+    --namespace="${KUBE_NAMESPACE}" \
     --from-literal=password="${REDIS_PASSWORD}" \
     --dry-run=client -o yaml | kubectl apply -f -
   ok "${APP_NAME}-redis secret created"
 
   # Typesense secret
   kubectl create secret generic "${APP_NAME}-typesense" \
-    --namespace="${APP_NAME}" \
+    --namespace="${KUBE_NAMESPACE}" \
     --from-literal=api-key="${TYPESENSE_API_KEY}" \
     --dry-run=client -o yaml | kubectl apply -f -
   ok "${APP_NAME}-typesense secret created"
@@ -310,7 +309,7 @@ step_secrets() {
 
   info "Server .env secret: skipped — CI/CD will create it from PROD_ENV / SERVER_ENV."
   info "If you need it now, run:"
-  info "  kubectl create secret generic ${APP_NAME}-server-env --from-file=.env=server/.env.production --namespace=${APP_NAME} --dry-run=client -o yaml | kubectl apply -f -"
+  info "  kubectl create secret generic ${APP_NAME}-server-env --from-file=.env=server/.env.production --namespace=${KUBE_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -"
 }
 
 # ─── Step 5: Pull secret ─────────────────────────────────────────────────────
@@ -327,7 +326,7 @@ step_pull_secret() {
       --docker-server=ghcr.io \
       --docker-username="${REGISTRY_USER}" \
       --docker-password="${REGISTRY_TOKEN}" \
-      --namespace="${APP_NAME}" \
+      --namespace="${KUBE_NAMESPACE}" \
       --dry-run=client -o yaml | kubectl apply -f -
     ok "ghcr-pull-secret created (ghcr.io)"
   elif [[ "$REGISTRY_TYPE" == "gitlab" ]]; then
@@ -335,7 +334,7 @@ step_pull_secret() {
       --docker-server=registry.gitlab.com \
       --docker-username="${REGISTRY_USER}" \
       --docker-password="${REGISTRY_TOKEN}" \
-      --namespace="${APP_NAME}" \
+      --namespace="${KUBE_NAMESPACE}" \
       --dry-run=client -o yaml | kubectl apply -f -
     ok "ghcr-pull-secret created (registry.gitlab.com)"
   fi
@@ -355,11 +354,11 @@ step_databases() {
   ok "Redis PVC + Deployment + Service applied"
 
   info "Waiting for MySQL to be ready (this may take ~2 minutes)..."
-  kubectl -n "${APP_NAME}" rollout status statefulset/"${APP_NAME}-mysql" --timeout=5m
+  kubectl -n "${KUBE_NAMESPACE}" rollout status statefulset/"${APP_NAME}-mysql" --timeout=5m
   ok "MySQL is ready"
 
   info "Waiting for Redis..."
-  kubectl -n "${APP_NAME}" rollout status deployment/"${APP_NAME}-redis" --timeout=3m
+  kubectl -n "${KUBE_NAMESPACE}" rollout status deployment/"${APP_NAME}-redis" --timeout=3m
   ok "Redis is ready"
 }
 
@@ -375,7 +374,7 @@ step_services() {
   kapply k8s/typesense/deployment.yaml
   kapply k8s/typesense/service.yaml
   info "Waiting for Typesense (~20s initialization)..."
-  kubectl -n "${APP_NAME}" rollout status deployment/"${APP_NAME}-typesense" --timeout=3m
+  kubectl -n "${KUBE_NAMESPACE}" rollout status deployment/"${APP_NAME}-typesense" --timeout=3m
   ok "Typesense is ready"
 }
 
@@ -421,7 +420,7 @@ step_ingress() {
     info "TLS certificate will be issued by cert-manager (may take 1-2 minutes after DNS is ready)"
   else
     warn "No ingress applied. Apply manually when ready:"
-    warn "  kubectl apply -f k8s/ingress.yaml"
+    warn "  APP_NAME=${APP_NAME} KUBE_NAMESPACE=${KUBE_NAMESPACE} ./k8s/render.sh k8s/ingress.yaml | kubectl apply -f -"
   fi
 }
 
@@ -564,13 +563,14 @@ print_summary() {
 
   echo -e "${GREEN}Cluster is set up. Here's what was deployed:${NC}"
   echo ""
-  kubectl -n "${APP_NAME}" get pods 2>/dev/null || true
+  kubectl -n "${KUBE_NAMESPACE}" get pods 2>/dev/null || true
   echo ""
   echo -e "${BOLD}Next steps:${NC}"
   echo ""
   echo "  1. Configure CI/CD secrets:"
-  echo "     GitHub: KUBECONFIG_PROD (plain text), PROD_ENV (Variable), ENV_CLIENT_PROD (Variable)"
-  echo "     GitLab: KUBECONFIG (plain text), SERVER_ENV (masked), ENV_CLIENT_PROD"
+  echo "     GitHub Variables: APP_NAME=${APP_NAME}, KUBE_NAMESPACE=${KUBE_NAMESPACE}, PROD_ENV, ENV_CLIENT_PROD"
+  echo "     GitHub Secret: KUBECONFIG_PROD (plain text)"
+  echo "     GitLab variables: APP_NAME=${APP_NAME}, KUBE_NAMESPACE=${KUBE_NAMESPACE}, KUBECONFIG, SERVER_ENV, ENV_CLIENT_PROD"
   echo ""
   echo "  2. Push to master — the pipeline will:"
   echo "     - Build Docker images"
@@ -579,19 +579,19 @@ print_summary() {
   echo "     - Roll out server + client"
   echo ""
   echo "  3. After first deploy, import search indexes:"
-  echo "     kubectl -n ${APP_NAME} exec deployment/${APP_NAME}-server -- php artisan scout:import 'App\\Models\\Product'"
-  echo "     kubectl -n ${APP_NAME} exec deployment/${APP_NAME}-server -- php artisan scout:import 'App\\Models\\BlogPost'"
+  echo "     kubectl -n ${KUBE_NAMESPACE} exec deployment/${APP_NAME}-server -- php artisan scout:import 'App\\Models\\Product'"
+  echo "     kubectl -n ${KUBE_NAMESPACE} exec deployment/${APP_NAME}-server -- php artisan scout:import 'App\\Models\\BlogPost'"
   echo ""
   echo "  4. (Optional) Set up MySQL backup CronJob:"
   echo "     mkdir -p /opt/${APP_NAME}-backups  # on the server"
-  echo "     kubectl apply -f k8s/mysql/cronjob-backup.yaml"
+  echo "     APP_NAME=${APP_NAME} KUBE_NAMESPACE=${KUBE_NAMESPACE} ./k8s/render.sh k8s/mysql/cronjob-backup.yaml | kubectl apply -f -"
   echo ""
   echo -e "${BOLD}Useful commands:${NC}"
-  echo "  kubectl -n ${APP_NAME} get pods          # check pod status"
-  echo "  kubectl -n ${APP_NAME} get ingress        # check ingress + IP"
-  echo "  kubectl -n ${APP_NAME} get certificate    # check TLS cert"
-  echo "  kubectl -n ${APP_NAME} logs -f deployment/${APP_NAME}-server"
-  echo "  k9s -n ${APP_NAME}                        # terminal UI"
+  echo "  kubectl -n ${KUBE_NAMESPACE} get pods          # check pod status"
+  echo "  kubectl -n ${KUBE_NAMESPACE} get ingress        # check ingress + IP"
+  echo "  kubectl -n ${KUBE_NAMESPACE} get certificate    # check TLS cert"
+  echo "  kubectl -n ${KUBE_NAMESPACE} logs -f deployment/${APP_NAME}-server"
+  echo "  k9s -n ${KUBE_NAMESPACE}                        # terminal UI"
   echo ""
 
   if [[ "$INSTALL_CERT" == [Yy] ]]; then

@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: app-typesense-data
-  namespace: app
+  name: ${APP_NAME}-typesense-data
+  namespace: ${KUBE_NAMESPACE}
 spec:
   accessModes: ["ReadWriteOnce"]
   storageClassName: local-path

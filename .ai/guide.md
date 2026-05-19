@@ -120,6 +120,7 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - **WCAG 2.1 AA** — skip nav link in root layout (`#main-content`), `aria-label` on icon-only buttons, `aria-live/atomic` on quantity steppers, `aria-current="page"` on active nav links, `aria-expanded/controls` on filter toggles, focus trap in cookie consent dialog (`role="dialog" aria-modal="true"`), labelled form inputs throughout
 - **EU/PL Legal Compliance** — checkout terms checkbox (required/accepted validation in `CheckoutRequest`), 14-day withdrawal notice in checkout, ODR platform link in footer legal menu (`https://ec.europa.eu/consumers/odr`), Omnibus price history (30-day low via `PriceHistory` + `ProductVariantPriceObserver`)
 - **Playwright E2E** — `client/tests/e2e/` (smoke, cart, i18n specs), Docker service under `testing` profile, `make e2e` / `make e2e-report` Makefile targets
+- **k3s deployment templating** — Kubernetes manifests use `k8s/render.sh` placeholders (`APP_NAME`, `KUBE_NAMESPACE`, `IMAGE_SERVER`, `IMAGE_CLIENT`, `REVISION`); defaults preserve `app` namespace/prefix. GitHub Actions is the primary deploy path, GitLab CI is an alternative. MySQL backup CronJob lives at `k8s/mysql/cronjob-backup.yaml`.
 
 ---
 

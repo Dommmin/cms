@@ -1,13 +1,13 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: app-server
-  namespace: app
+  name: ${APP_NAME}-server
+  namespace: ${KUBE_NAMESPACE}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: app-server
+    name: ${APP_NAME}-server
   minReplicas: 1
   maxReplicas: 10
   metrics:

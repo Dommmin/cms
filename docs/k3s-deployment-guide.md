@@ -84,16 +84,16 @@ Internet
     ▼
 [ Traefik ] ← wbudowany w k3s, zajmuje się TLS + routing
     │
-    ├──► app-client (Next.js :3000)       ← publiczny frontend
+    ├──► app-client (Next.js :3000)       ← publiczny frontend, domyślny APP_NAME=app
     │
-    └──► app-server (Laravel/Nginx :80)   ← API + admin panel
+    └──► app-server (Laravel/Nginx :80)   ← API + admin panel, domyślny APP_NAME=app
               │
               ├── app-mysql (MySQL 8)     ← StatefulSet + PVC
               ├── app-redis (Redis 7)     ← Deployment + PVC
               └── app-gotenberg           ← generowanie PDF
 ```
 
-Wszystko działa w namespace `app`. MySQL i Redis mają persystentne wolumeny na dysku serwera (k3s `local-path` storage class). Obrazy Docker buduje GitLab CI i pushuje do GitLab Container Registry.
+Domyślnie wszystko działa w namespace `app` i z prefiksem zasobów `app-*`. Możesz to zmienić jednym mechanizmem: `APP_NAME` ustawia prefiks zasobów, `KUBE_NAMESPACE` ustawia namespace. GitHub Actions jest główną ścieżką deploymentu i buduje obrazy w GHCR; GitLab CI zostaje alternatywą.
 
 ---
 
@@ -460,6 +460,8 @@ Skrypt interaktywnie zapyta o:
 
 | Pytanie                     | Co wpisać                                            |
 |-----------------------------|------------------------------------------------------|
+| Application name / prefix   | Domyślnie `app`; zasoby będą miały prefiks `<APP_NAME>-` |
+| Kubernetes namespace        | Domyślnie taki sam jak `APP_NAME`; można podać inny namespace |
 | Hasło MySQL root            | Silne hasło, min. 16 znaków                          |
 | Nazwa użytkownika MySQL     | Domyślnie `app`                                      |
 | Hasło MySQL app             | Silne hasło, min. 16 znaków                          |
@@ -559,14 +561,16 @@ kubectl -n kube-system get helmchartconfig traefik
 
 ## 7. Przygotowanie klastra — namespace i sekrety
 
-> **Uwaga o nazwie namespace:** Wszystkie manifesty w `k8s/` mają na stałe wpisany namespace `app` i prefiks zasobów `app-*` (`app-server`, `app-mysql`, `app-redis`, …). To **nie jest** konfigurowalne bez edycji każdego pliku — `bootstrap.sh` i pipeline CI/CD zakładają `app`. Jeśli naprawdę potrzebujesz innej nazwy, zrób globalny `sed` po `k8s/` i zaktualizuj `KUBE_NAMESPACE` w CI.
+> **Uwaga o nazwie i namespace:** Manifesty w `k8s/` są szablonami renderowanymi przez `k8s/render.sh`. Domyślne wartości to `APP_NAME=app` i `KUBE_NAMESPACE=app`, więc przykłady z `app-*` pokazują zachowanie domyślne. Jeśli używasz innego namespace, zastąp w przykładach `app` wartością `KUBE_NAMESPACE`; jeśli używasz innego prefiksu zasobów, zastąp `app-*` przez `<APP_NAME>-*`.
+
+Jedno miejsce konfiguracji: w GitHub Actions ustaw Variables `APP_NAME`, `KUBE_NAMESPACE`, `PROD_ENV`, `ENV_CLIENT_PROD`; lokalnie `bootstrap.sh` pyta o `APP_NAME` i `KUBE_NAMESPACE`; wszystkie aplikacyjne YAML-e przechodzą przez `k8s/render.sh`.
 
 ### 7.1 Utwórz namespace
 
 Namespace to izolowana przestrzeń w klastrze — jak osobny folder dla naszej aplikacji.
 
 ```bash
-kubectl apply -f k8s/namespace.yaml
+APP_NAME=app KUBE_NAMESPACE=app ./k8s/render.sh k8s/namespace.yaml | kubectl apply -f -
 kubectl get namespace app
 # NAME       STATUS   AGE
 # app   Active   5s
@@ -575,47 +579,37 @@ kubectl get namespace app
 Teraz zastosuj Traefik Middleware — wymaga istniejącego namespace (dlatego nie robiliśmy tego w sekcji 4):
 
 ```bash
-kubectl apply -f k8s/traefik/middleware.yaml
+APP_NAME=app KUBE_NAMESPACE=app ./k8s/render.sh k8s/traefik/middleware.yaml | kubectl apply -f -
 ```
 
 ### 7.2 Sekret MySQL
 
-Skopiuj przykładowy plik i uzupełnij hasła:
+`bootstrap.sh` tworzy ten sekret automatycznie. Jeśli konfigurujesz klaster ręcznie, utwórz go z CLI:
 
 ```bash
-cp k8s/mysql/secret.yaml.example k8s/mysql/secret.yaml
+kubectl create secret generic app-mysql \
+  --from-literal=root-password='SuperTajneHasloRoot123!' \
+  --from-literal=username='app' \
+  --from-literal=password='SuperTajneHasloApp456!' \
+  --namespace=app \
+  --dry-run=client -o yaml | kubectl apply -f -
 ```
 
-Otwórz `k8s/mysql/secret.yaml` i zmień `CHANGE_ME` na silne hasła:
-
-```yaml
-stringData:
-  root-password: "SuperTajneHasloRoot123!"
-  username: "app"
-  password: "SuperTajneHasloapp456!"
-```
-
-> **Nigdy nie commituj plików `secret.yaml` do repozytorium!**  
-> Dodaj `k8s/**/*secret.yaml` do `.gitignore`.
-
-Zastosuj:
-
-```bash
-kubectl apply -f k8s/mysql/secret.yaml
-```
+Jeśli używasz innego prefixu/namespace, zamień `app-mysql` na `${APP_NAME}-mysql`, a `--namespace=app` na `--namespace=${KUBE_NAMESPACE}`.
 
 ### 7.3 Sekret Redis
 
 ```bash
-cp k8s/redis/secret.yaml.example k8s/redis/secret.yaml
-# edytuj k8s/redis/secret.yaml — zmień hasło
-kubectl apply -f k8s/redis/secret.yaml
+kubectl create secret generic app-redis \
+  --from-literal=password='SuperTajneHasloRedis789!' \
+  --namespace=app \
+  --dry-run=client -o yaml | kubectl apply -f -
 ```
 
 ### 7.4 Sekret aplikacji Laravel — opcjonalne przy CI/CD
 
 > **Jeśli używasz GitHub Actions lub GitLab CI/CD — pomiń ten krok.**  
-> Pipeline automatycznie tworzy i aktualizuje ten sekret z zmiennej `PROD_ENV` przy każdym deploymencie (krok 0 w pipeline). Ręczne tworzenie jest potrzebne tylko jeśli chcesz uruchomić aplikację przed pierwszym CI/CD.
+> GitHub Actions automatycznie tworzy i aktualizuje ten sekret ze zmiennej `PROD_ENV` przy każdym deploymencie (krok 0 w pipeline). GitLab jako alternatywa używa `SERVER_ENV`. Ręczne tworzenie jest potrzebne tylko jeśli chcesz uruchomić aplikację przed pierwszym CI/CD.
 
 Jeśli jednak chcesz skonfigurować sekret ręcznie (np. przed pierwszym CI/CD run), użyj szablonu `server/.env.production.example`:
 
@@ -632,7 +626,7 @@ kubectl create secret generic app-server-env \
 
 ### 7.5 Konfiguracja klienta Next.js — brak sekretu
 
-Next.js po stronie serwera fetchuje dane z API pod wewnętrznym adresem klastra. Ten adres (`API_URL=http://app-server.app.svc.cluster.local/api/v1`) **nie jest wrażliwy** — to po prostu nazwa DNS wewnątrz klastra — więc **nie ma tu żadnego sekretu do utworzenia**.
+Next.js po stronie serwera fetchuje dane z API pod wewnętrznym adresem klastra. Domyślnie jest to `API_URL=http://app-server.app.svc.cluster.local/api/v1`; po zmianie konfiguracji renderer ustawia `http://${APP_NAME}-server.${KUBE_NAMESPACE}.svc.cluster.local/api/v1`. Ten adres **nie jest wrażliwy** — to po prostu nazwa DNS wewnątrz klastra — więc **nie ma tu żadnego sekretu do utworzenia**.
 
 `API_URL` jest wpisany na stałe jako zwykła zmienna `env:` w [`k8s/client/deployment.yaml`](../k8s/client/deployment.yaml). Nic nie musisz robić ręcznie.
 
@@ -938,10 +932,10 @@ Queue worker to **osobny Deployment** (`app-queue`), który nieprzerwanie czyta 
 Manifest `k8s/server/deployment-queue.yaml` startuje 2 repliki (HA) i uruchamia:
 
 ```
-php artisan queue:work redis --tries=3 --timeout=300 --max-jobs=1000 --max-time=3600
+php artisan queue:work --tries=3 --sleep=3 --max-time=3600 --no-ansi
 ```
 
-`--max-time=3600` i `--max-jobs=1000` powodują, że worker sam się restartuje co godzinę / co 1000 jobów — to chroni przed wyciekami pamięci w długich procesach.
+`--max-time=3600` powoduje, że worker sam się restartuje co godzinę — to chroni przed wyciekami pamięci w długich procesach.
 
 **Sprawdź że workery działają:**
 
@@ -1038,7 +1032,7 @@ kubectl -n app logs $LAST
 # Running ['artisan' cms:process-scheduled-pages]  2 sek. DONE
 ```
 
-**Częsta pomyłka:** CronJob używa tego samego obrazu co `app-server`. Pipeline aktualizuje obraz w obu (`kubectl set image deployment/app-server` **i** `kubectl set image cronjob/app-scheduler`) — sprawdź swój `.github/workflows/deploy.yml`, bo łatwo o tym zapomnieć.
+**Częsta pomyłka:** CronJob używa tego samego obrazu co `app-server`. Pipeline GitHub Actions renderuje i aplikuje `k8s/server/cronjob-scheduler.yaml` z `IMAGE_SERVER=<sha-tag>`, więc scheduler dostaje ten sam obraz co web i queue.
 
 ### 12.5 Mail (SMTP)
 
@@ -1304,7 +1298,7 @@ Port 22 (SSH) możesz zostawić tylko dla siebie — CI/CD już go nie potrzebuj
 
 ## 14. Konfiguracja GitHub Actions
 
-Repozytorium zawiera plik `.github/workflows/deploy.yml` z pełnym pipeline'em. Musisz tylko skonfigurować zmienne w GitHub.
+Repozytorium zawiera plik `.github/workflows/deploy.yml` z główną ścieżką deploymentu. Musisz tylko skonfigurować zmienne w GitHub.
 
 ### 14.1 Zmienne i sekrety
 
@@ -1325,11 +1319,15 @@ cat ~/.kube/config-hetzner
 
 | Variable          | Przykład                            | Opis                                       |
 |-------------------|-------------------------------------|--------------------------------------------|
+| `APP_NAME`        | `app`                               | Prefiks zasobów i nazw obrazów; domyślnie `app` |
+| `KUBE_NAMESPACE`  | `app`                               | Namespace Kubernetes; domyślnie `APP_NAME` |
 | `PROD_ENV`        | *(pełna treść .env produkcyjnego)*  | Automatycznie sync do k8s Secret           |
 | `ENV_CLIENT_PROD` | *(pełna treść .env frontendowego)*  | Build-time zmienne dla Next.js (multiline) |
 
 > **Dlaczego `PROD_ENV` jako Variable, a nie Secret?**  
 > Secrets są write-only — raz wklejonego nie możesz odczytać ani edytować linijka po linijce. Variables są widoczne w UI, więc łatwo sprawdzisz co jest ustawione. Pipeline i tak sync'uje wartość do k8s Secret przed deployem.
+
+`PROD_ENV` zostaje GitHub Actions Variable zgodnie z decyzją projektu. Repozytorium jest prywatne; nie przenoś tej wartości do `secrets.PROD_ENV`.
 
 #### Jak ustawić PROD_ENV
 
@@ -1376,16 +1374,16 @@ push → master/main
         ├── security       (composer audit, npm audit)
         ├── test           (Pest PHP — matrix 8.4 + 8.5)
         │
-        ├── build-server   → ghcr.io/<owner>/app-server:abc1234
-        ├── build-client   → ghcr.io/<owner>/app-client:abc1234
+        ├── build-server   → ghcr.io/<owner>/<APP_NAME>-server:abc1234
+        ├── build-client   → ghcr.io/<owner>/<APP_NAME>-client:abc1234
         │
         └── deploy
-              ├── 0. kubectl create secret app-server-env (sync PROD_ENV)
-              ├── 1. kubectl apply job-migrate (migracje DB, wait 2 min)
-              ├── 2. kubectl set image deployment/app-server
-              ├── 3. kubectl set image deployment/app-queue
-              ├── 4. kubectl set image cronjob/app-scheduler
-              └── 5. kubectl set image deployment/app-client
+              ├── 0. render namespace/config + create <APP_NAME>-server-env (sync PROD_ENV)
+              ├── 1. render job-migrate (migracje DB, wait 2 min)
+              ├── 2. render deployment/<APP_NAME>-server
+              ├── 3. render deployment/<APP_NAME>-queue
+              ├── 4. render cronjob/<APP_NAME>-scheduler
+              └── 5. render deployment/<APP_NAME>-client
 ```
 
 Każdy deploy:
@@ -1414,7 +1412,7 @@ Job używa też grupy `concurrency` (`production-deploy`) z `cancel-in-progress:
 
 ## 15. Konfiguracja GitLab CI/CD
 
-Repozytorium zawiera plik `.gitlab-ci.yml` z pełnym pipeline'em. Musisz tylko skonfigurować zmienne.
+Repozytorium zawiera plik `.gitlab-ci.yml` jako alternatywną ścieżkę deploymentu. Główną ścieżką projektu jest GitHub Actions.
 
 ### 15.1 Zmienne CI/CD
 
@@ -1425,9 +1423,13 @@ W GitLab: **Settings → CI/CD → Variables → Add variable**
 
 | Zmienna           | Typ      | Masked | Protected | Opis                                       |
 |-------------------|----------|--------|-----------|--------------------------------------------|
+| `APP_NAME`        | Variable | ❌      | ✅         | Prefiks zasobów i obrazów; domyślnie `app` |
+| `KUBE_NAMESPACE`  | Variable | ❌      | ✅         | Namespace; domyślnie `APP_NAME`            |
 | `KUBECONFIG`      | Variable | ✅      | ✅         | Surowa treść kubeconfig — patrz sekcja 13  |
 | `SERVER_ENV`      | Variable | ✅      | ✅         | Pełna treść `server/.env.production`       |
 | `ENV_CLIENT_PROD` | Variable | ❌      | ❌         | Build-time zmienne dla Next.js (multiline) |
+
+GitLab pipeline ma też domyślne `SERVER_IMAGE=$CI_REGISTRY_IMAGE/$APP_NAME-server` i `CLIENT_IMAGE=$CI_REGISTRY_IMAGE/$APP_NAME-client`. Nadpisuj je tylko, jeśli świadomie używasz innego rejestru.
 
 **Nie musisz** ustawiać zmiennych rejestru — GitLab dostarcza je automatycznie:
 - `CI_REGISTRY` — adres rejestru
@@ -1468,15 +1470,16 @@ push → master
         ├── security       (composer audit, npm audit)
         ├── test           (Pest PHP)
         │
-        ├── build-server   → registry.gitlab.com/.../server:abc1234
-        ├── build-client   → registry.gitlab.com/.../client:abc1234
+        ├── build-server   → registry.gitlab.com/.../<APP_NAME>-server:abc1234
+        ├── build-client   → registry.gitlab.com/.../<APP_NAME>-client:abc1234
         │
         └── deploy
-              ├── 1. kubectl apply job-migrate (migracje DB)
-              ├── 2. kubectl set image deployment/app-server
-              ├── 3. kubectl set image deployment/app-queue
-              ├── 4. kubectl set image cronjob/app-scheduler
-              └── 5. kubectl set image deployment/app-client
+              ├── 0. render namespace/config + sync SERVER_ENV
+              ├── 1. render job-migrate (migracje DB)
+              ├── 2. render deployment/<APP_NAME>-server
+              ├── 3. render deployment/<APP_NAME>-queue
+              ├── 4. render cronjob/<APP_NAME>-scheduler
+              └── 5. render deployment/<APP_NAME>-client
 ```
 
 ---
@@ -1622,6 +1625,8 @@ kubectl -n app top pods
 
 ### Rollback deploymentu
 
+> **Ważne:** rollback deploymentu nie cofa migracji bazy danych. Migracje produkcyjne muszą być backward-compatible i prowadzone stylem expand-contract: najpierw dodaj nowe kolumny/struktury, wdroż kod kompatybilny wstecz, dopiero w osobnym deployu usuń stare elementy.
+
 Jeśli nowa wersja psuje coś krytycznego:
 
 ```bash
@@ -1659,59 +1664,30 @@ kubectl -n app exec app-mysql-0 -- \
 
 ### Automatyczny backup przez CronJob
 
-Stwórz plik `k8s/mysql/cronjob-backup.yaml`:
-
-```yaml
-apiVersion: batch/v1
-kind: CronJob
-metadata:
-  name: app-mysql-backup
-  namespace: app
-spec:
-  schedule: "0 3 * * *"     # codziennie o 3:00
-  successfulJobsHistoryLimit: 3
-  failedJobsHistoryLimit: 1
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          containers:
-            - name: backup
-              image: mysql:8.0
-              command:
-                - /bin/sh
-                - -c
-                - |
-                  mysqldump -h app-mysql -u root -p$MYSQL_ROOT_PASSWORD app \
-                    | gzip > /backup/app_$(date +%Y%m%d_%H%M%S).sql.gz
-                  # Usuń backupy starsze niż 7 dni
-                  find /backup -name "*.sql.gz" -mtime +7 -delete
-              env:
-                - name: MYSQL_ROOT_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: app-mysql
-                      key: root-password
-              volumeMounts:
-                - name: backup
-                  mountPath: /backup
-          volumes:
-            - name: backup
-              hostPath:
-                path: /opt/app-backups    # katalog na serwerze
-                type: DirectoryOrCreate
-          restartPolicy: OnFailure
-```
+Repozytorium zawiera gotowy manifest `k8s/mysql/cronjob-backup.yaml`. CronJob działa codziennie o 03:00, robi dump przez `mysqldump -h ${APP_NAME}-mysql`, zapisuje go do hostPath `/opt/${APP_NAME}-backups` i trzyma lokalnie ostatnie 14 dni.
 
 ```bash
 # Na serwerze utwórz katalog
 mkdir -p /opt/app-backups
 
 # Zastosuj CronJob
-kubectl apply -f k8s/mysql/cronjob-backup.yaml
+APP_NAME=app KUBE_NAMESPACE=app ./k8s/render.sh k8s/mysql/cronjob-backup.yaml | kubectl apply -f -
 ```
 
-> **Zalecenie:** Dodatkowo synchronizuj katalog `/opt/app-backups` na zewnętrzny storage (np. Hetzner Object Storage, Backblaze B2) narzędziem `rclone`.
+> **Zalecenie:** Lokalny hostPath nie jest strategią disaster recovery. Synchronizuj `/opt/${APP_NAME}-backups` poza VPS, np. do Hetzner Object Storage, Backblaze B2 albo S3 przez `rclone`, i okresowo testuj restore.
+
+### Restore checklist
+
+1. Pobierz wybrany plik `.sql.gz` z backupu lokalnego albo zewnętrznego storage.
+2. Zatrzymaj aplikację albo przełącz ją w maintenance mode, żeby nie pisała do bazy podczas odtwarzania.
+3. Odtwórz dump do MySQL:
+
+```bash
+gzip -dc mysql-YYYYMMDDTHHMMSSZ.sql.gz | kubectl -n app exec -i app-mysql-0 -- \
+  mysql -u root -p<ROOT_PASSWORD>
+```
+
+4. Uruchom `php artisan migrate:status`, sprawdź logi aplikacji i wykonaj smoke test checkoutu/panelu admina.
 
 ---
 
@@ -2289,8 +2265,8 @@ deploy-staging:
   steps:
     - name: Deploy server to staging
       run: |
-        kubectl -n app-staging set image deployment/app-server \
-          app="ghcr.io/${{ github.repository_owner }}/app-server:${{ github.sha }}"
+        APP_NAME=app KUBE_NAMESPACE=app-staging IMAGE_SERVER="ghcr.io/${{ github.repository_owner }}/app-server:${{ github.sha }}" \
+          ./k8s/render.sh k8s/server/deployment.yaml | kubectl apply -f -
         kubectl -n app-staging rollout status deployment/app-server --timeout=5m
 ```
 
@@ -2301,7 +2277,7 @@ deploy-staging:
   rules:
     - if: $CI_COMMIT_BRANCH == "develop"
   script:
-    - kubectl -n app-staging set image deployment/app-server app="${SERVER_IMAGE}:${CI_COMMIT_SHORT_SHA}"
+    - APP_NAME=app KUBE_NAMESPACE=app-staging IMAGE_SERVER="${SERVER_IMAGE}:${CI_COMMIT_SHORT_SHA}" ./k8s/render.sh k8s/server/deployment.yaml | kubectl apply -f -
     - kubectl -n app-staging rollout status deployment/app-server --timeout=5m
 ```
 

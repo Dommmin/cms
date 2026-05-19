@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: app-mysql
-  namespace: app
+  name: ${APP_NAME}-mysql
+  namespace: ${KUBE_NAMESPACE}
   labels:
-    app: app-mysql
+    app: ${APP_NAME}-mysql
 spec:
   selector:
-    app: app-mysql
+    app: ${APP_NAME}-mysql
   ports:
     - port: 3306
       targetPort: 3306

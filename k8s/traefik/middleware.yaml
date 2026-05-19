@@ -10,7 +10,7 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: body-size
-  namespace: app
+  namespace: ${KUBE_NAMESPACE}
 spec:
   buffering:
     maxRequestBodyBytes: 104857600  # 100 MB
@@ -19,7 +19,7 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: redirect-https
-  namespace: app
+  namespace: ${KUBE_NAMESPACE}
 spec:
   redirectScheme:
     scheme: https

@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-client
-  namespace: app
+  name: ${APP_NAME}-client
+  namespace: ${KUBE_NAMESPACE}
   labels:
-    app: app-client
+    app: ${APP_NAME}-client
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app-client
+      app: ${APP_NAME}-client
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -18,12 +18,12 @@ spec:
   template:
     metadata:
       labels:
-        app: app-client
+        app: ${APP_NAME}-client
     spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: frontend
-          image: ghcr.io/dommmin/app-client:latest  # replaced by CI
+          image: ${IMAGE_CLIENT}  # replaced by CI
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
@@ -39,7 +39,7 @@ spec:
             # public internet). Not sensitive — a cluster-internal DNS name —
             # so it's a plain env var, not a Secret.
             - name: API_URL
-              value: "http://app-server.app.svc.cluster.local/api/v1"
+              value: "http://${APP_NAME}-server.${KUBE_NAMESPACE}.svc.cluster.local/api/v1"
           resources:
             requests:
               cpu: 100m

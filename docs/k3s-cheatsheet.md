@@ -1,7 +1,8 @@
 # k3s — ściągawka komend
 
-> Zastąp `app` nazwą swojego namespace (tą, co podałeś w `bootstrap.sh`).  
+> Przykłady używają domyślnych wartości `APP_NAME=app` i `KUBE_NAMESPACE=app`. Jeśli używasz innego namespace, zastąp `app` wartością `KUBE_NAMESPACE`; jeśli używasz innego prefiksu, zastąp `app-*` przez `<APP_NAME>-*`.  
 > Ustaw raz: `export KUBECONFIG=~/.kube/config-hetzner`
+> Główna ścieżka deploymentu to GitHub Actions; GitLab CI jest alternatywą.
 
 ---
 
@@ -102,6 +103,8 @@ kubectl -n app rollout undo deployment/app-server --to-revision=2
 kubectl -n app delete pod <nazwa-poda>
 ```
 
+Rollback deploymentu nie cofa migracji DB. Produkcyjne migracje rób backward-compatible / expand-contract.
+
 ---
 
 ## Diagnozy — gdy coś nie działa
@@ -185,10 +188,15 @@ kubectl -n app exec app-mysql-0 -- \
   mysqldump -u root -p<ROOT_PASS> <NAZWA_BAZY> \
   > backup_$(date +%Y%m%d_%H%M%S).sql
 
+# Automatyczny CronJob backupu MySQL (codziennie 03:00, hostPath /opt/app-backups)
+APP_NAME=app KUBE_NAMESPACE=app ./k8s/render.sh k8s/mysql/cronjob-backup.yaml | kubectl apply -f -
+
 # Port-forward do lokalnego klienta MySQL (np. TablePlus, DBeaver)
 kubectl -n app port-forward svc/app-mysql 3306:3306
 # Następnie połącz się lokalnie: host=127.0.0.1 port=3306
 ```
+
+Synchronizuj `/opt/app-backups` poza VPS i okresowo testuj restore.
 
 ---
 
@@ -226,7 +234,8 @@ kubectl -n app scale deployment/app-server --replicas=2
 kubectl -n app get hpa
 
 # Wyłącz HPA tymczasowo
-kubectl -n app delete hpa app-server-hpa
+kubectl -n app delete hpa app-server
+kubectl -n app delete hpa app-client
 ```
 
 ---

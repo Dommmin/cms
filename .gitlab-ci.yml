@@ -5,8 +5,10 @@ stages:
   - deploy
 
 variables:
-  SERVER_IMAGE: $CI_REGISTRY_IMAGE/server
-  CLIENT_IMAGE: $CI_REGISTRY_IMAGE/client
+  APP_NAME: app
+  KUBE_NAMESPACE: $APP_NAME
+  SERVER_IMAGE: $CI_REGISTRY_IMAGE/$APP_NAME-server
+  CLIENT_IMAGE: $CI_REGISTRY_IMAGE/$APP_NAME-client
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
   FF_USE_FASTZIP: "true"
@@ -180,30 +182,43 @@ deploy:
   resource_group: production  # prevent concurrent deploys
   before_script:
     - mkdir -p ~/.kube
-    - echo "$KUBECONFIG" | base64 -d > ~/.kube/config
+    - printf '%s' "$KUBECONFIG" > ~/.kube/config
     - chmod 600 ~/.kube/config
+    - export APP_NAME="${APP_NAME:-app}"
+    - export KUBE_NAMESPACE="${KUBE_NAMESPACE:-$APP_NAME}"
+    - export SERVER_IMAGE="${SERVER_IMAGE:-$CI_REGISTRY_IMAGE/$APP_NAME-server}"
+    - export CLIENT_IMAGE="${CLIENT_IMAGE:-$CI_REGISTRY_IMAGE/$APP_NAME-client}"
   script:
     - SHA=$CI_COMMIT_SHORT_SHA
 
-    # 1. Run migrations
+    # 0. Ensure namespace/config exists
+    - APP_NAME="$APP_NAME" KUBE_NAMESPACE="$KUBE_NAMESPACE" ./k8s/render.sh k8s/namespace.yaml k8s/traefik/middleware.yaml k8s/ingress.yaml k8s/server/service.yaml k8s/server/hpa.yaml k8s/client/service.yaml k8s/client/hpa.yaml | kubectl apply -f -
+    - kubectl apply -f k8s/traefik/config.yaml
     - |
-      sed \
-        -e "s|IMAGE_PLACEHOLDER|${SERVER_IMAGE}:${SHA}|g" \
-        -e "s|REVISION_PLACEHOLDER|${SHA}|g" \
-        k8s/server/job-migrate.yaml | kubectl apply -f -
-    - kubectl -n cms-prod wait job/cms-migrate-$SHA --for=condition=complete --timeout=120s
+      if [ -n "$SERVER_ENV" ]; then
+        printf '%s' "$SERVER_ENV" > /tmp/prod.env
+        kubectl create secret generic "${APP_NAME}-server-env" \
+          --from-file=.env=/tmp/prod.env \
+          --namespace="$KUBE_NAMESPACE" \
+          --dry-run=client -o yaml | kubectl apply -f -
+        rm /tmp/prod.env
+      fi
+
+    # 1. Run migrations
+    - APP_NAME="$APP_NAME" KUBE_NAMESPACE="$KUBE_NAMESPACE" IMAGE_SERVER="${SERVER_IMAGE}:${SHA}" REVISION="$SHA" ./k8s/render.sh k8s/server/job-migrate.yaml | kubectl apply -f -
+    - kubectl -n "$KUBE_NAMESPACE" wait job/${APP_NAME}-migrate-$SHA --for=condition=complete --timeout=120s
 
     # 2. Deploy server
-    - kubectl -n cms-prod set image deployment/cms-server app="${SERVER_IMAGE}:${SHA}"
-    - kubectl -n cms-prod rollout status deployment/cms-server --timeout=5m
+    - APP_NAME="$APP_NAME" KUBE_NAMESPACE="$KUBE_NAMESPACE" IMAGE_SERVER="${SERVER_IMAGE}:${SHA}" ./k8s/render.sh k8s/server/deployment.yaml | kubectl apply -f -
+    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/${APP_NAME}-server --timeout=5m
 
     # 3. Deploy queue workers
-    - kubectl -n cms-prod set image deployment/cms-queue queue="${SERVER_IMAGE}:${SHA}"
-    - kubectl -n cms-prod rollout status deployment/cms-queue --timeout=5m
+    - APP_NAME="$APP_NAME" KUBE_NAMESPACE="$KUBE_NAMESPACE" IMAGE_SERVER="${SERVER_IMAGE}:${SHA}" ./k8s/render.sh k8s/server/deployment-queue.yaml | kubectl apply -f -
+    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/${APP_NAME}-queue --timeout=5m
 
     # 4. Update scheduler
-    - kubectl -n cms-prod set image cronjob/cms-scheduler scheduler="${SERVER_IMAGE}:${SHA}"
+    - APP_NAME="$APP_NAME" KUBE_NAMESPACE="$KUBE_NAMESPACE" IMAGE_SERVER="${SERVER_IMAGE}:${SHA}" ./k8s/render.sh k8s/server/cronjob-scheduler.yaml | kubectl apply -f -
 
     # 5. Deploy client
-    - kubectl -n cms-prod set image deployment/cms-client frontend="${CLIENT_IMAGE}:${SHA}"
-    - kubectl -n cms-prod rollout status deployment/cms-client --timeout=5m
+    - APP_NAME="$APP_NAME" KUBE_NAMESPACE="$KUBE_NAMESPACE" IMAGE_CLIENT="${CLIENT_IMAGE}:${SHA}" ./k8s/render.sh k8s/client/deployment.yaml | kubectl apply -f -
+    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/${APP_NAME}-client --timeout=5m
