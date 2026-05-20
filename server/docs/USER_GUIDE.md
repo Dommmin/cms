@@ -200,8 +200,7 @@ similar payloads are removed or rejected.
 - **Undo / Redo** — up to 20 steps of history with the undo/redo buttons in the toolbar
 - **Navigator** — on desktop, use the left outline to jump to a section or block, hide/show items, or duplicate sections and blocks without scrolling through the full editor
 - **Copy / Paste blocks** — click the copy icon on any block to copy it to your clipboard, then paste it anywhere on the same or a different page
-- **Mobile preview** — switch to mobile preview mode in the toolbar to see how the page looks on a phone screen
-- **Split view** — view the editor and the page preview side by side
+- **Responsive preview** — on desktop, use the right preview panel to switch between desktop, tablet, and mobile viewport sizes; the status shows when unsaved changes make the preview outdated
 - **Scroll animations** — each section has a **Scroll Animation** setting: choose Fade In, Fade Up, Slide from Left/Right, or Zoom In to add an entrance animation when the visitor scrolls to that section. Set to **None** to disable.
 - **Section spacing** — the **Spacing** dropdown on each section controls padding (No padding / Small / Medium / Large / Extra large)
 

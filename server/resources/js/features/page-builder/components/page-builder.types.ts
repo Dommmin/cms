@@ -6,6 +6,11 @@ export type PageBuilderProps = {
     onSave: (sections: BuilderData['sections']) => Promise<void>;
     onPreview: () => void;
     onChange?: (sections: Section[]) => void;
+    previewUrl?: string | null;
+    isPreviewRefreshing?: boolean;
+    isPreviewStale?: boolean;
+    previewUpdatedAt?: Date | null;
+    onRefreshPreview?: () => void;
     isSaving?: boolean;
     isManualSaving?: boolean;
     isAutoSaving?: boolean;

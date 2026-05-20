@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import * as PageApprovalController from '@/actions/App/Http/Controllers/Admin/Cms/PageApprovalController';
 import * as PageBuilderController from '@/actions/App/Http/Controllers/Admin/Cms/PageBuilderController';
@@ -51,6 +51,9 @@ export default function BuilderPage({
     const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
     const [pendingNavigation, setPendingNavigation] =
         useState<PendingNavigation | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [previewUpdatedAt, setPreviewUpdatedAt] = useState<Date | null>(null);
+    const [isPreviewRefreshing, setIsPreviewRefreshing] = useState(false);
 
     const autoSaveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(
         null,
@@ -68,12 +71,61 @@ export default function BuilderPage({
 
     const displayTitle = resolveLocalizedText(page.title);
 
+    const refreshPreviewUrl = useCallback(
+        async (options?: { openInNewTab?: boolean; silent?: boolean }) => {
+            setIsPreviewRefreshing(true);
+
+            try {
+                const res = await fetch(
+                    PageBuilderController.previewUrl.url(page.id),
+                    {
+                        headers: {
+                            Accept: 'application/json',
+                        },
+                    },
+                );
+
+                if (!res.ok) {
+                    throw new Error('Preview URL request failed.');
+                }
+
+                const data = (await res.json()) as { url?: string };
+                if (!data.url) {
+                    throw new Error('Preview URL missing.');
+                }
+
+                setPreviewUrl(data.url);
+                setPreviewUpdatedAt(new Date());
+
+                if (options?.openInNewTab) {
+                    window.open(data.url, '_blank');
+                }
+
+                return data.url;
+            } catch {
+                if (!options?.silent) {
+                    toast.error('Preview unavailable. Please try again.');
+                }
+
+                return null;
+            } finally {
+                setIsPreviewRefreshing(false);
+            }
+        },
+        [page.id],
+    );
+
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'CMS', href: PageController.index.url() },
         { title: 'Pages', href: PageController.index.url() },
         { title: displayTitle, href: PageController.edit.url(page.id) },
         { title: 'Builder', href: '' },
     ];
+
+    // Load the iframe preview token once the builder mounts.
+    useEffect(() => {
+        void refreshPreviewUrl({ silent: true });
+    }, [refreshPreviewUrl]);
 
     // Scroll to block when ?block={id} is in URL
     useEffect(() => {
@@ -160,6 +212,7 @@ export default function BuilderPage({
                 if (data.version !== undefined) {
                     setPageVersion(data.version);
                 }
+                void refreshPreviewUrl({ silent: true });
             })
             .catch((err) => {
                 if (axios.isCancel(err)) return;
@@ -212,7 +265,7 @@ export default function BuilderPage({
             }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [hasUnsavedChanges, localSections]);
+    }, [hasUnsavedChanges, localSections, refreshPreviewUrl]);
 
     useEffect(
         () => () => {
@@ -287,6 +340,7 @@ export default function BuilderPage({
                     setHasUnsavedChanges(false);
                     setLastSavedAt(new Date());
                     setPageVersion((v) => v + 1);
+                    void refreshPreviewUrl({ silent: true });
                 },
                 onError: (errors) => {
                     if (
@@ -409,25 +463,7 @@ export default function BuilderPage({
     };
 
     const handlePreview = async () => {
-        const csrfMeta = document.querySelector<HTMLMetaElement>(
-            'meta[name="csrf-token"]',
-        );
-        if (!csrfMeta?.content) {
-            toast.error(
-                'Preview unavailable: CSRF token missing. Please refresh.',
-            );
-            return;
-        }
-        const res = await fetch(PageBuilderController.previewUrl.url(page.id), {
-            headers: {
-                'X-CSRF-TOKEN': csrfMeta.content,
-                Accept: 'application/json',
-            },
-        });
-        if (res.ok) {
-            const data = (await res.json()) as { url: string };
-            window.open(data.url, '_blank');
-        }
+        await refreshPreviewUrl({ openInNewTab: true });
     };
 
     const availableBlockRelations = capabilities.can_manage_custom_html
@@ -459,6 +495,11 @@ export default function BuilderPage({
                     onSave={handleSave}
                     onPreview={handlePreview}
                     onChange={handleSectionsChange}
+                    previewUrl={previewUrl}
+                    isPreviewRefreshing={isPreviewRefreshing}
+                    isPreviewStale={hasUnsavedChanges}
+                    previewUpdatedAt={previewUpdatedAt}
+                    onRefreshPreview={() => void refreshPreviewUrl()}
                     isSaving={isSaving || isAutoSaving}
                     isManualSaving={isSaving}
                     isAutoSaving={isAutoSaving}

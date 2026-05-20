@@ -14,7 +14,10 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
 import { cn } from '@/lib/utils';
-import type { AdminNotification } from './notification-bell.types';
+import type {
+    AdminNotification,
+    NotificationPayload,
+} from './notification-bell.types';
 
 const TYPE_ICON: Record<AdminNotification['type'], React.ElementType> = {
     new_order: Package,
@@ -42,6 +45,22 @@ function getBrowserPermission(): NotificationPermission | 'unsupported' {
         return 'unsupported';
     }
     return Notification.permission;
+}
+
+function normalizePayload(payload: NotificationPayload): {
+    data: AdminNotification[];
+    unread_count: number;
+} {
+    const notifications = Array.isArray(payload?.data) ? payload.data : [];
+    const unreadCount =
+        typeof payload?.unread_count === 'number'
+            ? payload.unread_count
+            : notifications.length;
+
+    return {
+        data: notifications,
+        unread_count: unreadCount,
+    };
 }
 
 export function NotificationBell() {
@@ -82,7 +101,8 @@ export function NotificationBell() {
     );
 
     const applyUpdate = useCallback(
-        (data: { data: AdminNotification[]; unread_count: number }) => {
+        (payload: NotificationPayload) => {
+            const data = normalizePayload(payload);
             const incoming = data.data;
             setNotifications(incoming);
             const newOnes = incoming.filter(
@@ -96,14 +116,14 @@ export function NotificationBell() {
 
     const fetchNotifications = useCallback(async () => {
         try {
-            const { data } = await axios.get<{
-                data: AdminNotification[];
-                unread_count: number;
-            }>(AppNotificationController.index.url(), {
-                headers: {
-                    Accept: 'application/json',
+            const { data } = await axios.get<NotificationPayload>(
+                AppNotificationController.index.url(),
+                {
+                    headers: {
+                        Accept: 'application/json',
+                    },
                 },
-            });
+            );
             applyUpdate(data);
         } catch {
             // ignore network errors

@@ -580,6 +580,24 @@ Pozostało:
 
 ## Log Wdrożeń
 
+### 2026-05-20 - Epic 5 - responsive preview Page Buildera
+
+Status: Partial
+
+Zmiany:
+- Dodano prawy panel responsive preview w Page Builderze z trybami desktop/tablet/mobile.
+- Builder pobiera podpisany URL preview przez `PageBuilderController::previewUrl()` i odświeża iframe po manual save oraz autosave.
+- Panel pokazuje status aktualności preview na podstawie niezapisanych zmian i pozwala ręcznie odświeżyć lub otworzyć preview w nowej karcie.
+- Przy okazji ustabilizowano `NotificationBell`, żeby nie crashował, gdy endpoint zwróci payload bez tablicy `data`.
+
+Testy:
+- `docker compose exec php npm run format`
+- `docker compose exec php npm run types`
+- `docker compose exec php npm run format:check`
+
+Pozostało:
+- Inspector jako prawy panel konfiguracji aktywnego section/block.
+
 ### 2026-05-14 - Epic 0 - wspólna walidacja snapshotu
 
 Status: Partial
@@ -650,7 +668,6 @@ Testy:
 
 Pozostało:
 - Inspector jako prawy panel konfiguracji aktywnego section/block.
-- Responsive preview desktop/tablet/mobile z informacją o aktualności preview.
 
 ### 2026-05-16 - Epic 3 - stabilne identyfikatory w builderze
 

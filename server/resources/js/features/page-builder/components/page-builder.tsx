@@ -24,6 +24,7 @@ import { useBuilderState } from '../hooks/use-builder-state';
 import { BuilderToolbar } from './builder-toolbar';
 import type { PageBuilderProps } from './page-builder.types';
 import { PageNavigator } from './page-navigator';
+import { ResponsivePreviewPanel } from './responsive-preview-panel';
 import { SectionTemplatesDialog } from './section-templates-dialog';
 import type { SectionTemplate } from './section-templates-dialog.types';
 import { SortableSection } from './sortable-section';
@@ -33,6 +34,11 @@ export function PageBuilder({
     onSave,
     onPreview,
     onChange,
+    previewUrl = null,
+    isPreviewRefreshing = false,
+    isPreviewStale = false,
+    previewUpdatedAt = null,
+    onRefreshPreview,
     isSaving = false,
     isManualSaving = isSaving,
     isAutoSaving = false,
@@ -230,7 +236,7 @@ export function PageBuilder({
                 onReject={onReject ?? (() => {})}
             />
 
-            <div className="container grid max-w-7xl gap-6 py-8 lg:grid-cols-[18rem_minmax(0,1fr)]">
+            <div className="container grid max-w-[100rem] gap-6 py-8 lg:grid-cols-[18rem_minmax(0,1fr)_minmax(22rem,30rem)]">
                 <PageNavigator
                     sections={sections}
                     availableSections={data.available_sections}
@@ -379,6 +385,15 @@ export function PageBuilder({
                         </DndContext>
                     )}
                 </div>
+
+                <ResponsivePreviewPanel
+                    previewUrl={previewUrl}
+                    isRefreshing={isPreviewRefreshing}
+                    isStale={isPreviewStale}
+                    updatedAt={previewUpdatedAt}
+                    onRefresh={onRefreshPreview ?? onPreview}
+                    onOpenPreview={onPreview}
+                />
             </div>
 
             <SectionTemplatesDialog

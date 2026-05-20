@@ -1502,6 +1502,10 @@ Implemented in `resources/js/hooks/use-builder-state.ts` using `useReducer` with
 
 `resources/js/features/page-builder/components/page-navigator.tsx` renders the desktop outline for sections and blocks. It uses stable `client_id` values as DOM anchors (`pb-section-*`, `pb-block-*`) so selecting an item can expand it, scroll it into view, and apply the active ring without relying on array indexes.
 
+### Responsive Preview
+
+`resources/js/features/page-builder/components/responsive-preview-panel.tsx` renders the sticky desktop preview iframe. `BuilderPage` fetches a signed preview URL through `PageBuilderController::previewUrl()`, refreshes it after manual save/autosave, and passes stale/current state from `hasUnsavedChanges` so editors can see whether the preview matches the last saved snapshot.
+
 ### Copy/Paste Blocks
 
 Clipboard stored in `localStorage` key `pb_clipboard`. Serialised block config is read on paste and inserted as a new block.

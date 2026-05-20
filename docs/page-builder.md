@@ -8,7 +8,7 @@
 4. [Developer Guide — Adding New Section Types](#adding-new-section-types)
 5. [Schema Field Reference](#schema-field-reference)
 6. [Global (Reusable) Blocks](#global-reusable-blocks)
-7. [Split View / Preview](#split-view--preview)
+7. [Responsive Preview](#responsive-preview)
 8. [Data Flow & Persistence](#data-flow--persistence)
 
 ---
@@ -83,7 +83,7 @@ Click the red trash icon on the block card header.
 
 Click **Save** in the top-right toolbar. A toast notification confirms success.
 
-> If you are in Split View, saves also refresh the preview iframe automatically.
+> Saves and autosaves refresh the responsive preview iframe automatically.
 
 ---
 
@@ -242,7 +242,7 @@ The `custom_html` block is additionally protected:
 
 ### Step 3: Add the block to the frontend preview
 
-If you have a Split View or standalone Preview page, add a case in
+If you have a standalone Preview page, add a case in
 `resources/js/pages/admin/cms/pages/page-preview.tsx`:
 
 ```tsx
@@ -442,27 +442,27 @@ copy and no longer syncs with the library.
 
 ---
 
-## Split View / Preview
+## Responsive Preview
 
-### Split View
+The builder renders a sticky preview panel on desktop. The panel uses a signed
+preview URL from `PageBuilderController::previewUrl()` and displays the current
+saved page in an iframe.
 
-Click **Split View** in the toolbar to activate a 45/55 layout:
+Available viewport modes:
 
-- **Left (45%)**: the Page Builder
-- **Right (55%)**: a live iframe preview of the page
+- **Desktop** — fills the preview panel width.
+- **Tablet** — constrains the iframe to a tablet-width frame.
+- **Mobile** — constrains the iframe to a phone-width frame.
 
-While in Split View, the builder **auto-saves every 1.5 seconds** after you stop
-editing, then automatically reloads the preview iframe.
-
-Click **Exit Split View** to return to the full-width editor.
-
-> Unsaved changes are **never lost** when toggling Split View — the builder component
-> stays mounted and local state is preserved.
+The preview status shows whether the iframe matches the last saved snapshot. Any
+local edit marks it as outdated; manual save and autosave refresh the signed URL and
+mark the preview current again. Editors can also refresh the iframe manually or open
+the same preview URL in a new tab from the panel.
 
 ### Standalone Preview
 
-Click **Preview** (only visible when not in Split View) to open the page preview in a
-new browser tab at `/admin/cms/pages/{id}/preview`.
+Click **Preview** in the toolbar or the open icon in the preview panel to open the
+signed page preview in a new browser tab.
 
 This renders only active sections and blocks, without the admin sidebar.
 
@@ -495,10 +495,10 @@ This means:
 - The delete/recreate work runs inside the same transaction as version increment and
   version snapshot creation, so a failed sync rolls back to the previous page tree.
 
-### Auto-save (Split View only)
+### Auto-save
 
-When Split View is active, a 1.5 s debounce timer triggers a **silent save** whenever
-`localSections` changes. The iframe is reloaded on success. No toast is shown for
+The builder runs a debounced silent autosave whenever `localSections` changes. The
+preview iframe URL is refreshed after successful autosave. No toast is shown for
 auto-saves.
 
 ### Shared snapshot validation

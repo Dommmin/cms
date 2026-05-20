@@ -6,3 +6,10 @@ export interface AdminNotification {
     created_at: string;
     url: string;
 }
+
+export type NotificationPayload =
+    | {
+          data?: AdminNotification[];
+          unread_count?: number;
+      }
+    | undefined;
