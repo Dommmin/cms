@@ -155,7 +155,7 @@ class PageBuilderSnapshotValidator
                 continue;
             }
 
-            if (array_key_exists('type', $relation) || array_key_exists('id', $relation)) {
+            if (array_key_exists('type', $relation)) {
                 $errors[$relationAttribute][] = 'Relations must use relation_type, relation_id, relation_key, position, and metadata keys.';
             }
 

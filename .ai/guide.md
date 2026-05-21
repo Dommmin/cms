@@ -33,6 +33,7 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
   - **B7 Export/Import** — `GET /admin/cms/pages/{page}/builder/export` (JSON download), `POST /admin/cms/pages/{page}/builder/import` (file upload); Export/Import buttons in toolbar (Wayfinder)
   - **B8 Approval Workflow** — `approval_status` (draft/in_review/approved) + `reviewer_id/review_note/submitted_for_review_at/approved_at` on `pages` table; `PageApprovalController` (submitForReview/approve/reject); approval buttons in BuilderToolbar; state managed in builder.tsx
   - **B9 New Block Types** — `alert_banner` (dismissable, cookie-persisted, 4 variants) + `pricing_cards` (monthly/yearly toggle, popular badge); in `PageBlockTypeEnum`, `config/blocks.php`, `block-renderer.tsx`, `client/types/api.ts`
+  - **Stable Builder Sync** — `PageBuilderSyncService` uses diff/upsert by DB `id` for sections, blocks and relations; normal saves preserve stable IDs, support block moves between sections, and delete only items omitted from the snapshot
 - **Themes** — multiple themes, activate/deactivate
 - **Menus** — CRUD, menu items with link types
 - **Forms** — form builder, submissions, email notifications

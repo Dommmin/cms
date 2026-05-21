@@ -580,6 +580,23 @@ Pozostało:
 
 ## Log Wdrożeń
 
+### 2026-05-21 - Page Builder - stable ID diff/upsert sync
+
+Status: Done
+
+Zmiany:
+- `PageBuilderSyncService` nie usuwa już całego drzewa przed zapisem.
+- Sekcje, bloki i relacje są aktualizowane po istniejącym DB `id`, nowe elementy są tworzone, a pominięte elementy usuwane.
+- Bloki mogą być przenoszone między sekcjami bez zmiany `id`.
+- Validator dopuszcza `id` relacji w snapshotcie, żeby relacje mogły być aktualizowane w miejscu.
+- Dokumentacja Page Buildera opisuje teraz diff/upsert zamiast delete/recreate.
+
+Testy:
+- `docker compose exec php php artisan test --compact tests/Feature/Admin/Cms/PageBuilderTransactionalSaveTest.php`
+
+Pozostało:
+- Rozszerzyć przyszły version history diff o czytelne różnice na poziomie sekcji/bloków.
+
 ### 2026-05-21 - Epic 7 - SEO quality panel
 
 Status: Partial
@@ -673,7 +690,7 @@ Testy:
 - `docker compose exec php php artisan test --compact tests/Feature/Admin/Cms/PageBuilderTransactionalSaveTest.php tests/Feature/Admin/Cms/PageBuilderSnapshotValidationTest.php tests/Feature/Admin/Cms/ReusableBlockValidationTest.php tests/Feature/Admin/Cms/SectionTemplateValidationTest.php`
 
 Pozostało:
-- Długofalowo: zastąpić delete/recreate diff/upsert, żeby zachować stabilne ID.
+- Zrealizowano 2026-05-21: sync działa jako diff/upsert i zachowuje stabilne ID.
 
 ### 2026-05-16 - Epic 2 - server-side custom HTML/CSS hardening
 
@@ -767,7 +784,7 @@ Testy:
 - `docker compose exec php npm run format:check`
 
 Pozostało:
-- Długofalowo: zastąpić delete/recreate diff/upsert, żeby zachować stabilne ID.
+- Zrealizowano 2026-05-21: sync działa jako diff/upsert i zachowuje stabilne ID.
 
 ### 2026-05-16 - Epic 2 - Custom HTML UI gate i feature flag
 

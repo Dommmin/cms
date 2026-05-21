@@ -488,14 +488,16 @@ This renders only active sections and blocks, without the admin sidebar.
    record is created with `source` metadata (`manual`, `autosave`, or `import`).
 7. Inertia redirects back → page refreshes with fresh server data.
 
-### Important: Delete-and-recreate pattern
+### Important: Diff/upsert pattern
 
-The save operation **deletes all sections and blocks** and recreates them from scratch.
+The save operation updates existing sections, blocks and relations by ID, creates
+new rows only for new items, and deletes rows omitted from the snapshot.
 This means:
-- Block `id` values change on every save.
-- Relations are also recreated.
+- Section and block `id` values remain stable across normal saves.
+- Blocks can move between sections without being deleted and recreated.
+- Relations are updated in place when their IDs are present.
 - `reusable_block_id` is preserved in the save payload so global links survive.
-- The delete/recreate work runs inside the same transaction as version increment and
+- The diff/upsert work runs inside the same transaction as version increment and
   version snapshot creation, so a failed sync rolls back to the previous page tree.
 
 ### Auto-save

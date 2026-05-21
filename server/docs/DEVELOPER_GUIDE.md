@@ -324,7 +324,7 @@ Syncs a page builder snapshot (sections and blocks array) to the database.
 sync(Page $page, array $snapshot): void
 ```
 
-Deletes all existing sections and blocks for the page and recreates them from the snapshot. Also handles block relations (polymorphic links to Products, Categories, etc.).
+Diffs the incoming snapshot against existing sections, blocks, and block relations. Existing records are updated by their DB `id`, new records are created, and records omitted from the snapshot are deleted. This preserves stable DB IDs across normal saves, autosaves, reorders, and moves between sections.
 
 Snapshots must be validated before calling `sync()`. Manual saves, autosaves, imports,
 reusable blocks, and section templates use the shared Page Builder validators:
@@ -1493,7 +1493,7 @@ Page (page_type = 'blocks')
 2. On save, the full structure is serialised to a JSON snapshot and submitted to the `PageBuilderController`.
 3. `UpdatePageBuilderRequest` passes the snapshot through `PageBuilderSnapshotValidator`; import, reusable block and section template saves use the same validation services.
 4. The controller opens a transaction, locks the page row with `lockForUpdate()`, and checks `expected_version` inside that lock.
-5. `PageBuilderSyncService::sync(Page, array $snapshot)` deletes the old structure and recreates it from the sanitized snapshot.
+5. `PageBuilderSyncService::sync(Page, array $snapshot)` upserts existing sections, blocks, and relations by ID, creates new items, and deletes items omitted from the sanitized snapshot.
 6. The page `version` is incremented only after `sync()` succeeds, and `PageVersionService` records a version snapshot with builder source metadata.
 
 ### Undo/Redo

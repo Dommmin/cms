@@ -6,6 +6,7 @@ use App\Models\Page;
 use App\Models\PageBlock;
 use App\Models\PageSection;
 use App\Models\PageVersion;
+use App\Models\Product;
 use App\Models\User;
 use App\Services\PageBuilderSyncService;
 use Illuminate\Http\UploadedFile;
@@ -92,6 +93,92 @@ it('returns conflict when expected version is stale', function (): void {
 
     expect(PageVersion::query()->where('page_id', $this->page->id)->count())->toBe(0)
         ->and(PageBlock::query()->where('page_id', $this->page->id)->count())->toBe(0);
+});
+
+it('preserves section block and relation ids when syncing an existing snapshot', function (): void {
+    $sourceSection = PageSection::query()->create([
+        'page_id' => $this->page->id,
+        'section_type' => 'standard',
+        'layout' => 'contained',
+        'variant' => 'light',
+        'position' => 0,
+        'is_active' => true,
+    ]);
+
+    $targetSection = PageSection::query()->create([
+        'page_id' => $this->page->id,
+        'section_type' => 'standard',
+        'layout' => 'contained',
+        'variant' => 'light',
+        'position' => 1,
+        'is_active' => true,
+    ]);
+
+    $block = PageBlock::query()->create([
+        'page_id' => $this->page->id,
+        'section_id' => $sourceSection->id,
+        'type' => 'featured_products',
+        'configuration' => ['filter_mode' => 'manual'],
+        'position' => 0,
+        'is_active' => true,
+    ]);
+
+    $product = Product::factory()->create();
+
+    $relation = $block->relations()->create([
+        'relation_type' => 'product',
+        'relation_id' => $product->id,
+        'relation_key' => 'products',
+        'position' => 0,
+        'metadata' => ['label' => 'Before'],
+    ]);
+
+    $this->actingAs($this->user)
+        ->putJson(route('admin.cms.pages.builder.update', $this->page), [
+            'expected_version' => 0,
+            'snapshot' => [
+                'sections' => [
+                    [
+                        'id' => $targetSection->id,
+                        'section_type' => 'standard',
+                        'layout' => 'full',
+                        'variant' => 'dark',
+                        'settings' => ['spacing' => 'large'],
+                        'position' => 0,
+                        'is_active' => true,
+                        'blocks' => [
+                            [
+                                'id' => $block->id,
+                                'type' => 'featured_products',
+                                'configuration' => [
+                                    'filter_mode' => 'manual',
+                                    'title' => 'Updated picks',
+                                ],
+                                'position' => 0,
+                                'is_active' => true,
+                                'relations' => [
+                                    [
+                                        'id' => $relation->id,
+                                        'relation_type' => 'product',
+                                        'relation_id' => $product->id,
+                                        'relation_key' => 'products',
+                                        'position' => 0,
+                                        'metadata' => ['label' => 'After'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])
+        ->assertRedirect();
+
+    expect(PageSection::query()->whereKey($sourceSection->id)->exists())->toBeFalse()
+        ->and(PageSection::query()->whereKey($targetSection->id)->exists())->toBeTrue()
+        ->and(PageBlock::query()->whereKey($block->id)->value('section_id'))->toBe($targetSection->id)
+        ->and(PageBlock::query()->whereKey($block->id)->firstOrFail()->configuration['title'])->toBe('Updated picks')
+        ->and($block->relations()->whereKey($relation->id)->firstOrFail()->metadata)->toBe(['label' => 'After']);
 });
 
 it('rolls back deleted sections when sync fails', function (): void {

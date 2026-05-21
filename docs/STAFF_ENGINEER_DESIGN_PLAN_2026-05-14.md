@@ -54,7 +54,7 @@ Plan wdrożenia:
 3. Porównywać `expected_version` wewnątrz transakcji.
 4. Dopiero po pełnym sync robić increment wersji.
 5. Tworzyć `PageVersion` dla manual save/import i osobny autosave snapshot z flagą `is_autosave`.
-6. Długofalowo zastąpić delete/recreate algorytmem diff/upsert, żeby zachować stabilne ID sekcji/bloków, historię i komentarze.
+6. Zrealizowano 2026-05-21: delete/recreate zastąpiono algorytmem diff/upsert, żeby zachować stabilne ID sekcji/bloków, historię i komentarze.
 
 ### 3. Zabezpieczyć custom HTML/CSS na serwerze
 
