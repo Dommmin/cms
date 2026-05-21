@@ -11,7 +11,6 @@ import { $applyNodeReplacement, $getNodeByKey, DecoratorNode } from 'lexical';
 import { AlignCenter, AlignLeft, AlignRight, Captions, LinkIcon, Maximize2, Pencil, Trash2 } from 'lucide-react';
 import type { CSSProperties, JSX, KeyboardEvent, MouseEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { getEditorLinkTarget, isAllowedEditorLinkUrl, normalizeEditorLinkUrl } from './lexical/link-url';
 import type {
     CreateImageNodePayload,
     ImageAlign,
@@ -24,6 +23,7 @@ import type {
     ImageWrap,
     SerializedImageNode,
 } from './image-node.types';
+import { getEditorLinkTarget, isAllowedEditorLinkUrl, normalizeEditorLinkUrl } from './lexical/link-url';
 
 const WIDTH_PRESETS: Array<{ label: string; preset: ImageSizePreset; width: string }> = [
     { label: 'S', preset: 'small', width: '25%' },
@@ -160,6 +160,7 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
     const [draftFocalY, setDraftFocalY] = useState(String(Math.round((focalPoint?.y ?? 0.5) * 100)));
     const [draftLoading, setDraftLoading] = useState<ImageLoading>(loading);
 
+    /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
         setLocalWidth(width);
         setDraftAlt(altText);
@@ -171,6 +172,7 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
         setDraftFocalY(String(Math.round((focalPoint?.y ?? 0.5) * 100)));
         setDraftLoading(loading);
     }, [altText, caption, credit, decorative, focalPoint, linkUrl, loading, width]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     const applyWidth = (nextWidth: string, nextPreset: ImageSizePreset) => {
         setLocalWidth(nextWidth);

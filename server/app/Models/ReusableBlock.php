@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property string $type
+ * @property array<string, mixed>|null $configuration
+ */
 #[Fillable([
     'name',
     'description',

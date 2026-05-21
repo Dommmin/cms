@@ -4,6 +4,7 @@
 export UID = $(shell id -u)
 export GID = $(shell id -g)
 export UNAME = $(shell whoami)
+export PEST_PARALLEL_PROCESSES ?= 2
 
 # Help
 help:
@@ -127,7 +128,7 @@ check:
 	docker compose exec node npm run lint
 	docker compose exec node npm run format:check
 	@echo ">>> [8/8] Tests (Pest parallel)"
-	docker compose exec php php -d memory_limit=512M vendor/bin/pest --parallel
+	docker compose exec php php -d memory_limit=512M vendor/bin/pest --parallel --processes=$(PEST_PARALLEL_PROCESSES)
 	@echo ">>> All checks passed. Safe to push."
 
 # Run quality tools

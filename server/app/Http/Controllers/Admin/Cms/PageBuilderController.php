@@ -11,6 +11,7 @@ use App\Http\Requests\Admin\Cms\SchedulePageRequest;
 use App\Http\Requests\Admin\Cms\UpdateBlockRequest;
 use App\Http\Requests\Admin\Cms\UpdatePageBuilderRequest;
 use App\Http\Requests\Admin\Cms\UpdateSectionRequest;
+use App\Models\BlockRelation;
 use App\Models\Page;
 use App\Models\PageBlock;
 use App\Models\PageSection;
@@ -18,9 +19,11 @@ use App\Services\PageBuilder\PageBuilderSnapshotValidator;
 use App\Services\PageBuilderSyncService;
 use App\Services\PagePreviewService;
 use App\Services\PageVersionService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -55,14 +58,19 @@ class PageBuilderController extends Controller
                 'is_active' => $block->is_active,
                 'reusable_block_id' => $block->reusable_block_id,
                 'reusable_block_name' => $block->reusableBlock?->name,
-                'relations' => $block->relations->map(fn ($rel): array => [
-                    'id' => $rel->id,
-                    'relation_type' => $rel->relation_type,
-                    'relation_id' => $rel->relation_id,
-                    'relation_key' => $rel->relation_key,
-                    'position' => $rel->position,
-                    'metadata' => $rel->metadata,
-                ])->all(),
+                'relations' => (function () use ($block): array {
+                    /** @var Collection<int, BlockRelation> $relations */
+                    $relations = $block->relations;
+
+                    return $relations->map(fn (BlockRelation $rel): array => [
+                        'id' => $rel->id,
+                        'relation_type' => $rel->relation_type,
+                        'relation_id' => $rel->relation_id,
+                        'relation_key' => $rel->relation_key,
+                        'position' => $rel->position,
+                        'metadata' => $rel->metadata,
+                    ])->all();
+                })(),
             ]),
         ]);
 
@@ -257,6 +265,7 @@ class PageBuilderController extends Controller
 
     public function export(Page $page): SymfonyResponse
     {
+        /** @var Collection<int, PageSection> $sections */
         $sections = $page->allSections()->with(['allBlocks.relations'])->orderBy('position')->get();
 
         $data = [
@@ -275,13 +284,18 @@ class PageBuilderController extends Controller
                     'configuration' => $b->configuration,
                     'position' => $b->position,
                     'is_active' => $b->is_active,
-                    'relations' => $b->relations->map(fn ($rel): array => [
-                        'relation_type' => $rel->relation_type,
-                        'relation_id' => $rel->relation_id,
-                        'relation_key' => $rel->relation_key,
-                        'position' => $rel->position,
-                        'metadata' => $rel->metadata,
-                    ])->values()->all(),
+                    'relations' => (function () use ($b): array {
+                        /** @var Collection<int, BlockRelation> $relations */
+                        $relations = $b->relations;
+
+                        return $relations->map(fn (BlockRelation $rel): array => [
+                            'relation_type' => $rel->relation_type,
+                            'relation_id' => $rel->relation_id,
+                            'relation_key' => $rel->relation_key,
+                            'position' => $rel->position,
+                            'metadata' => $rel->metadata,
+                        ])->values()->all();
+                    })(),
                 ])->values()->all(),
             ])->values()->all(),
         ];
@@ -338,6 +352,7 @@ class PageBuilderController extends Controller
         bool $isAutosave,
     ): array {
         return DB::transaction(function () use ($pageId, $snapshot, $expectedVersion, $source, $changeNote, $isAutosave): array {
+            /** @var Page $page */
             $page = Page::query()
                 ->whereKey($pageId)
                 ->lockForUpdate()
@@ -357,7 +372,7 @@ class PageBuilderController extends Controller
 
             $this->pageVersionService->createVersion(
                 page: $page,
-                userId: auth()->id(),
+                userId: Auth::id(),
                 changeNote: $changeNote,
                 isAutosave: $isAutosave,
                 source: $source,

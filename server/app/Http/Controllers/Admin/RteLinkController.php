@@ -9,6 +9,7 @@ use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\Page;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -26,74 +27,82 @@ class RteLinkController extends Controller
         $like = sprintf('%%%s%%', $query);
         $results = [];
 
-        Page::query()
+        /** @var Collection<int, Page> $pages */
+        $pages = Page::query()
             ->where(function ($builder) use ($like): void {
                 $builder->where('title', 'like', $like)
                     ->orWhere('slug', 'like', $like);
             })
             ->limit(6)
-            ->get(['id', 'title', 'slug', 'is_published'])
-            ->each(function (Page $page) use (&$results, $locale): void {
-                $slug = trim($page->slug, '/');
-                $results[] = [
-                    'type' => 'page',
-                    'id' => $page->id,
-                    'label' => $page->getTranslation('title', $locale, false) ?: $page->title,
-                    'meta' => $page->is_published ? 'Published page' : 'Draft page',
-                    'url' => $slug === '' ? sprintf('/%s', $locale) : sprintf('/%s/%s', $locale, $slug),
-                ];
-            });
+            ->get(['id', 'title', 'slug', 'is_published']);
 
-        Product::query()
+        $pages->each(function (Page $page) use (&$results, $locale): void {
+            $slug = mb_trim($page->slug, '/');
+            $results[] = [
+                'type' => 'page',
+                'id' => $page->id,
+                'label' => $page->getTranslation('title', $locale, false) ?: $page->title,
+                'meta' => $page->is_published ? 'Published page' : 'Draft page',
+                'url' => $slug === '' ? sprintf('/%s', $locale) : sprintf('/%s/%s', $locale, $slug),
+            ];
+        });
+
+        /** @var Collection<int, Product> $products */
+        $products = Product::query()
             ->where(function ($builder) use ($like): void {
                 $builder->where('name', 'like', $like)
                     ->orWhere('slug', 'like', $like);
             })
             ->limit(6)
-            ->get(['id', 'name', 'slug', 'is_active'])
-            ->each(function (Product $product) use (&$results, $locale): void {
-                $results[] = [
-                    'type' => 'product',
-                    'id' => $product->id,
-                    'label' => $product->getTranslation('name', $locale, false) ?: $product->name,
-                    'meta' => $product->is_active ? 'Active product' : 'Inactive product',
-                    'url' => sprintf('/%s/products/%s', $locale, $product->slug),
-                ];
-            });
+            ->get(['id', 'name', 'slug', 'is_active']);
 
-        Category::query()
+        $products->each(function (Product $product) use (&$results, $locale): void {
+            $results[] = [
+                'type' => 'product',
+                'id' => $product->id,
+                'label' => $product->getTranslation('name', $locale, false) ?: $product->name,
+                'meta' => $product->is_active ? 'Active product' : 'Inactive product',
+                'url' => sprintf('/%s/products/%s', $locale, $product->slug),
+            ];
+        });
+
+        /** @var Collection<int, Category> $categories */
+        $categories = Category::query()
             ->where(function ($builder) use ($like): void {
                 $builder->where('name', 'like', $like)
                     ->orWhere('slug', 'like', $like);
             })
             ->limit(6)
-            ->get(['id', 'name', 'slug', 'is_active'])
-            ->each(function (Category $category) use (&$results, $locale): void {
-                $results[] = [
-                    'type' => 'category',
-                    'id' => $category->id,
-                    'label' => $category->getTranslation('name', $locale, false) ?: $category->name,
-                    'meta' => $category->is_active ? 'Active category' : 'Inactive category',
-                    'url' => sprintf('/%s/categories/%s', $locale, $category->slug),
-                ];
-            });
+            ->get(['id', 'name', 'slug', 'is_active']);
 
-        BlogPost::query()
+        $categories->each(function (Category $category) use (&$results, $locale): void {
+            $results[] = [
+                'type' => 'category',
+                'id' => $category->id,
+                'label' => $category->getTranslation('name', $locale, false) ?: $category->name,
+                'meta' => $category->is_active ? 'Active category' : 'Inactive category',
+                'url' => sprintf('/%s/categories/%s', $locale, $category->slug),
+            ];
+        });
+
+        /** @var Collection<int, BlogPost> $posts */
+        $posts = BlogPost::query()
             ->where(function ($builder) use ($like): void {
                 $builder->where('title', 'like', $like)
                     ->orWhere('slug', 'like', $like);
             })
             ->limit(6)
-            ->get(['id', 'title', 'slug', 'status'])
-            ->each(function (BlogPost $post) use (&$results, $locale): void {
-                $results[] = [
-                    'type' => 'blog_post',
-                    'id' => $post->id,
-                    'label' => $post->getTranslation('title', $locale, false) ?: $post->title,
-                    'meta' => sprintf('Blog post · %s', is_string($post->status) ? $post->status : $post->status?->value),
-                    'url' => sprintf('/%s/blog/%s', $locale, $post->slug),
-                ];
-            });
+            ->get(['id', 'title', 'slug', 'status']);
+
+        $posts->each(function (BlogPost $post) use (&$results, $locale): void {
+            $results[] = [
+                'type' => 'blog_post',
+                'id' => $post->id,
+                'label' => $post->getTranslation('title', $locale, false) ?: $post->title,
+                'meta' => sprintf('Blog post · %s', is_string($post->status) ? $post->status : $post->status?->value),
+                'url' => sprintf('/%s/blog/%s', $locale, $post->slug),
+            ];
+        });
 
         return response()->json($results);
     }

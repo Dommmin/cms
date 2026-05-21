@@ -20,6 +20,12 @@ use Spatie\Translatable\HasTranslations;
 /**
  * Category Model
  * Moved to Ecommerce module
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property bool $is_active
+ * @property string|null $collection_type
  */
 #[Guarded(['id'])]
 #[Table(name: 'categories')]

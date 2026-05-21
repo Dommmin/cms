@@ -10,13 +10,13 @@ import type {
 import { $applyNodeReplacement, $getNodeByKey, DecoratorNode } from 'lexical';
 import { FileArchive, FileIcon, FileSpreadsheet, FileText, Presentation, Trash2 } from 'lucide-react';
 import type { JSX } from 'react';
-import { getEditorLinkTarget, isAllowedEditorLinkUrl, normalizeEditorLinkUrl } from './lexical/link-url';
 import type {
     AttachmentComponentProps,
     AttachmentNodeState,
     CreateAttachmentNodePayload,
     SerializedAttachmentNode,
 } from './attachment-node.types';
+import { getEditorLinkTarget, isAllowedEditorLinkUrl, normalizeEditorLinkUrl } from './lexical/link-url';
 
 function normalizeAttachmentState(payload: CreateAttachmentNodePayload): AttachmentNodeState {
     return {
@@ -44,23 +44,24 @@ function formatFileSize(size: number | null): string | null {
     return `${(size / 1024 / 1024).toFixed(1)} MB`;
 }
 
-function iconForMimeType(mimeType: string): typeof FileIcon {
-    if (mimeType.includes('pdf') || mimeType.includes('word')) return FileText;
-    if (mimeType.includes('sheet') || mimeType.includes('excel')) return FileSpreadsheet;
-    if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) return Presentation;
-    if (mimeType.includes('zip') || mimeType.includes('archive')) return FileArchive;
+function renderMimeIcon(mimeType: string): JSX.Element {
+    const className = 'h-5 w-5 flex-shrink-0 text-muted-foreground';
 
-    return FileIcon;
+    if (mimeType.includes('pdf') || mimeType.includes('word')) return <FileText className={className} />;
+    if (mimeType.includes('sheet') || mimeType.includes('excel')) return <FileSpreadsheet className={className} />;
+    if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) return <Presentation className={className} />;
+    if (mimeType.includes('zip') || mimeType.includes('archive')) return <FileArchive className={className} />;
+
+    return <FileIcon className={className} />;
 }
 
 function AttachmentComponent({ url, name, fileName, mimeType, size, description, nodeKey, editor }: AttachmentComponentProps): JSX.Element {
-    const Icon = iconForMimeType(mimeType);
     const safeUrl = safeAttachmentUrl(url);
     const target = getEditorLinkTarget(safeUrl) ?? undefined;
 
     return (
         <span contentEditable={false} className="my-2 flex max-w-xl items-center gap-3 rounded-md border bg-muted/30 p-3">
-            <Icon className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
+            {renderMimeIcon(mimeType)}
             <a href={safeUrl} target={target} rel={target === '_blank' ? 'noopener noreferrer' : undefined} className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium text-foreground">{name || fileName}</span>
                 <span className="block truncate text-xs text-muted-foreground">

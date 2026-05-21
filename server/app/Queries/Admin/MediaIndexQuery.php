@@ -80,17 +80,19 @@ final readonly class MediaIndexQuery
 
     private function transformItem(Media $item): Media
     {
-        $item->url = $item->getUrl();
-        $item->thumbnail_url = $item->hasGeneratedConversion('thumbnail')
+        $thumbnailUrl = $item->hasGeneratedConversion('thumbnail')
             ? $item->getUrl('thumbnail')
             : null;
-        $item->thumb_url = $item->thumbnail_url;
-        $item->alt = (string) $item->getCustomProperty('alt', '');
-        $item->caption = $item->getCustomProperty('caption');
-        $item->description = $item->getCustomProperty('description');
-        $item->credit = $item->getCustomProperty('author');
-        $item->width = $item->getCustomProperty('width');
-        $item->height = $item->getCustomProperty('height');
+
+        $item->setAttribute('url', $item->getUrl());
+        $item->setAttribute('thumbnail_url', $thumbnailUrl);
+        $item->setAttribute('thumb_url', $thumbnailUrl);
+        $item->setAttribute('alt', (string) $item->getCustomProperty('alt', ''));
+        $item->setAttribute('caption', $item->getCustomProperty('caption'));
+        $item->setAttribute('description', $item->getCustomProperty('description'));
+        $item->setAttribute('credit', $item->getCustomProperty('author'));
+        $item->setAttribute('width', $item->getCustomProperty('width'));
+        $item->setAttribute('height', $item->getCustomProperty('height'));
 
         return $item;
     }

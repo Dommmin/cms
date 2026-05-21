@@ -67,7 +67,10 @@ class PageBuilderSyncService
             return $sectionModel;
         }
 
-        return $page->allSections()->create($attributes);
+        /** @var PageSection $createdSection */
+        $createdSection = $page->allSections()->create($attributes);
+
+        return $createdSection;
     }
 
     /**
@@ -100,7 +103,10 @@ class PageBuilderSyncService
             return $blockModel;
         }
 
-        return $section->allBlocks()->create($attributes);
+        /** @var PageBlock $createdBlock */
+        $createdBlock = $section->allBlocks()->create($attributes);
+
+        return $createdBlock;
     }
 
     /**
@@ -128,6 +134,7 @@ class PageBuilderSyncService
                 $relationModel->fill($attributes);
                 $relationModel->save();
             } else {
+                /** @var BlockRelation $relationModel */
                 $relationModel = $block->relations()->create($attributes);
             }
 

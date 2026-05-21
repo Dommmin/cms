@@ -20,6 +20,13 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
+/**
+ * @property int $id
+ * @property string $title
+ * @property string $slug
+ * @property array<string, mixed>|null $content_json
+ * @property BlogPostStatusEnum|string|null $status
+ */
 #[Fillable([
     'user_id',
     'blog_id',

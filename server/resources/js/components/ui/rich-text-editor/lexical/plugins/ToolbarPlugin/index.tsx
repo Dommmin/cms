@@ -36,8 +36,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTranslation } from '@/hooks/use-translation';
 import { $createAttachmentNode } from '../../../attachment-node';
-import { $createImageNode } from '../../../image-node';
 import { $createImageGalleryNode } from '../../../image-gallery-node';
+import { $createImageNode } from '../../../image-node';
 import { $createYouTubeNode, extractYouTubeId } from '../../../youtube-node';
 import { $createCollapsibleContainerNode, $createCollapsibleTitleNode, $createCollapsibleContentNode } from '../../collapsible-nodes';
 import { $createLayoutContainerNode, $createLayoutItemNode } from '../../layout-nodes';

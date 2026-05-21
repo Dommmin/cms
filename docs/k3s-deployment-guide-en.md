@@ -2311,16 +2311,18 @@ kubectl -n app rollout restart deployment/app-queue
 
 This is not a day-to-day workflow, but it is useful when you want to reuse the same VPS for a completely different application without reinstalling the operating system, SSH setup, firewall rules, and basic packages.
 
-There are two cleanup levels:
+In the normal scenario, **do not remove k3s**. Delete only the application namespace. That keeps k3s, Traefik, cert-manager, kubeconfig, firewall rules, and the server configuration.
+
+There are two reset levels:
 
 | Goal | What to run | What remains |
 |------|-------------|--------------|
-| Remove only this application | `kubectl delete namespace app` | k3s, Traefik, cert-manager, cluster configuration |
-| Remove all Kubernetes | `k3s-uninstall.sh` | Linux system, SSH, firewall, DNS, system packages |
+| Deploy a new application on the same k3s | `./k8s/reset.sh --yes` | k3s, Traefik, cert-manager, kubeconfig, cluster configuration |
+| Remove Kubernetes from the server | `./k8s/uninstall.sh --host app --yes` | Linux system, SSH, firewall, DNS, system packages |
 
 ### 26.1 Before deleting
 
-A full k3s uninstall removes cluster resources, secrets, PVCs, and local `local-path` volumes. For this application, that means MySQL, Redis, Typesense, uploads stored in PVCs, and all Kubernetes secrets.
+Namespace reset removes application resources: pods, deployments, services, secrets, PVCs, jobs, ingress, namespace certificates, and local `local-path` claims. For this application, that means MySQL, Redis, Typesense, uploads stored in PVCs, and all secrets in the `app` namespace.
 
 Before resetting, do at least:
 
@@ -2338,22 +2340,34 @@ kubectl -n app get secret app-mysql -o yaml > app-mysql.backup.yaml
 kubectl -n app get all,ingress,certificate,pvc,secrets
 ```
 
-If uploads are stored in S3/R2, the database and configuration backups are usually enough. If files are stored in a PVC or local storage, copy them separately from the pod or volume before uninstalling.
+If uploads are stored in S3/R2, the database and configuration backups are usually enough. If files are stored in a PVC or local storage, copy them separately from the pod or volume before resetting.
 
-### 26.2 Lighter option — remove only the application
+### 26.2 Recommended — remove only the application
 
 If you want to deploy a new application on the same running k3s cluster, deleting the namespace is usually enough:
 
 ```bash
-kubectl delete namespace app
+# From the repo, on your local machine with active KUBECONFIG
+APP_NAME=app KUBE_NAMESPACE=app ./k8s/reset.sh --yes
+
+# Or manually, without the helper
+kubectl delete namespace app --wait=true
 kubectl get namespace app
 ```
 
-After the namespace is gone, you can run the bootstrap/deploy flow for the new application with a different `APP_NAME` and `KUBE_NAMESPACE`. This option keeps cert-manager, Traefik, Rancher/k9s, and the whole cluster configuration.
+After the namespace is gone, you can run `./k8s/bootstrap.sh` for the new application immediately. This option keeps cert-manager, Traefik, kubeconfig, Rancher/k9s, and the whole cluster configuration.
 
 ### 26.3 Full option — remove all k3s
 
-On the control-plane server, run:
+Use a full uninstall only when you want to remove Kubernetes from the server or rebuild the cluster from scratch. After this operation, `./k8s/bootstrap.sh` will not work until you install k3s again and refresh kubeconfig.
+
+From the repo, you can use the wrapper:
+
+```bash
+./k8s/uninstall.sh --host app --yes
+```
+
+Without the wrapper, on the control-plane server:
 
 ```bash
 sudo /usr/local/bin/k3s-uninstall.sh

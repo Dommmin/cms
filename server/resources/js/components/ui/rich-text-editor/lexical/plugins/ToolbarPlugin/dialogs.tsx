@@ -18,6 +18,7 @@ export function LinkDialog({ open, url, isInvalid, onOpenChange, onUrlChange, on
     const [results, setResults] = useState<InternalLinkSearchResult[]>([]);
     const [loading, setLoading] = useState(false);
 
+    /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
         if (!open || activeTab !== 'internal' || query.trim().length < 2) {
             setResults([]);
@@ -55,6 +56,7 @@ export function LinkDialog({ open, url, isInvalid, onOpenChange, onUrlChange, on
             setResults([]);
         }
     }, [open]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>

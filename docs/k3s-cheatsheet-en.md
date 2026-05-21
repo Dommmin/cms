@@ -267,22 +267,27 @@ kubectl -n app get pods -w
 
 ---
 
-## Reset the server for a new application
+## Reset for a new application
 
-> Destructive. Back up the database, uploaded files, secrets, and kubeconfig first. A full k3s uninstall removes cluster resources, secrets, PVCs, and local `local-path` volumes.
+> Destructive for the application. Back up the database, uploads, and secrets first. The default path removes only the application namespace and keeps k3s installed.
 
 ```bash
-# Lighter option: remove only the current application from the cluster
+# Recommended: remove only the current application from the cluster
+APP_NAME=app KUBE_NAMESPACE=app ./k8s/reset.sh --yes
+
+# Manual option, without the helper
 kubectl delete namespace app
-
-# Full option: remove k3s from the server
-sudo /usr/local/bin/k3s-uninstall.sh
-
-# If this was a worker/agent node, not the control-plane server:
-sudo /usr/local/bin/k3s-agent-uninstall.sh
 ```
 
-After a full uninstall, you can run the installation again from section 4 of `k3s-deployment-guide-en.md`. SSH, firewall rules, system packages, and DNS remain on the server, so you do not need to rebuild the VPS from scratch.
+After this reset, k3s, Traefik, cert-manager, and kubeconfig still work. You can run `./k8s/bootstrap.sh` for the new project immediately.
+
+Use a full k3s uninstall only when you want to remove Kubernetes from the server:
+
+```bash
+./k8s/uninstall.sh --host app --yes
+```
+
+After a full uninstall, you must install k3s again from section 4 of `k3s-deployment-guide-en.md`, refresh kubeconfig, and only then run `./k8s/bootstrap.sh`.
 
 If you also ran tools outside k3s on the same server, such as Rancher/Uptime Kuma in Docker, remove them separately:
 

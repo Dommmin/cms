@@ -111,7 +111,6 @@ class PageBuilderSnapshotValidator
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $relations
      * @return array<int, array<string, mixed>>
      *
      * @throws ValidationException
