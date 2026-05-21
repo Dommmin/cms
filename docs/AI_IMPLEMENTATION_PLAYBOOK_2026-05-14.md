@@ -580,6 +580,25 @@ Pozostało:
 
 ## Log Wdrożeń
 
+### 2026-05-21 - Epic 6 - checkout progress i mobile summary
+
+Status: Partial
+
+Zmiany:
+- Checkout ma teraz realne stany kroków: adres, dostawa, płatność i podsumowanie przechodzą z `upcoming` przez `current` do `completed` na podstawie walidacji formularza.
+- Łączniki progress bara pokazują ukończone kroki.
+- Order summary pozostał sticky na desktopie, a na mobile dostał rozwijane szczegóły z widoczną kwotą całkowitą w nagłówku.
+- Rozbicie checkoutu na komponenty z commita `d19bcad` domyka główny punkt strukturalny Epic 6 dla checkoutu.
+
+Testy:
+- `make fix`
+- `make check`
+- `docker compose exec node npm run build`
+
+Pozostało:
+- Ujednolicić spacing/typografię bloków Page Buildera na publicznym froncie.
+- Dodać pełne Playwright E2E/visual regression dla listing/detail/checkout mobile i desktop.
+
 ### 2026-05-21 - Page Builder - stable ID diff/upsert sync
 
 Status: Done
@@ -634,7 +653,6 @@ Testy:
 - Browser smoke check: `http://localhost:3000/products/sony-43-full-hd-smart-tv-ultra-syfjv`
 
 Pozostało:
-- Rozbić checkout na kroki i komponenty.
 - Ujednolicić spacing/typografię bloków Page Buildera na publicznym froncie.
 - Dodać pełne Playwright E2E/visual regression dla listing/detail/checkout mobile i desktop.
 

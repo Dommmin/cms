@@ -24,6 +24,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import { getToken } from '@/lib/axios';
 import { trackBeginCheckout, trackPurchase } from '@/lib/datalayer';
 import type { Address } from '@/types/api';
+import type { StepState } from './checkout.types';
 import { CheckoutAddressSection } from './components/checkout-address-section';
 import { CheckoutPaymentSection } from './components/checkout-payment-section';
 import { CheckoutStepIndicator } from './components/checkout-step-indicator';
@@ -153,6 +154,45 @@ export default function CheckoutPage() {
     const effectiveShipping =
         freeThreshold !== null && subtotal >= freeThreshold ? 0 : shippingCost;
     const total = subtotal + effectiveShipping;
+    const billingComplete = Object.keys(validateAddress(billing)).length === 0;
+    const shippingAddressComplete =
+        sameAddress || Object.keys(validateAddress(shipping)).length === 0;
+    const addressStepComplete =
+        (token !== null || guestEmail.trim().length > 0) &&
+        billingComplete &&
+        shippingAddressComplete;
+    const shippingStepComplete =
+        selectedMethod !== null &&
+        selectedShippingMethod?.configured === true &&
+        (!selectedShippingMethod.requires_pickup_point ||
+            pickupPointId.trim().length > 0);
+    const selectedPaymentProvider =
+        paymentMethod === 'p24'
+            ? 'p24'
+            : paymentMethod === 'bank_transfer'
+              ? 'bank_transfer'
+              : paymentMethod === 'cash_on_delivery'
+                ? 'cash_on_delivery'
+                : paymentMethod;
+    const selectedPaymentConfig = paymentMethods?.find(
+        (method) => method.id === selectedPaymentProvider,
+    );
+    const paymentProviderConfigured = selectedPaymentConfig?.configured ?? true;
+    const paymentInputComplete =
+        paymentMethod === 'blik'
+            ? blikCode.length === 6
+            : paymentMethod === 'apple_pay' || paymentMethod === 'google_pay'
+              ? paymentToken.length > 0
+              : true;
+    const paymentStepComplete =
+        paymentProviderConfigured && paymentInputComplete;
+    const currentStepIndex = !addressStepComplete
+        ? 0
+        : !shippingStepComplete
+          ? 1
+          : !paymentStepComplete
+            ? 2
+            : 3;
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -309,6 +349,14 @@ export default function CheckoutPage() {
         { label: t('checkout.step_review', 'Review') },
     ];
 
+    function getStepState(index: number): StepState {
+        if (index < currentStepIndex) return 'completed';
+
+        if (index === currentStepIndex) return 'current';
+
+        return 'upcoming';
+    }
+
     return (
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
             <h1 className="mb-6 text-3xl font-bold">
@@ -330,11 +378,15 @@ export default function CheckoutPage() {
                                 <CheckoutStepIndicator
                                     label={step.label}
                                     number={i + 1}
-                                    state="current"
+                                    state={getStepState(i)}
                                 />
                                 {i < CHECKOUT_STEPS.length - 1 && (
                                     <span
-                                        className="bg-border mx-2 h-px flex-1"
+                                        className={`mx-2 h-px flex-1 ${
+                                            i < currentStepIndex
+                                                ? 'bg-primary/60'
+                                                : 'bg-border'
+                                        }`}
                                         aria-hidden="true"
                                     />
                                 )}
