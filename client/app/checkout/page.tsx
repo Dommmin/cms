@@ -1,26 +1,16 @@
 'use client';
 
-import {
-    Check,
-    RotateCcw,
-    ShieldCheck,
-    ShoppingBag,
-    Truck,
-} from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { type AddressPayload } from '@/api/checkout';
 import {
-    AddressFieldset,
     addressToPayload,
     validateAddress,
 } from '@/components/checkout/address-fieldset';
-import { InpostPicker } from '@/components/checkout/inpost-picker';
-import { PaymentStep } from '@/components/checkout/payment-step';
 import type { PaymentMethodValue } from '@/components/checkout/payment-step.types';
-import { PickupPointPicker } from '@/components/checkout/pickup-point-picker';
 import { useCart } from '@/hooks/use-cart';
 import {
     useCheckout,
@@ -34,44 +24,12 @@ import { useTranslation } from '@/hooks/use-translation';
 import { getToken } from '@/lib/axios';
 import { trackBeginCheckout, trackPurchase } from '@/lib/datalayer';
 import type { Address } from '@/types/api';
-import type { StepState } from './checkout.types';
-
-// ── Step indicator ─────────────────────────────────────────────────────────
-
-function CheckoutStepIndicator({
-    label,
-    number,
-    state,
-}: {
-    label: string;
-    number: number;
-    state: StepState;
-}) {
-    return (
-        <div className="flex items-center gap-2">
-            <span
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all duration-300 ${
-                    state === 'completed'
-                        ? 'bg-green-500 text-white'
-                        : state === 'current'
-                          ? 'bg-primary text-primary-foreground shadow-[0_0_0_4px_oklch(0.537_0.229_276.9_/_0.2)]'
-                          : 'bg-muted text-muted-foreground'
-                }`}
-            >
-                {state === 'completed' ? <Check className="h-4 w-4" /> : number}
-            </span>
-            <span
-                className={`hidden text-sm font-medium sm:inline ${
-                    state === 'upcoming'
-                        ? 'text-muted-foreground'
-                        : 'text-foreground'
-                }`}
-            >
-                {label}
-            </span>
-        </div>
-    );
-}
+import { CheckoutAddressSection } from './components/checkout-address-section';
+import { CheckoutPaymentSection } from './components/checkout-payment-section';
+import { CheckoutStepIndicator } from './components/checkout-step-indicator';
+import { GuestEmailStep } from './components/guest-email-step';
+import { OrderSummary } from './components/order-summary';
+import { ShippingMethodStep } from './components/shipping-method-step';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -364,7 +322,6 @@ export default function CheckoutPage() {
             >
                 <ol className="flex items-center gap-0">
                     {CHECKOUT_STEPS.map((step, i) => {
-                        const state: StepState = 'current';
                         return (
                             <li
                                 key={step.label}
@@ -373,7 +330,7 @@ export default function CheckoutPage() {
                                 <CheckoutStepIndicator
                                     label={step.label}
                                     number={i + 1}
-                                    state={state}
+                                    state="current"
                                 />
                                 {i < CHECKOUT_STEPS.length - 1 && (
                                     <span
@@ -391,296 +348,57 @@ export default function CheckoutPage() {
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                     {/* ── Left column: forms ── */}
                     <div className="space-y-6 lg:col-span-2">
-                        {/* Guest email */}
                         {!token && (
-                            <div className="border-border rounded-xl border p-5">
-                                <label
-                                    htmlFor="guest-email"
-                                    className="mb-3 block text-sm font-semibold"
-                                >
-                                    {t(
-                                        'checkout.guest_email_title',
-                                        'Your Email Address',
-                                    )}
-                                </label>
-                                <p
-                                    className="text-muted-foreground mb-3 text-xs"
-                                    id="guest-email-hint"
-                                >
-                                    {t(
-                                        'checkout.guest_email_hint',
-                                        "We'll send your order confirmation here.",
-                                    )}
-                                </p>
-                                <input
-                                    id="guest-email"
-                                    type="email"
-                                    value={guestEmail}
-                                    onChange={(e) =>
-                                        setGuestEmail(e.target.value)
-                                    }
-                                    placeholder="you@example.com"
-                                    required
-                                    aria-describedby={
-                                        submitAttempted && !guestEmail.trim()
-                                            ? 'guest-email-hint guest-email-error'
-                                            : 'guest-email-hint'
-                                    }
-                                    aria-invalid={
-                                        submitAttempted && !guestEmail.trim()
-                                    }
-                                    className="border-input bg-background focus:ring-ring w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
-                                />
-                                {submitAttempted && !guestEmail.trim() && (
-                                    <p
-                                        id="guest-email-error"
-                                        role="alert"
-                                        className="text-destructive mt-1 text-xs"
-                                    >
-                                        {t(
-                                            'checkout.guest_email_required',
-                                            'Email address is required.',
-                                        )}
-                                    </p>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Billing address */}
-                        <AddressFieldset
-                            title={t(
-                                'checkout.billing_address',
-                                'Billing Address',
-                            )}
-                            value={billing}
-                            onChange={setBilling}
-                            savedAddresses={savedAddresses}
-                            autocompleteSection="billing"
-                            showAllErrors={submitAttempted}
-                        />
-                        {token && savedAddresses.length === 0 && (
-                            <label className="flex cursor-pointer items-center gap-2 text-sm">
-                                <input
-                                    type="checkbox"
-                                    checked={saveBilling}
-                                    onChange={(e) =>
-                                        setSaveBilling(e.target.checked)
-                                    }
-                                    className="border-input accent-primary h-4 w-4 rounded"
-                                />
-                                {t(
-                                    'checkout.save_billing',
-                                    'Save billing address to account',
-                                )}
-                            </label>
-                        )}
-
-                        {/* Same address toggle */}
-                        <label className="flex cursor-pointer items-center gap-2 text-sm">
-                            <input
-                                type="checkbox"
-                                checked={sameAddress}
-                                onChange={(e) =>
-                                    setSameAddress(e.target.checked)
-                                }
-                                className="border-input accent-primary h-4 w-4 rounded"
+                            <GuestEmailStep
+                                guestEmail={guestEmail}
+                                submitAttempted={submitAttempted}
+                                onGuestEmailChange={setGuestEmail}
                             />
-                            {t(
-                                'checkout.same_as_billing',
-                                'Shipping address same as billing',
-                            )}
-                        </label>
-
-                        {/* Shipping address */}
-                        {!sameAddress && (
-                            <>
-                                <AddressFieldset
-                                    title={t(
-                                        'checkout.shipping_address',
-                                        'Shipping Address',
-                                    )}
-                                    value={shipping}
-                                    onChange={setShipping}
-                                    savedAddresses={savedAddresses.filter(
-                                        (a) => a.type === 'shipping',
-                                    )}
-                                    autocompleteSection="shipping"
-                                    showAllErrors={submitAttempted}
-                                />
-                                {token && (
-                                    <label className="flex cursor-pointer items-center gap-2 text-sm">
-                                        <input
-                                            type="checkbox"
-                                            checked={saveShipping}
-                                            onChange={(e) =>
-                                                setSaveShipping(
-                                                    e.target.checked,
-                                                )
-                                            }
-                                            className="border-input accent-primary h-4 w-4 rounded"
-                                        />
-                                        {t(
-                                            'checkout.save_shipping',
-                                            'Save shipping address to account',
-                                        )}
-                                    </label>
-                                )}
-                            </>
                         )}
 
-                        {/* Shipping methods */}
-                        <div className="border-border rounded-xl border p-5">
-                            <h2 className="mb-3 text-sm font-semibold">
-                                {t(
-                                    'checkout.shipping_method',
-                                    'Shipping Method',
-                                )}
-                            </h2>
-                            {methodsLoading ? (
-                                <div className="space-y-2">
-                                    {[1, 2].map((i) => (
-                                        <div
-                                            key={i}
-                                            className="bg-muted h-14 animate-pulse rounded-lg"
-                                        />
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="space-y-2">
-                                    {shippingMethods.map((method) => {
-                                        const methodThreshold =
-                                            method.free_shipping_threshold ??
-                                            null;
-                                        const isFree =
-                                            methodThreshold !== null &&
-                                            subtotal >= methodThreshold;
-                                        const price = isFree
-                                            ? 0
-                                            : method.base_price;
-                                        const unconfigured = !method.configured;
+                        <CheckoutAddressSection
+                            billing={billing}
+                            sameAddress={sameAddress}
+                            savedAddresses={savedAddresses}
+                            saveBilling={saveBilling}
+                            saveShipping={saveShipping}
+                            shipping={shipping}
+                            submitAttempted={submitAttempted}
+                            token={token}
+                            onBillingChange={setBilling}
+                            onSameAddressChange={setSameAddress}
+                            onSaveBillingChange={setSaveBilling}
+                            onSaveShippingChange={setSaveShipping}
+                            onShippingChange={setShipping}
+                        />
 
-                                        return (
-                                            <label
-                                                key={method.id}
-                                                className={`flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors ${
-                                                    unconfigured
-                                                        ? 'border-border cursor-not-allowed opacity-60'
-                                                        : selectedMethod ===
-                                                            method.id
-                                                          ? 'border-primary bg-primary/5'
-                                                          : 'border-border hover:border-primary/50'
-                                                }`}
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <input
-                                                        type="radio"
-                                                        name="shipping_method"
-                                                        value={method.id}
-                                                        checked={
-                                                            selectedMethod ===
-                                                            method.id
-                                                        }
-                                                        disabled={unconfigured}
-                                                        onChange={() =>
-                                                            !unconfigured &&
-                                                            handleMethodChange(
-                                                                method.id,
-                                                            )
-                                                        }
-                                                        className="accent-primary"
-                                                    />
-                                                    <div>
-                                                        <p className="text-sm font-medium">
-                                                            {method.name}
-                                                        </p>
-                                                        {method.description && (
-                                                            <p className="text-muted-foreground text-xs">
-                                                                {
-                                                                    method.description
-                                                                }
-                                                            </p>
-                                                        )}
-                                                        {method.estimated_days_min &&
-                                                            method.estimated_days_max && (
-                                                                <p className="text-muted-foreground text-xs">
-                                                                    {
-                                                                        method.estimated_days_min
-                                                                    }
-                                                                    –
-                                                                    {
-                                                                        method.estimated_days_max
-                                                                    }{' '}
-                                                                    {t(
-                                                                        'checkout.business_days',
-                                                                        'business days',
-                                                                    )}
-                                                                </p>
-                                                            )}
-                                                        {unconfigured &&
-                                                            method
-                                                                .missing_config
-                                                                .length > 0 && (
-                                                                <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
-                                                                    Set in
-                                                                    server/.env:{' '}
-                                                                    {method.missing_config.join(
-                                                                        ', ',
-                                                                    )}
-                                                                </p>
-                                                            )}
-                                                    </div>
-                                                </div>
-                                                <span className="text-sm font-semibold">
-                                                    {price === 0 ? (
-                                                        <span className="text-green-600">
-                                                            {t(
-                                                                'checkout.free',
-                                                                'Free',
-                                                            )}
-                                                        </span>
-                                                    ) : (
-                                                        formatPrice(price)
-                                                    )}
-                                                </span>
-                                            </label>
-                                        );
-                                    })}
-                                </div>
-                            )}
+                        <ShippingMethodStep
+                            billing={billing}
+                            isLoading={methodsLoading}
+                            pickupPointId={pickupPointId}
+                            selectedMethod={selectedMethod}
+                            selectedShippingMethod={selectedShippingMethod}
+                            shippingMethods={shippingMethods}
+                            subtotal={subtotal}
+                            onMethodChange={handleMethodChange}
+                            onPickupPointChange={setPickupPointId}
+                            formatPrice={formatPrice}
+                        />
 
-                            {selectedShippingMethod?.requires_pickup_point &&
-                                (selectedShippingMethod.uses_native_widget ? (
-                                    <InpostPicker
-                                        value={pickupPointId || null}
-                                        onChange={(id) => setPickupPointId(id)}
-                                    />
-                                ) : (
-                                    <PickupPointPicker
-                                        carrier={
-                                            selectedShippingMethod.carrier ?? ''
-                                        }
-                                        postalCode={billing.postal_code}
-                                        value={pickupPointId || null}
-                                        onChange={(id) => setPickupPointId(id)}
-                                    />
-                                ))}
-                        </div>
-
-                        {/* Payment method */}
-                        <PaymentStep
-                            selected={paymentMethod}
-                            onSelect={(method) => {
+                        <CheckoutPaymentSection
+                            blikCode={blikCode}
+                            currencyCode={currencyCode}
+                            isPickup={isPickup}
+                            paymentMethod={paymentMethod}
+                            paymentMethods={paymentMethods}
+                            total={total}
+                            onApplePayToken={setPaymentToken}
+                            onBlikCode={setBlikCode}
+                            onGooglePayToken={setPaymentToken}
+                            onPaymentMethodChange={(method) => {
                                 setPaymentMethod(method);
                                 setPaymentToken('');
                             }}
-                            blikCode={blikCode}
-                            onBlikCode={setBlikCode}
-                            onApplePayToken={(token) => setPaymentToken(token)}
-                            onGooglePayToken={(token) => setPaymentToken(token)}
-                            cartTotal={total}
-                            currency={currencyCode}
-                            providerConfig={paymentMethods}
-                            isPickup={isPickup}
                         />
 
                         {/* Notes */}
@@ -711,209 +429,19 @@ export default function CheckoutPage() {
 
                     {/* ── Right column: summary ── */}
                     <div className="lg:col-span-1">
-                        <div className="border-border sticky top-24 rounded-xl border p-5">
-                            <h2 className="mb-4 text-base font-semibold">
-                                {t('checkout.summary', 'Order Summary')}
-                            </h2>
-
-                            {/* Items */}
-                            <ul className="divide-border mb-4 divide-y text-sm">
-                                {cart.items.map((item) => (
-                                    <li
-                                        key={item.id}
-                                        className="flex items-center justify-between gap-2 py-2"
-                                    >
-                                        <span className="text-muted-foreground truncate">
-                                            {item.product?.name ??
-                                                t(
-                                                    'product.no_image',
-                                                    'Product',
-                                                )}
-                                            <span className="ml-1 text-xs">
-                                                ×{item.quantity}
-                                            </span>
-                                        </span>
-                                        <span className="shrink-0 font-medium">
-                                            {formatPrice(item.subtotal)}
-                                        </span>
-                                    </li>
-                                ))}
-                            </ul>
-
-                            {/* Totals */}
-                            <div className="border-border space-y-1.5 border-t pt-3 text-sm">
-                                <div className="flex justify-between">
-                                    <span className="text-muted-foreground">
-                                        {t('checkout.products', 'Products')}
-                                    </span>
-                                    <span>{formatPrice(subtotal)}</span>
-                                </div>
-                                {cart.discount_amount > 0 && (
-                                    <div className="flex justify-between text-green-600">
-                                        <span>
-                                            {t('checkout.discount', 'Discount')}
-                                        </span>
-                                        <span>
-                                            -{formatPrice(cart.discount_amount)}
-                                        </span>
-                                    </div>
-                                )}
-                                <div className="flex justify-between">
-                                    <span className="text-muted-foreground">
-                                        {t(
-                                            'checkout.shipping_method',
-                                            'Shipping',
-                                        )}
-                                    </span>
-                                    <span>
-                                        {effectiveShipping === 0 ? (
-                                            <span className="text-green-600">
-                                                {t('checkout.free', 'Free')}
-                                            </span>
-                                        ) : (
-                                            formatPrice(effectiveShipping)
-                                        )}
-                                    </span>
-                                </div>
-                                <div className="border-border flex justify-between border-t pt-2 text-base font-bold">
-                                    <span>{t('cart.total', 'Total')}</span>
-                                    <span>{formatPrice(total)}</span>
-                                </div>
-                            </div>
-
-                            {/* Trust badges */}
-                            <div className="border-border text-muted-foreground mt-4 flex flex-col gap-2 border-t pt-4 text-xs">
-                                {(
-                                    [
-                                        {
-                                            icon: ShieldCheck,
-                                            label: 'Bezpieczna płatność SSL',
-                                        },
-                                        {
-                                            icon: RotateCcw,
-                                            label: '14 dni na zwrot',
-                                        },
-                                        {
-                                            icon: Truck,
-                                            label: 'Darmowa dostawa od 200 zł',
-                                        },
-                                    ] as {
-                                        icon: React.ElementType;
-                                        label: string;
-                                    }[]
-                                ).map(({ icon: Icon, label }) => (
-                                    <div
-                                        key={label}
-                                        className="flex items-center gap-2"
-                                    >
-                                        <Icon
-                                            className="text-primary h-3.5 w-3.5 shrink-0"
-                                            aria-hidden="true"
-                                        />
-                                        <span>{label}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {error && (
-                                <p
-                                    role="alert"
-                                    className="bg-destructive/10 text-destructive mt-3 rounded-lg p-2 text-xs"
-                                >
-                                    {t('checkout.error', 'Error')}:{' '}
-                                    {(error as Error).message}
-                                </p>
-                            )}
-
-                            <div className="mt-5">
-                                <label
-                                    htmlFor="terms-accepted"
-                                    className="flex cursor-pointer items-start gap-3"
-                                >
-                                    <input
-                                        id="terms-accepted"
-                                        type="checkbox"
-                                        checked={termsAccepted}
-                                        onChange={(e) =>
-                                            setTermsAccepted(e.target.checked)
-                                        }
-                                        className="accent-primary mt-0.5 h-4 w-4 shrink-0"
-                                        required
-                                        aria-describedby={
-                                            submitAttempted && !termsAccepted
-                                                ? 'terms-error'
-                                                : undefined
-                                        }
-                                        aria-invalid={
-                                            submitAttempted && !termsAccepted
-                                        }
-                                    />
-                                    <span className="text-muted-foreground text-xs">
-                                        {t(
-                                            'checkout.terms_accept_prefix',
-                                            'I have read and accept the',
-                                        )}{' '}
-                                        <Link
-                                            href={lp('/terms-of-service')}
-                                            target="_blank"
-                                            className="hover:text-foreground underline"
-                                        >
-                                            {t(
-                                                'checkout.terms_link',
-                                                'Terms of Service',
-                                            )}
-                                        </Link>{' '}
-                                        {t('checkout.and', 'and')}{' '}
-                                        <Link
-                                            href={lp('/privacy-policy')}
-                                            target="_blank"
-                                            className="hover:text-foreground underline"
-                                        >
-                                            {t(
-                                                'checkout.privacy_link',
-                                                'Privacy Policy',
-                                            )}
-                                        </Link>
-                                        {'. '}
-                                        {t(
-                                            'checkout.withdrawal_note',
-                                            'I am aware of my right to withdraw within 14 days.',
-                                        )}
-                                    </span>
-                                </label>
-
-                                {submitAttempted && !termsAccepted && (
-                                    <p
-                                        id="terms-error"
-                                        role="alert"
-                                        className="text-destructive mt-1 text-xs"
-                                    >
-                                        {t(
-                                            'checkout.terms_required',
-                                            'You must accept the terms to place an order.',
-                                        )}
-                                    </p>
-                                )}
-                            </div>
-
-                            <button
-                                type="submit"
-                                disabled={
-                                    isPending ||
-                                    !selectedMethod ||
-                                    !termsAccepted
-                                }
-                                aria-busy={isPending}
-                                className="bg-primary text-primary-foreground mt-4 w-full rounded-xl px-4 py-3 text-sm font-semibold hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                                {isPending
-                                    ? t(
-                                          'checkout.placing_order',
-                                          'Placing order...',
-                                      )
-                                    : t('checkout.place_order', 'Place Order')}
-                            </button>
-                        </div>
+                        <OrderSummary
+                            cart={cart}
+                            effectiveShipping={effectiveShipping}
+                            error={error}
+                            isPending={isPending}
+                            selectedMethod={selectedMethod}
+                            submitAttempted={submitAttempted}
+                            subtotal={subtotal}
+                            termsAccepted={termsAccepted}
+                            total={total}
+                            onTermsAcceptedChange={setTermsAccepted}
+                            formatPrice={formatPrice}
+                        />
                     </div>
                 </div>
             </form>
