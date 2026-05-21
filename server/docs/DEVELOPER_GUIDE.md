@@ -57,6 +57,8 @@ The platform is a **Laravel 12 monolith** serving two separate clients:
 
 2. **Public REST API** — a versioned JSON API at `/api/v1/*`. Token-based authentication via Laravel Sanctum. Consumed by the standalone Next.js frontend in `client/`.
 
+Admin SEO forms share `resources/js/components/seo-panel.tsx`. Keep SEO field warnings in `resources/js/components/seo-panel-health.ts` so the same content quality checks are reused by products, categories, and blog posts.
+
 Key design principles:
 - **No `Kernel.php`** — middleware registered declaratively in `bootstrap/app.php`.
 - **No inline validation** — all validation in Form Request classes.

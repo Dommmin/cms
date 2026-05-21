@@ -12,17 +12,10 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import type { SeoPanelProps } from './seo-panel.types';
+import { analyzeSeoHealth } from './seo-panel-health';
+import type { CharCounterProps, SeoPanelProps } from './seo-panel.types';
 
-function CharCounter({
-    value,
-    max,
-    warn,
-}: {
-    value: number;
-    max: number;
-    warn: number;
-}) {
+function CharCounter({ value, max, warn }: CharCounterProps) {
     const isGood = value >= warn && value <= max;
     const isOver = value > max;
     return (
@@ -77,9 +70,65 @@ export function SeoPanel({
 
     const displayTitle = data.seo_title || titleFallback;
     const displayDescription = data.seo_description || descriptionFallback;
+    const healthIssues = analyzeSeoHealth(data, {
+        displayTitle,
+        displayDescription,
+        showCanonical,
+    });
 
     return (
         <div className="space-y-6">
+            <div className="rounded-lg border bg-muted/20 p-4">
+                <div className="flex items-start justify-between gap-3">
+                    <div>
+                        <p className="text-sm font-medium">Content quality</p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                            Checks the SEO fields used before publishing.
+                        </p>
+                    </div>
+                    <span
+                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                            healthIssues.some(
+                                (issue) => issue.severity === 'error',
+                            )
+                                ? 'bg-destructive/10 text-destructive'
+                                : healthIssues.length > 0
+                                  ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300'
+                                  : 'bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300'
+                        }`}
+                    >
+                        {healthIssues.length === 0
+                            ? 'Ready'
+                            : `${healthIssues.length} issue${healthIssues.length === 1 ? '' : 's'}`}
+                    </span>
+                </div>
+
+                {healthIssues.length > 0 ? (
+                    <ul className="mt-3 space-y-2">
+                        {healthIssues.map((issue) => (
+                            <li
+                                key={issue.id}
+                                className="flex items-start gap-2 text-sm"
+                            >
+                                <AlertCircle
+                                    className={`mt-0.5 h-4 w-4 ${
+                                        issue.severity === 'error'
+                                            ? 'text-destructive'
+                                            : 'text-amber-600'
+                                    }`}
+                                />
+                                <span>{issue.message}</span>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className="mt-3 flex items-center gap-2 text-sm text-green-700 dark:text-green-300">
+                        <CheckCircle className="h-4 w-4" />
+                        No SEO publishing warnings.
+                    </p>
+                )}
+            </div>
+
             {/* SEO Title */}
             <div className="grid gap-2">
                 <div className="flex items-center justify-between">
@@ -135,6 +184,33 @@ export function SeoPanel({
                 <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
                     {displayDescription}
                 </p>
+            </div>
+
+            <div className="overflow-hidden rounded-lg border bg-card">
+                <div className="flex aspect-[1.91/1] items-center justify-center bg-muted">
+                    {data.og_image ? (
+                        <img
+                            src={data.og_image}
+                            alt=""
+                            className="h-full w-full object-cover"
+                        />
+                    ) : (
+                        <span className="text-xs text-muted-foreground">
+                            No Open Graph image
+                        </span>
+                    )}
+                </div>
+                <div className="space-y-1 p-4">
+                    <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                        Open Graph Preview
+                    </p>
+                    <p className="line-clamp-1 text-sm font-medium">
+                        {displayTitle}
+                    </p>
+                    <p className="line-clamp-2 text-xs text-muted-foreground">
+                        {displayDescription}
+                    </p>
+                </div>
             </div>
 
             {/* Canonical URL */}

@@ -1,6 +1,13 @@
 'use client';
 
-import { LayoutGrid, LayoutList, SlidersHorizontal } from 'lucide-react';
+import {
+    LayoutGrid,
+    LayoutList,
+    PackageOpen,
+    Search,
+    SlidersHorizontal,
+    X,
+} from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -21,7 +28,11 @@ import {
 import { useLocalePath } from '@/hooks/use-locale';
 import { useProducts } from '@/hooks/use-products';
 import { useTranslation } from '@/hooks/use-translation';
-import type { PendingFilters, ViewMode } from './ProductsClient.types';
+import type {
+    ActiveFilterChip,
+    PendingFilters,
+    ViewMode,
+} from './ProductsClient.types';
 
 function pendingFromSearchParams(
     searchParams: URLSearchParams,
@@ -177,6 +188,13 @@ export default function ProductsClient() {
         router.push(lp(`/products?${params.toString()}`));
     }
 
+    function removeFilterParam(key: string) {
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete(key);
+        params.delete('page');
+        router.push(lp(`/products?${params.toString()}`));
+    }
+
     function togglePendingAttribute(attributeSlug: string, valueSlug: string) {
         setPending((prev) => {
             const current = prev.attributes[attributeSlug] ?? [];
@@ -223,48 +241,309 @@ export default function ProductsClient() {
         return items;
     }
 
+    const activeFilterChips: ActiveFilterChip[] = [];
+    const activeBrand = searchParams.get('brand');
+
+    if (activeBrand) {
+        const brandLabel =
+            availableFilters?.brands.find(
+                (brand) => String(brand.id) === activeBrand,
+            )?.label ?? t('shop.brand', 'Brand');
+        activeFilterChips.push({
+            key: 'brand',
+            label: brandLabel,
+            onRemove: () => removeFilterParam('brand'),
+        });
+    }
+
+    if (searchParams.get('min_price')) {
+        activeFilterChips.push({
+            key: 'min_price',
+            label: `${t('shop.min_price', 'Min Price')}: ${searchParams.get('min_price')}`,
+            onRemove: () => removeFilterParam('min_price'),
+        });
+    }
+
+    if (searchParams.get('max_price')) {
+        activeFilterChips.push({
+            key: 'max_price',
+            label: `${t('shop.max_price', 'Max Price')}: ${searchParams.get('max_price')}`,
+            onRemove: () => removeFilterParam('max_price'),
+        });
+    }
+
+    if (searchParams.get('in_stock') === '1') {
+        activeFilterChips.push({
+            key: 'in_stock',
+            label: t('shop.in_stock_only', 'In stock only'),
+            onRemove: () => removeFilterParam('in_stock'),
+        });
+    }
+
+    Object.entries(appliedFilters.attributes ?? {}).forEach(
+        ([attributeSlug, values]) => {
+            values.forEach((valueSlug) => {
+                const attribute = availableFilters?.attributes.find(
+                    (item) => item.slug === attributeSlug,
+                );
+                const value = attribute?.values.find(
+                    (item) => item.slug === valueSlug,
+                );
+                activeFilterChips.push({
+                    key: `attr_${attributeSlug}_${valueSlug}`,
+                    label: `${attribute?.label ?? attributeSlug}: ${value?.label ?? valueSlug}`,
+                    onRemove: () => {
+                        const params = new URLSearchParams(
+                            searchParams.toString(),
+                        );
+                        const nextValues = values.filter(
+                            (item) => item !== valueSlug,
+                        );
+                        if (nextValues.length > 0) {
+                            params.set(
+                                `attr_${attributeSlug}`,
+                                nextValues.join(','),
+                            );
+                        } else {
+                            params.delete(`attr_${attributeSlug}`);
+                        }
+                        params.delete('page');
+                        router.push(lp(`/products?${params.toString()}`));
+                    },
+                });
+            });
+        },
+    );
+
+    const activeFilterCount = activeFilterChips.length;
+
+    const renderFiltersPanel = (idPrefix: string) => (
+        <div className="space-y-5">
+            <div className="flex items-start justify-between gap-3">
+                <div>
+                    <h2 className="text-sm font-semibold">
+                        {t('shop.filters', 'Filters')}
+                    </h2>
+                    <p className="text-muted-foreground mt-1 text-xs">
+                        {t(
+                            'shop.filters_hint',
+                            'Refine the product selection.',
+                        )}
+                    </p>
+                </div>
+                {activeFilterCount > 0 && (
+                    <span className="bg-secondary text-secondary-foreground rounded-full px-2 py-0.5 text-xs font-medium">
+                        {activeFilterCount}
+                    </span>
+                )}
+            </div>
+
+            {availableFilters && (
+                <div className="space-y-4">
+                    <div>
+                        <label
+                            htmlFor={`${idPrefix}-brand`}
+                            className="text-muted-foreground mb-1.5 block text-xs font-medium"
+                        >
+                            {t('shop.brand', 'Brand')}
+                        </label>
+                        <select
+                            id={`${idPrefix}-brand`}
+                            value={pending.brand}
+                            onChange={(e) =>
+                                setPending((prev) => ({
+                                    ...prev,
+                                    brand: e.target.value,
+                                }))
+                            }
+                            className="border-input bg-background focus:ring-ring min-h-11 w-full rounded-[var(--store-control-radius)] border px-3 text-sm focus:ring-2 focus:outline-none"
+                        >
+                            <option value="">
+                                {t('shop.all_brands', 'All brands')}
+                            </option>
+                            {availableFilters.brands.map((brand) => (
+                                <option key={brand.id} value={String(brand.id)}>
+                                    {brand.label} ({brand.count})
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <label
+                                htmlFor={`${idPrefix}-min-price`}
+                                className="text-muted-foreground mb-1.5 block text-xs font-medium"
+                            >
+                                {t('shop.min_price', 'Min Price')} (€)
+                            </label>
+                            <input
+                                id={`${idPrefix}-min-price`}
+                                type="number"
+                                value={pending.min_price}
+                                onChange={(e) =>
+                                    setPending((prev) => ({
+                                        ...prev,
+                                        min_price: e.target.value,
+                                    }))
+                                }
+                                className="border-input bg-background focus:ring-ring min-h-11 w-full rounded-[var(--store-control-radius)] border px-3 text-sm focus:ring-2 focus:outline-none"
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                htmlFor={`${idPrefix}-max-price`}
+                                className="text-muted-foreground mb-1.5 block text-xs font-medium"
+                            >
+                                {t('shop.max_price', 'Max Price')} (€)
+                            </label>
+                            <input
+                                id={`${idPrefix}-max-price`}
+                                type="number"
+                                value={pending.max_price}
+                                onChange={(e) =>
+                                    setPending((prev) => ({
+                                        ...prev,
+                                        max_price: e.target.value,
+                                    }))
+                                }
+                                className="border-input bg-background focus:ring-ring min-h-11 w-full rounded-[var(--store-control-radius)] border px-3 text-sm focus:ring-2 focus:outline-none"
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {availableFilters && availableFilters.attributes.length > 0 && (
+                <div className="space-y-5 border-t pt-5">
+                    {availableFilters.attributes.map((attribute) => (
+                        <div key={attribute.slug}>
+                            <p className="text-muted-foreground mb-2 text-xs font-medium">
+                                {attribute.label}
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                                {attribute.values.map((value) => {
+                                    const isSelected =
+                                        pending.attributes[
+                                            attribute.slug
+                                        ]?.includes(value.slug) ?? false;
+
+                                    return (
+                                        <button
+                                            key={`${attribute.slug}-${value.slug}`}
+                                            type="button"
+                                            onClick={() =>
+                                                togglePendingAttribute(
+                                                    attribute.slug,
+                                                    value.slug,
+                                                )
+                                            }
+                                            className={`min-h-9 rounded-full border px-3 text-sm transition-colors ${
+                                                isSelected
+                                                    ? 'border-primary bg-primary text-primary-foreground'
+                                                    : 'border-input bg-background hover:bg-accent'
+                                            }`}
+                                        >
+                                            {value.label} ({value.count})
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            <div className="space-y-4 border-t pt-5">
+                <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm">
+                    <input
+                        type="checkbox"
+                        checked={pending.in_stock}
+                        onChange={(e) =>
+                            setPending((prev) => ({
+                                ...prev,
+                                in_stock: e.target.checked,
+                            }))
+                        }
+                        className="accent-primary h-4 w-4 rounded"
+                    />
+                    {t('shop.in_stock_only', 'In stock only')}
+                </label>
+
+                <div className="grid grid-cols-2 gap-2">
+                    <button
+                        onClick={clearFilters}
+                        className="border-input bg-background hover:bg-accent min-h-11 rounded-[var(--store-control-radius)] border px-3 text-sm"
+                    >
+                        {t('shop.clear_filters', 'Clear all filters')}
+                    </button>
+                    <button
+                        onClick={() => {
+                            applyFilters();
+                            setShowFilters(false);
+                        }}
+                        className={`min-h-11 rounded-[var(--store-control-radius)] px-4 text-sm font-medium transition-colors ${
+                            hasChanges
+                                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                                : 'border-input bg-background text-muted-foreground cursor-default border'
+                        }`}
+                        disabled={!hasChanges}
+                    >
+                        {t('shop.apply_filters', 'Apply filters')}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+
     return (
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="store-shell mx-auto px-4 py-8 sm:px-6 lg:px-8">
             {appliedFilters.category && (
                 <CategoryBanner slug={appliedFilters.category} />
             )}
-            {/* Header row */}
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mb-6 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold">
+                    <p className="text-muted-foreground text-xs font-medium tracking-[0.18em] uppercase">
+                        {t('shop.collection_label', 'Collection')}
+                    </p>
+                    <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">
                         {t('shop.title', 'Shop')}
                     </h1>
                     {data && (
-                        <p className="text-muted-foreground mt-1 text-sm">
+                        <p className="text-muted-foreground mt-2 text-sm">
                             {data.meta?.total ?? data.data?.length ?? 0}{' '}
                             {t('shop.products_suffix', 'products')}
                         </p>
                     )}
                 </div>
-                <div className="flex items-center gap-3">
-                    {/* Search */}
+
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                     <label htmlFor="products-search" className="sr-only">
                         {t('shop.search_placeholder', 'Search products…')}
                     </label>
-                    <input
-                        id="products-search"
-                        type="search"
-                        placeholder={t(
-                            'shop.search_placeholder',
-                            'Search products…',
-                        )}
-                        defaultValue={appliedFilters.search ?? ''}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                setParam(
-                                    'search',
-                                    (e.target as HTMLInputElement).value,
-                                );
-                            }
-                        }}
-                        className="border-input bg-background focus:ring-ring rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
-                    />
-                    {/* Sort */}
+                    <div className="relative">
+                        <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                        <input
+                            id="products-search"
+                            type="search"
+                            placeholder={t(
+                                'shop.search_placeholder',
+                                'Search products…',
+                            )}
+                            defaultValue={appliedFilters.search ?? ''}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    setParam(
+                                        'search',
+                                        (e.target as HTMLInputElement).value,
+                                    );
+                                }
+                            }}
+                            className="border-input bg-background focus:ring-ring min-h-11 w-full rounded-[var(--store-control-radius)] border pr-3 pl-9 text-sm focus:ring-2 focus:outline-none sm:w-64"
+                        />
+                    </div>
+
                     <label htmlFor="products-sort" className="sr-only">
                         {t('shop.sort_label', 'Sort products')}
                     </label>
@@ -272,7 +551,7 @@ export default function ProductsClient() {
                         id="products-sort"
                         value={appliedFilters.sort ?? ''}
                         onChange={(e) => setParam('sort', e.target.value)}
-                        className="border-input bg-background focus:ring-ring rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
+                        className="border-input bg-background focus:ring-ring min-h-11 rounded-[var(--store-control-radius)] border px-3 text-sm focus:ring-2 focus:outline-none"
                     >
                         {SORT_OPTIONS.map((o) => (
                             <option key={o.value} value={o.value}>
@@ -281,384 +560,286 @@ export default function ProductsClient() {
                         ))}
                     </select>
 
-                    {/* View mode toggle */}
                     <div
                         role="group"
                         aria-label={t('shop.view_mode', 'View mode')}
-                        className="border-input flex overflow-hidden rounded-md border"
+                        className="border-input flex min-h-11 overflow-hidden rounded-[var(--store-control-radius)] border"
                     >
                         <button
                             onClick={() => changeViewMode('grid')}
                             aria-label={t('shop.view_grid', 'Grid view')}
                             aria-pressed={viewMode === 'grid'}
-                            className={`inline-flex items-center px-2.5 py-1.5 transition-colors ${
+                            className={`inline-flex min-w-11 items-center justify-center transition-colors ${
                                 viewMode === 'grid'
                                     ? 'bg-primary text-primary-foreground'
                                     : 'bg-background hover:bg-accent'
                             }`}
                         >
-                            <LayoutGrid
-                                className="h-4 w-4"
-                                aria-hidden="true"
-                            />
+                            <LayoutGrid className="h-4 w-4" />
                         </button>
                         <button
                             onClick={() => changeViewMode('list')}
                             aria-label={t('shop.view_list', 'List view')}
                             aria-pressed={viewMode === 'list'}
-                            className={`border-input inline-flex items-center border-l px-2.5 py-1.5 transition-colors ${
+                            className={`border-input inline-flex min-w-11 items-center justify-center border-l transition-colors ${
                                 viewMode === 'list'
                                     ? 'bg-primary text-primary-foreground'
                                     : 'bg-background hover:bg-accent'
                             }`}
                         >
-                            <LayoutList
-                                className="h-4 w-4"
-                                aria-hidden="true"
-                            />
+                            <LayoutList className="h-4 w-4" />
                         </button>
                     </div>
 
                     <button
-                        onClick={() => setShowFilters(!showFilters)}
+                        onClick={() => setShowFilters(true)}
                         aria-expanded={showFilters}
-                        aria-controls="products-filters-panel"
-                        className="border-input bg-background hover:bg-accent inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm"
+                        aria-controls="products-filters-drawer"
+                        className="border-input bg-background hover:bg-accent inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--store-control-radius)] border px-3 text-sm lg:hidden"
                     >
-                        <SlidersHorizontal
-                            className="h-4 w-4"
-                            aria-hidden="true"
-                        />
+                        <SlidersHorizontal className="h-4 w-4" />
                         {t('shop.filters', 'Filters')}
+                        {activeFilterCount > 0 && (
+                            <span className="bg-primary text-primary-foreground rounded-full px-1.5 text-xs">
+                                {activeFilterCount}
+                            </span>
+                        )}
                     </button>
                 </div>
             </div>
 
-            {/* Filters panel */}
+            {activeFilterChips.length > 0 && (
+                <div className="mb-6 flex flex-wrap items-center gap-2">
+                    {activeFilterChips.map((chip) => (
+                        <button
+                            key={chip.key}
+                            type="button"
+                            onClick={chip.onRemove}
+                            className="border-input bg-background hover:bg-accent inline-flex min-h-9 items-center gap-1 rounded-full border px-3 text-sm"
+                        >
+                            {chip.label}
+                            <X className="h-3.5 w-3.5" />
+                        </button>
+                    ))}
+                    <button
+                        type="button"
+                        onClick={clearFilters}
+                        className="text-muted-foreground hover:text-foreground min-h-9 px-2 text-sm underline-offset-4 hover:underline"
+                    >
+                        {t('shop.clear_filters', 'Clear all filters')}
+                    </button>
+                </div>
+            )}
+
             {showFilters && (
                 <div
-                    id="products-filters-panel"
-                    className="border-border bg-card mb-6 space-y-5 rounded-xl border p-4"
+                    id="products-filters-drawer"
+                    className="fixed inset-0 z-50 lg:hidden"
+                    role="dialog"
+                    aria-modal="true"
                 >
-                    {availableFilters && (
-                        <div className="grid gap-5 lg:grid-cols-3">
-                            <div>
-                                <label
-                                    htmlFor="products-brand"
-                                    className="text-muted-foreground mb-1 block text-xs font-medium"
-                                >
-                                    {t('shop.brand', 'Brand')}
-                                </label>
-                                <select
-                                    id="products-brand"
-                                    value={pending.brand}
-                                    onChange={(e) =>
-                                        setPending((prev) => ({
-                                            ...prev,
-                                            brand: e.target.value,
-                                        }))
-                                    }
-                                    className="border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
-                                >
-                                    <option value="">
-                                        {t('shop.all_brands', 'All brands')}
-                                    </option>
-                                    {availableFilters.brands.map((brand) => (
-                                        <option
-                                            key={brand.id}
-                                            value={String(brand.id)}
-                                        >
-                                            {brand.label} ({brand.count})
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <label
-                                    htmlFor="products-min-price"
-                                    className="text-muted-foreground mb-1 block text-xs font-medium"
-                                >
-                                    {t('shop.min_price', 'Min Price')} (€)
-                                </label>
-                                <input
-                                    id="products-min-price"
-                                    type="number"
-                                    value={pending.min_price}
-                                    onChange={(e) =>
-                                        setPending((prev) => ({
-                                            ...prev,
-                                            min_price: e.target.value,
-                                        }))
-                                    }
-                                    className="border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
-                                />
-                            </div>
-
-                            <div>
-                                <label
-                                    htmlFor="products-max-price"
-                                    className="text-muted-foreground mb-1 block text-xs font-medium"
-                                >
-                                    {t('shop.max_price', 'Max Price')} (€)
-                                </label>
-                                <input
-                                    id="products-max-price"
-                                    type="number"
-                                    value={pending.max_price}
-                                    onChange={(e) =>
-                                        setPending((prev) => ({
-                                            ...prev,
-                                            max_price: e.target.value,
-                                        }))
-                                    }
-                                    className="border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
-                                />
-                            </div>
-                        </div>
-                    )}
-
-                    {availableFilters &&
-                        availableFilters.attributes.length > 0 && (
-                            <div className="grid gap-4 lg:grid-cols-2">
-                                {availableFilters.attributes.map(
-                                    (attribute) => (
-                                        <div key={attribute.slug}>
-                                            <p className="text-muted-foreground mb-2 text-xs font-medium">
-                                                {attribute.label}
-                                            </p>
-                                            <div className="flex flex-wrap gap-2">
-                                                {attribute.values.map(
-                                                    (value) => {
-                                                        const isSelected =
-                                                            pending.attributes[
-                                                                attribute.slug
-                                                            ]?.includes(
-                                                                value.slug,
-                                                            ) ?? false;
-
-                                                        return (
-                                                            <button
-                                                                key={`${attribute.slug}-${value.slug}`}
-                                                                type="button"
-                                                                onClick={() =>
-                                                                    togglePendingAttribute(
-                                                                        attribute.slug,
-                                                                        value.slug,
-                                                                    )
-                                                                }
-                                                                className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
-                                                                    isSelected
-                                                                        ? 'border-primary bg-primary text-primary-foreground'
-                                                                        : 'border-input bg-background hover:bg-accent'
-                                                                }`}
-                                                            >
-                                                                {value.label} (
-                                                                {value.count})
-                                                            </button>
-                                                        );
-                                                    },
-                                                )}
-                                            </div>
-                                        </div>
-                                    ),
-                                )}
-                            </div>
-                        )}
-
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div className="flex items-center gap-6">
-                            <label className="flex cursor-pointer items-center gap-2 text-sm">
-                                <input
-                                    type="checkbox"
-                                    checked={pending.in_stock}
-                                    onChange={(e) =>
-                                        setPending((prev) => ({
-                                            ...prev,
-                                            in_stock: e.target.checked,
-                                        }))
-                                    }
-                                    className="accent-primary h-4 w-4 rounded"
-                                />
-                                {t('shop.in_stock_only', 'In stock only')}
-                            </label>
+                    <button
+                        type="button"
+                        className="absolute inset-0 bg-black/40"
+                        aria-label={t('shop.close_filters', 'Close filters')}
+                        onClick={() => setShowFilters(false)}
+                    />
+                    <div className="bg-card absolute right-0 bottom-0 left-0 max-h-[88vh] overflow-auto rounded-t-2xl border-t p-4 shadow-2xl">
+                        <div className="mb-4 flex items-center justify-between">
+                            <span className="text-sm font-semibold">
+                                {t('shop.filters', 'Filters')}
+                            </span>
                             <button
-                                onClick={clearFilters}
-                                className="border-input bg-background hover:bg-accent rounded-md border px-3 py-1.5 text-sm"
+                                type="button"
+                                onClick={() => setShowFilters(false)}
+                                className="hover:bg-accent flex h-10 w-10 items-center justify-center rounded-full"
+                                aria-label={t(
+                                    'shop.close_filters',
+                                    'Close filters',
+                                )}
                             >
-                                {t('shop.clear_filters', 'Clear all filters')}
+                                <X className="h-5 w-5" />
                             </button>
                         </div>
-
-                        <button
-                            onClick={applyFilters}
-                            className={`rounded-md px-5 py-1.5 text-sm font-medium transition-colors ${
-                                hasChanges
-                                    ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                                    : 'border-input bg-background text-muted-foreground cursor-default border'
-                            }`}
-                            disabled={!hasChanges}
-                        >
-                            {t('shop.apply_filters', 'Apply filters')}
-                            {hasChanges && (
-                                <span className="bg-primary-foreground/20 ml-2 inline-block h-2 w-2 rounded-full" />
-                            )}
-                        </button>
+                        {renderFiltersPanel('products-mobile-filters')}
                     </div>
                 </div>
             )}
 
-            {/* Product list */}
-            {isLoading ? (
-                viewMode === 'grid' ? (
-                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                        {Array.from({ length: 8 }).map((_, i) => (
-                            <div
-                                key={i}
-                                className="border-border bg-card overflow-hidden rounded-xl border"
-                            >
-                                <div className="bg-muted aspect-square animate-pulse" />
-                                <div className="space-y-2 p-4">
-                                    <div className="bg-muted h-3 w-1/3 animate-pulse rounded" />
-                                    <div className="bg-muted h-4 w-3/4 animate-pulse rounded" />
-                                    <div className="bg-muted h-4 w-1/2 animate-pulse rounded" />
-                                    <div className="bg-muted mt-3 h-9 animate-pulse rounded-lg" />
-                                </div>
-                            </div>
-                        ))}
+            <div className="grid gap-6 lg:grid-cols-[17rem_minmax(0,1fr)]">
+                <aside className="hidden lg:block">
+                    <div className="border-border bg-card sticky top-24 rounded-[var(--store-card-radius)] border p-4 shadow-[var(--store-shadow-soft)]">
+                        {renderFiltersPanel('products-desktop-filters')}
                     </div>
-                ) : (
-                    <div className="flex flex-col gap-4">
-                        {Array.from({ length: 6 }).map((_, i) => (
-                            <div
-                                key={i}
-                                className="border-border bg-card flex gap-4 rounded-xl border p-4 sm:gap-6"
-                            >
-                                <div className="bg-muted h-32 w-32 shrink-0 animate-pulse rounded-lg sm:h-40 sm:w-40" />
-                                <div className="flex flex-1 flex-col gap-3 py-1">
-                                    <div className="bg-muted h-3 w-24 animate-pulse rounded" />
-                                    <div className="bg-muted h-5 w-2/3 animate-pulse rounded" />
-                                    <div className="bg-muted h-5 w-1/4 animate-pulse rounded" />
-                                    <div className="flex gap-2">
-                                        <div className="bg-muted h-6 w-20 animate-pulse rounded-md" />
-                                        <div className="bg-muted h-6 w-20 animate-pulse rounded-md" />
+                </aside>
+
+                <div className="min-w-0">
+                    {isLoading ? (
+                        viewMode === 'grid' ? (
+                            <div className="grid grid-cols-2 gap-[var(--store-grid-gap)] sm:grid-cols-3 xl:grid-cols-4">
+                                {Array.from({ length: 8 }).map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className="border-border bg-card overflow-hidden rounded-[var(--store-card-radius)] border"
+                                    >
+                                        <div className="bg-muted aspect-[var(--store-product-image-ratio)] animate-pulse" />
+                                        <div className="space-y-2 p-4">
+                                            <div className="bg-muted h-3 w-1/3 animate-pulse rounded" />
+                                            <div className="bg-muted h-4 w-3/4 animate-pulse rounded" />
+                                            <div className="bg-muted h-4 w-1/2 animate-pulse rounded" />
+                                            <div className="bg-muted mt-3 h-11 animate-pulse rounded-md" />
+                                        </div>
                                     </div>
-                                    <div className="mt-auto flex gap-2">
-                                        <div className="bg-muted h-8 w-28 animate-pulse rounded-lg" />
-                                        <div className="bg-muted h-8 w-8 animate-pulse rounded-lg" />
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )
-            ) : data?.data?.length === 0 ? (
-                <div className="text-muted-foreground py-24 text-center">
-                    {t('shop.no_products', 'No products found.')}{' '}
-                    <button onClick={clearFilters} className="underline">
-                        {t('shop.clear_filters_link', 'Clear filters')}
-                    </button>
-                </div>
-            ) : (
-                <>
-                    <div
-                        className="transition-opacity duration-200"
-                        style={{ opacity: isFetching ? 0.4 : 1 }}
-                    >
-                        {viewMode === 'grid' ? (
-                            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                                {data?.data?.map((product) => (
-                                    <ProductCard
-                                        key={product.id}
-                                        product={product}
-                                    />
                                 ))}
                             </div>
                         ) : (
                             <div className="flex flex-col gap-4">
-                                {data?.data?.map((product) => (
-                                    <ProductListItem
-                                        key={product.id}
-                                        product={product}
-                                    />
+                                {Array.from({ length: 6 }).map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className="border-border bg-card flex gap-4 rounded-[var(--store-card-radius)] border p-4 sm:gap-6"
+                                    >
+                                        <div className="bg-muted h-32 w-28 shrink-0 animate-pulse rounded-md sm:h-40 sm:w-36" />
+                                        <div className="flex flex-1 flex-col gap-3 py-1">
+                                            <div className="bg-muted h-3 w-24 animate-pulse rounded" />
+                                            <div className="bg-muted h-5 w-2/3 animate-pulse rounded" />
+                                            <div className="bg-muted h-5 w-1/4 animate-pulse rounded" />
+                                            <div className="mt-auto flex gap-2">
+                                                <div className="bg-muted h-10 w-28 animate-pulse rounded-md" />
+                                                <div className="bg-muted h-10 w-10 animate-pulse rounded-md" />
+                                            </div>
+                                        </div>
+                                    </div>
                                 ))}
                             </div>
-                        )}
-                    </div>
+                        )
+                    ) : data?.data?.length === 0 ? (
+                        <div className="border-border bg-card flex min-h-[24rem] flex-col items-center justify-center rounded-[var(--store-card-radius)] border px-6 text-center shadow-[var(--store-shadow-soft)]">
+                            <PackageOpen className="text-muted-foreground h-10 w-10" />
+                            <h2 className="mt-4 text-xl font-semibold">
+                                {t('shop.no_products', 'No products found.')}
+                            </h2>
+                            <p className="text-muted-foreground mt-2 max-w-sm text-sm">
+                                {t(
+                                    'shop.no_products_hint',
+                                    'Try removing filters or searching for a broader term.',
+                                )}
+                            </p>
+                            <button
+                                onClick={clearFilters}
+                                className="bg-primary text-primary-foreground mt-6 min-h-11 rounded-[var(--store-control-radius)] px-5 text-sm font-medium"
+                            >
+                                {t('shop.clear_filters_link', 'Clear filters')}
+                            </button>
+                        </div>
+                    ) : (
+                        <>
+                            <div
+                                className="transition-opacity duration-200"
+                                style={{ opacity: isFetching ? 0.4 : 1 }}
+                            >
+                                {viewMode === 'grid' ? (
+                                    <div className="grid grid-cols-2 gap-[var(--store-grid-gap)] sm:grid-cols-3 xl:grid-cols-4">
+                                        {data?.data?.map((product) => (
+                                            <ProductCard
+                                                key={product.id}
+                                                product={product}
+                                            />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col gap-4">
+                                        {data?.data?.map((product) => (
+                                            <ProductListItem
+                                                key={product.id}
+                                                product={product}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
 
-                    {/* Pagination */}
-                    {data?.meta && data.meta.last_page > 1 && (
-                        <Pagination className="mt-8">
-                            <PaginationContent>
-                                <PaginationItem>
-                                    <PaginationPrevious
-                                        onClick={() =>
-                                            setParam(
-                                                'page',
-                                                String(
-                                                    data.meta!.current_page - 1,
-                                                ),
-                                            )
-                                        }
-                                        disabled={data.meta.current_page <= 1}
-                                    />
-                                </PaginationItem>
-
-                                {buildPaginationItems(
-                                    data.meta.current_page,
-                                    data.meta.last_page,
-                                ).map((item, index) =>
-                                    item === 'ellipsis' ? (
-                                        <PaginationItem
-                                            key={`ellipsis-${index}`}
-                                        >
-                                            <PaginationEllipsis />
-                                        </PaginationItem>
-                                    ) : (
-                                        <PaginationItem key={item}>
-                                            <PaginationLink
-                                                isActive={
-                                                    item ===
-                                                    data.meta!.current_page
-                                                }
+                            {data?.meta && data.meta.last_page > 1 && (
+                                <Pagination className="mt-8">
+                                    <PaginationContent>
+                                        <PaginationItem>
+                                            <PaginationPrevious
                                                 onClick={() =>
                                                     setParam(
                                                         'page',
-                                                        String(item),
+                                                        String(
+                                                            data.meta!
+                                                                .current_page -
+                                                                1,
+                                                        ),
                                                     )
                                                 }
-                                                aria-label={t(
-                                                    'shop.go_to_page',
-                                                    `Go to page ${item}`,
-                                                )}
-                                            >
-                                                {item}
-                                            </PaginationLink>
+                                                disabled={
+                                                    data.meta.current_page <= 1
+                                                }
+                                            />
                                         </PaginationItem>
-                                    ),
-                                )}
 
-                                <PaginationItem>
-                                    <PaginationNext
-                                        onClick={() =>
-                                            setParam(
-                                                'page',
-                                                String(
-                                                    data.meta!.current_page + 1,
-                                                ),
-                                            )
-                                        }
-                                        disabled={
-                                            data.meta.current_page >=
-                                            data.meta.last_page
-                                        }
-                                    />
-                                </PaginationItem>
-                            </PaginationContent>
-                        </Pagination>
+                                        {buildPaginationItems(
+                                            data.meta.current_page,
+                                            data.meta.last_page,
+                                        ).map((item, index) =>
+                                            item === 'ellipsis' ? (
+                                                <PaginationItem
+                                                    key={`ellipsis-${index}`}
+                                                >
+                                                    <PaginationEllipsis />
+                                                </PaginationItem>
+                                            ) : (
+                                                <PaginationItem key={item}>
+                                                    <PaginationLink
+                                                        isActive={
+                                                            item ===
+                                                            data.meta!
+                                                                .current_page
+                                                        }
+                                                        onClick={() =>
+                                                            setParam(
+                                                                'page',
+                                                                String(item),
+                                                            )
+                                                        }
+                                                        aria-label={t(
+                                                            'shop.go_to_page',
+                                                            `Go to page ${item}`,
+                                                        )}
+                                                    >
+                                                        {item}
+                                                    </PaginationLink>
+                                                </PaginationItem>
+                                            ),
+                                        )}
+
+                                        <PaginationItem>
+                                            <PaginationNext
+                                                onClick={() =>
+                                                    setParam(
+                                                        'page',
+                                                        String(
+                                                            data.meta!
+                                                                .current_page +
+                                                                1,
+                                                        ),
+                                                    )
+                                                }
+                                                disabled={
+                                                    data.meta.current_page >=
+                                                    data.meta.last_page
+                                                }
+                                            />
+                                        </PaginationItem>
+                                    </PaginationContent>
+                                </Pagination>
+                            )}
+                        </>
                     )}
-                </>
-            )}
+                </div>
+            </div>
             <BackToTop />
         </div>
     );

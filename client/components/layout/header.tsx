@@ -15,7 +15,7 @@ import { SearchBar } from './search-bar';
 import { ThemeToggle } from './theme-toggle';
 import { WishlistButton } from './wishlist-button';
 
-export async function Header({ modules }: HeaderProps) {
+export async function Header({ modules, siteName = 'Store' }: HeaderProps) {
     const [headersList, cookieStore] = await Promise.all([
         headers(),
         cookies(),
@@ -46,10 +46,10 @@ export async function Header({ modules }: HeaderProps) {
             <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 {/* Logo */}
                 <Link
-                    href="/"
+                    href={`/${locale}`}
                     className="text-primary shrink-0 text-xl font-bold tracking-tight"
                 >
-                    CMS
+                    {siteName}
                 </Link>
 
                 {/* Desktop mega menu */}

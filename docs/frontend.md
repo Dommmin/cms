@@ -127,6 +127,23 @@ Tailwind CSS v4. Dark mode via `.dark` class on `<html>` element.
 @custom-variant dark (&:is(.dark *))
 ```
 
+Public storefront design tokens live in `client/app/globals.css` as `--store-*`
+variables. Use them for product/card-heavy surfaces before adding ad hoc classes:
+
+- `--store-shell-width`, `--store-content-width`
+- `--store-section-y`, `--store-grid-gap`
+- `--store-card-radius`, `--store-control-radius`
+- `--store-product-image-ratio`
+- `--store-focus-ring`, `--store-shadow-soft`, `--store-shadow-lifted`
+
+The product listing uses a persistent desktop filter sidebar and a mobile filter
+drawer. Active filters are represented as removable chips derived from URL params.
+
+Product detail UI is split under `client/app/products/[slug]/` into focused
+components for gallery, buy box, variant selection, delivery info, tabs, reviews,
+and related products. Keep product data hooks in `ProductDetailClient.tsx` and
+pass presentation state through typed props.
+
 ---
 
 ## Public Frontend (`client/`)

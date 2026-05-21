@@ -1,16 +1,12 @@
 'use client';
 
-import { Share2, ShoppingCart, Star, ThumbsUp } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
+import type { FormEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { Breadcrumb } from '@/components/breadcrumb';
-import { CompareButton } from '@/components/compare-button';
 import { JsonLd } from '@/components/json-ld';
-import { LiveViewers } from '@/components/live-viewers';
-import { ProductCard } from '@/components/product-card';
 import { RecentlyViewed } from '@/components/recently-viewed';
 import { useMe } from '@/hooks/use-auth';
 import { useAddToCart } from '@/hooks/use-cart';
@@ -28,36 +24,12 @@ import { useTranslation } from '@/hooks/use-translation';
 import { trackViewItem } from '@/lib/datalayer';
 import { buildBreadcrumbList, buildProduct } from '@/lib/schema';
 import { generateCanonical } from '@/lib/seo';
-
-function StarRating({
-    value,
-    onChange,
-}: {
-    value: number;
-    onChange?: (v: number) => void;
-}) {
-    const [hovered, setHovered] = useState(0);
-    const display = hovered || value;
-    return (
-        <div className="flex gap-0.5">
-            {[1, 2, 3, 4, 5].map((n) => (
-                <button
-                    key={n}
-                    type="button"
-                    onClick={() => onChange?.(n)}
-                    onMouseEnter={() => onChange && setHovered(n)}
-                    onMouseLeave={() => onChange && setHovered(0)}
-                    className={onChange ? 'cursor-pointer' : 'cursor-default'}
-                    aria-label={`${n} star`}
-                >
-                    <Star
-                        className={`h-5 w-5 ${n <= display ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`}
-                    />
-                </button>
-            ))}
-        </div>
-    );
-}
+import {
+    ProductBuyBox,
+    ProductGallery,
+    ProductTabs,
+    RelatedProducts,
+} from './product-detail-components';
 
 export default function ProductDetailClient({ slug }: { slug: string }) {
     const { data: product, isLoading } = useProduct(slug);
@@ -156,9 +128,6 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
         ),
     );
     const price = formatPrice(selectedVariant?.price ?? product.price_min);
-    const images = product.images ?? [];
-    const activeImage = images[activeImageIndex] ?? null;
-
     function handleAddToCart() {
         const variant = selectedVariant ?? product?.variants?.[0];
         if (!variant) {
@@ -174,7 +143,21 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
         );
     }
 
-    function handleReviewSubmit(e: React.FormEvent) {
+    async function handleShare() {
+        const url = window.location.href;
+        if (navigator.share) {
+            await navigator.share({
+                title: currentProduct.name,
+                url,
+            });
+            return;
+        }
+
+        await navigator.clipboard.writeText(url);
+        toast.success(t('product.link_copied', 'Link copied!'));
+    }
+
+    function handleReviewSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (rating === 0) {
             toast.error('Please select a rating');
@@ -207,6 +190,15 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
             : null;
 
     const productUrl = generateCanonical(`/products/${product.slug}`);
+    const compareAtPrice =
+        selectedVariant?.compare_at_price &&
+        selectedVariant.compare_at_price > selectedVariant.price
+            ? formatPrice(selectedVariant.compare_at_price)
+            : null;
+    const omnibusPrice =
+        compareAtPrice && selectedVariant?.omnibus_price !== null
+            ? formatPrice(selectedVariant?.omnibus_price ?? 0)
+            : null;
 
     const breadcrumbs = [
         { label: t('nav.products', 'Products'), href: lp('/products') },
@@ -274,7 +266,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
     }
 
     return (
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="store-shell mx-auto px-4 py-12 sm:px-6 lg:px-8">
             <Breadcrumb items={breadcrumbs} homeHref={lp('/')} />
             <JsonLd
                 data={buildProduct(product, { url: productUrl, reviews })}
@@ -296,526 +288,131 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                 ])}
             />
             <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-                {/* Gallery */}
-                <div>
-                    <div className="bg-muted relative aspect-square overflow-hidden rounded-xl">
-                        {activeImage ? (
-                            <Image
-                                src={activeImage.url}
-                                alt={activeImage.alt ?? product.name}
-                                fill
-                                priority
-                                className="object-cover"
-                                sizes="(max-width: 1024px) 100vw, 50vw"
-                            />
-                        ) : product.thumbnail ? (
-                            <Image
-                                src={product.thumbnail.url}
-                                alt={product.thumbnail.alt ?? product.name}
-                                fill
-                                priority
-                                className="object-cover"
-                                sizes="(max-width: 1024px) 100vw, 50vw"
-                            />
-                        ) : (
-                            <div className="text-muted-foreground flex h-full items-center justify-center">
-                                {t('product.no_image', 'No image')}
-                            </div>
-                        )}
-                    </div>
-                    {images.length > 1 && (
-                        <div className="mt-3 grid grid-cols-5 gap-2">
-                            {images.map((img, i) => (
-                                <button
-                                    key={img.id}
-                                    onClick={() => setActiveImageIndex(i)}
-                                    aria-label={
-                                        img.alt ??
-                                        `${product.name} – image ${i + 1}`
-                                    }
-                                    aria-pressed={i === activeImageIndex}
-                                    className={`relative aspect-square overflow-hidden rounded-lg border-2 ${i === activeImageIndex ? 'border-primary' : 'border-transparent'}`}
-                                >
-                                    <Image
-                                        src={img.url}
-                                        alt=""
-                                        fill
-                                        className="object-cover"
-                                        sizes="80px"
-                                    />
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                <ProductGallery
+                    product={product}
+                    activeImageIndex={activeImageIndex}
+                    onImageSelect={setActiveImageIndex}
+                    noImageLabel={t('product.no_image', 'No image')}
+                />
 
-                {/* Details */}
-                <div>
-                    {product.brand && (
-                        <p className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
-                            {product.brand.name}
-                        </p>
-                    )}
-                    <h1 className="mt-1 text-3xl font-bold">{product.name}</h1>
-
-                    {/* Rating summary */}
-                    {avgRating && (
-                        <div className="mt-2 flex items-center gap-2">
-                            <StarRating value={Math.round(avgRating)} />
-                            <span className="text-muted-foreground text-sm">
-                                {avgRating} ({totalReviews}{' '}
-                                {totalReviews === 1 ? 'review' : 'reviews'})
-                            </span>
-                        </div>
-                    )}
-
-                    <div className="mt-3">
-                        <p className="text-2xl font-semibold">{price}</p>
-                        <div className="mt-1">
-                            <LiveViewers />
-                        </div>
-                        {selectedVariant?.compare_at_price &&
-                            selectedVariant.compare_at_price >
-                                selectedVariant.price && (
-                                <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-3 text-sm">
-                                    <span className="line-through">
-                                        {formatPrice(
-                                            selectedVariant.compare_at_price,
-                                        )}
-                                    </span>
-                                    {selectedVariant.omnibus_price !== null && (
-                                        <span>
-                                            {t(
-                                                'product.omnibus_label',
-                                                'Lowest price in last 30 days',
-                                            )}
-                                            :{' '}
-                                            <span className="font-medium">
-                                                {formatPrice(
-                                                    selectedVariant.omnibus_price,
-                                                )}
-                                            </span>
-                                        </span>
-                                    )}
-                                </div>
-                            )}
-                    </div>
-
-                    {/* Variants */}
-                    {variantAttributeGroups.length > 0 && (
-                        <div className="mt-6">
-                            <p className="mb-3 text-sm font-medium">
-                                {t('product.select_variant', 'Select variant')}
-                            </p>
-                            <div className="space-y-4">
-                                {variantAttributeGroups.map(
-                                    ([attributeName, values]) => (
-                                        <div key={attributeName}>
-                                            <p className="text-muted-foreground mb-2 text-sm font-medium">
-                                                {attributeName}
-                                            </p>
-                                            <div className="flex flex-wrap gap-2">
-                                                {values.map((value) => {
-                                                    const isSelected =
-                                                        selectedVariant
-                                                            ?.attributes?.[
-                                                            attributeName
-                                                        ] === value;
-                                                    const isSelectable =
-                                                        isAttributeValueSelectable(
-                                                            attributeName,
-                                                            value,
-                                                        );
-
-                                                    return (
-                                                        <button
-                                                            key={`${attributeName}-${value}`}
-                                                            type="button"
-                                                            onClick={() =>
-                                                                selectVariantAttribute(
-                                                                    attributeName,
-                                                                    value,
-                                                                )
-                                                            }
-                                                            disabled={
-                                                                !isSelectable
-                                                            }
-                                                            aria-pressed={
-                                                                isSelected
-                                                            }
-                                                            className={`rounded-md border px-3 py-1.5 text-sm disabled:opacity-40 ${
-                                                                isSelected
-                                                                    ? 'border-primary bg-primary text-primary-foreground'
-                                                                    : 'border-input hover:bg-accent'
-                                                            }`}
-                                                        >
-                                                            {value}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    ),
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Quantity selector */}
-                    <div className="mt-6 flex items-center gap-3">
-                        <span className="text-sm font-medium">
-                            {t('product.quantity', 'Quantity')}
-                        </span>
-                        <div className="border-border flex items-center rounded-lg border">
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setQuantity((q) => Math.max(1, q - 1))
-                                }
-                                className="text-muted-foreground hover:text-foreground px-3 py-2 text-lg leading-none"
-                                aria-label="Decrease quantity"
-                            >
-                                −
-                            </button>
-                            <span className="min-w-[2.5rem] text-center text-sm font-semibold">
-                                {quantity}
-                            </span>
-                            <button
-                                type="button"
-                                onClick={() => setQuantity((q) => q + 1)}
-                                className="text-muted-foreground hover:text-foreground px-3 py-2 text-lg leading-none"
-                                aria-label="Increase quantity"
-                            >
-                                +
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Add to cart */}
-                    <button
-                        onClick={handleAddToCart}
-                        disabled={isPending || !product.is_active}
-                        aria-busy={isPending}
-                        className="bg-primary text-primary-foreground mt-4 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
-                    >
-                        <ShoppingCart className="h-5 w-5" aria-hidden="true" />
-                        {isPending
-                            ? t('product.adding', 'Adding…')
-                            : t('product.add_to_cart', 'Add to Cart')}
-                    </button>
-                    <div className="mt-3 flex gap-2">
-                        <CompareButton
-                            productId={product.id}
-                            className="flex-1 justify-center"
-                        />
-                        <button
-                            type="button"
-                            onClick={async () => {
-                                const url = window.location.href;
-                                if (navigator.share) {
-                                    await navigator.share({
-                                        title: product.name,
-                                        url,
-                                    });
-                                } else {
-                                    await navigator.clipboard.writeText(url);
-                                    toast.success(
-                                        t(
-                                            'product.link_copied',
-                                            'Link copied!',
-                                        ),
-                                    );
-                                }
-                            }}
-                            className="border-input hover:bg-accent inline-flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium"
-                            aria-label={t('product.share', 'Share product')}
-                        >
-                            <Share2 className="h-4 w-4" aria-hidden="true" />
-                            <span className="hidden sm:inline">
-                                {t('product.share', 'Share')}
-                            </span>
-                        </button>
-                    </div>
-
-                    {/* Short description */}
-                    {product.short_description && (
-                        <p className="text-muted-foreground mt-6">
-                            {product.short_description}
-                        </p>
-                    )}
-                </div>
+                <ProductBuyBox
+                    product={product}
+                    selectedVariant={selectedVariant}
+                    variantAttributeGroups={variantAttributeGroups}
+                    quantity={quantity}
+                    avgRating={avgRating}
+                    totalReviews={totalReviews}
+                    price={price}
+                    compareAtPrice={compareAtPrice}
+                    omnibusPrice={omnibusPrice}
+                    isPending={isPending}
+                    onQuantityChange={setQuantity}
+                    onAddToCart={handleAddToCart}
+                    onShare={handleShare}
+                    onSelectAttribute={selectVariantAttribute}
+                    isAttributeValueSelectable={isAttributeValueSelectable}
+                    labels={{
+                        selectVariant: t(
+                            'product.select_variant',
+                            'Select variant',
+                        ),
+                        quantity: t('product.quantity', 'Quantity'),
+                        decreaseQuantity: t(
+                            'product.decrease_quantity',
+                            'Decrease quantity',
+                        ),
+                        increaseQuantity: t(
+                            'product.increase_quantity',
+                            'Increase quantity',
+                        ),
+                        adding: t('product.adding', 'Adding…'),
+                        addToCart: t('product.add_to_cart', 'Add to Cart'),
+                        share: t('product.share', 'Share'),
+                        reviewSingular: t('product.review', 'review'),
+                        reviewPlural: t('product.reviews', 'reviews'),
+                        omnibus: t(
+                            'product.omnibus_label',
+                            'Lowest price in last 30 days',
+                        ),
+                        delivery: t('product.delivery', 'Delivery'),
+                        deliveryHint: t(
+                            'product.delivery_hint',
+                            'Standard delivery options are available at checkout.',
+                        ),
+                        returns: t('product.returns', 'Returns'),
+                        returnsHint: t(
+                            'product.returns_hint',
+                            '14-day return window for eligible products.',
+                        ),
+                        inStock: t('product.in_stock', 'In stock'),
+                        unavailable: t('product.unavailable', 'Unavailable'),
+                    }}
+                />
             </div>
 
-            {/* Tabs: Description / Reviews */}
-            <div className="mt-12">
-                <div
-                    role="tablist"
-                    aria-label={t('product.tabs_label', 'Product information')}
-                    className="border-border flex gap-1 border-b"
-                >
-                    {(['description', 'reviews'] as const).map((tab) => (
-                        <button
-                            key={tab}
-                            role="tab"
-                            id={`tab-${tab}`}
-                            aria-selected={activeTab === tab}
-                            aria-controls={`tabpanel-${tab}`}
-                            onClick={() => setActiveTab(tab)}
-                            className={`px-4 py-2 text-sm font-medium capitalize ${
-                                activeTab === tab
-                                    ? 'border-primary text-foreground border-b-2'
-                                    : 'text-muted-foreground hover:text-foreground'
-                            }`}
-                        >
-                            {tab === 'description'
-                                ? t('product.tab_description', 'Description')
-                                : t('product.tab_reviews', 'Reviews')}
-                            {tab === 'reviews' && totalReviews > 0
-                                ? ` (${totalReviews})`
-                                : ''}
-                        </button>
-                    ))}
-                </div>
+            <ProductTabs
+                activeTab={activeTab}
+                product={product}
+                reviews={reviews}
+                totalReviews={totalReviews}
+                userExists={Boolean(user)}
+                reviewSubmitted={reviewSubmitted}
+                rating={rating}
+                reviewTitle={reviewTitle}
+                reviewBody={reviewBody}
+                isSubmitting={isSubmitting}
+                loginHref={lp('/login')}
+                onTabChange={setActiveTab}
+                onReviewSubmit={handleReviewSubmit}
+                onRatingChange={setRating}
+                onReviewTitleChange={setReviewTitle}
+                onReviewBodyChange={setReviewBody}
+                onMarkHelpful={markHelpful}
+                labels={{
+                    tabs: t('product.tabs_label', 'Product information'),
+                    description: t('product.tab_description', 'Description'),
+                    reviews: t('product.tab_reviews', 'Reviews'),
+                    noReviews: t(
+                        'product.no_reviews',
+                        'No reviews yet. Be the first!',
+                    ),
+                    verified: t('product.verified', 'Verified'),
+                    helpful: t('product.helpful', 'Helpful'),
+                    markHelpful: t(
+                        'product.mark_helpful',
+                        'Mark review by {author} as helpful',
+                    ),
+                    writeReview: t('product.write_review', 'Write a review'),
+                    rating: t('product.rating_label', 'Rating'),
+                    optional: t('common.optional', 'optional'),
+                    title: t('product.review_title_label', 'Title'),
+                    review: t('product.review_body_label', 'Review'),
+                    titlePlaceholder: t(
+                        'product.review_title_placeholder',
+                        'Summarise your experience…',
+                    ),
+                    bodyPlaceholder: t(
+                        'product.review_body_placeholder',
+                        'Tell others what you think about this product…',
+                    ),
+                    submitting: t('product.submitting', 'Submitting…'),
+                    submit: t('product.submit_review', 'Submit review'),
+                    thankYou: t(
+                        'product.review_thank_you',
+                        'Thank you for your review! It will appear after moderation.',
+                    ),
+                    login: t('auth.login', 'Log in'),
+                    loginSuffix: t(
+                        'product.login_to_review',
+                        'to write a review.',
+                    ),
+                }}
+            />
 
-                <div className="mt-6">
-                    {/* Description tab */}
-                    {activeTab === 'description' && (
-                        <div
-                            role="tabpanel"
-                            id="tabpanel-description"
-                            aria-labelledby="tab-description"
-                            className="prose prose-lg"
-                            dangerouslySetInnerHTML={{
-                                __html: product.description ?? '',
-                            }}
-                        />
-                    )}
-
-                    {/* Reviews tab */}
-                    {activeTab === 'reviews' && (
-                        <div
-                            role="tabpanel"
-                            id="tabpanel-reviews"
-                            aria-labelledby="tab-reviews"
-                            className="space-y-8"
-                        >
-                            {/* Review list */}
-                            {reviews.length === 0 ? (
-                                <p className="text-muted-foreground">
-                                    {t(
-                                        'product.no_reviews',
-                                        'No reviews yet. Be the first!',
-                                    )}
-                                </p>
-                            ) : (
-                                <div className="space-y-4">
-                                    {reviews.map((review) => (
-                                        <div
-                                            key={review.id}
-                                            className="border-border rounded-xl border p-4"
-                                        >
-                                            <div className="flex items-start justify-between gap-2">
-                                                <div>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-medium">
-                                                            {review.author}
-                                                        </span>
-                                                        {review.is_verified_purchase && (
-                                                            <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700">
-                                                                Verified
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <div className="mt-1 flex items-center gap-2">
-                                                        <StarRating
-                                                            value={
-                                                                review.rating
-                                                            }
-                                                        />
-                                                        <span className="text-muted-foreground text-xs">
-                                                            {new Date(
-                                                                review.created_at,
-                                                            ).toLocaleDateString()}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {review.title && (
-                                                <p className="mt-2 font-medium">
-                                                    {review.title}
-                                                </p>
-                                            )}
-                                            <p className="text-muted-foreground mt-1 text-sm">
-                                                {review.body}
-                                            </p>
-                                            {/* Helpful vote */}
-                                            <div className="mt-3">
-                                                <button
-                                                    onClick={() =>
-                                                        markHelpful(review.id)
-                                                    }
-                                                    aria-label={t(
-                                                        'product.mark_helpful',
-                                                        `Mark review by ${review.author} as helpful`,
-                                                    ).replace(
-                                                        '{author}',
-                                                        review.author,
-                                                    )}
-                                                    className="border-border text-muted-foreground hover:bg-accent hover:text-foreground inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs"
-                                                >
-                                                    <ThumbsUp
-                                                        className="h-3.5 w-3.5"
-                                                        aria-hidden="true"
-                                                    />
-                                                    <span>
-                                                        Helpful (
-                                                        {review.helpful_count})
-                                                    </span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Write a review form */}
-                            {user ? (
-                                reviewSubmitted ? (
-                                    <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800">
-                                        Thank you for your review! It will
-                                        appear after moderation.
-                                    </div>
-                                ) : (
-                                    <form
-                                        onSubmit={handleReviewSubmit}
-                                        className="border-border bg-card rounded-xl border p-6"
-                                    >
-                                        <h3 className="mb-4 font-semibold">
-                                            {t(
-                                                'product.write_review',
-                                                'Write a review',
-                                            )}
-                                        </h3>
-
-                                        <div className="mb-4">
-                                            <p
-                                                id="review-rating-label"
-                                                className="mb-1 block text-sm font-medium"
-                                            >
-                                                {t(
-                                                    'product.rating_label',
-                                                    'Rating',
-                                                )}{' '}
-                                                *
-                                            </p>
-                                            <div aria-labelledby="review-rating-label">
-                                                <StarRating
-                                                    value={rating}
-                                                    onChange={setRating}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="mb-4">
-                                            <label
-                                                htmlFor="review-title"
-                                                className="mb-1 block text-sm font-medium"
-                                            >
-                                                {t(
-                                                    'product.review_title_label',
-                                                    'Title',
-                                                )}{' '}
-                                                <span className="text-muted-foreground font-normal">
-                                                    (
-                                                    {t(
-                                                        'common.optional',
-                                                        'optional',
-                                                    )}
-                                                    )
-                                                </span>
-                                            </label>
-                                            <input
-                                                id="review-title"
-                                                type="text"
-                                                value={reviewTitle}
-                                                onChange={(e) =>
-                                                    setReviewTitle(
-                                                        e.target.value,
-                                                    )
-                                                }
-                                                placeholder="Summarise your experience…"
-                                                className="border-input bg-background focus:ring-ring w-full rounded-xl border px-4 py-2 text-sm focus:ring-2 focus:outline-none"
-                                            />
-                                        </div>
-
-                                        <div className="mb-4">
-                                            <label
-                                                htmlFor="review-body"
-                                                className="mb-1 block text-sm font-medium"
-                                            >
-                                                {t(
-                                                    'product.review_body_label',
-                                                    'Review',
-                                                )}{' '}
-                                                *
-                                            </label>
-                                            <textarea
-                                                id="review-body"
-                                                required
-                                                value={reviewBody}
-                                                onChange={(e) =>
-                                                    setReviewBody(
-                                                        e.target.value,
-                                                    )
-                                                }
-                                                rows={4}
-                                                placeholder="Tell others what you think about this product…"
-                                                className="border-input bg-background focus:ring-ring w-full rounded-xl border px-4 py-2 text-sm focus:ring-2 focus:outline-none"
-                                            />
-                                        </div>
-
-                                        <button
-                                            type="submit"
-                                            disabled={
-                                                isSubmitting || rating === 0
-                                            }
-                                            className="bg-primary text-primary-foreground rounded-xl px-6 py-2.5 text-sm font-semibold hover:opacity-90 disabled:opacity-50"
-                                        >
-                                            {isSubmitting
-                                                ? 'Submitting…'
-                                                : 'Submit review'}
-                                        </button>
-                                    </form>
-                                )
-                            ) : (
-                                <div className="border-border bg-card text-muted-foreground rounded-xl border p-4 text-center text-sm">
-                                    <Link
-                                        href={lp('/login')}
-                                        className="text-primary font-medium underline"
-                                    >
-                                        Log in
-                                    </Link>{' '}
-                                    to write a review.
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Related products */}
-            {relatedProducts && relatedProducts.length > 0 && (
-                <section className="mt-16">
-                    <h2 className="mb-6 text-2xl font-bold">
-                        {t('product.related_products', 'You may also like')}
-                    </h2>
-                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                        {relatedProducts.slice(0, 4).map((related) => (
-                            <ProductCard key={related.id} product={related} />
-                        ))}
-                    </div>
-                </section>
-            )}
+            <RelatedProducts
+                products={relatedProducts}
+                title={t('product.related_products', 'You may also like')}
+            />
 
             <RecentlyViewed excludeId={product.id} />
         </div>

@@ -7,3 +7,9 @@ export interface PendingFilters {
     in_stock: boolean;
     attributes: Record<string, string[]>;
 }
+
+export interface ActiveFilterChip {
+    key: string;
+    label: string;
+    onRemove: () => void;
+}

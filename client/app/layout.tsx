@@ -185,7 +185,7 @@ export default async function RootLayout({
                             <AdminBar entity={adminPreviewEntity} />
                             <div className="flex min-h-screen flex-col">
                                 <AnnouncementBar />
-                                <Header modules={modules} />
+                                <Header modules={modules} siteName={siteName} />
                                 <main
                                     id="main-content"
                                     className="flex-1 pb-16 md:pb-0"

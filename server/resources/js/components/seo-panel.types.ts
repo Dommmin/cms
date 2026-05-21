@@ -15,3 +15,23 @@ export type SeoPanelProps = {
     titleFallback?: string;
     descriptionFallback?: string;
 };
+
+export type CharCounterProps = {
+    value: number;
+    max: number;
+    warn: number;
+};
+
+export type SeoHealthSeverity = 'warning' | 'error';
+
+export type SeoHealthIssue = {
+    id: string;
+    severity: SeoHealthSeverity;
+    message: string;
+};
+
+export type SeoHealthOptions = {
+    displayTitle: string;
+    displayDescription: string;
+    showCanonical: boolean;
+};

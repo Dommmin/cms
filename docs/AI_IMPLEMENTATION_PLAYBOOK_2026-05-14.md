@@ -580,6 +580,47 @@ Pozostało:
 
 ## Log Wdrożeń
 
+### 2026-05-21 - Epic 7 - SEO quality panel
+
+Status: Partial
+
+Zmiany:
+- `SeoPanel` pokazuje panel jakości treści dla pól SEO: brak/za długi title, brak/za długa meta description, brak OG image, brak canonical przy wymaganym canonical oraz `noindex`.
+- Dodano pełniejszy Open Graph preview obok istniejącego Google snippet preview.
+- Reguły jakości wydzielono do `seo-panel-health.ts`, a typy propsów do `seo-panel.types.ts`.
+
+Testy:
+- `docker compose exec php npm run format`
+- `docker compose exec php npm run types`
+
+Pozostało:
+- Page health dla Page Buildera: H1, puste CTA, link bez href, obraz bez alt.
+- Kalendarz publikacji, kampanie contentowe, expiring preview links i webhook/revalidation po publikacji.
+- Personalizacja bloków po segmentach.
+
+### 2026-05-21 - Epic 6 - storefront tokens, listing i product detail
+
+Status: Partial
+
+Zmiany:
+- Dodano publiczne tokeny design systemu `--store-*` dla szerokości, spacingu sekcji, gapów siatki, radiusów, proporcji zdjęć produktów, focus ringów i cieni.
+- Header publiczny używa nazwy strony z public settings zamiast hardcoded `CMS`.
+- Product listing dostał desktopowy sidebar filtrów, mobilny drawer filtrów, licznik i chipsy aktywnych filtrów oraz bardziej użyteczny empty state.
+- Product cards używają tokenów radius/elevation/image ratio i mają 44px touch target dla akcji.
+- Product detail rozbito na `ProductGallery`, `ProductBuyBox`, `VariantSelector`, `DeliveryPanel`, `ProductTabs`, `ReviewsSection` i `RelatedProducts` z typami propsów poza TSX.
+
+Testy:
+- `docker compose exec node npm run format`
+- `docker compose exec node npx tsc`
+- `docker compose exec node npm run build`
+- Browser smoke check: `http://localhost:3000/products` desktop + 375px mobile
+- Browser smoke check: `http://localhost:3000/products/sony-43-full-hd-smart-tv-ultra-syfjv`
+
+Pozostało:
+- Rozbić checkout na kroki i komponenty.
+- Ujednolicić spacing/typografię bloków Page Buildera na publicznym froncie.
+- Dodać pełne Playwright E2E/visual regression dla listing/detail/checkout mobile i desktop.
+
 ### 2026-05-20 - Epic 5 - responsive preview Page Buildera
 
 Status: Done

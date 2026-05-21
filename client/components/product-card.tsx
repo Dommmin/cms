@@ -52,12 +52,12 @@ export function ProductCard({ product }: ProductCardProps) {
     }
 
     return (
-        <div className="group border-border bg-card flex flex-col overflow-hidden rounded-2xl border transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_20px_60px_-15px_oklch(0_0_0_/_0.15)] dark:hover:shadow-[0_20px_60px_-15px_oklch(0_0_0_/_0.5)]">
+        <div className="group border-border bg-card flex flex-col overflow-hidden rounded-[var(--store-card-radius)] border transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[var(--store-shadow-lifted)]">
             <Link
                 href={lp(`/products/${product.slug}`)}
                 className="flex flex-1 flex-col"
             >
-                <div className="bg-muted relative aspect-square overflow-hidden">
+                <div className="bg-muted relative aspect-[var(--store-product-image-ratio)] overflow-hidden">
                     {product.thumbnail?.url ? (
                         <Image
                             src={product.thumbnail.url}
@@ -84,7 +84,7 @@ export function ProductCard({ product }: ProductCardProps) {
                         </span>
                     ) : product.active_promotions &&
                       product.active_promotions.length > 0 ? (
-                        <span className="absolute top-2 left-2 rounded-full bg-orange-500 px-2 py-0.5 text-xs font-semibold text-white backdrop-blur-sm">
+                        <span className="absolute top-2 left-2 rounded-full bg-[var(--store-accent-amber)] px-2 py-0.5 text-xs font-semibold text-black backdrop-blur-sm">
                             {product.active_promotions[0].name}
                         </span>
                     ) : null}
@@ -98,7 +98,7 @@ export function ProductCard({ product }: ProductCardProps) {
                                     ? 'Remove from wishlist'
                                     : 'Add to wishlist'
                             }
-                            className="bg-background/80 hover:bg-background absolute top-2 right-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full shadow backdrop-blur-sm transition-all duration-200 active:scale-75"
+                            className="bg-background/85 hover:bg-background absolute top-2 right-2 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full shadow backdrop-blur-sm transition-all duration-200 active:scale-75"
                         >
                             <Heart
                                 className={`h-4 w-4 transition-all ${
@@ -133,7 +133,7 @@ export function ProductCard({ product }: ProductCardProps) {
                                   ? t('compare.max_reached', 'Max 4 products')
                                   : t('compare.add', 'Compare')
                         }
-                        className={`bg-background/80 hover:bg-background absolute top-12 right-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full shadow backdrop-blur-sm transition-colors disabled:opacity-40 ${
+                        className={`bg-background/85 hover:bg-background absolute top-14 right-2 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full shadow backdrop-blur-sm transition-colors disabled:opacity-40 ${
                             inComparison ? 'ring-primary ring-2' : ''
                         }`}
                     >
@@ -182,7 +182,7 @@ export function ProductCard({ product }: ProductCardProps) {
                     disabled={
                         !product.is_active || !firstVariantId || isAddingToCart
                     }
-                    className="bg-primary text-primary-foreground flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all hover:opacity-90 hover:shadow-[0_4px_15px_oklch(0.537_0.229_276.9_/_0.4)] active:scale-[0.98] disabled:opacity-50"
+                    className="bg-primary text-primary-foreground flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-[var(--store-control-radius)] px-4 text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
                 >
                     <ShoppingCart className="h-4 w-4" />
                     {isAddingToCart

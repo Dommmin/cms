@@ -115,6 +115,21 @@
     /* Vivid accent */
     --accent-vivid: oklch(0.82 0.165 80);
     --accent-vivid-foreground: oklch(0.15 0 0);
+
+    /* Storefront design tokens */
+    --store-shell-width: 80rem;
+    --store-content-width: 72rem;
+    --store-section-y: clamp(2.5rem, 6vw, 5rem);
+    --store-grid-gap: clamp(1rem, 2vw, 1.5rem);
+    --store-card-radius: 0.5rem;
+    --store-control-radius: 0.375rem;
+    --store-product-image-ratio: 4 / 5;
+    --store-focus-ring: 0 0 0 3px oklch(0.72 0.16 184.7 / 35%);
+    --store-shadow-soft: 0 18px 55px -36px oklch(0.16 0.03 264.7 / 45%);
+    --store-shadow-lifted: 0 24px 70px -42px oklch(0.16 0.03 264.7 / 55%);
+    --store-accent-mint: oklch(0.72 0.16 184.7);
+    --store-accent-amber: oklch(0.82 0.16 80);
+    --store-accent-rose: oklch(0.65 0.2 25);
 }
 
 .dark {
@@ -166,6 +181,11 @@
     --accent-vivid: oklch(0.82 0.165 80);
     --accent-vivid-foreground: oklch(0.15 0 0);
 
+    /* Storefront design tokens */
+    --store-focus-ring: 0 0 0 3px oklch(0.72 0.16 184.7 / 32%);
+    --store-shadow-soft: 0 20px 70px -42px oklch(0 0 0 / 85%);
+    --store-shadow-lifted: 0 28px 90px -48px oklch(0 0 0 / 95%);
+
     /* Sidebar */
     --sidebar: oklch(0.16 0.022 264.7);
     --sidebar-foreground: oklch(0.97 0 0);
@@ -183,6 +203,21 @@
     }
     body {
         @apply bg-background text-foreground;
+    }
+}
+
+@layer utilities {
+    .store-shell {
+        max-width: var(--store-shell-width);
+    }
+
+    .store-section {
+        padding-block: var(--store-section-y);
+    }
+
+    .store-focus {
+        outline: none;
+        box-shadow: var(--store-focus-ring);
     }
 }
 

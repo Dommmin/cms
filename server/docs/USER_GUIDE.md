@@ -147,7 +147,7 @@ Pages are the building blocks of your website. Navigate to **CMS > Pages**.
 
 Every page has a draft state and a published state. Editing a page modifies the draft. Click **Publish** to push the draft live. This means you can safely work on changes without affecting the live site.
 
-**SEO fields** are available on each page: title, meta description, and Open Graph settings. Fill these in to help search engines and social media display your content correctly.
+**SEO fields** are available on each page: title, meta description, and Open Graph settings. Fill these in to help search engines and social media display your content correctly. The SEO panel shows a content quality summary, search preview, and Open Graph preview so you can fix missing or overly long fields before publishing.
 
 **Translatable fields:** Page title, excerpt, content, and rich content can be entered in multiple languages. Use the language selector on the edit form to switch between locales.
 
