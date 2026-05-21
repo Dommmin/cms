@@ -1,11 +1,16 @@
 .git
-server/node_modules
-server/vendor
-server/.env
+.idea
+.ai
+
+**/node_modules
+**/.next
+**/vendor
+
+**/.env
+**/.env.*
+!server/.env.deploy
+
 server/tests
 server/storage
 
-client/node_modules
-client/.next
-client/.env.local
-client/.env*.local
+**/bootstrap/cache/*

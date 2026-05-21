@@ -60,9 +60,9 @@ helm upgrade --install glitchtip glitchtip/glitchtip \
 ## After install
 
 1. Open `https://<glitchtip.domain>` and create an organization.
-2. Create two projects: `cms-api` (PHP/Laravel) and `cms-frontend` (Next.js).
+2. Create two projects: `app-server` (PHP/Laravel) and `app-client` (Next.js).
 3. From **Settings → Client Keys (DSN)** copy each DSN.
-4. Wire DSNs into the CMS:
+4. Wire DSNs into the application:
    - Laravel: set `GLITCHTIP_DSN` in `server/.env.production` (and in the
      `PROD_ENV` GitHub Variable so CI/CD picks it up).
    - Next.js: set `NEXT_PUBLIC_GLITCHTIP_DSN` in `ENV_CLIENT_PROD`

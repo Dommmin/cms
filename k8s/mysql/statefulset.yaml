@@ -27,7 +27,7 @@ spec:
                   name: ${APP_NAME}-mysql
                   key: root-password
             - name: MYSQL_DATABASE
-              value: cms
+              value: ${APP_NAME}
             - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
