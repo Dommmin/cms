@@ -48,6 +48,7 @@ function formatUpdatedAt(value?: Date | null): string {
 
 export function ResponsivePreviewPanel({
     inspector,
+    health,
     previewUrl,
     isRefreshing = false,
     isStale = false,
@@ -168,10 +169,17 @@ export function ResponsivePreviewPanel({
             {inspector ? (
                 <Tabs defaultValue="inspector" className="h-full">
                     <div className="border-b p-2">
-                        <TabsList className="grid w-full grid-cols-2">
+                        <TabsList
+                            className={`grid w-full ${health ? 'grid-cols-3' : 'grid-cols-2'}`}
+                        >
                             <TabsTrigger value="inspector">
                                 {__('builder.inspector', 'Inspector')}
                             </TabsTrigger>
+                            {health && (
+                                <TabsTrigger value="health">
+                                    {__('builder.health', 'Health')}
+                                </TabsTrigger>
+                            )}
                             <TabsTrigger value="preview">
                                 {__('builder.preview', 'Preview')}
                             </TabsTrigger>
@@ -183,6 +191,14 @@ export function ResponsivePreviewPanel({
                     >
                         {inspector}
                     </TabsContent>
+                    {health && (
+                        <TabsContent
+                            value="health"
+                            className="mt-0 max-h-[calc(100vh-10.5rem)] overflow-auto"
+                        >
+                            {health}
+                        </TabsContent>
+                    )}
                     <TabsContent value="preview" className="mt-0">
                         {previewContent}
                     </TabsContent>

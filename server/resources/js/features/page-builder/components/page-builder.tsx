@@ -18,11 +18,13 @@ import {
     sortableKeyboardCoordinates,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from '@/hooks/use-translation';
 import { useBuilderState } from '../hooks/use-builder-state';
+import { analyzePageHealth } from '../page-health';
 import { BuilderToolbar } from './builder-toolbar';
 import type { PageBuilderProps } from './page-builder.types';
+import { PageHealthPanel } from './page-health-panel';
 import { PageInspector } from './page-inspector';
 import { PageNavigator } from './page-navigator';
 import { ResponsivePreviewPanel } from './responsive-preview-panel';
@@ -221,6 +223,19 @@ export function PageBuilder({
         activeSection && activeBlockIndex >= 0
             ? activeSection.blocks[activeBlockIndex]
             : null;
+    const blockLabels = useMemo(
+        () =>
+            Object.fromEntries(
+                Object.entries(data.available_block_relations).map(
+                    ([type, config]) => [type, config.name],
+                ),
+            ),
+        [data.available_block_relations],
+    );
+    const pageHealth = useMemo(
+        () => analyzePageHealth({ sections, blockLabels }),
+        [sections, blockLabels],
+    );
 
     return (
         <div className="min-h-screen bg-muted/30">
@@ -419,6 +434,12 @@ export function PageBuilder({
                             availableBlockTypes={data.available_block_relations}
                             onUpdateSection={updateSection}
                             onUpdateBlock={updateBlock}
+                        />
+                    }
+                    health={
+                        <PageHealthPanel
+                            issues={pageHealth.issues}
+                            summary={pageHealth.summary}
                         />
                     }
                     previewUrl={previewUrl}

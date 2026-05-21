@@ -1508,9 +1508,15 @@ Implemented in `resources/js/hooks/use-builder-state.ts` using `useReducer` with
 
 `resources/js/features/page-builder/components/page-inspector.tsx` renders the right-panel editor for the currently active section or block. It reuses `SectionForm` and `BlockForm`, so inline editing remains the fallback while the inspector gets the same schema-driven fields and relation controls.
 
+### Health
+
+`resources/js/features/page-builder/page-health.ts` analyzes the current client-side builder snapshot. It checks active sections/blocks for primary H1 coverage, duplicate H1s, CTA label/URL mismatches, raw HTML anchors without `href`, and image relations missing `metadata.alt`. Add new block-specific content quality rules there and cover them with Vitest tests in `page-health.test.ts`.
+
+`resources/js/features/page-builder/components/page-health-panel.tsx` renders the result in the right side panel. SEO field checks remain separate in `resources/js/components/seo-panel-health.ts`.
+
 ### Responsive Preview
 
-`resources/js/features/page-builder/components/responsive-preview-panel.tsx` renders the sticky desktop side panel with Inspector and Preview tabs. `BuilderPage` fetches a signed preview URL through `PageBuilderController::previewUrl()`, refreshes it after manual save/autosave, and passes stale/current state from `hasUnsavedChanges` so editors can see whether the preview matches the last saved snapshot.
+`resources/js/features/page-builder/components/responsive-preview-panel.tsx` renders the sticky desktop side panel with Inspector, Health and Preview tabs. `BuilderPage` fetches a signed preview URL through `PageBuilderController::previewUrl()`, refreshes it after manual save/autosave, and passes stale/current state from `hasUnsavedChanges` so editors can see whether the preview matches the last saved snapshot.
 
 ### Copy/Paste Blocks
 

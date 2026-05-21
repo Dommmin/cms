@@ -12,6 +12,7 @@ export type PreviewDeviceOption = {
 
 export type ResponsivePreviewPanelProps = {
     inspector?: ReactNode;
+    health?: ReactNode;
     previewUrl?: string | null;
     isRefreshing?: boolean;
     isStale?: boolean;

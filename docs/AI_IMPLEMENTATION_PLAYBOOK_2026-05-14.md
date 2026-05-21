@@ -580,6 +580,25 @@ Pozostało:
 
 ## Log Wdrożeń
 
+### 2026-05-21 - Epic 7 - Page Builder health panel
+
+Status: Partial
+
+Zmiany:
+- Dodano analizator `analyzePageHealth()` dla aktualnego snapshotu Page Buildera.
+- Panel Health w prawym panelu buildera pokazuje liczbę H1, błędy i ostrzeżenia.
+- Health wykrywa brak H1, wiele H1, CTA bez etykiety, CTA bez URL, linki HTML bez `href` oraz obrazy bez metadanych alt.
+- Dodano testy Vitest dla reguł Page Builder health.
+
+Testy:
+- `docker compose exec php npm run format`
+- `docker compose exec php npm run types`
+- `docker compose exec php npm run test:ui`
+
+Pozostało:
+- Kalendarz publikacji, kampanie contentowe, expiring preview links i webhook/revalidation po publikacji.
+- Personalizacja bloków po segmentach.
+
 ### 2026-05-21 - Epic 6 - checkout progress i mobile summary
 
 Status: Partial
@@ -630,7 +649,6 @@ Testy:
 - `docker compose exec php npm run types`
 
 Pozostało:
-- Page health dla Page Buildera: H1, puste CTA, link bez href, obraz bez alt.
 - Kalendarz publikacji, kampanie contentowe, expiring preview links i webhook/revalidation po publikacji.
 - Personalizacja bloków po segmentach.
 

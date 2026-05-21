@@ -200,7 +200,8 @@ similar payloads are removed or rejected.
 - **Undo / Redo** — up to 20 steps of history with the undo/redo buttons in the toolbar
 - **Navigator** — on desktop, use the left outline to jump to a section or block, hide/show items, or duplicate sections and blocks without scrolling through the full editor
 - **Copy / Paste blocks** — click the copy icon on any block to copy it to your clipboard, then paste it anywhere on the same or a different page
-- **Inspector / Preview panel** — on desktop, use the right panel to edit the selected section or block in **Inspector**, or switch to **Preview** to test desktop, tablet, and mobile viewport sizes; the preview status shows when unsaved changes make it outdated
+- **Inspector / Health / Preview panel** — on desktop, use the right panel to edit the selected section or block in **Inspector**, review content warnings in **Health**, or switch to **Preview** to test desktop, tablet, and mobile viewport sizes; the preview status shows when unsaved changes make it outdated
+- **Page health** — the **Health** tab warns about missing or duplicate H1 headings, CTA buttons without text or URLs, HTML links without `href`, and image relations without alt metadata. SEO title, meta description, canonical, robots and OG image warnings remain in the page edit SEO panel.
 - **Scroll animations** — each section has a **Scroll Animation** setting: choose Fade In, Fade Up, Slide from Left/Right, or Zoom In to add an entrance animation when the visitor scrolls to that section. Set to **None** to disable.
 - **Section spacing** — the **Spacing** dropdown on each section controls padding (No padding / Small / Medium / Large / Extra large)
 
