@@ -1502,9 +1502,13 @@ Implemented in `resources/js/hooks/use-builder-state.ts` using `useReducer` with
 
 `resources/js/features/page-builder/components/page-navigator.tsx` renders the desktop outline for sections and blocks. It uses stable `client_id` values as DOM anchors (`pb-section-*`, `pb-block-*`) so selecting an item can expand it, scroll it into view, and apply the active ring without relying on array indexes.
 
+### Inspector
+
+`resources/js/features/page-builder/components/page-inspector.tsx` renders the right-panel editor for the currently active section or block. It reuses `SectionForm` and `BlockForm`, so inline editing remains the fallback while the inspector gets the same schema-driven fields and relation controls.
+
 ### Responsive Preview
 
-`resources/js/features/page-builder/components/responsive-preview-panel.tsx` renders the sticky desktop preview iframe. `BuilderPage` fetches a signed preview URL through `PageBuilderController::previewUrl()`, refreshes it after manual save/autosave, and passes stale/current state from `hasUnsavedChanges` so editors can see whether the preview matches the last saved snapshot.
+`resources/js/features/page-builder/components/responsive-preview-panel.tsx` renders the sticky desktop side panel with Inspector and Preview tabs. `BuilderPage` fetches a signed preview URL through `PageBuilderController::previewUrl()`, refreshes it after manual save/autosave, and passes stale/current state from `hasUnsavedChanges` so editors can see whether the preview matches the last saved snapshot.
 
 ### Copy/Paste Blocks
 

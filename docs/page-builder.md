@@ -444,9 +444,12 @@ copy and no longer syncs with the library.
 
 ## Responsive Preview
 
-The builder renders a sticky preview panel on desktop. The panel uses a signed
-preview URL from `PageBuilderController::previewUrl()` and displays the current
-saved page in an iframe.
+The builder renders a sticky side panel on desktop with two tabs:
+
+- **Inspector** — edits the selected section or block using the same schema-driven
+  controls as the inline editor.
+- **Preview** — uses a signed preview URL from `PageBuilderController::previewUrl()`
+  and displays the current saved page in an iframe.
 
 Available viewport modes:
 

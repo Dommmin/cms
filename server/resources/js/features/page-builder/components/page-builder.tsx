@@ -23,6 +23,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import { useBuilderState } from '../hooks/use-builder-state';
 import { BuilderToolbar } from './builder-toolbar';
 import type { PageBuilderProps } from './page-builder.types';
+import { PageInspector } from './page-inspector';
 import { PageNavigator } from './page-navigator';
 import { ResponsivePreviewPanel } from './responsive-preview-panel';
 import { SectionTemplatesDialog } from './section-templates-dialog';
@@ -205,6 +206,21 @@ export function PageBuilder({
     const sectionIds = sections.map(
         (section) => section.client_id ?? `section-${section.id}`,
     );
+    const activeSectionIndex = activeSectionId
+        ? sections.findIndex((section) => section.client_id === activeSectionId)
+        : -1;
+    const activeSection =
+        activeSectionIndex >= 0 ? sections[activeSectionIndex] : null;
+    const activeBlockIndex =
+        activeSection && activeBlockId
+            ? activeSection.blocks.findIndex(
+                  (block) => block.client_id === activeBlockId,
+              )
+            : -1;
+    const activeBlock =
+        activeSection && activeBlockIndex >= 0
+            ? activeSection.blocks[activeBlockIndex]
+            : null;
 
     return (
         <div className="min-h-screen bg-muted/30">
@@ -387,6 +403,24 @@ export function PageBuilder({
                 </div>
 
                 <ResponsivePreviewPanel
+                    inspector={
+                        <PageInspector
+                            section={activeSection}
+                            sectionIndex={
+                                activeSectionIndex >= 0
+                                    ? activeSectionIndex
+                                    : null
+                            }
+                            block={activeBlock}
+                            blockIndex={
+                                activeBlockIndex >= 0 ? activeBlockIndex : null
+                            }
+                            availableSections={data.available_sections}
+                            availableBlockTypes={data.available_block_relations}
+                            onUpdateSection={updateSection}
+                            onUpdateBlock={updateBlock}
+                        />
+                    }
                     previewUrl={previewUrl}
                     isRefreshing={isPreviewRefreshing}
                     isStale={isPreviewStale}

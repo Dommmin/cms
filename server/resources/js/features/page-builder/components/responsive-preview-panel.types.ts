@@ -1,4 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 export type PreviewDevice = 'desktop' | 'tablet' | 'mobile';
 
@@ -10,6 +11,7 @@ export type PreviewDeviceOption = {
 };
 
 export type ResponsivePreviewPanelProps = {
+    inspector?: ReactNode;
     previewUrl?: string | null;
     isRefreshing?: boolean;
     isStale?: boolean;

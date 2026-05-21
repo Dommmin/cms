@@ -15,12 +15,14 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { useTranslation } from '@/hooks/use-translation';
+import { cn } from '@/lib/utils';
 import type { SectionFormProps } from './section-form.types';
 
 export function SectionForm({
     section,
     availableSections,
     onUpdate,
+    compact = false,
 }: SectionFormProps) {
     const __ = useTranslation();
     const currentSectionConfig = availableSections[section.section_type];
@@ -71,7 +73,12 @@ export function SectionForm({
                 </span>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+            <div
+                className={cn(
+                    'grid gap-4',
+                    compact ? 'grid-cols-1' : 'md:grid-cols-3 lg:grid-cols-5',
+                )}
+            >
                 {/* Section Type */}
                 <div className="space-y-1.5">
                     <Label htmlFor="section-type">

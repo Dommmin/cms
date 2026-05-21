@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
 import type {
@@ -46,6 +47,7 @@ function formatUpdatedAt(value?: Date | null): string {
 }
 
 export function ResponsivePreviewPanel({
+    inspector,
     previewUrl,
     isRefreshing = false,
     isStale = false,
@@ -64,8 +66,8 @@ export function ResponsivePreviewPanel({
           ? `${__('builder.preview_current', 'Current')} ${formatUpdatedAt(updatedAt)}`
           : __('builder.preview_ready', 'Ready');
 
-    return (
-        <aside className="sticky top-24 hidden max-h-[calc(100vh-7rem)] overflow-hidden rounded-lg border bg-background lg:block">
+    const previewContent = (
+        <>
             <div className="border-b px-3 py-3">
                 <div className="flex items-center justify-between gap-2">
                     <div>
@@ -134,7 +136,7 @@ export function ResponsivePreviewPanel({
                 </div>
             </div>
 
-            <div className="h-[calc(100vh-16rem)] overflow-auto bg-muted/40 p-3">
+            <div className="h-[calc(100vh-19.5rem)] overflow-auto bg-muted/40 p-3">
                 <div
                     className={cn(
                         'mx-auto h-full min-h-[32rem] overflow-hidden rounded-md border bg-background shadow-sm transition-[width]',
@@ -158,6 +160,36 @@ export function ResponsivePreviewPanel({
                     )}
                 </div>
             </div>
+        </>
+    );
+
+    return (
+        <aside className="sticky top-24 hidden max-h-[calc(100vh-7rem)] overflow-hidden rounded-lg border bg-background lg:block">
+            {inspector ? (
+                <Tabs defaultValue="inspector" className="h-full">
+                    <div className="border-b p-2">
+                        <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="inspector">
+                                {__('builder.inspector', 'Inspector')}
+                            </TabsTrigger>
+                            <TabsTrigger value="preview">
+                                {__('builder.preview', 'Preview')}
+                            </TabsTrigger>
+                        </TabsList>
+                    </div>
+                    <TabsContent
+                        value="inspector"
+                        className="mt-0 max-h-[calc(100vh-10.5rem)] overflow-auto"
+                    >
+                        {inspector}
+                    </TabsContent>
+                    <TabsContent value="preview" className="mt-0">
+                        {previewContent}
+                    </TabsContent>
+                </Tabs>
+            ) : (
+                previewContent
+            )}
         </aside>
     );
 }
