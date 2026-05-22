@@ -1,15 +1,17 @@
 #!/bin/sh
 set -e
 
-# If arguments are passed, run them directly (e.g. docker compose run node npm install)
 if [ "$#" -gt 0 ]; then
     exec "$@"
 fi
 
-if [ ! -d "node_modules" ] && [ -f "package.json" ]; then
+if [ ! -d "node_modules" ] || [ ! -f "node_modules/.package-lock.json" ]; then
     echo "Installing Node dependencies..."
     npm install
 fi
+
+# Ensure .next cache directory exists with correct permissions
+mkdir -p .next
 
 echo "Starting Node server..."
 exec npm run dev

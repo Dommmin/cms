@@ -12,7 +12,16 @@ const nextConfig: NextConfig = {
     output: 'standalone',
     poweredByHeader: false,
     compress: true,
-    // Skip redundant checks in Docker builds — lint job already runs these
+    reactStrictMode: true,
+    experimental: {
+        optimizePackageImports: [
+            '@headlessui/react',
+            '@heroicons/react',
+            '@radix-ui/react-icons',
+            'lucide-react',
+            'framer-motion',
+        ],
+    },
     typescript: { ignoreBuildErrors: process.env.DOCKER_BUILD === '1' },
     images: {
         remotePatterns: [
