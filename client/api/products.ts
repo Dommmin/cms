@@ -58,7 +58,7 @@ export async function getProductsByCategory(
     filters: Omit<ProductFilters, 'category'> = {},
 ): Promise<PaginatedResponse<Product>> {
     return apiGetPage<Product>(`/categories/${categorySlug}/products`, {
-        params: filters,
+        params: buildProductParams(filters),
     });
 }
 

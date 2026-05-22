@@ -40,7 +40,7 @@ export function PricingCardsBlock({ block }: BlockRendererProps) {
                 <p className="text-muted-foreground mb-6">{subtitle}</p>
             )}
             {show_toggle && (
-                <div className="mb-8 inline-flex items-center gap-3 rounded-full border p-1">
+                <div className="bg-muted/60 mb-8 inline-flex items-center gap-1 rounded-full border p-1">
                     <button
                         type="button"
                         onClick={() => setIsYearly(false)}
@@ -75,14 +75,14 @@ export function PricingCardsBlock({ block }: BlockRendererProps) {
                     <div
                         key={i}
                         className={cn(
-                            'relative flex flex-col rounded-2xl border p-6 text-left',
+                            'elevated-surface interactive-surface relative flex flex-col rounded-2xl p-6 text-left',
                             plan.is_popular
-                                ? 'border-primary shadow-primary/10 shadow-lg'
-                                : 'border-border',
+                                ? 'border-primary ring-primary/10 ring-1'
+                                : '',
                         )}
                     >
                         {plan.is_popular && (
-                            <span className="bg-primary text-primary-foreground absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 text-xs font-bold">
+                            <span className="bg-primary text-primary-foreground absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 text-xs font-bold shadow-sm">
                                 Popular
                             </span>
                         )}
@@ -115,7 +115,7 @@ export function PricingCardsBlock({ block }: BlockRendererProps) {
                                     'mt-auto rounded-xl px-4 py-2.5 text-center text-sm font-semibold transition-colors',
                                     plan.is_popular
                                         ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                                        : 'border-border hover:border-primary hover:text-primary border',
+                                        : 'border-border bg-background hover:border-primary hover:text-primary border',
                                 )}
                             >
                                 {plan.cta_label ?? 'Get started'}

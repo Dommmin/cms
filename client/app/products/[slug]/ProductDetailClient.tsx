@@ -74,13 +74,41 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
     if (isLoading) {
         return (
-            <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                    <div className="bg-muted aspect-square animate-pulse rounded-xl" />
-                    <div className="space-y-4">
-                        <div className="bg-muted h-8 w-3/4 animate-pulse rounded" />
-                        <div className="bg-muted h-6 w-1/4 animate-pulse rounded" />
-                        <div className="bg-muted h-24 animate-pulse rounded" />
+            <div className="store-shell mx-auto px-4 py-12 sm:px-6 lg:px-8">
+                <div className="bg-muted mb-8 h-4 w-64 animate-pulse rounded-full" />
+                <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+                    <div>
+                        <div className="bg-muted aspect-square animate-pulse rounded-[var(--store-card-radius)]" />
+                        <div className="mt-3 grid grid-cols-5 gap-2">
+                            {Array.from({ length: 5 }).map((_, index) => (
+                                <div
+                                    key={index}
+                                    className="bg-muted aspect-square animate-pulse rounded-[var(--store-control-radius)]"
+                                />
+                            ))}
+                        </div>
+                    </div>
+                    <div className="space-y-5">
+                        <div className="bg-muted h-3 w-24 animate-pulse rounded-full" />
+                        <div className="bg-muted h-9 w-4/5 animate-pulse rounded" />
+                        <div className="bg-muted h-5 w-48 animate-pulse rounded" />
+                        <div className="bg-muted h-8 w-32 animate-pulse rounded" />
+                        <div className="space-y-3 pt-3">
+                            <div className="bg-muted h-4 w-28 animate-pulse rounded" />
+                            <div className="flex flex-wrap gap-2">
+                                {Array.from({ length: 3 }).map((_, index) => (
+                                    <div
+                                        key={index}
+                                        className="bg-muted h-11 w-28 animate-pulse rounded-[var(--store-control-radius)]"
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                        <div className="bg-muted h-11 w-full animate-pulse rounded-[var(--store-control-radius)]" />
+                        <div className="grid gap-3 sm:grid-cols-2">
+                            <div className="bg-muted h-24 animate-pulse rounded-[var(--store-card-radius)]" />
+                            <div className="bg-muted h-24 animate-pulse rounded-[var(--store-card-radius)]" />
+                        </div>
                     </div>
                 </div>
             </div>

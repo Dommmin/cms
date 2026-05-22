@@ -93,33 +93,29 @@ export function PricingTableBlock({ block }: PricingTableProps) {
                     return (
                         <div
                             key={i}
-                            className={`relative flex flex-col rounded-2xl border p-8 ${
+                            className={`elevated-surface interactive-surface relative flex flex-col rounded-2xl p-8 ${
                                 plan.is_featured
-                                    ? 'border-primary bg-primary text-primary-foreground scale-105 shadow-xl'
-                                    : 'border-border bg-card'
+                                    ? 'border-primary ring-primary/10 ring-1'
+                                    : ''
                             }`}
                         >
                             {plan.badge && (
                                 <span
                                     className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 text-xs font-semibold ${
                                         plan.is_featured
-                                            ? 'text-primary bg-white'
-                                            : 'bg-primary text-white'
+                                            ? 'bg-primary text-primary-foreground shadow-sm'
+                                            : 'bg-accent text-accent-foreground'
                                     }`}
                                 >
                                     {plan.badge}
                                 </span>
                             )}
                             <div className="mb-6">
-                                <h3
-                                    className={`text-lg font-bold ${plan.is_featured ? 'text-primary-foreground' : ''}`}
-                                >
+                                <h3 className="text-lg font-bold">
                                     {plan.name}
                                 </h3>
                                 {plan.description && (
-                                    <p
-                                        className={`mt-1 text-sm ${plan.is_featured ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}
-                                    >
+                                    <p className="text-muted-foreground mt-1 text-sm">
                                         {plan.description}
                                     </p>
                                 )}
@@ -133,9 +129,7 @@ export function PricingTableBlock({ block }: PricingTableProps) {
                                             {currency}
                                         </span>
                                     </span>
-                                    <span
-                                        className={`ml-1 text-sm ${plan.is_featured ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}
-                                    >
+                                    <span className="text-muted-foreground ml-1 text-sm">
                                         /
                                         {isYearly ? 'mo (billed yearly)' : 'mo'}
                                     </span>
@@ -149,9 +143,7 @@ export function PricingTableBlock({ block }: PricingTableProps) {
                                             key={fi}
                                             className="flex items-start gap-2 text-sm"
                                         >
-                                            <Check
-                                                className={`mt-0.5 h-4 w-4 shrink-0 ${plan.is_featured ? 'text-primary-foreground' : 'text-primary'}`}
-                                            />
+                                            <Check className="text-primary mt-0.5 h-4 w-4 shrink-0" />
                                             <span>{feat}</span>
                                         </li>
                                     ))}
@@ -161,11 +153,7 @@ export function PricingTableBlock({ block }: PricingTableProps) {
                             {plan.cta_label && plan.cta_url && (
                                 <Link
                                     href={plan.cta_url}
-                                    className={`mt-auto block rounded-lg px-6 py-3 text-center font-semibold transition-opacity hover:opacity-90 ${
-                                        plan.is_featured
-                                            ? 'text-primary bg-white'
-                                            : 'bg-primary text-primary-foreground'
-                                    }`}
+                                    className="bg-primary text-primary-foreground hover:bg-primary/90 mt-auto block rounded-lg px-6 py-3 text-center font-semibold transition-colors"
                                 >
                                     {plan.cta_label}
                                 </Link>

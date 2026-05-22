@@ -47,6 +47,7 @@ class ProductController extends ApiController
                 AllowedFilter::custom('max_price', new MaxPriceFilter),
                 AllowedFilter::custom('in_stock', new InStockFilter),
                 AllowedFilter::exact('is_featured'),
+                AllowedFilter::callback('attributes', fn (Builder $query, mixed $value): null => null),
             ])
             ->allowedSorts([
                 'name',
@@ -296,15 +297,23 @@ class ProductController extends ApiController
         $products = QueryBuilder::for($baseQuery)
             ->allowedFilters([
                 AllowedFilter::partial('name'),
+                AllowedFilter::exact('brand_id'),
                 AllowedFilter::custom('min_price', new MinPriceFilter),
                 AllowedFilter::custom('max_price', new MaxPriceFilter),
+                AllowedFilter::custom('in_stock', new InStockFilter),
+                AllowedFilter::exact('is_featured'),
+                AllowedFilter::callback('attributes', fn (Builder $query, mixed $value): null => null),
             ])
             ->allowedSorts([
                 'name',
                 'created_at',
                 AllowedSort::custom('price', new VariantPriceSort),
             ])
-            ->defaultSort('name')
+            ->defaultSort('name');
+
+        $this->applyAttributeFilters($products, request()->input('filter.attributes', []));
+
+        $products = $products
             ->with(['thumbnail.media', 'brand'])
             ->paginate(24)
             ->withQueryString();

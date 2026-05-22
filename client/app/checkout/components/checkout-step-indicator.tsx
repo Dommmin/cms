@@ -16,7 +16,7 @@ export function CheckoutStepIndicator({
                     state === 'completed'
                         ? 'bg-green-500 text-white'
                         : state === 'current'
-                          ? 'bg-primary text-primary-foreground shadow-[0_0_0_4px_oklch(0.537_0.229_276.9_/_0.2)]'
+                          ? 'bg-primary text-primary-foreground shadow-[var(--store-focus-ring)]'
                           : 'bg-muted text-muted-foreground'
                 }`}
             >

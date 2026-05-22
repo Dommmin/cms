@@ -18,7 +18,10 @@ import {
 } from '@/hooks/use-wishlist';
 import type { ProductListItemProps } from './product-list-item.types';
 
-export function ProductListItem({ product }: ProductListItemProps) {
+export function ProductListItem({
+    product,
+    priority = false,
+}: ProductListItemProps) {
     const { t } = useTranslation();
     const lp = useLocalePath();
     const firstVariantId = product.variants?.[0]?.id ?? 0;
@@ -48,11 +51,11 @@ export function ProductListItem({ product }: ProductListItemProps) {
     }
 
     return (
-        <div className="border-border bg-card flex gap-4 rounded-xl border p-4 transition-shadow hover:shadow-md sm:gap-6">
+        <div className="border-border bg-card flex flex-col gap-4 rounded-xl border p-4 transition-shadow hover:shadow-md sm:flex-row sm:gap-6">
             {/* Thumbnail */}
             <Link
                 href={lp(`/products/${product.slug}`)}
-                className="bg-muted relative h-32 w-32 shrink-0 overflow-hidden rounded-lg sm:h-40 sm:w-40"
+                className="bg-muted/70 relative aspect-[4/3] w-full shrink-0 overflow-hidden rounded-lg sm:h-40 sm:w-40"
                 tabIndex={-1}
                 aria-hidden="true"
             >
@@ -61,8 +64,9 @@ export function ProductListItem({ product }: ProductListItemProps) {
                         src={product.thumbnail.url}
                         alt={product.thumbnail.alt ?? product.name}
                         fill
-                        className="object-cover transition-transform duration-300 hover:scale-105"
-                        sizes="160px"
+                        loading={priority ? 'eager' : 'lazy'}
+                        className="object-contain p-3 transition-transform duration-300 hover:scale-105"
+                        sizes="(max-width: 640px) 100vw, 160px"
                     />
                 ) : (
                     <div className="text-muted-foreground flex h-full items-center justify-center text-xs">

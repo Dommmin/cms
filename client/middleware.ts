@@ -120,7 +120,6 @@ export function middleware(request: NextRequest) {
         if (LOCALES.includes(preferred) && preferred !== DEFAULT_LOCALE) {
             const redirectUrl = request.nextUrl.clone();
             redirectUrl.pathname = `/${preferred}${pathname === '/' ? '' : pathname}`;
-            redirectUrl.pathname = `/${preferred}${pathname === '/' ? '' : pathname}`;
             const response = NextResponse.redirect(redirectUrl);
             response.headers.set(
                 'Content-Security-Policy',

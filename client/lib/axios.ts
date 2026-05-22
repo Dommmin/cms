@@ -1,6 +1,8 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import Cookies from 'js-cookie';
 
+const SUPPORTED_LOCALES = new Set(['en', 'pl']);
+
 export const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1',
     headers: {
@@ -40,6 +42,17 @@ function getCsrfToken(): string | undefined {
     return Cookies.get(CSRF_COOKIE_KEY);
 }
 
+function getRequestLocale(): string | undefined {
+    if (typeof window !== 'undefined') {
+        const segment = window.location.pathname.split('/')[1];
+        if (SUPPORTED_LOCALES.has(segment)) {
+            return segment;
+        }
+    }
+
+    return 'en';
+}
+
 // ── Request interceptor: attach Bearer token + CSRF + locale ─────────────────
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
@@ -57,8 +70,8 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
         }
     }
 
-    // Append ?locale= from cookie so the backend SetLocale middleware can translate responses
-    const locale = Cookies.get('locale');
+    // URL locale is the source of truth; cookie is only a fallback for legacy unprefixed paths.
+    const locale = getRequestLocale();
     if (locale) {
         config.params = { locale, ...config.params };
     }

@@ -55,14 +55,14 @@ export function ProductGallery({
 
     return (
         <div>
-            <div className="bg-muted relative aspect-square overflow-hidden rounded-[var(--store-card-radius)]">
+            <div className="bg-muted/70 relative aspect-square overflow-hidden rounded-[var(--store-card-radius)]">
                 {activeImage ? (
                     <Image
                         src={activeImage.url}
                         alt={activeImage.alt ?? product.name}
                         fill
                         priority
-                        className="object-cover"
+                        className="object-contain p-4 sm:p-6"
                         sizes="(max-width: 1024px) 100vw, 50vw"
                     />
                 ) : product.thumbnail ? (
@@ -71,7 +71,7 @@ export function ProductGallery({
                         alt={product.thumbnail.alt ?? product.name}
                         fill
                         priority
-                        className="object-cover"
+                        className="object-contain p-4 sm:p-6"
                         sizes="(max-width: 1024px) 100vw, 50vw"
                     />
                 ) : (
@@ -91,13 +91,13 @@ export function ProductGallery({
                                 img.alt ?? `${product.name} image ${i + 1}`
                             }
                             aria-pressed={i === activeImageIndex}
-                            className={`relative aspect-square overflow-hidden rounded-[var(--store-control-radius)] border-2 ${i === activeImageIndex ? 'border-primary' : 'border-transparent'}`}
+                            className={`bg-muted/70 relative aspect-square overflow-hidden rounded-[var(--store-control-radius)] border-2 ${i === activeImageIndex ? 'border-primary' : 'border-transparent'}`}
                         >
                             <Image
                                 src={img.url}
                                 alt=""
                                 fill
-                                className="object-cover"
+                                className="object-contain p-1.5"
                                 sizes="80px"
                             />
                         </button>
@@ -231,7 +231,9 @@ export function ProductBuyBox({
                     {product.brand.name}
                 </p>
             )}
-            <h1 className="mt-1 text-3xl font-bold">{product.name}</h1>
+            <h1 className="mt-1 text-2xl leading-tight font-bold sm:text-3xl">
+                {product.name}
+            </h1>
 
             {avgRating && (
                 <div className="mt-2 flex items-center gap-2">
@@ -274,7 +276,7 @@ export function ProductBuyBox({
                 selectVariantLabel={labels.selectVariant}
             />
 
-            <div className="mt-6 flex items-center gap-3">
+            <div className="mt-6 flex flex-wrap items-center gap-3">
                 <span className="text-sm font-medium">{labels.quantity}</span>
                 <div className="border-border flex min-h-11 items-center rounded-[var(--store-control-radius)] border">
                     <button

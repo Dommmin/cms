@@ -4,6 +4,7 @@ import { Cookie, X } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
+import { useTranslation } from '@/hooks/use-translation';
 import { updateConsent } from '@/lib/datalayer';
 import { COOKIE_CONSENT_OPEN_EVENT } from '@/providers/cookie-consent-provider';
 import type {
@@ -13,6 +14,16 @@ import type {
 } from './cookie-consent.types';
 
 const STORAGE_KEY = 'cookie_consent';
+
+const DEFAULT_COOKIE_COPY = {
+    bannerTitle: 'We use cookies',
+    bannerDescription:
+        'We use cookies to improve your experience, analyse traffic, and personalise content.',
+    analyticsDescription:
+        'Help us understand how visitors use the site (e.g. Google Analytics).',
+    marketingDescription:
+        'Used to show relevant ads and measure their effectiveness (e.g. Google Ads, Meta Pixel).',
+};
 
 function getStoredConsent(): StoredConsent | null {
     if (typeof window === 'undefined') return null;
@@ -71,6 +82,7 @@ const FOCUSABLE =
     'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export function CookieConsent({ settings = {} }: CookieConsentProps) {
+    const { t, locale } = useTranslation();
     const [visible, setVisible] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
     const [prefs, setPrefs] = useState<ConsentState>({
@@ -141,18 +153,59 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
 
     if (!visible) return null;
 
-    const bannerTitle = settings.banner_title ?? 'We use cookies';
+    const localizedBannerTitle = t(
+        'cookie.banner_title',
+        locale === 'pl'
+            ? 'Używamy plików cookie'
+            : DEFAULT_COOKIE_COPY.bannerTitle,
+    );
+    const localizedBannerDescription = t(
+        'cookie.banner_description',
+        locale === 'pl'
+            ? 'Używamy plików cookie, aby poprawiać działanie strony, analizować ruch i personalizować treści.'
+            : DEFAULT_COOKIE_COPY.bannerDescription,
+    );
+    const localizedAnalyticsDesc = t(
+        'cookie.analytics_description',
+        locale === 'pl'
+            ? 'Pomagają nam zrozumieć, jak odwiedzający korzystają ze strony, np. przez Google Analytics.'
+            : DEFAULT_COOKIE_COPY.analyticsDescription,
+    );
+    const localizedMarketingDesc = t(
+        'cookie.marketing_description',
+        locale === 'pl'
+            ? 'Służą do wyświetlania dopasowanych reklam i mierzenia ich skuteczności, np. Google Ads lub Meta Pixel.'
+            : DEFAULT_COOKIE_COPY.marketingDescription,
+    );
+    const bannerTitle =
+        locale !== 'en' &&
+        (!settings.banner_title ||
+            settings.banner_title === DEFAULT_COOKIE_COPY.bannerTitle)
+            ? localizedBannerTitle
+            : (settings.banner_title ?? localizedBannerTitle);
     const bannerDescription =
-        settings.banner_description ??
-        'We use cookies to improve your experience, analyse traffic, and personalise content.';
+        locale !== 'en' &&
+        (!settings.banner_description ||
+            settings.banner_description ===
+                DEFAULT_COOKIE_COPY.bannerDescription)
+            ? localizedBannerDescription
+            : (settings.banner_description ?? localizedBannerDescription);
     const privacyUrl = settings.privacy_policy_url ?? '/privacy-policy';
     const cookiePolicyUrl = settings.cookie_policy_url ?? '/cookie-policy';
     const analyticsDesc =
-        settings.analytics_description ??
-        'Help us understand how visitors use the site (e.g. Google Analytics).';
+        locale !== 'en' &&
+        (!settings.analytics_description ||
+            settings.analytics_description ===
+                DEFAULT_COOKIE_COPY.analyticsDescription)
+            ? localizedAnalyticsDesc
+            : (settings.analytics_description ?? localizedAnalyticsDesc);
     const marketingDesc =
-        settings.marketing_description ??
-        'Used to show relevant ads and measure their effectiveness (e.g. Google Ads, Meta Pixel).';
+        locale !== 'en' &&
+        (!settings.marketing_description ||
+            settings.marketing_description ===
+                DEFAULT_COOKIE_COPY.marketingDescription)
+            ? localizedMarketingDesc
+            : (settings.marketing_description ?? localizedMarketingDesc);
 
     function applyConsent(consent: ConsentState) {
         storeConsent(consent, version);
@@ -195,21 +248,36 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                                     onClick={() => setShowDetails(true)}
                                     className="text-foreground font-medium underline"
                                 >
-                                    Manage preferences
+                                    {t(
+                                        'cookie.manage_preferences',
+                                        locale === 'pl'
+                                            ? 'Zarządzaj zgodami'
+                                            : 'Manage preferences',
+                                    )}
                                 </button>
                                 {' · '}
                                 <Link
                                     href={privacyUrl}
                                     className="text-foreground font-medium underline"
                                 >
-                                    Privacy Policy
+                                    {t(
+                                        'cookie.privacy_policy',
+                                        locale === 'pl'
+                                            ? 'Polityka prywatności'
+                                            : 'Privacy Policy',
+                                    )}
                                 </Link>
                                 {' · '}
                                 <Link
                                     href={cookiePolicyUrl}
                                     className="text-foreground font-medium underline"
                                 >
-                                    Cookie Policy
+                                    {t(
+                                        'cookie.cookie_policy',
+                                        locale === 'pl'
+                                            ? 'Polityka cookies'
+                                            : 'Cookie Policy',
+                                    )}
                                 </Link>
                             </p>
                         </div>
@@ -218,13 +286,23 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                                 onClick={rejectAll}
                                 className="border-border/60 hover:bg-accent rounded-xl border px-4 py-2 text-sm backdrop-blur-sm transition-colors"
                             >
-                                Reject all
+                                {t(
+                                    'cookie.reject_all',
+                                    locale === 'pl'
+                                        ? 'Odrzuć wszystkie'
+                                        : 'Reject all',
+                                )}
                             </button>
                             <button
                                 onClick={acceptAll}
                                 className="bg-primary text-primary-foreground rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition-all hover:opacity-90 hover:shadow-md"
                             >
-                                Accept all
+                                {t(
+                                    'cookie.accept_all',
+                                    locale === 'pl'
+                                        ? 'Akceptuj wszystkie'
+                                        : 'Accept all',
+                                )}
                             </button>
                         </div>
                     </div>
@@ -242,7 +320,10 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                                     }
                                 }}
                                 className="hover:bg-accent rounded p-1"
-                                aria-label="Close"
+                                aria-label={t(
+                                    'common.close',
+                                    locale === 'pl' ? 'Zamknij' : 'Close',
+                                )}
                             >
                                 <X className="h-4 w-4" />
                             </button>
@@ -256,15 +337,23 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                                         id="consent-functional-label"
                                         className="text-sm font-medium"
                                     >
-                                        Functional (strictly necessary)
+                                        {t(
+                                            'cookie.functional_label',
+                                            locale === 'pl'
+                                                ? 'Funkcjonalne (niezbędne)'
+                                                : 'Functional (strictly necessary)',
+                                        )}
                                     </p>
                                     <p
                                         id="consent-functional-desc"
                                         className="text-muted-foreground text-xs"
                                     >
-                                        Essential for the site to work —
-                                        session, cart, security. Cannot be
-                                        disabled.
+                                        {t(
+                                            'cookie.functional_description',
+                                            locale === 'pl'
+                                                ? 'Niezbędne do działania strony: sesja, koszyk i bezpieczeństwo. Nie można ich wyłączyć.'
+                                                : 'Essential for the site to work: session, cart, security. Cannot be disabled.',
+                                        )}
                                     </p>
                                 </div>
                                 <input
@@ -284,7 +373,12 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                                         id="consent-analytics-label"
                                         className="text-sm font-medium"
                                     >
-                                        Analytics
+                                        {t(
+                                            'cookie.analytics_label',
+                                            locale === 'pl'
+                                                ? 'Analityczne'
+                                                : 'Analytics',
+                                        )}
                                     </p>
                                     <p
                                         id="consent-analytics-desc"
@@ -315,7 +409,12 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                                         id="consent-marketing-label"
                                         className="text-sm font-medium"
                                     >
-                                        Marketing
+                                        {t(
+                                            'cookie.marketing_label',
+                                            locale === 'pl'
+                                                ? 'Marketingowe'
+                                                : 'Marketing',
+                                        )}
                                     </p>
                                     <p
                                         id="consent-marketing-desc"
@@ -345,28 +444,58 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                                 onClick={savePrefs}
                                 className="bg-primary text-primary-foreground rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90"
                             >
-                                Save preferences
+                                {t(
+                                    'cookie.save_preferences',
+                                    locale === 'pl'
+                                        ? 'Zapisz preferencje'
+                                        : 'Save preferences',
+                                )}
                             </button>
                             <button
                                 onClick={rejectAll}
                                 className="border-border hover:bg-accent rounded-lg border px-4 py-2 text-sm"
                             >
-                                Reject all
+                                {t(
+                                    'cookie.reject_all',
+                                    locale === 'pl'
+                                        ? 'Odrzuć wszystkie'
+                                        : 'Reject all',
+                                )}
                             </button>
                             <button
                                 onClick={acceptAll}
                                 className="border-border hover:bg-accent rounded-lg border px-4 py-2 text-sm"
                             >
-                                Accept all
+                                {t(
+                                    'cookie.accept_all',
+                                    locale === 'pl'
+                                        ? 'Akceptuj wszystkie'
+                                        : 'Accept all',
+                                )}
                             </button>
                         </div>
 
                         <p className="text-muted-foreground mt-3 text-xs">
-                            You can change your preferences at any time via the{' '}
+                            {t(
+                                'cookie.footer_note_prefix',
+                                locale === 'pl'
+                                    ? 'Możesz zmienić preferencje w dowolnym momencie przez'
+                                    : 'You can change your preferences at any time via the',
+                            )}{' '}
                             <Link href={cookiePolicyUrl} className="underline">
-                                Cookie Policy
+                                {t(
+                                    'cookie.cookie_policy',
+                                    locale === 'pl'
+                                        ? 'Politykę cookies'
+                                        : 'Cookie Policy',
+                                )}
                             </Link>{' '}
-                            or the link in the footer. Consent version:{' '}
+                            {t(
+                                'cookie.footer_note_suffix',
+                                locale === 'pl'
+                                    ? 'lub link w stopce. Wersja zgody:'
+                                    : 'or the link in the footer. Consent version:',
+                            )}{' '}
                             {version}.
                         </p>
                     </div>

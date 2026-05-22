@@ -35,8 +35,8 @@ export function AdminBar({ entity: serverEntity }: AdminBarProps = {}) {
         >
             {/* Left: label */}
             <div className="flex items-center gap-2 font-semibold tracking-wide">
-                <Settings className="h-4 w-4 text-indigo-400" />
-                <span className="text-indigo-300">Admin Preview</span>
+                <Settings className="text-primary h-4 w-4" />
+                <span className="text-primary">Admin Preview</span>
             </div>
 
             {/* Center: entity context */}
@@ -60,7 +60,7 @@ export function AdminBar({ entity: serverEntity }: AdminBarProps = {}) {
                         href={entity.admin_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 rounded bg-indigo-600 px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-indigo-500"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1 rounded px-3 py-1 text-xs font-medium transition-colors"
                     >
                         <ExternalLink className="h-3 w-3" />
                         Edit in Admin

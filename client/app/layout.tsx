@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Playfair_Display } from 'next/font/google';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import Script from 'next/script';
 import { cache } from 'react';
 import { ToastContainer } from 'react-toastify';
@@ -90,8 +90,11 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const cookieStore = await cookies();
-    const locale = cookieStore.get('locale')?.value ?? 'en';
+    const [cookieStore, headersList] = await Promise.all([
+        cookies(),
+        headers(),
+    ]);
+    const locale = headersList.get('x-locale') ?? 'en';
     const adminPreviewRaw = cookieStore.get('admin_preview')?.value;
     const isAdminPreview = !!adminPreviewRaw;
     let adminPreviewEntity: AdminBarProps['entity'] = null;

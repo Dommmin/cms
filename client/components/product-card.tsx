@@ -23,7 +23,7 @@ import {
 } from '@/hooks/use-wishlist';
 import type { ProductCardProps } from './product-card.types';
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, priority = false }: ProductCardProps) {
     const { t } = useTranslation();
     const lp = useLocalePath();
     const firstVariantId = product.variants?.[0]?.id ?? 0;
@@ -57,13 +57,14 @@ export function ProductCard({ product }: ProductCardProps) {
                 href={lp(`/products/${product.slug}`)}
                 className="flex flex-1 flex-col"
             >
-                <div className="bg-muted relative aspect-[var(--store-product-image-ratio)] overflow-hidden">
+                <div className="bg-muted/70 relative aspect-square overflow-hidden sm:aspect-[var(--store-product-image-ratio)]">
                     {product.thumbnail?.url ? (
                         <Image
                             src={product.thumbnail.url}
                             alt={product.thumbnail.alt ?? product.name}
                             fill
-                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                            loading={priority ? 'eager' : 'lazy'}
+                            className="object-contain p-3 transition-transform duration-300 group-hover:scale-105 sm:p-4"
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         />
                     ) : (
@@ -143,7 +144,7 @@ export function ProductCard({ product }: ProductCardProps) {
                     </button>
                 </div>
 
-                <div className="flex flex-col gap-1 p-4">
+                <div className="flex min-h-[8.75rem] flex-col gap-1 p-4">
                     {product.brand && (
                         <span className="text-muted-foreground text-xs tracking-wide uppercase">
                             {product.brand.name}

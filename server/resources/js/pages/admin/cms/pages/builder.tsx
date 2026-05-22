@@ -139,12 +139,12 @@ export default function BuilderPage({
             );
             if (!el) return false;
             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            el.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2');
+            el.classList.add('ring-2', 'ring-primary', 'ring-offset-2');
             setTimeout(
                 () =>
                     el.classList.remove(
                         'ring-2',
-                        'ring-indigo-500',
+                        'ring-primary',
                         'ring-offset-2',
                     ),
                 2500,

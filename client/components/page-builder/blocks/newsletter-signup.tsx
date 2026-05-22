@@ -70,7 +70,7 @@ export function NewsletterSignupBlock({ block }: NewsletterSignupProps) {
                         className="border-input bg-background focus:ring-ring w-full rounded-lg border px-4 py-3 text-sm outline-none focus:ring-2"
                     />
                 )}
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
                     <input
                         type="email"
                         required
@@ -82,7 +82,7 @@ export function NewsletterSignupBlock({ block }: NewsletterSignupProps) {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="bg-primary text-primary-foreground hover:bg-primary/90 shrink-0 rounded-lg px-6 py-3 text-sm font-semibold transition-colors disabled:opacity-60"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 w-full shrink-0 rounded-lg px-6 py-3 text-sm font-semibold transition-colors disabled:opacity-60 sm:w-auto"
                     >
                         {loading ? '...' : (cfg.button_text ?? 'Subscribe')}
                     </button>

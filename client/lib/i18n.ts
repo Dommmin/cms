@@ -12,6 +12,11 @@ export function getLocaleFromPath(pathname: string): Locale {
     return isValidLocale(segment) ? segment : DEFAULT_LOCALE;
 }
 
+export function getExplicitLocaleFromPath(pathname: string): Locale | null {
+    const segment = pathname.split('/')[1] ?? '';
+    return isValidLocale(segment) ? segment : null;
+}
+
 /** Strip locale prefix: '/en/products' → '/products', '/en' → '/' */
 export function stripLocaleFromPath(pathname: string): string {
     const locale = getLocaleFromPath(pathname);

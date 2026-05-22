@@ -666,9 +666,9 @@ export default function ProductsClient() {
                 </div>
             )}
 
-            <div className="grid gap-6 lg:grid-cols-[17rem_minmax(0,1fr)]">
+            <div className="grid gap-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
                 <aside className="hidden lg:block">
-                    <div className="border-border bg-card sticky top-24 rounded-[var(--store-card-radius)] border p-4 shadow-[var(--store-shadow-soft)]">
+                    <div className="border-border bg-card sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-[var(--store-card-radius)] border p-4 shadow-[var(--store-shadow-soft)]">
                         {renderFiltersPanel('products-desktop-filters')}
                     </div>
                 </aside>
@@ -676,18 +676,19 @@ export default function ProductsClient() {
                 <div className="min-w-0">
                     {isLoading ? (
                         viewMode === 'grid' ? (
-                            <div className="grid grid-cols-2 gap-[var(--store-grid-gap)] sm:grid-cols-3 xl:grid-cols-4">
+                            <div className="grid grid-cols-1 gap-[var(--store-grid-gap)] min-[520px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                                 {Array.from({ length: 8 }).map((_, i) => (
                                     <div
                                         key={i}
-                                        className="border-border bg-card overflow-hidden rounded-[var(--store-card-radius)] border"
+                                        className="border-border bg-card overflow-hidden rounded-[var(--store-card-radius)] border shadow-[var(--store-shadow-soft)]"
                                     >
-                                        <div className="bg-muted aspect-[var(--store-product-image-ratio)] animate-pulse" />
+                                        <div className="bg-muted/70 aspect-square animate-pulse sm:aspect-[var(--store-product-image-ratio)]" />
                                         <div className="space-y-2 p-4">
-                                            <div className="bg-muted h-3 w-1/3 animate-pulse rounded" />
+                                            <div className="bg-muted h-3 w-1/3 animate-pulse rounded-full" />
+                                            <div className="bg-muted h-4 w-[88%] animate-pulse rounded" />
                                             <div className="bg-muted h-4 w-3/4 animate-pulse rounded" />
-                                            <div className="bg-muted h-4 w-1/2 animate-pulse rounded" />
-                                            <div className="bg-muted mt-3 h-11 animate-pulse rounded-md" />
+                                            <div className="bg-muted h-5 w-1/2 animate-pulse rounded" />
+                                            <div className="bg-muted mt-4 h-11 animate-pulse rounded-[var(--store-control-radius)]" />
                                         </div>
                                     </div>
                                 ))}
@@ -697,16 +698,20 @@ export default function ProductsClient() {
                                 {Array.from({ length: 6 }).map((_, i) => (
                                     <div
                                         key={i}
-                                        className="border-border bg-card flex gap-4 rounded-[var(--store-card-radius)] border p-4 sm:gap-6"
+                                        className="border-border bg-card flex flex-col gap-4 rounded-[var(--store-card-radius)] border p-4 shadow-[var(--store-shadow-soft)] sm:flex-row sm:gap-6"
                                     >
-                                        <div className="bg-muted h-32 w-28 shrink-0 animate-pulse rounded-md sm:h-40 sm:w-36" />
+                                        <div className="bg-muted aspect-[4/3] w-full shrink-0 animate-pulse rounded-md sm:h-40 sm:w-44" />
                                         <div className="flex flex-1 flex-col gap-3 py-1">
-                                            <div className="bg-muted h-3 w-24 animate-pulse rounded" />
+                                            <div className="bg-muted h-3 w-24 animate-pulse rounded-full" />
                                             <div className="bg-muted h-5 w-2/3 animate-pulse rounded" />
                                             <div className="bg-muted h-5 w-1/4 animate-pulse rounded" />
+                                            <div className="flex flex-wrap gap-2">
+                                                <div className="bg-muted h-7 w-24 animate-pulse rounded-md" />
+                                                <div className="bg-muted h-7 w-32 animate-pulse rounded-md" />
+                                            </div>
                                             <div className="mt-auto flex gap-2">
-                                                <div className="bg-muted h-10 w-28 animate-pulse rounded-md" />
-                                                <div className="bg-muted h-10 w-10 animate-pulse rounded-md" />
+                                                <div className="bg-muted h-10 w-32 animate-pulse rounded-[var(--store-control-radius)]" />
+                                                <div className="bg-muted h-10 w-10 animate-pulse rounded-[var(--store-control-radius)]" />
                                             </div>
                                         </div>
                                     </div>
@@ -739,20 +744,22 @@ export default function ProductsClient() {
                                 style={{ opacity: isFetching ? 0.4 : 1 }}
                             >
                                 {viewMode === 'grid' ? (
-                                    <div className="grid grid-cols-2 gap-[var(--store-grid-gap)] sm:grid-cols-3 xl:grid-cols-4">
-                                        {data?.data?.map((product) => (
+                                    <div className="grid grid-cols-1 gap-[var(--store-grid-gap)] min-[520px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                                        {data?.data?.map((product, index) => (
                                             <ProductCard
                                                 key={product.id}
                                                 product={product}
+                                                priority={index < 4}
                                             />
                                         ))}
                                     </div>
                                 ) : (
                                     <div className="flex flex-col gap-4">
-                                        {data?.data?.map((product) => (
+                                        {data?.data?.map((product, index) => (
                                             <ProductListItem
                                                 key={product.id}
                                                 product={product}
+                                                priority={index === 0}
                                             />
                                         ))}
                                     </div>
