@@ -19,6 +19,7 @@ import { Header } from '@/components/layout/header';
 import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import { PageTransition } from '@/components/layout/page-transition';
 import { BlockAnimationObserver } from '@/components/page-builder/block-animation-observer';
+import { getI18nConfig } from '@/lib/i18n-server';
 import { buildOrganization, buildWebSite } from '@/lib/schema';
 import { serverFetch } from '@/lib/server-fetch';
 import { ModulesProvider } from '@/providers/modules-provider';
@@ -94,7 +95,8 @@ export default async function RootLayout({
         cookies(),
         headers(),
     ]);
-    const locale = headersList.get('x-locale') ?? 'pl';
+    const i18nConfig = await getI18nConfig();
+    const locale = headersList.get('x-locale') ?? i18nConfig.defaultLocale;
     const adminPreviewRaw = cookieStore.get('admin_preview')?.value;
     const isAdminPreview = !!adminPreviewRaw;
     let adminPreviewEntity: AdminBarProps['entity'] = null;
@@ -161,6 +163,13 @@ export default async function RootLayout({
                         }}
                     />
                 )}
+                <Script
+                    id="i18n-config-init"
+                    strategy="beforeInteractive"
+                    dangerouslySetInnerHTML={{
+                        __html: `window.__I18N_CONFIG__=${JSON.stringify(i18nConfig)};`,
+                    }}
+                />
                 {/* Consent Mode v2: default DENIED — must run synchronously before GTM */}
                 <Script
                     id="consent-default"

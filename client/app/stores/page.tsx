@@ -6,16 +6,31 @@ export const dynamic = 'force-dynamic';
 import { getStores } from '@/api/stores';
 import { JsonLd } from '@/components/json-ld';
 import { StoreMap } from '@/components/store-map';
+import { getI18nConfig, resolveLocale } from '@/lib/i18n-server';
 import { buildBreadcrumbList, buildLocalBusiness } from '@/lib/schema';
 import { generateAlternates, generateCanonical } from '@/lib/seo';
 
-export const metadata: Metadata = {
-    title: 'Store Locations',
-    description: 'Find our stores near you.',
-    alternates: generateAlternates('/stores'),
-};
+export async function generateStoresMetadata(
+    locale?: string,
+): Promise<Metadata> {
+    const i18nConfig = await getI18nConfig();
+    const resolvedLocale = locale
+        ? await resolveLocale(locale)
+        : i18nConfig.defaultLocale;
+
+    return {
+        title: 'Store Locations',
+        description: 'Find our stores near you.',
+        alternates: generateAlternates('/stores', resolvedLocale, i18nConfig),
+    };
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+    return generateStoresMetadata();
+}
 
 export default async function StoresPage() {
+    const i18nConfig = await getI18nConfig();
     let stores;
     try {
         stores = await getStores();
@@ -48,7 +63,7 @@ export default async function StoresPage() {
                 data={buildBreadcrumbList([
                     {
                         name: 'Store Locations',
-                        url: generateCanonical('/stores'),
+                        url: generateCanonical('/stores', i18nConfig),
                     },
                 ])}
             />

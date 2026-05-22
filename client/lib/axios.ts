@@ -1,7 +1,7 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import Cookies from 'js-cookie';
 
-const SUPPORTED_LOCALES = new Set(['en', 'pl']);
+import { getLocaleFromPath, localePath } from '@/lib/i18n';
 
 declare global {
     interface Window {
@@ -11,10 +11,18 @@ declare global {
 
 function getBaseURL(): string {
     if (typeof window !== 'undefined') {
-        return window.__API_URL__ ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1';
+        return (
+            window.__API_URL__ ??
+            process.env.NEXT_PUBLIC_API_URL ??
+            'http://localhost:8000/api/v1'
+        );
     }
 
-    return process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost/api/v1';
+    return (
+        process.env.API_URL ??
+        process.env.NEXT_PUBLIC_API_URL ??
+        'http://localhost/api/v1'
+    );
 }
 
 export const api = axios.create({
@@ -58,13 +66,10 @@ function getCsrfToken(): string | undefined {
 
 function getRequestLocale(): string | undefined {
     if (typeof window !== 'undefined') {
-        const segment = window.location.pathname.split('/')[1];
-        if (SUPPORTED_LOCALES.has(segment)) {
-            return segment;
-        }
+        return getLocaleFromPath(window.location.pathname);
     }
 
-    return 'en';
+    return undefined;
 }
 
 // ── Request interceptor: attach Bearer token + CSRF + locale ─────────────────
@@ -109,8 +114,10 @@ api.interceptors.response.use(
             // Only redirect when an actual authenticated action fails (checkout, profile, etc.).
             const url = error.config?.url ?? '';
             if (typeof window !== 'undefined' && !url.endsWith('/auth/me')) {
-                const locale = Cookies.get('locale') ?? 'en';
-                window.location.href = `/${locale}/login`;
+                const locale =
+                    Cookies.get('locale') ??
+                    getLocaleFromPath(window.location.pathname);
+                window.location.href = localePath(locale, '/login');
             }
         }
         return Promise.reject(error);

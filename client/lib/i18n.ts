@@ -1,25 +1,84 @@
-export const LOCALES = ['pl', 'en'] as const;
-export type Locale = (typeof LOCALES)[number];
-export const DEFAULT_LOCALE: Locale = 'pl';
+export const FALLBACK_LOCALES = ['pl', 'en'] as const;
+export const FALLBACK_DEFAULT_LOCALE = 'pl';
 
-export function isValidLocale(s: string): s is Locale {
-    return (LOCALES as readonly string[]).includes(s);
+export type Locale = string;
+
+export interface LocaleOption {
+    code: string;
+    name?: string;
+    native_name?: string;
+    flag_emoji?: string;
+    is_default: boolean;
+}
+
+export interface I18nConfig {
+    locales: string[];
+    defaultLocale: string;
+}
+
+declare global {
+    interface Window {
+        __I18N_CONFIG__?: I18nConfig;
+    }
+}
+
+export const LOCALES = FALLBACK_LOCALES;
+export const DEFAULT_LOCALE: Locale = FALLBACK_DEFAULT_LOCALE;
+
+export function createI18nConfig(locales: LocaleOption[]): I18nConfig {
+    const activeLocales = locales.map((locale) => locale.code).filter(Boolean);
+    const defaultLocale =
+        locales.find((locale) => locale.is_default)?.code ??
+        activeLocales[0] ??
+        FALLBACK_DEFAULT_LOCALE;
+
+    return {
+        locales: activeLocales.length ? activeLocales : [...FALLBACK_LOCALES],
+        defaultLocale,
+    };
+}
+
+export function getRuntimeI18nConfig(): I18nConfig {
+    if (typeof window !== 'undefined' && window.__I18N_CONFIG__) {
+        return window.__I18N_CONFIG__;
+    }
+
+    return {
+        locales: [...FALLBACK_LOCALES],
+        defaultLocale: FALLBACK_DEFAULT_LOCALE,
+    };
+}
+
+export function isValidLocale(
+    s: string,
+    config: I18nConfig = getRuntimeI18nConfig(),
+): s is Locale {
+    return config.locales.includes(s);
 }
 
 /** Extract locale from pathname: '/en/products' → 'en' */
-export function getLocaleFromPath(pathname: string): Locale {
+export function getLocaleFromPath(
+    pathname: string,
+    config: I18nConfig = getRuntimeI18nConfig(),
+): Locale {
     const segment = pathname.split('/')[1] ?? '';
-    return isValidLocale(segment) ? segment : DEFAULT_LOCALE;
+    return isValidLocale(segment, config) ? segment : config.defaultLocale;
 }
 
-export function getExplicitLocaleFromPath(pathname: string): Locale | null {
+export function getExplicitLocaleFromPath(
+    pathname: string,
+    config: I18nConfig = getRuntimeI18nConfig(),
+): Locale | null {
     const segment = pathname.split('/')[1] ?? '';
-    return isValidLocale(segment) ? segment : null;
+    return isValidLocale(segment, config) ? segment : null;
 }
 
 /** Strip locale prefix: '/en/products' → '/products', '/en' → '/' */
-export function stripLocaleFromPath(pathname: string): string {
-    const locale = getLocaleFromPath(pathname);
+export function stripLocaleFromPath(
+    pathname: string,
+    config: I18nConfig = getRuntimeI18nConfig(),
+): string {
+    const locale = getLocaleFromPath(pathname, config);
     if (pathname === `/${locale}`) return '/';
     if (pathname.startsWith(`/${locale}/`))
         return pathname.slice(locale.length + 1);
@@ -28,11 +87,14 @@ export function stripLocaleFromPath(pathname: string): string {
 
 /**
  * Build locale-prefixed path.
- * Default locale (en) uses no prefix: (en, /products) → '/products'
- * Non-default locale: (pl, /products) → '/pl/products'
+ * Default locale uses no prefix; non-default locales are prefixed.
  */
-export function localePath(locale: string, path: string): string {
+export function localePath(
+    locale: string,
+    path: string,
+    config: I18nConfig = getRuntimeI18nConfig(),
+): string {
     const normalized = path.startsWith('/') ? path : `/${path}`;
-    if (locale === DEFAULT_LOCALE) return normalized || '/';
+    if (locale === config.defaultLocale) return normalized || '/';
     return `/${locale}${normalized === '/' ? '' : normalized}`;
 }

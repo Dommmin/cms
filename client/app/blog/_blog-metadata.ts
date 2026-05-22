@@ -1,16 +1,17 @@
 import { getBlogPost } from '@/api/cms';
-import { LOCALES } from '@/lib/i18n';
+import { getI18nConfig } from '@/lib/i18n-server';
 import { absoluteUrl, localizedBlogPath } from '@/lib/seo';
 import type { BlogPost } from '@/types/api';
 import type { Metadata } from 'next';
 
-function articleAlternates(
+async function articleAlternates(
     post: BlogPost,
     locale: string,
-): Metadata['alternates'] {
+): Promise<Metadata['alternates']> {
+    const i18nConfig = await getI18nConfig();
     const languages: Record<string, string> = {};
 
-    for (const availableLocale of LOCALES) {
+    for (const availableLocale of i18nConfig.locales) {
         if (!post.available_locales.includes(availableLocale)) {
             continue;
         }
@@ -22,6 +23,7 @@ function articleAlternates(
                 post.slug_translations,
                 post.canonical_slug,
             ),
+            i18nConfig,
         );
     }
 
@@ -32,18 +34,21 @@ function articleAlternates(
     );
 
     return {
-        canonical: post.canonical_url ?? absoluteUrl(locale, canonicalPath),
+        canonical:
+            post.canonical_url ??
+            absoluteUrl(locale, canonicalPath, i18nConfig),
         languages: {
             ...languages,
             'x-default':
-                languages.en ??
+                languages[i18nConfig.defaultLocale] ??
                 absoluteUrl(
-                    'en',
+                    i18nConfig.defaultLocale,
                     localizedBlogPath(
-                        'en',
+                        i18nConfig.defaultLocale,
                         post.slug_translations,
                         post.canonical_slug,
                     ),
+                    i18nConfig,
                 ),
         },
     };
@@ -54,6 +59,7 @@ export async function getBlogPostMetadata(
     locale: string,
 ): Promise<Metadata> {
     const post = await getBlogPost(slug, locale);
+    const i18nConfig = await getI18nConfig();
     const articlePath = localizedBlogPath(
         locale,
         post.slug_translations,
@@ -62,13 +68,14 @@ export async function getBlogPostMetadata(
     const dynamicOgImage = absoluteUrl(
         locale,
         `${articlePath}/opengraph-image`,
+        i18nConfig,
     );
 
     return {
         title: post.seo_title ?? post.title,
         description: post.seo_description ?? post.excerpt ?? undefined,
         robots: post.meta_robots ?? 'index, follow',
-        alternates: articleAlternates(post, locale),
+        alternates: await articleAlternates(post, locale),
         openGraph: {
             title: post.seo_title ?? post.title,
             description: post.seo_description ?? post.excerpt ?? undefined,
@@ -81,6 +88,7 @@ export async function getBlogPostMetadata(
                         post.slug_translations,
                         post.canonical_slug,
                     ),
+                    i18nConfig,
                 ),
             locale,
             alternateLocale: post.available_locales.filter((l) => l !== locale),

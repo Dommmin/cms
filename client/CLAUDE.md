@@ -37,23 +37,23 @@ const { data } = await api.get('/products');
 
 ---
 
-## i18n — Locale-Prefixed URLs
+## i18n — Default Locale Without Prefix
 
-All public URLs are locale-prefixed (`/en/products`, `/pl/blog`).
+Default locale URLs are unprefixed (`/products`, `/blog`). Non-default locale URLs are prefixed (`/en/products`, `/en/blog`). Do not use canonical URLs like `/pl/blog`.
 
 ```ts
 // Client components
-const lp = useLocalePath(); // returns (path) => `/${locale}${path}`
+const lp = useLocalePath(); // returns locale-aware URL, no prefix for default locale
 const locale = useLocale(); // extracts locale from pathname
 
 // Server components
 import { localePath } from '@/lib/i18n';
 import { cookies } from 'next/headers';
-const locale = (await cookies()).get('locale')?.value ?? 'en';
+const locale = (await cookies()).get('locale')?.value ?? 'pl';
 ```
 
 - **Never hardcode locale** in links — always use `lp(path)` or `localePath(locale, path)`
-- Middleware rewrites: `/en/x` → `/x` internally; `/x` → redirects to `/en/x`
+- Middleware redirects `/pl/x` → `/x`; `/en/x` stays prefixed; first-time visitors can be redirected from `/x` to `/en/x` by `Accept-Language`
 
 ---
 

@@ -1,4 +1,5 @@
-import { blogRss } from '@/lib/blog-rss';
+import { blogRssResponse } from '@/app/_routes/blog-rss';
+import { resolveLocale } from '@/lib/i18n-server';
 
 export async function GET(
     _request: Request,
@@ -8,7 +9,8 @@ export async function GET(
         params: Promise<{ locale: string }>;
     },
 ): Promise<Response> {
-    const { locale } = await params;
+    const { locale: rawLocale } = await params;
+    const locale = await resolveLocale(rawLocale);
 
-    return blogRss(locale);
+    return blogRssResponse(locale);
 }

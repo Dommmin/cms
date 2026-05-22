@@ -6,16 +6,22 @@ export const dynamic = 'force-dynamic';
 import { getPage } from '@/api/cms';
 import { PageRenderer } from '@/components/page-builder/page-renderer';
 import { RecentlyViewed } from '@/components/recently-viewed';
+import { getDefaultLocale, getI18nConfig } from '@/lib/i18n-server';
 import { generateAlternates } from '@/lib/seo';
 import type { PageData } from './page.types';
 
 export async function generateMetadata(): Promise<Metadata> {
     try {
-        const page = await getPage('home');
+        const i18nConfig = await getI18nConfig();
+        const page = await getPage('home', i18nConfig.defaultLocale);
         return {
             title: page.seo_title ?? page.title,
             description: page.seo_description ?? undefined,
-            alternates: generateAlternates('/'),
+            alternates: generateAlternates(
+                '/',
+                i18nConfig.defaultLocale,
+                i18nConfig,
+            ),
         };
     } catch {
         return {};
@@ -23,7 +29,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-    const page = await getPage('home').catch(() => null);
+    const page = await getPage('home', await getDefaultLocale()).catch(
+        () => null,
+    );
     return <HomeContent page={page} />;
 }
 

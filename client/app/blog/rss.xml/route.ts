@@ -1,6 +1,6 @@
-import { blogRss } from '@/lib/blog-rss';
-import { DEFAULT_LOCALE } from '@/lib/i18n';
+import { blogRssResponse } from '@/app/_routes/blog-rss';
+import { getDefaultLocale } from '@/lib/i18n-server';
 
 export async function GET(): Promise<Response> {
-    return blogRss(DEFAULT_LOCALE);
+    return blogRssResponse(await getDefaultLocale());
 }

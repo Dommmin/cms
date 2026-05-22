@@ -1,6 +1,8 @@
 import { getBlogPosts } from '@/api/cms';
+import { getI18nConfig } from '@/lib/i18n-server';
 import { absoluteUrl, localizedBlogPath } from '@/lib/seo';
 import type { BlogPost } from '@/types/api';
+import type { I18nConfig } from './i18n';
 
 const STORE_NAME = process.env.NEXT_PUBLIC_STORE_NAME ?? 'Store';
 
@@ -13,10 +15,15 @@ function escapeXml(value: string): string {
         .replace(/'/g, '&apos;');
 }
 
-function itemXml(post: BlogPost, locale: string): string {
+function itemXml(
+    post: BlogPost,
+    locale: string,
+    i18nConfig: I18nConfig,
+): string {
     const url = absoluteUrl(
         locale,
         localizedBlogPath(locale, post.slug_translations, post.canonical_slug),
+        i18nConfig,
     );
 
     return `
@@ -31,6 +38,7 @@ function itemXml(post: BlogPost, locale: string): string {
 }
 
 export async function blogRss(locale: string): Promise<Response> {
+    const i18nConfig = await getI18nConfig();
     let posts: BlogPost[] = [];
 
     try {
@@ -40,8 +48,8 @@ export async function blogRss(locale: string): Promise<Response> {
         posts = [];
     }
 
-    const feedUrl = absoluteUrl(locale, '/blog/rss.xml');
-    const blogUrl = absoluteUrl(locale, '/blog');
+    const feedUrl = absoluteUrl(locale, '/blog/rss.xml', i18nConfig);
+    const blogUrl = absoluteUrl(locale, '/blog', i18nConfig);
     const language = locale === 'pl' ? 'pl-PL' : 'en';
     const description =
         locale === 'pl'
@@ -57,7 +65,7 @@ export async function blogRss(locale: string): Promise<Response> {
     <language>${language}</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${escapeXml(feedUrl)}" rel="self" type="application/rss+xml"/>
-    ${posts.map((post) => itemXml(post, locale)).join('\n')}
+    ${posts.map((post) => itemXml(post, locale, i18nConfig)).join('\n')}
   </channel>
 </rss>`;
 

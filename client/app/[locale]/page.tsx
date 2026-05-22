@@ -4,16 +4,20 @@ import { notFound } from 'next/navigation';
 import { getPage } from '@/api/cms';
 import { PageRenderer } from '@/components/page-builder/page-renderer';
 import { RecentlyViewed } from '@/components/recently-viewed';
-import { DEFAULT_LOCALE, isValidLocale } from '@/lib/i18n';
+import { getI18nConfig } from '@/lib/i18n-server';
 import type { PageProps } from './page.types';
 
 export async function generateMetadata({
     params,
 }: PageProps): Promise<Metadata> {
     try {
-        const { locale } = await params;
-        const slug = isValidLocale(locale) ? 'home' : locale;
-        const fetchLocale = isValidLocale(locale) ? locale : DEFAULT_LOCALE;
+        const [{ locale }, i18nConfig] = await Promise.all([
+            params,
+            getI18nConfig(),
+        ]);
+        const isLocaleSegment = i18nConfig.locales.includes(locale);
+        const slug = isLocaleSegment ? 'home' : locale;
+        const fetchLocale = isLocaleSegment ? locale : i18nConfig.defaultLocale;
         const page = await getPage(slug, fetchLocale);
         return {
             title: page.seo_title ?? page.title,
@@ -25,11 +29,16 @@ export async function generateMetadata({
 }
 
 export default async function HomePage({ params }: PageProps) {
-    const { locale } = await params;
+    const [{ locale }, i18nConfig] = await Promise.all([
+        params,
+        getI18nConfig(),
+    ]);
 
-    if (!isValidLocale(locale)) {
-        // This segment is actually an English page slug (e.g. /contact intercepted here)
-        const page = await getPage(locale, DEFAULT_LOCALE).catch(() => null);
+    if (!i18nConfig.locales.includes(locale)) {
+        // This segment is actually a default-locale page slug (e.g. /contact intercepted here)
+        const page = await getPage(locale, i18nConfig.defaultLocale).catch(
+            () => null,
+        );
         if (!page || !page.is_published) notFound();
         return <PageRenderer page={page} />;
     }
