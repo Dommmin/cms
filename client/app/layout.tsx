@@ -148,6 +148,19 @@ export default async function RootLayout({
                         __html: `(function(){var t=localStorage.getItem('theme')||'system';if(t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}})();`,
                     }}
                 />
+                {/* Runtime API URL — injected from server env so browser-side
+                    axios calls hit the correct backend without a rebuild.
+                    NEXT_PUBLIC_API_URL is baked at build time, but this script
+                    overrides it at runtime if the env var changes. */}
+                {process.env.NEXT_PUBLIC_API_URL && (
+                    <Script
+                        id="api-url-init"
+                        strategy="beforeInteractive"
+                        dangerouslySetInnerHTML={{
+                            __html: `window.__API_URL__=${JSON.stringify(process.env.NEXT_PUBLIC_API_URL)};`,
+                        }}
+                    />
+                )}
                 {/* Consent Mode v2: default DENIED — must run synchronously before GTM */}
                 <Script
                     id="consent-default"

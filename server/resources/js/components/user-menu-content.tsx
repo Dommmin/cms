@@ -1,4 +1,4 @@
-import { Link, router } from '@inertiajs/react';
+import { Form, Link } from '@inertiajs/react';
 import { LogOut, Settings, Shield } from 'lucide-react';
 import {
     DropdownMenuItem,
@@ -9,15 +9,11 @@ import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { edit as profileEdit } from '@/routes/profile';
 import { show as twoFactorShow } from '@/routes/two-factor';
+import { logout } from '@/routes';
 import type { UserMenuContentProps } from './user-menu-content.types';
 
 export function UserMenuContent({ user }: UserMenuContentProps) {
     const cleanup = useMobileNavigation();
-
-    const handleLogout = () => {
-        cleanup();
-        router.flushAll();
-    };
 
     return (
         <>
@@ -41,16 +37,21 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-                <Link
-                    className="block w-full cursor-pointer"
-                    href="#"
-                    as="button"
-                    onClick={handleLogout}
-                    data-test="logout-button"
+                <Form
+                    className="w-full"
+                    action={logout.url()}
+                    method="post"
+                    onSubmit={() => cleanup()}
                 >
-                    <LogOut className="mr-2" />
-                    Logout
-                </Link>
+                    <button
+                        type="submit"
+                        className="flex w-full cursor-pointer items-center gap-2 text-sm"
+                        data-test="logout-button"
+                    >
+                        <LogOut className="h-4 w-4" />
+                        Logout
+                    </button>
+                </Form>
             </DropdownMenuItem>
         </>
     );

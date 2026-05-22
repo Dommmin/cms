@@ -3,8 +3,22 @@ import Cookies from 'js-cookie';
 
 const SUPPORTED_LOCALES = new Set(['en', 'pl']);
 
+declare global {
+    interface Window {
+        __API_URL__?: string;
+    }
+}
+
+function getBaseURL(): string {
+    if (typeof window !== 'undefined') {
+        return window.__API_URL__ ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1';
+    }
+
+    return process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost/api/v1';
+}
+
 export const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1',
+    baseURL: getBaseURL(),
     headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',

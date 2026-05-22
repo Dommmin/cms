@@ -1,6 +1,4 @@
-// Components
 import { Form, Head } from '@inertiajs/react';
-import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
@@ -22,27 +20,22 @@ export default function VerifyEmail({ status }: { status?: string }) {
                 </div>
             )}
 
-            <Form
-                action={send.url()}
-                method="post"
-                className="space-y-6 text-center"
-            >
-                {({ processing }) => (
-                    <>
+            <div className="space-y-6 text-center">
+                <Form action={send.url()} method="post">
+                    {({ processing }) => (
                         <Button disabled={processing} variant="secondary">
                             {processing && <Spinner />}
                             Resend verification email
                         </Button>
+                    )}
+                </Form>
 
-                        <TextLink
-                            href={logout()}
-                            className="mx-auto block text-sm"
-                        >
-                            Log out
-                        </TextLink>
-                    </>
-                )}
-            </Form>
+                <Form action={logout.url()} method="post">
+                    <button type="submit" className="text-sm text-muted-foreground hover:text-foreground">
+                        Log out
+                    </button>
+                </Form>
+            </div>
         </AuthLayout>
     );
 }

@@ -40,6 +40,12 @@ spec:
             # so it's a plain env var, not a Secret.
             - name: API_URL
               value: "http://${APP_NAME}-server.${KUBE_NAMESPACE}.svc.cluster.local/api/v1"
+            # Public API URL — injected at container startup into the built JS
+            # so that browser-side axios calls reach the backend. NEXT_PUBLIC_
+            # vars are normally baked at build time; the entrypoint script below
+            # replaces the compiled placeholder with this value at runtime.
+            - name: NEXT_PUBLIC_API_URL
+              value: "https://admin.laravel-test.shop/api/v1"
           resources:
             requests:
               cpu: 100m
