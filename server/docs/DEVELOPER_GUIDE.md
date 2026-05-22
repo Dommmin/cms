@@ -394,13 +394,14 @@ $service->getAll();               // ['blog' => true, 'ecommerce' => true, ...]
 
 Settings are read from the `settings` table (group: `features`).
 
-### PageCacheService / PageSlugService / PagePreviewService
+### PageCacheService / PageSlugService / PagePreviewService / PagePublicationWebhookService
 
 Supporting services for the CMS page layer:
 
 - **PageCacheService** — flushes page caches when pages are published or updated (called by `PageObserver`)
 - **PageSlugService** — validates and generates unique slugs
 - **PagePreviewService** — generates and validates signed preview tokens
+- **PagePublicationWebhookService** — dispatches `page.published` and `page.unpublished` through `WebhookService` for manual and scheduled page publication changes; the bundled Next.js storefront can consume them at `POST /api/cms/revalidate` when `CMS_REVALIDATION_SECRET` matches the webhook secret
 
 ### MediaService / BlockMediaService
 
@@ -1737,6 +1738,7 @@ npm run format
 | `APP_URL`             | Application base URL                                      | `http://localhost` |
 | `APP_LOCALE`          | Default application locale                                | `en`               |
 | `APP_FALLBACK_LOCALE` | Fallback locale                                           | `en`               |
+| `CMS_REVALIDATION_SECRET` | Next.js storefront secret used to verify CMS revalidation webhooks | — |
 
 ### Database
 

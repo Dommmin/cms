@@ -129,6 +129,7 @@ Business logic goes in `app/Services/`. Controllers should be thin.
 | `ShippingCarrierManager` | Strategy pattern for shipping carriers |
 | `PageBuilderSyncService` | Page builder draft/publish sync        |
 | `PageVersionService`     | Page version management                |
+| `PagePublicationWebhookService` | Page publish/unpublish webhook dispatch |
 | `ModuleRegistryService`  | Page module type registry              |
 
 ---

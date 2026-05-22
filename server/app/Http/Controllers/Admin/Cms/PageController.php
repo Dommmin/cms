@@ -11,6 +11,7 @@ use App\Http\Requests\Admin\Cms\UpdatePageRequest;
 use App\Models\Page;
 use App\Queries\Admin\PageIndexQuery;
 use App\Services\CloneSiteService;
+use App\Services\PagePublicationWebhookService;
 use App\Services\PageSlugService;
 use App\Services\PageVersionService;
 use Illuminate\Http\RedirectResponse;
@@ -24,6 +25,7 @@ class PageController extends Controller
     public function __construct(
         private readonly PageSlugService $slugService,
         private readonly PageVersionService $versionService,
+        private readonly PagePublicationWebhookService $publicationWebhookService,
     ) {}
 
     public function index(Request $request): Response
@@ -152,6 +154,7 @@ class PageController extends Controller
     {
         $version = $this->versionService->saveDraft($page, Auth::id(), 'Publish');
         $this->versionService->publishVersion($page, $version);
+        $this->publicationWebhookService->dispatchPublished($page->refresh(), 'manual');
 
         return back()->with('success', 'Page published');
     }
@@ -163,6 +166,7 @@ class PageController extends Controller
             'published_at' => null,
             'published_version_id' => null,
         ]);
+        $this->publicationWebhookService->dispatchUnpublished($page->refresh(), 'manual');
 
         return back()->with('success', 'Page unpublished');
     }

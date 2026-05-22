@@ -192,6 +192,19 @@ client/
 └── middleware.ts            Locale redirect/rewrite middleware
 ```
 
+### CMS Revalidation
+
+CMS page fetches use cache tags in `client/api/cms.ts` (`page:{slug}`). The
+storefront exposes `POST /api/cms/revalidate` for CMS webhooks:
+
+- accepts `page.published` and `page.unpublished` webhook payloads,
+- verifies `X-Webhook-Signature` with `CMS_REVALIDATION_SECRET`,
+- calls `revalidateTag('page:{slug}')` for default and translated slugs,
+- calls `revalidatePath()` for default and locale-prefixed page paths.
+
+Configure an active CMS webhook with the same secret and the storefront URL
+`https://<storefront-host>/api/cms/revalidate`.
+
 ### Server vs Client Components
 
 **Server components** (default) — use `serverFetch()`:

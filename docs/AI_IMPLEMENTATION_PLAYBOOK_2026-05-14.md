@@ -596,7 +596,28 @@ Testy:
 - `docker compose exec php npm run test:ui`
 
 Pozostało:
-- Kalendarz publikacji, kampanie contentowe, expiring preview links i webhook/revalidation po publikacji.
+- Kalendarz publikacji i kampanie contentowe.
+- Personalizacja bloków po segmentach.
+
+### 2026-05-21 - Epic 7 - page publication webhooks
+
+Status: Partial
+
+Zmiany:
+- Dodano `PagePublicationWebhookService`, który publikuje eventy `page.published` i `page.unpublished`.
+- Ręczna publikacja/wycofanie publikacji oraz `cms:process-scheduled-pages` wysyłają payload strony do aktywnych webhooków.
+- Lista eventów webhooków w adminie zawiera teraz eventy publikacji stron.
+- Factory webhooków uwzględnia event publikacji stron.
+- Publiczny frontend ma podpisany endpoint `POST /api/cms/revalidate`, który przy eventach stron odświeża tagi `page:{slug}` i odpowiadające ścieżki.
+
+Testy:
+- `docker compose exec php vendor/bin/pint --dirty`
+- `docker compose exec php php artisan test --compact tests/Feature/Admin/Cms/PagePublicationWebhookTest.php tests/Feature/WebhookManagementTest.php`
+- `make fix`
+- `make check`
+
+Pozostało:
+- Kalendarz publikacji i kampanie contentowe.
 - Personalizacja bloków po segmentach.
 
 ### 2026-05-21 - Epic 6 - checkout progress i mobile summary
@@ -649,7 +670,7 @@ Testy:
 - `docker compose exec php npm run types`
 
 Pozostało:
-- Kalendarz publikacji, kampanie contentowe, expiring preview links i webhook/revalidation po publikacji.
+- Kalendarz publikacji i kampanie contentowe.
 - Personalizacja bloków po segmentach.
 
 ### 2026-05-21 - Epic 6 - storefront tokens, listing i product detail

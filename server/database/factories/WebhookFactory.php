@@ -22,7 +22,7 @@ class WebhookFactory extends Factory
             'url' => $this->faker->url(),
             'secret' => bin2hex(random_bytes(32)),
             'events' => $this->faker->randomElements(
-                ['order.created', 'order.paid', 'order.shipped', 'customer.created', 'product.updated'],
+                ['order.created', 'order.paid', 'order.shipped', 'customer.created', 'page.published', 'product.updated'],
                 $this->faker->numberBetween(1, 3),
             ),
             'is_active' => true,
