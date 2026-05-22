@@ -25,11 +25,27 @@ export default defineConfig({
     server: {
         host: '0.0.0.0',
         port: 5173,
+        strictPort: true,
         hmr: {
             host: 'localhost',
+            port: 5173,
+            protocol: 'ws',
         },
         watch: {
-            usePolling: true,
+            ignored: [
+                '**/node_modules/**',
+                '**/vendor/**',
+                '**/storage/**',
+                '**/bootstrap/cache/**',
+                '**/.git/**',
+            ],
+
+            // set false at beginning (MacOS)
+            usePolling: false,
+
+            // If it is needed, set:
+            // usePolling: true,
+            // interval: 300,
         },
     },
 });

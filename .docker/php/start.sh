@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+# Ensure required directories exist on named volumes
+mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
+
 if [ ! -d "node_modules" ] || [ ! -f "node_modules/.package-lock.json" ]; then
     echo "Installing Laravel frontend dependencies..."
     npm install

@@ -1,4 +1,4 @@
-.PHONY: up stop down build install shell migrate fresh test setup-test-db logs pail seed fresh-seed scout-import clear sync-translations npm-build pint fix check e2e e2e-report glitchtip-up glitchtip-down glitchtip-logs help
+.PHONY: up stop down build install shell migrate fresh test setup-test-db logs pail seed fresh-seed scout-import clear sync-translations npm-build pint fix check e2e e2e-report glitchtip-up glitchtip-down glitchtip-logs nuke-volumes help
 
 # Set environment variables
 export UID = $(shell id -u)
@@ -36,6 +36,16 @@ help:
 	@echo "  glitchtip-down     - Stop the local GlitchTip stack"
 	@echo "  glitchtip-logs     - Tail GlitchTip logs"
 	@echo "  help               - Show this help"
+
+# Remove dependency volumes + local dirs, then rebuild clean
+nuke-volumes:
+	@echo ">>> Stopping containers..."
+	docker compose down
+	@echo ">>> Removing Docker volumes..."
+	docker volume rm cms_client_node_modules cms_client_next 2>/dev/null || true
+	@echo ">>> Removing local vendor + node_modules..."
+	rm -rf server/vendor server/node_modules client/node_modules client/.next
+	@echo ">>> Done. Run 'make setup' to rebuild."
 
 # Start the application
 up:

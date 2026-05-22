@@ -4,15 +4,28 @@ import type { NextConfig } from 'next';
 const errorTrackingDsn =
     process.env.NEXT_PUBLIC_GLITCHTIP_DSN ?? process.env.NEXT_PUBLIC_SENTRY_DSN;
 
-const apiHostname = process.env.NEXT_PUBLIC_API_URL
-    ? new URL(process.env.NEXT_PUBLIC_API_URL).hostname
-    : 'localhost';
+function getApiHostname(): string {
+    const url = process.env.NEXT_PUBLIC_API_URL;
+
+    if (!url) {
+        return 'localhost';
+    }
+
+    try {
+        return new URL(url).hostname;
+    } catch {
+        return 'localhost';
+    }
+}
+
+const apiHostname = getApiHostname();
 
 const nextConfig: NextConfig = {
     output: 'standalone',
     poweredByHeader: false,
     compress: true,
     reactStrictMode: true,
+
     experimental: {
         optimizePackageImports: [
             '@headlessui/react',
@@ -22,11 +35,14 @@ const nextConfig: NextConfig = {
             'framer-motion',
         ],
     },
-    typescript: { ignoreBuildErrors: process.env.DOCKER_BUILD === '1' },
+
+    typescript: {
+        ignoreBuildErrors: process.env.DOCKER_BUILD === '1',
+    },
+
     images: {
         remotePatterns: [
             {
-                // Laravel API / storage (nginx on default port 80)
                 protocol: 'http',
                 hostname: apiHostname,
                 pathname: '/**',
@@ -36,7 +52,6 @@ const nextConfig: NextConfig = {
                 hostname: apiHostname,
                 pathname: '/**',
             },
-            // Dev fallback: when API runs behind nginx but media URLs use localhost
             ...(apiHostname !== 'localhost'
                 ? [
                       {
@@ -47,13 +62,13 @@ const nextConfig: NextConfig = {
                   ]
                 : []),
             {
-                // Spatie media-library often serves from a CDN or S3
                 protocol: 'https',
                 hostname: '**.amazonaws.com',
                 pathname: '/**',
             },
         ],
     },
+
     async headers() {
         return [
             {
@@ -72,7 +87,6 @@ const nextConfig: NextConfig = {
                 ],
             },
             {
-                // Immutable cache for hashed Next.js static assets
                 source: '/_next/static/(.*)',
                 headers: [
                     {
@@ -86,7 +100,6 @@ const nextConfig: NextConfig = {
                 ],
             },
             {
-                // Static public files (favicons, fonts, images, icons)
                 source: '/(:path*\\.(?:ico|png|jpg|jpeg|webp|svg|woff2|woff|ttf|otf))',
                 headers: [
                     {
@@ -100,7 +113,6 @@ const nextConfig: NextConfig = {
                 ],
             },
             {
-                // Public content pages: stale-while-revalidate at edge
                 source: '/:locale(en|pl)/(products|categories|blog)(.*)',
                 headers: [
                     {
@@ -114,7 +126,6 @@ const nextConfig: NextConfig = {
                 ],
             },
             {
-                // Flash sales and stores pages — moderate cache
                 source: '/:locale(en|pl)/(flash-sales|stores)(.*)',
                 headers: [
                     {
@@ -128,7 +139,6 @@ const nextConfig: NextConfig = {
                 ],
             },
             {
-                // Checkout and account pages: never cache (private, user-specific)
                 source: '/:locale(en|pl)/(checkout|account)(.*)',
                 headers: [
                     {
