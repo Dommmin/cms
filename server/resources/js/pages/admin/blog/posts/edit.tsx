@@ -405,7 +405,8 @@ export default function EditBlogPost({
                                             seo_title: data.seo_title,
                                             seo_description:
                                                 data.seo_description,
-                                            canonical_url: data.canonical_url ?? undefined,
+                                            canonical_url:
+                                                data.canonical_url ?? undefined,
                                             meta_robots: data.meta_robots,
                                             og_image: data.og_image,
                                             sitemap_exclude:

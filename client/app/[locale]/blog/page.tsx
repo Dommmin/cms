@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import { getBlogCategories, getBlogPosts } from '@/api/cms';
 import { BlogListClient } from '@/components/blog-list-client';
+import { type Locale } from '@/lib/i18n';
 import { generateAlternates } from '@/lib/seo';
 import type { PageProps } from './page.types';
 
@@ -10,7 +11,9 @@ export const revalidate = 120;
 export async function generateMetadata({
     params,
 }: PageProps): Promise<Metadata> {
-    const { locale } = await params;
+    const { locale: rawLocale } = await params;
+    const locale: Locale =
+        rawLocale === 'en' || rawLocale === 'pl' ? rawLocale : 'pl';
     const title = 'Blog';
     const description = 'Articles, news and practical expert guides.';
     const alternates = generateAlternates('/blog', locale);
@@ -23,7 +26,10 @@ export async function generateMetadata({
             title,
             description,
             type: 'website',
-            url: alternates?.canonical,
+            url:
+                typeof alternates?.canonical === 'string'
+                    ? alternates.canonical
+                    : undefined,
         },
         twitter: {
             card: 'summary_large_image',

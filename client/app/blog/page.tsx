@@ -22,7 +22,10 @@ export async function generateMetadata(): Promise<Metadata> {
             title,
             description,
             type: 'website',
-            url: alternates?.canonical,
+            url:
+                typeof alternates?.canonical === 'string'
+                    ? alternates.canonical
+                    : undefined,
         },
         twitter: {
             card: 'summary_large_image',

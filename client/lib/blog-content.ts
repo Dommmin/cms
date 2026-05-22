@@ -19,9 +19,12 @@ export function enrichArticleHtml(html: string): {
 } {
     const seen = new Map<string, number>();
     const toc: TableOfContentsItem[] = [];
-    const bodyHtml = html.replace(/<h1([^>]*)>(.*?)<\/h1>/gis, '<h2$1>$2</h2>');
+    const bodyHtml = html.replace(
+        new RegExp('<h1([^>]*)>(.*?)</h1>', 'gis'),
+        '<h2$1>$2</h2>',
+    );
     const enrichedHtml = bodyHtml.replace(
-        /<h([23])([^>]*)>(.*?)<\/h\1>/gis,
+        new RegExp('<h([23])([^>]*)>(.*?)</h\\1>', 'gis'),
         (match, level: string, attributes: string, innerHtml: string) => {
             const text = innerHtml.replace(/<[^>]+>/g, '').trim();
 

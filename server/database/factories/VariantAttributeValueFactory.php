@@ -23,8 +23,8 @@ class VariantAttributeValueFactory extends Factory
 
         return [
             'variant_id' => ProductVariant::factory(),
-            'attribute_id' => $attribute->id,
-            'attribute_value_id' => AttributeValue::factory()->for($attribute)->create()->id,
+            'attribute_id' => $attribute->getKey(),
+            'attribute_value_id' => AttributeValue::factory()->for($attribute)->create()->getKey(),
         ];
     }
 }

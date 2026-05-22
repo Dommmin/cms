@@ -240,7 +240,11 @@
                 transparent 45%
             );
         background-attachment: fixed;
-        background-color: color-mix(in oklab, var(--background) 84%, var(--primary) 16%);
+        background-color: color-mix(
+            in oklab,
+            var(--background) 84%,
+            var(--primary) 16%
+        );
     }
 
     html[data-theme-slug='glassmorphism'] [data-slot='card'] {
@@ -260,8 +264,13 @@
     html[data-theme-slug='glassmorphism'] [data-sidebar='sidebar'] {
         backdrop-filter: blur(24px);
         -webkit-backdrop-filter: blur(24px);
-        background: color-mix(in oklab, var(--sidebar) 70%, transparent) !important;
-        border-right: 1px solid color-mix(in oklab, var(--primary) 35%, transparent) !important;
+        background: color-mix(
+            in oklab,
+            var(--sidebar) 70%,
+            transparent
+        ) !important;
+        border-right: 1px solid
+            color-mix(in oklab, var(--primary) 35%, transparent) !important;
     }
 
     html[data-theme-slug='glassmorphism'] [data-slot='sidebar-wrapper'] {
