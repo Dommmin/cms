@@ -311,6 +311,19 @@ If you have physical locations, manage them under **CMS > Stores**. Each store h
 
 ## 5. Blog
 
+Blog posts can be written in Polish and English. The public blog uses `/blog`
+for Polish and `/en/blog` for English. Fill in the translated title, excerpt,
+and content for every language you want indexed.
+
+For SEO, review the SEO title, meta description, Open Graph image, and indexing
+settings before publishing. Leave the canonical URL empty unless an article must
+point to a different canonical page. For technical tutorials, add useful
+sections such as "Common mistakes", "Production checklist", and
+"Troubleshooting" when they genuinely help the reader.
+
+Published articles appear in the sitemap and locale RSS feeds. Draft,
+scheduled, archived, preview, and admin content are not intended for indexing.
+
 Navigate to **Blog** in the sidebar.
 
 ### Blog Posts

@@ -9,18 +9,37 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
+ * @property int $id
+ * @property string $slug
+ * @property array<string, string>|null $slug_translations
+ * @property string|null $translation_group_id
+ * @property string|null $seo_description
+ * @property string|null $canonical_url
+ *
  * @mixin BlogPost
  */
 class BlogPostResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $locale = (string) ($request->query('locale') ?? app()->getLocale());
+        $availableLocales = $this->availableLocaleCodes();
+        $slugTranslations = [];
+
+        foreach ($availableLocales as $availableLocale) {
+            $slugTranslations[$availableLocale] = $this->slugForLocale($availableLocale);
+        }
+
         return [
             'id' => $this->id,
-            'title' => $this->getTranslation('title', app()->getLocale(), true),
-            'slug' => $this->slug,
-            'excerpt' => $this->getTranslation('excerpt', app()->getLocale(), true),
-            'content' => $this->content,
+            'title' => $this->getTranslation('title', $locale, true),
+            'slug' => $this->slugForLocale($locale),
+            'canonical_slug' => $this->slug,
+            'slug_translations' => $slugTranslations,
+            'available_locales' => $availableLocales,
+            'translation_group_id' => $this->translation_group_id,
+            'excerpt' => $this->getTranslation('excerpt', $locale, true),
+            'content' => $this->getTranslation('content', $locale, true),
             'content_type' => $this->content_type,
             'status' => $this->status,
             'featured_image' => $this->featured_image,
@@ -31,6 +50,8 @@ class BlogPostResource extends JsonResource
             'published_at' => $this->published_at?->toIso8601String(),
             'seo_title' => $this->seo_title,
             'seo_description' => $this->seo_description,
+            'meta_description' => $this->seo_description,
+            'canonical_url' => $this->canonical_url,
             'meta_robots' => $this->meta_robots ?? 'index, follow',
             'og_image' => $this->og_image,
             'sitemap_exclude' => (bool) $this->sitemap_exclude,

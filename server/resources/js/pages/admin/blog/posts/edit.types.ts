@@ -17,6 +17,7 @@ export type BlogPost = {
     published_at: string | null;
     seo_title: string | null;
     seo_description: string | null;
+    canonical_url: string | null;
     meta_robots: string | null;
     og_image: string | null;
     sitemap_exclude: boolean;
@@ -42,6 +43,7 @@ export type FormData = {
     featured_image: string;
     seo_title: string;
     seo_description: string;
+    canonical_url: string | null;
     meta_robots: string;
     og_image: string | null;
     sitemap_exclude: boolean;

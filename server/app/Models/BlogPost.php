@@ -24,8 +24,17 @@ use Spatie\Translatable\HasTranslations;
  * @property int $id
  * @property string $title
  * @property string $slug
+ * @property array<string, string>|null $slug_translations
+ * @property string|null $content
+ * @property string|null $excerpt
  * @property array<string, mixed>|null $content_json
  * @property BlogPostStatusEnum|string|null $status
+ * @property string|null $seo_title
+ * @property string|null $seo_description
+ * @property string|null $canonical_url
+ * @property int|null $reading_time
+ * @property string|null $translation_group_id
+ * @property array<string, string>|null $available_locales
  */
 #[Fillable([
     'user_id',
@@ -33,6 +42,7 @@ use Spatie\Translatable\HasTranslations;
     'blog_category_id',
     'title',
     'slug',
+    'slug_translations',
     'excerpt',
     'content',
     'content_json',
@@ -40,11 +50,13 @@ use Spatie\Translatable\HasTranslations;
     'status',
     'featured_image',
     'available_locales',
+    'translation_group_id',
     'is_featured',
     'published_at',
     'reading_time',
     'seo_title',
     'seo_description',
+    'canonical_url',
     'meta_robots',
     'og_image',
     'sitemap_exclude',
@@ -124,6 +136,28 @@ class BlogPost extends Model
         return (int) max(1, ceil($wordCount / 200));
     }
 
+    public function slugForLocale(string $locale): string
+    {
+        $translations = $this->slug_translations ?? [];
+
+        return $translations[$locale] ?? $this->slug;
+    }
+
+    public function availableLocaleCodes(): array
+    {
+        if (is_array($this->available_locales) && $this->available_locales !== []) {
+            return array_values(array_unique($this->available_locales));
+        }
+
+        $locales = array_unique(array_merge(
+            array_keys($this->getTranslations('title')),
+            array_keys($this->getTranslations('content')),
+            array_keys($this->slug_translations ?? []),
+        ));
+
+        return array_values(array_filter($locales, fn (string $locale): bool => $locale !== ''));
+    }
+
     #[Scope]
     protected function published(Builder $query): Builder
     {
@@ -146,6 +180,7 @@ class BlogPost extends Model
     {
         return [
             'available_locales' => 'array',
+            'slug_translations' => 'array',
             'content_json' => 'array',
             'is_featured' => 'boolean',
             'published_at' => 'datetime',

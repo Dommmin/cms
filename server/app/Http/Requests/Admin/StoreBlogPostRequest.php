@@ -26,6 +26,8 @@ class StoreBlogPostRequest extends FormRequest
             'title.*' => ['nullable', 'string', 'max:255'],
             'title.'.$defaultLocale => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', 'unique:blog_posts,slug'],
+            'slug_translations' => ['nullable', 'array'],
+            'slug_translations.*' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9-]+$/'],
             'excerpt' => ['nullable', 'array'],
             'excerpt.*' => ['nullable', 'string', 'max:500'],
             'content' => ['required', 'array'],
@@ -45,6 +47,10 @@ class StoreBlogPostRequest extends FormRequest
             'featured_image' => ['nullable', 'string', 'max:255'],
             'seo_title' => ['nullable', 'string', 'max:255'],
             'seo_description' => ['nullable', 'string', 'max:500'],
+            'canonical_url' => ['nullable', 'url', 'max:255'],
+            'meta_robots' => ['nullable', 'string', 'max:100'],
+            'og_image' => ['nullable', 'string', 'max:255'],
+            'sitemap_exclude' => ['sometimes', 'boolean'],
         ];
     }
 

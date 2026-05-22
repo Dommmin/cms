@@ -94,7 +94,7 @@ export default async function RootLayout({
         cookies(),
         headers(),
     ]);
-    const locale = headersList.get('x-locale') ?? 'en';
+    const locale = headersList.get('x-locale') ?? 'pl';
     const adminPreviewRaw = cookieStore.get('admin_preview')?.value;
     const isAdminPreview = !!adminPreviewRaw;
     let adminPreviewEntity: AdminBarProps['entity'] = null;

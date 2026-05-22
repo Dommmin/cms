@@ -205,6 +205,20 @@ storefront exposes `POST /api/cms/revalidate` for CMS webhooks:
 Configure an active CMS webhook with the same secret and the storefront URL
 `https://<storefront-host>/api/cms/revalidate`.
 
+### Blog SEO
+
+The blog uses Polish as the clean default URL (`/blog`, `/blog/{slug}`) and
+English under `/en/blog`. Article metadata is generated in
+`client/app/blog/_blog-metadata.ts` from Laravel API fields, including localized
+canonicals, hreflang alternates, x-default to English, OpenGraph, Twitter cards,
+and generated fallback OG images.
+
+The sitemap includes each published locale URL and excludes posts marked
+`sitemap_exclude`. Locale-specific blog RSS feeds are served at `/blog/rss.xml`
+and `/en/blog/rss.xml`. Article HTML is server-rendered and enriched with a table
+of contents, normalized body headings, JSON-LD BlogPosting/BreadcrumbList, an
+updated date, author box, and related posts.
+
 ### Server vs Client Components
 
 **Server components** (default) — use `serverFetch()`:

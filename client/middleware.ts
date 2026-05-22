@@ -1,8 +1,8 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-const LOCALES = ['en', 'pl'];
-const DEFAULT_LOCALE = 'en';
+const LOCALES = ['pl', 'en'];
+const DEFAULT_LOCALE = 'pl';
 
 /**
  * Paths that are user-session-specific and should NOT carry a locale prefix.

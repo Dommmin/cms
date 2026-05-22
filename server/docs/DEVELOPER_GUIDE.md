@@ -59,6 +59,17 @@ The platform is a **Laravel 12 monolith** serving two separate clients:
 
 Admin SEO forms share `resources/js/components/seo-panel.tsx`. Keep SEO field warnings in `resources/js/components/seo-panel-health.ts` so the same content quality checks are reused by products, categories, and blog posts.
 
+Blog multilingual SEO is implemented with one translatable `blog_posts` row per
+article. `slug_translations` stores per-locale slugs, `translation_group_id`
+identifies the translation set, and `canonical_url` is an optional manual
+override. The public API resolves articles by canonical slug or localized slug
+and returns localized content for the requested `?locale=`.
+
+Use `docker compose exec php php artisan blog:seo-audit --format=markdown` to
+review title/description/slug suggestions. Add `--fix` to fill generated fields
+without overwriting manual SEO values; add `--force` only when replacing existing
+generated SEO fields is intentional.
+
 Key design principles:
 - **No `Kernel.php`** — middleware registered declaratively in `bootstrap/app.php`.
 - **No inline validation** — all validation in Form Request classes.

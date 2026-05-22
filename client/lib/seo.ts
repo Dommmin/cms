@@ -13,7 +13,10 @@ export function absoluteUrl(locale: string, path: string): string {
  * Generates Next.js `alternates` metadata object with hreflang entries
  * for all active locales + x-default pointing to the default locale URL.
  */
-export function generateAlternates(path: string): Metadata['alternates'] {
+export function generateAlternates(
+    path: string,
+    locale = DEFAULT_LOCALE,
+): Metadata['alternates'] {
     const languages: Record<string, string> = {};
 
     for (const locale of LOCALES) {
@@ -21,10 +24,10 @@ export function generateAlternates(path: string): Metadata['alternates'] {
     }
 
     return {
-        canonical: absoluteUrl(DEFAULT_LOCALE, path),
+        canonical: absoluteUrl(locale, path),
         languages: {
             ...languages,
-            'x-default': absoluteUrl(DEFAULT_LOCALE, path),
+            'x-default': absoluteUrl('en', path),
         },
     };
 }
@@ -32,4 +35,12 @@ export function generateAlternates(path: string): Metadata['alternates'] {
 /** Returns the canonical URL for the given path (default locale). */
 export function generateCanonical(path: string): string {
     return absoluteUrl(DEFAULT_LOCALE, path);
+}
+
+export function localizedBlogPath(
+    locale: string,
+    slugs: Record<string, string> | undefined,
+    fallbackSlug: string,
+): string {
+    return `/blog/${slugs?.[locale] ?? fallbackSlug}`;
 }

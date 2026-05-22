@@ -71,6 +71,7 @@ export default function EditBlogPost({
         featured_image: post.featured_image ?? '',
         seo_title: post.seo_title ?? '',
         seo_description: post.seo_description ?? '',
+        canonical_url: post.canonical_url ?? null,
         meta_robots: post.meta_robots ?? 'index, follow',
         og_image: post.og_image ?? null,
         sitemap_exclude: post.sitemap_exclude ?? false,
@@ -404,6 +405,7 @@ export default function EditBlogPost({
                                             seo_title: data.seo_title,
                                             seo_description:
                                                 data.seo_description,
+                                            canonical_url: data.canonical_url ?? undefined,
                                             meta_robots: data.meta_robots,
                                             og_image: data.og_image,
                                             sitemap_exclude:
@@ -416,6 +418,7 @@ export default function EditBlogPost({
                                             }))
                                         }
                                         errors={errors}
+                                        showCanonical
                                         urlPath={`blog/${data.slug ?? post.slug}`}
                                         titleFallback={
                                             typeof data.title === 'object'

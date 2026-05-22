@@ -108,6 +108,7 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - **Schema.org** — WebSite, Org, BlogPosting, Product, LocalBusiness, FAQPage (client)
 - **Sitemap** — auto-generated, respects `sitemap_exclude` per product/post
 - **Enterprise SEO** — `meta_robots`, `og_image`, `sitemap_exclude` on Product/BlogPost/Page/Category; `generateMetadata()` on all public pages; OG + Twitter Card tags; dynamic robots.txt from `seo.robots_txt` setting; `SeoPanel` admin component with SERP preview, Open Graph preview, character counters, and content quality warnings for missing/long SEO fields, missing OG image, canonical gaps, and noindex robots
+- **Blog multilingual SEO** — blog posts support `slug_translations`, `translation_group_id`, canonical overrides, localized API slugs, localized article canonicals/hreflang, dynamic article OG images, PL/EN blog RSS (`/blog/rss.xml`, `/en/blog/rss.xml`), article ToC/updated/author/related-post rendering, and `blog:seo-audit` for metadata reports and safe generated fixes.
 - **DataLayer / GTM** — view_item, remove_from_cart, begin_checkout, purchase, search events wired (client)
 - **GDPR Data Export** — "Download my data" button in profile page, calls `GET /api/v1/profile/export`; includes `processing_restricted_at` in export JSON
 - **GDPR Consent Management** — `GET /api/v1/consent` (auth or X-Session-ID header), `DELETE /api/v1/consent/{category}` (withdraw); Cookie Preferences section in profile page with toggles

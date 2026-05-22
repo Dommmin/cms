@@ -8,11 +8,29 @@ import type { PageProps } from './page.types';
 
 export const revalidate = 120;
 
-export const metadata: Metadata = {
-    title: 'Blog',
-    description: 'Articles, news and inspiration from our team.',
-    alternates: generateAlternates('/blog'),
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const title = 'Blog';
+    const description =
+        'Poradniki, aktualności i praktyczne artykuły eksperckie.';
+    const alternates = generateAlternates('/blog', DEFAULT_LOCALE);
+
+    return {
+        title,
+        description,
+        alternates,
+        openGraph: {
+            title,
+            description,
+            type: 'website',
+            url: alternates?.canonical,
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title,
+            description,
+        },
+    };
+}
 
 export default async function BlogPage({ searchParams }: PageProps) {
     const { page = '1', category, sort = '-created_at' } = await searchParams;

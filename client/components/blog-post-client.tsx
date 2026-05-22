@@ -6,24 +6,36 @@ import { BlogComments } from '@/components/blog-comments';
 import { BlogVotes } from '@/components/blog-votes';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { JsonLd } from '@/components/json-ld';
+import { enrichArticleHtml } from '@/lib/blog-content';
 import { localePath } from '@/lib/i18n';
 import { sanitizeHtml } from '@/lib/sanitize';
 import { buildBlogPosting, buildBreadcrumbList } from '@/lib/schema';
-import { generateCanonical } from '@/lib/seo';
+import { absoluteUrl, localizedBlogPath } from '@/lib/seo';
 import type { BlogPostClientProps } from './blog-post-client.types';
 
-export function BlogPostClient({ post, locale }: BlogPostClientProps) {
+export function BlogPostClient({
+    post,
+    relatedPosts = [],
+    locale,
+}: BlogPostClientProps) {
     const lp = (path: string) => localePath(locale, path);
+    const articlePath = localizedBlogPath(
+        locale,
+        post.slug_translations,
+        post.canonical_slug,
+    );
+    const articleUrl = post.canonical_url ?? absoluteUrl(locale, articlePath);
+    const { html, toc } = enrichArticleHtml(sanitizeHtml(post.content));
 
     return (
         <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-            <JsonLd data={buildBlogPosting(post)} />
+            <JsonLd data={buildBlogPosting(post, locale)} />
             <JsonLd
                 data={buildBreadcrumbList([
-                    { name: 'Blog', url: generateCanonical('/blog') },
+                    { name: 'Blog', url: absoluteUrl(locale, '/blog') },
                     {
                         name: post.title,
-                        url: generateCanonical(`/blog/${post.slug}`),
+                        url: articleUrl,
                     },
                 ])}
             />
@@ -76,6 +88,20 @@ export function BlogPostClient({ post, locale }: BlogPostClientProps) {
                 {post.reading_time && <span>{post.reading_time} min read</span>}
             </div>
 
+            {post.updated_at && (
+                <p className="text-muted-foreground mt-2 text-sm">
+                    Last updated{' '}
+                    {new Date(post.updated_at).toLocaleDateString(
+                        locale === 'pl' ? 'pl-PL' : 'en-US',
+                        {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                        },
+                    )}
+                </p>
+            )}
+
             {post.featured_image && (
                 <div className="relative mt-8 aspect-video overflow-hidden rounded-xl">
                     <Image
@@ -89,10 +115,74 @@ export function BlogPostClient({ post, locale }: BlogPostClientProps) {
                 </div>
             )}
 
+            {toc.length > 0 && (
+                <nav
+                    aria-label="Table of contents"
+                    className="border-border bg-muted/30 mt-8 border-y py-4"
+                >
+                    <ol className="space-y-2 text-sm">
+                        {toc.map((item) => (
+                            <li
+                                key={item.id}
+                                className={
+                                    item.level === 3 ? 'pl-4' : undefined
+                                }
+                            >
+                                <a
+                                    href={`#${item.id}`}
+                                    className="text-muted-foreground hover:text-foreground"
+                                >
+                                    {item.text}
+                                </a>
+                            </li>
+                        ))}
+                    </ol>
+                </nav>
+            )}
+
             <div
                 className="prose prose-lg mt-8"
-                dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
+                dangerouslySetInnerHTML={{ __html: html }}
             />
+
+            {post.author && (
+                <aside className="border-border mt-10 border-t pt-6">
+                    <p className="text-muted-foreground text-sm">Author</p>
+                    <p className="mt-1 font-semibold">{post.author.name}</p>
+                    <p className="text-muted-foreground text-sm">
+                        Editorial contributor
+                    </p>
+                </aside>
+            )}
+
+            {relatedPosts.length > 0 && (
+                <section className="border-border mt-10 border-t pt-6">
+                    <h2 className="text-2xl font-semibold">Related posts</h2>
+                    <ul className="mt-4 space-y-3">
+                        {relatedPosts.map((relatedPost) => (
+                            <li key={relatedPost.id}>
+                                <Link
+                                    href={lp(
+                                        localizedBlogPath(
+                                            locale,
+                                            relatedPost.slug_translations,
+                                            relatedPost.canonical_slug,
+                                        ),
+                                    )}
+                                    className="font-medium hover:underline"
+                                >
+                                    {relatedPost.title}
+                                </Link>
+                                {relatedPost.excerpt && (
+                                    <p className="text-muted-foreground mt-1 text-sm">
+                                        {relatedPost.excerpt}
+                                    </p>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            )}
 
             <div className="mt-8 flex items-center justify-between">
                 <BlogVotes post={post} />

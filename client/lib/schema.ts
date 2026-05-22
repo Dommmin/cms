@@ -1,4 +1,5 @@
 import type { BlogPost, Product, ProductReview, Store } from '@/types/api';
+import { absoluteUrl, localizedBlogPath } from './seo';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:8000';
 
@@ -57,20 +58,44 @@ export function buildOrganization(options: {
 
 // ── BlogPosting ───────────────────────────────────────────────────────────────
 
-export function buildBlogPosting(post: BlogPost, siteUrl?: string) {
-    const base = siteUrl ?? SITE_URL;
+export function buildBlogPosting(post: BlogPost, locale = 'pl') {
+    const url =
+        post.canonical_url ??
+        absoluteUrl(
+            locale,
+            localizedBlogPath(
+                locale,
+                post.slug_translations,
+                post.canonical_slug,
+            ),
+        );
+
     return {
         '@context': 'https://schema.org',
         '@type': 'BlogPosting',
         headline: post.title,
-        ...(post.excerpt ? { description: post.excerpt } : {}),
-        url: `${base}/blog/${post.slug}`,
+        ...((post.seo_description ?? post.excerpt)
+            ? { description: post.seo_description ?? post.excerpt }
+            : {}),
+        url,
         datePublished: post.published_at ?? post.created_at,
         dateModified: post.updated_at,
-        ...(post.featured_image ? { image: post.featured_image } : {}),
-        ...(post.author
-            ? { author: { '@type': 'Person', name: post.author.name } }
+        ...((post.og_image ?? post.featured_image)
+            ? { image: post.og_image ?? post.featured_image }
             : {}),
+        ...(post.author
+            ? {
+                  author: {
+                      '@type': 'Person',
+                      name: post.author.name,
+                      jobTitle: 'Author',
+                  },
+              }
+            : {}),
+        mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': url,
+        },
         ...(post.category ? { articleSection: post.category.name } : {}),
         ...(post.tags?.length ? { keywords: post.tags.join(', ') } : {}),
     };

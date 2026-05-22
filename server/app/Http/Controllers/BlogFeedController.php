@@ -40,14 +40,15 @@ class BlogFeedController extends Controller
             ->get();
 
         $siteUrl = config('app.url');
-        $feedUrl = url(route('blog.feed'));
+        $feedUrl = url(route('blog.feed', ['locale' => $locale]));
         $title = e(config('app.name').' – Blog');
         $now = now()->toRfc2822String();
 
         $items = $posts->map(function (BlogPost $post) use ($siteUrl, $locale): string {
             $postTitle = e($post->getTranslation('title', $locale, false) ?: $post->getTranslation('title', 'en', false) ?: $post->title);
             $excerpt = e($post->getTranslation('excerpt', $locale, false) ?: $post->getTranslation('excerpt', 'en', false) ?: $post->excerpt ?? '');
-            $link = e(sprintf('%s/blog/%s', $siteUrl, $post->slug));
+            $prefix = $locale === 'en' ? '/en' : '';
+            $link = e(sprintf('%s%s/blog/%s', $siteUrl, $prefix, $post->slugForLocale($locale)));
             $pubDate = $post->published_at?->toRfc2822String() ?? now()->toRfc2822String();
             $author = e($post->author?->name ?? '');
 

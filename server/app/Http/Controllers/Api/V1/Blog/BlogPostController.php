@@ -52,7 +52,10 @@ class BlogPostController extends ApiController
         $locale = $request->query('locale', app()->getLocale());
 
         $post = BlogPost::query()->published()
-            ->where('slug', $slug)
+            ->where(function ($q) use ($locale, $slug): void {
+                $q->where('slug', $slug)
+                    ->orWhere('slug_translations->'.$locale, $slug);
+            })
             ->where(function ($q) use ($locale): void {
                 $q->whereNull('available_locales')
                     ->orWhereJsonContains('available_locales', $locale);

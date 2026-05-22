@@ -7,11 +7,29 @@ import type { PageProps } from './page.types';
 
 export const revalidate = 120;
 
-export async function generateMetadata({}: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+    params,
+}: PageProps): Promise<Metadata> {
+    const { locale } = await params;
+    const title = 'Blog';
+    const description = 'Articles, news and practical expert guides.';
+    const alternates = generateAlternates('/blog', locale);
+
     return {
-        title: 'Blog',
-        description: 'Articles, news and inspiration from our team.',
-        alternates: generateAlternates('/blog'),
+        title,
+        description,
+        alternates,
+        openGraph: {
+            title,
+            description,
+            type: 'website',
+            url: alternates?.canonical,
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title,
+            description,
+        },
     };
 }
 

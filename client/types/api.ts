@@ -172,6 +172,7 @@ export interface Product {
     created_at: string;
     seo_title: string | null;
     seo_description: string | null;
+    meta_description: string | null;
     meta_robots: string;
     og_image: string | null;
     sitemap_exclude: boolean;
@@ -461,6 +462,10 @@ export interface BlogPost {
     id: number;
     title: string;
     slug: string;
+    canonical_slug: string;
+    slug_translations: Record<string, string>;
+    available_locales: string[];
+    translation_group_id: string | null;
     excerpt: string | null;
     content: string;
     content_type: string;
@@ -479,6 +484,7 @@ export interface BlogPost {
     reading_time: number | null;
     seo_title: string | null;
     seo_description: string | null;
+    canonical_url: string | null;
     meta_robots: string;
     og_image: string | null;
     sitemap_exclude: boolean;

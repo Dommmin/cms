@@ -55,6 +55,7 @@ class BlogPostController extends Controller
             ? ($data['title'][config('app.locale')] ?? array_values($data['title'])[0] ?? '')
             : (string) $data['title'];
         $data['slug'] ??= Str::slug($titleForSlug);
+        $data['slug_translations'] = $this->slugTranslations($data);
         $data['is_featured'] ??= false;
         $contentForEstimate = is_array($data['content'])
             ? ($data['content'][config('app.locale')] ?? array_values($data['content'])[0] ?? '')
@@ -102,6 +103,7 @@ class BlogPostController extends Controller
             ? ($data['title'][config('app.locale')] ?? array_values($data['title'])[0] ?? '')
             : (string) $data['title'];
         $data['slug'] ??= Str::slug($titleForSlug);
+        $data['slug_translations'] = $this->slugTranslations($data, $post);
         $data['is_featured'] ??= false;
         $contentForEstimate = is_array($data['content'])
             ? ($data['content'][config('app.locale')] ?? array_values($data['content'])[0] ?? '')
@@ -164,5 +166,34 @@ class BlogPostController extends Controller
             ->unique()
             ->values()
             ->all();
+    }
+
+    /** @param array<string, mixed> $data */
+    private function slugTranslations(array $data, ?BlogPost $post = null): array
+    {
+        $translations = $data['slug_translations'] ?? ($post instanceof BlogPost ? $post->slug_translations : []) ?? [];
+        $title = $data['title'] ?? [];
+
+        if (! is_array($title)) {
+            return is_array($translations) ? $translations : [];
+        }
+
+        foreach ($title as $locale => $localizedTitle) {
+            if (($translations[$locale] ?? '') !== '') {
+                continue;
+            }
+
+            if (! is_string($localizedTitle)) {
+                continue;
+            }
+
+            if ($localizedTitle === '') {
+                continue;
+            }
+
+            $translations[$locale] = Str::slug($localizedTitle);
+        }
+
+        return is_array($translations) ? array_filter($translations) : [];
     }
 }
