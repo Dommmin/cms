@@ -184,105 +184,139 @@
 }
 
 @layer components {
-    html[data-theme-active='1'] body {
+    /* ── Orb background (always-on glassmorphism) ──────────────────────────── */
+    body {
+        background-color: color-mix(
+            in oklab,
+            var(--background) 88%,
+            var(--primary) 12%
+        );
         background-image:
             radial-gradient(
-                circle at 12% 0%,
-                color-mix(in oklab, var(--primary) 16%, transparent),
-                transparent 42%
+                ellipse at 20% 10%,
+                color-mix(in oklab, var(--primary) 48%, transparent) 0%,
+                transparent 55%
             ),
             radial-gradient(
-                circle at 88% 100%,
-                color-mix(in oklab, var(--accent) 16%, transparent),
-                transparent 48%
+                ellipse at 80% 90%,
+                color-mix(in oklab, var(--accent) 48%, transparent) 0%,
+                transparent 55%
+            ),
+            radial-gradient(
+                ellipse at 55% 45%,
+                color-mix(in oklab, var(--ring) 32%, transparent) 0%,
+                transparent 45%
             );
         background-attachment: fixed;
     }
 
-    html[data-theme-active='1'] [data-slot='button'][data-variant='default'] {
+    /* ── Button enhancements ───────────────────────────────────────────────── */
+    [data-slot='button'][data-variant='default'] {
         box-shadow: 0 10px 24px rgb(0 0 0 / 0.18);
         border: 1px solid
             color-mix(in oklab, var(--primary-foreground) 22%, transparent);
     }
 
-    html[data-theme-active='1'] [data-slot='button'][data-variant='outline'] {
+    [data-slot='button'][data-variant='outline'] {
         border-color: color-mix(in oklab, var(--foreground) 18%, var(--border));
     }
 
-    html[data-theme-active='1'] [data-sidebar='sidebar'] {
+    /* ── Sidebar shell ─────────────────────────────────────────────────────── */
+    [data-sidebar='sidebar'] {
         box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
     }
 
-    html[data-theme-active='1'] [data-slot='sidebar-wrapper'] {
-        background: linear-gradient(
-            180deg,
-            color-mix(in oklab, var(--sidebar) 90%, black 10%) 0%,
-            color-mix(in oklab, var(--background) 85%, black 15%) 100%
-        );
-    }
-
-    /* ── Glassmorphism theme overrides ─────────────────────────────────────── */
-    html[data-theme-slug='glassmorphism'] body {
-        background-image:
-            radial-gradient(
-                ellipse at 20% 10%,
-                color-mix(in oklab, var(--primary) 72%, white 8%) 0%,
-                transparent 55%
-            ),
-            radial-gradient(
-                ellipse at 80% 90%,
-                color-mix(in oklab, var(--accent) 72%, transparent) 0%,
-                transparent 55%
-            ),
-            radial-gradient(
-                ellipse at 60% 40%,
-                color-mix(in oklab, var(--ring) 52%, transparent) 0%,
-                transparent 45%
-            );
-        background-attachment: fixed;
-        background-color: color-mix(
-            in oklab,
-            var(--background) 84%,
-            var(--primary) 16%
-        );
-    }
-
-    html[data-theme-slug='glassmorphism'] [data-slot='card'] {
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        background: rgba(255, 255, 255, 0.55) !important;
-        border: 1px solid rgba(255, 255, 255, 0.7) !important;
-    }
-
-    html[data-theme-slug='glassmorphism'] [data-slot='popover'] {
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        background: rgba(255, 255, 255, 0.8) !important;
-        border: 1px solid rgba(255, 255, 255, 0.7) !important;
-    }
-
-    html[data-theme-slug='glassmorphism'] [data-sidebar='sidebar'] {
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
-        background: color-mix(
-            in oklab,
-            var(--sidebar) 70%,
-            transparent
-        ) !important;
-        border-right: 1px solid
-            color-mix(in oklab, var(--primary) 35%, transparent) !important;
-    }
-
-    html[data-theme-slug='glassmorphism'] [data-slot='sidebar-wrapper'] {
+    [data-slot='sidebar-wrapper'] {
         background: transparent;
     }
 
+    /* ── Glass: Cards ──────────────────────────────────────────────────────── */
+    [data-slot='card'] {
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: color-mix(in oklab, var(--card) 65%, transparent);
+        border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+    }
+
+    /* ── Glass: Sidebar panel ──────────────────────────────────────────────── */
+    [data-sidebar='sidebar'] {
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        background: color-mix(in oklab, var(--sidebar) 72%, transparent);
+    }
+
+    /* ── Glass: Floating surfaces (popover, dropdown, select) ──────────────── */
+    [data-slot='popover-content'],
+    [data-slot='dropdown-menu-content'],
+    [data-slot='select-content'] {
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        background: color-mix(in oklab, var(--popover) 75%, transparent);
+        border: 1px solid color-mix(in oklab, var(--border) 72%, transparent);
+    }
+
+    /* ── Glass: Dialog ─────────────────────────────────────────────────────── */
+    [data-slot='dialog-content'] {
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: color-mix(in oklab, var(--background) 70%, transparent);
+        border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+    }
+
+    [data-slot='dialog-overlay'] {
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+    }
+
+    /* ── Dark mode glass overrides ─────────────────────────────────────────── */
+    .dark [data-slot='card'] {
+        background: color-mix(in oklab, var(--card) 68%, transparent);
+        border-color: color-mix(in oklab, white 8%, transparent);
+    }
+
+    .dark [data-sidebar='sidebar'] {
+        background: color-mix(in oklab, var(--sidebar) 75%, transparent);
+    }
+
+    .dark [data-slot='popover-content'],
+    .dark [data-slot='dropdown-menu-content'],
+    .dark [data-slot='select-content'] {
+        background: color-mix(in oklab, var(--popover) 70%, transparent);
+        border-color: color-mix(in oklab, white 8%, transparent);
+    }
+
+    .dark [data-slot='dialog-content'] {
+        background: color-mix(in oklab, var(--background) 65%, transparent);
+        border-color: color-mix(in oklab, white 8%, transparent);
+    }
+
+    /* ── Glass utility (matches frontend .glassmorphism) ───────────────────── */
+    .glassmorphism {
+        background: color-mix(in oklab, var(--background) 72%, white 8%);
+        backdrop-filter: blur(1.5rem) saturate(1.35);
+        -webkit-backdrop-filter: blur(1.5rem) saturate(1.35);
+        border: 1px solid
+            color-mix(in oklab, var(--foreground) 12%, transparent);
+        box-shadow: 0 18px 55px -36px rgb(0 0 0 / 0.45);
+    }
+
+    .dark .glassmorphism {
+        background: color-mix(in oklab, var(--card) 72%, transparent);
+        border: 1px solid color-mix(in oklab, white 8%, transparent);
+    }
+
+    /* ── Surface utilities ─────────────────────────────────────────────────── */
     .glass-surface {
         background: color-mix(in oklab, var(--card) 78%, transparent);
         border: 1px solid color-mix(in oklab, var(--border) 76%, transparent);
         box-shadow: 0 18px 55px -36px rgb(0 0 0 / 0.45);
         backdrop-filter: blur(1.25rem) saturate(1.25);
         -webkit-backdrop-filter: blur(1.25rem) saturate(1.25);
+    }
+
+    .dark .glass-surface {
+        background: color-mix(in oklab, var(--card) 76%, transparent);
+        border-color: color-mix(in oklab, white 8%, transparent);
     }
 
     .elevated-surface {
