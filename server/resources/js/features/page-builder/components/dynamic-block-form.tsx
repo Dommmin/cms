@@ -50,6 +50,7 @@ export function DynamicBlockForm({
                             schema={propSchema}
                             value={block.configuration[key]}
                             onChange={(v) => updateConfigField(key, v)}
+                            blockType={block.type}
                         />
                     ))}
                 </div>

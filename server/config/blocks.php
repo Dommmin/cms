@@ -175,6 +175,7 @@ return [
                         'type' => 'string',
                         'label' => 'Content',
                         'format' => 'richtext',
+                        'editor_mode' => 'full',
                     ],
                     'max_width' => [
                         'type' => 'string',

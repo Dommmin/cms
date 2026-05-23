@@ -12,7 +12,13 @@ import { Textarea } from '@/components/ui/textarea';
 import type { StringSchemaProperty } from '../../types';
 import type { FieldProps } from '../dynamic-block-form.types';
 
-export function StringField({ fieldKey, schema, value, onChange }: FieldProps) {
+export function StringField({
+    fieldKey,
+    schema,
+    value,
+    onChange,
+    blockType,
+}: FieldProps) {
     const s = schema as StringSchemaProperty;
     const str = (value as string | undefined) ?? '';
     const label = s.label ?? fieldKey;
@@ -45,6 +51,10 @@ export function StringField({ fieldKey, schema, value, onChange }: FieldProps) {
     }
 
     if (s.format === 'richtext') {
+        const editorMode =
+            s.editor_mode === 'full' || blockType === 'rich_text'
+                ? 'full'
+                : 'simple';
         return (
             <div className="space-y-1.5">
                 <Label>{label}</Label>
@@ -53,7 +63,11 @@ export function StringField({ fieldKey, schema, value, onChange }: FieldProps) {
                         {s.description}
                     </p>
                 )}
-                <RichTextEditor value={str} onChange={onChange} mode="simple" />
+                <RichTextEditor
+                    value={str}
+                    onChange={onChange}
+                    mode={editorMode}
+                />
             </div>
         );
     }

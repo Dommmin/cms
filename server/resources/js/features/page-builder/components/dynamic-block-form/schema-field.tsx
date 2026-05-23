@@ -21,6 +21,7 @@ export function SchemaField(props: FieldProps) {
                         <SchemaField
                             key={fieldProps.fieldKey}
                             {...fieldProps}
+                            blockType={props.blockType}
                         />
                     )}
                 />

@@ -65,6 +65,7 @@ export type StringSchemaProperty = SchemaPropertyBase & {
     format?: 'richtext' | 'textarea' | 'url' | 'color' | 'code';
     enum?: string[];
     maxLength?: number;
+    editor_mode?: 'simple' | 'full';
 };
 
 export type NumberSchemaProperty = SchemaPropertyBase & {

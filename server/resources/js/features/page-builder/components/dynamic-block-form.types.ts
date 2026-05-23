@@ -10,6 +10,7 @@ export type FieldProps = {
     schema: SchemaProperty;
     value: unknown;
     onChange: (value: unknown) => void;
+    blockType?: string;
 };
 
 export type RepeaterFieldProps = FieldProps & {
