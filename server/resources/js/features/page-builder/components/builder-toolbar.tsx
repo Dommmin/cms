@@ -9,7 +9,9 @@ import {
     ArrowLeft,
     BookmarkPlus,
     Eye,
+    LayoutDashboard,
     LayoutTemplate,
+    List,
     Plus,
     Save,
 } from 'lucide-react';
@@ -50,6 +52,8 @@ export function BuilderToolbar({
     onSubmitForReview,
     onApprove,
     onReject,
+    viewMode = 'cards',
+    onViewModeChange,
 }: BuilderToolbarProps) {
     const __ = useTranslation();
     const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
@@ -103,6 +107,31 @@ export function BuilderToolbar({
                         <Plus className="mr-2 h-4 w-4" />
                         {__('builder.add_section', 'Add Section')}
                     </Button>
+
+                    <div className="flex rounded-md border">
+                        <Button
+                            onClick={() => onViewModeChange?.('cards')}
+                            variant={viewMode === 'cards' ? 'default' : 'ghost'}
+                            size="sm"
+                            className="rounded-r-none"
+                            title="Card view"
+                        >
+                            <List className="mr-1 h-4 w-4" />
+                            Cards
+                        </Button>
+                        <Button
+                            onClick={() => onViewModeChange?.('canvas')}
+                            variant={
+                                viewMode === 'canvas' ? 'default' : 'ghost'
+                            }
+                            size="sm"
+                            className="rounded-l-none"
+                            title="Canvas view"
+                        >
+                            <LayoutDashboard className="mr-1 h-4 w-4" />
+                            Canvas
+                        </Button>
+                    </div>
 
                     <Button onClick={onPreview} variant="outline" size="sm">
                         <Eye className="mr-2 h-4 w-4" />

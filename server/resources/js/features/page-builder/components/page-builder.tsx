@@ -18,11 +18,12 @@ import {
     sortableKeyboardCoordinates,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from '@/hooks/use-translation';
 import { useBuilderState } from '../hooks/use-builder-state';
 import { analyzePageHealth } from '../page-health';
 import { BuilderToolbar } from './builder-toolbar';
+import { CanvasView } from './canvas-view';
 import type { PageBuilderProps } from './page-builder.types';
 import { PageHealthPanel } from './page-health-panel';
 import { PageInspector } from './page-inspector';
@@ -83,12 +84,38 @@ export function PageBuilder({
     const [templatesOpen, setTemplatesOpen] = useState(false);
     const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
     const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
+    const [viewMode, setViewMode] = useState<'cards' | 'canvas'>('cards');
+    const [inspectorOpen, setInspectorOpen] = useState(false);
 
     useEffect(() => {
         onChange?.(sections);
     }, [sections]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Keyboard shortcuts: Ctrl+Z = undo, Ctrl+Shift+Z or Ctrl+Y = redo
+    const firstSectionType = Object.keys(data.available_sections)[0] ?? '';
+
+    const sectionIds = sections.map(
+        (section) => section.client_id ?? `section-${section.id}`,
+    );
+    const activeSectionIndex = activeSectionId
+        ? sections.findIndex((section) => section.client_id === activeSectionId)
+        : -1;
+    const activeSection =
+        activeSectionIndex >= 0 ? sections[activeSectionIndex] : null;
+    const activeBlockIndex =
+        activeSection && activeBlockId
+            ? activeSection.blocks.findIndex(
+                  (block) => block.client_id === activeBlockId,
+              )
+            : -1;
+    const activeBlock =
+        activeSection && activeBlockIndex >= 0
+            ? activeSection.blocks[activeBlockIndex]
+            : null;
+
+    const handleSave = useCallback(async () => {
+        await onSave(sections);
+    }, [onSave, sections]);
+
     useEffect(() => {
         function handleKeyDown(e: KeyboardEvent) {
             const target = e.target as HTMLElement;
@@ -105,12 +132,61 @@ export function PageBuilder({
                 } else if ((e.key === 'z' && e.shiftKey) || e.key === 'y') {
                     e.preventDefault();
                     redo();
+                } else if (e.key === 's') {
+                    e.preventDefault();
+                    handleSave();
+                } else if (e.key === 'd') {
+                    e.preventDefault();
+                    // Duplicate active section or block
+                    if (activeBlockId && activeSectionIndex >= 0) {
+                        const blockIndex = sections[
+                            activeSectionIndex
+                        ]?.blocks.findIndex(
+                            (b) => b.client_id === activeBlockId,
+                        );
+                        if (blockIndex !== undefined && blockIndex >= 0) {
+                            duplicateBlock(activeSectionIndex, blockIndex);
+                        }
+                    } else if (activeSectionIndex >= 0) {
+                        duplicateSection(activeSectionIndex);
+                    }
                 }
+            }
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                if (activeBlockId && activeSectionIndex >= 0) {
+                    const blockIndex = sections[
+                        activeSectionIndex
+                    ]?.blocks.findIndex((b) => b.client_id === activeBlockId);
+                    if (blockIndex !== undefined && blockIndex >= 0) {
+                        e.preventDefault();
+                        deleteBlock(activeSectionIndex, blockIndex);
+                        setActiveBlockId(null);
+                    }
+                } else if (activeSectionIndex >= 0) {
+                    e.preventDefault();
+                    deleteSection(activeSectionIndex);
+                    setActiveSectionId(null);
+                }
+            }
+            if (e.key === 'Escape') {
+                setActiveBlockId(null);
+                setInspectorOpen(false);
             }
         }
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [undo, redo]);
+    }, [
+        undo,
+        redo,
+        activeBlockId,
+        activeSectionIndex,
+        sections,
+        duplicateBlock,
+        duplicateSection,
+        deleteBlock,
+        deleteSection,
+        handleSave,
+    ]);
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -134,10 +210,6 @@ export function PageBuilder({
         if (oldIndex === -1 || newIndex === -1) return;
 
         moveSection(oldIndex, newIndex);
-    };
-
-    const handleSave = async () => {
-        await onSave(sections);
     };
 
     const handleInsertTemplate = (template: SectionTemplate) => {
@@ -175,6 +247,7 @@ export function PageBuilder({
 
         setActiveSectionId(section.client_id);
         setActiveBlockId(block.client_id);
+        setInspectorOpen(true);
 
         if (!expandedSections.has(section.client_id)) {
             toggleSection(section.client_id);
@@ -184,6 +257,10 @@ export function PageBuilder({
         }
 
         scrollToBuilderItem('block', block.client_id);
+    };
+
+    const handleEditBlock = (_sectionIndex: number, _blockIndex: number) => {
+        setInspectorOpen(true);
     };
 
     const handleToggleSectionVisibility = (sectionIndex: number) => {
@@ -203,26 +280,6 @@ export function PageBuilder({
         updateBlock(sectionIndex, blockIndex, { is_active: !block.is_active });
     };
 
-    const firstSectionType = Object.keys(data.available_sections)[0] ?? '';
-
-    const sectionIds = sections.map(
-        (section) => section.client_id ?? `section-${section.id}`,
-    );
-    const activeSectionIndex = activeSectionId
-        ? sections.findIndex((section) => section.client_id === activeSectionId)
-        : -1;
-    const activeSection =
-        activeSectionIndex >= 0 ? sections[activeSectionIndex] : null;
-    const activeBlockIndex =
-        activeSection && activeBlockId
-            ? activeSection.blocks.findIndex(
-                  (block) => block.client_id === activeBlockId,
-              )
-            : -1;
-    const activeBlock =
-        activeSection && activeBlockIndex >= 0
-            ? activeSection.blocks[activeBlockIndex]
-            : null;
     const blockLabels = useMemo(
         () =>
             Object.fromEntries(
@@ -265,6 +322,8 @@ export function PageBuilder({
                 onSubmitForReview={onSubmitForReview ?? (() => {})}
                 onApprove={onApprove ?? (() => {})}
                 onReject={onReject ?? (() => {})}
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
             />
 
             <div className="container grid max-w-[100rem] gap-6 py-8 lg:grid-cols-[18rem_minmax(0,1fr)_minmax(22rem,30rem)]">
@@ -282,143 +341,169 @@ export function PageBuilder({
                     onDuplicateBlock={duplicateBlock}
                 />
 
-                <div className="min-w-0">
-                    {sections.length === 0 ? (
-                        <div className="rounded-lg border border-dashed bg-background p-16 text-center">
-                            <h3 className="mb-2 text-lg font-semibold">
-                                {__(
-                                    'builder.no_sections_yet',
-                                    'No sections yet',
-                                )}
-                            </h3>
-                            <p className="mb-6 text-sm text-muted-foreground">
-                                {__(
-                                    'builder.no_sections_hint',
-                                    'Get started by adding a section or choose a template',
-                                )}
-                            </p>
-                            <div className="flex items-center justify-center gap-3">
-                                <button
-                                    onClick={() => addSection(firstSectionType)}
-                                    className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-                                >
-                                    {__('builder.add_section', 'Add Section')}
-                                </button>
-                                <button
-                                    onClick={() => setTemplatesOpen(true)}
-                                    className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent"
-                                >
+                {viewMode === 'canvas' ? (
+                    <CanvasView
+                        sections={sections}
+                        activeSectionId={activeSectionId}
+                        activeBlockId={activeBlockId}
+                        onSelectSection={handleSelectSection}
+                        onSelectBlock={handleSelectBlock}
+                        onEditBlock={handleEditBlock}
+                        availableSections={data.available_sections}
+                    />
+                ) : (
+                    <div className="min-w-0">
+                        {sections.length === 0 ? (
+                            <div className="rounded-lg border border-dashed bg-background p-16 text-center">
+                                <h3 className="mb-2 text-lg font-semibold">
                                     {__(
-                                        'builder.from_template',
-                                        'From Template',
+                                        'builder.no_sections_yet',
+                                        'No sections yet',
                                     )}
-                                </button>
+                                </h3>
+                                <p className="mb-6 text-sm text-muted-foreground">
+                                    {__(
+                                        'builder.no_sections_hint',
+                                        'Get started by adding a section or choose a template',
+                                    )}
+                                </p>
+                                <div className="flex items-center justify-center gap-3">
+                                    <button
+                                        onClick={() =>
+                                            addSection(firstSectionType)
+                                        }
+                                        className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                                    >
+                                        {__(
+                                            'builder.add_section',
+                                            'Add Section',
+                                        )}
+                                    </button>
+                                    <button
+                                        onClick={() => setTemplatesOpen(true)}
+                                        className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent"
+                                    >
+                                        {__(
+                                            'builder.from_template',
+                                            'From Template',
+                                        )}
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    ) : (
-                        <DndContext
-                            sensors={sensors}
-                            collisionDetection={closestCenter}
-                            onDragEnd={handleSectionDragEnd}
-                        >
-                            <SortableContext
-                                items={sectionIds}
-                                strategy={verticalListSortingStrategy}
+                        ) : (
+                            <DndContext
+                                sensors={sensors}
+                                collisionDetection={closestCenter}
+                                onDragEnd={handleSectionDragEnd}
                             >
-                                <div className="space-y-4">
-                                    {sections.map((section, index) => (
-                                        <SortableSection
-                                            key={section.client_id}
-                                            section={section}
-                                            index={index}
-                                            pageId={data.page.id}
-                                            isExpanded={expandedSections.has(
-                                                section.client_id ?? '',
-                                            )}
-                                            isSelected={
-                                                activeSectionId ===
-                                                    section.client_id &&
-                                                !activeBlockId
-                                            }
-                                            activeBlockId={activeBlockId}
-                                            expandedBlocks={expandedBlocks}
-                                            availableSections={
-                                                data.available_sections
-                                            }
-                                            availableBlockTypes={
-                                                data.available_block_relations
-                                            }
-                                            onToggle={() =>
-                                                toggleSection(
+                                <SortableContext
+                                    items={sectionIds}
+                                    strategy={verticalListSortingStrategy}
+                                >
+                                    <div className="space-y-4">
+                                        {sections.map((section, index) => (
+                                            <SortableSection
+                                                key={section.client_id}
+                                                section={section}
+                                                index={index}
+                                                pageId={data.page.id}
+                                                isExpanded={expandedSections.has(
                                                     section.client_id ?? '',
-                                                )
-                                            }
-                                            onDelete={() =>
-                                                deleteSection(index)
-                                            }
-                                            onSelect={() =>
-                                                handleSelectSection(index)
-                                            }
-                                            onUpdate={(patch) =>
-                                                updateSection(index, patch)
-                                            }
-                                            onAddBlock={(type) =>
-                                                addBlock(index, { type })
-                                            }
-                                            onAddReusableBlock={(block) =>
-                                                addBlock(index, {
-                                                    type: block.type,
-                                                    configuration:
-                                                        block.configuration,
-                                                    relations:
-                                                        block.relations_config ??
-                                                        [],
-                                                    reusable_block_id: block.id,
-                                                    reusable_block_name:
-                                                        block.name,
-                                                })
-                                            }
-                                            onPasteBlock={(patch) =>
-                                                addBlock(index, patch)
-                                            }
-                                            onUpdateBlock={(
-                                                blockIndex,
-                                                patch,
-                                            ) =>
-                                                updateBlock(
-                                                    index,
+                                                )}
+                                                isSelected={
+                                                    activeSectionId ===
+                                                        section.client_id &&
+                                                    !activeBlockId
+                                                }
+                                                activeBlockId={activeBlockId}
+                                                expandedBlocks={expandedBlocks}
+                                                availableSections={
+                                                    data.available_sections
+                                                }
+                                                availableBlockTypes={
+                                                    data.available_block_relations
+                                                }
+                                                onToggle={() =>
+                                                    toggleSection(
+                                                        section.client_id ?? '',
+                                                    )
+                                                }
+                                                onDelete={() =>
+                                                    deleteSection(index)
+                                                }
+                                                onSelect={() =>
+                                                    handleSelectSection(index)
+                                                }
+                                                onUpdate={(patch) =>
+                                                    updateSection(index, patch)
+                                                }
+                                                onAddBlock={(type) =>
+                                                    addBlock(index, { type })
+                                                }
+                                                onAddReusableBlock={(block) =>
+                                                    addBlock(index, {
+                                                        type: block.type,
+                                                        configuration:
+                                                            block.configuration,
+                                                        relations:
+                                                            block.relations_config ??
+                                                            [],
+                                                        reusable_block_id:
+                                                            block.id,
+                                                        reusable_block_name:
+                                                            block.name,
+                                                    })
+                                                }
+                                                onPasteBlock={(patch) =>
+                                                    addBlock(index, patch)
+                                                }
+                                                onUpdateBlock={(
                                                     blockIndex,
                                                     patch,
-                                                )
-                                            }
-                                            onDeleteBlock={(blockIndex) =>
-                                                deleteBlock(index, blockIndex)
-                                            }
-                                            onMoveBlock={(oldIdx, newIdx) =>
-                                                moveBlock(index, oldIdx, newIdx)
-                                            }
-                                            onToggleBlock={(blockIndex) =>
-                                                toggleBlock(
-                                                    section.blocks[blockIndex]
-                                                        ?.client_id ?? '',
-                                                )
-                                            }
-                                            onSelectBlock={(blockIndex) =>
-                                                handleSelectBlock(
-                                                    index,
-                                                    blockIndex,
-                                                )
-                                            }
-                                        />
-                                    ))}
-                                </div>
-                            </SortableContext>
-                        </DndContext>
-                    )}
-                </div>
+                                                ) =>
+                                                    updateBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        patch,
+                                                    )
+                                                }
+                                                onDeleteBlock={(blockIndex) =>
+                                                    deleteBlock(
+                                                        index,
+                                                        blockIndex,
+                                                    )
+                                                }
+                                                onMoveBlock={(oldIdx, newIdx) =>
+                                                    moveBlock(
+                                                        index,
+                                                        oldIdx,
+                                                        newIdx,
+                                                    )
+                                                }
+                                                onToggleBlock={(blockIndex) =>
+                                                    toggleBlock(
+                                                        section.blocks[
+                                                            blockIndex
+                                                        ]?.client_id ?? '',
+                                                    )
+                                                }
+                                                onSelectBlock={(blockIndex) =>
+                                                    handleSelectBlock(
+                                                        index,
+                                                        blockIndex,
+                                                    )
+                                                }
+                                            />
+                                        ))}
+                                    </div>
+                                </SortableContext>
+                            </DndContext>
+                        )}
+                    </div>
+                )}
 
-                <ResponsivePreviewPanel
-                    inspector={
+                {inspectorOpen && (activeSection || activeBlock) ? (
+                    <div className="max-w-[30rem] min-w-[22rem]">
                         <PageInspector
                             section={activeSection}
                             sectionIndex={
@@ -435,20 +520,45 @@ export function PageBuilder({
                             onUpdateSection={updateSection}
                             onUpdateBlock={updateBlock}
                         />
-                    }
-                    health={
-                        <PageHealthPanel
-                            issues={pageHealth.issues}
-                            summary={pageHealth.summary}
-                        />
-                    }
-                    previewUrl={previewUrl}
-                    isRefreshing={isPreviewRefreshing}
-                    isStale={isPreviewStale}
-                    updatedAt={previewUpdatedAt}
-                    onRefresh={onRefreshPreview ?? onPreview}
-                    onOpenPreview={onPreview}
-                />
+                    </div>
+                ) : viewMode === 'cards' ? (
+                    <ResponsivePreviewPanel
+                        inspector={
+                            <PageInspector
+                                section={activeSection}
+                                sectionIndex={
+                                    activeSectionIndex >= 0
+                                        ? activeSectionIndex
+                                        : null
+                                }
+                                block={activeBlock}
+                                blockIndex={
+                                    activeBlockIndex >= 0
+                                        ? activeBlockIndex
+                                        : null
+                                }
+                                availableSections={data.available_sections}
+                                availableBlockTypes={
+                                    data.available_block_relations
+                                }
+                                onUpdateSection={updateSection}
+                                onUpdateBlock={updateBlock}
+                            />
+                        }
+                        health={
+                            <PageHealthPanel
+                                issues={pageHealth.issues}
+                                summary={pageHealth.summary}
+                            />
+                        }
+                        previewUrl={previewUrl}
+                        isRefreshing={isPreviewRefreshing}
+                        isStale={isPreviewStale}
+                        updatedAt={previewUpdatedAt}
+                        onRefresh={onRefreshPreview ?? onPreview}
+                        onOpenPreview={onPreview}
+                    />
+                ) : null}
             </div>
 
             <SectionTemplatesDialog

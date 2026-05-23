@@ -36,6 +36,8 @@ export type BuilderToolbarProps = {
     onSubmitForReview: () => void;
     onApprove: () => void;
     onReject: (note: string) => void;
+    viewMode?: 'cards' | 'canvas';
+    onViewModeChange?: (mode: 'cards' | 'canvas') => void;
 };
 
 export type SaveStatusProps = {
