@@ -422,6 +422,84 @@ export function useBuilderState(initialSections: Section[]) {
         [sections],
     );
 
+    /**
+     * Quick add a block to the last section (or create a standard section first).
+     * If no sections exist, creates a 'standard' section first.
+     */
+    const addQuickBlock = useCallback(
+        (type: string) => {
+            if (sections.length === 0) {
+                const newSection: Section = {
+                    client_id: createClientId('section'),
+                    section_type: 'standard',
+                    layout: 'contained',
+                    variant: null,
+                    settings: null,
+                    position: 0,
+                    is_active: true,
+                    blocks: [],
+                };
+                const newBlock: Block = {
+                    client_id: createClientId('block'),
+                    type,
+                    configuration: {},
+                    position: 0,
+                    is_active: true,
+                    relations: [],
+                };
+                newSection.blocks = [newBlock];
+                dispatch({ type: 'SET', sections: [newSection] });
+                return;
+            }
+
+            const lastSection = sections[sections.length - 1];
+            if (!lastSection) return;
+
+            const heroSections = ['hero'];
+            if (heroSections.includes(lastSection.section_type)) {
+                const newSection: Section = {
+                    client_id: createClientId('section'),
+                    section_type: 'standard',
+                    layout: 'contained',
+                    variant: null,
+                    settings: null,
+                    position: sections.length,
+                    is_active: true,
+                    blocks: [],
+                };
+                const newBlock: Block = {
+                    client_id: createClientId('block'),
+                    type,
+                    configuration: {},
+                    position: 0,
+                    is_active: true,
+                    relations: [],
+                };
+                newSection.blocks = [newBlock];
+                dispatch({ type: 'SET', sections: [...sections, newSection] });
+                return;
+            }
+
+            const newBlock: Block = {
+                client_id: createClientId('block'),
+                type,
+                configuration: {},
+                position: lastSection.blocks.length,
+                is_active: true,
+                relations: [],
+            };
+            dispatch({
+                type: 'SET',
+                sections: sections.map((section, i) =>
+                    i === sections.length - 1
+                        ? { ...section, blocks: [...section.blocks, newBlock] }
+                        : section,
+                ),
+            });
+        },
+        [sections],
+    );
+
     return {
         sections,
         expandedSections,
@@ -444,6 +522,7 @@ export function useBuilderState(initialSections: Section[]) {
         deleteBlock,
         moveBlock,
         duplicateBlock,
+        addQuickBlock,
         // UI
         toggleSection,
         toggleBlock,
