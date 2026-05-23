@@ -198,6 +198,9 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('panel')->name(
     Route::post('media/upload', [MediaController::class, 'upload'])
         ->name('media.upload');
 
+    Route::post('media/{media}/crop', [MediaController::class, 'crop'])
+        ->name('media.crop');
+
     Route::get('rte/links/search', [RteLinkController::class, 'search'])
         ->name('rte.links.search');
 

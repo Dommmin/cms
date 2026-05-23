@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\BulkDestroyMediaRequest;
+use App\Http\Requests\Admin\MediaCropRequest;
 use App\Http\Requests\Admin\StoreMediaRequest;
 use App\Http\Requests\Admin\UpdateMediaRequest;
 use App\Models\CmsMedia;
@@ -14,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Response;
+use Spatie\Image\Image as SpatieImage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class MediaController extends Controller
@@ -72,6 +74,77 @@ class MediaController extends Controller
         $media->save();
 
         return back()->with('success', 'Media updated');
+    }
+
+    public function crop(MediaCropRequest $request, Media $media): JsonResponse
+    {
+        $validated = $request->validated();
+
+        $x = (float) $validated['x'];
+        $y = (float) $validated['y'];
+        $width = (float) $validated['width'];
+        $height = (float) $validated['height'];
+        $rotate = (int) ($validated['rotate'] ?? 0);
+        $aspectRatio = $validated['aspect_ratio'] ?? 'free';
+        $focalPoint = $validated['focal_point'] ?? null;
+
+        $mediaPath = $media->getPath();
+        $image = SpatieImage::load($mediaPath);
+
+        if ($rotate !== 0) {
+            $image = $image->rotate($rotate);
+        }
+
+        $image = $image->crop((int) $width, (int) $height, (int) $x, (int) $y);
+
+        if ($aspectRatio !== 'free') {
+            str_replace(':', '_', $aspectRatio);
+        }
+
+        $cmsMedia = CmsMedia::query()->findOrFail($media->model_id);
+
+        $tempPath = sys_get_temp_dir().'/crop_'.$media->id.'_'.time().'.jpg';
+        $image->save($tempPath);
+
+        $cmsMedia->addMedia($tempPath)
+            ->withCustomProperties([
+                'alt' => $media->getCustomProperty('alt', ''),
+                'caption' => $media->getCustomProperty('caption', ''),
+                'description' => $media->getCustomProperty('description', ''),
+                'author' => $media->getCustomProperty('author', ''),
+                'crop_of' => (string) $media->id,
+                'crop_params' => json_encode([
+                    'x' => $x,
+                    'y' => $y,
+                    'width' => $width,
+                    'height' => $height,
+                    'rotate' => $rotate,
+                    'aspect_ratio' => $aspectRatio,
+                ]),
+            ])
+            ->toMediaCollection($media->collection_name);
+
+        if ($focalPoint) {
+            $media->setCustomProperty('focal_point', $focalPoint);
+            $media->save();
+        }
+
+        $newMedia = $cmsMedia->getMedia($media->collection_name)->last();
+
+        return response()->json([
+            'id' => $newMedia->id,
+            'name' => $newMedia->name,
+            'file_name' => $newMedia->file_name,
+            'mime_type' => $newMedia->mime_type,
+            'size' => $newMedia->size,
+            'url' => $newMedia->getUrl(),
+            'thumb_url' => $newMedia->hasGeneratedConversion('thumbnail')
+                ? $newMedia->getUrl('thumbnail')
+                : null,
+            'width' => $newMedia->getCustomProperty('width'),
+            'height' => $newMedia->getCustomProperty('height'),
+            'crop_of' => $media->id,
+        ]);
     }
 
     public function destroy(Media $media): RedirectResponse

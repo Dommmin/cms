@@ -8,6 +8,7 @@ import {
     GripVerticalIcon,
     ImageIcon,
     LoaderCircleIcon,
+    PencilIcon,
     Search,
     StarIcon,
     TrashIcon,
@@ -16,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as MediaController from '@/actions/App/Http/Controllers/Admin/MediaController';
+import { ImageEditorModal } from '@/components/image-editor-modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type {
@@ -154,6 +156,7 @@ export function MediaPickerModal({
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [uploading, setUploading] = useState(false);
     const [isDragOver, setIsDragOver] = useState(false);
+    const [editingImage, setEditingImage] = useState<MediaItem | null>(null);
     const uploadInputRef = useRef<HTMLInputElement>(null);
     const searchRef = useRef(search);
     const extensionRef = useRef(extension);
@@ -600,6 +603,21 @@ export function MediaPickerModal({
                                                 >
                                                     <StarIcon className="h-4 w-4" />
                                                 </button>
+                                                {image.mime_type?.startsWith(
+                                                    'image/',
+                                                ) && (
+                                                    <button
+                                                        onClick={() =>
+                                                            setEditingImage(
+                                                                image as unknown as MediaItem,
+                                                            )
+                                                        }
+                                                        className="rounded p-1 text-muted-foreground hover:text-primary"
+                                                        title="Edit image"
+                                                    >
+                                                        <PencilIcon className="h-4 w-4" />
+                                                    </button>
+                                                )}
                                                 <button
                                                     onClick={() =>
                                                         onRemove(image.id)
@@ -627,6 +645,18 @@ export function MediaPickerModal({
                     </Button>
                 </div>
             </div>
+
+            {editingImage && (
+                <ImageEditorModal
+                    open={!!editingImage}
+                    onClose={() => setEditingImage(null)}
+                    imageUrl={editingImage.url}
+                    mediaId={editingImage.id}
+                    onCropComplete={(_result) => {
+                        setEditingImage(null);
+                    }}
+                />
+            )}
         </div>
     );
 }

@@ -100,6 +100,7 @@
         "react-dom": "^19.2.0",
         "react-dropzone": "^15.0.0",
         "react-hot-toast": "^2.6.0",
+        "react-image-crop": "^11.0.10",
         "recharts": "^3.7.0",
         "tailwind-merge": "^3.5.0",
         "tailwindcss": "^4.0.0",
