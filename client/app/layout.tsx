@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Playfair_Display } from 'next/font/google';
 import { cookies, headers } from 'next/headers';
-import Script from 'next/script';
+
 import { cache } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -145,9 +145,8 @@ export default async function RootLayout({
                     />
                 )}
                 {/* Theme: prevent flash — must run before hydration to avoid dark-mode flash */}
-                <Script
+                <script
                     id="theme-init"
-                    strategy="beforeInteractive"
                     dangerouslySetInnerHTML={{
                         __html: `(function(){var t=localStorage.getItem('theme')||'system';if(t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}})();`,
                     }}
@@ -157,25 +156,22 @@ export default async function RootLayout({
                     NEXT_PUBLIC_API_URL is baked at build time, but this script
                     overrides it at runtime if the env var changes. */}
                 {process.env.NEXT_PUBLIC_API_URL && (
-                    <Script
+                    <script
                         id="api-url-init"
-                        strategy="beforeInteractive"
                         dangerouslySetInnerHTML={{
                             __html: `window.__API_URL__=${JSON.stringify(process.env.NEXT_PUBLIC_API_URL)};`,
                         }}
                     />
                 )}
-                <Script
+                <script
                     id="i18n-config-init"
-                    strategy="beforeInteractive"
                     dangerouslySetInnerHTML={{
                         __html: `window.__I18N_CONFIG__=${JSON.stringify(i18nConfig)};`,
                     }}
                 />
                 {/* Consent Mode v2: default DENIED — must run synchronously before GTM */}
-                <Script
+                <script
                     id="consent-default"
-                    strategy="beforeInteractive"
                     dangerouslySetInnerHTML={{
                         __html: `window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:"consent_default",analytics_storage:"denied",ad_storage:"denied",ad_user_data:"denied",ad_personalization:"denied",functionality_storage:"denied",security_storage:"granted"});`,
                     }}
