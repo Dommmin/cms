@@ -19,6 +19,7 @@ import { Header } from '@/components/layout/header';
 import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import { PageTransition } from '@/components/layout/page-transition';
 import { BlockAnimationObserver } from '@/components/page-builder/block-animation-observer';
+import { ThemeStyles } from '@/components/theme-styles';
 import { getI18nConfig } from '@/lib/i18n-server';
 import { buildOrganization, buildWebSite } from '@/lib/schema';
 import { serverFetch } from '@/lib/server-fetch';
@@ -128,6 +129,7 @@ export default async function RootLayout({
     return (
         <html lang={locale} suppressHydrationWarning>
             <head>
+                <ThemeStyles theme={publicSettings?.theme ?? null} />
                 {/* Preconnect to API origin for faster TTFB on client-side fetches */}
                 {process.env.NEXT_PUBLIC_API_URL && (
                     <link

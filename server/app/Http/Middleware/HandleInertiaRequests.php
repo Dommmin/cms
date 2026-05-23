@@ -48,7 +48,7 @@ class HandleInertiaRequests extends Middleware
         $flashError = $request->session()->get('error');
         $activeTheme = Theme::query()
             ->where('is_active', true)
-            ->first(['id', 'slug', 'tokens']);
+            ->first(['id', 'slug', 'tokens', 'typography', 'spacing', 'buttons', 'containers']);
 
         return [
             ...parent::share($request),
@@ -68,6 +68,10 @@ class HandleInertiaRequests extends Middleware
                 'id' => $activeTheme->id,
                 'slug' => $activeTheme->slug,
                 'tokens' => $activeTheme->tokens,
+                'typography' => $activeTheme->typography,
+                'spacing' => $activeTheme->spacing,
+                'buttons' => $activeTheme->buttons,
+                'containers' => $activeTheme->containers,
             ] : null,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'frontendUrl' => config('app.frontend_url', 'http://localhost:3000'),

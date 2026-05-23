@@ -7,6 +7,13 @@ import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
@@ -44,8 +51,62 @@ const editableTokens = [
     { key: 'sidebar-ring', label: 'Sidebar Ring' },
 ] as const;
 
+const fontOptions = [
+    'Inter',
+    'Plus Jakarta Sans',
+    'DM Sans',
+    'Manrope',
+    'Outfit',
+    'Sora',
+    'Space Grotesk',
+    'Geist',
+    'System UI',
+];
+
+const scaleOptions = ['1.125', '1.2', '1.25', '1.333', '1.5'];
+
+function DesignSection({
+    title,
+    description,
+    children,
+}: {
+    title: string;
+    description?: string;
+    children: React.ReactNode;
+}) {
+    return (
+        <div className="rounded-lg border p-4">
+            <h3 className="mb-1 text-sm font-semibold">{title}</h3>
+            {description && (
+                <p className="mb-3 text-xs text-muted-foreground">
+                    {description}
+                </p>
+            )}
+            {children}
+        </div>
+    );
+}
+
+function FieldGroup({
+    label,
+    name,
+    placeholder,
+}: {
+    label: string;
+    name: string;
+    placeholder?: string;
+}) {
+    return (
+        <div className="grid gap-2">
+            <Label htmlFor={name}>{label}</Label>
+            <Input id={name} name={name} placeholder={placeholder} />
+        </div>
+    );
+}
+
 export default function Create() {
     const formId = 'theme-create-form';
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Theme" />
@@ -72,7 +133,7 @@ export default function Create() {
                     action={ThemeController.store.url()}
                     method="post"
                     id={formId}
-                    className="max-w-2xl space-y-6"
+                    className="max-w-3xl space-y-6"
                 >
                     {({ processing, errors }) => (
                         <>
@@ -109,10 +170,10 @@ export default function Create() {
                                 <InputError message={errors.description} />
                             </div>
 
-                            <div className="rounded-lg border p-4">
-                                <h3 className="mb-3 text-sm font-semibold">
-                                    Theme Tokens
-                                </h3>
+                            <DesignSection
+                                title="Colors"
+                                description="Core color tokens used across the site."
+                            >
                                 <div className="grid gap-4 md:grid-cols-2">
                                     {editableTokens.map((token) => (
                                         <div
@@ -133,7 +194,201 @@ export default function Create() {
                                     ))}
                                 </div>
                                 <InputError message={errors.tokens} />
-                            </div>
+                            </DesignSection>
+
+                            <DesignSection
+                                title="Typography"
+                                description="Font families, sizes, and type scale."
+                            >
+                                <div className="grid gap-4 md:grid-cols-2">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="typography-heading_font">
+                                            Heading Font
+                                        </Label>
+                                        <Select
+                                            name="typography[heading_font]"
+                                            defaultValue="Inter"
+                                        >
+                                            <SelectTrigger id="typography-heading_font">
+                                                <SelectValue placeholder="Select font" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {fontOptions.map((font) => (
+                                                    <SelectItem
+                                                        key={font}
+                                                        value={font}
+                                                    >
+                                                        {font}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="typography-body_font">
+                                            Body Font
+                                        </Label>
+                                        <Select
+                                            name="typography[body_font]"
+                                            defaultValue="Inter"
+                                        >
+                                            <SelectTrigger id="typography-body_font">
+                                                <SelectValue placeholder="Select font" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {fontOptions.map((font) => (
+                                                    <SelectItem
+                                                        key={font}
+                                                        value={font}
+                                                    >
+                                                        {font}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <FieldGroup
+                                        label="Base Size"
+                                        name="typography[base_size]"
+                                        placeholder="16px"
+                                    />
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="typography-scale">
+                                            Type Scale
+                                        </Label>
+                                        <Select
+                                            name="typography[scale]"
+                                            defaultValue="1.25"
+                                        >
+                                            <SelectTrigger id="typography-scale">
+                                                <SelectValue placeholder="Select scale" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {scaleOptions.map((s) => (
+                                                    <SelectItem
+                                                        key={s}
+                                                        value={s}
+                                                    >
+                                                        {s}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <FieldGroup
+                                        label="H1 Size"
+                                        name="typography[h1_size]"
+                                        placeholder="2.5rem"
+                                    />
+                                    <FieldGroup
+                                        label="H2 Size"
+                                        name="typography[h2_size]"
+                                        placeholder="2rem"
+                                    />
+                                    <FieldGroup
+                                        label="H3 Size"
+                                        name="typography[h3_size]"
+                                        placeholder="1.5rem"
+                                    />
+                                    <FieldGroup
+                                        label="H4 Size"
+                                        name="typography[h4_size]"
+                                        placeholder="1.25rem"
+                                    />
+                                </div>
+                            </DesignSection>
+
+                            <DesignSection
+                                title="Spacing & Layout"
+                                description="Section padding, block gaps, and container widths."
+                            >
+                                <div className="grid gap-4 md:grid-cols-3">
+                                    <FieldGroup
+                                        label="Section Padding Y"
+                                        name="spacing[section_padding]"
+                                        placeholder="5rem"
+                                    />
+                                    <FieldGroup
+                                        label="Block Gap"
+                                        name="spacing[block_gap]"
+                                        placeholder="2rem"
+                                    />
+                                    <FieldGroup
+                                        label="Container Padding"
+                                        name="spacing[container_padding]"
+                                        placeholder="1.5rem"
+                                    />
+                                </div>
+                            </DesignSection>
+
+                            <DesignSection
+                                title="Buttons"
+                                description="Button radius and padding."
+                            >
+                                <div className="mb-3 text-xs font-medium text-muted-foreground">
+                                    Primary Button
+                                </div>
+                                <div className="grid gap-4 md:grid-cols-3">
+                                    <FieldGroup
+                                        label="Border Radius"
+                                        name="buttons[primary_border_radius]"
+                                        placeholder="0.5rem"
+                                    />
+                                    <FieldGroup
+                                        label="Padding X"
+                                        name="buttons[primary_padding_x]"
+                                        placeholder="1.5rem"
+                                    />
+                                    <FieldGroup
+                                        label="Padding Y"
+                                        name="buttons[primary_padding_y]"
+                                        placeholder="0.75rem"
+                                    />
+                                </div>
+                                <div className="mt-4 mb-3 text-xs font-medium text-muted-foreground">
+                                    Secondary Button
+                                </div>
+                                <div className="grid gap-4 md:grid-cols-3">
+                                    <FieldGroup
+                                        label="Border Radius"
+                                        name="buttons[secondary_border_radius]"
+                                        placeholder="0.5rem"
+                                    />
+                                    <FieldGroup
+                                        label="Padding X"
+                                        name="buttons[secondary_padding_x]"
+                                        placeholder="1.5rem"
+                                    />
+                                    <FieldGroup
+                                        label="Padding Y"
+                                        name="buttons[secondary_padding_y]"
+                                        placeholder="0.75rem"
+                                    />
+                                </div>
+                            </DesignSection>
+
+                            <DesignSection
+                                title="Containers"
+                                description="Max widths for page layouts."
+                            >
+                                <div className="grid gap-4 md:grid-cols-3">
+                                    <FieldGroup
+                                        label="Max Width"
+                                        name="containers[max_width]"
+                                        placeholder="1280px"
+                                    />
+                                    <FieldGroup
+                                        label="Content Width"
+                                        name="containers[content_width]"
+                                        placeholder="768px"
+                                    />
+                                    <FieldGroup
+                                        label="Narrow Width"
+                                        name="containers[narrow_width]"
+                                        placeholder="640px"
+                                    />
+                                </div>
+                            </DesignSection>
 
                             <div className="flex items-center gap-2">
                                 <input

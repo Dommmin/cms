@@ -19,16 +19,6 @@ export function HeroBannerBlock({ block }: HeroBannerProps) {
         right: 'items-end text-right',
     }[align];
 
-    const ctaClass = {
-        primary:
-            'bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-3 rounded-lg font-semibold transition-colors',
-        secondary:
-            'bg-secondary text-secondary-foreground hover:bg-secondary/80 px-8 py-3 rounded-lg font-semibold transition-colors',
-        outline:
-            'border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 px-8 py-3 rounded-lg font-semibold transition-colors',
-        ghost: 'text-primary-foreground hover:bg-primary-foreground/10 px-8 py-3 rounded-lg font-semibold transition-colors',
-    }[cfg.cta_style ?? 'primary'];
-
     return (
         <div
             className="relative flex w-full flex-col justify-center overflow-hidden"
@@ -54,7 +44,7 @@ export function HeroBannerBlock({ block }: HeroBannerProps) {
                     />
                 </>
             ) : (
-                <div className="from-primary via-primary/90 to-primary/70 absolute inset-0 bg-gradient-to-br" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)] via-[var(--primary)]/90 to-[var(--primary)]/70" />
             )}
 
             {/* Content */}
@@ -62,36 +52,49 @@ export function HeroBannerBlock({ block }: HeroBannerProps) {
                 className={`relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-6 px-6 py-16 ${alignClass}`}
             >
                 {cfg.title && (
-                    <h1 className="text-primary-foreground text-4xl font-bold drop-shadow-md md:text-6xl">
+                    <h1 className="text-4xl font-bold text-[var(--primary-foreground)] drop-shadow-md md:text-6xl">
                         {cfg.title}
                     </h1>
                 )}
                 {cfg.subtitle && (
-                    <p className="text-primary-foreground/90 max-w-2xl text-lg drop-shadow md:text-xl">
+                    <p className="max-w-2xl text-lg text-[var(--primary-foreground)]/90 drop-shadow md:text-xl">
                         {cfg.subtitle}
                     </p>
                 )}
                 {(cfg.cta_text || cfg.cta2_text) && (
                     <div className="mt-2 flex flex-wrap gap-4">
                         {cfg.cta_text && cfg.cta_url && (
-                            <Link href={cfg.cta_url} className={ctaClass}>
+                            <Link
+                                href={cfg.cta_url}
+                                className="font-semibold transition-colors hover:opacity-90"
+                                style={{
+                                    backgroundColor: 'var(--primary)',
+                                    color: 'var(--primary-foreground)',
+                                    borderRadius: 'var(--btn-radius, 0.5rem)',
+                                    paddingInline: 'var(--btn-padding-x, 2rem)',
+                                    paddingBlock:
+                                        'var(--btn-padding-y, 0.75rem)',
+                                }}
+                            >
                                 {cfg.cta_text}
                             </Link>
                         )}
                         {cfg.cta2_text && cfg.cta2_url && (
                             <Link
                                 href={cfg.cta2_url}
-                                className={
-                                    {
-                                        primary:
-                                            'bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-8 py-3 font-semibold transition-colors',
-                                        secondary:
-                                            'bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-lg px-8 py-3 font-semibold transition-colors',
-                                        outline:
-                                            'border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 rounded-lg border-2 px-8 py-3 font-semibold transition-colors',
-                                        ghost: 'text-primary-foreground hover:bg-primary-foreground/10 rounded-lg px-8 py-3 font-semibold transition-colors',
-                                    }[cfg.cta2_style ?? 'outline']
-                                }
+                                className="font-semibold transition-colors"
+                                style={{
+                                    borderColor: 'var(--primary-foreground)',
+                                    color: 'var(--primary-foreground)',
+                                    borderRadius:
+                                        'var(--btn-secondary-radius, 0.5rem)',
+                                    paddingInline:
+                                        'var(--btn-secondary-padding-x, 2rem)',
+                                    paddingBlock:
+                                        'var(--btn-secondary-padding-y, 0.75rem)',
+                                    borderWidth: '2px',
+                                    borderStyle: 'solid',
+                                }}
                             >
                                 {cfg.cta2_text}
                             </Link>

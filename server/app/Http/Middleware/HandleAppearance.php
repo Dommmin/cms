@@ -21,22 +21,129 @@ class HandleAppearance
     {
         $activeTheme = Theme::query()
             ->where('is_active', true)
-            ->first(['slug', 'tokens']);
+            ->first(['slug', 'tokens', 'typography', 'spacing', 'buttons', 'containers']);
 
         View::share('appearance', $request->cookie('appearance') ?? 'system');
-        View::share('activeThemeCssVariables', $this->activeThemeCssVariables($activeTheme?->tokens));
+        View::share('activeThemeCssVariables', $this->buildCssVariables($activeTheme));
         View::share('activeThemeSlug', $activeTheme?->slug);
 
         return $next($request);
     }
 
-    private function activeThemeCssVariables(mixed $tokens): string
+    private function buildCssVariables(?Theme $theme): string
     {
-        if (! is_array($tokens)) {
+        if (! $theme instanceof Theme) {
             return '';
         }
 
-        $allowedKeys = [
+        $variables = [];
+
+        // Color tokens (existing)
+        $colorVars = $this->sanitizeTokenVariables(
+            (array) ($theme->tokens ?? []),
+            $this->allowedColorKeys(),
+        );
+        foreach ($colorVars as $key => $value) {
+            $variables[$key] = $value;
+        }
+
+        // Typography tokens
+        $typography = (array) ($theme->typography ?? []);
+        $typographyMap = [
+            'heading_font' => 'font-heading',
+            'body_font' => 'font-body',
+            'base_size' => 'text-base-size',
+            'scale' => 'text-scale',
+            'h1_size' => 'h1-size',
+            'h2_size' => 'h2-size',
+            'h3_size' => 'h3-size',
+            'h4_size' => 'h4-size',
+        ];
+        foreach ($typographyMap as $tokenKey => $cssVar) {
+            if (isset($typography[$tokenKey]) && is_string($typography[$tokenKey]) && $typography[$tokenKey] !== '') {
+                $variables[$cssVar] = $typography[$tokenKey];
+            }
+        }
+
+        // Spacing tokens
+        $spacing = (array) ($theme->spacing ?? []);
+        $spacingMap = [
+            'section_padding' => 'section-padding-y',
+            'block_gap' => 'block-gap',
+            'container_padding' => 'container-padding',
+        ];
+        foreach ($spacingMap as $tokenKey => $cssVar) {
+            if (isset($spacing[$tokenKey]) && is_string($spacing[$tokenKey]) && $spacing[$tokenKey] !== '') {
+                $variables[$cssVar] = $spacing[$tokenKey];
+            }
+        }
+
+        // Button tokens
+        $buttons = (array) ($theme->buttons ?? []);
+        $buttonMap = [
+            'primary_border_radius' => 'btn-radius',
+            'primary_padding_x' => 'btn-padding-x',
+            'primary_padding_y' => 'btn-padding-y',
+            'secondary_border_radius' => 'btn-secondary-radius',
+            'secondary_padding_x' => 'btn-secondary-padding-x',
+            'secondary_padding_y' => 'btn-secondary-padding-y',
+        ];
+        foreach ($buttonMap as $tokenKey => $cssVar) {
+            if (isset($buttons[$tokenKey]) && is_string($buttons[$tokenKey]) && $buttons[$tokenKey] !== '') {
+                $variables[$cssVar] = $buttons[$tokenKey];
+            }
+        }
+
+        // Container tokens
+        $containers = (array) ($theme->containers ?? []);
+        $containerMap = [
+            'max_width' => 'container-max-width',
+            'content_width' => 'container-content-width',
+            'narrow_width' => 'container-narrow-width',
+        ];
+        foreach ($containerMap as $tokenKey => $cssVar) {
+            if (isset($containers[$tokenKey]) && is_string($containers[$tokenKey]) && $containers[$tokenKey] !== '') {
+                $variables[$cssVar] = $containers[$tokenKey];
+            }
+        }
+
+        // Section variant tokens derived from color tokens
+        $sectionDarkBg = $variables['foreground'] ?? '#0f172a';
+        $sectionDarkText = $variables['background'] ?? '#ffffff';
+        $variables['section-dark-bg'] = $sectionDarkBg;
+        $variables['section-dark-text'] = $sectionDarkText;
+
+        return collect($variables)
+            ->map(fn (string $value, string $key): string => sprintf('--%s: %s;', $key, $value))
+            ->values()
+            ->implode(' ');
+    }
+
+    /**
+     * @param  array<string, mixed>  $tokens
+     * @param  list<string>  $allowedKeys
+     * @return array<string, string>
+     */
+    private function sanitizeTokenVariables(array $tokens, array $allowedKeys): array
+    {
+        return collect($tokens)
+            ->filter(fn (mixed $value, mixed $key): bool => is_string($key) && (is_string($value) || is_null($value)))
+            ->mapWithKeys(fn (mixed $value, string $key): array => [mb_ltrim(mb_trim($key), '-') => is_string($value) ? mb_trim($value) : ''])
+            ->filter(
+                fn (string $value, string $key): bool => in_array($key, $allowedKeys, true)
+                    && $value !== ''
+                    && mb_strlen($value) <= 100
+                    && preg_match('/^[#(),.%\\-\\sa-zA-Z0-9]+$/', $value) === 1
+            )
+            ->all();
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function allowedColorKeys(): array
+    {
+        return [
             'background',
             'foreground',
             'card',
@@ -71,20 +178,5 @@ class HandleAppearance
             'sidebar-border',
             'sidebar-ring',
         ];
-
-        $lines = collect($tokens)
-            ->filter(fn (mixed $value, mixed $key): bool => is_string($key) && is_string($value))
-            ->mapWithKeys(fn (string $value, string $key): array => [mb_ltrim(mb_trim($key), '-') => mb_trim($value)])
-            ->filter(
-                fn (string $value, string $key): bool => in_array($key, $allowedKeys, true)
-                    && $value !== ''
-                    && mb_strlen($value) <= 100
-                    && preg_match('/^[#(),.%\\-\\sa-zA-Z0-9]+$/', $value) === 1
-            )
-            ->map(fn (string $value, string $key): string => sprintf('--%s: %s;', $key, $value))
-            ->values()
-            ->all();
-
-        return implode(' ', $lines);
     }
 }

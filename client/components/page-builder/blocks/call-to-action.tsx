@@ -22,17 +22,21 @@ export function CallToActionBlock({ block }: CallToActionProps) {
     }[alignment];
 
     const containerStyle = {
-        plain: 'bg-background',
-        gradient: 'bg-gradient-to-r from-primary to-primary/80',
-        dark: 'bg-gray-950 text-white',
-        brand: 'bg-primary text-primary-foreground',
-        image: 'relative bg-gray-950 text-white overflow-hidden',
+        plain: 'bg-[var(--background)] text-[var(--foreground)]',
+        gradient:
+            'bg-gradient-to-r from-[var(--primary)] to-[var(--primary)]/80 text-[var(--primary-foreground)]',
+        dark: 'bg-[var(--section-dark-bg,var(--foreground))] text-[var(--section-dark-text,var(--background))]',
+        brand: 'bg-[var(--primary)] text-[var(--primary-foreground)]',
+        image: 'relative bg-[var(--section-dark-bg,var(--foreground))] text-[var(--section-dark-text,var(--background))] overflow-hidden',
     }[style];
 
     const isLight = style === 'plain';
 
     return (
-        <div className={`relative rounded-2xl px-8 py-16 ${containerStyle}`}>
+        <div
+            className={`relative rounded-2xl px-8 py-16`}
+            style={{ gap: 'var(--block-gap, 1.5rem)' }}
+        >
             {style === 'image' && bgImageUrl && (
                 <Image
                     src={bgImageUrl}
@@ -41,7 +45,9 @@ export function CallToActionBlock({ block }: CallToActionProps) {
                     className="object-cover opacity-30"
                 />
             )}
-            <div className={`relative flex flex-col gap-6 ${alignClass}`}>
+            <div
+                className={`relative flex flex-col ${containerStyle} rounded-2xl px-8 py-16 ${alignClass}`}
+            >
                 {cfg.badge_text && (
                     <span className="inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-semibold tracking-wider uppercase">
                         {cfg.badge_text}
@@ -49,30 +55,37 @@ export function CallToActionBlock({ block }: CallToActionProps) {
                 )}
                 {cfg.title && (
                     <h2
-                        className={`max-w-3xl text-3xl font-bold md:text-4xl ${isLight ? 'text-foreground' : 'text-white'}`}
+                        className={`max-w-3xl text-3xl font-bold md:text-4xl ${isLight ? 'text-[var(--foreground)]' : 'text-[var(--section-dark-text,var(--background))]'}`}
                     >
                         {cfg.title}
                     </h2>
                 )}
                 {cfg.subtitle && (
                     <p
-                        className={`max-w-2xl text-lg ${isLight ? 'text-muted-foreground' : 'text-white/80'}`}
+                        className={`max-w-2xl text-lg ${isLight ? 'text-[var(--muted-foreground)]' : 'text-[var(--section-dark-text,var(--background))]/80'}`}
                     >
                         {cfg.subtitle}
                     </p>
                 )}
                 {(cfg.primary_label || cfg.secondary_label) && (
                     <div
-                        className={`flex flex-wrap gap-4 ${alignment === 'center' ? 'justify-center' : ''}`}
+                        className={`flex flex-wrap ${alignment === 'center' ? 'justify-center' : ''}`}
+                        style={{ gap: 'var(--block-gap, 1rem)' }}
                     >
                         {cfg.primary_label && cfg.primary_url && (
                             <Link
                                 href={cfg.primary_url}
-                                className={`rounded-lg px-8 py-3 font-semibold transition-opacity hover:opacity-90 ${
+                                className={`font-semibold transition-opacity hover:opacity-90 ${
                                     isLight
-                                        ? 'bg-primary text-primary-foreground'
-                                        : 'bg-white text-gray-950'
+                                        ? 'bg-[var(--primary)] text-[var(--primary-foreground)]'
+                                        : 'bg-[var(--section-dark-text,var(--background))] text-[var(--section-dark-bg,var(--foreground))]'
                                 }`}
+                                style={{
+                                    borderRadius: 'var(--btn-radius, 0.5rem)',
+                                    paddingInline: 'var(--btn-padding-x, 2rem)',
+                                    paddingBlock:
+                                        'var(--btn-padding-y, 0.75rem)',
+                                }}
                             >
                                 {cfg.primary_label}
                             </Link>
@@ -80,11 +93,20 @@ export function CallToActionBlock({ block }: CallToActionProps) {
                         {cfg.secondary_label && cfg.secondary_url && (
                             <Link
                                 href={cfg.secondary_url}
-                                className={`rounded-lg border-2 px-8 py-3 font-semibold transition-colors ${
+                                className={`font-semibold transition-colors ${
                                     isLight
-                                        ? 'border-primary text-primary hover:bg-primary/5'
-                                        : 'border-white text-white hover:bg-white/10'
+                                        ? 'border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)]/5'
+                                        : 'border-[var(--section-dark-text,var(--background))] text-[var(--section-dark-text,var(--background))] hover:bg-[var(--section-dark-text,var(--background))]/10'
                                 }`}
+                                style={{
+                                    borderWidth: '2px',
+                                    borderRadius:
+                                        'var(--btn-secondary-radius, 0.5rem)',
+                                    paddingInline:
+                                        'var(--btn-secondary-padding-x, 2rem)',
+                                    paddingBlock:
+                                        'var(--btn-secondary-padding-y, 0.75rem)',
+                                }}
                             >
                                 {cfg.secondary_label}
                             </Link>

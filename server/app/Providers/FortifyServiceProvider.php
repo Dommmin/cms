@@ -23,10 +23,11 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(LogoutResponse::class, fn () => new class implements LogoutResponse {
+        $this->app->singleton(LogoutResponse::class, fn (): LogoutResponse => new class implements LogoutResponse
+        {
             public function toResponse($request)
             {
-                return redirect()->route('login');
+                return to_route('login');
             }
         });
     }

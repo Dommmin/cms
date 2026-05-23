@@ -13,6 +13,7 @@ use App\Http\Requests\Api\V1\UpdateProfileRequest;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Models\Order;
 use App\Models\Setting;
+use App\Models\Theme;
 use App\Notifications\AccountDeletedNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -163,9 +164,21 @@ class ProfileController extends ApiController
             $setting->key => $setting->value,
         ]));
 
+        $activeTheme = Theme::query()->where('is_active', true)->first([
+            'slug', 'tokens', 'typography', 'spacing', 'buttons', 'containers',
+        ]);
+
         return $this->ok([
             'settings' => $grouped,
             'modules' => config('modules'),
+            'theme' => $activeTheme ? [
+                'slug' => $activeTheme->slug,
+                'tokens' => $activeTheme->tokens,
+                'typography' => $activeTheme->typography,
+                'spacing' => $activeTheme->spacing,
+                'buttons' => $activeTheme->buttons,
+                'containers' => $activeTheme->containers,
+            ] : null,
         ]);
     }
 

@@ -1,59 +1,51 @@
-import { AdminBlockOverlay } from '@/components/admin/admin-block-overlay';
-import { cn } from '@/lib/utils';
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
 
 import { AnimatedSection } from './animated-section';
 import { BlockRenderer } from './block-renderer';
 import type { SectionRendererProps } from './section-renderer.types';
 
 function sanitizeCss(css: string): string {
-    return (
-        css
-            // Prevent closing the <style> tag and injecting HTML
-            .replace(/<\s*\/\s*style\b[^>]*>/gi, '')
-            // Prevent opening script tags
-            .replace(/<\s*script\b[^>]*>/gi, '')
-            // Block @import (external CSS/data exfiltration)
-            .replace(/@import\b/gi, '')
-            // Block IE behavior (ActiveX XSS)
-            .replace(/behavior\s*:/gi, '')
-            // Block expression() including whitespace variants (IE XSS)
-            .replace(/expression\s*\(/gi, '')
-            // Block javascript: URIs in any context
-            .replace(/javascript\s*:/gi, '')
-            // Block vbscript: URIs
-            .replace(/vbscript\s*:/gi, '')
-            // Block data: URIs in url() (SVG/XML with script)
-            .replace(/url\s*\(\s*['"]?\s*data\s*:/gi, 'url(')
-    );
+    return css
+        .replace(/<\s*\/\s*style\b[^>]*>/gi, '')
+        .replace(/<\s*script\b[^>]*>/gi, '')
+        .replace(/@import\b/gi, '')
+        .replace(/behavior\s*:/gi, '')
+        .replace(/expression\s*\(/gi, '')
+        .replace(/javascript\s*:/gi, '')
+        .replace(/vbscript\s*:/gi, '')
+        .replace(/url\s*\(\s*['"]?\s*data\s*:/gi, 'url(');
 }
 
 const variantStyles: Record<string, string> = {
-    light: 'bg-background text-foreground',
-    dark: 'bg-gray-950 text-white dark:bg-slate-900',
-    muted: 'bg-muted text-foreground',
-    brand: 'bg-primary text-primary-foreground',
-    hero: 'bg-gray-950 text-white dark:bg-slate-900',
+    light: 'bg-[var(--background)] text-[var(--foreground)]',
+    dark: 'bg-[var(--section-dark-bg,var(--foreground))] text-[var(--section-dark-text,var(--background))]',
+    muted: 'bg-[var(--muted)] text-[var(--foreground)]',
+    brand: 'bg-[var(--primary)] text-[var(--primary-foreground)]',
+    hero: 'bg-[var(--section-dark-bg,var(--foreground))] text-[var(--section-dark-text,var(--background))]',
 };
 
 const layoutContainerStyles: Record<string, string> = {
-    contained: 'mx-auto max-w-7xl px-4 sm:px-6 lg:px-8',
+    contained:
+        'mx-auto max-w-[var(--container-max-width,80rem)] px-4 sm:px-6 lg:px-8',
     'full-width': 'w-full',
     flush: 'w-full',
     'two-col':
-        'mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8',
+        'mx-auto max-w-[var(--container-max-width,80rem)] px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8',
     'three-col':
-        'mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8',
+        'mx-auto max-w-[var(--container-max-width,80rem)] px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8',
 };
 
 const sectionPaddingStyles: Record<string, string> = {
     none: 'py-0',
     sm: 'py-6',
     md: 'py-12',
-    lg: 'py-20',
+    lg: 'py-[var(--section-padding-y,5rem)]',
     xl: 'py-28',
 };
 
-export function SectionRenderer({
+function SectionContent({
     section,
     isPreview,
     pageId,
@@ -75,7 +67,7 @@ export function SectionRenderer({
 
     const activeBlocks = section.blocks.filter((b) => b.is_active);
 
-    const sectionClassName = cn(sectionBg, sectionPadding);
+    const sectionClassName = sectionBg + ' ' + sectionPadding;
     const sectionProps = {
         'data-section-type': section.section_type,
         'data-section-id': section.id,
@@ -85,23 +77,24 @@ export function SectionRenderer({
         <div className={containerClass}>
             {activeBlocks.map((block) =>
                 isPreview && pageId && adminBaseUrl ? (
-                    <AdminBlockOverlay
+                    <div
                         key={block.id}
-                        blockId={block.id}
-                        blockType={block.type}
-                        pageId={pageId}
-                        adminBaseUrl={adminBaseUrl}
+                        className="w-full"
+                        id={
+                            (block.configuration._custom_id as string) ||
+                            undefined
+                        }
                     >
                         <BlockRenderer block={block} />
-                    </AdminBlockOverlay>
+                    </div>
                 ) : (
                     <div
                         key={block.id}
-                        className={cn(
-                            'w-full',
-                            (block.configuration._custom_classes as string) ||
-                                undefined,
-                        )}
+                        className={
+                            'w-full ' +
+                            ((block.configuration._custom_classes as string) ||
+                                '')
+                        }
                         id={
                             (block.configuration._custom_id as string) ||
                             undefined
@@ -184,3 +177,59 @@ export function SectionRenderer({
         </section>
     );
 }
+
+export function SectionLazyWrapper(props: SectionRendererProps) {
+    const section = props.section;
+    const settings = section.settings as Record<string, string> | null;
+    const lazyLoad =
+        settings?.lazy_load === 'true' || settings?.lazy_load === '1';
+
+    const [isVisible, setIsVisible] = useState(false);
+    const ref = useRef<HTMLElement>(null);
+
+    useEffect(() => {
+        if (!lazyLoad) return;
+        if (!ref.current) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.disconnect();
+                }
+            },
+            { rootMargin: '200px' },
+        );
+
+        observer.observe(ref.current);
+        return () => observer.disconnect();
+    }, [lazyLoad]);
+
+    if (!lazyLoad) {
+        return <SectionContent {...props} />;
+    }
+
+    const variant = section.variant ?? 'light';
+    const layout = section.layout ?? 'contained';
+    const padding = settings?.padding ?? 'lg';
+    const sectionBg = variantStyles[variant] ?? '';
+    const sectionPad =
+        layout === 'flush' ? '' : (sectionPaddingStyles[padding] ?? 'py-12');
+    const minHeight = settings?.min_height ?? '200px';
+
+    if (!isVisible) {
+        return (
+            <section
+                ref={ref}
+                className={sectionBg + ' ' + sectionPad}
+                style={{ minHeight }}
+                data-section-type={section.section_type}
+                data-section-id={section.id}
+            />
+        );
+    }
+
+    return <SectionContent {...props} />;
+}
+
+export { SectionContent as SectionRenderer };

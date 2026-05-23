@@ -14,12 +14,24 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * Theme model representing UI/themes configuration stored in the database.
+ *
+ * @property array<string, mixed>|null $tokens
+ * @property array<string, mixed>|null $typography
+ * @property array<string, mixed>|null $spacing
+ * @property array<string, mixed>|null $buttons
+ * @property array<string, mixed>|null $containers
+ * @property array<string, mixed>|null $settings
+ * @property bool $is_active
  */
 #[Fillable([
     'name',
     'slug',
     'description',
     'tokens',
+    'typography',
+    'spacing',
+    'buttons',
+    'containers',
     'settings',
     'preview_image',
     'is_active',
@@ -32,6 +44,10 @@ class Theme extends Model
 
     protected $casts = [
         'tokens' => 'array',
+        'typography' => 'array',
+        'spacing' => 'array',
+        'buttons' => 'array',
+        'containers' => 'array',
         'settings' => 'array',
         'is_active' => 'boolean',
     ];

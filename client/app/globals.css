@@ -130,6 +130,30 @@
     --store-accent-mint: oklch(0.72 0.16 184.7);
     --store-accent-amber: oklch(0.82 0.16 80);
     --store-accent-rose: oklch(0.65 0.2 25);
+
+    /* Design system tokens (overridden by active theme via ThemeStyles) */
+    --font-heading: Inter, system-ui, sans-serif;
+    --font-body: Inter, system-ui, sans-serif;
+    --text-base-size: 16px;
+    --text-scale: 1.25;
+    --h1-size: 2.5rem;
+    --h2-size: 2rem;
+    --h3-size: 1.5rem;
+    --h4-size: 1.25rem;
+    --section-padding-y: 5rem;
+    --block-gap: 2rem;
+    --container-padding: 1.5rem;
+    --container-max-width: 80rem;
+    --container-content-width: 48rem;
+    --container-narrow-width: 40rem;
+    --btn-radius: 0.5rem;
+    --btn-padding-x: 2rem;
+    --btn-padding-y: 0.75rem;
+    --btn-secondary-radius: 0.5rem;
+    --btn-secondary-padding-x: 2rem;
+    --btn-secondary-padding-y: 0.75rem;
+    --section-dark-bg: var(--foreground);
+    --section-dark-text: var(--background);
 }
 
 .dark {
