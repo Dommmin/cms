@@ -31,7 +31,10 @@ export default function VerifyEmail({ status }: { status?: string }) {
                 </Form>
 
                 <Form action={logout.url()} method="post">
-                    <button type="submit" className="text-sm text-muted-foreground hover:text-foreground">
+                    <button
+                        type="submit"
+                        className="text-sm text-muted-foreground hover:text-foreground"
+                    >
                         Log out
                     </button>
                 </Form>

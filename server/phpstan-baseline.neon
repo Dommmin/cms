@@ -31,12 +31,6 @@ parameters:
 			path: app/Actions/ImpersonateCustomer.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Category\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Console/Commands/GenerateSitemap.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Category\:\:\$updated_at\.$#'
 			identifier: property.notFound
 			count: 1
@@ -307,24 +301,6 @@ parameters:
 			path: app/Http/Controllers/Admin/ActivityLogController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/AdminSearchController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$status\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/AdminSearchController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$title\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/AdminSearchController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\User\:\:\$email\.$#'
 			identifier: property.notFound
 			count: 1
@@ -385,12 +361,6 @@ parameters:
 			path: app/Http/Controllers/Admin/BlockRelationController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$available_locales\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/BlogPostController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$is_featured\.$#'
 			identifier: property.notFound
 			count: 2
@@ -441,7 +411,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 3
+			count: 2
 			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
 
 		-
@@ -457,33 +427,9 @@ parameters:
 			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$metadata\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$position\.$#'
 			identifier: property.notFound
-			count: 3
-			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$relation_id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$relation_key\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$relation_type\.$#'
-			identifier: property.notFound
-			count: 1
+			count: 2
 			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
 
 		-
@@ -511,18 +457,6 @@ parameters:
 			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
 
 		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:allBlocks\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
-
-		-
-			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\),Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
-			identifier: argument.unresolvableType
-			count: 1
-			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
-
-		-
 			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\PageBlock\>\:\:map\(\) contains unresolvable type\.$#'
 			identifier: argument.unresolvableType
 			count: 1
@@ -535,22 +469,10 @@ parameters:
 			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
 
 		-
-			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,stdClass\>\:\:map\(\) expects callable\(stdClass, int\)\: array\{section_type\: string\|null, layout\: string, variant\: string\|null, settings\: array\<string, mixed\>\|null, position\: int, is_active\: bool, blocks\: array\<int, array\{type\: string, configuration\: array\<string, mixed\>\|null, position\: int, is_active\: bool\}\>\}, Closure\(App\\Models\\PageSection\)\: array\{section_type\: string\|null, layout\: string, variant\: string\|null, settings\: array\<string, mixed\>\|null, position\: int, is_active\: bool, blocks\: array\<int, array\{type\: string, configuration\: array\<string, mixed\>\|null, position\: int, is_active\: bool\}\>\} given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Http/Controllers/Admin/Cms/PageBuilderController.php
-
-		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Query\\Builder\:\:with\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: app/Http/Controllers/Admin/Cms/PageController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\ReusableBlock\:\:\$configuration\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Http/Controllers/Admin/Cms/ReusableBlockController.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\ReusableBlock\:\:\$created_at\.$#'
@@ -592,12 +514,6 @@ parameters:
 			message: '#^Access to an undefined property App\\Models\\ReusableBlock\:\:\$relations_config\.$#'
 			identifier: property.notFound
 			count: 2
-			path: app/Http/Controllers/Admin/Cms/ReusableBlockController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\ReusableBlock\:\:\$type\.$#'
-			identifier: property.notFound
-			count: 3
 			path: app/Http/Controllers/Admin/Cms/ReusableBlockController.php
 
 		-
@@ -685,18 +601,6 @@ parameters:
 			path: app/Http/Controllers/Admin/Ecommerce/CartController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Category\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Http/Controllers/Admin/Ecommerce/CategoryController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Category\:\:\$is_active\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/CategoryController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Category\:\:\$meta_robots\.$#'
 			identifier: property.notFound
 			count: 1
@@ -728,12 +632,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Category\:\:\$sitemap_exclude\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/CategoryController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Category\:\:\$slug\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Controllers/Admin/Ecommerce/CategoryController.php
@@ -871,26 +769,8 @@ parameters:
 			path: app/Http/Controllers/Admin/Ecommerce/ReturnRequestController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Category\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Http/Controllers/Admin/Ecommerce/ShippingMethodController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Category\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/ShippingMethodController.php
-
-		-
 			message: '#^Parameter \#1 \$array of function reset is passed by reference, so it expects variables only\.$#'
 			identifier: argument.byRef
-			count: 2
-			path: app/Http/Controllers/Admin/Ecommerce/ShippingMethodController.php
-
-		-
-			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,stdClass\>\:\:map\(\) contains unresolvable type\.$#'
-			identifier: argument.unresolvableType
 			count: 2
 			path: app/Http/Controllers/Admin/Ecommerce/ShippingMethodController.php
 
@@ -975,6 +855,12 @@ parameters:
 		-
 			message: '#^Access to an undefined property Spatie\\MediaLibrary\\MediaCollections\\Models\\Media\:\:\$id\.$#'
 			identifier: property.notFound
+			count: 5
+			path: app/Http/Controllers/Admin/MediaController.php
+
+		-
+			message: '#^Call to an undefined method Spatie\\Image\\Image\:\:rotate\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: app/Http/Controllers/Admin/MediaController.php
 
@@ -1190,12 +1076,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Theme\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/ThemeController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Theme\:\:\$is_active\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Controllers/Admin/ThemeController.php
@@ -1597,12 +1477,6 @@ parameters:
 			path: app/Http/Controllers/Api/V1/ProductController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Category\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/ProductController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Product\:\:\$activeVariants\.$#'
 			identifier: property.notFound
 			count: 2
@@ -1622,12 +1496,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Product\:\:\$short_description\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/ProductController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$thumbnail\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Controllers/Api/V1/ProductController.php
@@ -1717,6 +1585,12 @@ parameters:
 			path: app/Http/Controllers/Api/V1/ProfileController.php
 
 		-
+			message: '#^Access to an undefined property App\\Models\\Theme\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/ProfileController.php
+
+		-
 			message: '#^Method App\\Models\\Promotion\:\:active\(\) invoked with 0 parameters, 1 required\.$#'
 			identifier: arguments.count
 			count: 1
@@ -1789,18 +1663,6 @@ parameters:
 			path: app/Http/Controllers/BlogFeedController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/BlogFeedController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$title\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/BlogFeedController.php
-
-		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\BlogPost\>\:\:published\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -1811,12 +1673,6 @@ parameters:
 			identifier: nullsafe.neverNull
 			count: 1
 			path: app/Http/Controllers/BlogFeedController.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Redis\\Connections\\Connection\:\:ping\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Http/Controllers/HealthCheckController.php
 
 		-
 			message: '#^Access to an undefined property App\\Http\\Requests\\Settings\\PasswordUpdateRequest\:\:\$password\.$#'
@@ -1837,8 +1693,8 @@ parameters:
 			path: app/Http/Middleware/HandleAppearance.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Theme\:\:\$tokens\.$#'
-			identifier: property.notFound
+			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
 			count: 1
 			path: app/Http/Middleware/HandleAppearance.php
 
@@ -1850,12 +1706,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Theme\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Middleware/HandleInertiaRequests.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Theme\:\:\$tokens\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Middleware/HandleInertiaRequests.php
@@ -2269,12 +2119,6 @@ parameters:
 			path: app/Http/Resources/Api/V1/BlogPostResource.php
 
 		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$content\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/BlogPostResource.php
-
-		-
 			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$content_type\.$#'
 			identifier: property.notFound
 			count: 1
@@ -2288,12 +2132,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$featured_image\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/BlogPostResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Resources/Api/V1/BlogPostResource.php
@@ -2317,37 +2155,7 @@ parameters:
 			path: app/Http/Resources/Api/V1/BlogPostResource.php
 
 		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$reading_time\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/BlogPostResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$seo_description\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/BlogPostResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$seo_title\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/BlogPostResource.php
-
-		-
 			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$sitemap_exclude\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/BlogPostResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/BlogPostResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$status\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Resources/Api/V1/BlogPostResource.php
@@ -3115,12 +2923,6 @@ parameters:
 			path: app/Imports/ProductsImport.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Category\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Imports/ProductsImport.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\ProductType\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
@@ -3721,12 +3523,6 @@ parameters:
 			path: app/Models/CartItem.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Category\:\:\$collection_type\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Category.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Category\:\:\$tags\.$#'
 			identifier: property.notFound
 			count: 2
@@ -3917,12 +3713,6 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: app/Models/Menu.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Category\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Category\>\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/MenuItem.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\MenuItem\:\:\$link_type\.$#'
@@ -4405,12 +4195,6 @@ parameters:
 			path: app/Models/ReturnRequest.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\ReusableBlock\:\:\$configuration\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/ReusableBlock.php
-
-		-
 			message: '#^Class App\\Modules\\Core\\Domain\\Models\\Customer not found\.$#'
 			identifier: class.notFound
 			count: 1
@@ -4580,18 +4364,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property App\\Models\\BlogComment\:\:\$user\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Notifications/BlogCommentReplyNotification.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Notifications/BlogCommentReplyNotification.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$title\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Notifications/BlogCommentReplyNotification.php
@@ -4945,18 +4717,6 @@ parameters:
 			path: app/Queries/Admin/MediaIndexQuery.php
 
 		-
-			message: '#^Access to an undefined property Spatie\\MediaLibrary\\MediaCollections\\Models\\Media\:\:\$thumbnail_url\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Queries/Admin/MediaIndexQuery.php
-
-		-
-			message: '#^Access to an undefined property Spatie\\MediaLibrary\\MediaCollections\\Models\\Media\:\:\$url\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Queries/Admin/MediaIndexQuery.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$location\.$#'
 			identifier: property.notFound
 			count: 1
@@ -5072,12 +4832,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Product\:\:\$productType\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Queries/Admin/ProductIndexQuery.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$thumbnail\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Queries/Admin/ProductIndexQuery.php
@@ -5569,12 +5323,6 @@ parameters:
 			path: app/Services/ModuleRegistryService.php
 
 		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:allBlocks\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Services/PageBuilderSyncService.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\ContentEntry\:\:\$content\.$#'
 			identifier: property.notFound
 			count: 1
@@ -5587,19 +5335,7 @@ parameters:
 			path: app/Services/PageCacheService.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Theme\:\:\$settings\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/PageCacheService.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Theme\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/PageCacheService.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Theme\:\:\$tokens\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Services/PageCacheService.php
@@ -5911,12 +5647,6 @@ parameters:
 			path: database/seeders/ElectronicsSeeder.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Category\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: database/seeders/ElectronicsSeeder.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\ProductType\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 2
@@ -5963,12 +5693,6 @@ parameters:
 			identifier: method.staticCall
 			count: 2
 			path: database/seeders/PagesDemoSeeder.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Category\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 4
-			path: database/seeders/PromotionSeeder.php
 
 		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Model\:\:assignRole\(\)\.$#'

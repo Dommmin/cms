@@ -7,9 +7,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
+import { logout } from '@/routes';
 import { edit as profileEdit } from '@/routes/profile';
 import { show as twoFactorShow } from '@/routes/two-factor';
-import { logout } from '@/routes';
 import type { UserMenuContentProps } from './user-menu-content.types';
 
 export function UserMenuContent({ user }: UserMenuContentProps) {
