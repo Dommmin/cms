@@ -375,7 +375,7 @@ Dodaj przycisk `MD`, który pobiera `content.md`.
 
 To jest największy brak jakościowy.
 
-Status: odłożone do osobnego kroku. `client/` ma obecnie `lint`, `types`, `build` i Playwright w devDependencies, ale nie ma skonfigurowanego React component test runnera dla smoke testów komponentów bloków. Najpierw dodaj minimalny setup testowy klienta zgodny z istniejącym stackiem, potem osobno dopisz smoke testy wszystkich bloków i `SectionRenderer`.
+Status 2026-05-24: **częściowo wdrożone**. `client/` ma minimalny Vitest setup (`npm run test:ui`) dla smoke testów rendererów w środowisku Node. Dodano `tests/unit/page-builder-renderers.test.tsx`, który przechodzi przez wszystkie 30 typów bloków storefront Page Buildera, mockuje zależności Next/browser/API, osobno wskazuje awarię konkretnego typu bloku oraz obejmuje `SectionRenderer` i `SectionLazyWrapper`. Nadal do zrobienia: głębsze testy variantów light/dark/brand, layoutów, theme token inheritance i crop endpointu.
 
 ### Minimalny Zakres
 
@@ -407,8 +407,10 @@ Status: odłożone do osobnego kroku. `client/` ma obecnie `lint`, `types`, `bui
 
 ### Akceptacja
 
-- Istnieje test, który przechodzi przez wszystkie typy bloków.
-- Awaria pojedynczego bloku jest łatwa do zlokalizowania.
+- [x] Istnieje test, który przechodzi przez wszystkie typy bloków.
+- [x] Awaria pojedynczego bloku jest łatwa do zlokalizowania.
+- [ ] Theme token inheritance jest pokryte testem.
+- [ ] Crop endpoint jest pokryty testem w planowanym zakresie.
 
 ## Kolejność Rekomendowana
 

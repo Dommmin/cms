@@ -1540,6 +1540,15 @@ Inline text editing is intentionally limited to scalar configuration fields: `ti
 
 `resources/js/features/page-builder/components/page-health-panel.tsx` renders the result in the right side panel. SEO field checks remain separate in `resources/js/components/seo-panel-health.ts`.
 
+### Storefront Renderer Tests
+
+`client/vitest.config.ts` defines the Next.js storefront unit smoke-test runner.
+Run it through Docker with `docker compose exec -T node npm run test:ui`.
+`client/tests/unit/page-builder-renderers.test.tsx` renders every public Page
+Builder block type with minimal fixtures and mocks browser/Next/API dependencies
+so a failure identifies the exact block type. The suite also covers basic
+`SectionRenderer` metadata output and the `SectionLazyWrapper` placeholder path.
+
 ### Responsive Preview
 
 `resources/js/features/page-builder/components/responsive-preview-panel.tsx` renders the sticky desktop side panel with Inspector, Health and Preview tabs. `BuilderPage` fetches a signed preview URL through `PageBuilderController::previewUrl()`, refreshes it after manual save/autosave, and passes stale/current state from `hasUnsavedChanges` so editors can see whether the preview matches the last saved snapshot.

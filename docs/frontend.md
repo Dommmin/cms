@@ -192,6 +192,22 @@ client/
 └── middleware.ts            Locale redirect/rewrite middleware
 ```
 
+### Tests
+
+Run client checks through the Node Docker service:
+
+```bash
+docker compose exec -T node npm run test:ui
+docker compose exec -T node npm run types
+docker compose exec -T node npm run lint
+```
+
+`npm run test:ui` uses Vitest with `client/vitest.config.ts` and loads
+`client/tests/unit/**/*.{test,spec}.{ts,tsx}` in a Node environment. The initial
+unit smoke suite covers storefront Page Builder renderers: every block type has
+an isolated render case, and `SectionRenderer`/`SectionLazyWrapper` have basic
+metadata and lazy-placeholder coverage.
+
 ### CMS Revalidation
 
 CMS page fetches use cache tags in `client/api/cms.ts` (`page:{slug}`). The
