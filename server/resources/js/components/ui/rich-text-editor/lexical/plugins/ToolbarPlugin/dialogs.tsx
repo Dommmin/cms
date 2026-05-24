@@ -8,8 +8,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslation } from '@/hooks/use-translation';
 import { detectEmbed } from '../../../embed-node';
+import { isAllowedEditorLinkUrl } from '../../link-url';
 import { EMOJIS, SPECIAL_CHARS } from './constants';
 import type { CharacterDialogProps, EmbedDialogProps, InternalLinkSearchResult, LinkDialogProps, LinkDialogTab, SnippetsDialogProps, TableDialogProps } from './types';
+
+function internalLinkQueryFromUrl(url: string): string {
+    const trimmed = url.trim();
+
+    if (trimmed.length < 2 || isAllowedEditorLinkUrl(trimmed)) {
+        return '';
+    }
+
+    return trimmed;
+}
 
 export function LinkDialog({ open, url, isInvalid, onOpenChange, onUrlChange, onInternalSelect, onInsert }: LinkDialogProps): JSX.Element {
     const __ = useTranslation();
@@ -17,6 +28,8 @@ export function LinkDialog({ open, url, isInvalid, onOpenChange, onUrlChange, on
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<InternalLinkSearchResult[]>([]);
     const [loading, setLoading] = useState(false);
+    const [urlResults, setUrlResults] = useState<InternalLinkSearchResult[]>([]);
+    const [urlLoading, setUrlLoading] = useState(false);
 
     /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
@@ -50,10 +63,43 @@ export function LinkDialog({ open, url, isInvalid, onOpenChange, onUrlChange, on
     }, [activeTab, open, query]);
 
     useEffect(() => {
+        const autocompleteQuery = internalLinkQueryFromUrl(url);
+
+        if (!open || activeTab !== 'url' || autocompleteQuery.length < 2) {
+            setUrlResults([]);
+            return;
+        }
+
+        const controller = new AbortController();
+        const timeout = setTimeout(() => {
+            setUrlLoading(true);
+            axios
+                .get<InternalLinkSearchResult[]>(
+                    RteLinkController.search.url({
+                        query: { q: autocompleteQuery, locale: document.documentElement.lang || 'en' },
+                    }),
+                    { signal: controller.signal },
+                )
+                .then(({ data }) => setUrlResults(data))
+                .catch((error: unknown) => {
+                    if (axios.isCancel(error)) return;
+                    setUrlResults([]);
+                })
+                .finally(() => setUrlLoading(false));
+        }, 250);
+
+        return () => {
+            controller.abort();
+            clearTimeout(timeout);
+        };
+    }, [activeTab, open, url]);
+
+    useEffect(() => {
         if (!open) {
             setActiveTab('url');
             setQuery('');
             setResults([]);
+            setUrlResults([]);
         }
     }, [open]);
     /* eslint-enable react-hooks/set-state-in-effect */
@@ -102,6 +148,24 @@ export function LinkDialog({ open, url, isInvalid, onOpenChange, onUrlChange, on
                                 />
                             </div>
                             {isInvalid && <p className="text-xs text-destructive">{__('rte.dialog.link.invalid_url', 'Use https://, mailto:, tel:, /relative or #anchor links.')}</p>}
+                            {(urlLoading || urlResults.length > 0) && (
+                                <div className="max-h-52 overflow-y-auto rounded-md border">
+                                    {urlLoading && <p className="px-3 py-3 text-center text-xs text-muted-foreground">{__('common.loading', 'Loading...')}</p>}
+                                    {!urlLoading &&
+                                        urlResults.map((result) => (
+                                            <button
+                                                key={`${result.type}-${result.id}`}
+                                                type="button"
+                                                onClick={() => onInternalSelect(result.url)}
+                                                className="grid w-full gap-0.5 px-3 py-2 text-left text-xs hover:bg-accent"
+                                            >
+                                                <span className="font-medium">{result.label}</span>
+                                                <span className="text-muted-foreground">{result.meta}</span>
+                                                <span className="truncate text-[11px] text-muted-foreground">{result.url}</span>
+                                            </button>
+                                        ))}
+                                </div>
+                            )}
                         </>
                     ) : (
                         <div className="grid gap-2">

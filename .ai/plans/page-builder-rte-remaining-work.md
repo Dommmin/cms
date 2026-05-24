@@ -276,6 +276,8 @@ Użytkownik może zapisać zaznaczony fragment jako snippet i wstawić go późn
 
 ## Priorytet 6 — Link Autocomplete + Broken Link Health
 
+Status: wdrożono. Zakładka URL w `LinkDialog` pokazuje autocomplete dla wpisów bez schematu, korzystając z `admin.rte.links.search`. `ContentHealthPlugin` zbiera tylko relatywne linki wewnętrzne i waliduje je przez `admin.rte.links.validate`, bez sprawdzania zewnętrznych URL-i z przeglądarki.
+
 ### Cel
 
 Ulepszyć linkowanie wewnętrzne i wykrywanie błędnych linków.
@@ -286,9 +288,7 @@ Ulepszyć linkowanie wewnętrzne i wykrywanie błędnych linków.
 
 ### Braki
 
-- Brak autocomplete bezpośrednio podczas wpisywania w polu URL.
-- Brak walidacji osiągalności linków.
-- Brak broken-link warningów w content health.
+- Brak walidacji zewnętrznych URL-i. Celowo pominięte w tej iteracji, żeby uniknąć CORS i niestabilnych requestów HEAD z przeglądarki.
 
 ### Pliki Startowe
 
@@ -306,11 +306,13 @@ Ulepszyć linkowanie wewnętrzne i wykrywanie błędnych linków.
 
 ### Akceptacja
 
-- Wpisanie `prod` w URL input pokazuje produkty/strony/posty.
-- Internal link do nieistniejącego zasobu pokazuje warning.
-- Zewnętrzne linki nadal przechodzą normalną walidację scheme.
+- [x] Wpisanie `prod` w URL input pokazuje produkty/strony/posty.
+- [x] Internal link do nieistniejącego zasobu pokazuje warning.
+- [x] Zewnętrzne linki nadal przechodzą normalną walidację scheme.
 
 ## Priorytet 7 — Mobile / Touch RTE
+
+Status: wdrożono podstawę touch/mobile. `ImageNode` używa pointer events (`pointerdown/move/up/cancel`) do resize, resize handle ma 32px touch target, a toolbar na małych ekranach przewija się poziomo zamiast łamać layout.
 
 ### Cel
 
@@ -334,10 +336,12 @@ Image resize i toolbar mają działać sensownie na touch devices.
 
 ### Akceptacja
 
-- Resize obrazu działa myszą i dotykiem.
-- Toolbar nie rozwala layoutu na małej szerokości.
+- [x] Resize obrazu działa myszą i dotykiem.
+- [x] Toolbar nie rozwala layoutu na małej szerokości.
 
 ## Priorytet 8 — Markdown Export
+
+Status: wdrożono. `ExportPlugin` ma przycisk `MD`, który eksportuje aktualny dokument przez `@lexical/markdown` do `content.md`.
 
 ### Obecnie
 
@@ -363,13 +367,15 @@ Dodaj przycisk `MD`, który pobiera `content.md`.
 
 ### Akceptacja
 
-- Export HTML nadal działa.
-- Export TXT nadal działa.
-- Export MD pobiera markdown bez crasha.
+- [x] Export HTML nadal działa.
+- [x] Export TXT nadal działa.
+- [x] Export MD pobiera markdown bez crasha.
 
 ## Priorytet 9 — Testy Page Buildera
 
 To jest największy brak jakościowy.
+
+Status: odłożone do osobnego kroku. `client/` ma obecnie `lint`, `types`, `build` i Playwright w devDependencies, ale nie ma skonfigurowanego React component test runnera dla smoke testów komponentów bloków. Najpierw dodaj minimalny setup testowy klienta zgodny z istniejącym stackiem, potem osobno dopisz smoke testy wszystkich bloków i `SectionRenderer`.
 
 ### Minimalny Zakres
 

@@ -203,6 +203,8 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('panel')->name(
 
     Route::get('rte/links/search', [RteLinkController::class, 'search'])
         ->name('rte.links.search');
+    Route::post('rte/links/validate', [RteLinkController::class, 'validateUrls'])
+        ->name('rte.links.validate');
 
     Route::get('block-relations/search', [BlockRelationController::class, 'search'])
         ->name('block-relations.search');

@@ -1,16 +1,64 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import axios from 'axios';
 import { AlertTriangle } from 'lucide-react';
-import { useEffect, useState, type JSX } from 'react';
-import { analyzeContentHealth, type ContentHealthWarning } from './content-health';
+import { useEffect, useRef, useState, type JSX } from 'react';
+import RteLinkController from '@/actions/App/Http/Controllers/Admin/RteLinkController';
+import { analyzeContentHealth, collectInternalLinkUrls, type ContentHealthWarning } from './content-health';
+
+type LinkValidationResponse = {
+    results: Array<{
+        url: string;
+        valid: boolean;
+    }>;
+};
 
 export default function ContentHealthPlugin(): JSX.Element | null {
     const [editor] = useLexicalComposerContext();
     const [warnings, setWarnings] = useState<ContentHealthWarning[]>([]);
+    const latestJsonRef = useRef<unknown>(null);
+    const validationRunRef = useRef(0);
+    const validationTimeoutRef = useRef<number | null>(null);
 
     useEffect(() => {
-        return editor.registerUpdateListener(({ editorState }) => {
-            setWarnings(analyzeContentHealth(editorState.toJSON()));
+        const unregister = editor.registerUpdateListener(({ editorState }) => {
+            const editorJson = editorState.toJSON();
+            const internalUrls = collectInternalLinkUrls(editorJson);
+            const validationRun = validationRunRef.current + 1;
+
+            latestJsonRef.current = editorJson;
+            validationRunRef.current = validationRun;
+            setWarnings(analyzeContentHealth(editorJson));
+
+            if (validationTimeoutRef.current !== null) {
+                window.clearTimeout(validationTimeoutRef.current);
+            }
+
+            if (internalUrls.length === 0) return;
+
+            validationTimeoutRef.current = window.setTimeout(() => {
+                axios
+                    .post<LinkValidationResponse>(RteLinkController.validateUrls.url(), { urls: internalUrls })
+                    .then(({ data }) => {
+                        if (validationRunRef.current !== validationRun) return;
+
+                        const brokenUrls = new Set(data.results.filter((result) => !result.valid).map((result) => result.url));
+                        setWarnings(analyzeContentHealth(latestJsonRef.current, brokenUrls));
+                    })
+                    .catch(() => {
+                        if (validationRunRef.current === validationRun) {
+                            setWarnings(analyzeContentHealth(latestJsonRef.current));
+                        }
+                    });
+            }, 300);
         });
+
+        return () => {
+            if (validationTimeoutRef.current !== null) {
+                window.clearTimeout(validationTimeoutRef.current);
+            }
+
+            unregister();
+        };
     }, [editor]);
 
     if (warnings.length === 0) {

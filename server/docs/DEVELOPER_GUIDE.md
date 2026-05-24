@@ -2065,11 +2065,14 @@ Errors:
 | `CopyCodePlugin`           | Injects "Copy" button on `<code>` blocks via MutationObserver  |
 | `WordCountPlugin`          | Shows word + character count in footer                         |
 
+`ExportPlugin` can download rendered HTML, plain text and Markdown. Markdown export uses `@lexical/markdown` `TRANSFORMERS` and writes `content.md`.
+
 ### Enterprise media nodes
 
 RTE media nodes are registered in `lexical/nodes.ts`:
 
 - `ImageNode` stores `mediaId`, `src`, `altText`, `caption`, `credit`, `layout`, `wrap`, `sizePreset`, `decorative`, `linkUrl`, `loading`, and optional focal point metadata. HTML export uses `<figure data-rte-image>`.
+- Image resize uses pointer events for mouse/touch support and keeps keyboard resize on selected figures. The resize handle target is 32px for touch devices; the visible dot remains smaller.
 - `ImageGalleryNode` stores ordered image assets with captions, desktop/mobile columns, gap, aspect ratio and lightbox metadata. HTML export uses `<figure data-rte-gallery data-columns="...">`.
 - `AttachmentNode` stores media ID, URL, public name, file name, MIME type, size, and optional description. HTML export uses `<a data-rte-attachment>`.
 - `EmbedNode` stores the original URL, provider, label and render mode for supported HTTPS embeds. HTML export uses `<figure data-rte-embed data-embed-platform="...">` with safe iframes for YouTube, Vimeo, Spotify, Loom and TikTok, and safe link placeholders for Instagram and Twitter/X.
@@ -2078,7 +2081,7 @@ RTE media nodes are registered in `lexical/nodes.ts`:
 
 `HtmlPlugin` can emit both rendered HTML (`onChange`) and canonical Lexical JSON (`onJsonChange`). Blog posts persist JSON in `blog_posts.content_json`; existing HTML-only content remains supported.
 
-Internal links use `RteLinkController::search` via the `admin.rte.links.search` route. Results include `type`, `id`, `label`, `meta`, and locale-aware public `url`.
+Internal links use `RteLinkController::search` via the `admin.rte.links.search` route. Results include `type`, `id`, `label`, `meta`, and locale-aware public `url`. The URL tab reuses the same endpoint for autocomplete when the editor value does not already look like a valid URL. `ContentHealthPlugin` sends only relative internal links to `RteLinkController::validateUrls` via `admin.rte.links.validate`; external URLs are not probed from the browser.
 
 RTE HTML must remain inside the `HtmlSanitizerService` default allowlist. Add new public node attributes to `config/purifier.php` `HTML.Allowed` and `custom_attributes`, keep iframe sources constrained with `URI.SafeIframeRegexp`, then cover them in `tests/Feature/HtmlSanitizationTest.php`.
 

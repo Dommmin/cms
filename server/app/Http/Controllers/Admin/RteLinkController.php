@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\BlogPostStatusEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\RteLinkValidateRequest;
 use App\Models\BlogPost;
 use App\Models\Category;
+use App\Models\Locale;
 use App\Models\Page;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
@@ -105,5 +108,111 @@ class RteLinkController extends Controller
         });
 
         return response()->json($results);
+    }
+
+    public function validateUrls(RteLinkValidateRequest $request): JsonResponse
+    {
+        $urls = collect($request->validated('urls'))
+            ->map(fn (string $url): string => mb_trim($url))
+            ->filter()
+            ->unique()
+            ->values();
+
+        return response()->json([
+            'results' => $urls
+                ->map(fn (string $url): array => [
+                    'url' => $url,
+                    'valid' => $this->isValidInternalUrl($url),
+                ])
+                ->values()
+                ->all(),
+        ]);
+    }
+
+    private function isValidInternalUrl(string $url): bool
+    {
+        if (! str_starts_with($url, '/') || str_starts_with($url, '//')) {
+            return true;
+        }
+
+        $path = parse_url($url, PHP_URL_PATH);
+        if (! is_string($path)) {
+            return false;
+        }
+
+        $segments = array_values(array_filter(explode('/', mb_trim($path, '/')), fn (string $segment): bool => $segment !== ''));
+        if ($segments === []) {
+            return true;
+        }
+
+        $locale = $this->extractLocale($segments);
+
+        if ($segments === []) {
+            return true;
+        }
+
+        return match ($segments[0]) {
+            'products' => $this->productExists($segments[1] ?? null),
+            'categories' => $this->categoryExists($segments[1] ?? null),
+            'blog' => $this->blogPostExists($segments[1] ?? null, $locale),
+            default => Page::findByLocalizedPath($segments, $locale) instanceof Page,
+        };
+    }
+
+    /**
+     * @param  array<int, string>  $segments
+     */
+    private function extractLocale(array &$segments): string
+    {
+        $defaultLocale = config('app.locale', 'en');
+        $locales = Locale::query()->active()->pluck('code')->all();
+        $candidate = $segments[0] ?? null;
+
+        if (is_string($candidate) && in_array($candidate, $locales, true)) {
+            array_shift($segments);
+
+            return $candidate;
+        }
+
+        return is_string($defaultLocale) ? $defaultLocale : 'en';
+    }
+
+    private function productExists(?string $slug): bool
+    {
+        if ($slug === null || $slug === '') {
+            return false;
+        }
+
+        return Product::query()
+            ->where('slug', $slug)
+            ->where('is_active', true)
+            ->exists();
+    }
+
+    private function categoryExists(?string $slug): bool
+    {
+        if ($slug === null || $slug === '') {
+            return false;
+        }
+
+        return Category::query()
+            ->where('slug', $slug)
+            ->where('is_active', true)
+            ->exists();
+    }
+
+    private function blogPostExists(?string $slug, string $locale): bool
+    {
+        if ($slug === null || $slug === '') {
+            return false;
+        }
+
+        return BlogPost::query()
+            ->where('status', BlogPostStatusEnum::Published)
+            ->where(function ($query) use ($slug, $locale): void {
+                $query->where('slug', $slug)
+                    ->orWhere('slug_translations->'.$locale, $slug);
+            })
+            ->exists();
     }
 }

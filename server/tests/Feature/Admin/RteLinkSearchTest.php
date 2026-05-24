@@ -70,3 +70,44 @@ it('requires at least two characters before searching', function (): void {
         ->assertOk()
         ->assertExactJson([]);
 });
+
+it('validates internal RTE links against published content', function (): void {
+    Product::factory()->create([
+        'name' => ['en' => 'Active Chair'],
+        'slug' => 'active-chair',
+        'is_active' => true,
+    ]);
+    Product::factory()->create([
+        'name' => ['en' => 'Inactive Chair'],
+        'slug' => 'inactive-chair',
+        'is_active' => false,
+    ]);
+    Page::factory()->published()->create([
+        'title' => ['en' => 'About'],
+        'slug' => 'about',
+    ]);
+    BlogPost::factory()->published()->create([
+        'title' => ['en' => 'News'],
+        'slug' => 'news',
+        'slug_translations' => ['pl' => 'wiadomosci'],
+    ]);
+
+    actingAs($this->admin)
+        ->postJson(route('admin.rte.links.validate'), [
+            'urls' => [
+                '/en/products/active-chair',
+                '/en/products/inactive-chair',
+                '/en/products/missing',
+                '/en/about',
+                '/pl/blog/wiadomosci',
+                'https://example.com/external',
+            ],
+        ])
+        ->assertOk()
+        ->assertJsonFragment(['url' => '/en/products/active-chair', 'valid' => true])
+        ->assertJsonFragment(['url' => '/en/products/inactive-chair', 'valid' => false])
+        ->assertJsonFragment(['url' => '/en/products/missing', 'valid' => false])
+        ->assertJsonFragment(['url' => '/en/about', 'valid' => true])
+        ->assertJsonFragment(['url' => '/pl/blog/wiadomosci', 'valid' => true])
+        ->assertJsonFragment(['url' => 'https://example.com/external', 'valid' => true]);
+});

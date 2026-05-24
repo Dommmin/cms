@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { analyzeContentHealth } from './content-health';
+import { analyzeContentHealth, collectInternalLinkUrls } from './content-health';
 
 describe('analyzeContentHealth', () => {
     it('warns about missing image alt text', () => {
@@ -25,6 +25,25 @@ describe('analyzeContentHealth', () => {
         });
 
         expect(warnings.map((warning) => warning.id)).toEqual(expect.arrayContaining(['link-empty', 'link-rel-missing']));
+    });
+
+    it('collects and warns about broken internal links', () => {
+        const editorJson = {
+            root: {
+                type: 'root',
+                children: [
+                    { type: 'link', url: '/en/products/missing', children: [] },
+                    { type: 'link', url: '/en/products/missing', children: [] },
+                    { type: 'link', url: 'https://example.com', children: [] },
+                ],
+            },
+        };
+
+        expect(collectInternalLinkUrls(editorJson)).toEqual(['/en/products/missing']);
+
+        const warnings = analyzeContentHealth(editorJson, new Set(['/en/products/missing']));
+
+        expect(warnings.map((warning) => warning.id)).toContain('link-internal-broken');
     });
 
     it('warns about heading jumps and multiple H1 headings', () => {

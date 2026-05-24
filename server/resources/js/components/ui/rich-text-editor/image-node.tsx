@@ -9,7 +9,7 @@ import type {
 } from 'lexical';
 import { $applyNodeReplacement, $getNodeByKey, DecoratorNode } from 'lexical';
 import { AlignCenter, AlignLeft, AlignRight, Captions, LinkIcon, Maximize2, Pencil, Trash2 } from 'lucide-react';
-import type { CSSProperties, JSX, KeyboardEvent, MouseEvent } from 'react';
+import type { CSSProperties, JSX, KeyboardEvent, PointerEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import type {
     CreateImageNodePayload,
@@ -253,20 +253,25 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
         updateNode(editor, nodeKey, { width: nextWidthValue, sizePreset: 'custom' });
     };
 
-    const startResize = (event: MouseEvent) => {
+    const startResize = (event: PointerEvent<HTMLElement>) => {
         event.preventDefault();
         const startX = event.clientX;
         const startWidth = imgRef.current?.offsetWidth ?? 300;
+        const pointerId = event.pointerId;
+        const target = event.currentTarget;
         dragRef.current = { startX, startWidth };
+        target.setPointerCapture(pointerId);
 
-        const onMove = (moveEvent: globalThis.MouseEvent) => {
+        const onMove = (moveEvent: globalThis.PointerEvent) => {
+            if (moveEvent.pointerId !== pointerId) return;
             if (!dragRef.current || !imgRef.current) return;
             const maxWidth = imgRef.current.parentElement?.clientWidth ?? 1200;
             const nextWidth = Math.min(maxWidth, Math.max(80, dragRef.current.startWidth + (moveEvent.clientX - dragRef.current.startX)));
             imgRef.current.style.width = `${nextWidth}px`;
         };
 
-        const onUp = (upEvent: globalThis.MouseEvent) => {
+        const onUp = (upEvent: globalThis.PointerEvent) => {
+            if (upEvent.pointerId !== pointerId) return;
             if (!dragRef.current) return;
             const maxWidth = imgRef.current?.parentElement?.clientWidth ?? 1200;
             const nextWidth = Math.min(maxWidth, Math.max(80, dragRef.current.startWidth + (upEvent.clientX - dragRef.current.startX)));
@@ -274,12 +279,17 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
             setLocalWidth(nextWidthValue);
             updateNode(editor, nodeKey, { width: nextWidthValue, sizePreset: 'custom' });
             dragRef.current = null;
-            document.removeEventListener('mousemove', onMove);
-            document.removeEventListener('mouseup', onUp);
+            if (target.hasPointerCapture(pointerId)) {
+                target.releasePointerCapture(pointerId);
+            }
+            document.removeEventListener('pointermove', onMove);
+            document.removeEventListener('pointerup', onUp);
+            document.removeEventListener('pointercancel', onUp);
         };
 
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('mouseup', onUp);
+        document.addEventListener('pointermove', onMove);
+        document.addEventListener('pointerup', onUp);
+        document.addEventListener('pointercancel', onUp);
     };
 
     const figureStyle: CSSProperties = {
@@ -609,12 +619,16 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
                         </span>
                     )}
 
-                    <span
+                    <button
+                        type="button"
+                        aria-label="Resize image"
                         contentEditable={false}
-                        onMouseDown={startResize}
-                        className="absolute -right-1.5 -bottom-1.5 z-10 h-4 w-4 rounded bg-primary"
+                        onPointerDown={startResize}
+                        className="absolute -right-4 -bottom-4 z-10 flex h-8 w-8 touch-none items-center justify-center rounded-full"
                         style={{ cursor: 'nwse-resize' }}
-                    />
+                    >
+                        <span className="h-4 w-4 rounded bg-primary" />
+                    </button>
                 </>
             )}
         </figure>

@@ -1,3 +1,5 @@
+import { isInternalEditorLinkUrl } from '../link-url';
+
 export type ContentHealthSeverity = 'warning' | 'error';
 
 export type ContentHealthWarning = {
@@ -37,7 +39,28 @@ function nodeText(node: SerializedNode): string {
     return node.children?.map(nodeText).join(' ') ?? '';
 }
 
-export function analyzeContentHealth(editorJson: unknown): ContentHealthWarning[] {
+export function collectInternalLinkUrls(editorJson: unknown): string[] {
+    if (!isSerializedNode(editorJson)) {
+        return [];
+    }
+
+    const root = isSerializedNode('root' in editorJson ? (editorJson as { root?: unknown }).root : editorJson)
+        ? ('root' in editorJson ? (editorJson as { root: SerializedNode }).root : editorJson)
+        : editorJson;
+    const urls = new Set<string>();
+
+    walk(root, (node) => {
+        const url = (node.url ?? '').trim();
+
+        if (node.type === 'link' && isInternalEditorLinkUrl(url)) {
+            urls.add(url);
+        }
+    });
+
+    return [...urls];
+}
+
+export function analyzeContentHealth(editorJson: unknown, brokenInternalUrls: ReadonlySet<string> = new Set()): ContentHealthWarning[] {
     if (!isSerializedNode(editorJson)) {
         return [];
     }
@@ -59,11 +82,20 @@ export function analyzeContentHealth(editorJson: unknown): ContentHealthWarning[
         }
 
         if (node.type === 'link') {
+            const url = (node.url ?? '').trim();
+
             if ((node.url ?? '').trim() === '') {
                 warnings.push({
                     id: 'link-empty',
                     severity: 'error',
                     message: 'Link has an empty URL.',
+                });
+            }
+            if (url !== '' && brokenInternalUrls.has(url)) {
+                warnings.push({
+                    id: 'link-internal-broken',
+                    severity: 'warning',
+                    message: 'Internal link points to missing or unpublished content.',
                 });
             }
             if (node.target === '_blank' && !(node.rel ?? '').includes('noopener')) {

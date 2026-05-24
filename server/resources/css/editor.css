@@ -41,6 +41,20 @@
     border-top-right-radius: 0.75rem;
 }
 
+@media (max-width: 640px) {
+    .editor-toolbar {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overscroll-behavior-inline: contain;
+        scrollbar-width: thin;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .editor-toolbar > * {
+        flex: 0 0 auto;
+    }
+}
+
 /* ─── Block elements ─────────────────────────────────────────────────────────── */
 
 .editor-paragraph {
