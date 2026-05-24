@@ -63,6 +63,19 @@ describe('HtmlSanitizerService', function (): void {
             ->and($clean)->not->toContain('onerror');
     });
 
+    it('preserves safe RTE embeds and strips unsafe iframe sources', function (): void {
+        $sanitizer = resolve(HtmlSanitizerService::class);
+
+        $html = '<figure data-rte-embed="true" data-embed-platform="vimeo"><iframe src="https://player.vimeo.com/video/123456" title="Vimeo video" loading="lazy" allowfullscreen="true" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"></iframe><figcaption>Vimeo</figcaption></figure><iframe src="https://evil.test/embed/1"></iframe>';
+        $clean = $sanitizer->sanitize($html);
+
+        expect($clean)->toContain('data-rte-embed="true"')
+            ->and($clean)->toContain('data-embed-platform="vimeo"')
+            ->and($clean)->toContain('https://player.vimeo.com/video/123456')
+            ->and($clean)->toContain('sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"')
+            ->and($clean)->not->toContain('https://evil.test/embed/1');
+    });
+
     it('returns null for null input', function (): void {
         $sanitizer = resolve(HtmlSanitizerService::class);
 

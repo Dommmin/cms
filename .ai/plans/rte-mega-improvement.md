@@ -161,6 +161,12 @@ GET /admin/embed/oembed?url=https://...
 → zwraca HTML z oEmbed API (z cachowaniem 24h)
 ```
 
+**Postęp 2026-05-24:** dodano `EmbedNode` dla bezpiecznych iframe URL-i: YouTube,
+Vimeo, Spotify, Loom i TikTok. Toolbar ma teraz `Insert > Embed`, HTML export używa
+`figure[data-rte-embed]`, a `HtmlSanitizerService` dopuszcza tylko allowlistowane
+źródła iframe. Do domknięcia tej fazy zostaje backendowy oEmbed/proxy dla platform,
+które wymagają renderowania server-side (np. Instagram, Twitter/X).
+
 ### R2.2 Paste/Clipboard Image
 
 **Problem:** Użytkownik nie może wkleić obrazka ze schowka (screenshot).

@@ -407,6 +407,24 @@
         height: auto;
     }
 
+    .prose figure[data-rte-embed] {
+        margin: 1.5em 0;
+    }
+
+    .prose figure[data-rte-embed] iframe {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        height: auto;
+        border: 0;
+        border-radius: var(--radius);
+    }
+
+    .prose figure[data-rte-embed] figcaption {
+        margin-top: 0.35rem;
+        color: var(--prose-captions);
+        font-size: 0.875em;
+    }
+
     .prose-lg {
         font-size: 1.125rem;
     }

@@ -7,9 +7,9 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslation } from '@/hooks/use-translation';
-import { extractYouTubeId } from '../../../youtube-node';
+import { detectEmbed } from '../../../embed-node';
 import { EMOJIS, SPECIAL_CHARS } from './constants';
-import type { CharacterDialogProps, InternalLinkSearchResult, LinkDialogProps, LinkDialogTab, TableDialogProps, YouTubeDialogProps } from './types';
+import type { CharacterDialogProps, EmbedDialogProps, InternalLinkSearchResult, LinkDialogProps, LinkDialogTab, TableDialogProps } from './types';
 
 export function LinkDialog({ open, url, isInvalid, onOpenChange, onUrlChange, onInternalSelect, onInsert }: LinkDialogProps): JSX.Element {
     const __ = useTranslation();
@@ -142,31 +142,33 @@ export function LinkDialog({ open, url, isInvalid, onOpenChange, onUrlChange, on
     );
 }
 
-export function YouTubeDialog({ open, url, onOpenChange, onUrlChange, onInsert }: YouTubeDialogProps): JSX.Element {
+export function EmbedDialog({ open, url, onOpenChange, onUrlChange, onInsert }: EmbedDialogProps): JSX.Element {
     const __ = useTranslation();
-    const canInsert = url.trim() !== '' && extractYouTubeId(url) !== null;
+    const detectedEmbed = detectEmbed(url);
+    const canInsert = url.trim() !== '' && detectedEmbed !== null;
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>{__('rte.dialog.youtube.title', 'Insert YouTube Video')}</DialogTitle>
+                    <DialogTitle>{__('rte.dialog.embed.title', 'Insert embed')}</DialogTitle>
                 </DialogHeader>
                 <div className="grid gap-3 py-2">
                     <div className="grid gap-1.5">
-                        <Label htmlFor="yt-url" className="text-xs">
-                            {__('rte.dialog.youtube.url', 'YouTube URL')}
+                        <Label htmlFor="embed-url" className="text-xs">
+                            {__('rte.dialog.embed.url', 'Embed URL')}
                         </Label>
                         <Input
-                            id="yt-url"
-                            placeholder="https://www.youtube.com/watch?v=..."
+                            id="embed-url"
+                            placeholder="YouTube, Vimeo, Spotify, Loom or TikTok URL"
                             value={url}
                             onChange={(e) => onUrlChange(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && onInsert()}
                             autoFocus
                         />
                     </div>
-                    {url && !extractYouTubeId(url) && <p className="text-xs text-destructive">{__('rte.dialog.youtube.invalid_url', 'Invalid YouTube URL')}</p>}
+                    {url && !detectedEmbed && <p className="text-xs text-destructive">{__('rte.dialog.embed.invalid_url', 'Use a supported HTTPS embed URL from YouTube, Vimeo, Spotify, Loom or TikTok.')}</p>}
+                    {detectedEmbed && <p className="text-xs text-muted-foreground">{__('rte.dialog.embed.detected', 'Detected')}: {detectedEmbed.label}</p>}
                 </div>
                 <DialogFooter>
                     <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

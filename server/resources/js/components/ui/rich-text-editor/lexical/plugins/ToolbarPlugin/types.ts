@@ -4,7 +4,7 @@ import type {
 import type { ReactNode } from 'react';
 
 export type BlockType = 'paragraph' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'quote' | 'code' | 'bullet' | 'number' | 'check';
-export type InsertDialog = 'image' | 'youtube' | 'table' | 'emoji' | 'special' | null;
+export type InsertDialog = 'image' | 'embed' | 'table' | 'emoji' | 'special' | null;
 export type LinkDialogTab = 'url' | 'internal';
 
 export type InternalLinkSearchResult = {
@@ -37,7 +37,7 @@ export type ToolbarToggleProps = {
     className?: string;
 };
 
-export type YouTubeDialogProps = {
+export type EmbedDialogProps = {
     open: boolean;
     url: string;
     onOpenChange: (open: boolean) => void;
@@ -81,7 +81,7 @@ export type InsertMenuProps = {
     onOpenMediaPicker: () => void;
     onOpenGalleryPicker: () => void;
     onOpenFilePicker: () => void;
-    onOpenYouTubeDialog: () => void;
+    onOpenEmbedDialog: () => void;
     onOpenTableDialog: () => void;
     onInsertCallout: () => void;
     onInsertColumns: (templateColumns: string) => void;

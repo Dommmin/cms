@@ -1003,13 +1003,14 @@ The admin panel uses a full-featured rich text editor (Lexical) for Blog Post co
 - **Text formatting** — Bold, Italic, Underline, Strikethrough, Inline Code, Subscript, Superscript, Highlight, Clear formatting
 - **Alignment** — Left, Center, Right, Justify
 - **Links** — click the link button to add an external URL or search internal Pages, Products, Categories and Blog Posts
-- **Insert** — Horizontal Rule, Image (from Media Library), Gallery, File attachment, YouTube Video, Table (rows × columns)
+- **Insert** — Horizontal Rule, Image (from Media Library), Gallery, File attachment, Embed, Table (rows × columns)
 - **Code blocks** — language selector dropdown; "Copy" button appears on hover
 
 **Images and media:**
 - Use **Insert > Image** for one image. After selecting it, click the image to set alignment, text wrap, width, caption, credit, link, or mark it as decorative.
 - Use **Insert > Gallery** to select multiple images and reorder them before inserting a grid.
 - Use **Insert > File** for downloadable files such as PDFs, Office documents, spreadsheets, presentations, and ZIP archives.
+- Use **Insert > Embed** for supported public HTTPS URLs from YouTube, Vimeo, Spotify, Loom or TikTok.
 - When pasting from Word or Google Docs, the editor cleans unsafe styles and links before saving.
 - The editor shows content health warnings for common issues such as images without alt text, unsafe link metadata, skipped heading levels, long paragraphs, generic file names, or tables without headers.
 

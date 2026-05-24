@@ -520,6 +520,24 @@
     border-radius: 0.5rem;
 }
 
+figure[data-rte-embed] {
+    margin: 1rem 0;
+}
+
+figure[data-rte-embed] iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    border: 0;
+    border-radius: 0.5rem;
+}
+
+figure[data-rte-embed] figcaption {
+    margin-top: 0.25rem;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+}
+
 /* ─── Indentation ────────────────────────────────────────────────────────────── */
 
 .editor-indent {

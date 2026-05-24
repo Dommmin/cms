@@ -37,16 +37,16 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useTranslation } from '@/hooks/use-translation';
 import { $createAttachmentNode } from '../../../attachment-node';
 import { $createCalloutNode } from '../../../callout-node';
+import { $createEmbedNode, detectEmbed } from '../../../embed-node';
 import { $createImageGalleryNode } from '../../../image-gallery-node';
 import { $createImageNode } from '../../../image-node';
-import { $createYouTubeNode, extractYouTubeId } from '../../../youtube-node';
 import { $createCollapsibleContainerNode, $createCollapsibleTitleNode, $createCollapsibleContentNode } from '../../collapsible-nodes';
 import { $createLayoutContainerNode, $createLayoutItemNode } from '../../layout-nodes';
 import { getEditorLinkTarget, isAllowedEditorLinkUrl, normalizeEditorLinkUrl } from '../../link-url';
 import ShortcutsDialog from '../ShortcutsDialog';
 import { CODE_LANGUAGES, ELEMENT_FORMAT_NUM_TO_TYPE } from './constants';
 import { ToolbarSeparator as Sep } from './controls';
-import { EmojiDialog, LinkDialog, SpecialCharactersDialog, TableDialog, YouTubeDialog } from './dialogs';
+import { EmbedDialog, EmojiDialog, LinkDialog, SpecialCharactersDialog, TableDialog } from './dialogs';
 import { AlignmentGroup, FontStyleGroup, HistoryGroup, InlineFormatGroup, LinkGroup } from './groups';
 import { BlockTypeMenu, InsertMenu } from './menus';
 import type { BlockType, InsertDialog, ToolbarPluginProps, ToolbarState } from './types';
@@ -87,7 +87,7 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
     const [selectedGalleryImages, setSelectedGalleryImages] = useState<SelectedImage[]>([]);
     const [linkDialogOpen, setLinkDialogOpen] = useState(false);
     const [linkUrl, setLinkUrl] = useState('');
-    const [ytUrl, setYtUrl] = useState('');
+    const [embedUrl, setEmbedUrl] = useState('');
     const [tableRows, setTableRows] = useState(3);
     const [tableCols, setTableCols] = useState(3);
     const [shortcutsOpen, setShortcutsOpen] = useState(false);
@@ -395,13 +395,13 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
         setFilePickerOpen(false);
     }, [editor]);
 
-    const handleInsertYoutube = () => {
-        const videoId = extractYouTubeId(ytUrl.trim());
-        if (!videoId) return;
+    const handleInsertEmbed = () => {
+        const definition = detectEmbed(embedUrl);
+        if (!definition) return;
         editor.update(() => {
-            $insertNodes([$createYouTubeNode(videoId)]);
+            $insertNodes([$createEmbedNode(definition)]);
         });
-        setYtUrl('');
+        setEmbedUrl('');
         setInsertDialog(null);
     };
 
@@ -566,9 +566,9 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
                             onOpenMediaPicker={openMediaPicker}
                             onOpenGalleryPicker={openGalleryPicker}
                             onOpenFilePicker={() => setFilePickerOpen(true)}
-                            onOpenYouTubeDialog={() => {
-                                setYtUrl('');
-                                setInsertDialog('youtube');
+                            onOpenEmbedDialog={() => {
+                                setEmbedUrl('');
+                                setInsertDialog('embed');
                             }}
                             onOpenTableDialog={() => {
                                 setTableRows(3);
@@ -645,14 +645,14 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
                 onInsert={handleInsertLink}
             />
 
-            <YouTubeDialog
-                open={insertDialog === 'youtube'}
-                url={ytUrl}
+            <EmbedDialog
+                open={insertDialog === 'embed'}
+                url={embedUrl}
                 onOpenChange={(open) => {
                     if (!open) setInsertDialog(null);
                 }}
-                onUrlChange={setYtUrl}
-                onInsert={handleInsertYoutube}
+                onUrlChange={setEmbedUrl}
+                onInsert={handleInsertEmbed}
             />
 
             <TableDialog
