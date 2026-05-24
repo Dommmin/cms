@@ -2,6 +2,7 @@ import type {
     AvailableSection,
     Block,
     BlockTypeConfig,
+    EditorMode,
     ReusableBlock,
     Section,
 } from '../types';
@@ -16,6 +17,7 @@ export type SortableSectionProps = {
     expandedBlocks: Set<string>;
     availableSections: Record<string, AvailableSection>;
     availableBlockTypes: Record<string, BlockTypeConfig>;
+    editorMode: EditorMode;
     onToggle: () => void;
     onDelete: () => void;
     onSelect?: () => void;

@@ -1526,6 +1526,10 @@ Implemented in `resources/js/hooks/use-builder-state.ts` using `useReducer` with
 
 Inline text editing is intentionally limited to scalar configuration fields: `title`, `heading`, `subtitle`, `description`, `primary_label`, and `secondary_label`. Canvas sends edits through `onInlineEdit(sectionIndex, blockIndex, field, value)`, and `useBuilderState.updateBlockConfigurationField()` writes the value into `block.configuration` so normal save/autosave/version flows continue to apply.
 
+### Simple / Advanced Mode
+
+`PageBuilder` owns `editorMode: 'simple' | 'advanced'` and passes it through toolbar, cards, canvas inspector, section forms and block forms. Simple mode switches to Canvas and filters `DynamicBlockForm` to primary scalar fields plus media relations; it hides linked-content, section animation and block Advanced controls. Advanced mode renders the full schema-driven form. The mode only changes UI visibility and must not delete keys from `block.configuration`, `block.relations` or `section.settings`.
+
 ### Health
 
 `resources/js/features/page-builder/page-health.ts` analyzes the current client-side builder snapshot. It checks active sections/blocks for primary H1 coverage, duplicate H1s, CTA label/URL mismatches, raw HTML anchors without `href`, and image relations missing `metadata.alt`. Add new block-specific content quality rules there and cover them with Vitest tests in `page-health.test.ts`.

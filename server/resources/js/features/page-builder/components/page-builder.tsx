@@ -22,6 +22,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from '@/hooks/use-translation';
 import { useBuilderState } from '../hooks/use-builder-state';
 import { analyzePageHealth } from '../page-health';
+import type { EditorMode } from '../types';
 import { BuilderToolbar } from './builder-toolbar';
 import { CanvasView } from './canvas-view';
 import type { PageBuilderProps } from './page-builder.types';
@@ -86,6 +87,7 @@ export function PageBuilder({
     const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
     const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<'cards' | 'canvas'>('cards');
+    const [editorMode, setEditorMode] = useState<EditorMode>('advanced');
     const [inspectorOpen, setInspectorOpen] = useState(false);
 
     useEffect(() => {
@@ -264,6 +266,14 @@ export function PageBuilder({
         setInspectorOpen(true);
     };
 
+    const handleEditorModeChange = useCallback((mode: EditorMode) => {
+        setEditorMode(mode);
+
+        if (mode === 'simple') {
+            setViewMode('canvas');
+        }
+    }, []);
+
     const handleInlineEdit = useCallback(
         (
             sectionIndex: number,
@@ -342,6 +352,8 @@ export function PageBuilder({
                 onReject={onReject ?? (() => {})}
                 viewMode={viewMode}
                 onViewModeChange={setViewMode}
+                editorMode={editorMode}
+                onEditorModeChange={handleEditorModeChange}
             />
 
             <div className="container grid max-w-[100rem] gap-6 py-8 lg:grid-cols-[18rem_minmax(0,1fr)_minmax(22rem,30rem)]">
@@ -442,6 +454,7 @@ export function PageBuilder({
                                                 availableBlockTypes={
                                                     data.available_block_relations
                                                 }
+                                                editorMode={editorMode}
                                                 onToggle={() =>
                                                     toggleSection(
                                                         section.client_id ?? '',
@@ -538,6 +551,7 @@ export function PageBuilder({
                             availableBlockTypes={data.available_block_relations}
                             onUpdateSection={updateSection}
                             onUpdateBlock={updateBlock}
+                            editorMode={editorMode}
                         />
                     </div>
                 ) : viewMode === 'cards' ? (
@@ -562,6 +576,7 @@ export function PageBuilder({
                                 }
                                 onUpdateSection={updateSection}
                                 onUpdateBlock={updateBlock}
+                                editorMode={editorMode}
                             />
                         }
                         health={

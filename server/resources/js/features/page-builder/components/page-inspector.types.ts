@@ -2,6 +2,7 @@ import type {
     AvailableSection,
     Block,
     BlockTypeConfig,
+    EditorMode,
     Section,
 } from '../types';
 
@@ -18,4 +19,5 @@ export type PageInspectorProps = {
         blockIndex: number,
         patch: Partial<Block>,
     ) => void;
+    editorMode: EditorMode;
 };

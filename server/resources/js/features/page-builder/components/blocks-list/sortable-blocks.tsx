@@ -14,6 +14,7 @@ export function SortableBlocks({
     expandedBlocks,
     activeBlockId = null,
     availableBlockTypes,
+    editorMode,
     onMoveBlock,
     onToggleBlock,
     onDeleteBlock,
@@ -87,6 +88,7 @@ export function SortableBlocks({
                                     onUnlinkReusable={() =>
                                         onUnlinkGlobal(blockIndex)
                                     }
+                                    editorMode={editorMode}
                                 />
                             </BlockCard>
                         );

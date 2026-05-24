@@ -124,6 +124,8 @@ W `use-builder-state.ts` dodaj akcję aktualizującą `block.configuration[field
 
 ## Priorytet 2 — Page Builder Simple / Advanced Mode
 
+Status 2026-05-24: **wdrożone**. Toolbar ma przełącznik `Simple` / `Advanced`. Simple mode przełącza builder do Canvas, zostawia inline editing, ogranicza formularze do podstawowych pól scalar i relacji media, ukrywa sekcję Advanced bloków oraz scroll animation sekcji bez usuwania danych z konfiguracji. Advanced mode pokazuje pełny schema-driven formularz.
+
 ### Cel
 
 Użytkownik może przełączyć tryb pracy:
@@ -147,9 +149,9 @@ Użytkownik może przełączyć tryb pracy:
 
 ### Akceptacja
 
-- Przełącznik działa bez utraty danych.
-- Simple mode pokazuje mniej pól.
-- Advanced mode pokazuje pełny obecny formularz.
+- [x] Przełącznik działa bez utraty danych.
+- [x] Simple mode pokazuje mniej pól.
+- [x] Advanced mode pokazuje pełny obecny formularz.
 
 ## Priorytet 3 — Image Editing Domknięcie
 

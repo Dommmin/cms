@@ -23,6 +23,7 @@ export function SectionForm({
     availableSections,
     onUpdate,
     compact = false,
+    editorMode,
 }: SectionFormProps) {
     const __ = useTranslation();
     const currentSectionConfig = availableSections[section.section_type];
@@ -198,58 +199,61 @@ export function SectionForm({
                     </Select>
                 </div>
 
-                {/* Scroll animation */}
-                <div className="space-y-1.5">
-                    <Label htmlFor="section-animation">
-                        {__('builder.scroll_animation', 'Scroll Animation')}
-                    </Label>
-                    <Select
-                        value={
-                            (section.settings?.animation as
-                                | string
-                                | undefined) ?? 'none'
-                        }
-                        onValueChange={(value) =>
-                            onUpdate({
-                                settings: {
-                                    ...section.settings,
-                                    animation:
-                                        value === 'none' ? undefined : value,
-                                },
-                            })
-                        }
-                    >
-                        <SelectTrigger id="section-animation">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="none">
-                                {__('builder.none', 'None')}
-                            </SelectItem>
-                            <SelectItem value="fade-in">
-                                {__('builder.fade_in', 'Fade In')}
-                            </SelectItem>
-                            <SelectItem value="fade-up">
-                                {__('builder.fade_up', 'Fade Up')}
-                            </SelectItem>
-                            <SelectItem value="fade-left">
-                                {__(
-                                    'builder.slide_from_left',
-                                    'Slide from Left',
-                                )}
-                            </SelectItem>
-                            <SelectItem value="fade-right">
-                                {__(
-                                    'builder.slide_from_right',
-                                    'Slide from Right',
-                                )}
-                            </SelectItem>
-                            <SelectItem value="zoom-in">
-                                {__('builder.zoom_in', 'Zoom In')}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
+                {editorMode === 'advanced' && (
+                    <div className="space-y-1.5">
+                        <Label htmlFor="section-animation">
+                            {__('builder.scroll_animation', 'Scroll Animation')}
+                        </Label>
+                        <Select
+                            value={
+                                (section.settings?.animation as
+                                    | string
+                                    | undefined) ?? 'none'
+                            }
+                            onValueChange={(value) =>
+                                onUpdate({
+                                    settings: {
+                                        ...section.settings,
+                                        animation:
+                                            value === 'none'
+                                                ? undefined
+                                                : value,
+                                    },
+                                })
+                            }
+                        >
+                            <SelectTrigger id="section-animation">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="none">
+                                    {__('builder.none', 'None')}
+                                </SelectItem>
+                                <SelectItem value="fade-in">
+                                    {__('builder.fade_in', 'Fade In')}
+                                </SelectItem>
+                                <SelectItem value="fade-up">
+                                    {__('builder.fade_up', 'Fade Up')}
+                                </SelectItem>
+                                <SelectItem value="fade-left">
+                                    {__(
+                                        'builder.slide_from_left',
+                                        'Slide from Left',
+                                    )}
+                                </SelectItem>
+                                <SelectItem value="fade-right">
+                                    {__(
+                                        'builder.slide_from_right',
+                                        'Slide from Right',
+                                    )}
+                                </SelectItem>
+                                <SelectItem value="zoom-in">
+                                    {__('builder.zoom_in', 'Zoom In')}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                )}
 
                 {/* Variant */}
                 {variantOptions.length > 0 && (

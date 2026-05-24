@@ -1,4 +1,4 @@
-import type { Section } from '../types';
+import type { EditorMode, Section } from '../types';
 
 export type ApprovalStatus = 'draft' | 'in_review' | 'approved';
 
@@ -38,6 +38,8 @@ export type BuilderToolbarProps = {
     onReject: (note: string) => void;
     viewMode?: 'cards' | 'canvas';
     onViewModeChange?: (mode: 'cards' | 'canvas') => void;
+    editorMode?: EditorMode;
+    onEditorModeChange?: (mode: EditorMode) => void;
 };
 
 export type SaveStatusProps = {

@@ -3,7 +3,12 @@ import type {
     RelationConfig as BRMRelationConfig,
     Relation,
 } from '@/components/admin/block-relation-manager';
-import type { Block, BlockTypeConfig, SchemaProperty } from '../types';
+import type {
+    Block,
+    BlockTypeConfig,
+    EditorMode,
+    SchemaProperty,
+} from '../types';
 
 export type FieldProps = {
     fieldKey: string;
@@ -22,6 +27,7 @@ export type DynamicBlockFormProps = {
     blockTypeConfig: BlockTypeConfig;
     onUpdateConfig: (config: Record<string, unknown>) => void;
     onUpdateRelations: (relations: Block['relations']) => void;
+    editorMode: EditorMode;
 };
 
 export type RelationsData = Record<string, Relation | Relation[]>;

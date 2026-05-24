@@ -19,6 +19,7 @@ export function SortableSection({
     expandedBlocks,
     availableSections,
     availableBlockTypes,
+    editorMode,
     onToggle,
     onDelete,
     onSelect,
@@ -49,6 +50,7 @@ export function SortableSection({
                     section={section}
                     availableSections={availableSections}
                     onUpdate={onUpdate}
+                    editorMode={editorMode}
                 />
 
                 {/* Blocks List */}
@@ -59,6 +61,7 @@ export function SortableSection({
                     expandedBlocks={expandedBlocks}
                     activeBlockId={activeBlockId}
                     availableBlockTypes={availableBlockTypes}
+                    editorMode={editorMode}
                     onAddBlock={onAddBlock}
                     onAddReusableBlock={onAddReusableBlock}
                     onPasteBlock={onPasteBlock}

@@ -1,8 +1,9 @@
-import type { Block, BlockTypeConfig } from '../types';
+import type { Block, BlockTypeConfig, EditorMode } from '../types';
 
 export type BlockFormProps = {
     block: Block;
     availableBlockTypes: Record<string, BlockTypeConfig>;
     onUpdate: (patch: Partial<Block>) => void;
     onUnlinkReusable?: () => void;
+    editorMode: EditorMode;
 };

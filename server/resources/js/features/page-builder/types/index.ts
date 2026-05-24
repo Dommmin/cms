@@ -134,6 +134,8 @@ export type BuilderData = {
     available_block_relations: Record<string, BlockTypeConfig>;
 };
 
+export type EditorMode = 'simple' | 'advanced';
+
 export type SortableItemProps = {
     id: string;
     index: number;

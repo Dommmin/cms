@@ -13,6 +13,7 @@ export function PageInspector({
     availableBlockTypes,
     onUpdateSection,
     onUpdateBlock,
+    editorMode,
 }: PageInspectorProps) {
     const __ = useTranslation();
 
@@ -58,6 +59,7 @@ export function PageInspector({
                             reusable_block_name: null,
                         })
                     }
+                    editorMode={editorMode}
                 />
             </div>
         );
@@ -83,6 +85,7 @@ export function PageInspector({
                 availableSections={availableSections}
                 onUpdate={(patch) => onUpdateSection(sectionIndex, patch)}
                 compact
+                editorMode={editorMode}
             />
         </div>
     );

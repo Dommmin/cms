@@ -1,4 +1,9 @@
-import type { Block, BlockTypeConfig, ReusableBlock } from '../types';
+import type {
+    Block,
+    BlockTypeConfig,
+    EditorMode,
+    ReusableBlock,
+} from '../types';
 
 export type BlocksListProps = {
     blocks: Block[];
@@ -7,6 +12,7 @@ export type BlocksListProps = {
     expandedBlocks: Set<string>;
     activeBlockId?: string | null;
     availableBlockTypes: Record<string, BlockTypeConfig>;
+    editorMode: EditorMode;
     onAddBlock: (type: string) => void;
     onAddReusableBlock: (block: ReusableBlock) => void;
     onPasteBlock: (patch: Partial<Block>) => void;
@@ -36,6 +42,7 @@ export type SortableBlocksProps = {
     expandedBlocks: Set<string>;
     activeBlockId?: string | null;
     availableBlockTypes: Record<string, BlockTypeConfig>;
+    editorMode: EditorMode;
     onMoveBlock: (oldIndex: number, newIndex: number) => void;
     onToggleBlock: (blockIndex: number) => void;
     onDeleteBlock: (blockIndex: number) => void;

@@ -18,11 +18,30 @@ import type {
     RelationSectionProps,
 } from './dynamic-block-form.types';
 
+const simpleModeFieldKeys = new Set([
+    'title',
+    'heading',
+    'subtitle',
+    'description',
+    'content',
+    'primary_label',
+    'secondary_label',
+    'primary_url',
+    'secondary_url',
+    'cta_text',
+    'cta_url',
+    'cta2_text',
+    'cta2_url',
+    'button_text',
+    'button_url',
+]);
+
 export function DynamicBlockForm({
     block,
     blockTypeConfig,
     onUpdateConfig,
     onUpdateRelations,
+    editorMode,
 }: DynamicBlockFormProps) {
     const __ = useTranslation();
     const schema = blockTypeConfig.schema;
@@ -37,22 +56,33 @@ export function DynamicBlockForm({
     };
 
     const hasSchemaFields = Object.keys(properties).length > 0;
+    const visibleProperties =
+        editorMode === 'simple'
+            ? Object.fromEntries(
+                  Object.entries(properties).filter(([key]) =>
+                      simpleModeFieldKeys.has(key),
+                  ),
+              )
+            : properties;
+    const hasVisibleSchemaFields = Object.keys(visibleProperties).length > 0;
     const hasNonMediaRelations = nonMediaRelationKeys.length > 0;
 
     return (
         <div className="space-y-5">
-            {hasSchemaFields && (
+            {hasVisibleSchemaFields && (
                 <div className="space-y-4">
-                    {Object.entries(properties).map(([key, propSchema]) => (
-                        <SchemaField
-                            key={key}
-                            fieldKey={key}
-                            schema={propSchema}
-                            value={block.configuration[key]}
-                            onChange={(v) => updateConfigField(key, v)}
-                            blockType={block.type}
-                        />
-                    ))}
+                    {Object.entries(visibleProperties).map(
+                        ([key, propSchema]) => (
+                            <SchemaField
+                                key={key}
+                                fieldKey={key}
+                                schema={propSchema}
+                                value={block.configuration[key]}
+                                onChange={(v) => updateConfigField(key, v)}
+                                blockType={block.type}
+                            />
+                        ),
+                    )}
                 </div>
             )}
 
@@ -73,7 +103,7 @@ export function DynamicBlockForm({
                 />
             )}
 
-            {hasNonMediaRelations && (
+            {editorMode === 'advanced' && hasNonMediaRelations && (
                 <RelationSection
                     title={__('builder.linked_content', 'Linked Content')}
                     blockType={block.type}

@@ -14,6 +14,8 @@ import {
     List,
     Plus,
     Save,
+    SlidersHorizontal,
+    Sparkles,
 } from 'lucide-react';
 import { useState } from 'react';
 import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
@@ -54,6 +56,8 @@ export function BuilderToolbar({
     onReject,
     viewMode = 'cards',
     onViewModeChange,
+    editorMode = 'advanced',
+    onEditorModeChange,
 }: BuilderToolbarProps) {
     const __ = useTranslation();
     const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
@@ -130,6 +134,33 @@ export function BuilderToolbar({
                         >
                             <LayoutDashboard className="mr-1 h-4 w-4" />
                             Canvas
+                        </Button>
+                    </div>
+
+                    <div className="flex rounded-md border">
+                        <Button
+                            onClick={() => onEditorModeChange?.('simple')}
+                            variant={
+                                editorMode === 'simple' ? 'default' : 'ghost'
+                            }
+                            size="sm"
+                            className="rounded-r-none"
+                            title="Simple editor mode"
+                        >
+                            <Sparkles className="mr-1 h-4 w-4" />
+                            Simple
+                        </Button>
+                        <Button
+                            onClick={() => onEditorModeChange?.('advanced')}
+                            variant={
+                                editorMode === 'advanced' ? 'default' : 'ghost'
+                            }
+                            size="sm"
+                            className="rounded-l-none"
+                            title="Advanced editor mode"
+                        >
+                            <SlidersHorizontal className="mr-1 h-4 w-4" />
+                            Advanced
                         </Button>
                     </div>
 

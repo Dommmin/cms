@@ -22,6 +22,7 @@ export function BlocksList({
     expandedBlocks,
     activeBlockId = null,
     availableBlockTypes,
+    editorMode,
     onAddBlock,
     onAddReusableBlock,
     onPasteBlock,
@@ -118,6 +119,7 @@ export function BlocksList({
                     expandedBlocks={expandedBlocks}
                     activeBlockId={activeBlockId}
                     availableBlockTypes={availableBlockTypes}
+                    editorMode={editorMode}
                     onMoveBlock={onMoveBlock}
                     onToggleBlock={onToggleBlock}
                     onDeleteBlock={onDeleteBlock}
