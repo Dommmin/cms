@@ -1,4 +1,5 @@
 import { $createCodeNode, $isCodeNode, getDefaultCodeLanguage } from '@lexical/code';
+import { $generateHtmlFromNodes } from '@lexical/html';
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link';
 import {
     $isListNode,
@@ -44,9 +45,12 @@ import { $createCollapsibleContainerNode, $createCollapsibleTitleNode, $createCo
 import { $createLayoutContainerNode, $createLayoutItemNode } from '../../layout-nodes';
 import { getEditorLinkTarget, isAllowedEditorLinkUrl, normalizeEditorLinkUrl } from '../../link-url';
 import ShortcutsDialog from '../ShortcutsDialog';
+import { createRteSnippet, loadRteSnippets, saveRteSnippets } from '../snippets-storage';
+import type { RteSnippet } from '../snippets-storage.types';
+import { INSERT_SNIPPET_COMMAND } from '../SnippetsPlugin';
 import { CODE_LANGUAGES, ELEMENT_FORMAT_NUM_TO_TYPE } from './constants';
 import { ToolbarSeparator as Sep } from './controls';
-import { EmbedDialog, EmojiDialog, LinkDialog, SpecialCharactersDialog, TableDialog } from './dialogs';
+import { EmbedDialog, EmojiDialog, LinkDialog, SnippetsDialog, SpecialCharactersDialog, TableDialog } from './dialogs';
 import { AlignmentGroup, FontStyleGroup, HistoryGroup, InlineFormatGroup, LinkGroup } from './groups';
 import { BlockTypeMenu, InsertMenu } from './menus';
 import type { BlockType, InsertDialog, ToolbarPluginProps, ToolbarState } from './types';
@@ -91,6 +95,9 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
     const [tableRows, setTableRows] = useState(3);
     const [tableCols, setTableCols] = useState(3);
     const [shortcutsOpen, setShortcutsOpen] = useState(false);
+    const [snippets, setSnippets] = useState<RteSnippet[]>([]);
+    const [snippetName, setSnippetName] = useState('');
+    const [snippetError, setSnippetError] = useState<string | null>(null);
 
     const updateToolbar = useCallback(() => {
         editor.getEditorState().read(() => {
@@ -481,6 +488,49 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
         });
     }, [editor]);
 
+    const handleSaveSnippet = useCallback(() => {
+        let html = '';
+
+        editor.getEditorState().read(() => {
+            const selection = $getSelection();
+
+            if (!$isRangeSelection(selection) || selection.isCollapsed()) return;
+
+            html = $generateHtmlFromNodes(editor, selection);
+        });
+
+        if (html.trim() === '') {
+            setSnippetError(__('rte.dialog.snippets.select_content', 'Select content in the editor before saving a snippet.'));
+            return;
+        }
+
+        const name = snippetName.trim() || __('rte.dialog.snippets.default_name', 'Untitled snippet');
+        const next = [createRteSnippet(name, html), ...snippets].slice(0, 50);
+
+        saveRteSnippets(next);
+        setSnippets(next);
+        setSnippetName('');
+        setSnippetError(null);
+    }, [__, editor, snippetName, snippets]);
+
+    const handleInsertSnippet = useCallback((snippet: RteSnippet) => {
+        editor.dispatchCommand(INSERT_SNIPPET_COMMAND, snippet.html);
+        setInsertDialog(null);
+    }, [editor]);
+
+    const handleDeleteSnippet = useCallback((snippet: RteSnippet) => {
+        const next = snippets.filter((item) => item.id !== snippet.id);
+
+        saveRteSnippets(next);
+        setSnippets(next);
+    }, [snippets]);
+
+    const openSnippetsDialog = useCallback(() => {
+        setSnippets(loadRteSnippets());
+        setSnippetError(null);
+        setInsertDialog('snippets');
+    }, []);
+
     // ─── Render ────────────────────────────────────────────────────────────────
 
     const { canUndo, canRedo, blockType, elementFormat, isBold, isItalic, isUnderline, isStrikethrough, isCode, isSubscript, isSuperscript, isHighlight, isLink, codeLanguage, fontSize, fontFamily, fontColor, highlightColor } = state;
@@ -601,6 +651,7 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
                             onInsertCallout={handleInsertCallout}
                             onInsertColumns={handleInsertColumns}
                             onInsertCollapsible={handleInsertCollapsible}
+                            onOpenSnippetsDialog={openSnippetsDialog}
                             onOpenEmojiDialog={() => setInsertDialog('emoji')}
                             onOpenSpecialCharactersDialog={() => setInsertDialog('special')}
                         />
@@ -688,6 +739,24 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
                 onRowsChange={setTableRows}
                 onColumnsChange={setTableCols}
                 onInsert={handleInsertTable}
+            />
+
+            <SnippetsDialog
+                open={insertDialog === 'snippets'}
+                snippets={snippets}
+                name={snippetName}
+                error={snippetError}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setInsertDialog(null);
+                        setSnippetName('');
+                        setSnippetError(null);
+                    }
+                }}
+                onNameChange={setSnippetName}
+                onSaveSelection={handleSaveSnippet}
+                onInsert={handleInsertSnippet}
+                onDelete={handleDeleteSnippet}
             />
 
             <SpecialCharactersDialog

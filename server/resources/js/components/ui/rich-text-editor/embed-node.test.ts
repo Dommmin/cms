@@ -42,6 +42,9 @@ describe('EmbedNode', () => {
         expect(detectEmbed('https://open.spotify.com/track/abc123')?.embedUrl).toBe('https://open.spotify.com/embed/track/abc123');
         expect(detectEmbed('https://www.loom.com/share/abc123')?.embedUrl).toBe('https://www.loom.com/embed/abc123');
         expect(detectEmbed('https://www.tiktok.com/@user/video/123456789')?.embedUrl).toBe('https://www.tiktok.com/embed/v2/123456789');
+        expect(detectEmbed('https://www.instagram.com/p/abc123/')?.renderMode).toBe('link');
+        expect(detectEmbed('https://x.com/example/status/123456789')?.platform).toBe('twitter');
+        expect(detectEmbed('https://twitter.com/example/statuses/123456789')?.renderMode).toBe('link');
     });
 
     it('rejects unsupported or unsafe embed URLs', () => {
@@ -64,6 +67,7 @@ describe('EmbedNode', () => {
             sourceUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
             embedUrl: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
             label: 'YouTube video',
+            renderMode: 'iframe',
         });
     });
 
@@ -77,5 +81,18 @@ describe('EmbedNode', () => {
         expect(iframe?.getAttribute('src')).toBe('https://player.vimeo.com/video/123456');
         expect(iframe?.getAttribute('sandbox')).toContain('allow-scripts');
         expect(iframe?.getAttribute('loading')).toBe('lazy');
+    });
+
+    it('exports social embeds as safe placeholder links', () => {
+        const element = exportElement('https://www.instagram.com/reel/abc123/');
+        const link = element.querySelector('a');
+
+        expect(element.tagName).toBe('FIGURE');
+        expect(element.getAttribute('data-rte-embed')).toBe('true');
+        expect(element.getAttribute('data-embed-platform')).toBe('instagram');
+        expect(element.querySelector('iframe')).toBeNull();
+        expect(link?.getAttribute('href')).toBe('https://www.instagram.com/reel/abc123/');
+        expect(link?.getAttribute('target')).toBe('_blank');
+        expect(link?.getAttribute('rel')).toBe('noopener noreferrer');
     });
 });

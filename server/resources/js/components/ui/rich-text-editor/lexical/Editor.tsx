@@ -28,6 +28,7 @@ import HtmlPlugin from './plugins/HtmlPlugin';
 import MarkdownPlugin from './plugins/MarkdownPlugin';
 import PasteSanitizerPlugin from './plugins/PasteSanitizerPlugin';
 import SlashCommandPlugin from './plugins/SlashCommandPlugin';
+import SnippetsPlugin from './plugins/SnippetsPlugin';
 import TableActionMenuPlugin from './plugins/TableActionMenuPlugin';
 import ToolbarPlugin from './plugins/ToolbarPlugin';
 import WordCountPlugin from './plugins/WordCountPlugin';
@@ -95,6 +96,7 @@ export default function Editor({ value, onChange, onJsonChange, placeholder = 'S
                 {editable && <PasteSanitizerPlugin />}
                 {editable && <ClipboardImagePlugin />}
                 {editable && <SlashCommandPlugin />}
+                {editable && <SnippetsPlugin />}
                 {/* eslint-disable-next-line react-hooks/refs */}
                 {editable && <DraggableBlockPlugin anchorElem={containerRef.current ?? undefined} />}
                 <HtmlPlugin value={value} onChange={onChange} onJsonChange={onJsonChange} instanceKey={instanceKey} />

@@ -196,6 +196,8 @@ Status 2026-05-24: **wdrożone w pierwszym pełnym zakresie**. Crop modal ma zoo
 
 ## Priorytet 4 — RTE Embeds: oEmbed / Instagram / Twitter/X
 
+Status: wdrożono bezpieczny wariant bez backendowego oEmbed. Instagram i Twitter/X są rozpoznawane przez `EmbedNode`, ale eksportują placeholder z linkiem zamiast iframe/HTML z zewnętrznego oEmbed. Dzięki temu nie wymagają tokenów i nie rozszerzają whitelisty `URI.SafeIframeRegexp`.
+
 Obecnie `EmbedNode` obsługuje bezpieczne iframe URL-e dla:
 
 - YouTube
@@ -204,11 +206,14 @@ Obecnie `EmbedNode` obsługuje bezpieczne iframe URL-e dla:
 - Loom
 - TikTok
 
-Brakuje:
+Uzupełniono:
 
 - Instagram
 - Twitter/X
-- backendowego oEmbed/proxy z cache.
+
+Nie dodano:
+
+- backendowego oEmbed/proxy z cache, bo dla Instagram i Twitter/X stabilniejszy jest bezpieczny placeholder + link.
 
 ### Pliki Startowe
 
@@ -233,12 +238,14 @@ GET /admin/embed/oembed?url=https://...
 
 ### Akceptacja
 
-- YouTube/Vimeo/Spotify/Loom/TikTok dalej działają.
-- Instagram/Twitter/X nie wprowadzają unsafe HTML.
-- Sanitizer blokuje obce iframe.
-- Testy pokrywają supported i unsupported providers.
+- [x] YouTube/Vimeo/Spotify/Loom/TikTok dalej działają.
+- [x] Instagram/Twitter/X nie wprowadzają unsafe HTML.
+- [x] Sanitizer blokuje obce iframe.
+- [x] Testy pokrywają supported i unsupported providers.
 
 ## Priorytet 5 — RTE Snippets
+
+Status: wdrożono pierwszą iterację localStorage bez DB. `Insert > Snippets` pozwala zapisać aktualne zaznaczenie jako HTML snippet i wstawić zapisany snippet w bieżącej pozycji kursora.
 
 ### Cel
 
@@ -263,9 +270,9 @@ Użytkownik może zapisać zaznaczony fragment jako snippet i wstawić go późn
 
 ### Akceptacja
 
-- Można zapisać zaznaczenie jako snippet.
-- Można wstawić snippet w bieżącej pozycji kursora.
-- Snippety przeżywają reload przeglądarki.
+- [x] Można zapisać zaznaczenie jako snippet.
+- [x] Można wstawić snippet w bieżącej pozycji kursora.
+- [x] Snippety przeżywają reload przeglądarki.
 
 ## Priorytet 6 — Link Autocomplete + Broken Link Health
 

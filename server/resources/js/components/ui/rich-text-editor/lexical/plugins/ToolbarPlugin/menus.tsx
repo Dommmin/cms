@@ -1,4 +1,4 @@
-import { AlertCircle, ChevronDown, ChevronRight, Columns2, Columns3, FileText, Hash, Image, Images, Minus, Plus, Smile, Table, Video } from 'lucide-react';
+import { AlertCircle, BookMarked, ChevronDown, ChevronRight, Columns2, Columns3, FileText, Hash, Image, Images, Minus, Plus, Smile, Table, Video } from 'lucide-react';
 import { Fragment, type JSX } from 'react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -53,6 +53,7 @@ export function InsertMenu({
     onInsertCallout,
     onInsertColumns,
     onInsertCollapsible,
+    onOpenSnippetsDialog,
     onOpenEmojiDialog,
     onOpenSpecialCharactersDialog,
 }: InsertMenuProps): JSX.Element {
@@ -90,6 +91,9 @@ export function InsertMenu({
                 </DropdownMenuItem>
                 <DropdownMenuItem className="gap-2 text-xs" onClick={onOpenEmbedDialog}>
                     <Video size={14} /> {__('rte.insert.embed', 'Embed')}
+                </DropdownMenuItem>
+                <DropdownMenuItem className="gap-2 text-xs" onClick={onOpenSnippetsDialog}>
+                    <BookMarked size={14} /> {__('rte.insert.snippets', 'Snippets')}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="gap-2 text-xs" onClick={onOpenTableDialog}>

@@ -66,14 +66,18 @@ describe('HtmlSanitizerService', function (): void {
     it('preserves safe RTE embeds and strips unsafe iframe sources', function (): void {
         $sanitizer = resolve(HtmlSanitizerService::class);
 
-        $html = '<figure data-rte-embed="true" data-embed-platform="vimeo"><iframe src="https://player.vimeo.com/video/123456" title="Vimeo video" loading="lazy" allowfullscreen="true" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"></iframe><figcaption>Vimeo</figcaption></figure><iframe src="https://evil.test/embed/1"></iframe>';
+        $html = '<figure data-rte-embed="true" data-embed-platform="vimeo"><iframe src="https://player.vimeo.com/video/123456" title="Vimeo video" loading="lazy" allowfullscreen="true" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"></iframe><figcaption>Vimeo</figcaption></figure><figure data-rte-embed="true" data-embed-platform="instagram"><a href="https://www.instagram.com/p/abc123/" target="_blank" rel="noopener noreferrer">View Instagram post</a><figcaption>Instagram</figcaption></figure><iframe src="https://evil.test/embed/1"></iframe><iframe src="https://www.instagram.com/p/abc123/embed"></iframe><iframe src="https://x.com/example/status/123456789"></iframe>';
         $clean = $sanitizer->sanitize($html);
 
         expect($clean)->toContain('data-rte-embed="true"')
             ->and($clean)->toContain('data-embed-platform="vimeo"')
             ->and($clean)->toContain('https://player.vimeo.com/video/123456')
+            ->and($clean)->toContain('data-embed-platform="instagram"')
+            ->and($clean)->toContain('https://www.instagram.com/p/abc123/')
             ->and($clean)->toContain('sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"')
-            ->and($clean)->not->toContain('https://evil.test/embed/1');
+            ->and($clean)->not->toContain('https://evil.test/embed/1')
+            ->and($clean)->not->toContain('https://www.instagram.com/p/abc123/embed')
+            ->and($clean)->not->toContain('https://x.com/example/status/123456789');
     });
 
     it('returns null for null input', function (): void {

@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { useTranslation } from '@/hooks/use-translation';
 import { detectEmbed } from '../../../embed-node';
 import { EMOJIS, SPECIAL_CHARS } from './constants';
-import type { CharacterDialogProps, EmbedDialogProps, InternalLinkSearchResult, LinkDialogProps, LinkDialogTab, TableDialogProps } from './types';
+import type { CharacterDialogProps, EmbedDialogProps, InternalLinkSearchResult, LinkDialogProps, LinkDialogTab, SnippetsDialogProps, TableDialogProps } from './types';
 
 export function LinkDialog({ open, url, isInvalid, onOpenChange, onUrlChange, onInternalSelect, onInsert }: LinkDialogProps): JSX.Element {
     const __ = useTranslation();
@@ -160,14 +160,14 @@ export function EmbedDialog({ open, url, onOpenChange, onUrlChange, onInsert }: 
                         </Label>
                         <Input
                             id="embed-url"
-                            placeholder="YouTube, Vimeo, Spotify, Loom or TikTok URL"
+                            placeholder="YouTube, Vimeo, Spotify, Loom, TikTok, Instagram or X URL"
                             value={url}
                             onChange={(e) => onUrlChange(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && onInsert()}
                             autoFocus
                         />
                     </div>
-                    {url && !detectedEmbed && <p className="text-xs text-destructive">{__('rte.dialog.embed.invalid_url', 'Use a supported HTTPS embed URL from YouTube, Vimeo, Spotify, Loom or TikTok.')}</p>}
+                    {url && !detectedEmbed && <p className="text-xs text-destructive">{__('rte.dialog.embed.invalid_url', 'Use a supported HTTPS embed URL from YouTube, Vimeo, Spotify, Loom, TikTok, Instagram or X.')}</p>}
                     {detectedEmbed && <p className="text-xs text-muted-foreground">{__('rte.dialog.embed.detected', 'Detected')}: {detectedEmbed.label}</p>}
                 </div>
                 <DialogFooter>
@@ -214,6 +214,62 @@ export function TableDialog({ open, rows, columns, onOpenChange, onRowsChange, o
                         {__('common.insert', 'Insert')}
                     </Button>
                 </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+export function SnippetsDialog({ open, snippets, name, error, onOpenChange, onNameChange, onSaveSelection, onInsert, onDelete }: SnippetsDialogProps): JSX.Element {
+    const __ = useTranslation();
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                    <DialogTitle>{__('rte.dialog.snippets.title', 'Snippets')}</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-2">
+                    <div className="grid gap-2 rounded-md border p-3">
+                        <Label htmlFor="snippet-name" className="text-xs">
+                            {__('rte.dialog.snippets.name', 'Snippet name')}
+                        </Label>
+                        <div className="flex gap-2">
+                            <Input
+                                id="snippet-name"
+                                value={name}
+                                onChange={(event) => onNameChange(event.target.value)}
+                                placeholder={__('rte.dialog.snippets.name_placeholder', 'Reusable intro, CTA, disclaimer...')}
+                            />
+                            <Button type="button" onClick={onSaveSelection}>
+                                {__('rte.dialog.snippets.save_selection', 'Save selection')}
+                            </Button>
+                        </div>
+                        {error && <p className="text-xs text-destructive">{error}</p>}
+                    </div>
+
+                    <div className="max-h-72 overflow-y-auto rounded-md border">
+                        {snippets.length === 0 ? (
+                            <p className="px-3 py-6 text-center text-xs text-muted-foreground">{__('rte.dialog.snippets.empty', 'No snippets saved yet.')}</p>
+                        ) : (
+                            snippets.map((snippet) => (
+                                <div key={snippet.id} className="flex items-center justify-between gap-3 border-b px-3 py-2 last:border-b-0">
+                                    <div className="min-w-0">
+                                        <p className="truncate text-sm font-medium">{snippet.name}</p>
+                                        <p className="text-xs text-muted-foreground">{new Date(snippet.createdAt).toLocaleString()}</p>
+                                    </div>
+                                    <div className="flex shrink-0 gap-1">
+                                        <Button type="button" size="sm" variant="outline" onClick={() => onInsert(snippet)}>
+                                            {__('common.insert', 'Insert')}
+                                        </Button>
+                                        <Button type="button" size="sm" variant="ghost" onClick={() => onDelete(snippet)}>
+                                            {__('common.delete', 'Delete')}
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
             </DialogContent>
         </Dialog>
     );

@@ -17,6 +17,8 @@ const PLATFORM_LABELS: Record<EmbedPlatform, string> = {
     spotify: 'Spotify',
     loom: 'Loom',
     tiktok: 'TikTok',
+    instagram: 'Instagram',
+    twitter: 'Twitter/X',
 };
 
 function safeUrl(input: string): URL | null {
@@ -61,6 +63,7 @@ function detectYouTube(url: URL, sourceUrl: string): EmbedDefinition | null {
         sourceUrl,
         embedUrl: `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}`,
         label: 'YouTube video',
+        renderMode: 'iframe',
     };
 }
 
@@ -77,6 +80,7 @@ function detectVimeo(url: URL, sourceUrl: string): EmbedDefinition | null {
         sourceUrl,
         embedUrl: `https://player.vimeo.com/video/${id}`,
         label: 'Vimeo video',
+        renderMode: 'iframe',
     };
 }
 
@@ -100,6 +104,7 @@ function detectSpotify(url: URL, sourceUrl: string): EmbedDefinition | null {
         sourceUrl,
         embedUrl: `https://open.spotify.com/embed/${type}/${id}`,
         label: `Spotify ${type}`,
+        renderMode: 'iframe',
     };
 }
 
@@ -117,6 +122,7 @@ function detectLoom(url: URL, sourceUrl: string): EmbedDefinition | null {
         sourceUrl,
         embedUrl: `https://www.loom.com/embed/${id}`,
         label: 'Loom video',
+        renderMode: 'iframe',
     };
 }
 
@@ -133,6 +139,51 @@ function detectTikTok(url: URL, sourceUrl: string): EmbedDefinition | null {
         sourceUrl,
         embedUrl: `https://www.tiktok.com/embed/v2/${match[1]}`,
         label: 'TikTok video',
+        renderMode: 'iframe',
+    };
+}
+
+function detectInstagram(url: URL, sourceUrl: string): EmbedDefinition | null {
+    if (!hostIncludes(url, 'instagram.com')) {
+        return null;
+    }
+
+    const parts = url.pathname.split('/').filter(Boolean);
+    const type = parts[0];
+    const id = parts[1];
+
+    if (!id || !['p', 'reel', 'tv'].includes(type ?? '')) {
+        return null;
+    }
+
+    return {
+        platform: 'instagram',
+        sourceUrl,
+        embedUrl: null,
+        label: 'Instagram post',
+        renderMode: 'link',
+    };
+}
+
+function detectTwitter(url: URL, sourceUrl: string): EmbedDefinition | null {
+    if (!hostIncludes(url, 'twitter.com') && !hostIncludes(url, 'x.com')) {
+        return null;
+    }
+
+    const parts = url.pathname.split('/').filter(Boolean);
+    const statusIndex = parts.findIndex((part) => part === 'status' || part === 'statuses');
+    const id = statusIndex >= 0 ? parts[statusIndex + 1] : null;
+
+    if (!id || !/^\d+$/.test(id)) {
+        return null;
+    }
+
+    return {
+        platform: 'twitter',
+        sourceUrl,
+        embedUrl: null,
+        label: 'Twitter/X post',
+        renderMode: 'link',
     };
 }
 
@@ -145,10 +196,30 @@ export function detectEmbed(input: string): EmbedDefinition | null {
         ?? detectVimeo(url, normalized)
         ?? detectSpotify(url, normalized)
         ?? detectLoom(url, normalized)
-        ?? detectTikTok(url, normalized);
+        ?? detectTikTok(url, normalized)
+        ?? detectInstagram(url, normalized)
+        ?? detectTwitter(url, normalized);
 }
 
 function EmbedComponent({ definition }: { definition: EmbedDefinition }): JSX.Element {
+    if (definition.renderMode === 'link' || !definition.embedUrl) {
+        return (
+            <figure contentEditable={false} className="my-4 rounded-lg border bg-muted/30 p-4" data-rte-embed data-embed-platform={definition.platform}>
+                <a
+                    href={definition.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                >
+                    View {definition.label}
+                </a>
+                <figcaption className="mt-1 text-xs text-muted-foreground">
+                    {PLATFORM_LABELS[definition.platform]}
+                </figcaption>
+            </figure>
+        );
+    }
+
     return (
         <figure contentEditable={false} className="my-4" data-rte-embed data-embed-platform={definition.platform}>
             <div className="relative aspect-video w-full overflow-hidden rounded-lg border bg-muted">
@@ -192,6 +263,7 @@ export class EmbedNode extends DecoratorNode<JSX.Element> {
             sourceUrl: serialized.sourceUrl,
             embedUrl: serialized.embedUrl,
             label: serialized.label,
+            renderMode: serialized.renderMode ?? (serialized.embedUrl ? 'iframe' : 'link'),
         });
     }
 
@@ -217,6 +289,21 @@ export class EmbedNode extends DecoratorNode<JSX.Element> {
         wrapper.setAttribute('data-rte-embed', 'true');
         wrapper.setAttribute('data-embed-platform', this.__definition.platform);
         wrapper.style.cssText = 'margin:1rem 0;';
+
+        if (this.__definition.renderMode === 'link' || !this.__definition.embedUrl) {
+            const link = document.createElement('a');
+            link.setAttribute('href', this.__definition.sourceUrl);
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener noreferrer');
+            link.textContent = `View ${this.__definition.label}`;
+
+            const caption = document.createElement('figcaption');
+            caption.textContent = PLATFORM_LABELS[this.__definition.platform];
+
+            wrapper.append(link, caption);
+
+            return { element: wrapper };
+        }
 
         const iframe = document.createElement('iframe');
         iframe.setAttribute('src', this.__definition.embedUrl);

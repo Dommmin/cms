@@ -2,9 +2,10 @@ import type {
     ElementFormatType,
 } from 'lexical';
 import type { ReactNode } from 'react';
+import type { RteSnippet } from '../snippets-storage.types';
 
 export type BlockType = 'paragraph' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'quote' | 'code' | 'bullet' | 'number' | 'check';
-export type InsertDialog = 'image' | 'embed' | 'table' | 'emoji' | 'special' | null;
+export type InsertDialog = 'image' | 'embed' | 'table' | 'emoji' | 'special' | 'snippets' | null;
 export type LinkDialogTab = 'url' | 'internal';
 
 export type InternalLinkSearchResult = {
@@ -65,6 +66,18 @@ export type TableDialogProps = {
     onInsert: () => void;
 };
 
+export type SnippetsDialogProps = {
+    open: boolean;
+    snippets: RteSnippet[];
+    name: string;
+    error: string | null;
+    onOpenChange: (open: boolean) => void;
+    onNameChange: (name: string) => void;
+    onSaveSelection: () => void;
+    onInsert: (snippet: RteSnippet) => void;
+    onDelete: (snippet: RteSnippet) => void;
+};
+
 export type CharacterDialogProps = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -86,6 +99,7 @@ export type InsertMenuProps = {
     onInsertCallout: () => void;
     onInsertColumns: (templateColumns: string) => void;
     onInsertCollapsible: () => void;
+    onOpenSnippetsDialog: () => void;
     onOpenEmojiDialog: () => void;
     onOpenSpecialCharactersDialog: () => void;
 };

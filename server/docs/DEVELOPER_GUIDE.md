@@ -2060,6 +2060,7 @@ Errors:
 | `HtmlPlugin`               | Serializes/deserializes HTML                                   |
 | `MarkdownPlugin`           | Markdown shortcut transforms                                   |
 | `PasteSanitizerPlugin`     | Cleans pasted HTML before Lexical imports it                   |
+| `SnippetsPlugin`           | Inserts reusable localStorage snippets at the current selection |
 | `ContentHealthPlugin`      | Analyzes serialized editor state and displays local warnings    |
 | `CopyCodePlugin`           | Injects "Copy" button on `<code>` blocks via MutationObserver  |
 | `WordCountPlugin`          | Shows word + character count in footer                         |
@@ -2071,7 +2072,7 @@ RTE media nodes are registered in `lexical/nodes.ts`:
 - `ImageNode` stores `mediaId`, `src`, `altText`, `caption`, `credit`, `layout`, `wrap`, `sizePreset`, `decorative`, `linkUrl`, `loading`, and optional focal point metadata. HTML export uses `<figure data-rte-image>`.
 - `ImageGalleryNode` stores ordered image assets with captions, desktop/mobile columns, gap, aspect ratio and lightbox metadata. HTML export uses `<figure data-rte-gallery data-columns="...">`.
 - `AttachmentNode` stores media ID, URL, public name, file name, MIME type, size, and optional description. HTML export uses `<a data-rte-attachment>`.
-- `EmbedNode` stores the original URL, normalized iframe URL, provider and label for supported HTTPS embeds. HTML export uses `<figure data-rte-embed data-embed-platform="...">` with safe iframes for YouTube, Vimeo, Spotify, Loom and TikTok.
+- `EmbedNode` stores the original URL, provider, label and render mode for supported HTTPS embeds. HTML export uses `<figure data-rte-embed data-embed-platform="...">` with safe iframes for YouTube, Vimeo, Spotify, Loom and TikTok, and safe link placeholders for Instagram and Twitter/X.
 
 `MediaPickerModal` supports explicit modes: `image`, `gallery`, `file`, `video`, and `any`. The admin media search endpoint returns RTE metadata fields (`alt`, `caption`, `credit`, `width`, `height`, `thumb_url`) and accepts `mime_types[]` filtering.
 
@@ -2080,6 +2081,8 @@ RTE media nodes are registered in `lexical/nodes.ts`:
 Internal links use `RteLinkController::search` via the `admin.rte.links.search` route. Results include `type`, `id`, `label`, `meta`, and locale-aware public `url`.
 
 RTE HTML must remain inside the `HtmlSanitizerService` default allowlist. Add new public node attributes to `config/purifier.php` `HTML.Allowed` and `custom_attributes`, keep iframe sources constrained with `URI.SafeIframeRegexp`, then cover them in `tests/Feature/HtmlSanitizationTest.php`.
+
+Snippets are intentionally browser-local in the first iteration. `snippets-storage.ts` persists `{ id, name, html, createdAt }` under `cms:rte:snippets:v1`; `SnippetsPlugin` imports the stored HTML through Lexical DOM conversion instead of writing raw HTML into the document.
 
 ### Adding a new node type
 
