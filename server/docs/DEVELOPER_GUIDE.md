@@ -1530,6 +1530,10 @@ Inline text editing is intentionally limited to scalar configuration fields: `ti
 
 `PageBuilder` owns `editorMode: 'simple' | 'advanced'` and passes it through toolbar, cards, canvas inspector, section forms and block forms. Simple mode switches to Canvas and filters `DynamicBlockForm` to primary scalar fields plus media relations; it hides linked-content, section animation and block Advanced controls. Advanced mode renders the full schema-driven form. The mode only changes UI visibility and must not delete keys from `block.configuration`, `block.relations` or `section.settings`.
 
+### Image Crop Variants
+
+`MediaController::crop()` accepts natural-pixel crop coordinates, validates that the target media is an image, and stores generated variants in the same media collection with `crop_of`, `crop_params`, `crop_variant`, `width` and `height` custom properties. `MediaIndexQuery` exposes those variants as `crop_variants` for the original media item. RTE `ImageNode` stores `cropVariants`, `cropVariantId` and `cropVariant`; the metadata popover can switch `src`/`mediaId` to a selected variant while preserving alt text, caption, credit, link and loading settings.
+
 ### Health
 
 `resources/js/features/page-builder/page-health.ts` analyzes the current client-side builder snapshot. It checks active sections/blocks for primary H1 coverage, duplicate H1s, CTA label/URL mismatches, raw HTML anchors without `href`, and image relations missing `metadata.alt`. Add new block-specific content quality rules there and cover them with Vitest tests in `page-health.test.ts`.

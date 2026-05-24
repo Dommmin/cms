@@ -12,6 +12,16 @@ export type RteMediaAsset = {
     focalPoint: { x: number; y: number } | null;
 };
 
+export type MediaCropVariant = {
+    id: number;
+    url: string;
+    label: string;
+    variant: string;
+    width: number | null;
+    height: number | null;
+    focal_point?: { x: number; y: number } | null;
+};
+
 export type MediaItem = {
     id: number;
     name: string;
@@ -27,6 +37,11 @@ export type MediaItem = {
     height?: number | null;
     thumb_url?: string | null;
     thumbnail_url?: string | null;
+    crop_of?: string | number | null;
+    crop_params?: Record<string, unknown> | null;
+    crop_variant?: string | null;
+    crop_variants?: MediaCropVariant[];
+    focal_point?: { x: number; y: number } | null;
     created_at: string;
 };
 export type SelectedImage = {

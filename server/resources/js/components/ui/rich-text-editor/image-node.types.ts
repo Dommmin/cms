@@ -18,6 +18,16 @@ export type ImageFocalPoint = {
     y: number;
 };
 
+export type ImageCropVariant = {
+    id: number;
+    url: string;
+    label: string;
+    variant: string;
+    width: number | null;
+    height: number | null;
+    focalPoint?: ImageFocalPoint | null;
+};
+
 export type SerializedImageNode = Spread<
     {
         src: string;
@@ -35,6 +45,9 @@ export type SerializedImageNode = Spread<
         linkUrl?: string | null;
         loading?: ImageLoading;
         filters?: ImageFilters | null;
+        cropVariants?: ImageCropVariant[];
+        cropVariantId?: number | null;
+        cropVariant?: string | null;
     },
     SerializedLexicalNode
 >;
@@ -55,9 +68,12 @@ export type CreateImageNodePayload = {
     linkUrl?: string | null;
     loading?: ImageLoading;
     filters?: ImageFilters | null;
+    cropVariants?: ImageCropVariant[];
+    cropVariantId?: number | null;
+    cropVariant?: string | null;
 };
 
-export type ImageNodeState = Required<Omit<CreateImageNodePayload, 'width' | 'mediaId' | 'caption' | 'credit' | 'focalPoint' | 'linkUrl' | 'filters'>> & {
+export type ImageNodeState = Required<Omit<CreateImageNodePayload, 'width' | 'mediaId' | 'caption' | 'credit' | 'focalPoint' | 'linkUrl' | 'filters' | 'cropVariantId' | 'cropVariant'>> & {
     width?: string;
     mediaId: number | null;
     caption: string | null;
@@ -65,6 +81,8 @@ export type ImageNodeState = Required<Omit<CreateImageNodePayload, 'width' | 'me
     focalPoint: ImageFocalPoint | null;
     linkUrl: string | null;
     filters: ImageFilters | null;
+    cropVariantId: number | null;
+    cropVariant: string | null;
 };
 
 export type ImageComponentProps = ImageNodeState & {

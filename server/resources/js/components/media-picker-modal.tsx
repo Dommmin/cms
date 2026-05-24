@@ -652,7 +652,33 @@ export function MediaPickerModal({
                     onClose={() => setEditingImage(null)}
                     imageUrl={editingImage.url}
                     mediaId={editingImage.id}
-                    onCropComplete={(_result) => {
+                    onCropComplete={(result) => {
+                        const croppedItem: MediaItem = {
+                            id: result.id,
+                            name: result.crop_variant,
+                            file_name: result.crop_variant,
+                            mime_type: 'image/jpeg',
+                            size: 0,
+                            url: result.url,
+                            width: result.width,
+                            height: result.height,
+                            crop_of: result.crop_of,
+                            crop_params: result.crop_params,
+                            crop_variant: result.crop_variant,
+                            focal_point: result.focal_point,
+                            created_at: new Date().toISOString(),
+                        };
+
+                        setMedia((current) =>
+                            current
+                                ? {
+                                      ...current,
+                                      data: [croppedItem, ...current.data],
+                                      total: current.total + 1,
+                                  }
+                                : current,
+                        );
+                        onSelect(croppedItem);
                         setEditingImage(null);
                     }}
                 />

@@ -84,6 +84,7 @@ class MediaController extends Controller
         $y = (float) $validated['y'];
         $width = (float) $validated['width'];
         $height = (float) $validated['height'];
+        $zoom = (float) ($validated['zoom'] ?? 1);
         $rotate = (int) ($validated['rotate'] ?? 0);
         $aspectRatio = $validated['aspect_ratio'] ?? 'free';
         $focalPoint = $validated['focal_point'] ?? null;
@@ -95,13 +96,27 @@ class MediaController extends Controller
             $image = $image->rotate($rotate);
         }
 
-        $image = $image->crop((int) $width, (int) $height, (int) $x, (int) $y);
+        $sourceWidth = $image->getWidth();
+        $sourceHeight = $image->getHeight();
+        $cropX = max(0, min((int) round($x), $sourceWidth - 1));
+        $cropY = max(0, min((int) round($y), $sourceHeight - 1));
+        $cropWidth = max(1, min((int) round($width), $sourceWidth - $cropX));
+        $cropHeight = max(1, min((int) round($height), $sourceHeight - $cropY));
 
-        if ($aspectRatio !== 'free') {
-            str_replace(':', '_', $aspectRatio);
-        }
+        $image = $image->manualCrop($cropWidth, $cropHeight, $cropX, $cropY);
 
         $cmsMedia = CmsMedia::query()->findOrFail($media->model_id);
+        $cropVariant = $aspectRatio === 'free' ? 'free' : str_replace(':', '_', $aspectRatio);
+        $cropParams = [
+            'x' => $cropX,
+            'y' => $cropY,
+            'width' => $cropWidth,
+            'height' => $cropHeight,
+            'rotate' => $rotate,
+            'zoom' => $zoom,
+            'aspect_ratio' => $aspectRatio,
+            'variant' => $cropVariant,
+        ];
 
         $tempPath = sys_get_temp_dir().'/crop_'.$media->id.'_'.time().'.jpg';
         $image->save($tempPath);
@@ -113,14 +128,10 @@ class MediaController extends Controller
                 'description' => $media->getCustomProperty('description', ''),
                 'author' => $media->getCustomProperty('author', ''),
                 'crop_of' => (string) $media->id,
-                'crop_params' => json_encode([
-                    'x' => $x,
-                    'y' => $y,
-                    'width' => $width,
-                    'height' => $height,
-                    'rotate' => $rotate,
-                    'aspect_ratio' => $aspectRatio,
-                ]),
+                'crop_params' => $cropParams,
+                'crop_variant' => $cropVariant,
+                'width' => $cropWidth,
+                'height' => $cropHeight,
             ])
             ->toMediaCollection($media->collection_name);
 
@@ -141,9 +152,12 @@ class MediaController extends Controller
             'thumb_url' => $newMedia->hasGeneratedConversion('thumbnail')
                 ? $newMedia->getUrl('thumbnail')
                 : null,
-            'width' => $newMedia->getCustomProperty('width'),
-            'height' => $newMedia->getCustomProperty('height'),
+            'width' => $cropWidth,
+            'height' => $cropHeight,
             'crop_of' => $media->id,
+            'crop_params' => $cropParams,
+            'crop_variant' => $cropVariant,
+            'focal_point' => $focalPoint,
         ]);
     }
 

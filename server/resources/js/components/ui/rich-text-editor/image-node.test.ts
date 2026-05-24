@@ -48,6 +48,19 @@ describe('ImageNode', () => {
             decorative: false,
             linkUrl: '/en/story',
             loading: 'lazy',
+            cropVariantId: 43,
+            cropVariant: '16_9',
+            cropVariants: [
+                {
+                    id: 43,
+                    url: '/storage/hero-16-9.jpg',
+                    label: '16_9',
+                    variant: '16_9',
+                    width: 1600,
+                    height: 900,
+                    focalPoint: { x: 0.5, y: 0.5 },
+                },
+            ],
         }).exportJSON());
 
         expect(json).toMatchObject({
@@ -67,6 +80,15 @@ describe('ImageNode', () => {
             decorative: false,
             linkUrl: '/en/story',
             loading: 'lazy',
+            cropVariantId: 43,
+            cropVariant: '16_9',
+            cropVariants: [
+                expect.objectContaining({
+                    id: 43,
+                    url: '/storage/hero-16-9.jpg',
+                    variant: '16_9',
+                }),
+            ],
         });
     });
 
@@ -83,6 +105,8 @@ describe('ImageNode', () => {
             wrap: 'wrap-right',
             sizePreset: 'medium',
             linkUrl: 'https://example.com/story',
+            cropVariantId: 43,
+            cropVariant: '16_9',
         });
         const image = element.querySelector('img');
         const link = element.querySelector('a');
@@ -90,6 +114,8 @@ describe('ImageNode', () => {
         expect(element.tagName).toBe('FIGURE');
         expect(element.getAttribute('data-rte-image')).toBe('true');
         expect(element.getAttribute('data-media-id')).toBe('42');
+        expect(element.getAttribute('data-crop-variant-id')).toBe('43');
+        expect(element.getAttribute('data-crop-variant')).toBe('16_9');
         expect(element.getAttribute('data-wrap')).toBe('wrap-right');
         expect(link?.getAttribute('target')).toBe('_blank');
         expect(link?.getAttribute('rel')).toBe('noopener noreferrer');

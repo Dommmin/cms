@@ -93,8 +93,36 @@ final readonly class MediaIndexQuery
         $item->setAttribute('credit', $item->getCustomProperty('author'));
         $item->setAttribute('width', $item->getCustomProperty('width'));
         $item->setAttribute('height', $item->getCustomProperty('height'));
+        $item->setAttribute('crop_of', $item->getCustomProperty('crop_of'));
+        $item->setAttribute('crop_params', $item->getCustomProperty('crop_params'));
+        $item->setAttribute('crop_variant', $item->getCustomProperty('crop_variant'));
+        $item->setAttribute('focal_point', $item->getCustomProperty('focal_point'));
+        $item->setAttribute('crop_variants', $this->cropVariants($item));
 
         return $item;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function cropVariants(Media $item): array
+    {
+        return Media::query()
+            ->where('model_type', $item->model_type)
+            ->where('model_id', $item->model_id)
+            ->where('custom_properties->crop_of', (string) $item->id)
+            ->orderByDesc('id')
+            ->get()
+            ->map(fn (Media $variant): array => [
+                'id' => $variant->id,
+                'url' => $variant->getUrl(),
+                'label' => (string) $variant->getCustomProperty('crop_variant', 'crop'),
+                'variant' => (string) $variant->getCustomProperty('crop_variant', 'crop'),
+                'width' => $variant->getCustomProperty('width'),
+                'height' => $variant->getCustomProperty('height'),
+                'focal_point' => $variant->getCustomProperty('focal_point'),
+            ])
+            ->all();
     }
 
     /**

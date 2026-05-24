@@ -15,6 +15,7 @@ import type {
     CreateImageNodePayload,
     ImageAlign,
     ImageComponentProps,
+    ImageCropVariant,
     ImageFocalPoint,
     ImageFilters,
     ImageLayout,
@@ -47,6 +48,9 @@ const DEFAULT_IMAGE_STATE: Omit<ImageNodeState, 'src' | 'altText'> = {
     linkUrl: null,
     loading: 'lazy',
     filters: null,
+    cropVariants: [],
+    cropVariantId: null,
+    cropVariant: null,
 };
 
 function normalizeImageState(payload: CreateImageNodePayload): ImageNodeState {
@@ -61,6 +65,9 @@ function normalizeImageState(payload: CreateImageNodePayload): ImageNodeState {
         decorative: payload.decorative ?? false,
         loading: payload.loading ?? 'lazy',
         filters: payload.filters ?? null,
+        cropVariants: payload.cropVariants ?? [],
+        cropVariantId: payload.cropVariantId ?? null,
+        cropVariant: payload.cropVariant ?? null,
     };
 }
 
@@ -158,6 +165,8 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
         linkUrl,
         loading,
         filters,
+        cropVariants,
+        cropVariantId,
         nodeKey,
         editor,
     } = props;
@@ -175,6 +184,7 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
     const [draftFocalY, setDraftFocalY] = useState(String(Math.round((focalPoint?.y ?? 0.5) * 100)));
     const [draftLoading, setDraftLoading] = useState<ImageLoading>(loading);
     const [draftFilters, setDraftFilters] = useState<ImageFilters | null>(filters);
+    const [draftCropVariantId, setDraftCropVariantId] = useState(cropVariantId ? String(cropVariantId) : 'original');
 
     /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
@@ -188,7 +198,8 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
         setDraftFocalY(String(Math.round((focalPoint?.y ?? 0.5) * 100)));
         setDraftLoading(loading);
         setDraftFilters(filters);
-    }, [altText, caption, credit, decorative, focalPoint, linkUrl, loading, width, filters]);
+        setDraftCropVariantId(cropVariantId ? String(cropVariantId) : 'original');
+    }, [altText, caption, credit, decorative, focalPoint, linkUrl, loading, width, filters, cropVariantId]);
     /* eslint-enable react-hooks/set-state-in-effect */
 
     const applyWidth = (nextWidth: string, nextPreset: ImageSizePreset) => {
@@ -198,14 +209,27 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
 
     const applyMetadata = () => {
         const safeLinkUrl = draftLinkUrl.trim() === '' ? null : normalizeLinkUrl(draftLinkUrl);
+        const selectedCropVariant = cropVariants.find((variant: ImageCropVariant) => String(variant.id) === draftCropVariantId) ?? null;
 
         updateNode(editor, nodeKey, {
+            ...(selectedCropVariant
+                ? {
+                    src: selectedCropVariant.url,
+                    mediaId: selectedCropVariant.id,
+                    cropVariantId: selectedCropVariant.id,
+                    cropVariant: selectedCropVariant.variant,
+                    focalPoint: selectedCropVariant.focalPoint ?? focalPoint,
+                }
+                : {
+                    cropVariantId: null,
+                    cropVariant: null,
+                }),
             altText: draftDecorative ? '' : draftAlt,
             caption: draftCaption.trim() === '' ? null : draftCaption,
             credit: draftCredit.trim() === '' ? null : draftCredit,
             linkUrl: safeLinkUrl,
             decorative: draftDecorative,
-            focalPoint: {
+            focalPoint: selectedCropVariant?.focalPoint ?? {
                 x: clampFocalPoint(Number(draftFocalX) / 100),
                 y: clampFocalPoint(Number(draftFocalY) / 100),
             },
@@ -473,6 +497,19 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
                                 <span className="font-medium">Image link</span>
                                 <input value={draftLinkUrl} onChange={(event) => setDraftLinkUrl(event.target.value)} className="h-8 rounded border bg-background px-2" placeholder="https://, /relative or #anchor" />
                             </label>
+                            {cropVariants.length > 0 && (
+                                <label className="grid gap-1">
+                                    <span className="font-medium">Crop variant</span>
+                                    <select value={draftCropVariantId} onChange={(event) => setDraftCropVariantId(event.target.value)} className="h-8 rounded border bg-background px-2">
+                                        <option value="original">Original</option>
+                                        {cropVariants.map((variant: ImageCropVariant) => (
+                                            <option key={variant.id} value={variant.id}>
+                                                {variant.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </label>
+                            )}
                             <div className="grid grid-cols-2 gap-2">
                                 <label className="grid gap-1">
                                     <span className="font-medium">Focal X (%)</span>
@@ -617,6 +654,9 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
             linkUrl: serialized.linkUrl,
             loading: serialized.loading,
             filters: serialized.filters,
+            cropVariants: serialized.cropVariants,
+            cropVariantId: serialized.cropVariantId,
+            cropVariant: serialized.cropVariant,
         });
     }
 
@@ -654,6 +694,8 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
         if (state.mediaId !== null) figure.setAttribute('data-media-id', String(state.mediaId));
         if (state.credit) figure.setAttribute('data-credit', state.credit);
         if (state.focalPoint) figure.setAttribute('data-focal-point', JSON.stringify(state.focalPoint));
+        if (state.cropVariant) figure.setAttribute('data-crop-variant', state.cropVariant);
+        if (state.cropVariantId !== null) figure.setAttribute('data-crop-variant-id', String(state.cropVariantId));
         figure.className = `rte-image rte-image--${state.layout} rte-image--${state.wrap}`;
         figure.style.maxWidth = '100%';
         figure.style.marginBlock = '0.75rem';
@@ -806,6 +848,7 @@ export function $isImageNode(node: LexicalNode | null | undefined): node is Imag
 export type {
     CreateImageNodePayload,
     ImageAlign,
+    ImageCropVariant,
     ImageFocalPoint,
     ImageLayout,
     ImageLoading,

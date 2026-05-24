@@ -324,6 +324,13 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
     }, [editor]);
 
     const handleMediaSelect = useCallback((media: MediaItem) => {
+        const focalPoint = media.focal_point
+            ? {
+                x: media.focal_point.x / 100,
+                y: media.focal_point.y / 100,
+            }
+            : null;
+
         editor.update(() => {
             const node = $createImageNode({
                 src: media.url,
@@ -331,8 +338,24 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
                 mediaId: media.id,
                 caption: media.caption ?? null,
                 credit: media.credit ?? null,
-                focalPoint: null,
+                focalPoint,
                 loading: 'lazy',
+                cropVariant: media.crop_variant ?? null,
+                cropVariantId: media.crop_variant ? media.id : null,
+                cropVariants: (media.crop_variants ?? []).map((variant) => ({
+                    id: variant.id,
+                    url: variant.url,
+                    label: variant.label,
+                    variant: variant.variant,
+                    width: variant.width,
+                    height: variant.height,
+                    focalPoint: variant.focal_point
+                        ? {
+                            x: variant.focal_point.x / 100,
+                            y: variant.focal_point.y / 100,
+                        }
+                        : null,
+                })),
             });
             $insertNodes([node]);
         });

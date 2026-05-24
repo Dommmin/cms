@@ -157,6 +157,8 @@ Użytkownik może przełączyć tryb pracy:
 
 Obecnie istnieje crop modal i backend endpoint, ale UX nie jest pełny.
 
+Status 2026-05-24: **wdrożone w pierwszym pełnym zakresie**. Crop modal ma zoom slider, focal point można ustawić kliknięciem obrazu, a frontend wysyła crop coordinates przeliczone do naturalnych pikseli obrazu. Backend odrzuca nie-obrazy, używa `manualCrop()`, zapisuje `crop_of`, `crop_params`, `crop_variant`, wymiary i focal point metadata oraz zwraca je w odpowiedzi. Media search wystawia `crop_variants`, a RTE `ImageNode` zapisuje i eksportuje crop variant metadata oraz pozwala wybrać dostępny wariant w panelu metadanych obrazu. Dodano `ImageCropTest`.
+
 ### Braki
 
 - Brak zoomu w crop modal.
@@ -188,9 +190,9 @@ Obecnie istnieje crop modal i backend endpoint, ale UX nie jest pełny.
 
 ### Akceptacja
 
-- Crop działa z presetami i zoomem.
-- RTE może użyć wariantu crop.
-- Test backendowy przechodzi.
+- [x] Crop działa z presetami i zoomem.
+- [x] RTE może użyć wariantu crop.
+- [x] Test backendowy przechodzi.
 
 ## Priorytet 4 — RTE Embeds: oEmbed / Instagram / Twitter/X
 

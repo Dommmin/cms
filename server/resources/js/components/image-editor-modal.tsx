@@ -1,7 +1,8 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
+import * as MediaController from '@/actions/App/Http/Controllers/Admin/MediaController';
 import {
     Dialog,
     DialogContent,
@@ -38,18 +39,32 @@ type FocalPoint = {
     y: number;
 };
 
+type CropResult = {
+    id: number;
+    url: string;
+    width: number;
+    height: number;
+    crop_of: number;
+    crop_params: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        rotate: number;
+        zoom: number;
+        aspect_ratio: string;
+        variant: string;
+    };
+    crop_variant: string;
+    focal_point: FocalPoint | null;
+};
+
 type ImageEditorModalProps = {
     open: boolean;
     onClose: () => void;
     imageUrl: string;
     mediaId: number;
-    onCropComplete: (result: {
-        id: number;
-        url: string;
-        width: number;
-        height: number;
-        crop_of: number;
-    }) => void;
+    onCropComplete: (result: CropResult) => void;
 };
 
 export function ImageEditorModal({
@@ -59,10 +74,12 @@ export function ImageEditorModal({
     mediaId,
     onCropComplete,
 }: ImageEditorModalProps) {
+    const imageRef = useRef<HTMLImageElement>(null);
     const [crop, setCrop] = useState<Crop>();
     const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
     const [aspectRatio, setAspectRatio] = useState<string>('free');
     const [rotation, setRotation] = useState(0);
+    const [zoom, setZoom] = useState(1);
     const [focalPoint, setFocalPoint] = useState<FocalPoint | null>(null);
     const [isSaving, setIsSaving] = useState(false);
 
@@ -83,14 +100,27 @@ export function ImageEditorModal({
 
     const handleSave = useCallback(async () => {
         if (!completedCrop) return;
+        const image = imageRef.current;
+        if (!image) return;
+
+        const scaleX = image.naturalWidth / image.getBoundingClientRect().width;
+        const scaleY =
+            image.naturalHeight / image.getBoundingClientRect().height;
 
         setIsSaving(true);
         try {
             const formData = new FormData();
-            formData.append('x', String(completedCrop.x));
-            formData.append('y', String(completedCrop.y));
-            formData.append('width', String(completedCrop.width));
-            formData.append('height', String(completedCrop.height));
+            formData.append('x', String(Math.round(completedCrop.x * scaleX)));
+            formData.append('y', String(Math.round(completedCrop.y * scaleY)));
+            formData.append(
+                'width',
+                String(Math.round(completedCrop.width * scaleX)),
+            );
+            formData.append(
+                'height',
+                String(Math.round(completedCrop.height * scaleY)),
+            );
+            formData.append('zoom', String(zoom));
             formData.append('rotate', String(rotation));
             formData.append('aspect_ratio', aspectRatio);
             if (focalPoint) {
@@ -98,7 +128,7 @@ export function ImageEditorModal({
                 formData.append('focal_point[y]', String(focalPoint.y));
             }
 
-            const response = await fetch(`/admin/media/${mediaId}/crop`, {
+            const response = await fetch(MediaController.crop.url(mediaId), {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -125,6 +155,7 @@ export function ImageEditorModal({
     }, [
         completedCrop,
         rotation,
+        zoom,
         aspectRatio,
         focalPoint,
         mediaId,
@@ -134,14 +165,13 @@ export function ImageEditorModal({
 
     const handleImageClick = useCallback(
         (e: React.MouseEvent<HTMLImageElement>) => {
-            if (!aspectRatio || aspectRatio === 'free') return;
             const img = e.currentTarget;
             const rect = img.getBoundingClientRect();
             const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
             const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
             setFocalPoint({ x, y });
         },
-        [aspectRatio],
+        [],
     );
 
     const aspectRatioNumber =
@@ -177,6 +207,23 @@ export function ImageEditorModal({
                                 </SelectContent>
                             </Select>
                         </div>
+                        <div className="min-w-56 space-y-1.5">
+                            <Label htmlFor="image-zoom">
+                                Zoom: {zoom.toFixed(1)}x
+                            </Label>
+                            <input
+                                id="image-zoom"
+                                type="range"
+                                min={1}
+                                max={3}
+                                step={0.1}
+                                value={zoom}
+                                onChange={(event) =>
+                                    setZoom(Number(event.target.value))
+                                }
+                                className="w-full"
+                            />
+                        </div>
                         <div className="space-y-1.5">
                             <Label>Rotation: {rotation}°</Label>
                             <div className="flex gap-2">
@@ -209,7 +256,7 @@ export function ImageEditorModal({
                         </div>
                     </div>
 
-                    <div className="relative overflow-hidden rounded-lg border bg-muted/30">
+                    <div className="relative overflow-auto rounded-lg border bg-muted/30">
                         <ReactCrop
                             crop={crop}
                             onChange={(c) => setCrop(c)}
@@ -218,11 +265,13 @@ export function ImageEditorModal({
                             ruleOfThirds
                         >
                             <img
+                                ref={imageRef}
                                 src={imageUrl}
                                 alt="Edit"
                                 style={{
                                     maxWidth: '100%',
-                                    transform: `rotate(${rotation}deg)`,
+                                    transform: `scale(${zoom}) rotate(${rotation}deg)`,
+                                    transformOrigin: 'center',
                                 }}
                                 onClick={handleImageClick}
                                 crossOrigin="anonymous"
@@ -241,6 +290,12 @@ export function ImageEditorModal({
                                 Clear
                             </button>
                         </div>
+                    )}
+                    {!focalPoint && (
+                        <p className="text-xs text-muted-foreground">
+                            Click the image to set a focal point for responsive
+                            crops.
+                        </p>
                     )}
 
                     <div className="flex justify-end gap-2">
