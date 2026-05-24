@@ -80,6 +80,31 @@ export const TEXT_COLORS = [
     '#dcfce7',
 ];
 
+export const HIGHLIGHT_COLORS = [
+    '#fef08a',
+    '#fde68a',
+    '#fed7aa',
+    '#fecaca',
+    '#fecdd3',
+    '#e9d5ff',
+    '#c4b5fd',
+    '#a5b4fc',
+    '#93c5fd',
+    '#a7f3d0',
+    '#bbf7d0',
+    '#d9f99d',
+    '#fcd34d',
+    '#fdba74',
+    '#f87171',
+    '#f472b6',
+    '#c084fc',
+    '#818cf8',
+    '#38bdf8',
+    '#34d399',
+    '#a3e635',
+    '#facc15',
+];
+
 export const EMOJIS: Array<{ label: string; emojis: string[] }> = [
     {
         label: 'Smileys',

@@ -4,7 +4,7 @@ import { useEffect, useState, type JSX } from 'react';
 
 export default function WordCountPlugin(): JSX.Element {
     const [editor] = useLexicalComposerContext();
-    const [counts, setCounts] = useState({ chars: 0, words: 0 });
+    const [counts, setCounts] = useState({ chars: 0, words: 0, readingTime: '' });
 
     useEffect(() => {
         return editor.registerUpdateListener(({ editorState }) => {
@@ -12,7 +12,9 @@ export default function WordCountPlugin(): JSX.Element {
                 const text = $getRoot().getTextContent();
                 const chars = text.length;
                 const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
-                setCounts({ chars, words });
+                const minutes = Math.max(1, Math.ceil(words / 200));
+                const readingTime = words === 0 ? '< 1 min' : `~${minutes} min`;
+                setCounts({ chars, words, readingTime });
             });
         });
     }, [editor]);
@@ -22,6 +24,8 @@ export default function WordCountPlugin(): JSX.Element {
             <span>{counts.words} {counts.words === 1 ? 'word' : 'words'}</span>
             <span className="text-border">·</span>
             <span>{counts.chars} {counts.chars === 1 ? 'character' : 'characters'}</span>
+            <span className="text-border">·</span>
+            <span>{counts.readingTime}</span>
         </div>
     );
 }

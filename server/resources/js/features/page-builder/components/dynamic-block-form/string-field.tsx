@@ -54,7 +54,9 @@ export function StringField({
         const editorMode =
             s.editor_mode === 'full' || blockType === 'rich_text'
                 ? 'full'
-                : 'simple';
+                : s.editor_mode === 'standard'
+                  ? 'standard'
+                  : 'simple';
         return (
             <div className="space-y-1.5">
                 <Label>{label}</Label>

@@ -475,6 +475,28 @@
     background: color-mix(in oklab, var(--primary) 12%, transparent);
 }
 
+/* ─── Table style presets ─────────────────────────────────────────────────── */
+
+.editor-table.rte-table-striped .editor-table-cell-header {
+    background: var(--muted);
+}
+
+.editor-table.rte-table-striped tr:nth-child(even) .editor-table-cell {
+    background: color-mix(in oklab, var(--muted) 40%, transparent);
+}
+
+.editor-table.rte-table-bordered,
+.editor-table.rte-table-bordered .editor-table-cell,
+.editor-table.rte-table-bordered .editor-table-cell-header {
+    border: 2px solid var(--border);
+}
+
+.editor-table.rte-table-borderless .editor-table-cell,
+.editor-table.rte-table-borderless .editor-table-cell-header {
+    border: none;
+    border-bottom: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+}
+
 /* ─── Mark / Highlight overlay ───────────────────────────────────────────────── */
 
 .editor-mark {

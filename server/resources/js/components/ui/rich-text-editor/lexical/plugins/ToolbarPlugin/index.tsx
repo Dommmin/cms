@@ -36,12 +36,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTranslation } from '@/hooks/use-translation';
 import { $createAttachmentNode } from '../../../attachment-node';
+import { $createCalloutNode } from '../../../callout-node';
 import { $createImageGalleryNode } from '../../../image-gallery-node';
 import { $createImageNode } from '../../../image-node';
 import { $createYouTubeNode, extractYouTubeId } from '../../../youtube-node';
 import { $createCollapsibleContainerNode, $createCollapsibleTitleNode, $createCollapsibleContentNode } from '../../collapsible-nodes';
 import { $createLayoutContainerNode, $createLayoutItemNode } from '../../layout-nodes';
 import { getEditorLinkTarget, isAllowedEditorLinkUrl, normalizeEditorLinkUrl } from '../../link-url';
+import ShortcutsDialog from '../ShortcutsDialog';
 import { CODE_LANGUAGES, ELEMENT_FORMAT_NUM_TO_TYPE } from './constants';
 import { ToolbarSeparator as Sep } from './controls';
 import { EmojiDialog, LinkDialog, SpecialCharactersDialog, TableDialog, YouTubeDialog } from './dialogs';
@@ -55,6 +57,7 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
     const [editor] = useLexicalComposerContext();
     const __ = useTranslation();
     const isFullMode = mode === 'full';
+    const showInsertMenu = mode === 'full' || mode === 'standard';
 
     const [state, setState] = useState<ToolbarState>({
         canUndo: false,
@@ -74,6 +77,7 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
         fontSize: '15px',
         fontFamily: '',
         fontColor: '',
+        highlightColor: '',
     });
 
     const [insertDialog, setInsertDialog] = useState<InsertDialog>(null);
@@ -86,6 +90,7 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
     const [ytUrl, setYtUrl] = useState('');
     const [tableRows, setTableRows] = useState(3);
     const [tableCols, setTableCols] = useState(3);
+    const [shortcutsOpen, setShortcutsOpen] = useState(false);
 
     const updateToolbar = useCallback(() => {
         editor.getEditorState().read(() => {
@@ -134,6 +139,7 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
             const fontSize = $getSelectionStyleValueForProperty(selection, 'font-size', '15px');
             const fontFamily = $getSelectionStyleValueForProperty(selection, 'font-family', '');
             const fontColor = $getSelectionStyleValueForProperty(selection, 'color', '');
+            const highlightColor = $getSelectionStyleValueForProperty(selection, 'background-color', '');
 
             setState((prev) => ({
                 ...prev,
@@ -152,6 +158,7 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
                 fontSize,
                 fontFamily,
                 fontColor,
+                highlightColor,
             }));
         });
     }, [editor]);
@@ -445,9 +452,15 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
         });
     }, [editor]);
 
+    const handleInsertCallout = useCallback(() => {
+        editor.update(() => {
+            $insertNodes([$createCalloutNode('info')]);
+        });
+    }, [editor]);
+
     // ─── Render ────────────────────────────────────────────────────────────────
 
-    const { canUndo, canRedo, blockType, elementFormat, isBold, isItalic, isUnderline, isStrikethrough, isCode, isSubscript, isSuperscript, isHighlight, isLink, codeLanguage, fontSize, fontFamily, fontColor } = state;
+    const { canUndo, canRedo, blockType, elementFormat, isBold, isItalic, isUnderline, isStrikethrough, isCode, isSubscript, isSuperscript, isHighlight, isLink, codeLanguage, fontSize, fontFamily, fontColor, highlightColor } = state;
 
     return (
         <TooltipProvider delayDuration={300}>
@@ -466,7 +479,7 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
                 <BlockTypeMenu blockType={blockType} onSelect={onBlockTypeSelect} />
 
                 {/* Code language selector */}
-                {isFullMode && blockType === 'code' && (
+                {(isFullMode || mode === 'standard') && blockType === 'code' && (
                     <>
                         <Sep />
                         <Select value={codeLanguage} onValueChange={onCodeLanguageSelect}>
@@ -490,7 +503,7 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
                 <Sep />
 
                 <InlineFormatGroup
-                    showAdvanced={isFullMode}
+                    showAdvanced={isFullMode || mode === 'standard'}
                     isBold={isBold}
                     isItalic={isItalic}
                     isUnderline={isUnderline}
@@ -517,11 +530,14 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
                             fontSize={fontSize}
                             fontFamily={fontFamily}
                             fontColor={fontColor}
+                            highlightColor={highlightColor}
                             spellcheck={spellcheck}
                             onFontSizeChange={(val) => applyStyleText({ 'font-size': val })}
                             onFontFamilyChange={(val) => applyStyleText({ 'font-family': val === '__default__' ? '' : val })}
                             onFontColorChange={(color) => applyStyleText({ color })}
+                            onHighlightColorChange={(color) => applyStyleText({ 'background-color': color })}
                             onResetColor={() => applyStyleText({ color: '' })}
+                            onResetHighlightColor={() => applyStyleText({ 'background-color': '' })}
                             onToggleSpellcheck={toggleSpellcheck}
                         />
 
@@ -541,7 +557,7 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
 
                 <LinkGroup isLink={isLink} onToggleLink={toggleLink} />
 
-                {isFullMode && (
+                {showInsertMenu && (
                     <>
                         <Sep />
 
@@ -559,6 +575,7 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
                                 setTableCols(3);
                                 setInsertDialog('table');
                             }}
+                            onInsertCallout={handleInsertCallout}
                             onInsertColumns={handleInsertColumns}
                             onInsertCollapsible={handleInsertCollapsible}
                             onOpenEmojiDialog={() => setInsertDialog('emoji')}
@@ -566,6 +583,17 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
                         />
                     </>
                 )}
+
+                <Sep />
+
+                <button
+                    type="button"
+                    className="inline-flex h-7 w-7 items-center justify-center rounded text-xs font-bold text-muted-foreground hover:bg-accent hover:text-foreground"
+                    onClick={() => setShortcutsOpen(true)}
+                    title="Keyboard shortcuts"
+                >
+                    ?
+                </button>
             </div>
 
             {/* ─── Media Picker (Insert Image) ─────────────────────────────────────── */}
@@ -654,6 +682,8 @@ export default function ToolbarPlugin({ mode = 'full' }: ToolbarPluginProps): JS
                 }}
                 onSelect={handleInsertEmoji}
             />
+
+            <ShortcutsDialog open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
         </TooltipProvider>
     );
 }

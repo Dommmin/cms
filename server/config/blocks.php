@@ -569,11 +569,13 @@ return [
                         'type' => 'string',
                         'label' => 'Left Column Content',
                         'format' => 'richtext',
+                        'editor_mode' => 'standard',
                     ],
                     'right_content' => [
                         'type' => 'string',
                         'label' => 'Right Column Content',
                         'format' => 'richtext',
+                        'editor_mode' => 'standard',
                     ],
                     'ratio' => [
                         'type' => 'string',
@@ -611,11 +613,11 @@ return [
                 'type' => 'object',
                 'properties' => [
                     'column_1_title' => ['type' => 'string', 'label' => 'Column 1 Title'],
-                    'column_1_content' => ['type' => 'string', 'label' => 'Column 1 Content', 'format' => 'richtext'],
+                    'column_1_content' => ['type' => 'string', 'label' => 'Column 1 Content', 'format' => 'richtext', 'editor_mode' => 'standard'],
                     'column_2_title' => ['type' => 'string', 'label' => 'Column 2 Title'],
-                    'column_2_content' => ['type' => 'string', 'label' => 'Column 2 Content', 'format' => 'richtext'],
+                    'column_2_content' => ['type' => 'string', 'label' => 'Column 2 Content', 'format' => 'richtext', 'editor_mode' => 'standard'],
                     'column_3_title' => ['type' => 'string', 'label' => 'Column 3 Title'],
-                    'column_3_content' => ['type' => 'string', 'label' => 'Column 3 Content', 'format' => 'richtext'],
+                    'column_3_content' => ['type' => 'string', 'label' => 'Column 3 Content', 'format' => 'richtext', 'editor_mode' => 'standard'],
                     'vertical_alignment' => [
                         'type' => 'string',
                         'label' => 'Vertical Alignment',
@@ -677,7 +679,7 @@ return [
                             'type' => 'object',
                             'properties' => [
                                 'title' => ['type' => 'string', 'label' => 'Tab Label', 'placeholder' => 'Tab name'],
-                                'content' => ['type' => 'string', 'label' => 'Tab Content', 'format' => 'richtext'],
+                                'content' => ['type' => 'string', 'label' => 'Tab Content', 'format' => 'richtext', 'editor_mode' => 'standard'],
                             ],
                         ],
                     ],

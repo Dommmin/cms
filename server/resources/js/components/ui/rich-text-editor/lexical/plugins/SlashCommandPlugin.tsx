@@ -37,6 +37,7 @@ import {
 import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 import { $createAttachmentNode } from '../../attachment-node';
+import { $createCalloutNode } from '../../callout-node';
 import { $createImageGalleryNode } from '../../image-gallery-node';
 import type { CommandItem } from './SlashCommandPlugin.types';
 
@@ -54,6 +55,7 @@ const COMMANDS: CommandItem[] = [
     { id: 'number', label: 'Numbered List', description: 'Ordered list', keywords: ['number', 'ordered', 'ol', 'list'], icon: '1.' },
     { id: 'check', label: 'Check List', description: 'Todo checklist', keywords: ['check', 'todo', 'task'], icon: '✓' },
     { id: 'hr', label: 'Divider', description: 'Horizontal rule', keywords: ['divider', 'hr', 'line', 'rule', 'separator'], icon: '—' },
+    { id: 'callout', label: 'Callout', description: 'Info, warning, success, or danger box', keywords: ['callout', 'info', 'warning', 'alert', 'tip', 'note'], icon: '!' },
     { id: 'gallery', label: 'Gallery', description: 'Image grid', keywords: ['gallery', 'images', 'grid'], icon: '▦' },
     { id: 'file', label: 'File', description: 'Attachment link', keywords: ['file', 'attachment', 'download', 'pdf'], icon: '□' },
     { id: 'table', label: 'Table', description: '3×3 table', keywords: ['table', 'grid'], icon: '⊞' },
@@ -231,6 +233,11 @@ export default function SlashCommandPlugin(): JSX.Element | null {
                     break;
                 case 'table':
                     editor.dispatchCommand(INSERT_TABLE_COMMAND, { rows: '3', columns: '3', includeHeaders: true });
+                    break;
+                case 'callout':
+                    editor.update(() => {
+                        $insertNodes([$createCalloutNode('info')]);
+                    });
                     break;
             }
 

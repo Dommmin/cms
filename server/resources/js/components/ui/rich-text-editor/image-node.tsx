@@ -16,6 +16,7 @@ import type {
     ImageAlign,
     ImageComponentProps,
     ImageFocalPoint,
+    ImageFilters,
     ImageLayout,
     ImageLoading,
     ImageNodeState,
@@ -45,6 +46,7 @@ const DEFAULT_IMAGE_STATE: Omit<ImageNodeState, 'src' | 'altText'> = {
     decorative: false,
     linkUrl: null,
     loading: 'lazy',
+    filters: null,
 };
 
 function normalizeImageState(payload: CreateImageNodePayload): ImageNodeState {
@@ -58,6 +60,7 @@ function normalizeImageState(payload: CreateImageNodePayload): ImageNodeState {
         linkUrl: payload.linkUrl ?? null,
         decorative: payload.decorative ?? false,
         loading: payload.loading ?? 'lazy',
+        filters: payload.filters ?? null,
     };
 }
 
@@ -91,6 +94,17 @@ function normalizeLinkUrl(value: string): string | null {
     const normalized = normalizeEditorLinkUrl(value);
 
     return isAllowedEditorLinkUrl(normalized) ? normalized : null;
+}
+
+function cssFilters(filters: ImageFilters | null): string | undefined {
+    if (!filters) return undefined;
+    const parts: string[] = [];
+    if (filters.brightness !== undefined && filters.brightness !== 100) parts.push(`brightness(${filters.brightness}%)`);
+    if (filters.contrast !== undefined && filters.contrast !== 100) parts.push(`contrast(${filters.contrast}%)`);
+    if (filters.saturate !== undefined && filters.saturate !== 100) parts.push(`saturate(${filters.saturate}%)`);
+    if (filters.blur !== undefined && filters.blur > 0) parts.push(`blur(${filters.blur}px)`);
+
+    return parts.length > 0 ? parts.join(' ') : undefined;
 }
 
 function imageObjectPosition(focalPoint: ImageFocalPoint | null): string | undefined {
@@ -143,6 +157,7 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
         decorative,
         linkUrl,
         loading,
+        filters,
         nodeKey,
         editor,
     } = props;
@@ -159,6 +174,7 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
     const [draftFocalX, setDraftFocalX] = useState(String(Math.round((focalPoint?.x ?? 0.5) * 100)));
     const [draftFocalY, setDraftFocalY] = useState(String(Math.round((focalPoint?.y ?? 0.5) * 100)));
     const [draftLoading, setDraftLoading] = useState<ImageLoading>(loading);
+    const [draftFilters, setDraftFilters] = useState<ImageFilters | null>(filters);
 
     /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
@@ -171,7 +187,8 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
         setDraftFocalX(String(Math.round((focalPoint?.x ?? 0.5) * 100)));
         setDraftFocalY(String(Math.round((focalPoint?.y ?? 0.5) * 100)));
         setDraftLoading(loading);
-    }, [altText, caption, credit, decorative, focalPoint, linkUrl, loading, width]);
+        setDraftFilters(filters);
+    }, [altText, caption, credit, decorative, focalPoint, linkUrl, loading, width, filters]);
     /* eslint-enable react-hooks/set-state-in-effect */
 
     const applyWidth = (nextWidth: string, nextPreset: ImageSizePreset) => {
@@ -193,6 +210,7 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
                 y: clampFocalPoint(Number(draftFocalY) / 100),
             },
             loading: draftLoading,
+            filters: draftFilters && (draftFilters.brightness !== 100 || draftFilters.contrast !== 100 || draftFilters.saturate !== 100 || (draftFilters.blur ?? 0) > 0) ? draftFilters : null,
         });
         setIsMetadataOpen(false);
     };
@@ -267,6 +285,8 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
         figureStyle.marginInline = 'auto';
     }
 
+    const imageFilterStyle = cssFilters(filters);
+
     const imageElement = (
         <img
             ref={imgRef}
@@ -279,6 +299,7 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
                 width: layout === 'wide' || layout === 'full' ? '100%' : (localWidth ?? 'auto'),
                 maxWidth: '100%',
                 objectPosition: imageObjectPosition(focalPoint),
+                filter: imageFilterStyle,
             }}
             draggable={false}
             className={`rounded-lg transition-shadow ${isSelected ? 'ring-2 ring-primary ring-offset-1' : ''}`}
@@ -469,6 +490,60 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
                                     <option value="eager">Eager</option>
                                 </select>
                             </label>
+                            <div className="grid gap-1">
+                                <span className="font-medium">Filters</span>
+                                <div className="space-y-1">
+                                    <label className="flex items-center gap-2 text-[11px]">
+                                        <span className="w-20">Brightness</span>
+                                        <input
+                                            type="range"
+                                            min={0}
+                                            max={200}
+                                            value={draftFilters?.brightness ?? 100}
+                                            onChange={(e) => setDraftFilters((prev) => ({ ...prev, brightness: Number(e.target.value) }))}
+                                            className="flex-1"
+                                        />
+                                        <span className="w-10 text-right">{draftFilters?.brightness ?? 100}%</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 text-[11px]">
+                                        <span className="w-20">Contrast</span>
+                                        <input
+                                            type="range"
+                                            min={0}
+                                            max={200}
+                                            value={draftFilters?.contrast ?? 100}
+                                            onChange={(e) => setDraftFilters((prev) => ({ ...prev, contrast: Number(e.target.value) }))}
+                                            className="flex-1"
+                                        />
+                                        <span className="w-10 text-right">{draftFilters?.contrast ?? 100}%</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 text-[11px]">
+                                        <span className="w-20">Saturation</span>
+                                        <input
+                                            type="range"
+                                            min={0}
+                                            max={200}
+                                            value={draftFilters?.saturate ?? 100}
+                                            onChange={(e) => setDraftFilters((prev) => ({ ...prev, saturate: Number(e.target.value) }))}
+                                            className="flex-1"
+                                        />
+                                        <span className="w-10 text-right">{draftFilters?.saturate ?? 100}%</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 text-[11px]">
+                                        <span className="w-20">Blur</span>
+                                        <input
+                                            type="range"
+                                            min={0}
+                                            max={10}
+                                            step={0.5}
+                                            value={draftFilters?.blur ?? 0}
+                                            onChange={(e) => setDraftFilters((prev) => ({ ...prev, blur: Number(e.target.value) }))}
+                                            className="flex-1"
+                                        />
+                                        <span className="w-10 text-right">{draftFilters?.blur ?? 0}px</span>
+                                    </label>
+                                </div>
+                            </div>
                             {!draftDecorative && draftAlt.trim() === '' && (
                                 <span className="flex items-center gap-1 text-destructive">
                                     <Captions size={13} />
@@ -541,6 +616,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
             decorative: serialized.decorative,
             linkUrl: serialized.linkUrl,
             loading: serialized.loading,
+            filters: serialized.filters,
         });
     }
 
@@ -606,6 +682,9 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
         img.style.width = state.layout === 'wide' || state.layout === 'full' ? '100%' : (state.width ?? 'auto');
         const objectPosition = imageObjectPosition(state.focalPoint);
         if (objectPosition) img.style.objectPosition = objectPosition;
+
+        const imageFilter = cssFilters(state.filters);
+        if (imageFilter) img.style.filter = imageFilter;
 
         const safeLinkUrl = state.linkUrl ? normalizeLinkUrl(state.linkUrl) : null;
         if (safeLinkUrl) {

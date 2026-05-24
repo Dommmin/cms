@@ -15,7 +15,7 @@ export type InternalLinkSearchResult = {
     url: string;
 };
 
-export type ToolbarMode = 'simple' | 'full';
+export type ToolbarMode = 'simple' | 'standard' | 'full';
 
 export type ToolbarPluginProps = {
     mode?: ToolbarMode;
@@ -83,6 +83,7 @@ export type InsertMenuProps = {
     onOpenFilePicker: () => void;
     onOpenYouTubeDialog: () => void;
     onOpenTableDialog: () => void;
+    onInsertCallout: () => void;
     onInsertColumns: (templateColumns: string) => void;
     onInsertCollapsible: () => void;
     onOpenEmojiDialog: () => void;
@@ -121,11 +122,14 @@ export type FontStyleGroupProps = {
     fontSize: string;
     fontFamily: string;
     fontColor: string;
+    highlightColor: string;
     spellcheck: boolean;
     onFontSizeChange: (fontSize: string) => void;
     onFontFamilyChange: (fontFamily: string) => void;
     onFontColorChange: (fontColor: string) => void;
+    onHighlightColorChange: (highlightColor: string) => void;
     onResetColor: () => void;
+    onResetHighlightColor: () => void;
     onToggleSpellcheck: () => void;
 };
 
@@ -160,4 +164,5 @@ export interface ToolbarState {
     fontSize: string;
     fontFamily: string;
     fontColor: string;
+    highlightColor: string;
 }

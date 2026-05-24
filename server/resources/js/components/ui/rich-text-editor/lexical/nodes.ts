@@ -8,6 +8,7 @@ import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import type { Klass, LexicalNode } from 'lexical';
 import { AttachmentNode } from '../attachment-node';
+import { CalloutNode } from '../callout-node';
 import { ImageGalleryNode } from '../image-gallery-node';
 import { ImageNode } from '../image-node';
 import { YouTubeNode } from '../youtube-node';
@@ -31,6 +32,7 @@ export const nodes: Array<Klass<LexicalNode>> = [
     ImageNode,
     YouTubeNode,
     ImageGalleryNode,
+    CalloutNode,
     MarkNode,
     OverflowNode,
     LayoutContainerNode,

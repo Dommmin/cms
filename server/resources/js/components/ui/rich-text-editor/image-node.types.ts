@@ -6,6 +6,13 @@ export type ImageWrap = 'none' | 'wrap-left' | 'wrap-right';
 export type ImageSizePreset = 'small' | 'medium' | 'large' | 'full' | 'custom';
 export type ImageLoading = 'lazy' | 'eager';
 
+export type ImageFilters = {
+    brightness?: number;
+    contrast?: number;
+    saturate?: number;
+    blur?: number;
+};
+
 export type ImageFocalPoint = {
     x: number;
     y: number;
@@ -27,6 +34,7 @@ export type SerializedImageNode = Spread<
         decorative?: boolean;
         linkUrl?: string | null;
         loading?: ImageLoading;
+        filters?: ImageFilters | null;
     },
     SerializedLexicalNode
 >;
@@ -46,15 +54,17 @@ export type CreateImageNodePayload = {
     decorative?: boolean;
     linkUrl?: string | null;
     loading?: ImageLoading;
+    filters?: ImageFilters | null;
 };
 
-export type ImageNodeState = Required<Omit<CreateImageNodePayload, 'width' | 'mediaId' | 'caption' | 'credit' | 'focalPoint' | 'linkUrl'>> & {
+export type ImageNodeState = Required<Omit<CreateImageNodePayload, 'width' | 'mediaId' | 'caption' | 'credit' | 'focalPoint' | 'linkUrl' | 'filters'>> & {
     width?: string;
     mediaId: number | null;
     caption: string | null;
     credit: string | null;
     focalPoint: ImageFocalPoint | null;
     linkUrl: string | null;
+    filters: ImageFilters | null;
 };
 
 export type ImageComponentProps = ImageNodeState & {

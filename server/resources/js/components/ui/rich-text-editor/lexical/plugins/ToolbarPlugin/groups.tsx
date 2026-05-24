@@ -1,11 +1,11 @@
-import { AlignCenter, AlignJustify, AlignLeft, AlignRight, Baseline, Bold, Code2, Eraser, Highlighter, Italic, Link2, Link2Off, Redo2, SpellCheck, Strikethrough, Subscript, Superscript, Underline, Undo2 } from 'lucide-react';
+import { AlignCenter, AlignJustify, AlignLeft, AlignRight, Baseline, Bold, Code2, Eraser, Highlighter, Italic, Link2, Link2Off, Paintbrush, Redo2, SpellCheck, Strikethrough, Subscript, Superscript, Underline, Undo2 } from 'lucide-react';
 import type { JSX } from 'react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTranslation } from '@/hooks/use-translation';
-import { FONT_FAMILIES, FONT_SIZES, TEXT_COLORS } from './constants';
+import { FONT_FAMILIES, FONT_SIZES, HIGHLIGHT_COLORS, TEXT_COLORS } from './constants';
 import { ToolbarButton as Btn, ToolbarToggle as Tog } from './controls';
 import type { AlignmentGroupProps, FontStyleGroupProps, HistoryGroupProps, InlineFormatGroupProps, LinkGroupProps } from './types';
 
@@ -87,11 +87,14 @@ export function FontStyleGroup({
     fontSize,
     fontFamily,
     fontColor,
+    highlightColor,
     spellcheck,
     onFontSizeChange,
     onFontFamilyChange,
     onFontColorChange,
+    onHighlightColorChange,
     onResetColor,
+    onResetHighlightColor,
     onToggleSpellcheck,
 }: FontStyleGroupProps): JSX.Element {
     const __ = useTranslation();
@@ -168,6 +171,40 @@ export function FontStyleGroup({
                     <DropdownMenuSeparator className="my-1.5" />
                     <button type="button" className="w-full py-0.5 text-center text-xs text-muted-foreground hover:text-foreground" onClick={onResetColor}>
                         {__('rte.toolbar.reset_color', 'Reset color')}
+                    </button>
+                </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <DropdownMenuTrigger asChild>
+                            <Button type="button" variant="ghost" size="sm" className="relative h-7 w-7 p-0">
+                                <Paintbrush size={13} />
+                                <span className="absolute right-1 bottom-0.5 left-1 h-0.5 rounded-full" style={{ backgroundColor: highlightColor || 'transparent', border: highlightColor ? 'none' : '1px solid currentColor' }} />
+                            </Button>
+                        </DropdownMenuTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="text-xs">
+                        {__('rte.toolbar.highlight_color', 'Highlight color')}
+                    </TooltipContent>
+                </Tooltip>
+                <DropdownMenuContent className="p-2">
+                    <div className="grid grid-cols-8 gap-1">
+                        {HIGHLIGHT_COLORS.map((color) => (
+                            <button
+                                key={color}
+                                type="button"
+                                className="h-5 w-5 rounded border border-border transition-transform hover:scale-110"
+                                style={{ backgroundColor: color }}
+                                onClick={() => onHighlightColorChange(color)}
+                                title={color}
+                            />
+                        ))}
+                    </div>
+                    <DropdownMenuSeparator className="my-1.5" />
+                    <button type="button" className="w-full py-0.5 text-center text-xs text-muted-foreground hover:text-foreground" onClick={onResetHighlightColor}>
+                        {__('rte.toolbar.reset_highlight', 'Reset highlight')}
                     </button>
                 </DropdownMenuContent>
             </DropdownMenu>

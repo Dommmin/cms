@@ -16,9 +16,12 @@ import type { EditorProps } from './Editor.types';
 import { isAllowedEditorLinkUrl } from './link-url';
 import { nodes } from './nodes';
 import AutoLinkPlugin from './plugins/AutoLinkPlugin';
+import ClipboardImagePlugin from './plugins/ClipboardImagePlugin';
 import ContentHealthPlugin from './plugins/ContentHealthPlugin';
 import CopyCodePlugin from './plugins/CopyCodePlugin';
 import DraggableBlockPlugin from './plugins/DraggableBlockPlugin';
+import ExportPlugin from './plugins/ExportPlugin';
+import FindReplacePlugin from './plugins/FindReplacePlugin';
 import FloatingLinkEditorPlugin from './plugins/FloatingLinkEditorPlugin';
 import FloatingTextFormatPlugin from './plugins/FloatingTextFormatPlugin';
 import HtmlPlugin from './plugins/HtmlPlugin';
@@ -57,6 +60,7 @@ function EditablePlugin({ editable }: { editable: boolean }): null {
 export default function Editor({ value, onChange, onJsonChange, placeholder = 'Start writing...', className, maxHeight, editable = true, mode = 'full', showWordCount = true, instanceKey }: EditorProps): JSX.Element {
     const containerRef = useRef<HTMLDivElement>(null);
     const config = useRef(buildConfig(editable));
+    const isFullMode = mode === 'full';
 
     const contentStyle = maxHeight
         ? { maxHeight: typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight, overflowY: 'auto' as const }
@@ -82,13 +86,14 @@ export default function Editor({ value, onChange, onJsonChange, placeholder = 'S
                 <ListPlugin />
                 <CheckListPlugin />
                 <LinkPlugin validateUrl={isAllowedEditorLinkUrl} />
-                {editable && <AutoLinkPlugin />}
+{editable && <AutoLinkPlugin />}
                 <CodePlugin />
                 <TablePlugin hasCellMerge hasCellBackgroundColor />
                 {editable && <TableActionMenuPlugin />}
                 <HorizontalRulePlugin />
                 {editable && <MarkdownPlugin />}
                 {editable && <PasteSanitizerPlugin />}
+                {editable && <ClipboardImagePlugin />}
                 {editable && <SlashCommandPlugin />}
                 {/* eslint-disable-next-line react-hooks/refs */}
                 {editable && <DraggableBlockPlugin anchorElem={containerRef.current ?? undefined} />}
@@ -96,7 +101,9 @@ export default function Editor({ value, onChange, onJsonChange, placeholder = 'S
                 <EditablePlugin editable={editable} />
                 <CopyCodePlugin />
                 {editable && <ContentHealthPlugin />}
+                {isFullMode && editable && <FindReplacePlugin />}
                 {showWordCount && <WordCountPlugin />}
+                {isFullMode && editable && <ExportPlugin />}
             </LexicalComposer>
         </div>
     );
