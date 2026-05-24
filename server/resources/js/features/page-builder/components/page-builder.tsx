@@ -74,6 +74,7 @@ export function PageBuilder({
         insertTemplateSections,
         addBlock,
         updateBlock,
+        updateBlockConfigurationField,
         deleteBlock,
         moveBlock,
         duplicateBlock,
@@ -263,6 +264,23 @@ export function PageBuilder({
         setInspectorOpen(true);
     };
 
+    const handleInlineEdit = useCallback(
+        (
+            sectionIndex: number,
+            blockIndex: number,
+            field: string,
+            value: string,
+        ) => {
+            updateBlockConfigurationField(
+                sectionIndex,
+                blockIndex,
+                field,
+                value,
+            );
+        },
+        [updateBlockConfigurationField],
+    );
+
     const handleToggleSectionVisibility = (sectionIndex: number) => {
         const section = sections[sectionIndex];
         if (!section) return;
@@ -349,6 +367,7 @@ export function PageBuilder({
                         onSelectSection={handleSelectSection}
                         onSelectBlock={handleSelectBlock}
                         onEditBlock={handleEditBlock}
+                        onInlineEdit={handleInlineEdit}
                         availableSections={data.available_sections}
                     />
                 ) : (

@@ -296,6 +296,26 @@ export function useBuilderState(initialSections: Section[]) {
         [sections],
     );
 
+    const updateBlockConfigurationField = useCallback(
+        (
+            sectionIndex: number,
+            blockIndex: number,
+            field: string,
+            value: unknown,
+        ) => {
+            const block = sections[sectionIndex]?.blocks[blockIndex];
+            if (!block) return;
+
+            updateBlock(sectionIndex, blockIndex, {
+                configuration: {
+                    ...block.configuration,
+                    [field]: value,
+                },
+            });
+        },
+        [sections, updateBlock],
+    );
+
     const deleteBlock = useCallback(
         (sectionIndex: number, blockIndex: number) => {
             const blockClientId =
@@ -519,6 +539,7 @@ export function useBuilderState(initialSections: Section[]) {
         // Block ops
         addBlock,
         updateBlock,
+        updateBlockConfigurationField,
         deleteBlock,
         moveBlock,
         duplicateBlock,

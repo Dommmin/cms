@@ -1,16 +1,7 @@
 import { useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import type { Section } from '../types';
-
-type CanvasViewProps = {
-    sections: Section[];
-    activeSectionId: string | null;
-    activeBlockId: string | null;
-    onSelectSection: (sectionIndex: number) => void;
-    onSelectBlock: (sectionIndex: number, blockIndex: number) => void;
-    onEditBlock: (sectionIndex: number, blockIndex: number) => void;
-    availableSections: Record<string, { label: string; description?: string }>;
-};
+import { CanvasBlockPreview } from './canvas-block-preview';
+import type { CanvasViewProps } from './canvas-view.types';
 
 const variantStyles: Record<string, string> = {
     light: 'bg-background text-foreground',
@@ -58,6 +49,7 @@ export function CanvasView({
     onSelectSection,
     onSelectBlock,
     onEditBlock,
+    onInlineEdit,
     availableSections,
 }: CanvasViewProps) {
     const getSectionLabel = useCallback(
@@ -145,7 +137,7 @@ export function CanvasView({
                                                         );
                                                     }}
                                                 >
-                                                    <div className="pointer-events-none absolute top-2 right-2 z-10 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                                                    <div className="absolute top-2 right-2 z-10 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                                                         <button
                                                             type="button"
                                                             className="rounded bg-primary px-2 py-1 text-[10px] text-primary-foreground hover:bg-primary/90"
@@ -160,38 +152,20 @@ export function CanvasView({
                                                             Edit
                                                         </button>
                                                     </div>
-                                                    <div className="pointer-events-none min-h-[2rem] text-sm select-none">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground uppercase">
-                                                                {block.type.replace(
-                                                                    /_/g,
-                                                                    ' ',
-                                                                )}
-                                                            </span>
-                                                            {(block
-                                                                .configuration
-                                                                .heading as string) && (
-                                                                <span className="truncate text-sm">
-                                                                    {
-                                                                        block
-                                                                            .configuration
-                                                                            .heading as string
-                                                                    }
-                                                                </span>
-                                                            )}
-                                                            {(block
-                                                                .configuration
-                                                                .title as string) && (
-                                                                <span className="truncate text-sm">
-                                                                    {
-                                                                        block
-                                                                            .configuration
-                                                                            .title as string
-                                                                    }
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </div>
+                                                    <CanvasBlockPreview
+                                                        block={block}
+                                                        onInlineEdit={(
+                                                            field,
+                                                            value,
+                                                        ) =>
+                                                            onInlineEdit(
+                                                                sectionIndex,
+                                                                blockIndex,
+                                                                field,
+                                                                value,
+                                                            )
+                                                        }
+                                                    />
                                                 </div>
                                             );
                                         })}

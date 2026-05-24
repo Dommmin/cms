@@ -1520,6 +1520,12 @@ Implemented in `resources/js/hooks/use-builder-state.ts` using `useReducer` with
 
 `resources/js/features/page-builder/components/page-inspector.tsx` renders the right-panel editor for the currently active section or block. It reuses `SectionForm` and `BlockForm`, so inline editing remains the fallback while the inspector gets the same schema-driven fields and relation controls.
 
+### Canvas View
+
+`resources/js/features/page-builder/components/canvas-view.tsx` renders the visual editor mode. It applies section variant, layout and padding styles, delegates supported block previews to `CanvasBlockPreview`, and keeps Cards view as the full-schema fallback. The first admin-native preview set covers `hero_banner`, `rich_text`, `call_to_action`, `image_gallery`, and `featured_products`; other block types render a labeled fallback until a preview is added.
+
+Inline text editing is intentionally limited to scalar configuration fields: `title`, `heading`, `subtitle`, `description`, `primary_label`, and `secondary_label`. Canvas sends edits through `onInlineEdit(sectionIndex, blockIndex, field, value)`, and `useBuilderState.updateBlockConfigurationField()` writes the value into `block.configuration` so normal save/autosave/version flows continue to apply.
+
 ### Health
 
 `resources/js/features/page-builder/page-health.ts` analyzes the current client-side builder snapshot. It checks active sections/blocks for primary H1 coverage, duplicate H1s, CTA label/URL mismatches, raw HTML anchors without `href`, and image relations missing `metadata.alt`. Add new block-specific content quality rules there and cover them with Vitest tests in `page-health.test.ts`.
