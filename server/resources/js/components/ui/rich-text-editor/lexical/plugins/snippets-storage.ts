@@ -1,3 +1,4 @@
+import { sanitizePastedHtml } from './paste-sanitizer';
 import type { RteSnippet } from './snippets-storage.types';
 
 export const RTE_SNIPPETS_STORAGE_KEY = 'cms:rte:snippets:v1';
@@ -19,6 +20,10 @@ function isSnippet(value: unknown): value is RteSnippet {
         && typeof candidate.createdAt === 'string';
 }
 
+export function sanitizeSnippetHtml(html: string): string {
+    return sanitizePastedHtml(html);
+}
+
 export function loadRteSnippets(storage: Storage | null = getStorage()): RteSnippet[] {
     if (!storage) return [];
 
@@ -28,7 +33,15 @@ export function loadRteSnippets(storage: Storage | null = getStorage()): RteSnip
 
         const decoded: unknown = JSON.parse(raw);
 
-        return Array.isArray(decoded) ? decoded.filter(isSnippet) : [];
+        return Array.isArray(decoded)
+            ? decoded
+                .filter(isSnippet)
+                .map((snippet) => ({
+                    ...snippet,
+                    html: sanitizeSnippetHtml(snippet.html),
+                }))
+                .filter((snippet) => snippet.html.trim() !== '')
+            : [];
     } catch {
         return [];
     }
@@ -44,7 +57,7 @@ export function createRteSnippet(name: string, html: string): RteSnippet {
     return {
         id: globalThis.crypto?.randomUUID?.() ?? `snippet-${Date.now()}`,
         name,
-        html,
+        html: sanitizeSnippetHtml(html),
         createdAt: new Date().toISOString(),
     };
 }

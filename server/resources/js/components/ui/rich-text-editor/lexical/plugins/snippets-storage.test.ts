@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { createRteSnippet, loadRteSnippets, RTE_SNIPPETS_STORAGE_KEY, saveRteSnippets } from './snippets-storage';
+import { createRteSnippet, loadRteSnippets, RTE_SNIPPETS_STORAGE_KEY, sanitizeSnippetHtml, saveRteSnippets } from './snippets-storage';
 
 describe('snippets storage', () => {
     beforeEach(() => {
@@ -26,5 +26,56 @@ describe('snippets storage', () => {
         window.localStorage.setItem(RTE_SNIPPETS_STORAGE_KEY, JSON.stringify([snippet, { id: 'bad' }]));
 
         expect(loadRteSnippets()).toEqual([snippet]);
+    });
+
+    it('sanitizes snippet HTML before saving it for later insertion', () => {
+        const snippet = createRteSnippet('Unsafe', '<p onclick="alert(1)"><a href="javascript:alert(1)">Bad</a><script>alert(1)</script></p>');
+
+        expect(snippet.html).toBe('<p>Bad</p>');
+    });
+
+    it('sanitizes snippets loaded from localStorage', () => {
+        window.localStorage.setItem(
+            RTE_SNIPPETS_STORAGE_KEY,
+            JSON.stringify([
+                {
+                    id: 'stored',
+                    name: 'Stored',
+                    html: '<img src="data:image/png;base64,abc"><p style="color:red">Safe text</p>',
+                    createdAt: '2026-05-25T00:00:00.000Z',
+                },
+            ]),
+        );
+
+        expect(loadRteSnippets()).toEqual([
+            {
+                id: 'stored',
+                name: 'Stored',
+                html: '<p>Safe text</p>',
+                createdAt: '2026-05-25T00:00:00.000Z',
+            },
+        ]);
+    });
+
+    it('drops stored snippets that sanitize to empty HTML', () => {
+        window.localStorage.setItem(
+            RTE_SNIPPETS_STORAGE_KEY,
+            JSON.stringify([
+                {
+                    id: 'empty',
+                    name: 'Empty',
+                    html: '<script>alert(1)</script>',
+                    createdAt: '2026-05-25T00:00:00.000Z',
+                },
+            ]),
+        );
+
+        expect(loadRteSnippets()).toEqual([]);
+    });
+
+    it('exposes the same sanitizer for command-driven snippet insertion', () => {
+        expect(sanitizeSnippetHtml('<p><a href="https://example.com" target="_blank">External</a></p>')).toBe(
+            '<p><a href="https://example.com" target="_blank" rel="noopener noreferrer">External</a></p>',
+        );
     });
 });
