@@ -29,7 +29,7 @@ function makeSection(blocks: Block[]): Section {
 }
 
 describe('CanvasBlockPreview', () => {
-    it('renders real previews for the primary page builder block types', () => {
+    it('renders real previews for all page builder block types', () => {
         const blocks = [
             makeBlock('hero_banner', {
                 title: 'Hero headline',
@@ -78,6 +78,65 @@ describe('CanvasBlockPreview', () => {
                 title: 'Pricing',
                 plans: [{ name: 'Starter', price: '$10' }],
             }),
+            makeBlock('categories_grid', {
+                title: 'Categories',
+            }),
+            makeBlock('two_columns', {
+                left_title: 'Left side',
+                left_content: '<p>Left body</p>',
+                right_title: 'Right side',
+                right_content: '<p>Right body</p>',
+            }),
+            makeBlock('three_columns', {
+                column_1_title: 'First column',
+                column_2_title: 'Second column',
+                column_3_title: 'Third column',
+            }),
+            makeBlock('form_embed', {
+                title: 'Contact form',
+                form: { fields: [{ label: 'Email' }] },
+            }),
+            makeBlock('map', {
+                title: 'Store map',
+            }),
+            makeBlock('featured_posts', {
+                title: 'Latest posts',
+            }),
+            makeBlock('brands_slider', {
+                title: 'Trusted brands',
+            }),
+            makeBlock('logo_cloud', {
+                title: 'Partners',
+            }),
+            makeBlock('countdown_timer', {
+                title: 'Sale ends soon',
+            }),
+            makeBlock('timeline', {
+                title: 'Timeline',
+                items: [{ date: '2026', title: 'Launch' }],
+            }),
+            makeBlock('team_members', {
+                title: 'Team',
+                members: [{ name: 'Grace', role: 'Lead' }],
+            }),
+            makeBlock('icon_list', {
+                title: 'Benefits',
+                items: [{ title: 'Fast', description: 'Ships quickly' }],
+            }),
+            makeBlock('steps_process', {
+                title: 'Process',
+                steps: [{ title: 'Plan', description: 'Define scope' }],
+            }),
+            makeBlock('trust_badges', {
+                badges: [{ label: 'Secure checkout' }],
+            }),
+            makeBlock('video_embed', {
+                title: 'Product video',
+                url: 'https://example.com/video',
+            }),
+            makeBlock('custom_html', {
+                html: '<strong>Custom snippet</strong>',
+            }),
         ];
 
         for (const block of blocks) {
@@ -99,6 +158,22 @@ describe('CanvasBlockPreview', () => {
         expect(screen.getByText('Numbers')).toBeInTheDocument();
         expect(screen.getByText('Important notice')).toBeInTheDocument();
         expect(screen.getByText('Starter')).toBeInTheDocument();
+        expect(screen.getByText('Categories')).toBeInTheDocument();
+        expect(screen.getByText('Left side')).toBeInTheDocument();
+        expect(screen.getByText('Second column')).toBeInTheDocument();
+        expect(screen.getByText('Contact form')).toBeInTheDocument();
+        expect(screen.getByText('Store map')).toBeInTheDocument();
+        expect(screen.getByText('Latest posts')).toBeInTheDocument();
+        expect(screen.getByText('Trusted brands')).toBeInTheDocument();
+        expect(screen.getByText('Partners')).toBeInTheDocument();
+        expect(screen.getByText('Sale ends soon')).toBeInTheDocument();
+        expect(screen.getByText('Launch')).toBeInTheDocument();
+        expect(screen.getByText('Grace')).toBeInTheDocument();
+        expect(screen.getByText('Fast')).toBeInTheDocument();
+        expect(screen.getByText('Plan')).toBeInTheDocument();
+        expect(screen.getByText('Secure checkout')).toBeInTheDocument();
+        expect(screen.getByText('Product video')).toBeInTheDocument();
+        expect(screen.getByText('Custom snippet')).toBeInTheDocument();
     });
 
     it('commits inline edits on blur', () => {

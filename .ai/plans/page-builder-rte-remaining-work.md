@@ -30,7 +30,7 @@ część funkcji już istnieje, część jest tylko częściowa, a część nada
 - Theme design tokens: `typography`, `spacing`, `buttons`, `containers`.
 - CSS variables z theme po stronie Laravel i Next.js.
 - Image crop modal + backend crop endpoint + focal point.
-- Page Builder `CanvasView`, ale tylko jako uproszczony podgląd/placeholder.
+- Page Builder `CanvasView` z admin-native preview dla wszystkich aktualnych typów bloków.
 - Quick add block, skróty klawiszowe, block patterns.
 - Lazy loading sekcji i code splitting bloków.
 - RTE `standard` mode, `full` dla `rich_text`.
@@ -41,10 +41,7 @@ część funkcji już istnieje, część jest tylko częściowa, a część nada
 
 ### Nadal Brakuje / Jest Częściowe
 
-- Prawdziwy visual canvas z renderowaniem bloków, a nie placeholderów.
-- Inline editing prostych pól w Page Builderze.
-- Tryb Simple/Advanced w builderze.
-- Pełne testy dla page builder block renderingu, theme tokens i crop endpointu.
+- Pełniejsza zgodność wizualna adminowego Canvasu ze storefrontem dla najbardziej złożonych bloków.
 - Pełny image editing UX: zoom, lepszy focal-point workflow, crop variants w RTE ImageNode.
 - RTE embeds dla Instagram i Twitter/X przez backend oEmbed/proxy.
 - RTE snippets.
@@ -54,7 +51,7 @@ część funkcji już istnieje, część jest tylko częściowa, a część nada
 
 ## Priorytet 1 — Page Builder Visual Canvas
 
-Status 2026-05-25: **częściowo wdrożone, rozszerzone**. Adminowy Canvas renderuje realne preview dla `hero_banner`, `rich_text`, `call_to_action`, `image_gallery`, `featured_products`, `promotional_banner`, `newsletter_signup`, `testimonials`, `accordion`, `tabs`, `stats_counter`, `alert_banner`, `pricing_cards` i `pricing_table`; kliknięcie wybiera blok, double-click/Edit otwiera inspector, a inline edit obsługuje proste pola tekstowe (`title`, `heading`, `subtitle`, `description`, `primary_label`, `secondary_label`) przez `useBuilderState.updateBlockConfigurationField()`. Cards view pozostaje fallbackiem. Do domknięcia nadal zostało rozszerzenie preview na pozostałe, relacyjne lub bardziej interaktywne bloki i pełniejsza zgodność wizualna ze storefrontem.
+Status 2026-05-25: **wdrożone dla aktualnych typów bloków**. Adminowy Canvas renderuje realne, admin-native preview dla wszystkich 30 typów Page Buildera, w tym bloków relacyjnych/interaktywnych jako stabilne statyczne podglądy bez wywołań API. Kliknięcie wybiera blok, double-click/Edit otwiera inspector, a inline edit obsługuje proste pola tekstowe (`title`, `heading`, `subtitle`, `description`, `primary_label`, `secondary_label`) przez `useBuilderState.updateBlockConfigurationField()`. Cards view pozostaje pełnym fallbackiem edycyjnym i miejscem dla pełnego schema-driven formularza.
 
 To jest najważniejsza luka UX. Obecny `CanvasView` renderuje sekcje i placeholdery bloków, ale nie renderuje prawdziwych komponentów bloków. Celem jest zbliżenie do Shopify/Gutenberg.
 
@@ -118,6 +115,7 @@ W `use-builder-state.ts` dodaj akcję aktualizującą `block.configuration[field
 
 - [x] Canvas renderuje realną treść dla minimum 5 typów bloków.
 - [x] Canvas renderuje realną treść dla prostych bloków marketing/content bez API.
+- [x] Canvas ma admin-native preview dla wszystkich aktualnych 30 typów bloków.
 - [x] Kliknięcie bloku wybiera go i synchronizuje z inspectorem.
 - [x] Double-click otwiera inspector.
 - [x] Inline edit aktualizuje konfigurację i ustawia unsaved state.
