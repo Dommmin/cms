@@ -52,7 +52,7 @@ async function recordConsentOnServer(
 ): Promise<void> {
     try {
         const sessionId = getOrCreateSessionId();
-        await fetch('/api/v1/consent', {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? '/api/v1'}/consent`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -232,7 +232,7 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
             role="dialog"
             aria-modal="true"
             aria-label={bannerTitle}
-            className="bg-background/70 fixed right-0 bottom-0 left-0 z-50 overflow-hidden border-t border-white/10 shadow-[0_-8px_32px_0_oklch(0_0_0_/_0.15)] backdrop-blur-2xl backdrop-saturate-150 dark:border-white/5 dark:shadow-[0_-8px_32px_0_oklch(0_0_0_/_0.4)]"
+            className="bg-background/70 fixed right-0 bottom-0 left-0 z-[60] overflow-hidden border-t border-white/10 pb-16 shadow-[0_-8px_32px_0_oklch(0_0_0_/_0.15)] backdrop-blur-2xl backdrop-saturate-150 md:pb-0 dark:border-white/5 dark:shadow-[0_-8px_32px_0_oklch(0_0_0_/_0.4)]"
         >
             <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
                 {!showDetails ? (

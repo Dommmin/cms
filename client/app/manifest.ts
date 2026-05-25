@@ -4,7 +4,7 @@ const appName = process.env.NEXT_PUBLIC_APP_NAME ?? 'Store';
 const appDescription =
     process.env.NEXT_PUBLIC_APP_DESCRIPTION ??
     'Mobile-friendly storefront for browsing products, managing cart, and checking out.';
-const startUrl = process.env.NEXT_PUBLIC_PWA_START_URL ?? '/en';
+const startUrl = process.env.NEXT_PUBLIC_PWA_START_URL ?? '/';
 const themeColor = process.env.NEXT_PUBLIC_PWA_THEME_COLOR ?? '#111827';
 const backgroundColor =
     process.env.NEXT_PUBLIC_PWA_BACKGROUND_COLOR ?? '#ffffff';
@@ -57,13 +57,13 @@ export default function manifest(): MetadataRoute.Manifest {
             {
                 name: 'Products',
                 short_name: 'Products',
-                url: '/en/products',
+                url: '/products',
                 icons: [{ src: '/pwa/icon-192.png', sizes: '192x192' }],
             },
             {
                 name: 'Cart',
                 short_name: 'Cart',
-                url: '/en/cart',
+                url: '/cart',
                 icons: [{ src: '/pwa/icon-192.png', sizes: '192x192' }],
             },
         ],

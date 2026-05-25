@@ -53,10 +53,13 @@ export function LocaleSwitcher() {
                 className="border-border bg-background text-foreground focus:ring-ring flex cursor-pointer items-center gap-1 rounded-md border px-2 py-1 text-sm focus:ring-2 focus:outline-none"
                 aria-haspopup="listbox"
                 aria-expanded={open}
-                aria-label="Select language"
+                aria-label={`${current.native_name} (${current.code.toUpperCase()})`}
             >
-                {current.flag_emoji && <span>{current.flag_emoji}</span>}
-                <span>{current.native_name}</span>
+                {current.flag_emoji && (
+                    <span className="text-base leading-none">
+                        {current.flag_emoji}
+                    </span>
+                )}
                 <ChevronDown
                     className="h-3 w-3 opacity-60"
                     aria-hidden="true"
@@ -86,7 +89,11 @@ export function LocaleSwitcher() {
                                         : 'text-foreground'
                                 }`}
                             >
-                                {l.flag_emoji && <span>{l.flag_emoji}</span>}
+                                {l.flag_emoji && (
+                                    <span className="text-base leading-none">
+                                        {l.flag_emoji}
+                                    </span>
+                                )}
                                 <span>{l.native_name}</span>
                             </button>
                         </li>

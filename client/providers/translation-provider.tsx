@@ -1,11 +1,7 @@
 'use client';
 
 import { getTranslations } from '@/api/translations';
-import {
-    getExplicitLocaleFromPath,
-    localePath,
-    stripLocaleFromPath,
-} from '@/lib/i18n';
+import { getLocaleFromPath, localePath, stripLocaleFromPath } from '@/lib/i18n';
 import { useQuery } from '@tanstack/react-query';
 import { usePathname } from 'next/navigation';
 import { createContext, useCallback } from 'react';
@@ -22,9 +18,7 @@ export const TranslationContext = createContext<TranslationContextType | null>(
 export function TranslationProvider({ children }: TranslationProviderProps) {
     const pathname = usePathname();
 
-    // Derive locale from URL. Default-locale URLs are intentionally unprefixed.
-    const explicitLocaleFromPath = getExplicitLocaleFromPath(pathname);
-    const currentLocale = explicitLocaleFromPath ?? 'en';
+    const currentLocale = getLocaleFromPath(pathname);
 
     const { data: translations, isLoading } = useQuery({
         queryKey: ['translations', currentLocale],

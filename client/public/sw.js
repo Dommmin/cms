@@ -1,4 +1,4 @@
-const VERSION = 'pwa-v1';
+const VERSION = 'pwa-v2';
 const STATIC_CACHE = `${VERSION}-static`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 const OFFLINE_URL = '/offline';
@@ -24,17 +24,18 @@ const PRIVATE_PATHS = [
 ];
 
 function isPrivateUrl(url) {
-    const localizedPrivatePath = /^\/(en|pl)(\/.*)?$/.test(url.pathname)
-        ? url.pathname.includes('/account') ||
-          url.pathname.includes('/cart') ||
-          url.pathname.includes('/checkout')
+    const pathname = url.pathname;
+
+    const localizedPrivatePath = /^\/[a-z]{2}(\/.*)?$/.test(pathname)
+        ? pathname.includes('/account') ||
+          pathname.includes('/cart') ||
+          pathname.includes('/checkout')
         : false;
 
     return (
         localizedPrivatePath ||
         PRIVATE_PATHS.some(
-            (path) =>
-                url.pathname === path || url.pathname.startsWith(`${path}/`),
+            (path) => pathname === path || pathname.startsWith(`${path}/`),
         )
     );
 }
@@ -97,12 +98,10 @@ self.addEventListener('fetch', (event) => {
     }
 
     if (
-        url.pathname.startsWith('/en/products') ||
-        url.pathname.startsWith('/pl/products') ||
-        url.pathname.startsWith('/en/blog') ||
-        url.pathname.startsWith('/pl/blog') ||
-        url.pathname.startsWith('/en/stores') ||
-        url.pathname.startsWith('/pl/stores')
+        url.pathname.startsWith('/products') ||
+        url.pathname.startsWith('/blog') ||
+        url.pathname.startsWith('/stores') ||
+        /^\/[a-z]{2}\/(products|blog|stores)/.test(url.pathname)
     ) {
         event.respondWith(staleWhileRevalidate(request));
     }
@@ -117,7 +116,7 @@ async function cacheFirst(request) {
 
     const response = await fetch(request);
 
-    if (response.ok) {
+    if (response.ok && response.type !== 'opaqueredirect') {
         const cache = await caches.open(STATIC_CACHE);
         await cache.put(request, response.clone());
     }
@@ -131,7 +130,7 @@ async function networkFirst(request) {
     try {
         const response = await fetch(request);
 
-        if (response.ok) {
+        if (response.ok && response.type !== 'opaqueredirect') {
             await cache.put(request, response.clone());
         }
 
@@ -150,7 +149,7 @@ async function staleWhileRevalidate(request) {
     const cached = await cache.match(request);
     const network = fetch(request)
         .then((response) => {
-            if (response.ok) {
+            if (response.ok && response.type !== 'opaqueredirect') {
                 cache.put(request, response.clone());
             }
 

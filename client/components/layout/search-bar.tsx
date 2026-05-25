@@ -117,11 +117,19 @@ export function SearchBar() {
         return () => document.removeEventListener('keydown', onKey);
     }, [open]);
 
+    useEffect(() => {
+        function onOpenSearch() {
+            openSearch();
+        }
+        window.addEventListener('open-search', onOpenSearch);
+        return () => window.removeEventListener('open-search', onOpenSearch);
+    }, []);
+
     return (
         <>
             <button
                 onClick={openSearch}
-                className="hover:bg-accent inline-flex h-9 w-9 items-center justify-center rounded-md"
+                className="hover:bg-accent hidden h-9 w-9 items-center justify-center rounded-md md:inline-flex"
                 aria-label="Search"
             >
                 <Search className="h-4 w-4" />

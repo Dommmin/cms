@@ -198,7 +198,7 @@ export default async function RootLayout({
                                 <Header modules={modules} siteName={siteName} />
                                 <main
                                     id="main-content"
-                                    className="flex-1 pb-16 md:pb-0"
+                                    className="flex-1 pb-20 md:pb-0"
                                 >
                                     <PageTransition>{children}</PageTransition>
                                 </main>
