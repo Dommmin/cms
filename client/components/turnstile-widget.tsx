@@ -1,17 +1,10 @@
 'use client';
 
-import Script from 'next/script';
 import { useEffect, useRef } from 'react';
 import type { TurnstileWidgetProps } from './turnstile-widget.types';
 
 const SITE_KEY = process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY ?? '';
 
-/**
- * Cloudflare Turnstile CAPTCHA widget.
- *
- * Renders nothing when NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY is not set,
- * so local development works without Cloudflare credentials.
- */
 export function TurnstileWidget({
     onVerify,
     onExpire,
@@ -34,26 +27,26 @@ export function TurnstileWidget({
 
     useEffect(() => {
         if (!SITE_KEY) return;
-        // Script may already be loaded (e.g. navigating back to the page)
+
         if (window.turnstile) {
             renderWidget();
+            return;
         }
+
+        const script = document.createElement('script');
+        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+        script.async = true;
+        script.onload = renderWidget;
+        document.head.appendChild(script);
+
         return () => {
             widgetIdRef.current = null;
+            document.head.removeChild(script);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     if (!SITE_KEY) return null;
 
-    return (
-        <>
-            <Script
-                src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-                strategy="lazyOnload"
-                onLoad={renderWidget}
-            />
-            <div ref={containerRef} className={className} />
-        </>
-    );
+    return <div ref={containerRef} className={className} />;
 }

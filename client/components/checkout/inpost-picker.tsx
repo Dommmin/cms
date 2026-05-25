@@ -1,8 +1,20 @@
 'use client';
 
-import Script from 'next/script';
 import { useEffect, useRef } from 'react';
 import type { InPostPoint, InpostPickerProps } from './inpost-picker.types';
+
+function InpostScript() {
+    useEffect(() => {
+        const script = document.createElement('script');
+        script.src = 'https://geowidget.inpost.pl/inpost-geowidget.js';
+        script.async = true;
+        document.head.appendChild(script);
+        return () => {
+            document.head.removeChild(script);
+        };
+    }, []);
+    return null;
+}
 
 // Inner component — only rendered when the token is present (hooks are always called).
 function InpostWidget({
@@ -88,10 +100,7 @@ function InpostWidget({
                 </div>
             )}
 
-            <Script
-                src="https://geowidget.inpost.pl/inpost-geowidget.js"
-                strategy="lazyOnload"
-            />
+            <InpostScript />
             <div
                 ref={containerRef}
                 className="border-border overflow-hidden rounded-xl border"
