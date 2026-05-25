@@ -8,7 +8,7 @@ import type {
     NodeKey,
 } from 'lexical';
 import { $applyNodeReplacement, $getNodeByKey, DecoratorNode } from 'lexical';
-import { Plus, X } from 'lucide-react';
+import { Plus, Trash2, X } from 'lucide-react';
 import type { JSX } from 'react';
 import { useState } from 'react';
 import { MediaPickerModal, type MediaItem } from '@/components/media-picker-modal';
@@ -77,6 +77,10 @@ function ImageGalleryComponent({
         updateNode({ images: images.filter((_, i) => i !== index) });
     };
 
+    const removeGallery = () => {
+        editor.update(() => $getNodeByKey(nodeKey)?.remove());
+    };
+
     return (
         <div
             contentEditable={false}
@@ -127,6 +131,15 @@ function ImageGalleryComponent({
                         <input type="checkbox" checked={lightbox} onChange={(event) => updateNode({ lightbox: event.target.checked })} />
                         Lightbox
                     </label>
+                    <button
+                        type="button"
+                        onClick={removeGallery}
+                        className="rounded p-1 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                        title="Remove gallery"
+                    >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Remove gallery</span>
+                    </button>
                 </div>
             </div>
 

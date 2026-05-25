@@ -9,7 +9,7 @@ import type {
 } from 'lexical';
 import { $applyNodeReplacement, $getNodeByKey, DecoratorNode } from 'lexical';
 import { FileArchive, FileIcon, FileSpreadsheet, FileText, Presentation, Trash2 } from 'lucide-react';
-import type { JSX } from 'react';
+import type { JSX, KeyboardEvent } from 'react';
 import type {
     AttachmentComponentProps,
     AttachmentNodeState,
@@ -58,9 +58,24 @@ function renderMimeIcon(mimeType: string): JSX.Element {
 function AttachmentComponent({ url, name, fileName, mimeType, size, description, nodeKey, editor }: AttachmentComponentProps): JSX.Element {
     const safeUrl = safeAttachmentUrl(url);
     const target = getEditorLinkTarget(safeUrl) ?? undefined;
+    const removeAttachment = () => {
+        editor.update(() => $getNodeByKey(nodeKey)?.remove());
+    };
+
+    const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+        if (event.key !== 'Delete' && event.key !== 'Backspace') return;
+
+        event.preventDefault();
+        removeAttachment();
+    };
 
     return (
-        <span contentEditable={false} className="my-2 flex max-w-xl items-center gap-3 rounded-md border bg-muted/30 p-3">
+        <span
+            contentEditable={false}
+            tabIndex={0}
+            onKeyDown={handleKeyDown}
+            className="my-2 flex max-w-xl items-center gap-3 rounded-md border bg-muted/30 p-3 outline-none transition-shadow focus:ring-2 focus:ring-primary focus:ring-offset-1"
+        >
             {renderMimeIcon(mimeType)}
             <a href={safeUrl} target={target} rel={target === '_blank' ? 'noopener noreferrer' : undefined} className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium text-foreground">{name || fileName}</span>
@@ -74,11 +89,10 @@ function AttachmentComponent({ url, name, fileName, mimeType, size, description,
                 type="button"
                 className="rounded p-1 text-muted-foreground hover:text-destructive"
                 title="Remove file"
-                onClick={() => {
-                    editor.update(() => $getNodeByKey(nodeKey)?.remove());
-                }}
+                onClick={removeAttachment}
             >
                 <Trash2 className="h-4 w-4" />
+                <span className="sr-only">Remove file</span>
             </button>
         </span>
     );

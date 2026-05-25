@@ -240,6 +240,12 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
     };
 
     const resizeWithKeyboard = (event: KeyboardEvent<HTMLElement>) => {
+        if (isSelected && (event.key === 'Delete' || event.key === 'Backspace')) {
+            event.preventDefault();
+            editor.update(() => $getNodeByKey(nodeKey)?.remove());
+            return;
+        }
+
         if (!isSelected || (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight')) {
             return;
         }
@@ -351,6 +357,11 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
             onClick={() => setIsSelected((selected) => !selected)}
             onKeyDown={resizeWithKeyboard}
         >
+            {isSelected && (
+                <span className="absolute top-2 left-2 z-20 rounded bg-black/70 px-2 py-1 text-xs font-medium text-white">
+                    Image selected
+                </span>
+            )}
             {linkUrl ? (
                 <a href={linkUrl} target={getEditorLinkTarget(linkUrl) ?? undefined} rel={getEditorLinkTarget(linkUrl) === '_blank' ? 'noopener noreferrer' : undefined}>
                     {imageElement}
@@ -473,6 +484,7 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
                             title="Remove image"
                         >
                             <Trash2 size={13} />
+                            <span className="sr-only">Remove image</span>
                         </button>
                     </span>
 
