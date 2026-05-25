@@ -16,12 +16,6 @@ export interface I18nConfig {
     defaultLocale: string;
 }
 
-declare global {
-    interface Window {
-        __I18N_CONFIG__?: I18nConfig;
-    }
-}
-
 export const LOCALES = FALLBACK_LOCALES;
 export const DEFAULT_LOCALE: Locale = FALLBACK_DEFAULT_LOCALE;
 
@@ -39,8 +33,15 @@ export function createI18nConfig(locales: LocaleOption[]): I18nConfig {
 }
 
 export function getRuntimeI18nConfig(): I18nConfig {
-    if (typeof window !== 'undefined' && window.__I18N_CONFIG__) {
-        return window.__I18N_CONFIG__;
+    if (typeof window !== 'undefined') {
+        const raw = document.documentElement.dataset.i18n;
+        if (raw) {
+            try {
+                return JSON.parse(raw) as I18nConfig;
+            } catch {
+                // malformed data attribute — fall through
+            }
+        }
     }
 
     return {

@@ -18,6 +18,7 @@ import { GoogleTagManager } from '@/components/layout/google-tag-manager';
 import { Header } from '@/components/layout/header';
 import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import { PageTransition } from '@/components/layout/page-transition';
+import { ThemeInit } from '@/components/layout/theme-init';
 import { BlockAnimationObserver } from '@/components/page-builder/block-animation-observer';
 import { ThemeStyles } from '@/components/theme-styles';
 import { getI18nConfig } from '@/lib/i18n-server';
@@ -127,55 +128,25 @@ export default async function RootLayout({
     const cookieSettings = publicSettings?.settings.cookie ?? {};
 
     return (
-        <html lang={locale} suppressHydrationWarning>
+        <html
+            lang={locale}
+            data-i18n={JSON.stringify(i18nConfig)}
+            suppressHydrationWarning
+        >
             <head>
                 <ThemeStyles theme={publicSettings?.theme ?? null} />
-                {/* Preconnect to API origin for faster TTFB on client-side fetches */}
                 {process.env.NEXT_PUBLIC_API_URL && (
                     <link
                         rel="preconnect"
                         href={new URL(process.env.NEXT_PUBLIC_API_URL).origin}
                     />
                 )}
-                {/* Preconnect to Cloudflare Turnstile if key is configured */}
                 {process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY && (
                     <link
                         rel="preconnect"
                         href="https://challenges.cloudflare.com"
                     />
                 )}
-                {/* Theme: prevent flash — must run before hydration to avoid dark-mode flash */}
-                <script
-                    id="theme-init"
-                    dangerouslySetInnerHTML={{
-                        __html: `(function(){var t=localStorage.getItem('theme')||'system';if(t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}})();`,
-                    }}
-                />
-                {/* Runtime API URL — injected from server env so browser-side
-                    axios calls hit the correct backend without a rebuild.
-                    NEXT_PUBLIC_API_URL is baked at build time, but this script
-                    overrides it at runtime if the env var changes. */}
-                {process.env.NEXT_PUBLIC_API_URL && (
-                    <script
-                        id="api-url-init"
-                        dangerouslySetInnerHTML={{
-                            __html: `window.__API_URL__=${JSON.stringify(process.env.NEXT_PUBLIC_API_URL)};`,
-                        }}
-                    />
-                )}
-                <script
-                    id="i18n-config-init"
-                    dangerouslySetInnerHTML={{
-                        __html: `window.__I18N_CONFIG__=${JSON.stringify(i18nConfig)};`,
-                    }}
-                />
-                {/* Consent Mode v2: default DENIED — must run synchronously before GTM */}
-                <script
-                    id="consent-default"
-                    dangerouslySetInnerHTML={{
-                        __html: `window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:"consent_default",analytics_storage:"denied",ad_storage:"denied",ad_user_data:"denied",ad_personalization:"denied",functionality_storage:"denied",security_storage:"granted"});`,
-                    }}
-                />
                 <JsonLd
                     data={buildWebSite({
                         name: siteName,
@@ -196,6 +167,7 @@ export default async function RootLayout({
             <body
                 className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased${isAdminPreview ? 'pt-10' : ''}`}
             >
+                <ThemeInit />
                 <a
                     href="#main-content"
                     className="focus:bg-primary focus:text-primary-foreground sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:rounded-md focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:outline-none"

@@ -4,6 +4,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* System-preference dark fallback — prevents white flash before JS hydrates.
+   ThemeInit component applies .dark class on mount; this CSS rule covers
+   users whose OS is set to dark but haven't yet selected a theme. */
+@media (prefers-color-scheme: dark) {
+    :root:not(.light) {
+        color-scheme: dark;
+        background-color: oklch(0.1 0.02 264.7);
+        color: oklch(0.97 0 0);
+    }
+}
+
 @keyframes marquee {
     from {
         transform: translateX(0);
