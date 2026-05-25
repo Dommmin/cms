@@ -101,11 +101,13 @@ client/          Next.js public storefront
 - Server components → `serverFetch()` from `lib/server-fetch.ts`; client components (`"use client"`) → `api` from `lib/axios.ts`
 - Admin SPA routes → Wayfinder (`@/actions/`, `@/routes/`) — never hardcode strings
 - All client links → `useLocalePath()` / `lp()` (locale-prefixed URLs `/en/`, `/pl/`)
+- **No hardcoded strings in admin JSX** — always use `__('key', 'Fallback')` from `useTranslation()`, add keys to both `lang/en/admin.php` and `lang/pl/admin.php`
 
 **Always:**
 - Pest tests for every feature: `docker compose exec php php artisan make:test --pest Name`
 - All tests must pass: `docker compose exec php php artisan test --compact`
 - Use factories in tests — never `Model::create()` manually
+- **Translations required** — every user-facing string in admin components must use `__('key', 'Fallback')` from `useTranslation()`. When creating or modifying components, add corresponding keys to both `server/lang/en/admin.php` and `server/lang/pl/admin.php`. Never hardcode English text in JSX. After adding translation keys, clear cache: `docker compose exec php php artisan cache:clear`
 - Update `.ai/guide.md` when adding or changing features
 
 ---
@@ -114,13 +116,13 @@ client/          Next.js public storefront
 
 Always check `client/types/api.ts` before writing client code.
 
-| Type | Field | Note |
-|------|-------|------|
-| `CartItem` | `unit_price`, `subtotal` | `product` is direct (not `variant.product`) |
-| `ProductVariant` | `attributes: Record<string, string>` | not `attribute_values` |
-| `ProductReview` | `author`, `body` | not `reviewer_name` |
-| `Order` | `items?.length` | no `items_count` field |
-| `BlogPost` | `featured_image: string\|null` | not `cover_image_url` |
+| Type             | Field                                | Note                                        |
+|------------------|--------------------------------------|---------------------------------------------|
+| `CartItem`       | `unit_price`, `subtotal`             | `product` is direct (not `variant.product`) |
+| `ProductVariant` | `attributes: Record<string, string>` | not `attribute_values`                      |
+| `ProductReview`  | `author`, `body`                     | not `reviewer_name`                         |
+| `Order`          | `items?.length`                      | no `items_count` field                      |
+| `BlogPost`       | `featured_image: string\|null`       | not `cover_image_url`                       |
 
 ---
 
@@ -137,10 +139,10 @@ Always check `client/types/api.ts` before writing client code.
 
 ## Authentication
 
-| System | Scope | Mechanism |
-|--------|-------|-----------|
+| System  | Scope                | Mechanism      |
+|---------|----------------------|----------------|
 | Fortify | Admin SPA `/admin/*` | Session cookie |
-| Sanctum | REST API `/api/v1/*` | Bearer token |
+| Sanctum | REST API `/api/v1/*` | Bearer token   |
 
 API test auth: `$this->actingAs($user, 'sanctum')`
 
