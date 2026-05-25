@@ -7,15 +7,18 @@ import {
     FileTextIcon,
     GripVerticalIcon,
     ImageIcon,
+    LayoutGrid,
+    List,
     LoaderCircleIcon,
     PencilIcon,
     Search,
+    SlidersHorizontal,
     StarIcon,
     TrashIcon,
     UploadIcon,
     XIcon,
 } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as MediaController from '@/actions/App/Http/Controllers/Admin/MediaController';
 import { ImageEditorModal } from '@/components/image-editor-modal';
 import { Button } from '@/components/ui/button';
@@ -77,6 +80,28 @@ const MODE_ACCEPTS: Record<MediaPickerMode, string> = {
 };
 
 const EMPTY_ACCEPTED_MIME_TYPES: string[] = [];
+const MODE_SEARCH_MIME_TYPES: Record<MediaPickerMode, string[]> = {
+    image: ['image/*'],
+    gallery: ['image/*'],
+    file: FILE_MIME_TYPES,
+    video: ['video/*'],
+    any: [],
+};
+const THUMBNAIL_SIZES = ['tiny', 'small', 'medium'] as const;
+const THUMBNAIL_SIZE_LABELS: Record<(typeof THUMBNAIL_SIZES)[number], string> =
+    {
+        tiny: 'Tiny',
+        small: 'Small',
+        medium: 'Medium',
+    };
+const SORT_OPTIONS = [
+    { value: 'created_desc', label: 'Newest' },
+    { value: 'created_asc', label: 'Oldest' },
+    { value: 'name_asc', label: 'Name A-Z' },
+    { value: 'name_desc', label: 'Name Z-A' },
+    { value: 'size_desc', label: 'Largest' },
+    { value: 'size_asc', label: 'Smallest' },
+];
 
 const MIME_TYPE_ICONS: Record<string, React.ElementType> = {
     'image/': ImageIcon,
@@ -90,6 +115,20 @@ function getFileIcon(mimeType: string) {
         }
     }
     return FileIcon;
+}
+
+function gridClassForThumbnailSize(
+    size: (typeof THUMBNAIL_SIZES)[number],
+): string {
+    if (size === 'tiny') {
+        return 'grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10';
+    }
+
+    if (size === 'medium') {
+        return 'grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5';
+    }
+
+    return 'grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6';
 }
 
 function modeAllowsMimeType(
@@ -151,6 +190,10 @@ export function MediaPickerModal({
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [extension, setExtension] = useState('');
+    const [sort, setSort] = useState('created_desc');
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+    const [thumbnailSize, setThumbnailSize] =
+        useState<(typeof THUMBNAIL_SIZES)[number]>('medium');
     const [_selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -160,6 +203,7 @@ export function MediaPickerModal({
     const uploadInputRef = useRef<HTMLInputElement>(null);
     const searchRef = useRef(search);
     const extensionRef = useRef(extension);
+    const sortRef = useRef(sort);
     const effectiveMultiple = multiple ?? mode === 'gallery';
     const selectedMediaItems = selectedItems ?? selectedImages;
     const extensions = MODE_EXTENSIONS[mode];
@@ -167,6 +211,13 @@ export function MediaPickerModal({
         acceptedMimeTypes.length > 0
             ? acceptedMimeTypes.join(',')
             : MODE_ACCEPTS[mode];
+    const searchMimeTypes = useMemo(
+        () =>
+            acceptedMimeTypes.length > 0
+                ? acceptedMimeTypes
+                : MODE_SEARCH_MIME_TYPES[mode],
+        [acceptedMimeTypes, mode],
+    );
 
     useEffect(() => {
         searchRef.current = search;
@@ -176,6 +227,10 @@ export function MediaPickerModal({
         extensionRef.current = extension;
     }, [extension]);
 
+    useEffect(() => {
+        sortRef.current = sort;
+    }, [sort]);
+
     const fetchMedia = useCallback(
         async (page = 1) => {
             setLoading(true);
@@ -184,7 +239,8 @@ export function MediaPickerModal({
             if (searchRef.current) params.set('search', searchRef.current);
             if (extensionRef.current)
                 params.set('extension', extensionRef.current);
-            acceptedMimeTypes.forEach((mimeType) => {
+            params.set('sort', sortRef.current);
+            searchMimeTypes.forEach((mimeType) => {
                 params.append('mime_types[]', mimeType);
             });
 
@@ -199,7 +255,7 @@ export function MediaPickerModal({
                 setLoading(false);
             }
         },
-        [acceptedMimeTypes],
+        [searchMimeTypes],
     );
 
     useEffect(() => {
@@ -220,6 +276,13 @@ export function MediaPickerModal({
 
     const handleExtensionChange = (value: string) => {
         setExtension(value);
+        setCurrentPage(1);
+        fetchMedia(1);
+    };
+
+    const handleSortChange = (value: string) => {
+        setSort(value);
+        sortRef.current = value;
         setCurrentPage(1);
         fetchMedia(1);
     };
@@ -387,6 +450,77 @@ export function MediaPickerModal({
                                     </option>
                                 ))}
                             </select>
+                            <select
+                                value={sort}
+                                onChange={(e) => {
+                                    handleSortChange(e.target.value);
+                                }}
+                                className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                aria-label="Sort media"
+                            >
+                                {SORT_OPTIONS.map((option) => (
+                                    <option
+                                        key={option.value}
+                                        value={option.value}
+                                    >
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
+                            <div className="flex items-center rounded-md border border-input">
+                                <Button
+                                    type="button"
+                                    variant={
+                                        viewMode === 'grid'
+                                            ? 'secondary'
+                                            : 'ghost'
+                                    }
+                                    size="icon"
+                                    className="h-9 w-9 rounded-r-none"
+                                    onClick={() => setViewMode('grid')}
+                                    title="Grid view"
+                                    aria-label="Grid view"
+                                >
+                                    <LayoutGrid className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant={
+                                        viewMode === 'list'
+                                            ? 'secondary'
+                                            : 'ghost'
+                                    }
+                                    size="icon"
+                                    className="h-9 w-9 rounded-l-none"
+                                    onClick={() => setViewMode('list')}
+                                    title="List view"
+                                    aria-label="List view"
+                                >
+                                    <List className="h-4 w-4" />
+                                </Button>
+                            </div>
+                            {viewMode === 'grid' && (
+                                <div className="flex items-center gap-2 rounded-md border border-input px-2">
+                                    <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+                                    <select
+                                        value={thumbnailSize}
+                                        onChange={(e) =>
+                                            setThumbnailSize(
+                                                e.target
+                                                    .value as (typeof THUMBNAIL_SIZES)[number],
+                                            )
+                                        }
+                                        className="h-8 bg-background text-sm"
+                                        aria-label="Thumbnail size"
+                                    >
+                                        {THUMBNAIL_SIZES.map((size) => (
+                                            <option key={size} value={size}>
+                                                {THUMBNAIL_SIZE_LABELS[size]}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
                             <input
                                 ref={uploadInputRef}
                                 type="file"
@@ -425,11 +559,23 @@ export function MediaPickerModal({
                                 </div>
                             )}
                             {loading ? (
-                                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                                <div
+                                    className={
+                                        viewMode === 'grid'
+                                            ? gridClassForThumbnailSize(
+                                                  thumbnailSize,
+                                              )
+                                            : 'space-y-2'
+                                    }
+                                >
                                     {[...Array(12)].map((_, i) => (
                                         <div
                                             key={i}
-                                            className="aspect-square animate-pulse rounded-lg bg-muted"
+                                            className={
+                                                viewMode === 'grid'
+                                                    ? 'aspect-square animate-pulse rounded-lg bg-muted'
+                                                    : 'h-14 animate-pulse rounded-lg bg-muted'
+                                            }
                                         />
                                     ))}
                                 </div>
@@ -445,7 +591,15 @@ export function MediaPickerModal({
                                     </p>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                                <div
+                                    className={
+                                        viewMode === 'grid'
+                                            ? gridClassForThumbnailSize(
+                                                  thumbnailSize,
+                                              )
+                                            : 'space-y-2'
+                                    }
+                                >
                                     {visibleMedia?.map((item) => {
                                         const selected = isSelected(item.id);
                                         const Icon = getFileIcon(
@@ -457,35 +611,78 @@ export function MediaPickerModal({
                                                 onClick={() =>
                                                     handleMediaSelect(item)
                                                 }
-                                                className={`group relative aspect-square overflow-hidden rounded-lg border-2 transition-all hover:ring-2 hover:ring-ring ${
-                                                    selected
-                                                        ? 'border-primary ring-2 ring-primary'
-                                                        : 'border-transparent'
-                                                }`}
+                                                className={
+                                                    viewMode === 'grid'
+                                                        ? `group relative aspect-square overflow-hidden rounded-lg border-2 transition-all hover:ring-2 hover:ring-ring ${
+                                                              selected
+                                                                  ? 'border-primary ring-2 ring-primary'
+                                                                  : 'border-transparent'
+                                                          }`
+                                                        : `group flex w-full items-center gap-3 rounded-lg border p-2 text-left transition-all hover:bg-muted ${
+                                                              selected
+                                                                  ? 'border-primary ring-2 ring-primary'
+                                                                  : 'border-border'
+                                                          }`
+                                                }
                                             >
-                                                {item.mime_type.startsWith(
-                                                    'image/',
-                                                ) ? (
-                                                    <img
-                                                        src={item.url}
-                                                        alt={item.name}
-                                                        className="h-full w-full object-cover"
-                                                    />
+                                                {viewMode === 'grid' ? (
+                                                    <>
+                                                        {item.mime_type.startsWith(
+                                                            'image/',
+                                                        ) ? (
+                                                            <img
+                                                                src={item.url}
+                                                                alt={item.name}
+                                                                className="h-full w-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="flex h-full w-full items-center justify-center bg-muted">
+                                                                <Icon className="h-12 w-12 text-muted-foreground" />
+                                                            </div>
+                                                        )}
+                                                        {selected && (
+                                                            <div className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary">
+                                                                <CheckIcon className="h-4 w-4 text-primary-foreground" />
+                                                            </div>
+                                                        )}
+                                                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
+                                                            <p className="truncate text-xs text-white">
+                                                                {item.name}
+                                                            </p>
+                                                        </div>
+                                                    </>
                                                 ) : (
-                                                    <div className="flex h-full w-full items-center justify-center bg-muted">
-                                                        <Icon className="h-12 w-12 text-muted-foreground" />
-                                                    </div>
+                                                    <>
+                                                        {item.mime_type.startsWith(
+                                                            'image/',
+                                                        ) ? (
+                                                            <img
+                                                                src={item.url}
+                                                                alt={item.name}
+                                                                className="h-12 w-12 rounded object-cover"
+                                                            />
+                                                        ) : (
+                                                            <span className="flex h-12 w-12 items-center justify-center rounded bg-muted">
+                                                                <Icon className="h-5 w-5 text-muted-foreground" />
+                                                            </span>
+                                                        )}
+                                                        <span className="min-w-0 flex-1">
+                                                            <span className="block truncate text-sm font-medium">
+                                                                {item.name}
+                                                            </span>
+                                                            <span className="block truncate text-xs text-muted-foreground">
+                                                                {item.file_name}{' '}
+                                                                ·{' '}
+                                                                {item.mime_type}
+                                                            </span>
+                                                        </span>
+                                                        {selected && (
+                                                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary">
+                                                                <CheckIcon className="h-4 w-4 text-primary-foreground" />
+                                                            </span>
+                                                        )}
+                                                    </>
                                                 )}
-                                                {selected && (
-                                                    <div className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary">
-                                                        <CheckIcon className="h-4 w-4 text-primary-foreground" />
-                                                    </div>
-                                                )}
-                                                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
-                                                    <p className="truncate text-xs text-white">
-                                                        {item.name}
-                                                    </p>
-                                                </div>
                                             </button>
                                         );
                                     })}

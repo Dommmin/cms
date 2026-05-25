@@ -93,6 +93,26 @@ it('filters media search results by mime type policy', function (): void {
         ->getJson(route('admin.media.search', ['mime_types' => [$pdf->mime_type]]))
         ->assertOk()
         ->assertJsonCount(1, 'data')
+        ->assertJsonPath('total', 1)
         ->assertJsonPath('data.0.id', $pdf->id)
         ->assertJsonPath('data.0.mime_type', $pdf->mime_type);
+});
+
+it('sorts media search results by name and size', function (): void {
+    $small = createSearchMedia(UploadedFile::fake()->create('alpha.pdf', 16, 'application/pdf'));
+    $large = createSearchMedia(UploadedFile::fake()->create('zulu.pdf', 64, 'application/pdf'));
+    $small->forceFill(['size' => 16])->save();
+    $large->forceFill(['size' => 64])->save();
+
+    actingAs($this->admin)
+        ->getJson(route('admin.media.search', ['sort' => 'name_asc']))
+        ->assertOk()
+        ->assertJsonPath('data.0.id', $small->id)
+        ->assertJsonPath('data.1.id', $large->id);
+
+    actingAs($this->admin)
+        ->getJson(route('admin.media.search', ['sort' => 'size_desc']))
+        ->assertOk()
+        ->assertJsonPath('data.0.id', $large->id)
+        ->assertJsonPath('data.1.id', $small->id);
 });

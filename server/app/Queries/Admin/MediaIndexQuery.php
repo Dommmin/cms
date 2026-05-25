@@ -37,7 +37,10 @@ final readonly class MediaIndexQuery
             })
             ->when($this->request->extension, function ($query): void {
                 $query->where('file_name', 'like', '%.'.$this->request->extension);
-            })->latest()
+            })
+            ->when($this->sortColumn() === 'name', fn ($query): mixed => $query->orderBy('name', $this->sortDirection()))
+            ->when($this->sortColumn() === 'size', fn ($query): mixed => $query->orderBy('size', $this->sortDirection()))
+            ->when($this->sortColumn() === 'created_at', fn ($query): mixed => $query->orderBy('created_at', $this->sortDirection()))
             ->paginate($this->request->per_page ?? 20)
             ->withQueryString();
 
@@ -70,7 +73,10 @@ final readonly class MediaIndexQuery
             })
             ->when($this->request->extension, function ($query): void {
                 $query->where('file_name', 'like', '%.'.$this->request->extension);
-            })->latest()
+            })
+            ->when($this->sortColumn() === 'name', fn ($query): mixed => $query->orderBy('name', $this->sortDirection()))
+            ->when($this->sortColumn() === 'size', fn ($query): mixed => $query->orderBy('size', $this->sortDirection()))
+            ->when($this->sortColumn() === 'created_at', fn ($query): mixed => $query->orderBy('created_at', $this->sortDirection()))
             ->paginate($this->request->per_page ?? 40)
             ->withQueryString();
 
@@ -145,5 +151,23 @@ final readonly class MediaIndexQuery
         }
 
         return array_values(array_filter($mimeTypes, is_string(...)));
+    }
+
+    private function sortColumn(): string
+    {
+        $sort = $this->request->string('sort', 'created_desc')->toString();
+
+        return match ($sort) {
+            'name_asc', 'name_desc' => 'name',
+            'size_asc', 'size_desc' => 'size',
+            default => 'created_at',
+        };
+    }
+
+    private function sortDirection(): string
+    {
+        $sort = $this->request->string('sort', 'created_desc')->toString();
+
+        return str_ends_with($sort, '_asc') ? 'asc' : 'desc';
     }
 }

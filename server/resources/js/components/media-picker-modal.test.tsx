@@ -87,10 +87,12 @@ describe('MediaPickerModal', () => {
         expect(await screen.findByAltText('Hero image')).toBeInTheDocument();
         expect(screen.queryByText('Manual PDF')).not.toBeInTheDocument();
         expect(screen.queryByText('Demo video')).not.toBeInTheDocument();
+        expect(axios.get).toHaveBeenCalledWith(
+            expect.stringContaining('mime_types%5B%5D=image%2F*'),
+        );
     });
 
     it('allows gallery mode to select multiple images and reorder the selected rail', async () => {
-        const user = userEvent.setup();
         const onSelect = vi.fn();
         const onReorder = vi.fn();
         const selectedImages: SelectedImage[] = [
@@ -117,7 +119,7 @@ describe('MediaPickerModal', () => {
             selectedImages,
         });
 
-        await user.click(await screen.findByAltText('Hero image'));
+        fireEvent.click(await screen.findByAltText('Hero image'));
         expect(onSelect).toHaveBeenCalledWith(
             expect.objectContaining({ id: 1 }),
         );
@@ -160,5 +162,39 @@ describe('MediaPickerModal', () => {
         expect(onSelect).toHaveBeenCalledWith(
             expect.objectContaining({ id: 2 }),
         );
+    });
+
+    it('supports list view, thumbnail size, and media sort controls', async () => {
+        const user = userEvent.setup();
+
+        renderPicker({ mode: 'any' });
+
+        expect(await screen.findByAltText('Hero image')).toBeInTheDocument();
+
+        await user.selectOptions(
+            screen.getByLabelText('Thumbnail size'),
+            'medium',
+        );
+        expect(screen.getByLabelText('Thumbnail size')).toHaveValue('medium');
+        expect(
+            screen.queryByRole('option', { name: 'Large' }),
+        ).not.toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', { name: 'List view' }));
+        expect(screen.getByText('hero.jpg · image/jpeg')).toBeInTheDocument();
+        expect(
+            screen.queryByLabelText('Thumbnail size'),
+        ).not.toBeInTheDocument();
+
+        await user.selectOptions(
+            screen.getByLabelText('Sort media'),
+            'name_asc',
+        );
+
+        await waitFor(() => {
+            expect(axios.get).toHaveBeenLastCalledWith(
+                expect.stringContaining('sort=name_asc'),
+            );
+        });
     });
 });
