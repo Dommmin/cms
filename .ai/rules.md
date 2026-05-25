@@ -190,6 +190,8 @@ make check  # read-only CI mirror: fails if anything is wrong (same checks as Gi
 - `casts()` method (not `$casts` property)
 
 ### Frontend
+- **Always prefer shadcn/ui components** over raw HTML elements for any interactive UI (buttons, inputs, switches, selects, dialogs, etc.) — both `server/` and `client/`
+- The shadcn MCP tool (`npx shadcn@latest mcp`) is your source of truth for shadcn component API and variants; use it before writing custom UI
 - Always use Wayfinder for backend route references
 - Check `client/types/api.ts` before using API response fields
 - Server components → `serverFetch()`, client components → `api` (axios)

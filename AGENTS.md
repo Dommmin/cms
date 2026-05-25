@@ -96,6 +96,7 @@ client/          Next.js public storefront
 - Every API endpoint needs a rate limiter: `api.strict` (10/min) · `api.public` (60/min) · `api.auth` (300/min)
 
 **TypeScript (`client/` and `server/resources/js/`):**
+- **Always prefer shadcn/ui components** over raw HTML for interactive UI — applies to both `server/` and `client/`
 - `.tsx` files are clean — no `interface` or `type` definitions inside them
 - Types in `.ts` files: `Name.types.ts` (component), `types.ts` (shared), `client/types/api.ts` (API — check before every API call)
 - Server components → `serverFetch()` from `lib/server-fetch.ts`; client components (`"use client"`) → `api` from `lib/axios.ts`
