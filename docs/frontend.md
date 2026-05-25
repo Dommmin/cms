@@ -263,6 +263,8 @@ Key rules:
 - Checkout MVP submits contact/address/delivery/payment/terms data to `/checkout`
   and opens provider redirect URLs through `expo-web-browser`.
 - Account MVP supports login, registration, logout and recent order history.
+- Order detail, blog list/detail, stores list, newsletter signup and a safe MVP
+  CMS Page Builder renderer are implemented as native screens.
 
 Checks:
 

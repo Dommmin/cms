@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { Link, type Href } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -71,15 +72,17 @@ export default function AccountScreen() {
                   data={ordersQuery.data.data}
                   keyExtractor={(item) => String(item.id)}
                   renderItem={({ item }) => (
-                    <ThemedView style={styles.orderRow}>
-                      <ThemedView style={styles.orderMain}>
-                        <ThemedText type="smallBold">#{item.reference_number}</ThemedText>
-                        <ThemedText type="small" themeColor="textSecondary">
-                          {new Date(item.created_at).toLocaleDateString('pl-PL')} · {item.status_label ?? item.status}
-                        </ThemedText>
-                      </ThemedView>
-                      <ThemedText type="smallBold">{formatMoney(item.total, item.currency_code)}</ThemedText>
-                    </ThemedView>
+                    <Link href={`/account/orders/${item.reference_number}` as Href} asChild>
+                      <Pressable style={styles.orderRow}>
+                        <ThemedView style={styles.orderMain}>
+                          <ThemedText type="smallBold">#{item.reference_number}</ThemedText>
+                          <ThemedText type="small" themeColor="textSecondary">
+                            {new Date(item.created_at).toLocaleDateString('pl-PL')} · {item.status_label ?? item.status}
+                          </ThemedText>
+                        </ThemedView>
+                        <ThemedText type="smallBold">{formatMoney(item.total, item.currency_code)}</ThemedText>
+                      </Pressable>
+                    </Link>
                   )}
                 />
               ) : null}

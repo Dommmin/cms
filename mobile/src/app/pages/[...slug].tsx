@@ -4,11 +4,10 @@ import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getPage } from '@/api/cms';
+import { MobilePageRenderer } from '@/components/cms/mobile-page-renderer';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
-import { stripHtml } from '@/lib/format';
 
 export default function CmsPageScreen() {
   const params = useLocalSearchParams<{ slug?: string[] }>();
@@ -28,23 +27,7 @@ export default function CmsPageScreen() {
         {pageQuery.data.excerpt ? (
           <ThemedText themeColor="textSecondary">{pageQuery.data.excerpt}</ThemedText>
         ) : null}
-        {pageQuery.data.content ? (
-          <ThemedView style={styles.panel}>
-            <ThemedText>{stripHtml(pageQuery.data.content)}</ThemedText>
-          </ThemedView>
-        ) : null}
-        {pageQuery.data.sections?.map((section) => (
-          <ThemedView key={section.id} style={styles.panel}>
-            {section.blocks.map((block) => (
-              <ThemedView key={block.id} style={styles.block}>
-                <ThemedText type="smallBold">{String(block.configuration.title ?? block.configuration.heading ?? block.type)}</ThemedText>
-                {typeof block.configuration.description === 'string' ? (
-                  <ThemedText themeColor="textSecondary">{stripHtml(block.configuration.description)}</ThemedText>
-                ) : null}
-              </ThemedView>
-            ))}
-          </ThemedView>
-        ))}
+        <MobilePageRenderer page={pageQuery.data} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -53,6 +36,4 @@ export default function CmsPageScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   content: { gap: Spacing.three, padding: Spacing.three },
-  panel: { gap: Spacing.two, padding: Spacing.three, borderRadius: 8, backgroundColor: '#F3F4F6' },
-  block: { gap: Spacing.one, backgroundColor: 'transparent' },
 });

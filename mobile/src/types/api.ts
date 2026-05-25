@@ -211,6 +211,11 @@ export interface Order {
   created_at: string;
 }
 
+export interface PaymentStatus {
+  status: 'pending' | 'completed' | 'failed' | 'authorized' | 'refunded' | 'partially_refunded';
+  order_reference: string | null;
+}
+
 export type ReviewStatus = 'pending' | 'approved' | 'rejected';
 
 export interface ProductReview {
@@ -318,6 +323,26 @@ export interface BlogPost {
   reading_time: number | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface Store {
+  id: number;
+  name: string;
+  slug: string;
+  address: string;
+  city: string;
+  country: string;
+  phone: string | null;
+  email: string | null;
+  opening_hours: Record<string, string> | null;
+  lat: number;
+  lng: number;
+}
+
+export interface NewsletterSubscribePayload {
+  email: string;
+  name?: string;
+  cf_turnstile_response?: string;
 }
 
 export type PageType = 'blocks' | 'module';

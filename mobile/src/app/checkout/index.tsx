@@ -44,7 +44,13 @@ export default function CheckoutScreen() {
       if (response.payment.redirect_url) {
         await WebBrowser.openBrowserAsync(response.payment.redirect_url);
       }
-      router.push('/checkout/pending' as Href);
+      router.push({
+        pathname: '/checkout/pending',
+        params: {
+          payment_id: response.payment.id ? String(response.payment.id) : '',
+          order_reference: response.order.reference_number,
+        },
+      } as unknown as Href);
     },
     onError: () => setFormError('Nie udało się złożyć zamówienia. Sprawdź dane i spróbuj ponownie.'),
   });

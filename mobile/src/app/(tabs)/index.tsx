@@ -37,6 +37,12 @@ export default function HomeScreen() {
           <ThemedText type="smallBold">Nowości</ThemedText>
         </ThemedView>
 
+        <ThemedView style={styles.quickLinks}>
+          <QuickLink href="/blog" label="Blog" />
+          <QuickLink href="/stores" label="Sklepy" />
+          <QuickLink href="/newsletter" label="Newsletter" />
+        </ThemedView>
+
         {featuredQuery.isLoading ? <LoadingState /> : null}
         {featuredQuery.isError ? <ErrorState onRetry={() => featuredQuery.refetch()} /> : null}
         {featuredQuery.data ? (
@@ -52,6 +58,16 @@ export default function HomeScreen() {
         ) : null}
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function QuickLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link href={href as Href} asChild>
+      <Pressable style={styles.quickLink}>
+        <ThemedText type="smallBold">{label}</ThemedText>
+      </Pressable>
+    </Link>
   );
 }
 
@@ -81,6 +97,18 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     backgroundColor: 'transparent',
+  },
+  quickLinks: {
+    flexDirection: 'row',
+    gap: Spacing.two,
+    backgroundColor: 'transparent',
+  },
+  quickLink: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: Spacing.three,
+    borderRadius: 8,
+    backgroundColor: '#E5E7EB',
   },
   grid: {
     gap: Spacing.three,
