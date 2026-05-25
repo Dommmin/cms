@@ -11,7 +11,6 @@ import {
     type SelectedImage,
 } from '@/components/media-picker-modal';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
-import { SlugField } from '@/components/ui/slug-field';
 import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,6 +24,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import { SlugField } from '@/components/ui/slug-field';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Wrapper from '@/components/wrapper';
 import { useAdminLocale } from '@/hooks/use-admin-locale';
@@ -402,22 +402,18 @@ export default function Create({
                                                 </div>
 
                                                 <div className="grid gap-2">
-                                                    {locales.map(
-                                                        (locale) => (
-                                                            <input
-                                                                key={`slug-${locale.code}`}
-                                                                type="hidden"
-                                                                name={`slug[${locale.code}]`}
-                                                                value={
-                                                                    formData
-                                                                        .slug[
-                                                                        locale
-                                                                            .code
-                                                                    ] ?? ''
-                                                                }
-                                                            />
-                                                        ),
-                                                    )}
+                                                    {locales.map((locale) => (
+                                                        <input
+                                                            key={`slug-${locale.code}`}
+                                                            type="hidden"
+                                                            name={`slug[${locale.code}]`}
+                                                            value={
+                                                                formData.slug[
+                                                                    locale.code
+                                                                ] ?? ''
+                                                            }
+                                                        />
+                                                    ))}
                                                     <SlugField
                                                         label="Slug"
                                                         name="slug"
@@ -436,9 +432,7 @@ export default function Create({
                                                             );
                                                             if (auto) {
                                                                 setFormData(
-                                                                    (
-                                                                        prev,
-                                                                    ) => {
+                                                                    (prev) => {
                                                                         const updated =
                                                                             {
                                                                                 ...prev.slug,
@@ -448,8 +442,7 @@ export default function Create({
                                                                                 l,
                                                                             ) => {
                                                                                 updated[
-                                                                                    l
-                                                                                        .code
+                                                                                    l.code
                                                                                 ] =
                                                                                     slugify(
                                                                                         prev
@@ -471,7 +464,10 @@ export default function Create({
                                                         }}
                                                         locales={locales}
                                                         errors={
-                                                            errors as Record<string, string>
+                                                            errors as Record<
+                                                                string,
+                                                                string
+                                                            >
                                                         }
                                                         required
                                                     />

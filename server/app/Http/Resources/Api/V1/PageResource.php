@@ -28,6 +28,7 @@ class PageResource extends JsonResource
         $resolvedForms = $this->resolveEmbeddedForms($page);
         $relationLookup = $this->resolveBlockRelationLookup($page);
         $autoPostsLookup = $this->resolveAutoSourcePosts($page, $relationLookup);
+        $locale = app()->getLocale();
 
         return [
             'id' => $page->id,

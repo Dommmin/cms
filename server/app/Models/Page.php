@@ -127,7 +127,7 @@ class Page extends Model
      * Find a published page by locale-aware path segments.
      *
      * For each segment: first tries locale-specific page, then falls back to global (locale = null).
-     * Each segment is matched against canonical slug OR slug_translations->{locale}.
+     * Each segment is matched against the locale-specific slug translation.
      */
     public static function findByLocalizedPath(array $segments, string $locale = 'en'): ?self
     {

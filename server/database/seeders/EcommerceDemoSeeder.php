@@ -222,10 +222,10 @@ class EcommerceDemoSeeder extends Seeder
         ];
 
         foreach ($parents as $p) {
-            $model = Category::query()->updateOrCreate(
-                ['slug' => $p['slug']],
-                ['name' => ['en' => $p['en'], 'pl' => $p['pl']], 'parent_id' => null, 'is_active' => true, 'position' => $p['position']],
-            );
+            $model = Category::query()->where('slug->en', $p['slug'])->first() ?? new Category(['slug' => ['en' => $p['slug'], 'pl' => $p['slug']]]);
+            $model->fill(['name' => ['en' => $p['en'], 'pl' => $p['pl']], 'parent_id' => null, 'is_active' => true, 'position' => $p['position']]);
+            $model->save();
+
             $result[$p['slug']] = $model;
         }
 
@@ -253,16 +253,16 @@ class EcommerceDemoSeeder extends Seeder
         foreach ($children as $c) {
             $parent = $result[$c['parent']];
             $type = $productTypes->get($c['type']);
-            $model = Category::query()->updateOrCreate(
-                ['slug' => $c['slug']],
-                [
-                    'name' => ['en' => $c['en'], 'pl' => $c['pl']],
-                    'parent_id' => $parent->id,
-                    'product_type_id' => $type?->id,
-                    'is_active' => true,
-                    'position' => $c['pos'],
-                ],
-            );
+            $model = Category::query()->where('slug->en', $c['slug'])->first() ?? new Category(['slug' => ['en' => $c['slug'], 'pl' => $c['slug']]]);
+            $model->fill([
+                'name' => ['en' => $c['en'], 'pl' => $c['pl']],
+                'parent_id' => $parent->id,
+                'product_type_id' => $type?->id,
+                'is_active' => true,
+                'position' => $c['pos'],
+            ]);
+            $model->save();
+
             $result[$c['slug']] = $model;
         }
 
@@ -313,25 +313,24 @@ class EcommerceDemoSeeder extends Seeder
 
             $namePl = $item['name_pl'] ?? $item['name'];
             $existing = Product::query()->where('name->en', $item['name'])->first();
-            $slug = $existing?->slug ?? Str::slug($item['name']).'-'.Str::lower(Str::random(4));
+            $slug = $existing?->getTranslation('slug', 'en', false) ?? Str::slug($item['name']).'-'.Str::lower(Str::random(4));
 
-            $product = Product::query()->updateOrCreate(
-                ['slug' => $slug],
-                [
-                    'name' => ['en' => $item['name'], 'pl' => $namePl],
-                    'product_type_id' => $type->id,
-                    'category_id' => $category->id,
-                    'brand_id' => $brand?->id,
-                    'description' => $this->generateDescription($item['name'], $namePl),
-                    'short_description' => [
-                        'en' => $item['short_description'] ?? $item['name'].' — quality craftsmanship for everyday use.',
-                        'pl' => $item['short_description_pl'] ?? $namePl.' — najwyższa jakość na co dzień.',
-                    ],
-                    'sku_prefix' => mb_strtoupper(Str::substr(Str::slug($item['name']), 0, 4)),
-                    'is_active' => true,
-                    'is_saleable' => true,
+            $product = Product::query()->where('slug->en', $slug)->first() ?? new Product(['slug' => ['en' => $slug, 'pl' => $slug]]);
+            $product->fill([
+                'name' => ['en' => $item['name'], 'pl' => $namePl],
+                'product_type_id' => $type->id,
+                'category_id' => $category->id,
+                'brand_id' => $brand?->id,
+                'description' => $this->generateDescription($item['name'], $namePl),
+                'short_description' => [
+                    'en' => $item['short_description'] ?? $item['name'].' — quality craftsmanship for everyday use.',
+                    'pl' => $item['short_description_pl'] ?? $namePl.' — najwyższa jakość na co dzień.',
                 ],
-            );
+                'sku_prefix' => mb_strtoupper(Str::substr(Str::slug($item['name']), 0, 4)),
+                'is_active' => true,
+                'is_saleable' => true,
+            ]);
+            $product->save();
 
             $product->categories()->syncWithoutDetaching([$category->id]);
 

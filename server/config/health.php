@@ -8,6 +8,8 @@ use Spatie\Health\Notifications\Notifiable;
 use Spatie\Health\ResultStores\EloquentHealthResultStore;
 
 return [
+    'disk_min_free_percent' => env('HEALTH_DISK_MIN_FREE_PERCENT', 10),
+
     /*
      * A result store is responsible for saving the results of the checks. The
      * `EloquentHealthResultStore` will save results in the database. You

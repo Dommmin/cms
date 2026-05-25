@@ -18,7 +18,9 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         $product = $this->route('product');
-        $productId = is_object($product) ? $product->getKey() : $product;
+        if (is_object($product)) {
+            $product->getKey();
+        }
 
         return [
             'name' => ['required', 'array'],
@@ -93,12 +95,14 @@ class UpdateProductRequest extends FormRequest
             foreach ($slugInput as $locale => $value) {
                 $normalized[$locale] = Str::slug((string) ($value ?: ''));
             }
+
             if (empty($normalized[$defaultLocale] ?? '')) {
                 $nameForSlug = is_array($name)
                     ? ($name[$defaultLocale] ?? array_values($name)[0] ?? '')
                     : (string) $name;
                 $normalized[$defaultLocale] = Str::slug($nameForSlug);
             }
+
             $this->merge(['slug' => array_filter($normalized, fn (string $v): bool => $v !== '')]);
         }
 

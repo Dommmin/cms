@@ -70,7 +70,8 @@ class HealthCheckController extends Controller
         }
 
         $freePercent = ($freeBytes / $totalBytes) * 100;
+        $minimumFreePercent = (float) config('health.disk_min_free_percent', 10);
 
-        return $freePercent > 10;
+        return $freePercent > $minimumFreePercent;
     }
 }

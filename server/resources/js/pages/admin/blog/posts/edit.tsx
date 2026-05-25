@@ -8,7 +8,6 @@ import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { SeoPanel } from '@/components/seo-panel';
-import { SlugField } from '@/components/ui/slug-field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,6 +20,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { SlugField } from '@/components/ui/slug-field';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { VersionHistory } from '@/components/version-history';
@@ -92,10 +92,9 @@ export default function EditBlogPost({
         setData((prev) => ({
             ...prev,
             title: { ...prev.title, [locale]: value },
-            slug:
-                autoGenerateSlug
-                    ? { ...prev.slug, [locale]: slugify(value) }
-                    : prev.slug,
+            slug: autoGenerateSlug
+                ? { ...prev.slug, [locale]: slugify(value) }
+                : prev.slug,
         }));
     };
 
@@ -168,7 +167,8 @@ export default function EditBlogPost({
                                         entity_id: String(post.id),
                                         entity_name:
                                             data.title[defaultLocale] ??
-                                            data.slug[defaultLocale] ?? '',
+                                            data.slug[defaultLocale] ??
+                                            '',
                                         admin_url: BlogPostController.edit.url(
                                             post.id,
                                         ),
@@ -258,10 +258,7 @@ export default function EditBlogPost({
                                             />
                                         ))}
                                         <SlugField
-                                            label={__(
-                                                'label.slug',
-                                                'Slug',
-                                            )}
+                                            label={__('label.slug', 'Slug')}
                                             name="slug"
                                             value={data.slug}
                                             onChange={(val) =>
@@ -278,17 +275,14 @@ export default function EditBlogPost({
                                                         const updated = {
                                                             ...prev.slug,
                                                         };
-                                                        locales.forEach(
-                                                            (l) => {
-                                                                updated[
-                                                                    l.code
-                                                                ] = slugify(
+                                                        locales.forEach((l) => {
+                                                            updated[l.code] =
+                                                                slugify(
                                                                     prev.title[
                                                                         l.code
                                                                     ] ?? '',
                                                                 );
-                                                            },
-                                                        );
+                                                        });
                                                         return {
                                                             ...prev,
                                                             slug: updated,

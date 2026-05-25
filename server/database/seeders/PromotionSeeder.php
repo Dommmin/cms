@@ -63,7 +63,7 @@ class PromotionSeeder extends Seeder
         );
 
         // Podpnij do kategorii womens-clothing
-        $womensCategory = Category::query()->where('slug', 'womens-clothing')->first();
+        $womensCategory = Category::query()->where('slug->en', 'womens-clothing')->first();
         if ($womensCategory && ! $womensSale->categories()->where('categories.id', $womensCategory->id)->exists()) {
             $womensSale->categories()->attach($womensCategory->id, [
                 'discount_value' => 30,
@@ -147,7 +147,7 @@ class PromotionSeeder extends Seeder
             ],
         );
 
-        $electronicsCategory = Category::query()->where('slug', 'electronics')->first();
+        $electronicsCategory = Category::query()->where('slug->en', 'electronics')->first();
         if ($electronicsCategory && ! $electronicsSale->categories()->where('categories.id', $electronicsCategory->id)->exists()) {
             $electronicsSale->categories()->attach($electronicsCategory->id, [
                 'discount_value' => 50,

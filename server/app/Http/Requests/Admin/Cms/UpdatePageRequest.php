@@ -23,7 +23,7 @@ class UpdatePageRequest extends FormRequest
      */
     public function rules(): array
     {
-        $page = $this->route('page');
+        $this->route('page');
         $modules = array_keys((array) config('cms.modules', []));
         $defaultLocale = config('app.locale');
 
@@ -83,7 +83,7 @@ class UpdatePageRequest extends FormRequest
                     ->exists();
 
                 if ($exists) {
-                    $validator->errors()->add("slug.{$localeCode}", 'The slug must be unique for this parent and locale.');
+                    $validator->errors()->add('slug.'.$localeCode, 'The slug must be unique for this parent and locale.');
                 }
             }
         });

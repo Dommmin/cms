@@ -26,7 +26,7 @@ class MenuSeeder extends Seeder
      */
     private function pageId(string $slug): ?int
     {
-        return Page::query()->where('slug', $slug)->value('id');
+        return Page::query()->where('slug->en', $slug)->value('id');
     }
 
     private function seedHeaderMenu(): void

@@ -22,7 +22,6 @@ import {
 } from '@/components/media-picker-modal';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { SeoPanel } from '@/components/seo-panel';
-import { SlugField } from '@/components/ui/slug-field';
 import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,6 +35,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import { SlugField } from '@/components/ui/slug-field';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VersionHistory } from '@/components/version-history';
 import Wrapper from '@/components/wrapper';
@@ -374,7 +374,8 @@ export default function Edit({
                                         entity_id: String(product.id),
                                         entity_name:
                                             product.name?.[defaultLocale] ??
-                                            product.slug?.[defaultLocale] ?? '',
+                                            product.slug?.[defaultLocale] ??
+                                            '',
                                         admin_url: ProductController.edit.url(
                                             product.id,
                                         ),
@@ -597,9 +598,7 @@ export default function Edit({
                                                                     setAutoGenerateSlug(
                                                                         auto,
                                                                     );
-                                                                    if (
-                                                                        auto
-                                                                    ) {
+                                                                    if (auto) {
                                                                         setFormData(
                                                                             (
                                                                                 prev,
@@ -613,8 +612,7 @@ export default function Edit({
                                                                                         l,
                                                                                     ) => {
                                                                                         updated[
-                                                                                            l
-                                                                                                .code
+                                                                                            l.code
                                                                                         ] =
                                                                                             slugify(
                                                                                                 prev
@@ -638,7 +636,10 @@ export default function Edit({
                                                                     locales
                                                                 }
                                                                 errors={
-                                                                    errors as Record<string, string>
+                                                                    errors as Record<
+                                                                        string,
+                                                                        string
+                                                                    >
                                                                 }
                                                                 required
                                                             />

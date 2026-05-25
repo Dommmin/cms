@@ -101,10 +101,7 @@ export function ResponsivePreviewPanel({
                 <div className="flex items-center justify-between gap-2">
                     <div>
                         <h2 className="text-sm font-semibold">
-                            {__(
-                                'builder.responsive_preview',
-                                'Preview',
-                            )}
+                            {__('builder.responsive_preview', 'Preview')}
                         </h2>
                         <p className="text-xs text-muted-foreground">
                             {previewStatus}
@@ -150,10 +147,7 @@ export function ResponsivePreviewPanel({
                             size="icon"
                             className="h-8 w-8"
                             onClick={onOpenPreview}
-                            title={__(
-                                'builder.open_preview',
-                                'Open preview',
-                            )}
+                            title={__('builder.open_preview', 'Open preview')}
                         >
                             <ExternalLink className="h-4 w-4" />
                         </Button>
@@ -173,10 +167,7 @@ export function ResponsivePreviewPanel({
                     {previewUrl ? (
                         <iframe
                             key={`${previewUrl}-${device}`}
-                            title={__(
-                                'builder.responsive_preview',
-                                'Preview',
-                            )}
+                            title={__('builder.responsive_preview', 'Preview')}
                             src={previewUrl}
                             className="h-full w-full bg-background"
                         />
@@ -198,10 +189,7 @@ export function ResponsivePreviewPanel({
             <div className="flex items-center justify-between border-b px-4 py-2">
                 <div className="flex items-center gap-3">
                     <h2 className="text-sm font-semibold">
-                        {__(
-                            'builder.responsive_preview',
-                            'Preview',
-                        )}
+                        {__('builder.responsive_preview', 'Preview')}
                     </h2>
                     <span className="text-xs text-muted-foreground">
                         {previewStatus}
@@ -237,10 +225,7 @@ export function ResponsivePreviewPanel({
                             size="icon"
                             className="h-8 w-8"
                             onClick={onOpenPreview}
-                            title={__(
-                                'builder.open_preview',
-                                'Open preview',
-                            )}
+                            title={__('builder.open_preview', 'Open preview')}
                         >
                             <ExternalLink className="h-4 w-4" />
                         </Button>
@@ -255,10 +240,7 @@ export function ResponsivePreviewPanel({
                             )}
                         >
                             <Minimize2 className="mr-1 h-4 w-4" />
-                            {__(
-                                'builder.close',
-                                'Close',
-                            )}
+                            {__('builder.close', 'Close')}
                         </Button>
                     </div>
                 </div>
@@ -274,10 +256,7 @@ export function ResponsivePreviewPanel({
                     {previewUrl ? (
                         <iframe
                             key={`${previewUrl}-${device}-fullscreen`}
-                            title={__(
-                                'builder.responsive_preview',
-                                'Preview',
-                            )}
+                            title={__('builder.responsive_preview', 'Preview')}
                             src={previewUrl}
                             className="h-full w-full bg-background"
                         />
@@ -304,24 +283,15 @@ export function ResponsivePreviewPanel({
                                 className={`grid w-full ${health ? 'grid-cols-3' : 'grid-cols-2'}`}
                             >
                                 <TabsTrigger value="inspector">
-                                    {__(
-                                        'builder.inspector',
-                                        'Inspector',
-                                    )}
+                                    {__('builder.inspector', 'Inspector')}
                                 </TabsTrigger>
                                 {health && (
                                     <TabsTrigger value="health">
-                                        {__(
-                                            'builder.health',
-                                            'Health',
-                                        )}
+                                        {__('builder.health', 'Health')}
                                     </TabsTrigger>
                                 )}
                                 <TabsTrigger value="preview">
-                                    {__(
-                                        'builder.preview',
-                                        'Preview',
-                                    )}
+                                    {__('builder.preview', 'Preview')}
                                 </TabsTrigger>
                             </TabsList>
                         </div>

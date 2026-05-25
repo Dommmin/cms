@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\ContentEntry;
 use App\Models\Page;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
 class PageCacheService
@@ -21,12 +22,14 @@ class PageCacheService
      */
     public function getCachedPage(string $slug): ?array
     {
+        $locale = app()->getLocale();
+
         return Cache::remember(
-            'page:'.$slug,
+            'page:'.$locale.':'.$slug,
             now()->addHours(24),
-            function () use ($slug): ?array {
+            function () use ($slug, $locale): ?array {
                 $page = Page::query()
-                    ->where('slug', $slug)
+                    ->where('slug->'.$locale, $slug)
                     ->where('is_published', true)
                     ->withFullContent()
                     ->first();
@@ -45,19 +48,21 @@ class PageCacheService
      */
     public function invalidatePage(Page $page): void
     {
-        Cache::forget('page:'.$page->slug);
+        $this->forgetPageCache($page);
 
         // Also invalidate parent pages if this is a child page
         if ($page->parent_id) {
             $parent = Page::query()->find($page->parent_id);
             if ($parent) {
-                Cache::forget('page:'.$parent->slug);
+                $this->forgetPageCache($parent);
             }
         }
 
         // Invalidate children pages
-        foreach ($page->children()->get(['id', 'slug']) as $child) {
-            Cache::forget('page:'.$child->slug);
+        /** @var Collection<int, Page> $children */
+        $children = $page->children()->get(['id', 'slug']);
+        foreach ($children as $child) {
+            $this->forgetPageCache($child);
         }
     }
 
@@ -67,6 +72,13 @@ class PageCacheService
     public function invalidateAll(): void
     {
         Cache::flush();
+    }
+
+    private function forgetPageCache(Page $page): void
+    {
+        foreach (array_keys($page->getTranslations('slug')) as $locale) {
+            Cache::forget('page:'.$locale.':'.$page->getTranslation('slug', $locale, false));
+        }
     }
 
     /**

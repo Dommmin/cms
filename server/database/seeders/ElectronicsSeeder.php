@@ -68,7 +68,7 @@ class ElectronicsSeeder extends Seeder
 
     public function run(): void
     {
-        if (Product::query()->whereHas('category', fn ($q) => $q->where('slug', 'like', 'rtv%')->orWhere('slug', 'like', 'komputery%'))->exists()) {
+        if (Product::query()->whereHas('category', fn ($q) => $q->where('slug->pl', 'like', 'rtv%')->orWhere('slug->pl', 'like', 'komputery%'))->exists()) {
             $this->command->info('Electronics already seeded, skipping.');
 
             return;
@@ -503,16 +503,15 @@ class ElectronicsSeeder extends Seeder
             $slugBase = Str::slug($name);
             $slug = $prefix !== '' && $prefix !== '0' ? $prefix.'-'.$slugBase : $slugBase;
 
-            $category = Category::query()->updateOrCreate(
-                ['slug' => $slug],
-                [
-                    'name' => ['pl' => $name, 'en' => $name],
-                    'description' => ['pl' => 'Kategoria '.$name, 'en' => $name.' category'],
-                    'is_active' => true,
-                    'parent_id' => $parentId,
-                    'position' => $position++,
-                ],
-            );
+            $category = Category::query()->where('slug->pl', $slug)->first() ?? new Category(['slug' => ['pl' => $slug, 'en' => $slug]]);
+            $category->fill([
+                'name' => ['pl' => $name, 'en' => $name],
+                'description' => ['pl' => 'Kategoria '.$name, 'en' => $name.' category'],
+                'is_active' => true,
+                'parent_id' => $parentId,
+                'position' => $position++,
+            ]);
+            $category->save();
 
             // First occurrence of a name wins — prevents Gaming duplicates from overwriting Komputery entries
             if (! isset($this->categories[$name])) {
@@ -1621,12 +1620,14 @@ class ElectronicsSeeder extends Seeder
             return;
         }
 
+        $slug = Str::slug($config['name']).'-'.Str::random(5);
+
         $product = Product::query()->create([
             'product_type_id' => $productTypeId,
             'category_id' => $categoryId,
             'brand_id' => $brandId,
             'name' => ['pl' => $config['name'], 'en' => $config['name']],
-            'slug' => Str::slug($config['name']).'-'.Str::random(5),
+            'slug' => ['pl' => $slug, 'en' => $slug],
             'description' => ['pl' => $this->generateDescription($config['name']), 'en' => $this->generateDescription($config['name'])],
             'short_description' => ['pl' => 'Wysokiej jakosci produkt '.$config['name'], 'en' => 'High quality product '.$config['name']],
             'is_active' => true,

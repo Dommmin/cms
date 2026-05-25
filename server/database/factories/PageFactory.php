@@ -16,9 +16,11 @@ class PageFactory extends Factory
 
     public function definition(): array
     {
+        $slug = fake()->unique()->slug();
+
         return [
             'title' => fake()->sentence(3),
-            'slug' => fake()->unique()->slug(),
+            'slug' => ['en' => $slug],
             'layout' => 'default',
             'page_type' => 'blocks',
             'is_published' => false,

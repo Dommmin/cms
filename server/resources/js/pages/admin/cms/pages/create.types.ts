@@ -5,7 +5,7 @@ export type ModuleConfig = {
 export type ParentPage = {
     id: number;
     title: string;
-    slug: string;
+    slug: string | Record<string, string>;
     children?: { id: number; title: string }[];
 };
 export type CreateProps = {

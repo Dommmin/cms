@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
-import { SlugField } from '@/components/ui/slug-field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -49,10 +48,16 @@ export default function Create({ modules, pages }: CreateProps) {
     const [slugValue, setSlugValue] = useState('');
     const [autoGenerateSlug, setAutoGenerateSlug] = useState(true);
 
-    const defaultLocale =
-        locales.find((l) => l.is_default)?.code ?? 'en';
+    const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
 
     const effectiveLocale = locale !== 'global' ? locale : defaultLocale;
+    const pageSlug = (slug: string | Record<string, string>) =>
+        typeof slug === 'string'
+            ? slug
+            : (slug[effectiveLocale] ??
+              slug[defaultLocale] ??
+              Object.values(slug)[0] ??
+              '');
 
     const handleTitleChange = (value: string) => {
         setTitle(value);
@@ -197,7 +202,7 @@ export default function Create({ modules, pages }: CreateProps) {
                                                             key={p.id}
                                                             value={String(p.id)}
                                                         >
-                                                            /{p.slug}
+                                                            /{pageSlug(p.slug)}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>

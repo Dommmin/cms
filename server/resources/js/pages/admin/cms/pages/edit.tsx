@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LocalizedField } from '@/components/ui/localized-field';
-import { SlugField } from '@/components/ui/slug-field';
 import {
     Select,
     SelectContent,
@@ -20,6 +19,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { SlugField } from '@/components/ui/slug-field';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
@@ -101,11 +101,11 @@ export default function Edit({ page, modules, pages }: EditProps) {
                     >
                         <PageHeaderActions>
                             <Button asChild variant="outline">
-                                    <a
-                                        href={PreviewController.url({
-                                            query: {
-                                                url: `${frontendUrl}/${slugValues[defaultLocale] ?? ''}`,
-                                                entity_type: 'page',
+                                <a
+                                    href={PreviewController.url({
+                                        query: {
+                                            url: `${frontendUrl}/${slugValues[defaultLocale] ?? ''}`,
+                                            entity_type: 'page',
                                             entity_id: String(page.id),
                                             entity_name: displayTitle,
                                             admin_url: PageController.edit.url(
@@ -407,10 +407,7 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                                 />
                                             ))}
                                             <SlugField
-                                                label={__(
-                                                    'label.slug',
-                                                    'Slug',
-                                                )}
+                                                label={__('label.slug', 'Slug')}
                                                 name="slug"
                                                 value={slugValues}
                                                 onChange={setSlugValues}
@@ -422,14 +419,14 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                                     if (auto) {
                                                         setSlugValues(
                                                             (prev) => {
-                                                                const updated = {
-                                                                    ...prev,
-                                                                };
+                                                                const updated =
+                                                                    {
+                                                                        ...prev,
+                                                                    };
                                                                 locales.forEach(
                                                                     (l) => {
                                                                         updated[
-                                                                            l
-                                                                                .code
+                                                                            l.code
                                                                         ] =
                                                                             slugify(
                                                                                 titleValues[
@@ -446,7 +443,12 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                                     }
                                                 }}
                                                 locales={locales}
-                                                errors={errors as Record<string, string>}
+                                                errors={
+                                                    errors as Record<
+                                                        string,
+                                                        string
+                                                    >
+                                                }
                                                 required
                                             />
                                         </div>

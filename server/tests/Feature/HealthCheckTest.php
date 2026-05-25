@@ -5,6 +5,10 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 
+beforeEach(function (): void {
+    config(['health.disk_min_free_percent' => 0]);
+});
+
 it('returns 200 and ok status when all services are healthy', function (): void {
     Redis::shouldReceive('connection->ping')->andReturn(true);
 

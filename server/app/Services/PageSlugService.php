@@ -25,8 +25,10 @@ class PageSlugService
 
     private function exists(string $slug, ?int $parentId): bool
     {
+        $locale = app()->getLocale();
+
         return Page::query()
-            ->where('slug', $slug)
+            ->where('slug->'.$locale, $slug)
             ->where('parent_id', $parentId)
             ->exists();
     }

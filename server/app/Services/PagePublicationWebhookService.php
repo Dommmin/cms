@@ -35,7 +35,7 @@ final readonly class PagePublicationWebhookService
             'id' => $page->id,
             'title' => $page->getTranslations('title'),
             'slug' => $page->slug,
-            'slug_translations' => $page->slug_translations ?? [],
+            'slug_translations' => $page->getTranslations('slug'),
             'path' => $path,
             'url' => $frontendUrl !== '' ? $frontendUrl.$path : $path,
             'is_published' => $page->is_published,

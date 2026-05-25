@@ -79,13 +79,13 @@ class ProductsImport implements OnEachRow, WithChunkReading, WithHeadingRow, Wit
         }
 
         $baseSlug = Str::slug((string) $data['name']);
-        $slug = Product::query()->where('slug', $baseSlug)->exists()
+        $slug = Product::query()->where('slug->'.app()->getLocale(), $baseSlug)->exists()
             ? $baseSlug.'-'.Str::random(6)
             : $baseSlug;
 
         return Product::query()->create([
             'name' => $data['name'],
-            'slug' => $slug,
+            'slug' => [app()->getLocale() => $slug],
             'sku_prefix' => $data['sku'],
             'description' => $data['description'] ?? '',
             'short_description' => '',

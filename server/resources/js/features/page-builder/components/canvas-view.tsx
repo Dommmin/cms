@@ -65,7 +65,10 @@ export function CanvasView({
             {sections.length === 0 ? (
                 <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 text-center">
                     <p className="text-muted-foreground">
-                        {__('builder.no_sections_yet', 'No sections yet. Add a section from the navigator.')}
+                        {__(
+                            'builder.no_sections_yet',
+                            'No sections yet. Add a section from the navigator.',
+                        )}
                     </p>
                 </div>
             ) : (
@@ -151,7 +154,10 @@ export function CanvasView({
                                                                 );
                                                             }}
                                                         >
-                                                            {__('builder.edit', 'Edit')}
+                                                            {__(
+                                                                'builder.edit',
+                                                                'Edit',
+                                                            )}
                                                         </button>
                                                     </div>
                                                     <CanvasBlockPreview

@@ -80,7 +80,7 @@ class StorePageRequest extends FormRequest
                     ->exists();
 
                 if ($exists) {
-                    $validator->errors()->add("slug.{$localeCode}", 'The slug must be unique for this parent and locale.');
+                    $validator->errors()->add('slug.'.$localeCode, 'The slug must be unique for this parent and locale.');
                 }
             }
         });

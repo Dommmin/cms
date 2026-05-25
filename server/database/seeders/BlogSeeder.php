@@ -227,9 +227,10 @@ class BlogSeeder extends Seeder
 
             $hasPl = isset($polishTranslations[$slug]);
 
-            $post = BlogPost::query()->firstOrCreate(
-                ['slug' => $slug],
-                array_merge($postData, [
+            $post = BlogPost::query()->where('slug->en', $slug)->first();
+            if (! $post instanceof BlogPost) {
+                $post = BlogPost::query()->create(array_merge($postData, [
+                    'slug' => ['en' => $slug],
                     'user_id' => $admin->id,
                     'blog_category_id' => $createdCategories[$categorySlug]->id,
                     'content_type' => 'richtext',
@@ -238,13 +239,14 @@ class BlogSeeder extends Seeder
                     'published_at' => now()->subDays($daysAgo),
                     'reading_time' => $readingTime,
                     'available_locales' => $hasPl ? ['en', 'pl'] : null,
-                ]),
-            );
+                ]));
+            }
 
             // Add Polish translations for bilingual demo posts
             if ($hasPl && $post->wasRecentlyCreated) {
                 $pl = $polishTranslations[$slug];
                 $post->setTranslation('title', 'pl', $pl['title']);
+                $post->setTranslation('slug', 'pl', $slug);
                 $post->setTranslation('excerpt', 'pl', $pl['excerpt']);
                 $post->setTranslation('content', 'pl', $pl['content']);
                 $post->save();

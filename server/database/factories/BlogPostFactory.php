@@ -24,7 +24,7 @@ class BlogPostFactory extends Factory
             'user_id' => User::factory(),
             'blog_category_id' => null,
             'title' => mb_rtrim($title, '.'),
-            'slug' => Str::slug($title),
+            'slug' => ['en' => Str::slug($title)],
             'excerpt' => fake()->optional()->paragraph(),
             'content' => $content,
             'content_type' => 'richtext',

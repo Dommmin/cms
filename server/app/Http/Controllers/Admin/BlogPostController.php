@@ -54,9 +54,10 @@ class BlogPostController extends Controller
         $titleForSlug = is_array($data['title'])
             ? ($data['title'][config('app.locale')] ?? array_values($data['title'])[0] ?? '')
             : (string) $data['title'];
-        if (empty($data['slug']) || (is_array($data['slug']) && empty(array_filter($data['slug'])))) {
+        if (empty($data['slug']) || (is_array($data['slug']) && array_filter($data['slug']) === [])) {
             $data['slug'] = [config('app.locale') => Str::slug($titleForSlug)];
         }
+
         $data['is_featured'] ??= false;
         $contentForEstimate = is_array($data['content'])
             ? ($data['content'][config('app.locale')] ?? array_values($data['content'])[0] ?? '')
@@ -104,9 +105,10 @@ class BlogPostController extends Controller
         $titleForSlug = is_array($data['title'])
             ? ($data['title'][config('app.locale')] ?? array_values($data['title'])[0] ?? '')
             : (string) $data['title'];
-        if (empty($data['slug']) || (is_array($data['slug']) && empty(array_filter($data['slug'])))) {
+        if (empty($data['slug']) || (is_array($data['slug']) && array_filter($data['slug']) === [])) {
             $data['slug'] = [config('app.locale') => Str::slug($titleForSlug)];
         }
+
         $data['is_featured'] ??= false;
         $contentForEstimate = is_array($data['content'])
             ? ($data['content'][config('app.locale')] ?? array_values($data['content'])[0] ?? '')

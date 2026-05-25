@@ -11,7 +11,6 @@ use App\Models\Blog;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Inertia\Response;
 
 class BlogController extends Controller
@@ -21,7 +20,7 @@ class BlogController extends Controller
         $blogs = Blog::query()
             ->withCount('posts')
             ->when($request->input('search'), function ($query, string $search): void {
-                $query->where('slug', 'like', sprintf('%%%s%%', $search));
+                $query->where('slug->'.app()->getLocale(), 'like', sprintf('%%%s%%', $search));
             })
             ->orderBy('position')
             ->orderBy('id')
@@ -44,11 +43,6 @@ class BlogController extends Controller
     {
         $data = $request->validated();
 
-        if (empty($data['slug'])) {
-            $nameEn = is_array($data['name']) ? ($data['name']['en'] ?? '') : (string) $data['name'];
-            $data['slug'] = Str::slug($nameEn);
-        }
-
         $blog = Blog::query()->create($data);
 
         return to_route('admin.blogs.edit', $blog)->with('success', 'Blog created successfully');
@@ -61,6 +55,7 @@ class BlogController extends Controller
         return inertia('admin/blogs/edit', [
             'blog' => array_merge($blog->toArray(), [
                 'name' => $blog->getTranslations('name'),
+                'slug' => $blog->getTranslations('slug'),
                 'description' => $blog->getTranslations('description'),
             ]),
             'users' => User::query()->orderBy('name')->get(['id', 'name']),
@@ -70,11 +65,6 @@ class BlogController extends Controller
     public function update(UpdateBlogRequest $request, Blog $blog): RedirectResponse
     {
         $data = $request->validated();
-
-        if (empty($data['slug'])) {
-            $nameEn = is_array($data['name']) ? ($data['name']['en'] ?? '') : (string) $data['name'];
-            $data['slug'] = Str::slug($nameEn);
-        }
 
         $blog->update($data);
 

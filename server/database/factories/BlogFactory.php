@@ -19,7 +19,7 @@ class BlogFactory extends Factory
 
         return [
             'name' => ['en' => ucfirst($name)],
-            'slug' => Str::slug($name),
+            'slug' => ['en' => Str::slug($name)],
             'description' => null,
             'layout' => fake()->randomElement(['grid', 'list', 'magazine']),
             'posts_per_page' => 12,

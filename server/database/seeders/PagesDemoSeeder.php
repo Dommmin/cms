@@ -40,6 +40,26 @@ class PagesDemoSeeder extends Seeder
         $this->seedPolishContactPage();
     }
 
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    private function updatePage(string $slug, array $attributes, string $locale = 'en'): Page
+    {
+        $page = Page::query()
+            ->where('slug->'.$locale, $slug)
+            ->when($locale === 'en', fn ($query) => $query->whereNull('locale'))
+            ->when($locale !== 'en', fn ($query) => $query->where('locale', $locale))
+            ->first() ?? new Page;
+
+        $attributes['slug'] = array_merge($page->getTranslations('slug'), [$locale => $slug]);
+        $attributes['locale'] = $locale === 'en' ? null : $locale;
+
+        $page->fill($attributes);
+        $page->save();
+
+        return $page;
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // FAQs
     // ─────────────────────────────────────────────────────────────────────────
@@ -80,10 +100,9 @@ class PagesDemoSeeder extends Seeder
 
     private function seedHomepage(): void
     {
-        $page = Page::query()->updateOrCreate(['slug' => 'home'], [
+        $page = $this->updatePage('home', [
             'parent_id' => null,
             'title' => ['en' => 'Home', 'pl' => 'Strona główna'],
-            'slug_translations' => ['pl' => 'strona-glowna'],
             'page_type' => 'blocks',
             'is_published' => true,
             'published_at' => now(),
@@ -315,10 +334,9 @@ class PagesDemoSeeder extends Seeder
 
     private function seedAboutPage(): void
     {
-        $page = Page::query()->updateOrCreate(['slug' => 'about-us'], [
+        $page = $this->updatePage('about-us', [
             'parent_id' => null,
             'title' => ['en' => 'About Us', 'pl' => 'O nas'],
-            'slug_translations' => ['pl' => 'o-nas'],
             'page_type' => 'blocks',
             'is_published' => true,
             'published_at' => now(),
@@ -436,7 +454,6 @@ class PagesDemoSeeder extends Seeder
             [
                 'slug' => 'privacy-policy',
                 'title' => ['en' => 'Privacy Policy', 'pl' => 'Polityka prywatności'],
-                'slug_translations' => ['pl' => 'polityka-prywatnosci'],
                 'position' => 20,
                 'seo_title' => 'Privacy Policy',
                 'seo_description' => 'Learn how we collect, use, and protect your personal data.',
@@ -445,7 +462,6 @@ class PagesDemoSeeder extends Seeder
             [
                 'slug' => 'terms-of-service',
                 'title' => ['en' => 'Terms of Service', 'pl' => 'Regulamin'],
-                'slug_translations' => ['pl' => 'regulamin'],
                 'position' => 21,
                 'seo_title' => 'Terms of Service',
                 'seo_description' => 'Our terms and conditions governing the use of our website and services.',
@@ -454,10 +470,9 @@ class PagesDemoSeeder extends Seeder
         ];
 
         foreach ($legalPages as $def) {
-            $p = Page::query()->updateOrCreate(['slug' => $def['slug']], [
+            $p = $this->updatePage($def['slug'], [
                 'parent_id' => null,
                 'title' => $def['title'],
-                'slug_translations' => $def['slug_translations'],
                 'page_type' => 'module',
                 'module_name' => 'content',
                 'module_config' => ['html' => $def['content']],
@@ -480,10 +495,9 @@ class PagesDemoSeeder extends Seeder
     {
         $faqs = Faq::active()->orderBy('category')->orderBy('position')->get();
 
-        $page = Page::query()->updateOrCreate(['slug' => 'faq'], [
+        $page = $this->updatePage('faq', [
             'parent_id' => null,
             'title' => ['en' => 'Frequently Asked Questions', 'pl' => 'Najczęstsze pytania'],
-            'slug_translations' => ['pl' => 'faq'],
             'page_type' => 'module',
             'module_name' => 'faq',
             'module_config' => [
@@ -509,10 +523,9 @@ class PagesDemoSeeder extends Seeder
 
     private function seedShippingPage(): void
     {
-        $p = Page::query()->updateOrCreate(['slug' => 'shipping-policy'], [
+        $p = $this->updatePage('shipping-policy', [
             'parent_id' => null,
             'title' => ['en' => 'Shipping Policy', 'pl' => 'Polityka wysyłki'],
-            'slug_translations' => ['pl' => 'polityka-wysylki'],
             'page_type' => 'module',
             'module_name' => 'content',
             'module_config' => ['html' => $this->shippingPolicyHtml()],
@@ -528,10 +541,9 @@ class PagesDemoSeeder extends Seeder
 
     private function seedReturnPolicyPage(): void
     {
-        $p = Page::query()->updateOrCreate(['slug' => 'return-policy'], [
+        $p = $this->updatePage('return-policy', [
             'parent_id' => null,
             'title' => ['en' => 'Return & Refund Policy', 'pl' => 'Polityka zwrotów'],
-            'slug_translations' => ['pl' => 'polityka-zwrotow'],
             'page_type' => 'module',
             'module_name' => 'content',
             'module_config' => ['html' => $this->returnPolicyHtml()],
@@ -547,10 +559,9 @@ class PagesDemoSeeder extends Seeder
 
     private function seedCookiePolicyPage(): void
     {
-        $p = Page::query()->updateOrCreate(['slug' => 'cookie-policy'], [
+        $p = $this->updatePage('cookie-policy', [
             'parent_id' => null,
             'title' => ['en' => 'Cookie Policy', 'pl' => 'Polityka cookies'],
-            'slug_translations' => ['pl' => 'polityka-cookies'],
             'page_type' => 'module',
             'module_name' => 'content',
             'module_config' => ['html' => $this->cookiePolicyHtml()],
@@ -572,10 +583,9 @@ class PagesDemoSeeder extends Seeder
     {
         $contactForm = Form::query()->where('slug', 'contact')->first();
 
-        $page = Page::query()->updateOrCreate(['slug' => 'contact'], [
+        $page = $this->updatePage('contact', [
             'parent_id' => null,
             'title' => ['en' => 'Contact Us', 'pl' => 'Kontakt'],
-            'slug_translations' => ['pl' => 'kontakt'],
             'page_type' => 'blocks',
             'is_published' => true,
             'published_at' => now(),
@@ -633,7 +643,7 @@ class PagesDemoSeeder extends Seeder
 
     private function seedPolishHomepage(): void
     {
-        $page = Page::query()->updateOrCreate(['slug' => 'strona-glowna', 'locale' => 'pl'], [
+        $page = $this->updatePage('strona-glowna', [
             'parent_id' => null,
             'title' => ['pl' => 'Strona główna', 'en' => 'Home'],
             'page_type' => 'blocks',
@@ -642,7 +652,7 @@ class PagesDemoSeeder extends Seeder
             'position' => 1,
             'seo_title' => 'Kupuj modę, dom i lifestyle w najlepszej jakości',
             'seo_description' => 'Odkryj starannie wyselekcjonowane kolekcje mody, dekoracji domu, urody i sportu. Darmowa dostawa od 299 zł.',
-        ]);
+        ], 'pl');
 
         $page->allSections()->delete();
         $pos = 1;
@@ -862,7 +872,7 @@ class PagesDemoSeeder extends Seeder
 
     private function seedPolishAboutPage(): void
     {
-        $page = Page::query()->updateOrCreate(['slug' => 'o-nas', 'locale' => 'pl'], [
+        $page = $this->updatePage('o-nas', [
             'parent_id' => null,
             'title' => ['pl' => 'O nas', 'en' => 'About Us'],
             'page_type' => 'blocks',
@@ -871,7 +881,7 @@ class PagesDemoSeeder extends Seeder
             'position' => 10,
             'seo_title' => 'O nas — Nasza historia i wartości',
             'seo_description' => 'Poznaj naszą misję: dostarczać starannie zaprojektowane, etycznie wytwarzane produkty do codziennego życia.',
-        ]);
+        ], 'pl');
 
         $page->allSections()->delete();
         $pos = 1;
@@ -994,7 +1004,7 @@ class PagesDemoSeeder extends Seeder
         ];
 
         foreach ($legalPages as $def) {
-            $p = Page::query()->updateOrCreate(['slug' => $def['slug'], 'locale' => 'pl'], [
+            $p = $this->updatePage($def['slug'], [
                 'parent_id' => null,
                 'title' => $def['title'],
                 'page_type' => 'module',
@@ -1006,7 +1016,7 @@ class PagesDemoSeeder extends Seeder
                 'position' => $def['position'],
                 'seo_title' => $def['seo_title'],
                 'seo_description' => $def['seo_description'],
-            ]);
+            ], 'pl');
             $p->allSections()->delete();
         }
     }
@@ -1015,7 +1025,7 @@ class PagesDemoSeeder extends Seeder
     {
         $faqs = Faq::active()->orderBy('category')->orderBy('position')->get();
 
-        $page = Page::query()->updateOrCreate(['slug' => 'faq', 'locale' => 'pl'], [
+        $page = $this->updatePage('faq', [
             'parent_id' => null,
             'title' => ['pl' => 'Najczęstsze pytania', 'en' => 'FAQ'],
             'page_type' => 'module',
@@ -1033,13 +1043,13 @@ class PagesDemoSeeder extends Seeder
             'position' => 30,
             'seo_title' => 'FAQ — Najczęstsze pytania',
             'seo_description' => 'Odpowiedzi na najczęstsze pytania dotyczące zamówień, dostawy, zwrotów i płatności.',
-        ]);
+        ], 'pl');
         $page->allSections()->delete();
     }
 
     private function seedPolishShippingPage(): void
     {
-        $p = Page::query()->updateOrCreate(['slug' => 'polityka-wysylki', 'locale' => 'pl'], [
+        $p = $this->updatePage('polityka-wysylki', [
             'parent_id' => null,
             'title' => ['pl' => 'Polityka wysyłki', 'en' => 'Shipping Policy'],
             'page_type' => 'module',
@@ -1051,13 +1061,13 @@ class PagesDemoSeeder extends Seeder
             'position' => 22,
             'seo_title' => 'Polityka wysyłki',
             'seo_description' => 'Wszystko, co musisz wiedzieć o opcjach dostawy, czasach realizacji i kosztach wysyłki.',
-        ]);
+        ], 'pl');
         $p->allSections()->delete();
     }
 
     private function seedPolishReturnPolicyPage(): void
     {
-        $p = Page::query()->updateOrCreate(['slug' => 'polityka-zwrotow', 'locale' => 'pl'], [
+        $p = $this->updatePage('polityka-zwrotow', [
             'parent_id' => null,
             'title' => ['pl' => 'Polityka zwrotów', 'en' => 'Return Policy'],
             'page_type' => 'module',
@@ -1069,13 +1079,13 @@ class PagesDemoSeeder extends Seeder
             'position' => 23,
             'seo_title' => 'Polityka zwrotów i reklamacji',
             'seo_description' => 'Nasza bezproblemowa polityka zwrotów i reklamacji w ciągu 30 dni.',
-        ]);
+        ], 'pl');
         $p->allSections()->delete();
     }
 
     private function seedPolishCookiePolicyPage(): void
     {
-        $p = Page::query()->updateOrCreate(['slug' => 'polityka-cookies', 'locale' => 'pl'], [
+        $p = $this->updatePage('polityka-cookies', [
             'parent_id' => null,
             'title' => ['pl' => 'Polityka cookies', 'en' => 'Cookie Policy'],
             'page_type' => 'module',
@@ -1087,7 +1097,7 @@ class PagesDemoSeeder extends Seeder
             'position' => 24,
             'seo_title' => 'Polityka plików cookies',
             'seo_description' => 'Jak używamy plików cookies i podobnych technologii na naszej stronie.',
-        ]);
+        ], 'pl');
         $p->allSections()->delete();
     }
 
@@ -1095,7 +1105,7 @@ class PagesDemoSeeder extends Seeder
     {
         $contactForm = Form::query()->where('slug', 'contact')->first();
 
-        $page = Page::query()->updateOrCreate(['slug' => 'kontakt', 'locale' => 'pl'], [
+        $page = $this->updatePage('kontakt', [
             'parent_id' => null,
             'title' => ['pl' => 'Kontakt', 'en' => 'Contact Us'],
             'page_type' => 'blocks',
@@ -1104,7 +1114,7 @@ class PagesDemoSeeder extends Seeder
             'position' => 20,
             'seo_title' => 'Kontakt — Chętnie odpiszemy',
             'seo_description' => 'Masz pytanie lub potrzebujesz pomocy? Skontaktuj się z nami, a odpiszemy w ciągu 1–2 dni roboczych.',
-        ]);
+        ], 'pl');
 
         $page->allSections()->delete();
         $pos = 1;

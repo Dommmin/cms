@@ -25,7 +25,7 @@ class ProductFactory extends Factory
             'product_type_id' => ProductType::factory(),
             'category_id' => Category::factory(),
             'name' => $name,
-            'slug' => Str::slug($name).'-'.Str::random(5),
+            'slug' => ['en' => Str::slug($name).'-'.Str::random(5)],
             'description' => $this->faker->paragraph(),
             'short_description' => $this->faker->sentence(),
             'is_active' => true,

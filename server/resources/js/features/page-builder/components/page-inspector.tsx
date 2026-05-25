@@ -53,7 +53,10 @@ export function PageInspector({
                             size="icon"
                             className="h-7 w-7 shrink-0"
                             onClick={onClose}
-                            title={__('builder.close_inspector', 'Close inspector')}
+                            title={__(
+                                'builder.close_inspector',
+                                'Close inspector',
+                            )}
                         >
                             <X className="h-4 w-4" />
                         </Button>

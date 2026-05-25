@@ -15,12 +15,14 @@ class CategoryFilter implements Filter
 {
     public function __invoke(Builder $query, mixed $value, string $property): void
     {
-        $query->whereHas('category', function (Builder $q) use ($value): void {
+        $locale = app()->getLocale();
+
+        $query->whereHas('category', function (Builder $q) use ($value, $locale): void {
             $q->where('is_active', true)
-                ->where(function (Builder $q) use ($value): void {
+                ->where(function (Builder $q) use ($value, $locale): void {
                     // Match the category directly OR via its parent (one level up)
-                    $q->where('slug', $value)
-                        ->orWhereHas('parent', fn (Builder $q) => $q->where('slug', $value)->where('is_active', true));
+                    $q->where('slug->'.$locale, $value)
+                        ->orWhereHas('parent', fn (Builder $q) => $q->where('slug->'.$locale, $value)->where('is_active', true));
                 });
         });
     }

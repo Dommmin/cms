@@ -1,11 +1,10 @@
 import { useState } from 'react';
 
-import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { slugify } from '@/lib/slug';
-import type { SharedLocale } from '@/types/global';
 
 import type { SlugFieldProps } from './slug-field.types';
 
@@ -85,15 +84,13 @@ export function SlugField({
                 <p className="text-xs text-destructive">{topLevelError}</p>
             )}
 
-            <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                <input
-                    type="checkbox"
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Switch
                     checked={autoGenerate}
-                    onChange={(e) => handleToggle(e.target.checked)}
-                    className="h-4 w-4 rounded border-input"
+                    onCheckedChange={handleToggle}
                 />
                 {autoGenerate ? 'Auto-generated from title' : 'Manual slug'}
-            </label>
+            </div>
         </div>
     );
 }

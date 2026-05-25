@@ -145,7 +145,10 @@ export function BuilderToolbar({
                             }
                             size="sm"
                             className="rounded-r-none"
-                            title={__('builder.simple_mode', 'Simple editor mode')}
+                            title={__(
+                                'builder.simple_mode',
+                                'Simple editor mode',
+                            )}
                         >
                             <Sparkles className="mr-1 h-4 w-4" />
                             {__('builder.simple', 'Simple')}
@@ -157,7 +160,10 @@ export function BuilderToolbar({
                             }
                             size="sm"
                             className="rounded-l-none"
-                            title={__('builder.advanced_mode', 'Advanced editor mode')}
+                            title={__(
+                                'builder.advanced_mode',
+                                'Advanced editor mode',
+                            )}
                         >
                             <SlidersHorizontal className="mr-1 h-4 w-4" />
                             {__('builder.advanced', 'Advanced')}

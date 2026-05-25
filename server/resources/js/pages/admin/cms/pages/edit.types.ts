@@ -7,8 +7,7 @@ export type PageData = {
     parent_id: number | null;
     locale: string | null;
     title: Record<string, string>;
-    slug: string;
-    slug_translations: Record<string, string> | null;
+    slug: Record<string, string>;
     excerpt: Record<string, string> | null;
     content: Record<string, string> | null;
     rich_content: Record<string, string> | null;
@@ -27,7 +26,7 @@ export type PageData = {
 export type ParentPage = {
     id: number;
     title: string | Record<string, string>;
-    slug: string;
+    slug: string | Record<string, string>;
 };
 export type EditProps = {
     page: PageData;
