@@ -56,7 +56,7 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 
 ### E-commerce
 - **Products** — variants, attributes, product types, categories, flags, images (spatie/medialibrary), price history
-- **Mobile storefront MVP** — `mobile/` Expo Router app with typed API client, TanStack Query provider, SecureStore-backed bearer auth, guest cart token persistence, idempotency keys for cart/checkout mutations, tab navigation (Home, Products, Cart, Account), product listing/detail, cart quantity/remove actions, checkout metadata preview, and MVP CMS page fallback renderer
+- **Mobile storefront MVP** — `mobile/` Expo Router app with typed API client, TanStack Query provider, SecureStore-backed bearer auth, guest cart token persistence, idempotency keys for cart/checkout mutations, tab navigation (Home, Products, Cart, Account), product listing/detail with native filters/sort, cart quantity/remove actions, MVP checkout submit with payment redirect, and MVP CMS page fallback renderer
 - **Orders** — full lifecycle, status machine, invoices (PDF), export
 - **Cart** — token-based guest cart, abandoned cart cleanup + emails
 - **Checkout** — multi-step, shipping, payment providers, idempotency

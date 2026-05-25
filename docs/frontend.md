@@ -244,7 +244,7 @@ Expo Router app backed by the same Laravel REST API as `client/`.
 
 ```
 mobile/src/
-├── app/              Expo Router tabs and stack screens
+├── app/              Expo Router tabs, product detail, checkout and CMS screens
 ├── api/              Axios API modules for products, cart, auth, checkout, CMS
 ├── components/       Native UI pieces for products, cart and screen states
 ├── hooks/            React Query hooks such as useCart()
@@ -260,6 +260,8 @@ Key rules:
 - Guest cart token is sent as `X-Cart-Token` and persisted locally.
 - Cart and checkout mutations send `Idempotency-Key`.
 - Prices stay as integer cents/grosze until formatted in `lib/format.ts`.
+- Checkout MVP submits contact/address/delivery/payment/terms data to `/checkout`
+  and opens provider redirect URLs through `expo-web-browser`.
 
 Checks:
 

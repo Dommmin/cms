@@ -2119,6 +2119,7 @@ Extension points:
 - Guest cart state persists the backend cart token and sends it as `X-Cart-Token`.
 - Cart and checkout mutations must send `Idempotency-Key`.
 - Prices are integer cents/grosze until formatted with `mobile/src/lib/format.ts`.
+- Checkout MVP posts contact, address, shipping method, payment provider and legal acceptance to `/checkout`, then opens provider redirect URLs through `expo-web-browser`.
 
 Run mobile checks from the repo root:
 

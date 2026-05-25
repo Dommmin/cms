@@ -16,6 +16,7 @@ import { formatMoney, stripHtml } from '@/lib/format';
 export default function ProductDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
+  const [added, setAdded] = useState(false);
   const { addItem } = useCart();
 
   const productQuery = useQuery({
@@ -89,10 +90,21 @@ export default function ProductDetailScreen() {
       <ThemedView style={styles.stickyBar}>
         <Pressable
           disabled={!selectedVariant?.is_available || addItem.isPending}
-          onPress={() => selectedVariant && addItem.mutate({ variant_id: selectedVariant.id, quantity: 1 })}
+          onPress={() =>
+            selectedVariant &&
+            addItem.mutate(
+              { variant_id: selectedVariant.id, quantity: 1 },
+              {
+                onSuccess: () => {
+                  setAdded(true);
+                  setTimeout(() => setAdded(false), 1800);
+                },
+              },
+            )
+          }
           style={[styles.primaryButton, (!selectedVariant?.is_available || addItem.isPending) && styles.disabled]}>
           <ThemedText type="smallBold" style={styles.primaryButtonText}>
-            {selectedVariant?.is_available ? 'Dodaj do koszyka' : 'Niedostępny'}
+            {added ? 'Dodano do koszyka' : selectedVariant?.is_available ? 'Dodaj do koszyka' : 'Niedostępny'}
           </ThemedText>
         </Pressable>
       </ThemedView>

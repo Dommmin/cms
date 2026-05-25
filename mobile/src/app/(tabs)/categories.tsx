@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { FlatList, Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getCategories, getProducts } from '@/api/products';
@@ -13,6 +13,9 @@ import { Spacing } from '@/constants/theme';
 export default function CategoriesScreen() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string | undefined>();
+  const [sort, setSort] = useState('-created_at');
+  const [inStock, setInStock] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const deferredSearch = search.trim();
 
   const categoriesQuery = useQuery({
@@ -21,12 +24,14 @@ export default function CategoriesScreen() {
   });
 
   const productsQuery = useQuery({
-    queryKey: ['products', { search: deferredSearch, category }],
+    queryKey: ['products', { search: deferredSearch, category, sort, inStock }],
     queryFn: () =>
       getProducts({
         per_page: 20,
         search: deferredSearch || undefined,
         category,
+        sort,
+        in_stock: inStock,
       }),
   });
 
@@ -42,6 +47,15 @@ export default function CategoriesScreen() {
           autoCapitalize="none"
           style={styles.search}
         />
+
+        <ThemedView style={styles.toolbar}>
+          <Pressable onPress={() => setFiltersOpen(true)} style={styles.toolbarButton}>
+            <ThemedText type="smallBold">Filtry</ThemedText>
+          </Pressable>
+          <ThemedText type="small" themeColor="textSecondary">
+            {productsQuery.data?.meta.total ?? 0} produktów
+          </ThemedText>
+        </ThemedView>
 
         <FlatList
           horizontal
@@ -79,6 +93,47 @@ export default function CategoriesScreen() {
             ListFooterComponent={<View style={styles.footer} />}
           />
         ) : null}
+
+        <Modal
+          visible={filtersOpen}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setFiltersOpen(false)}>
+          <Pressable style={styles.sheetBackdrop} onPress={() => setFiltersOpen(false)} />
+          <ThemedView style={styles.sheet}>
+            <ThemedText type="smallBold">Sortowanie</ThemedText>
+            {[
+              { label: 'Najnowsze', value: '-created_at' },
+              { label: 'Cena rosnąco', value: 'price' },
+              { label: 'Cena malejąco', value: '-price' },
+              { label: 'Nazwa A-Z', value: 'name' },
+            ].map((option) => {
+              const isActive = option.value === sort;
+              return (
+                <Pressable
+                  key={option.value}
+                  onPress={() => setSort(option.value)}
+                  style={[styles.sheetOption, isActive && styles.sheetOptionActive]}>
+                  <ThemedText type="smallBold" style={isActive && styles.activeChipText}>
+                    {option.label}
+                  </ThemedText>
+                </Pressable>
+              );
+            })}
+            <Pressable
+              onPress={() => setInStock((value) => !value)}
+              style={[styles.sheetOption, inStock && styles.sheetOptionActive]}>
+              <ThemedText type="smallBold" style={inStock && styles.activeChipText}>
+                Tylko dostępne
+              </ThemedText>
+            </Pressable>
+            <Pressable onPress={() => setFiltersOpen(false)} style={styles.doneButton}>
+              <ThemedText type="smallBold" style={styles.doneButtonText}>
+                Zastosuj
+              </ThemedText>
+            </Pressable>
+          </ThemedView>
+        </Modal>
       </ThemedView>
     </SafeAreaView>
   );
@@ -99,6 +154,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
     paddingHorizontal: Spacing.three,
     fontSize: 16,
+  },
+  toolbar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'transparent',
+  },
+  toolbarButton: {
+    height: 40,
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.three,
+    borderRadius: 8,
+    backgroundColor: '#E5E7EB',
   },
   chips: {
     gap: Spacing.two,
@@ -125,5 +193,38 @@ const styles = StyleSheet.create({
   },
   footer: {
     height: Spacing.five,
+  },
+  sheetBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+  },
+  sheet: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    gap: Spacing.two,
+    padding: Spacing.three,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+  },
+  sheetOption: {
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.three,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+  },
+  sheetOptionActive: {
+    backgroundColor: '#111827',
+  },
+  doneButton: {
+    alignItems: 'center',
+    marginTop: Spacing.two,
+    paddingVertical: Spacing.three,
+    borderRadius: 8,
+    backgroundColor: '#111827',
+  },
+  doneButtonText: {
+    color: '#FFFFFF',
   },
 });
