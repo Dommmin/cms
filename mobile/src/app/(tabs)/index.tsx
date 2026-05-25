@@ -9,8 +9,12 @@ import { ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
+import { useRecentlyViewed } from '@/hooks/use-recently-viewed';
+import { formatMoney } from '@/lib/format';
+import type { RecentlyViewedProduct } from '@/lib/recently-viewed';
 
 export default function HomeScreen() {
+  const recentlyViewed = useRecentlyViewed();
   const featuredQuery = useQuery({
     queryKey: ['products', 'home-featured'],
     queryFn: () => getProducts({ per_page: 8, sort: '-created_at' }),
@@ -43,6 +47,22 @@ export default function HomeScreen() {
           <QuickLink href="/newsletter" label="Newsletter" />
         </ThemedView>
 
+        {recentlyViewed.products.length > 0 ? (
+          <>
+            <ThemedView style={styles.sectionHeader}>
+              <ThemedText type="smallBold">Ostatnio oglądane</ThemedText>
+            </ThemedView>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={recentlyViewed.products}
+              keyExtractor={(item) => String(item.id)}
+              renderItem={({ item }) => <RecentProductCard product={item} />}
+              contentContainerStyle={styles.recentList}
+            />
+          </>
+        ) : null}
+
         {featuredQuery.isLoading ? <LoadingState /> : null}
         {featuredQuery.isError ? <ErrorState onRetry={() => featuredQuery.refetch()} /> : null}
         {featuredQuery.data ? (
@@ -58,6 +78,21 @@ export default function HomeScreen() {
         ) : null}
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function RecentProductCard({ product }: { product: RecentlyViewedProduct }) {
+  return (
+    <Link href={`/products/${product.slug}` as Href} asChild>
+      <Pressable style={styles.recentCard}>
+        <ThemedText type="smallBold" numberOfLines={2}>
+          {product.name}
+        </ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">
+          {formatMoney(product.price_min)}
+        </ThemedText>
+      </Pressable>
+    </Link>
   );
 }
 
@@ -109,6 +144,16 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.three,
     borderRadius: 8,
     backgroundColor: '#E5E7EB',
+  },
+  recentList: {
+    gap: Spacing.two,
+  },
+  recentCard: {
+    width: 152,
+    gap: Spacing.one,
+    padding: Spacing.three,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
   },
   grid: {
     gap: Spacing.three,

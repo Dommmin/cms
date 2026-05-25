@@ -1,10 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link, type Href } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getOrders } from '@/api/orders';
+import { updateProfile } from '@/api/profile';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -19,11 +20,16 @@ export default function AccountScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const [profileName, setProfileName] = useState('');
+  const [profileEmail, setProfileEmail] = useState('');
   const [error, setError] = useState(false);
   const ordersQuery = useQuery({
     queryKey: ['orders'],
     queryFn: () => getOrders({ per_page: 5 }),
     enabled: auth.isAuthenticated,
+  });
+  const updateProfileMutation = useMutation({
+    mutationFn: updateProfile,
   });
 
   if (auth.isLoading) return <LoadingState />;
@@ -58,6 +64,39 @@ export default function AccountScreen() {
             <ThemedView style={styles.panel}>
               <ThemedText type="smallBold">{auth.user.name}</ThemedText>
               <ThemedText themeColor="textSecondary">{auth.user.email}</ThemedText>
+            </ThemedView>
+            <ThemedView style={styles.panel}>
+              <ThemedText type="smallBold">Profil</ThemedText>
+              <TextInput
+                defaultValue={auth.user.name}
+                onChangeText={setProfileName}
+                placeholder="Imię i nazwisko"
+                autoCapitalize="words"
+                style={styles.input}
+              />
+              <TextInput
+                defaultValue={auth.user.email}
+                onChangeText={setProfileEmail}
+                placeholder="Email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                style={styles.input}
+              />
+              {updateProfileMutation.isSuccess ? <ThemedText type="smallBold">Zapisano profil.</ThemedText> : null}
+              {updateProfileMutation.isError ? <ThemedText style={styles.errorText}>Nie udało się zapisać profilu.</ThemedText> : null}
+              <Pressable
+                disabled={updateProfileMutation.isPending}
+                onPress={() =>
+                  updateProfileMutation.mutate({
+                    name: profileName || auth.user?.name || '',
+                    email: profileEmail || auth.user?.email || '',
+                  })
+                }
+                style={[styles.primaryButton, updateProfileMutation.isPending && styles.disabled]}>
+                <ThemedText type="smallBold" style={styles.primaryButtonText}>
+                  Zapisz profil
+                </ThemedText>
+              </Pressable>
             </ThemedView>
             <ThemedView style={styles.panel}>
               <ThemedText type="smallBold">Ostatnie zamówienia</ThemedText>
@@ -182,6 +221,9 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.three,
     borderRadius: 8,
     backgroundColor: '#E5E7EB',
+  },
+  disabled: {
+    opacity: 0.45,
   },
   orderRow: {
     flexDirection: 'row',

@@ -230,6 +230,25 @@ export interface ProductReview {
   created_at: string;
 }
 
+export interface WishlistItem {
+  id: number;
+  variant_id: number;
+  product: Pick<Product, 'id' | 'name' | 'slug' | 'thumbnail' | 'price_min'>;
+  variant: Pick<ProductVariant, 'id' | 'sku' | 'price' | 'attributes'> & {
+    compare_at_price: number | null;
+    omnibus_price: number | null;
+    is_on_sale: boolean;
+    in_stock: boolean;
+  };
+  added_at: string;
+}
+
+export interface Wishlist {
+  id: number;
+  items: WishlistItem[];
+  items_count: number;
+}
+
 export interface AddressPayload {
   first_name: string;
   last_name: string;

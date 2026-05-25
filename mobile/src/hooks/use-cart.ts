@@ -30,6 +30,11 @@ export function useCart() {
     onSuccess: setCart,
   });
 
+  const applyDiscount = useMutation({
+    mutationFn: cartApi.applyDiscount,
+    onSuccess: setCart,
+  });
+
   return {
     cart: cartQuery.data ?? null,
     isLoading: cartQuery.isLoading,
@@ -38,5 +43,6 @@ export function useCart() {
     addItem,
     updateItem,
     removeItem,
+    applyDiscount,
   };
 }

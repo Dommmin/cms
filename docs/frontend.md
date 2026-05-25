@@ -265,6 +265,8 @@ Key rules:
 - Account MVP supports login, registration, logout and recent order history.
 - Order detail, blog list/detail, stores list, newsletter signup and a safe MVP
   CMS Page Builder renderer are implemented as native screens.
+- Product reviews, wishlist actions, recently viewed products, profile editing and
+  cart discount codes are included in the MVP surface.
 
 Checks:
 

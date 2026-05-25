@@ -1,5 +1,6 @@
 import { Link, type Href } from 'expo-router';
-import { FlatList, Pressable, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { FlatList, Pressable, StyleSheet, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CartRow } from '@/components/cart/cart-row';
@@ -11,7 +12,8 @@ import { useCart } from '@/hooks/use-cart';
 import { formatMoney } from '@/lib/format';
 
 export default function CartScreen() {
-  const { cart, isLoading, isError, refetch, updateItem, removeItem } = useCart();
+  const [discountCode, setDiscountCode] = useState('');
+  const { cart, isLoading, isError, refetch, updateItem, removeItem, applyDiscount } = useCart();
 
   if (isLoading) return <LoadingState />;
   if (isError) return <ErrorState onRetry={() => refetch()} />;
@@ -40,6 +42,31 @@ export default function CartScreen() {
             ItemSeparatorComponent={() => <ThemedView style={styles.separator} />}
           />
           <ThemedView style={styles.summary}>
+            <ThemedView style={styles.discountRow}>
+              <TextInput
+                value={discountCode}
+                onChangeText={setDiscountCode}
+                placeholder="Kod rabatowy"
+                autoCapitalize="characters"
+                style={styles.discountInput}
+              />
+              <Pressable
+                disabled={!discountCode.trim() || applyDiscount.isPending}
+                onPress={() =>
+                  applyDiscount.mutate(discountCode.trim(), {
+                    onSuccess: () => setDiscountCode(''),
+                  })
+                }
+                style={[styles.discountButton, (!discountCode.trim() || applyDiscount.isPending) && styles.disabled]}>
+                <ThemedText type="smallBold">Dodaj</ThemedText>
+              </Pressable>
+            </ThemedView>
+            {cart.discount_code ? (
+              <ThemedView style={styles.summaryRow}>
+                <ThemedText themeColor="textSecondary">Rabat {cart.discount_code}</ThemedText>
+                <ThemedText type="smallBold">-{formatMoney(cart.discount_amount, cart.currency)}</ThemedText>
+              </ThemedView>
+            ) : null}
             <ThemedView style={styles.summaryRow}>
               <ThemedText themeColor="textSecondary">Suma</ThemedText>
               <ThemedText type="smallBold">{formatMoney(cart.total, cart.currency)}</ThemedText>
@@ -80,6 +107,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  discountRow: {
+    flexDirection: 'row',
+    gap: Spacing.two,
+    backgroundColor: 'transparent',
+  },
+  discountInput: {
+    flex: 1,
+    minHeight: 44,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+    paddingHorizontal: Spacing.three,
+    fontSize: 16,
+  },
+  discountButton: {
+    minWidth: 72,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    backgroundColor: '#E5E7EB',
+  },
   primaryButton: {
     alignItems: 'center',
     paddingVertical: Spacing.three,
@@ -88,5 +135,8 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     color: '#FFFFFF',
+  },
+  disabled: {
+    opacity: 0.45,
   },
 });

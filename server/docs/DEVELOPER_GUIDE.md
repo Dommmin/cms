@@ -2122,6 +2122,7 @@ Extension points:
 - Checkout MVP posts contact, address, shipping method, payment provider and legal acceptance to `/checkout`, then opens provider redirect URLs through `expo-web-browser`.
 - Account MVP uses `/auth/login`, `/auth/register`, `/auth/logout`, `/auth/me` and `/orders` for recent order history.
 - Mobile content screens use `/pages/{slug}`, `/blog/posts`, `/blog/posts/{slug}`, `/stores` and `/newsletter/subscribe`; the CMS renderer supports a safe subset of Page Builder blocks and skips unknown blocks.
+- Product/account completion includes `/products/{slug}/reviews`, `/wishlist`, `/profile`, local recently viewed storage and cart discount application.
 
 Run mobile checks from the repo root:
 

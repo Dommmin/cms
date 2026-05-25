@@ -1,23 +1,29 @@
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getProduct } from '@/api/products';
+import { getProduct, getProductReviews } from '@/api/products';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useCart } from '@/hooks/use-cart';
+import { useRecentlyViewed } from '@/hooks/use-recently-viewed';
+import { useWishlist } from '@/hooks/use-wishlist';
 import { formatMoney, stripHtml } from '@/lib/format';
+import { useAuth } from '@/providers/auth-provider';
 
 export default function ProductDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
   const [added, setAdded] = useState(false);
   const { addItem } = useCart();
+  const auth = useAuth();
+  const wishlist = useWishlist(auth.isAuthenticated);
+  const { remember } = useRecentlyViewed();
 
   const productQuery = useQuery({
     queryKey: ['products', slug],
@@ -26,6 +32,11 @@ export default function ProductDetailScreen() {
   });
 
   const product = productQuery.data;
+  const reviewsQuery = useQuery({
+    queryKey: ['product-reviews', slug],
+    queryFn: () => getProductReviews(slug, { per_page: 3 }),
+    enabled: Boolean(slug),
+  });
   const selectedVariant = useMemo(() => {
     if (!product) return null;
     return (
@@ -36,10 +47,19 @@ export default function ProductDetailScreen() {
     );
   }, [product, selectedVariantId]);
 
+  useEffect(() => {
+    if (product) {
+      void remember(product);
+    }
+  }, [product, remember]);
+
   if (productQuery.isLoading) return <LoadingState />;
   if (productQuery.isError || !product) return <ErrorState onRetry={() => productQuery.refetch()} />;
 
   const image = product.images[0] ?? product.thumbnail;
+  const isWishlisted = selectedVariant
+    ? wishlist.wishlist?.items.some((item) => item.variant_id === selectedVariant.id)
+    : false;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -78,6 +98,22 @@ export default function ProductDetailScreen() {
           </ThemedView>
         ) : null}
 
+        {auth.isAuthenticated && selectedVariant ? (
+          <ThemedView style={styles.section}>
+            <Pressable
+              onPress={() =>
+                isWishlisted
+                  ? wishlist.remove.mutate(selectedVariant.id)
+                  : wishlist.add.mutate(selectedVariant.id)
+              }
+              style={styles.secondaryButton}>
+              <ThemedText type="smallBold">
+                {isWishlisted ? 'Usuń z wishlisty' : 'Dodaj do wishlisty'}
+              </ThemedText>
+            </Pressable>
+          </ThemedView>
+        ) : null}
+
         {product.short_description || product.description ? (
           <ThemedView style={styles.section}>
             <ThemedText type="smallBold">Opis</ThemedText>
@@ -86,6 +122,23 @@ export default function ProductDetailScreen() {
             </ThemedText>
           </ThemedView>
         ) : null}
+
+        <ThemedView style={styles.section}>
+          <ThemedText type="smallBold">Opinie</ThemedText>
+          {reviewsQuery.isLoading ? <ThemedText themeColor="textSecondary">Ładowanie</ThemedText> : null}
+          {reviewsQuery.data?.data.length === 0 ? (
+            <ThemedText themeColor="textSecondary">Brak opinii dla tego produktu.</ThemedText>
+          ) : null}
+          {reviewsQuery.data?.data.map((review) => (
+            <ThemedView key={review.id} style={styles.review}>
+              <ThemedText type="smallBold">
+                {review.author} · {review.rating}/5
+              </ThemedText>
+              {review.title ? <ThemedText type="smallBold">{review.title}</ThemedText> : null}
+              <ThemedText themeColor="textSecondary">{review.body}</ThemedText>
+            </ThemedView>
+          ))}
+        </ThemedView>
       </ScrollView>
       <ThemedView style={styles.stickyBar}>
         <Pressable
@@ -152,6 +205,18 @@ const styles = StyleSheet.create({
   },
   disabled: {
     opacity: 0.45,
+  },
+  secondaryButton: {
+    alignItems: 'center',
+    paddingVertical: Spacing.three,
+    borderRadius: 8,
+    backgroundColor: '#E5E7EB',
+  },
+  review: {
+    gap: Spacing.one,
+    padding: Spacing.three,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
   },
   stickyBar: {
     position: 'absolute',

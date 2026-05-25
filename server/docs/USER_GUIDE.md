@@ -1034,3 +1034,5 @@ The admin panel uses a full-featured rich text editor (Lexical) for Blog Post co
 The mobile app is a customer storefront built from the same products, categories, cart, checkout settings, pages and account data as the public website.
 
 Content editors do not manage mobile content separately. Publish and update Products, Categories, Blog Posts, Store locations, Newsletter settings and CMS Pages in the admin panel as usual; supported mobile screens read the same public API data.
+
+The mobile MVP also exposes customer account basics: login, registration, profile edits, order history, wishlists, product reviews, cart discounts and checkout redirects.
