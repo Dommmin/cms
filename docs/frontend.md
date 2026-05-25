@@ -1,11 +1,12 @@
 # Frontend Documentation
 
-This project has **two** frontend contexts:
+This project has **three** frontend contexts:
 
 | Context             | Path                   | Framework             | Served by      |
 |---------------------|------------------------|-----------------------|----------------|
 | **Admin SPA**       | `server/resources/js/` | Inertia v2 + React 19 | Laravel (PHP)  |
 | **Public Frontend** | `client/`              | Next.js 16            | Node container |
+| **Mobile App**      | `mobile/`              | Expo React Native     | Expo CLI       |
 
 ---
 
@@ -234,6 +235,38 @@ The public storefront is installable as a PWA:
 
 Configure an active CMS webhook with the same secret and the storefront URL
 `https://<storefront-host>/api/cms/revalidate`.
+
+---
+
+## Mobile App (`mobile/`)
+
+Expo Router app backed by the same Laravel REST API as `client/`.
+
+```
+mobile/src/
+├── app/              Expo Router tabs and stack screens
+├── api/              Axios API modules for products, cart, auth, checkout, CMS
+├── components/       Native UI pieces for products, cart and screen states
+├── hooks/            React Query hooks such as useCart()
+├── lib/              env, storage, formatting and idempotency helpers
+├── providers/        QueryClientProvider and AuthProvider
+└── types/api.ts      Mobile API contracts mirrored from client/types/api.ts
+```
+
+Key rules:
+
+- `EXPO_PUBLIC_API_URL` provides the `/api/v1` base URL.
+- Auth uses Sanctum bearer tokens stored through `expo-secure-store`.
+- Guest cart token is sent as `X-Cart-Token` and persisted locally.
+- Cart and checkout mutations send `Idempotency-Key`.
+- Prices stay as integer cents/grosze until formatted in `lib/format.ts`.
+
+Checks:
+
+```bash
+npm --prefix mobile run types
+npm --prefix mobile run lint
+```
 
 ### Blog SEO
 

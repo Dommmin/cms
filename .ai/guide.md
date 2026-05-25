@@ -7,12 +7,13 @@
 
 ## What This Project Is
 
-A **headless CMS + e-commerce platform** with two apps in one monorepo:
+A **headless CMS + e-commerce platform** with three apps in one monorepo:
 
 | App | Path | Tech | Purpose |
 |-----|------|------|---------|
 | **Admin SPA** | `server/` | Laravel 12 + Inertia/React | Content management, orders, users, settings |
 | **Public Frontend** | `client/` | Next.js 16 | Storefront, blog, pages for end users |
+| **Mobile App** | `mobile/` | Expo React Native | Native mobile storefront MVP |
 
 Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 
@@ -55,6 +56,7 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 
 ### E-commerce
 - **Products** — variants, attributes, product types, categories, flags, images (spatie/medialibrary), price history
+- **Mobile storefront MVP** — `mobile/` Expo Router app with typed API client, TanStack Query provider, SecureStore-backed bearer auth, guest cart token persistence, idempotency keys for cart/checkout mutations, tab navigation (Home, Products, Cart, Account), product listing/detail, cart quantity/remove actions, checkout metadata preview, and MVP CMS page fallback renderer
 - **Orders** — full lifecycle, status machine, invoices (PDF), export
 - **Cart** — token-based guest cart, abandoned cart cleanup + emails
 - **Checkout** — multi-step, shipping, payment providers, idempotency

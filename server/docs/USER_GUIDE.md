@@ -1026,3 +1026,11 @@ The admin panel uses a full-featured rich text editor (Lexical) for Blog Post co
 `Ctrl+B` Bold · `Ctrl+I` Italic · `Ctrl+U` Underline · `Ctrl+Z` Undo · `Ctrl+Shift+Z` Redo
 
 **Word count** is shown at the bottom of the editor.
+
+---
+
+### Mobile Storefront
+
+The mobile app is a customer storefront built from the same products, categories, cart, checkout settings, pages and account data as the public website.
+
+Content editors do not manage mobile content separately. Publish and update Products, Categories, Blog Posts and CMS Pages in the admin panel as usual; supported mobile screens read the same public API data.

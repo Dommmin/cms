@@ -2104,3 +2104,25 @@ Snippets are intentionally browser-local in the first iteration. `snippets-stora
 3. Add a theme class in `lexical/theme.ts`
 4. Add CSS in `resources/css/editor.css`
 5. Add toolbar trigger in `ToolbarPlugin.tsx`
+
+---
+
+## Mobile Storefront MVP
+
+The Expo React Native app lives in `mobile/` and uses the same `/api/v1/*` REST contracts as the public Next.js storefront.
+
+Extension points:
+
+- API modules live in `mobile/src/api/`; keep response names aligned with `client/types/api.ts`.
+- Shared mobile contracts live in `mobile/src/types/api.ts`.
+- Auth uses Sanctum bearer tokens through `expo-secure-store`.
+- Guest cart state persists the backend cart token and sends it as `X-Cart-Token`.
+- Cart and checkout mutations must send `Idempotency-Key`.
+- Prices are integer cents/grosze until formatted with `mobile/src/lib/format.ts`.
+
+Run mobile checks from the repo root:
+
+```bash
+npm --prefix mobile run types
+npm --prefix mobile run lint
+```
