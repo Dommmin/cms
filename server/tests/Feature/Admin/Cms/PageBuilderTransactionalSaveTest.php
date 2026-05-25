@@ -80,6 +80,37 @@ it('increments version and creates an autosave page version after autosave', fun
         ->and($version->change_note)->toBe('Autosave');
 });
 
+it('allows autosave to persist draft block configuration without full field validation', function (): void {
+    $snapshot = transactionalSnapshot();
+    $snapshot['sections'][0]['blocks'][0]['configuration']['max_width'] = 'not-a-valid-option';
+
+    $this->actingAs($this->user)
+        ->putJson(route('admin.cms.pages.builder.autosave', $this->page), [
+            'expected_version' => 0,
+            'snapshot' => $snapshot,
+        ])
+        ->assertOk()
+        ->assertJsonPath('success', true);
+
+    $block = PageBlock::query()->where('page_id', $this->page->id)->firstOrFail();
+
+    expect($block->configuration['max_width'])->toBe('not-a-valid-option');
+});
+
+it('keeps full block configuration validation for manual page builder saves', function (): void {
+    $snapshot = transactionalSnapshot();
+    $snapshot['sections'][0]['blocks'][0]['configuration']['max_width'] = 'not-a-valid-option';
+
+    $this->actingAs($this->user)
+        ->putJson(route('admin.cms.pages.builder.update', $this->page), [
+            'expected_version' => 0,
+            'snapshot' => $snapshot,
+        ])
+        ->assertUnprocessable();
+
+    expect(PageBlock::query()->where('page_id', $this->page->id)->count())->toBe(0);
+});
+
 it('returns conflict when expected version is stale', function (): void {
     $this->page->forceFill(['version' => 3])->save();
 

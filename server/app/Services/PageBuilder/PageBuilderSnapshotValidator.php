@@ -28,6 +28,46 @@ class PageBuilderSnapshotValidator
      */
     public function validateAndSanitize(array $snapshot, string $attribute = 'snapshot', ?User $user = null): array
     {
+        return $this->validateSnapshot($snapshot, $attribute, $user, true);
+    }
+
+    /**
+     * Draft autosaves intentionally avoid full block configuration validation.
+     * Editors can preserve partial work without required-field errors, while the
+     * snapshot still keeps a valid top-level Page Builder shape.
+     *
+     * @param  array<string, mixed>  $snapshot
+     * @return array<string, mixed>
+     *
+     * @throws ValidationException
+     */
+    public function validateDraftAndSanitize(array $snapshot, string $attribute = 'snapshot', ?User $user = null): array
+    {
+        return $this->validateSnapshot($snapshot, $attribute, $user, false);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     *
+     * @throws ValidationException
+     */
+    public function validateRelationsForBlock(string $blockType, mixed $relations, string $attribute = 'relations_config'): array
+    {
+        $errors = [];
+        $this->validateRelations($relations, $blockType, $attribute, $errors);
+        $this->throwIfInvalid($errors);
+
+        return is_array($relations) ? $relations : [];
+    }
+
+    /**
+     * @param  array<string, mixed>  $snapshot
+     * @return array<string, mixed>
+     *
+     * @throws ValidationException
+     */
+    private function validateSnapshot(array $snapshot, string $attribute, ?User $user, bool $validateConfiguration): array
+    {
         $errors = [];
 
         $encoded = json_encode($snapshot);
@@ -89,11 +129,15 @@ class PageBuilderSnapshotValidator
                     continue;
                 }
 
-                try {
-                    $snapshot['sections'][$sectionIndex]['blocks'][$blockIndex]['configuration'] = $this->configurationValidator
-                        ->validateAndSanitize($blockType, $block['configuration'] ?? [], $blockAttribute.'.configuration', $user);
-                } catch (ValidationException $exception) {
-                    $this->mergeErrors($errors, $exception->errors());
+                if ($validateConfiguration) {
+                    try {
+                        $snapshot['sections'][$sectionIndex]['blocks'][$blockIndex]['configuration'] = $this->configurationValidator
+                            ->validateAndSanitize($blockType, $block['configuration'] ?? [], $blockAttribute.'.configuration', $user);
+                    } catch (ValidationException $exception) {
+                        $this->mergeErrors($errors, $exception->errors());
+                    }
+                } elseif (! isset($block['configuration']) || ! is_array($block['configuration'])) {
+                    $snapshot['sections'][$sectionIndex]['blocks'][$blockIndex]['configuration'] = [];
                 }
 
                 $this->validateRelations(
@@ -108,20 +152,6 @@ class PageBuilderSnapshotValidator
         $this->throwIfInvalid($errors);
 
         return $snapshot;
-    }
-
-    /**
-     * @return array<int, array<string, mixed>>
-     *
-     * @throws ValidationException
-     */
-    public function validateRelationsForBlock(string $blockType, mixed $relations, string $attribute = 'relations_config'): array
-    {
-        $errors = [];
-        $this->validateRelations($relations, $blockType, $attribute, $errors);
-        $this->throwIfInvalid($errors);
-
-        return is_array($relations) ? $relations : [];
     }
 
     /**

@@ -46,10 +46,10 @@ class UpdatePageBuilderRequest extends FormRequest
             }
 
             try {
-                $snapshot = resolve(PageBuilderSnapshotValidator::class)->validateAndSanitize(
-                    $this->input('snapshot'),
-                    user: $this->user(),
-                );
+                $snapshotValidator = resolve(PageBuilderSnapshotValidator::class);
+                $snapshot = $this->routeIs('admin.cms.pages.builder.autosave')
+                    ? $snapshotValidator->validateDraftAndSanitize($this->input('snapshot'), user: $this->user())
+                    : $snapshotValidator->validateAndSanitize($this->input('snapshot'), user: $this->user());
             } catch (ValidationException $validationException) {
                 foreach ($validationException->errors() as $attribute => $messages) {
                     foreach ($messages as $message) {
