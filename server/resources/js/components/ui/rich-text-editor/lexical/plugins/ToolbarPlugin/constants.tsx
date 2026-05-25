@@ -222,6 +222,11 @@ export const SPECIAL_CHARS: Array<{ label: string; chars: Array<{ char: string; 
     },
 ];
 
+const EXTRA_CODE_LANGUAGES: Array<[string, string]> = [
+    ['csharp', 'C#'],
+    ['php', 'PHP'],
+];
+
 export const CODE_LANGUAGES = Object.entries(CODE_LANGUAGE_MAP)
     .reduce<Array<[string, string]>>((acc, [key]) => {
         const normalized = CODE_LANGUAGE_MAP[key];
@@ -231,5 +236,5 @@ export const CODE_LANGUAGES = Object.entries(CODE_LANGUAGE_MAP)
         }
 
         return acc;
-    }, [])
+    }, EXTRA_CODE_LANGUAGES)
     .sort(([, a], [, b]) => a.localeCompare(b));

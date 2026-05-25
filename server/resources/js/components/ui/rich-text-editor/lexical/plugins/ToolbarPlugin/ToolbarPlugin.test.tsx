@@ -2,6 +2,7 @@ import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { nodes } from '../../nodes';
+import { CODE_LANGUAGES } from './constants';
 import ToolbarPlugin from './index';
 
 function renderToolbar(mode: 'simple' | 'full') {
@@ -21,6 +22,13 @@ function renderToolbar(mode: 'simple' | 'full') {
 }
 
 describe('ToolbarPlugin', () => {
+    it('offers PHP and C# code block languages', () => {
+        expect(CODE_LANGUAGES).toEqual(expect.arrayContaining([
+            ['php', 'PHP'],
+            ['csharp', 'C#'],
+        ]));
+    });
+
     it('hides advanced controls in simple mode', () => {
         renderToolbar('simple');
 
