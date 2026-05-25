@@ -49,6 +49,35 @@ describe('CanvasBlockPreview', () => {
                 title: 'Featured products',
                 subtitle: 'Best picks',
             }),
+            makeBlock('promotional_banner', {
+                title: 'Limited offer',
+                subtitle: 'Save today',
+            }),
+            makeBlock('newsletter_signup', {
+                title: 'Join the list',
+                subtitle: 'Monthly updates',
+            }),
+            makeBlock('testimonials', {
+                title: 'Customers',
+                items: [{ author: 'Ada', quote: 'Great service' }],
+            }),
+            makeBlock('accordion', {
+                items: [{ content: '<p>Answer text</p>', title: 'Question' }],
+            }),
+            makeBlock('tabs', {
+                tabs: [{ content: '<p>Tab body</p>', title: 'Overview' }],
+            }),
+            makeBlock('stats_counter', {
+                title: 'Numbers',
+                stats: [{ label: 'Orders', value: '120' }],
+            }),
+            makeBlock('alert_banner', {
+                message: 'Important notice',
+            }),
+            makeBlock('pricing_cards', {
+                title: 'Pricing',
+                plans: [{ name: 'Starter', price: '$10' }],
+            }),
         ];
 
         for (const block of blocks) {
@@ -62,6 +91,14 @@ describe('CanvasBlockPreview', () => {
         expect(screen.getByText('Start now')).toBeInTheDocument();
         expect(screen.getByText('Gallery')).toBeInTheDocument();
         expect(screen.getByText('Featured products')).toBeInTheDocument();
+        expect(screen.getByText('Limited offer')).toBeInTheDocument();
+        expect(screen.getByText('Join the list')).toBeInTheDocument();
+        expect(screen.getByText('Ada')).toBeInTheDocument();
+        expect(screen.getByText('Question')).toBeInTheDocument();
+        expect(screen.getByText('Overview')).toBeInTheDocument();
+        expect(screen.getByText('Numbers')).toBeInTheDocument();
+        expect(screen.getByText('Important notice')).toBeInTheDocument();
+        expect(screen.getByText('Starter')).toBeInTheDocument();
     });
 
     it('commits inline edits on blur', () => {

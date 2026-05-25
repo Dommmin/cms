@@ -54,7 +54,7 @@ część funkcji już istnieje, część jest tylko częściowa, a część nada
 
 ## Priorytet 1 — Page Builder Visual Canvas
 
-Status 2026-05-24: **częściowo wdrożone**. Adminowy Canvas renderuje realne preview dla `hero_banner`, `rich_text`, `call_to_action`, `image_gallery` i `featured_products`; kliknięcie wybiera blok, double-click/Edit otwiera inspector, a inline edit obsługuje proste pola tekstowe (`title`, `heading`, `subtitle`, `description`, `primary_label`, `secondary_label`) przez `useBuilderState.updateBlockConfigurationField()`. Cards view pozostaje fallbackiem. Do domknięcia nadal zostało rozszerzenie preview na pozostałe bloki i pełniejsza zgodność wizualna ze storefrontem.
+Status 2026-05-25: **częściowo wdrożone, rozszerzone**. Adminowy Canvas renderuje realne preview dla `hero_banner`, `rich_text`, `call_to_action`, `image_gallery`, `featured_products`, `promotional_banner`, `newsletter_signup`, `testimonials`, `accordion`, `tabs`, `stats_counter`, `alert_banner`, `pricing_cards` i `pricing_table`; kliknięcie wybiera blok, double-click/Edit otwiera inspector, a inline edit obsługuje proste pola tekstowe (`title`, `heading`, `subtitle`, `description`, `primary_label`, `secondary_label`) przez `useBuilderState.updateBlockConfigurationField()`. Cards view pozostaje fallbackiem. Do domknięcia nadal zostało rozszerzenie preview na pozostałe, relacyjne lub bardziej interaktywne bloki i pełniejsza zgodność wizualna ze storefrontem.
 
 To jest najważniejsza luka UX. Obecny `CanvasView` renderuje sekcje i placeholdery bloków, ale nie renderuje prawdziwych komponentów bloków. Celem jest zbliżenie do Shopify/Gutenberg.
 
@@ -117,6 +117,7 @@ W `use-builder-state.ts` dodaj akcję aktualizującą `block.configuration[field
 ### Akceptacja
 
 - [x] Canvas renderuje realną treść dla minimum 5 typów bloków.
+- [x] Canvas renderuje realną treść dla prostych bloków marketing/content bez API.
 - [x] Kliknięcie bloku wybiera go i synchronizuje z inspectorem.
 - [x] Double-click otwiera inspector.
 - [x] Inline edit aktualizuje konfigurację i ustawia unsaved state.
@@ -375,7 +376,7 @@ Dodaj przycisk `MD`, który pobiera `content.md`.
 
 To jest największy brak jakościowy.
 
-Status 2026-05-24: **częściowo wdrożone**. `client/` ma minimalny Vitest setup (`npm run test:ui`) dla smoke testów rendererów w środowisku Node. Dodano `tests/unit/page-builder-renderers.test.tsx`, który przechodzi przez wszystkie 30 typów bloków storefront Page Buildera, mockuje zależności Next/browser/API, osobno wskazuje awarię konkretnego typu bloku oraz obejmuje `SectionRenderer` i `SectionLazyWrapper`. Nadal do zrobienia: głębsze testy variantów light/dark/brand, layoutów, theme token inheritance i crop endpointu.
+Status 2026-05-25: **wdrożone w planowanym zakresie**. `client/` ma minimalny Vitest setup (`npm run test:ui`) dla smoke testów rendererów w środowisku Node. `tests/unit/page-builder-renderers.test.tsx` przechodzi przez wszystkie 30 typów bloków storefront Page Buildera, mockuje zależności Next/browser/API, osobno wskazuje awarię konkretnego typu bloku oraz obejmuje `SectionRenderer`, `SectionLazyWrapper`, warianty light/dark/brand, layouty contained/full-width/two-col i `ThemeStyles` z CSS variables/filtrowaniem tokenów. Crop endpoint jest pokryty w `server/tests/Feature/Admin/ImageCropTest.php`: walidacja, odrzucenie nie-obrazów, generowanie wariantu, metadata/focal point i ekspozycja `crop_variants` w media search.
 
 ### Minimalny Zakres
 
@@ -409,8 +410,8 @@ Status 2026-05-24: **częściowo wdrożone**. `client/` ma minimalny Vitest setu
 
 - [x] Istnieje test, który przechodzi przez wszystkie typy bloków.
 - [x] Awaria pojedynczego bloku jest łatwa do zlokalizowania.
-- [ ] Theme token inheritance jest pokryte testem.
-- [ ] Crop endpoint jest pokryty testem w planowanym zakresie.
+- [x] Theme token inheritance jest pokryte testem.
+- [x] Crop endpoint jest pokryty testem w planowanym zakresie.
 
 ## Kolejność Rekomendowana
 

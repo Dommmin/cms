@@ -165,7 +165,7 @@ class RteLinkController extends Controller
     private function extractLocale(array &$segments): string
     {
         $defaultLocale = config('app.locale', 'en');
-        $locales = Locale::query()->active()->pluck('code')->all();
+        $locales = Locale::query()->where('is_active', true)->pluck('code')->all();
         $candidate = $segments[0] ?? null;
 
         if (is_string($candidate) && in_array($candidate, $locales, true)) {

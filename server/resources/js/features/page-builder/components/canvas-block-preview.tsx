@@ -45,6 +45,14 @@ function placeholderRelations(count: number): (BlockRelation | null)[] {
     return Array.from({ length: count }, () => null);
 }
 
+function itemsValue(value: unknown): Record<string, unknown>[] {
+    return Array.isArray(value)
+        ? value.filter((item): item is Record<string, unknown> => {
+              return item !== null && typeof item === 'object';
+          })
+        : [];
+}
+
 function stripHtml(html: unknown): string {
     if (typeof html !== 'string') return '';
 
@@ -348,6 +356,272 @@ function FeaturedProductsPreview({
     );
 }
 
+function PromotionalBannerPreview({
+    block,
+    onInlineEdit,
+}: CanvasBlockPreviewProps) {
+    const cfg = block.configuration;
+    const background = mediaUrl(
+        getRelationByKey(block.relations, 'background'),
+    );
+
+    return (
+        <div className="relative overflow-hidden rounded-lg bg-primary px-8 py-12 text-primary-foreground">
+            {background ? (
+                <img
+                    src={background}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover"
+                />
+            ) : null}
+            <div className="absolute inset-0 bg-primary/80" />
+            <div className="relative z-10 flex max-w-2xl flex-col gap-4">
+                <EditableText
+                    as="h2"
+                    field="title"
+                    value={cfg.title}
+                    placeholder="Promotional banner title"
+                    onInlineEdit={onInlineEdit}
+                    className="text-3xl font-bold"
+                />
+                <EditableText
+                    as="p"
+                    field="subtitle"
+                    value={cfg.subtitle ?? cfg.description}
+                    placeholder="Promotional banner copy"
+                    onInlineEdit={(field, value) => {
+                        onInlineEdit(
+                            cfg.subtitle === undefined ? 'description' : field,
+                            value,
+                        );
+                    }}
+                    className="text-primary-foreground/85"
+                />
+            </div>
+        </div>
+    );
+}
+
+function NewsletterSignupPreview({
+    block,
+    onInlineEdit,
+}: CanvasBlockPreviewProps) {
+    const cfg = block.configuration;
+
+    return (
+        <div className="rounded-lg border bg-background px-8 py-10 text-center">
+            <div className="mx-auto flex max-w-xl flex-col items-center gap-4">
+                <EditableText
+                    as="h2"
+                    field="title"
+                    value={cfg.title}
+                    placeholder="Newsletter title"
+                    onInlineEdit={onInlineEdit}
+                    className="text-2xl font-semibold"
+                />
+                <EditableText
+                    as="p"
+                    field="subtitle"
+                    value={cfg.subtitle ?? cfg.description}
+                    placeholder="Newsletter supporting copy"
+                    onInlineEdit={(field, value) => {
+                        onInlineEdit(
+                            cfg.subtitle === undefined ? 'description' : field,
+                            value,
+                        );
+                    }}
+                    className="text-sm text-muted-foreground"
+                />
+                <div className="mt-2 flex w-full max-w-md gap-2">
+                    <div className="h-10 flex-1 rounded-md border bg-muted" />
+                    <div className="h-10 w-28 rounded-md bg-primary" />
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function TestimonialsPreview({ block, onInlineEdit }: CanvasBlockPreviewProps) {
+    const cfg = block.configuration;
+    const items = itemsValue(cfg.items).slice(0, 3);
+    const testimonials =
+        items.length > 0
+            ? items
+            : [
+                  {
+                      author: 'Customer name',
+                      quote: 'Customer quote appears here.',
+                  },
+              ];
+
+    return (
+        <div className="space-y-5">
+            <EditableText
+                as="h2"
+                field="title"
+                value={cfg.title}
+                placeholder="Testimonials"
+                onInlineEdit={onInlineEdit}
+                className="text-center text-2xl font-semibold"
+            />
+            <div className="grid gap-4 md:grid-cols-3">
+                {testimonials.map((item, index) => (
+                    <div
+                        key={index}
+                        className="rounded-lg border bg-background p-5 shadow-sm"
+                    >
+                        <p className="text-sm leading-6 text-muted-foreground">
+                            “{textValue(item.quote)}”
+                        </p>
+                        <p className="mt-4 text-sm font-semibold">
+                            {textValue(item.author)}
+                        </p>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function AccordionPreview({ block }: CanvasBlockPreviewProps) {
+    const items = itemsValue(block.configuration.items).slice(0, 4);
+    const accordionItems =
+        items.length > 0
+            ? items
+            : [{ content: 'Answer appears here.', title: 'Question' }];
+
+    return (
+        <div className="rounded-lg border bg-background">
+            {accordionItems.map((item, index) => (
+                <div key={index} className="border-b px-5 py-4 last:border-b-0">
+                    <p className="font-medium">{textValue(item.title)}</p>
+                    {index === 0 ? (
+                        <p className="mt-2 text-sm text-muted-foreground">
+                            {stripHtml(item.content)}
+                        </p>
+                    ) : null}
+                </div>
+            ))}
+        </div>
+    );
+}
+
+function TabsPreview({ block }: CanvasBlockPreviewProps) {
+    const tabs = itemsValue(block.configuration.tabs).slice(0, 4);
+    const tabItems =
+        tabs.length > 0
+            ? tabs
+            : [{ content: 'Tab content appears here.', title: 'Tab' }];
+
+    return (
+        <div className="rounded-lg border bg-background p-5">
+            <div className="mb-4 flex flex-wrap gap-2">
+                {tabItems.map((tab, index) => (
+                    <span
+                        key={index}
+                        className={cn(
+                            'rounded-md px-3 py-2 text-sm font-medium',
+                            index === 0
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-muted text-muted-foreground',
+                        )}
+                    >
+                        {textValue(tab.title)}
+                    </span>
+                ))}
+            </div>
+            <p className="text-sm leading-6 text-muted-foreground">
+                {stripHtml(tabItems[0]?.content)}
+            </p>
+        </div>
+    );
+}
+
+function StatsCounterPreview({ block, onInlineEdit }: CanvasBlockPreviewProps) {
+    const cfg = block.configuration;
+    const stats = itemsValue(cfg.stats).slice(0, 4);
+    const statItems =
+        stats.length > 0 ? stats : [{ label: 'Metric', value: '100' }];
+
+    return (
+        <div className="space-y-6">
+            <EditableText
+                as="h2"
+                field="title"
+                value={cfg.title}
+                placeholder="Stats title"
+                onInlineEdit={onInlineEdit}
+                className="text-center text-2xl font-semibold"
+            />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {statItems.map((stat, index) => (
+                    <div
+                        key={index}
+                        className="rounded-lg border bg-background p-5 text-center"
+                    >
+                        <p className="text-3xl font-bold text-primary">
+                            {textValue(stat.value)}
+                            {textValue(stat.suffix)}
+                        </p>
+                        <p className="mt-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                            {textValue(stat.label)}
+                        </p>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function AlertBannerPreview({ block }: CanvasBlockPreviewProps) {
+    const cfg = block.configuration;
+
+    return (
+        <div className="rounded-lg border border-blue-200 bg-blue-50 px-5 py-4 text-blue-900">
+            <p className="text-sm font-medium">
+                {textValue(cfg.message) || 'Important message'}
+            </p>
+        </div>
+    );
+}
+
+function PricingPreview({ block, onInlineEdit }: CanvasBlockPreviewProps) {
+    const cfg = block.configuration;
+    const plans = itemsValue(cfg.plans).slice(0, 3);
+    const planItems =
+        plans.length > 0
+            ? plans
+            : [{ features: ['Feature'], name: 'Starter', price: '$10' }];
+
+    return (
+        <div className="space-y-6">
+            <EditableText
+                as="h2"
+                field="title"
+                value={cfg.title}
+                placeholder="Pricing"
+                onInlineEdit={onInlineEdit}
+                className="text-center text-2xl font-semibold"
+            />
+            <div className="grid gap-4 md:grid-cols-3">
+                {planItems.map((plan, index) => (
+                    <div
+                        key={index}
+                        className="rounded-lg border bg-background p-5 shadow-sm"
+                    >
+                        <p className="font-semibold">{textValue(plan.name)}</p>
+                        <p className="mt-3 text-3xl font-bold">
+                            {textValue(plan.price) ||
+                                textValue(plan.price_monthly)}
+                        </p>
+                        <div className="mt-4 h-9 rounded-md bg-primary" />
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 function FallbackPreview({ block }: CanvasBlockPreviewProps) {
     const label = block.type.replace(/_/g, ' ');
     const visibleFields = editableFields
@@ -389,6 +663,33 @@ export function CanvasBlockPreview(props: CanvasBlockPreviewProps) {
     }
     if (props.block.type === 'featured_products') {
         return <FeaturedProductsPreview {...props} />;
+    }
+    if (props.block.type === 'promotional_banner') {
+        return <PromotionalBannerPreview {...props} />;
+    }
+    if (props.block.type === 'newsletter_signup') {
+        return <NewsletterSignupPreview {...props} />;
+    }
+    if (props.block.type === 'testimonials') {
+        return <TestimonialsPreview {...props} />;
+    }
+    if (props.block.type === 'accordion') {
+        return <AccordionPreview {...props} />;
+    }
+    if (props.block.type === 'tabs') {
+        return <TabsPreview {...props} />;
+    }
+    if (props.block.type === 'stats_counter') {
+        return <StatsCounterPreview {...props} />;
+    }
+    if (props.block.type === 'alert_banner') {
+        return <AlertBannerPreview {...props} />;
+    }
+    if (
+        props.block.type === 'pricing_cards' ||
+        props.block.type === 'pricing_table'
+    ) {
+        return <PricingPreview {...props} />;
     }
 
     return <FallbackPreview {...props} />;

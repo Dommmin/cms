@@ -206,7 +206,8 @@ docker compose exec -T node npm run lint
 `client/tests/unit/**/*.{test,spec}.{ts,tsx}` in a Node environment. The initial
 unit smoke suite covers storefront Page Builder renderers: every block type has
 an isolated render case, and `SectionRenderer`/`SectionLazyWrapper` have basic
-metadata and lazy-placeholder coverage.
+metadata, lazy-placeholder, section variant/layout and theme CSS variable
+coverage.
 
 ### CMS Revalidation
 

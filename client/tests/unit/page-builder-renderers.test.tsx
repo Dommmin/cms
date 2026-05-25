@@ -2,6 +2,7 @@ import type { AnchorHTMLAttributes, ComponentType, ReactNode } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
+import type { ActiveTheme } from '@/app/layout.types';
 import type { BlockRendererProps } from '@/components/page-builder/block-renderer.types';
 import { AccordionBlock } from '@/components/page-builder/blocks/accordion-block';
 import { AlertBannerBlock } from '@/components/page-builder/blocks/alert-banner';
@@ -37,6 +38,7 @@ import {
     SectionLazyWrapper,
     SectionRenderer,
 } from '@/components/page-builder/section-renderer';
+import { ThemeStyles } from '@/components/theme-styles';
 import type {
     BlockRelation,
     BlockType,
@@ -347,6 +349,36 @@ describe('page builder block renderers', () => {
 });
 
 describe('page builder section renderer', () => {
+    it.each([
+        ['light', 'bg-[var(--background)] text-[var(--foreground)]'],
+        [
+            'dark',
+            'bg-[var(--section-dark-bg,var(--foreground))] text-[var(--section-dark-text,var(--background))]',
+        ],
+        ['brand', 'bg-[var(--primary)] text-[var(--primary-foreground)]'],
+    ] as const)(
+        'renders %s variant with theme variable classes',
+        (variant, className) => {
+            const html = renderToStaticMarkup(
+                <SectionRenderer section={makeSection({ variant })} />,
+            );
+
+            expect(html).toContain(className);
+        },
+    );
+
+    it.each([
+        ['contained', 'max-w-[var(--container-max-width,80rem)]'],
+        ['full-width', 'w-full'],
+        ['two-col', 'md:grid-cols-2'],
+    ] as const)('renders %s layout container classes', (layout, className) => {
+        const html = renderToStaticMarkup(
+            <SectionRenderer section={makeSection({ layout })} />,
+        );
+
+        expect(html).toContain(className);
+    });
+
     it('renders active block wrappers with section metadata', () => {
         const html = renderToStaticMarkup(
             <SectionRenderer
@@ -386,5 +418,61 @@ describe('page builder section renderer', () => {
 
         expect(html).toContain('data-section-id="10"');
         expect(html).toContain('min-height:240px');
+    });
+});
+
+describe('theme styles', () => {
+    it('renders active theme CSS variables consumed by page builder sections', () => {
+        const theme: ActiveTheme = {
+            slug: 'editorial',
+            buttons: {
+                primary_border_radius: '12px',
+                primary_padding_x: '1.25rem',
+                primary_padding_y: '0.75rem',
+            },
+            containers: {
+                max_width: '72rem',
+            },
+            spacing: {
+                section_padding: '6rem',
+            },
+            tokens: {
+                background: '#ffffff',
+                foreground: '#111111',
+                primary: '#2563eb',
+                'primary-foreground': '#ffffff',
+            },
+            typography: {
+                heading_font: 'Inter',
+            },
+        };
+
+        const html = renderToStaticMarkup(<ThemeStyles theme={theme} />);
+
+        expect(html).toContain('--primary: #2563eb;');
+        expect(html).toContain('--primary-foreground: #ffffff;');
+        expect(html).toContain('--font-heading: Inter;');
+        expect(html).toContain('--section-padding-y: 6rem;');
+        expect(html).toContain('--btn-radius: 12px;');
+        expect(html).toContain('--container-max-width: 72rem;');
+        expect(html).toContain('--section-dark-bg: #111111;');
+        expect(html).toContain('--section-dark-text: #ffffff;');
+    });
+
+    it('skips unsupported or oversized CSS token keys', () => {
+        const theme: ActiveTheme = {
+            slug: 'restricted',
+            tokens: {
+                background: '#ffffff',
+                malicious: 'url(javascript:alert(1))',
+                primary: 'x'.repeat(101),
+            },
+        };
+
+        const html = renderToStaticMarkup(<ThemeStyles theme={theme} />);
+
+        expect(html).toContain('--background: #ffffff;');
+        expect(html).not.toContain('malicious');
+        expect(html).not.toContain('--primary:');
     });
 });

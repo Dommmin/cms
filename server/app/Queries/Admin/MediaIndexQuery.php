@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Queries\Admin;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -107,14 +108,17 @@ final readonly class MediaIndexQuery
      */
     private function cropVariants(Media $item): array
     {
-        return Media::query()
+        /** @var Collection<int, Media> $variants */
+        $variants = Media::query()
             ->where('model_type', $item->model_type)
             ->where('model_id', $item->model_id)
-            ->where('custom_properties->crop_of', (string) $item->id)
+            ->where('custom_properties->crop_of', (string) $item->getKey())
             ->orderByDesc('id')
-            ->get()
+            ->get();
+
+        return $variants
             ->map(fn (Media $variant): array => [
-                'id' => $variant->id,
+                'id' => $variant->getKey(),
                 'url' => $variant->getUrl(),
                 'label' => (string) $variant->getCustomProperty('crop_variant', 'crop'),
                 'variant' => (string) $variant->getCustomProperty('crop_variant', 'crop'),
