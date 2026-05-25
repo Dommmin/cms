@@ -143,7 +143,7 @@ export interface Brand {
 export interface Product {
     id: number;
     name: string;
-    slug: Record<string, string>;
+    slug: string;
     short_description: string | null;
     description: string | null;
     /** min price across variants, in cents */
@@ -183,7 +183,7 @@ export interface Product {
 export interface Category {
     id: number;
     name: string;
-    slug: Record<string, string>;
+    slug: string;
     description: string | null;
     image_url: string | null;
     parent_id: number | null;
@@ -461,7 +461,9 @@ export interface BlogCategory {
 export interface BlogPost {
     id: number;
     title: string;
-    slug: Record<string, string>;
+    slug: string;
+    canonical_slug: string;
+    slug_translations: Record<string, string>;
     available_locales: string[];
     translation_group_id: string | null;
     excerpt: string | null;
