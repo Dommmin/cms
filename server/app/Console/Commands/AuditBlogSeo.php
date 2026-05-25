@@ -60,21 +60,28 @@ class AuditBlogSeo extends Command
         $reasons = $this->reasons($post, $metaDescription, $slugTranslations);
 
         if ($fix) {
-            $updates = [
-                'reading_time' => $post->estimateReadingTime((string) $content),
-                'slug_translations' => $slugTranslations,
-                'translation_group_id' => $post->translation_group_id ?? (string) Str::uuid(),
-            ];
+            $post->reading_time = $post->estimateReadingTime((string) $content);
+
+            if ($post->translation_group_id === null) {
+                $post->translation_group_id = (string) Str::uuid();
+            }
 
             if ($force || blank($post->seo_title)) {
-                $updates['seo_title'] = $seoTitle;
+                $post->seo_title = $seoTitle;
             }
 
             if ($force || blank($post->seo_description)) {
-                $updates['seo_description'] = $metaDescription;
+                $post->seo_description = $metaDescription;
             }
 
-            $post->update($updates);
+            foreach ($slugTranslations as $locale => $value) {
+                $existing = $post->getTranslation('slug', $locale, false);
+                if ($force || blank($existing)) {
+                    $post->setTranslation('slug', $locale, $value);
+                }
+            }
+
+            $post->saveQuietly();
         }
 
         return [
@@ -116,7 +123,7 @@ class AuditBlogSeo extends Command
     /** @return array<string, string> */
     private function slugTranslations(BlogPost $post): array
     {
-        $translations = $post->slug_translations ?? [];
+        $translations = $post->getTranslations('slug');
 
         foreach ($post->availableLocaleCodes() as $locale) {
             if (($translations[$locale] ?? '') !== '') {

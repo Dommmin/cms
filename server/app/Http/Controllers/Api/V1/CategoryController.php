@@ -33,8 +33,10 @@ class CategoryController extends ApiController
 
     public function show(string $slug): JsonResponse
     {
+        $locale = app()->getLocale();
+
         $category = Category::query()
-            ->where('slug', $slug)
+            ->where('slug->'.$locale, $slug)
             ->where('is_active', true)
             ->with(['parent', 'children'])
             ->firstOrFail();

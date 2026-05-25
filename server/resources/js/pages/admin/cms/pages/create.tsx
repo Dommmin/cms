@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
+import { SlugField } from '@/components/ui/slug-field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -45,13 +46,18 @@ export default function Create({ modules, pages }: CreateProps) {
     const [locale, setLocale] = useState<string>('global');
     const [parentId, setParentId] = useState<string>('none');
     const [title, setTitle] = useState('');
-    const [slug, setSlug] = useState('');
-    const [isSlugManual, setIsSlugManual] = useState(false);
+    const [slugValue, setSlugValue] = useState('');
+    const [autoGenerateSlug, setAutoGenerateSlug] = useState(true);
+
+    const defaultLocale =
+        locales.find((l) => l.is_default)?.code ?? 'en';
+
+    const effectiveLocale = locale !== 'global' ? locale : defaultLocale;
 
     const handleTitleChange = (value: string) => {
         setTitle(value);
-        if (!isSlugManual) {
-            setSlug(slugify(value));
+        if (autoGenerateSlug) {
+            setSlugValue(slugify(value));
         }
     };
 
@@ -226,38 +232,46 @@ export default function Create({ modules, pages }: CreateProps) {
                                     </div>
 
                                     <div className="grid gap-2">
+                                        <input
+                                            type="hidden"
+                                            name={`slug[${effectiveLocale}]`}
+                                            value={slugValue}
+                                        />
                                         <Label htmlFor="slug">
                                             {__('label.slug', 'Slug')}
                                         </Label>
                                         <Input
                                             id="slug"
-                                            name="slug"
                                             required
                                             placeholder="page-slug"
-                                            value={slug}
-                                            readOnly={!isSlugManual}
+                                            value={slugValue}
+                                            readOnly={autoGenerateSlug}
                                             onChange={(e) =>
-                                                setSlug(slugify(e.target.value))
+                                                setSlugValue(
+                                                    slugify(e.target.value),
+                                                )
                                             }
                                         />
                                         <InputError message={errors.slug} />
                                         <label className="flex items-center gap-2 text-sm text-muted-foreground">
                                             <input
                                                 type="checkbox"
-                                                checked={isSlugManual}
+                                                checked={autoGenerateSlug}
                                                 onChange={(e) => {
-                                                    const manual =
+                                                    const auto =
                                                         e.target.checked;
-                                                    setIsSlugManual(manual);
-                                                    if (!manual) {
-                                                        setSlug(slugify(title));
+                                                    setAutoGenerateSlug(auto);
+                                                    if (auto) {
+                                                        setSlugValue(
+                                                            slugify(title),
+                                                        );
                                                     }
                                                 }}
                                                 className="h-4 w-4 rounded border-input"
                                             />
                                             {__(
-                                                'misc.slug_auto_hint',
-                                                'Set slug manually',
+                                                'misc.auto_generate_slug',
+                                                'Auto-generate from title',
                                             )}
                                         </label>
                                     </div>

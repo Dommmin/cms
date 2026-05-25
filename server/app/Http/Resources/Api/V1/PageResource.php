@@ -32,8 +32,7 @@ class PageResource extends JsonResource
         return [
             'id' => $page->id,
             'title' => $page->title,
-            'slug' => $page->slug,
-            'slug_translations' => $page->slug_translations ?? [],
+            'slug' => $page->getTranslation('slug', $locale, false),
             'is_published' => $page->is_published,
             'page_type' => $page->page_type instanceof BackedEnum ? $page->page_type->value : $page->page_type,
             'module_name' => $page->module_name,

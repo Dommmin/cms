@@ -268,10 +268,6 @@ export function PageBuilder({
 
     const handleEditorModeChange = useCallback((mode: EditorMode) => {
         setEditorMode(mode);
-
-        if (mode === 'simple') {
-            setViewMode('canvas');
-        }
     }, []);
 
     const handleInlineEdit = useCallback(
@@ -534,27 +530,7 @@ export function PageBuilder({
                     </div>
                 )}
 
-                {inspectorOpen && (activeSection || activeBlock) ? (
-                    <div className="max-w-[30rem] min-w-[22rem]">
-                        <PageInspector
-                            section={activeSection}
-                            sectionIndex={
-                                activeSectionIndex >= 0
-                                    ? activeSectionIndex
-                                    : null
-                            }
-                            block={activeBlock}
-                            blockIndex={
-                                activeBlockIndex >= 0 ? activeBlockIndex : null
-                            }
-                            availableSections={data.available_sections}
-                            availableBlockTypes={data.available_block_relations}
-                            onUpdateSection={updateSection}
-                            onUpdateBlock={updateBlock}
-                            editorMode={editorMode}
-                        />
-                    </div>
-                ) : viewMode === 'cards' ? (
+                {viewMode === 'cards' ? (
                     <ResponsivePreviewPanel
                         inspector={
                             <PageInspector
@@ -577,6 +553,10 @@ export function PageBuilder({
                                 onUpdateSection={updateSection}
                                 onUpdateBlock={updateBlock}
                                 editorMode={editorMode}
+                                onClose={() => {
+                                    setActiveSectionId(null);
+                                    setActiveBlockId(null);
+                                }}
                             />
                         }
                         health={
@@ -592,6 +572,27 @@ export function PageBuilder({
                         onRefresh={onRefreshPreview ?? onPreview}
                         onOpenPreview={onPreview}
                     />
+                ) : inspectorOpen && (activeSection || activeBlock) ? (
+                    <div className="max-w-[30rem] min-w-[22rem]">
+                        <PageInspector
+                            section={activeSection}
+                            sectionIndex={
+                                activeSectionIndex >= 0
+                                    ? activeSectionIndex
+                                    : null
+                            }
+                            block={activeBlock}
+                            blockIndex={
+                                activeBlockIndex >= 0 ? activeBlockIndex : null
+                            }
+                            availableSections={data.available_sections}
+                            availableBlockTypes={data.available_block_relations}
+                            onUpdateSection={updateSection}
+                            onUpdateBlock={updateBlock}
+                            editorMode={editorMode}
+                            onClose={() => setInspectorOpen(false)}
+                        />
+                    </div>
                 ) : null}
             </div>
 

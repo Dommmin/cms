@@ -3,7 +3,7 @@ export type Category = { id: number; name: string };
 export type BlogPost = {
     id: number;
     title: Record<string, string>;
-    slug: string;
+    slug: Record<string, string>;
     excerpt: Record<string, string> | null;
     content: Record<string, string>;
     content_json: Record<string, string> | null;
@@ -29,7 +29,7 @@ export type EditProps = {
 };
 export type FormData = {
     title: Record<string, string>;
-    slug: string;
+    slug: Record<string, string>;
     excerpt: Record<string, string>;
     content: Record<string, string>;
     content_json: Record<string, string>;

@@ -26,10 +26,9 @@ class UpdateProductRequest extends FormRequest
             'name.*' => ['nullable', 'string', 'max:255'],
             'slug' => [
                 'required',
-                'string',
-                'max:255',
-                Rule::unique('products', 'slug')->ignore($productId),
+                'array',
             ],
+            'slug.*' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9-]+$/'],
             'description' => ['nullable'],
             'description.*' => ['nullable', 'string'],
             'short_description' => ['nullable'],
@@ -86,13 +85,22 @@ class UpdateProductRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $name = $this->input('name');
-        $nameForSlug = is_array($name)
-            ? ($name[config('app.locale')] ?? array_values($name)[0] ?? '')
-            : (string) $name;
+        $slugInput = $this->input('slug', []);
+        $defaultLocale = config('app.locale');
 
-        $normalizedSlug = Str::slug(
-            (string) ($this->input('slug') ?: $nameForSlug)
-        );
+        if (is_array($slugInput)) {
+            $normalized = [];
+            foreach ($slugInput as $locale => $value) {
+                $normalized[$locale] = Str::slug((string) ($value ?: ''));
+            }
+            if (empty($normalized[$defaultLocale] ?? '')) {
+                $nameForSlug = is_array($name)
+                    ? ($name[$defaultLocale] ?? array_values($name)[0] ?? '')
+                    : (string) $name;
+                $normalized[$defaultLocale] = Str::slug($nameForSlug);
+            }
+            $this->merge(['slug' => array_filter($normalized, fn (string $v): bool => $v !== '')]);
+        }
 
         $variant = $this->input('variant');
 
@@ -125,7 +133,6 @@ class UpdateProductRequest extends FormRequest
         }
 
         $this->merge([
-            'slug' => $normalizedSlug,
             'variant' => is_array($variant) ? $variant : $this->input('variant'),
         ]);
     }

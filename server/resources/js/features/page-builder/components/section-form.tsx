@@ -58,7 +58,6 @@ export function SectionForm({
 
     return (
         <div className="space-y-4">
-            {/* Info banner */}
             <div className="flex items-start gap-2 rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
                 <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 <span>
@@ -77,7 +76,7 @@ export function SectionForm({
             <div
                 className={cn(
                     'grid gap-4',
-                    compact ? 'grid-cols-1' : 'md:grid-cols-3 lg:grid-cols-5',
+                    compact ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
                 )}
             >
                 {/* Section Type */}
@@ -114,7 +113,7 @@ export function SectionForm({
                         </SelectContent>
                     </Select>
                     {currentSectionConfig?.description && (
-                        <p className="text-xs text-muted-foreground">
+                        <p className="hidden text-xs text-muted-foreground xl:block">
                             {currentSectionConfig.description}
                         </p>
                     )}

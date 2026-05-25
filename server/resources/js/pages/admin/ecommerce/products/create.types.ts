@@ -11,7 +11,7 @@ export type FormErrors = Record<string, string>;
 export type TabKey = 'general' | 'pricing' | 'media' | 'metadata';
 export type FormData = {
     name: Record<string, string>;
-    slug: string;
+    slug: Record<string, string>;
     description: Record<string, string>;
     short_description: Record<string, string>;
     sku_prefix: string;

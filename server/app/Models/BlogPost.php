@@ -42,7 +42,6 @@ use Spatie\Translatable\HasTranslations;
     'blog_category_id',
     'title',
     'slug',
-    'slug_translations',
     'excerpt',
     'content',
     'content_json',
@@ -72,7 +71,7 @@ class BlogPost extends Model
     use SanitizesTranslatableHtml;
 
     /** @var array<int, string> */
-    public array $translatable = ['title', 'excerpt', 'content'];
+    public array $translatable = ['title', 'slug', 'excerpt', 'content'];
 
     /** @var array<int, string> */
     protected array $htmlAttributes = ['content', 'excerpt'];
@@ -138,9 +137,7 @@ class BlogPost extends Model
 
     public function slugForLocale(string $locale): string
     {
-        $translations = $this->slug_translations ?? [];
-
-        return $translations[$locale] ?? $this->slug;
+        return $this->getTranslation('slug', $locale, false) ?? '';
     }
 
     public function availableLocaleCodes(): array
@@ -152,7 +149,7 @@ class BlogPost extends Model
         $locales = array_unique(array_merge(
             array_keys($this->getTranslations('title')),
             array_keys($this->getTranslations('content')),
-            array_keys($this->slug_translations ?? []),
+            array_keys($this->getTranslations('slug')),
         ));
 
         return array_values(array_filter($locales, fn (string $locale): bool => $locale !== ''));
@@ -180,7 +177,6 @@ class BlogPost extends Model
     {
         return [
             'available_locales' => 'array',
-            'slug_translations' => 'array',
             'content_json' => 'array',
             'is_featured' => 'boolean',
             'published_at' => 'datetime',

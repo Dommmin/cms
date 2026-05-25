@@ -50,7 +50,7 @@ class Product extends Model implements HasMedia
     use Searchable;
 
     /** @var array<int, string> */
-    public array $translatable = ['name', 'description', 'short_description'];
+    public array $translatable = ['name', 'slug', 'description', 'short_description'];
 
     /** @var array<int, string> */
     protected array $htmlAttributes = ['description', 'short_description'];

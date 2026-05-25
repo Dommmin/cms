@@ -32,11 +32,11 @@ class Blog extends Model
     use HasTranslations;
 
     /** @var array<int, string> */
-    public array $translatable = ['name', 'description'];
+    public array $translatable = ['name', 'slug', 'description'];
 
-    public static function findBySlug(string $slug): ?self
+    public static function findBySlug(string $slug, string $locale = 'en'): ?self
     {
-        return self::query()->where('slug', $slug)->first();
+        return self::query()->where('slug->'.$locale, $slug)->first();
     }
 
     /** @return HasMany<BlogPost, $this> */

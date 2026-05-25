@@ -8,6 +8,7 @@ import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { SeoPanel } from '@/components/seo-panel';
+import { SlugField } from '@/components/ui/slug-field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -55,7 +56,7 @@ export default function EditBlogPost({
     const __ = useTranslation();
     const [data, setData] = useState<FormData>({
         title: post.title ?? { [defaultLocale]: '' },
-        slug: post.slug,
+        slug: post.slug ?? { [defaultLocale]: '' },
         excerpt: post.excerpt ?? { [defaultLocale]: '' },
         content: post.content ?? { [defaultLocale]: '' },
         content_json: post.content_json ?? { [defaultLocale]: '' },
@@ -78,8 +79,12 @@ export default function EditBlogPost({
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
-    const [isSlugManual, setIsSlugManual] = useState(
-        post.slug !== slugify(post.title?.[defaultLocale] ?? ''),
+    const [autoGenerateSlug, setAutoGenerateSlug] = useState(
+        locales.every((l) => {
+            const src = post.title?.[l.code] ?? '';
+            const sl = (post.slug ?? {})[l.code] ?? '';
+            return src === '' || sl === slugify(src);
+        }),
     );
     const [tagInput, setTagInput] = useState('');
 
@@ -88,8 +93,8 @@ export default function EditBlogPost({
             ...prev,
             title: { ...prev.title, [locale]: value },
             slug:
-                !isSlugManual && locale === defaultLocale
-                    ? slugify(value)
+                autoGenerateSlug
+                    ? { ...prev.slug, [locale]: slugify(value) }
                     : prev.slug,
         }));
     };
@@ -145,7 +150,7 @@ export default function EditBlogPost({
                         {post.status === 'published' && (
                             <Button variant="outline" asChild>
                                 <a
-                                    href={`${frontendUrl}/blog/${post.slug}`}
+                                    href={`${frontendUrl}/blog/${data.slug[defaultLocale] ?? ''}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
@@ -158,12 +163,12 @@ export default function EditBlogPost({
                             <a
                                 href={PreviewController.url({
                                     query: {
-                                        url: `${frontendUrl}/blog/${post.slug}`,
+                                        url: `${frontendUrl}/blog/${data.slug[defaultLocale] ?? ''}`,
                                         entity_type: 'blog_post',
                                         entity_id: String(post.id),
                                         entity_name:
                                             data.title[defaultLocale] ??
-                                            post.slug,
+                                            data.slug[defaultLocale] ?? '',
                                         admin_url: BlogPostController.edit.url(
                                             post.id,
                                         ),
@@ -242,50 +247,58 @@ export default function EditBlogPost({
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="slug">
-                                            {__('label.slug', 'Slug')}
-                                        </Label>
-                                        <Input
-                                            id="slug"
+                                        {locales.map((locale) => (
+                                            <input
+                                                key={`slug-${locale.code}`}
+                                                type="hidden"
+                                                name={`slug[${locale.code}]`}
+                                                value={
+                                                    data.slug[locale.code] ?? ''
+                                                }
+                                            />
+                                        ))}
+                                        <SlugField
+                                            label={__(
+                                                'label.slug',
+                                                'Slug',
+                                            )}
+                                            name="slug"
                                             value={data.slug}
-                                            readOnly={!isSlugManual}
-                                            onChange={(e) =>
+                                            onChange={(val) =>
                                                 setData((prev) => ({
                                                     ...prev,
-                                                    slug: slugify(
-                                                        e.target.value,
-                                                    ),
+                                                    slug: val,
                                                 }))
                                             }
-                                            placeholder="post-slug"
-                                        />
-                                        <InputError message={errors.slug} />
-                                        <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                                            <input
-                                                type="checkbox"
-                                                checked={isSlugManual}
-                                                onChange={(e) => {
-                                                    const manual =
-                                                        e.target.checked;
-                                                    setIsSlugManual(manual);
-                                                    if (!manual) {
-                                                        setData((prev) => ({
+                                            autoGenerate={autoGenerateSlug}
+                                            onAutoGenerateChange={(auto) => {
+                                                setAutoGenerateSlug(auto);
+                                                if (auto) {
+                                                    setData((prev) => {
+                                                        const updated = {
+                                                            ...prev.slug,
+                                                        };
+                                                        locales.forEach(
+                                                            (l) => {
+                                                                updated[
+                                                                    l.code
+                                                                ] = slugify(
+                                                                    prev.title[
+                                                                        l.code
+                                                                    ] ?? '',
+                                                                );
+                                                            },
+                                                        );
+                                                        return {
                                                             ...prev,
-                                                            slug: slugify(
-                                                                prev.title[
-                                                                    defaultLocale
-                                                                ] ?? '',
-                                                            ),
-                                                        }));
-                                                    }
-                                                }}
-                                                className="h-4 w-4 rounded border-input"
-                                            />
-                                            {__(
-                                                'misc.set_slug_manually',
-                                                'Set slug manually',
-                                            )}
-                                        </label>
+                                                            slug: updated,
+                                                        };
+                                                    });
+                                                }
+                                            }}
+                                            locales={locales}
+                                            errors={errors}
+                                        />
                                     </div>
 
                                     <div className="grid gap-2">
@@ -420,11 +433,11 @@ export default function EditBlogPost({
                                         }
                                         errors={errors}
                                         showCanonical
-                                        urlPath={`blog/${data.slug ?? post.slug}`}
+                                        urlPath={`blog/${data.slug?.[defaultLocale] ?? ''}`}
                                         titleFallback={
                                             typeof data.title === 'object'
                                                 ? Object.values(data.title)[0]
-                                                : post.slug
+                                                : ''
                                         }
                                     />
                                 </TabsContent>

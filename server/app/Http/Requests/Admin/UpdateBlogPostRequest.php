@@ -6,7 +6,6 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateBlogPostRequest extends FormRequest
 {
@@ -26,9 +25,8 @@ class UpdateBlogPostRequest extends FormRequest
             'title' => ['required', 'array'],
             'title.*' => ['nullable', 'string', 'max:255'],
             'title.'.$defaultLocale => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', Rule::unique('blog_posts', 'slug')->ignore($this->route('post'))],
-            'slug_translations' => ['nullable', 'array'],
-            'slug_translations.*' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9-]+$/'],
+            'slug' => ['nullable', 'array'],
+            'slug.*' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9-]+$/'],
             'excerpt' => ['nullable', 'array'],
             'excerpt.*' => ['nullable', 'string', 'max:500'],
             'content' => ['required', 'array'],

@@ -47,7 +47,7 @@ export type PriceHistoryEntry = {
 };
 export type FormData = {
     name: Record<string, string>;
-    slug: string;
+    slug: Record<string, string>;
     description: Record<string, string>;
     short_description: Record<string, string>;
     sku_prefix: string;

@@ -1,4 +1,5 @@
-import { Box, Layers, MousePointer2 } from 'lucide-react';
+import { Box, Layers, MousePointer2, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
 import { BlockForm } from './block-form';
 import type { PageInspectorProps } from './page-inspector.types';
@@ -14,6 +15,7 @@ export function PageInspector({
     onUpdateSection,
     onUpdateBlock,
     editorMode,
+    onClose,
 }: PageInspectorProps) {
     const __ = useTranslation();
 
@@ -36,7 +38,7 @@ export function PageInspector({
             <div className="space-y-4 p-3">
                 <div className="flex items-center gap-2 border-b pb-3">
                     <Box className="h-4 w-4 text-muted-foreground" />
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                         <h2 className="truncate text-sm font-semibold">
                             {__('builder.block_inspector', 'Block settings')}
                         </h2>
@@ -45,6 +47,17 @@ export function PageInspector({
                                 block.type}
                         </p>
                     </div>
+                    {onClose && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 shrink-0"
+                            onClick={onClose}
+                            title={__('builder.close_inspector', 'Close inspector')}
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    )}
                 </div>
 
                 <BlockForm
@@ -69,7 +82,7 @@ export function PageInspector({
         <div className="space-y-4 p-3">
             <div className="flex items-center gap-2 border-b pb-3">
                 <Layers className="h-4 w-4 text-muted-foreground" />
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                     <h2 className="truncate text-sm font-semibold">
                         {__('builder.section_inspector', 'Section settings')}
                     </h2>
@@ -78,6 +91,17 @@ export function PageInspector({
                             section.section_type}
                     </p>
                 </div>
+                {onClose && (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 shrink-0"
+                        onClick={onClose}
+                        title={__('builder.close_inspector', 'Close inspector')}
+                    >
+                        <X className="h-4 w-4" />
+                    </Button>
+                )}
             </div>
 
             <SectionForm

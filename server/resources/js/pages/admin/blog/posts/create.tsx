@@ -7,6 +7,7 @@ import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPo
 import InputError from '@/components/input-error';
 import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
+import { SlugField } from '@/components/ui/slug-field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -46,7 +47,7 @@ export default function CreateBlogPost({
 
     const [data, setData] = useState<FormData>({
         title: { [defaultLocale]: '' },
-        slug: '',
+        slug: { [defaultLocale]: '' },
         excerpt: { [defaultLocale]: '' },
         content: { [defaultLocale]: '' },
         content_json: { [defaultLocale]: '' },
@@ -63,17 +64,16 @@ export default function CreateBlogPost({
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
-    const [isSlugManual, setIsSlugManual] = useState(false);
+    const [autoGenerateSlug, setAutoGenerateSlug] = useState(true);
     const [tagInput, setTagInput] = useState('');
 
-    const handleTitleChange = (value: string) => {
+    const handleTitleChange = (locale: string, value: string) => {
         setData((prev) => ({
             ...prev,
-            title: { ...prev.title, [activeLocale]: value },
-            slug:
-                !isSlugManual && activeLocale === defaultLocale
-                    ? slugify(value)
-                    : prev.slug,
+            title: { ...prev.title, [locale]: value },
+            slug: autoGenerateSlug
+                ? { ...prev.slug, [locale]: slugify(value) }
+                : prev.slug,
         }));
     };
 
@@ -179,6 +179,7 @@ export default function CreateBlogPost({
                                             }
                                             onChange={(e) =>
                                                 handleTitleChange(
+                                                    activeLocale,
                                                     e.target.value,
                                                 )
                                             }
@@ -193,50 +194,58 @@ export default function CreateBlogPost({
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="slug">
-                                            {__('label.slug', 'Slug')}
-                                        </Label>
-                                        <Input
-                                            id="slug"
+                                        {locales.map((locale) => (
+                                            <input
+                                                key={`slug-${locale.code}`}
+                                                type="hidden"
+                                                name={`slug[${locale.code}]`}
+                                                value={
+                                                    data.slug[locale.code] ?? ''
+                                                }
+                                            />
+                                        ))}
+                                        <SlugField
+                                            label={__(
+                                                'label.slug',
+                                                'Slug',
+                                            )}
+                                            name="slug"
                                             value={data.slug}
-                                            readOnly={!isSlugManual}
-                                            onChange={(e) =>
+                                            onChange={(val) =>
                                                 setData((prev) => ({
                                                     ...prev,
-                                                    slug: slugify(
-                                                        e.target.value,
-                                                    ),
+                                                    slug: val,
                                                 }))
                                             }
-                                            placeholder="post-slug"
-                                        />
-                                        <InputError message={errors.slug} />
-                                        <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                                            <input
-                                                type="checkbox"
-                                                checked={isSlugManual}
-                                                onChange={(e) => {
-                                                    const manual =
-                                                        e.target.checked;
-                                                    setIsSlugManual(manual);
-                                                    if (!manual) {
-                                                        setData((prev) => ({
+                                            autoGenerate={autoGenerateSlug}
+                                            onAutoGenerateChange={(auto) => {
+                                                setAutoGenerateSlug(auto);
+                                                if (auto) {
+                                                    setData((prev) => {
+                                                        const updated = {
+                                                            ...prev.slug,
+                                                        };
+                                                        locales.forEach(
+                                                            (l) => {
+                                                                updated[
+                                                                    l.code
+                                                                ] = slugify(
+                                                                    prev.title[
+                                                                        l.code
+                                                                    ] ?? '',
+                                                                );
+                                                            },
+                                                        );
+                                                        return {
                                                             ...prev,
-                                                            slug: slugify(
-                                                                prev.title[
-                                                                    defaultLocale
-                                                                ] ?? '',
-                                                            ),
-                                                        }));
-                                                    }
-                                                }}
-                                                className="h-4 w-4 rounded border-input"
-                                            />
-                                            {__(
-                                                'misc.slug_auto_hint',
-                                                'Set slug manually',
-                                            )}
-                                        </label>
+                                                            slug: updated,
+                                                        };
+                                                    });
+                                                }
+                                            }}
+                                            locales={locales}
+                                            errors={errors}
+                                        />
                                     </div>
 
                                     <div className="grid gap-2">

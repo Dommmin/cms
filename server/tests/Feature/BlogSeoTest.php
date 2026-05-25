@@ -7,8 +7,7 @@ use App\Models\BlogPost;
 it('exposes localized published article seo fields', function (): void {
     BlogPost::factory()->published()->create([
         'title' => ['pl' => 'Polski poradnik SEO', 'en' => 'English SEO Guide'],
-        'slug' => 'polski-poradnik-seo',
-        'slug_translations' => ['pl' => 'polski-poradnik-seo', 'en' => 'english-seo-guide'],
+        'slug' => ['pl' => 'polski-poradnik-seo', 'en' => 'english-seo-guide'],
         'excerpt' => ['pl' => 'Polski opis meta', 'en' => 'English meta description'],
         'content' => ['pl' => '<h2>Wstęp</h2>', 'en' => '<h2>Introduction</h2>'],
         'available_locales' => ['pl', 'en'],
@@ -22,7 +21,7 @@ it('exposes localized published article seo fields', function (): void {
         ->assertOk()
         ->assertJsonPath('title', 'English SEO Guide')
         ->assertJsonPath('slug', 'english-seo-guide')
-        ->assertJsonPath('canonical_slug', 'polski-poradnik-seo')
+        ->assertJsonPath('canonical_slug', 'english-seo-guide')
         ->assertJsonPath('slug_translations.en', 'english-seo-guide')
         ->assertJsonPath('available_locales.0', 'pl')
         ->assertJsonPath('canonical_url', 'https://example.com/en/blog/english-seo-guide')
@@ -33,8 +32,7 @@ it('exposes localized published article seo fields', function (): void {
 it('does not expose draft articles to crawlers through the public api', function (): void {
     BlogPost::factory()->draft()->create([
         'title' => ['en' => 'Draft Article'],
-        'slug' => 'draft-article',
-        'slug_translations' => ['en' => 'draft-article'],
+        'slug' => ['en' => 'draft-article'],
         'available_locales' => ['en'],
     ]);
 
@@ -45,7 +43,7 @@ it('does not expose draft articles to crawlers through the public api', function
 it('audits and fills missing generated seo fields without overwriting manual values', function (): void {
     $post = BlogPost::factory()->published()->create([
         'title' => ['pl' => 'Polski tytuł', 'en' => 'English Production Checklist'],
-        'slug' => 'polski-tytul',
+        'slug' => ['pl' => 'polski-tytul', 'en' => ''],
         'excerpt' => ['en' => 'A practical checklist for production deployments and troubleshooting.'],
         'content' => ['en' => str_repeat('word ', 420)],
         'available_locales' => ['pl', 'en'],
@@ -62,6 +60,6 @@ it('audits and fills missing generated seo fields without overwriting manual val
     expect($post->seo_title)->toBe('Manual SEO Title')
         ->and($post->seo_description)->toBe('A practical checklist for production deployments and troubleshooting.')
         ->and($post->reading_time)->toBe(3)
-        ->and($post->slug_translations)->toHaveKey('en', 'english-production-checklist')
+        ->and($post->getTranslations('slug'))->toHaveKey('en', 'english-production-checklist')
         ->and($post->translation_group_id)->not->toBeNull();
 });

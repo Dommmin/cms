@@ -27,8 +27,10 @@ class BlogController extends ApiController
 
     public function show(string $slug, Request $request): JsonResponse
     {
+        $locale = app()->getLocale();
+
         $blog = Blog::query()
-            ->where('slug', $slug)
+            ->where('slug->'.$locale, $slug)
             ->active()
             ->firstOrFail();
 
@@ -45,8 +47,10 @@ class BlogController extends ApiController
 
     public function posts(string $slug, Request $request): JsonResponse
     {
+        $locale = app()->getLocale();
+
         $blog = Blog::query()
-            ->where('slug', $slug)
+            ->where('slug->'.$locale, $slug)
             ->active()
             ->firstOrFail();
 

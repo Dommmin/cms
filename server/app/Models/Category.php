@@ -39,7 +39,7 @@ class Category extends Model
     use LogsActivity;
 
     /** @var array<int, string> */
-    public array $translatable = ['name', 'description'];
+    public array $translatable = ['name', 'slug', 'description'];
 
     /** @var array<int, string> */
     protected array $versionedAttributes = ['name', 'slug', 'description', 'is_active', 'parent_id'];

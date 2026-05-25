@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LocalizedField } from '@/components/ui/localized-field';
+import { SlugField } from '@/components/ui/slug-field';
 import {
     Select,
     SelectContent,
@@ -63,19 +64,19 @@ export default function Edit({ page, modules, pages }: EditProps) {
     const [richContentValues, setRichContentValues] = useState<
         Record<string, string>
     >(page.rich_content ?? { [defaultLocale]: '' });
-    const [slugTranslations, setSlugTranslations] = useState<
-        Record<string, string>
-    >(page.slug_translations ?? {});
+    const [slugValues, setSlugValues] = useState<Record<string, string>>(
+        page.slug ?? { [defaultLocale]: '' },
+    );
     const [parentId, setParentId] = useState<string>(
         page.parent_id ? String(page.parent_id) : 'none',
     );
-    const [slug, setSlug] = useState(page.slug);
-    const [isSlugManual, setIsSlugManual] = useState(
-        page.slug !== slugify(page.title?.[defaultLocale] ?? ''),
+    const [autoGenerateSlug, setAutoGenerateSlug] = useState(
+        locales.every((l) => {
+            const src = page.title?.[l.code] ?? '';
+            const sl = (page.slug ?? {})[l.code] ?? '';
+            return src === '' || sl === slugify(src);
+        }),
     );
-
-    // Non-default locales that can have translated slugs
-    const translatableLocales = locales.filter((l) => !l.is_default);
 
     const displayTitle =
         titleValues[defaultLocale] ?? Object.values(titleValues)[0] ?? '';
@@ -100,11 +101,11 @@ export default function Edit({ page, modules, pages }: EditProps) {
                     >
                         <PageHeaderActions>
                             <Button asChild variant="outline">
-                                <a
-                                    href={PreviewController.url({
-                                        query: {
-                                            url: `${frontendUrl}/${page.slug}`,
-                                            entity_type: 'page',
+                                    <a
+                                        href={PreviewController.url({
+                                            query: {
+                                                url: `${frontendUrl}/${slugValues[defaultLocale] ?? ''}`,
+                                                entity_type: 'page',
                                             entity_id: String(page.id),
                                             entity_name: displayTitle,
                                             admin_url: PageController.edit.url(
@@ -276,17 +277,6 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                         }
                                     />
                                 ))}
-                                {/* Hidden inputs for slug translations */}
-                                {translatableLocales.map((locale) => (
-                                    <input
-                                        key={`slug_translations-${locale.code}`}
-                                        type="hidden"
-                                        name={`slug_translations[${locale.code}]`}
-                                        value={
-                                            slugTranslations[locale.code] ?? ''
-                                        }
-                                    />
-                                ))}
 
                                 <Tabs
                                     defaultValue="general"
@@ -385,12 +375,16 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                                         ...prev,
                                                         [activeLocale]: value,
                                                     }));
-                                                    if (
-                                                        !isSlugManual &&
-                                                        activeLocale ===
-                                                            defaultLocale
-                                                    ) {
-                                                        setSlug(slugify(value));
+                                                    if (autoGenerateSlug) {
+                                                        setSlugValues(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                [activeLocale]:
+                                                                    slugify(
+                                                                        value,
+                                                                    ),
+                                                            }),
+                                                        );
                                                     }
                                                 }}
                                             />
@@ -400,138 +394,62 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                         </div>
 
                                         <div className="grid gap-2">
-                                            <Label htmlFor="slug">
-                                                {__(
-                                                    'label.slug_default',
-                                                    'Slug (default)',
-                                                )}
-                                            </Label>
-                                            <Input
-                                                id="slug"
-                                                name="slug"
-                                                required
-                                                value={slug}
-                                                readOnly={!isSlugManual}
-                                                onChange={(e) =>
-                                                    setSlug(
-                                                        slugify(e.target.value),
-                                                    )
-                                                }
-                                            />
-                                            <InputError message={errors.slug} />
-                                            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                                            {locales.map((locale) => (
                                                 <input
-                                                    type="checkbox"
-                                                    checked={isSlugManual}
-                                                    onChange={(e) => {
-                                                        const manual =
-                                                            e.target.checked;
-                                                        setIsSlugManual(manual);
-                                                        if (!manual) {
-                                                            setSlug(
-                                                                slugify(
-                                                                    titleValues[
-                                                                        defaultLocale
-                                                                    ] ?? '',
-                                                                ),
-                                                            );
-                                                        }
-                                                    }}
-                                                    className="h-4 w-4 rounded border-input"
+                                                    key={`slug-${locale.code}`}
+                                                    type="hidden"
+                                                    name={`slug[${locale.code}]`}
+                                                    value={
+                                                        slugValues[
+                                                            locale.code
+                                                        ] ?? ''
+                                                    }
                                                 />
-                                                {__(
-                                                    'misc.set_slug_manually',
-                                                    'Set slug manually',
+                                            ))}
+                                            <SlugField
+                                                label={__(
+                                                    'label.slug',
+                                                    'Slug',
                                                 )}
-                                            </label>
-                                        </div>
-
-                                        {translatableLocales.length > 0 && (
-                                            <div className="grid gap-3 rounded-lg border p-4">
-                                                <div>
-                                                    <Label className="text-sm font-medium">
-                                                        {__(
-                                                            'label.slug_translations',
-                                                            'Slug Translations',
-                                                        )}
-                                                    </Label>
-                                                    <p className="mt-0.5 text-xs text-muted-foreground">
-                                                        {__(
-                                                            'misc.slug_translations_desc',
-                                                            'Define locale-specific slugs. Leave blank to use the default slug.',
-                                                        )}
-                                                    </p>
-                                                </div>
-                                                {translatableLocales.map(
-                                                    (locale) => (
-                                                        <div
-                                                            key={locale.code}
-                                                            className="grid gap-1"
-                                                        >
-                                                            <Label
-                                                                htmlFor={`slug_translation_${locale.code}`}
-                                                                className="text-xs text-muted-foreground"
-                                                            >
-                                                                {locale.name} (
-                                                                {locale.code})
-                                                            </Label>
-                                                            <Input
-                                                                id={`slug_translation_${locale.code}`}
-                                                                placeholder={
-                                                                    page.slug
-                                                                }
-                                                                value={
-                                                                    slugTranslations[
-                                                                        locale
-                                                                            .code
-                                                                    ] ?? ''
-                                                                }
-                                                                onChange={(
-                                                                    e,
-                                                                ) => {
-                                                                    const val =
-                                                                        e.target.value
-                                                                            .toLowerCase()
-                                                                            .replace(
-                                                                                /[^a-z0-9-]/g,
-                                                                                '-',
-                                                                            )
-                                                                            .replace(
-                                                                                /-+/g,
-                                                                                '-',
-                                                                            )
-                                                                            .replace(
-                                                                                /^-|-$/g,
-                                                                                '',
+                                                name="slug"
+                                                value={slugValues}
+                                                onChange={setSlugValues}
+                                                autoGenerate={autoGenerateSlug}
+                                                onAutoGenerateChange={(
+                                                    auto,
+                                                ) => {
+                                                    setAutoGenerateSlug(auto);
+                                                    if (auto) {
+                                                        setSlugValues(
+                                                            (prev) => {
+                                                                const updated = {
+                                                                    ...prev,
+                                                                };
+                                                                locales.forEach(
+                                                                    (l) => {
+                                                                        updated[
+                                                                            l
+                                                                                .code
+                                                                        ] =
+                                                                            slugify(
+                                                                                titleValues[
+                                                                                    l
+                                                                                        .code
+                                                                                ] ??
+                                                                                    '',
                                                                             );
-                                                                    setSlugTranslations(
-                                                                        (
-                                                                            prev,
-                                                                        ) => ({
-                                                                            ...prev,
-                                                                            [locale.code]:
-                                                                                val,
-                                                                        }),
-                                                                    );
-                                                                }}
-                                                            />
-                                                            <InputError
-                                                                message={
-                                                                    (
-                                                                        errors as Record<
-                                                                            string,
-                                                                            string
-                                                                        >
-                                                                    )[
-                                                                        `slug_translations.${locale.code}`
-                                                                    ]
-                                                                }
-                                                            />
-                                                        </div>
-                                                    ),
-                                                )}
-                                            </div>
-                                        )}
+                                                                    },
+                                                                );
+                                                                return updated;
+                                                            },
+                                                        );
+                                                    }
+                                                }}
+                                                locales={locales}
+                                                errors={errors as Record<string, string>}
+                                                required
+                                            />
+                                        </div>
 
                                         <div className="grid gap-2">
                                             <div className="flex items-center justify-between">

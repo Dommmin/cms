@@ -20,4 +20,5 @@ export type PageInspectorProps = {
         patch: Partial<Block>,
     ) => void;
     editorMode: EditorMode;
+    onClose?: () => void;
 };

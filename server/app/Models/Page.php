@@ -68,7 +68,7 @@ use Spatie\Translatable\HasTranslations;
  * @property-read Theme|null $theme
  */
 #[Fillable([
-    'parent_id', 'locale', 'title', 'slug', 'slug_translations', 'content', 'rich_content', 'excerpt', 'layout',
+    'parent_id', 'locale', 'title', 'slug', 'content', 'rich_content', 'excerpt', 'layout',
     'builder_snapshot', 'page_type', 'module_name', 'module_config',
     'theme_id', 'is_published', 'published_at', 'scheduled_publish_at', 'scheduled_unpublish_at',
     'published_version_id', 'draft_version_id', 'position',
@@ -86,7 +86,7 @@ class Page extends Model
     use SanitizesTranslatableHtml;
 
     /** @var array<int, string> */
-    public array $translatable = ['title', 'excerpt', 'content', 'rich_content'];
+    public array $translatable = ['title', 'slug', 'excerpt', 'content', 'rich_content'];
 
     /** @var array<int, string> */
     protected array $htmlAttributes = ['content', 'rich_content', 'excerpt'];
@@ -100,9 +100,14 @@ class Page extends Model
             return null;
         }
 
+        $locale = app()->getLocale();
         $page = null;
-        foreach ($segments as $slug) {
-            $query = self::query()->where('slug', $slug)->where('is_published', true);
+        foreach ($segments as $segment) {
+            $query = self::query()
+                ->where(function ($q) use ($segment, $locale): void {
+                    $q->where('slug->'.$locale, $segment);
+                })
+                ->where('is_published', true);
             if ($page === null) {
                 $query->whereNull('parent_id');
             } else {
@@ -233,9 +238,7 @@ class Page extends Model
      */
     public function getSlugForLocale(string $locale): string
     {
-        $translations = $this->slug_translations ?? [];
-
-        return $translations[$locale] ?? $this->slug;
+        return $this->getTranslation('slug', $locale, false) ?? '';
     }
 
     /**
@@ -291,7 +294,6 @@ class Page extends Model
             'page_type' => PageTypeEnum::class,
             'module_config' => 'array',
             'builder_snapshot' => 'array',
-            'slug_translations' => 'array',
             'available_locales' => 'array',
             'is_published' => 'boolean',
             'published_at' => 'datetime',
@@ -314,18 +316,15 @@ class Page extends Model
         $baseQuery = fn () => self::query()
             ->where('is_published', true)
             ->where(function ($q) use ($segment, $locale): void {
-                $q->where('slug', $segment)
-                    ->orWhere('slug_translations->'.$locale, $segment);
+                $q->where('slug->'.$locale, $segment);
             })
             ->when($parentId === null,
                 fn ($q) => $q->whereNull('parent_id'),
                 fn ($q) => $q->where('parent_id', $parentId),
             );
 
-        // 1. Locale-specific page (highest priority)
         $found = $baseQuery()->where('locale', $locale)->first();
 
-        // 2. Global page fallback (locale = null)
         return $found ?? $baseQuery()->whereNull('locale')->first();
     }
 }

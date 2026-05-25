@@ -80,6 +80,7 @@ class PageController extends Controller
         return inertia('admin/cms/pages/edit', [
             'page' => array_merge($page->toArray(), [
                 'title' => $page->getTranslations('title'),
+                'slug' => $page->getTranslations('slug'),
                 'excerpt' => $page->getTranslations('excerpt'),
             ]),
             'modules' => config('cms.modules'),
@@ -94,14 +95,6 @@ class PageController extends Controller
         if (($data['page_type'] ?? null) === 'blocks') {
             $data['module_name'] = null;
             $data['module_config'] = null;
-        }
-
-        // Remove empty slug translations so we don't store {"pl": ""} in the DB
-        if (isset($data['slug_translations'])) {
-            $data['slug_translations'] = array_filter(
-                $data['slug_translations'],
-                fn ($v): bool => is_string($v) && $v !== '',
-            ) ?: null;
         }
 
         $page->update($data);

@@ -54,8 +54,9 @@ class BlogPostController extends Controller
         $titleForSlug = is_array($data['title'])
             ? ($data['title'][config('app.locale')] ?? array_values($data['title'])[0] ?? '')
             : (string) $data['title'];
-        $data['slug'] ??= Str::slug($titleForSlug);
-        $data['slug_translations'] = $this->slugTranslations($data);
+        if (empty($data['slug']) || (is_array($data['slug']) && empty(array_filter($data['slug'])))) {
+            $data['slug'] = [config('app.locale') => Str::slug($titleForSlug)];
+        }
         $data['is_featured'] ??= false;
         $contentForEstimate = is_array($data['content'])
             ? ($data['content'][config('app.locale')] ?? array_values($data['content'])[0] ?? '')
@@ -84,6 +85,7 @@ class BlogPostController extends Controller
         return inertia('admin/blog/posts/edit', [
             'post' => array_merge($post->toArray(), [
                 'title' => $post->getTranslations('title'),
+                'slug' => $post->getTranslations('slug'),
                 'excerpt' => $post->getTranslations('excerpt'),
                 'content' => $post->getTranslations('content'),
                 'content_json' => $post->content_json,
@@ -102,8 +104,9 @@ class BlogPostController extends Controller
         $titleForSlug = is_array($data['title'])
             ? ($data['title'][config('app.locale')] ?? array_values($data['title'])[0] ?? '')
             : (string) $data['title'];
-        $data['slug'] ??= Str::slug($titleForSlug);
-        $data['slug_translations'] = $this->slugTranslations($data, $post);
+        if (empty($data['slug']) || (is_array($data['slug']) && empty(array_filter($data['slug'])))) {
+            $data['slug'] = [config('app.locale') => Str::slug($titleForSlug)];
+        }
         $data['is_featured'] ??= false;
         $contentForEstimate = is_array($data['content'])
             ? ($data['content'][config('app.locale')] ?? array_values($data['content'])[0] ?? '')
@@ -166,34 +169,5 @@ class BlogPostController extends Controller
             ->unique()
             ->values()
             ->all();
-    }
-
-    /** @param array<string, mixed> $data */
-    private function slugTranslations(array $data, ?BlogPost $post = null): array
-    {
-        $translations = $data['slug_translations'] ?? ($post instanceof BlogPost ? $post->slug_translations : []) ?? [];
-        $title = $data['title'] ?? [];
-
-        if (! is_array($title)) {
-            return is_array($translations) ? $translations : [];
-        }
-
-        foreach ($title as $locale => $localizedTitle) {
-            if (($translations[$locale] ?? '') !== '') {
-                continue;
-            }
-
-            if (! is_string($localizedTitle)) {
-                continue;
-            }
-
-            if ($localizedTitle === '') {
-                continue;
-            }
-
-            $translations[$locale] = Str::slug($localizedTitle);
-        }
-
-        return is_array($translations) ? array_filter($translations) : [];
     }
 }

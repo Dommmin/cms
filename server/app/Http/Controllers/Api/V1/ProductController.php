@@ -82,9 +82,11 @@ class ProductController extends ApiController
 
     public function show(string $slug): JsonResponse
     {
+        $locale = app()->getLocale();
+
         $product = Product::query()
             ->available()
-            ->where('slug', $slug)
+            ->where('slug->'.$locale, $slug)
             ->with([
                 'category',
                 'brand',
@@ -264,7 +266,9 @@ class ProductController extends ApiController
 
     public function related(string $slug): JsonResponse
     {
-        $product = Product::query()->available()->where('slug', $slug)->firstOrFail();
+        $locale = app()->getLocale();
+
+        $product = Product::query()->available()->where('slug->'.$locale, $slug)->firstOrFail();
 
         $related = Product::query()
             ->available()
@@ -288,7 +292,9 @@ class ProductController extends ApiController
 
     public function byCategory(string $slug, SmartCollectionService $smartCollectionService): AnonymousResourceCollection
     {
-        $category = Category::query()->where('slug', $slug)->where('is_active', true)->firstOrFail();
+        $locale = app()->getLocale();
+
+        $category = Category::query()->where('slug->'.$locale, $slug)->where('is_active', true)->firstOrFail();
 
         $baseQuery = $category->isSmartCollection()
             ? $smartCollectionService->buildQuery($category)

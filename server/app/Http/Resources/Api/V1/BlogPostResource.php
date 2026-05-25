@@ -24,18 +24,13 @@ class BlogPostResource extends JsonResource
     {
         $locale = (string) ($request->query('locale') ?? app()->getLocale());
         $availableLocales = $this->availableLocaleCodes();
-        $slugTranslations = [];
-
-        foreach ($availableLocales as $availableLocale) {
-            $slugTranslations[$availableLocale] = $this->slugForLocale($availableLocale);
-        }
 
         return [
             'id' => $this->id,
             'title' => $this->getTranslation('title', $locale, true),
-            'slug' => $this->slugForLocale($locale),
-            'canonical_slug' => $this->slug,
-            'slug_translations' => $slugTranslations,
+            'slug' => $this->getTranslation('slug', $locale, false),
+            'canonical_slug' => $this->getTranslation('slug', config('app.locale'), false),
+            'slug_translations' => $this->getTranslations('slug'),
             'available_locales' => $availableLocales,
             'translation_group_id' => $this->translation_group_id,
             'excerpt' => $this->getTranslation('excerpt', $locale, true),

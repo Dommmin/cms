@@ -22,21 +22,21 @@ beforeEach(function (): void {
 it('returns locale-aware internal link targets for RTE', function (): void {
     Page::factory()->published()->create([
         'title' => ['en' => 'About Studio', 'pl' => 'O pracowni'],
-        'slug' => 'about-studio',
+        'slug' => ['en' => 'about-studio', 'pl' => 'about-studio'],
     ]);
     Product::factory()->create([
         'name' => ['en' => 'Studio Chair', 'pl' => 'Krzeslo Studio'],
-        'slug' => 'studio-chair',
+        'slug' => ['en' => 'studio-chair', 'pl' => 'studio-chair'],
         'is_active' => true,
     ]);
     Category::factory()->create([
         'name' => ['en' => 'Studio Furniture', 'pl' => 'Meble Studio'],
-        'slug' => 'studio-furniture',
+        'slug' => ['en' => 'studio-furniture', 'pl' => 'studio-furniture'],
         'is_active' => true,
     ]);
     BlogPost::factory()->published()->create([
         'title' => ['en' => 'Studio News', 'pl' => 'Wiadomosci Studio'],
-        'slug' => 'studio-news',
+        'slug' => ['en' => 'studio-news', 'pl' => 'studio-news'],
     ]);
 
     actingAs($this->admin)
@@ -88,8 +88,7 @@ it('validates internal RTE links against published content', function (): void {
     ]);
     BlogPost::factory()->published()->create([
         'title' => ['en' => 'News'],
-        'slug' => 'news',
-        'slug_translations' => ['pl' => 'wiadomosci'],
+        'slug' => ['en' => 'news', 'pl' => 'wiadomosci'],
     ]);
 
     actingAs($this->admin)

@@ -32,15 +32,15 @@ class RteLinkController extends Controller
 
         /** @var Collection<int, Page> $pages */
         $pages = Page::query()
-            ->where(function ($builder) use ($like): void {
+            ->where(function ($builder) use ($like, $locale): void {
                 $builder->where('title', 'like', $like)
-                    ->orWhere('slug', 'like', $like);
+                    ->orWhere('slug->'.$locale, 'like', $like);
             })
             ->limit(6)
             ->get(['id', 'title', 'slug', 'is_published']);
 
         $pages->each(function (Page $page) use (&$results, $locale): void {
-            $slug = mb_trim($page->slug, '/');
+            $slug = $page->getTranslation('slug', $locale, false) ?: '';
             $results[] = [
                 'type' => 'page',
                 'id' => $page->id,
@@ -52,9 +52,9 @@ class RteLinkController extends Controller
 
         /** @var Collection<int, Product> $products */
         $products = Product::query()
-            ->where(function ($builder) use ($like): void {
+            ->where(function ($builder) use ($like, $locale): void {
                 $builder->where('name', 'like', $like)
-                    ->orWhere('slug', 'like', $like);
+                    ->orWhere('slug->'.$locale, 'like', $like);
             })
             ->limit(6)
             ->get(['id', 'name', 'slug', 'is_active']);
@@ -65,15 +65,15 @@ class RteLinkController extends Controller
                 'id' => $product->id,
                 'label' => $product->getTranslation('name', $locale, false) ?: $product->name,
                 'meta' => $product->is_active ? 'Active product' : 'Inactive product',
-                'url' => sprintf('/%s/products/%s', $locale, $product->slug),
+                'url' => sprintf('/%s/products/%s', $locale, $product->getTranslation('slug', $locale, false) ?: $product->slug),
             ];
         });
 
         /** @var Collection<int, Category> $categories */
         $categories = Category::query()
-            ->where(function ($builder) use ($like): void {
+            ->where(function ($builder) use ($like, $locale): void {
                 $builder->where('name', 'like', $like)
-                    ->orWhere('slug', 'like', $like);
+                    ->orWhere('slug->'.$locale, 'like', $like);
             })
             ->limit(6)
             ->get(['id', 'name', 'slug', 'is_active']);
@@ -84,15 +84,15 @@ class RteLinkController extends Controller
                 'id' => $category->id,
                 'label' => $category->getTranslation('name', $locale, false) ?: $category->name,
                 'meta' => $category->is_active ? 'Active category' : 'Inactive category',
-                'url' => sprintf('/%s/categories/%s', $locale, $category->slug),
+                'url' => sprintf('/%s/categories/%s', $locale, $category->getTranslation('slug', $locale, false) ?: $category->slug),
             ];
         });
 
         /** @var Collection<int, BlogPost> $posts */
         $posts = BlogPost::query()
-            ->where(function ($builder) use ($like): void {
+            ->where(function ($builder) use ($like, $locale): void {
                 $builder->where('title', 'like', $like)
-                    ->orWhere('slug', 'like', $like);
+                    ->orWhere('slug->'.$locale, 'like', $like);
             })
             ->limit(6)
             ->get(['id', 'title', 'slug', 'status']);
@@ -103,7 +103,7 @@ class RteLinkController extends Controller
                 'id' => $post->id,
                 'label' => $post->getTranslation('title', $locale, false) ?: $post->title,
                 'meta' => sprintf('Blog post · %s', is_string($post->status) ? $post->status : $post->status?->value),
-                'url' => sprintf('/%s/blog/%s', $locale, $post->slug),
+                'url' => sprintf('/%s/blog/%s', $locale, $post->getTranslation('slug', $locale, false) ?: $post->slug),
             ];
         });
 
@@ -152,8 +152,8 @@ class RteLinkController extends Controller
         }
 
         return match ($segments[0]) {
-            'products' => $this->productExists($segments[1] ?? null),
-            'categories' => $this->categoryExists($segments[1] ?? null),
+            'products' => $this->productExists($segments[1] ?? null, $locale),
+            'categories' => $this->categoryExists($segments[1] ?? null, $locale),
             'blog' => $this->blogPostExists($segments[1] ?? null, $locale),
             default => Page::findByLocalizedPath($segments, $locale) instanceof Page,
         };
@@ -177,26 +177,26 @@ class RteLinkController extends Controller
         return is_string($defaultLocale) ? $defaultLocale : 'en';
     }
 
-    private function productExists(?string $slug): bool
+    private function productExists(?string $slug, string $locale): bool
     {
         if ($slug === null || $slug === '') {
             return false;
         }
 
         return Product::query()
-            ->where('slug', $slug)
+            ->where('slug->'.$locale, $slug)
             ->where('is_active', true)
             ->exists();
     }
 
-    private function categoryExists(?string $slug): bool
+    private function categoryExists(?string $slug, string $locale): bool
     {
         if ($slug === null || $slug === '') {
             return false;
         }
 
         return Category::query()
-            ->where('slug', $slug)
+            ->where('slug->'.$locale, $slug)
             ->where('is_active', true)
             ->exists();
     }
@@ -209,10 +209,7 @@ class RteLinkController extends Controller
 
         return BlogPost::query()
             ->where('status', BlogPostStatusEnum::Published)
-            ->where(function ($query) use ($slug, $locale): void {
-                $query->where('slug', $slug)
-                    ->orWhere('slug_translations->'.$locale, $slug);
-            })
+            ->where('slug->'.$locale, $slug)
             ->exists();
     }
 }

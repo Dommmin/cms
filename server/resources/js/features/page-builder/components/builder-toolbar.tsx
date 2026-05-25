@@ -118,10 +118,10 @@ export function BuilderToolbar({
                             variant={viewMode === 'cards' ? 'default' : 'ghost'}
                             size="sm"
                             className="rounded-r-none"
-                            title="Card view"
+                            title={__('builder.cards_view', 'Card view')}
                         >
                             <List className="mr-1 h-4 w-4" />
-                            Cards
+                            {__('builder.cards', 'Cards')}
                         </Button>
                         <Button
                             onClick={() => onViewModeChange?.('canvas')}
@@ -130,10 +130,10 @@ export function BuilderToolbar({
                             }
                             size="sm"
                             className="rounded-l-none"
-                            title="Canvas view"
+                            title={__('builder.canvas_view', 'Canvas view')}
                         >
                             <LayoutDashboard className="mr-1 h-4 w-4" />
-                            Canvas
+                            {__('builder.canvas', 'Canvas')}
                         </Button>
                     </div>
 
@@ -145,10 +145,10 @@ export function BuilderToolbar({
                             }
                             size="sm"
                             className="rounded-r-none"
-                            title="Simple editor mode"
+                            title={__('builder.simple_mode', 'Simple editor mode')}
                         >
                             <Sparkles className="mr-1 h-4 w-4" />
-                            Simple
+                            {__('builder.simple', 'Simple')}
                         </Button>
                         <Button
                             onClick={() => onEditorModeChange?.('advanced')}
@@ -157,10 +157,10 @@ export function BuilderToolbar({
                             }
                             size="sm"
                             className="rounded-l-none"
-                            title="Advanced editor mode"
+                            title={__('builder.advanced_mode', 'Advanced editor mode')}
                         >
                             <SlidersHorizontal className="mr-1 h-4 w-4" />
-                            Advanced
+                            {__('builder.advanced', 'Advanced')}
                         </Button>
                     </div>
 

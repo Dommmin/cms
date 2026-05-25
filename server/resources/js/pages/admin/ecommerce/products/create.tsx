@@ -11,6 +11,7 @@ import {
     type SelectedImage,
 } from '@/components/media-picker-modal';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
+import { SlugField } from '@/components/ui/slug-field';
 import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import {
@@ -50,7 +51,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const defaultFormData = (defaultLocale: string): FormData => ({
     name: { [defaultLocale]: '' },
-    slug: '',
+    slug: { [defaultLocale]: '' },
     description: { [defaultLocale]: '' },
     short_description: { [defaultLocale]: '' },
     sku_prefix: '',
@@ -156,21 +157,20 @@ export default function Create({
     const [formData, setFormData] = useState<FormData>(
         defaultFormData(defaultLocale),
     );
-    const [isSlugManual, setIsSlugManual] = useState(false);
+    const [autoGenerateSlug, setAutoGenerateSlug] = useState(true);
 
     const handleNameChange = (locale: string, value: string) => {
         setFormData((prev) => ({
             ...prev,
             name: { ...prev.name, [locale]: value },
-            slug:
-                !isSlugManual && locale === defaultLocale
-                    ? slugify(value)
-                    : prev.slug,
+            slug: autoGenerateSlug
+                ? { ...prev.slug, [locale]: slugify(value) }
+                : prev.slug,
         }));
     };
 
-    const handleSlugChange = (value: string) => {
-        setFormData((prev) => ({ ...prev, slug: slugify(value) }));
+    const handleSlugChange = (value: Record<string, string>) => {
+        setFormData((prev) => ({ ...prev, slug: value }));
     };
 
     const handleFormChange = <
@@ -402,59 +402,79 @@ export default function Create({
                                                 </div>
 
                                                 <div className="grid gap-2">
-                                                    <Label htmlFor="slug">
-                                                        Slug *
-                                                    </Label>
-                                                    <Input
-                                                        id="slug"
-                                                        name="slug"
-                                                        required
-                                                        placeholder="product-slug"
-                                                        value={formData.slug}
-                                                        readOnly={!isSlugManual}
-                                                        onChange={(e) =>
-                                                            handleSlugChange(
-                                                                e.target.value,
-                                                            )
-                                                        }
-                                                    />
-                                                    <InputError
-                                                        message={errors.slug}
-                                                    />
-                                                    <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={
-                                                                isSlugManual
-                                                            }
-                                                            onChange={(e) => {
-                                                                const manual =
-                                                                    e.target
-                                                                        .checked;
-                                                                setIsSlugManual(
-                                                                    manual,
-                                                                );
-                                                                if (!manual) {
-                                                                    setFormData(
-                                                                        (
-                                                                            prev,
-                                                                        ) => ({
-                                                                            ...prev,
-                                                                            slug: slugify(
-                                                                                prev
-                                                                                    .name[
-                                                                                    defaultLocale
-                                                                                ] ??
-                                                                                    '',
-                                                                            ),
-                                                                        }),
-                                                                    );
+                                                    {locales.map(
+                                                        (locale) => (
+                                                            <input
+                                                                key={`slug-${locale.code}`}
+                                                                type="hidden"
+                                                                name={`slug[${locale.code}]`}
+                                                                value={
+                                                                    formData
+                                                                        .slug[
+                                                                        locale
+                                                                            .code
+                                                                    ] ?? ''
                                                                 }
-                                                            }}
-                                                            className="h-4 w-4 rounded border-input"
-                                                        />
-                                                        Ustaw slug ręcznie
-                                                    </label>
+                                                            />
+                                                        ),
+                                                    )}
+                                                    <SlugField
+                                                        label="Slug"
+                                                        name="slug"
+                                                        value={formData.slug}
+                                                        onChange={
+                                                            handleSlugChange
+                                                        }
+                                                        autoGenerate={
+                                                            autoGenerateSlug
+                                                        }
+                                                        onAutoGenerateChange={(
+                                                            auto,
+                                                        ) => {
+                                                            setAutoGenerateSlug(
+                                                                auto,
+                                                            );
+                                                            if (auto) {
+                                                                setFormData(
+                                                                    (
+                                                                        prev,
+                                                                    ) => {
+                                                                        const updated =
+                                                                            {
+                                                                                ...prev.slug,
+                                                                            };
+                                                                        locales.forEach(
+                                                                            (
+                                                                                l,
+                                                                            ) => {
+                                                                                updated[
+                                                                                    l
+                                                                                        .code
+                                                                                ] =
+                                                                                    slugify(
+                                                                                        prev
+                                                                                            .name[
+                                                                                            l
+                                                                                                .code
+                                                                                        ] ??
+                                                                                            '',
+                                                                                    );
+                                                                            },
+                                                                        );
+                                                                        return {
+                                                                            ...prev,
+                                                                            slug: updated,
+                                                                        };
+                                                                    },
+                                                                );
+                                                            }
+                                                        }}
+                                                        locales={locales}
+                                                        errors={
+                                                            errors as Record<string, string>
+                                                        }
+                                                        required
+                                                    />
                                                 </div>
 
                                                 <div className="grid gap-2">

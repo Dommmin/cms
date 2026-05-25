@@ -45,8 +45,10 @@ class FlashSaleController extends ApiController
 
     public function forProduct(string $slug): JsonResponse
     {
+        $locale = app()->getLocale();
+
         $product = Product::query()
-            ->where('slug', $slug)
+            ->where('slug->'.$locale, $slug)
             ->firstOrFail();
 
         $flashSale = FlashSale::query()

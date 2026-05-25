@@ -18,7 +18,9 @@ class BlogCommentController extends ApiController
 {
     public function index(string $slug): AnonymousResourceCollection
     {
-        $post = BlogPost::query()->published()->where('slug', $slug)->firstOrFail();
+        $locale = app()->getLocale();
+
+        $post = BlogPost::query()->published()->where('slug->'.$locale, $slug)->firstOrFail();
 
         $comments = $post->comments()
             ->with(['user', 'replies.user'])
@@ -31,7 +33,9 @@ class BlogCommentController extends ApiController
 
     public function store(StoreBlogCommentRequest $request, string $slug): JsonResponse
     {
-        $post = BlogPost::query()->published()->where('slug', $slug)->firstOrFail();
+        $locale = app()->getLocale();
+
+        $post = BlogPost::query()->published()->where('slug->'.$locale, $slug)->firstOrFail();
 
         $data = $request->validated();
         $parentId = $data['parent_id'] ?? null;

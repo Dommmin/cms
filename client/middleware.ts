@@ -99,6 +99,9 @@ function generateNonce(): string {
 
 function getCspHeader(nonce: string): string {
     const isDev = process.env.NODE_ENV === 'development';
+    const frameAncestors = isDev
+        ? "frame-ancestors 'self' http://localhost:*"
+        : "frame-ancestors 'self'";
 
     return [
         `default-src 'self'`,
@@ -111,7 +114,7 @@ function getCspHeader(nonce: string): string {
         `object-src 'none'`,
         `base-uri 'self'`,
         `form-action 'self'`,
-        `frame-ancestors 'self'`,
+        frameAncestors,
         `upgrade-insecure-requests`,
     ]
         .filter(Boolean)

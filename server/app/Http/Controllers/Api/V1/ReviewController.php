@@ -19,7 +19,9 @@ class ReviewController extends ApiController
 {
     public function index(Request $request, string $slug): AnonymousResourceCollection
     {
-        $product = Product::query()->where('slug', $slug)->available()->firstOrFail();
+        $locale = app()->getLocale();
+
+        $product = Product::query()->where('slug->'.$locale, $slug)->available()->firstOrFail();
 
         $reviews = $product->reviews()
             ->where('status', ReviewStatusEnum::Approved->value)
@@ -34,7 +36,9 @@ class ReviewController extends ApiController
 
     public function store(StoreReviewRequest $request, string $slug): JsonResponse
     {
-        $product = Product::query()->where('slug', $slug)->available()->firstOrFail();
+        $locale = app()->getLocale();
+
+        $product = Product::query()->where('slug->'.$locale, $slug)->available()->firstOrFail();
         $customer = $request->user()->customer;
 
         if (! $customer) {

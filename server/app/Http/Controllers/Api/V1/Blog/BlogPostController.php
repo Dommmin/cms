@@ -28,7 +28,7 @@ class BlogPostController extends ApiController
                     ->orWhereJsonContains('available_locales', $locale);
             })
             ->when($request->category, fn ($q, $slug) => $q->whereHas(
-                'category', fn ($c) => $c->where('slug', $slug)
+                'category', fn ($c) => $c->where('slug->'.$locale, $slug)
             ))
             ->when($request->featured, fn ($q) => $q->featured())
             ->when($request->search, fn ($q, $search) => $q->where(function ($q) use ($search, $locale): void {
@@ -52,10 +52,7 @@ class BlogPostController extends ApiController
         $locale = $request->query('locale', app()->getLocale());
 
         $post = BlogPost::query()->published()
-            ->where(function ($q) use ($locale, $slug): void {
-                $q->where('slug', $slug)
-                    ->orWhere('slug_translations->'.$locale, $slug);
-            })
+            ->where('slug->'.$locale, $slug)
             ->where(function ($q) use ($locale): void {
                 $q->whereNull('available_locales')
                     ->orWhereJsonContains('available_locales', $locale);
@@ -69,8 +66,9 @@ class BlogPostController extends ApiController
     public function vote(StoreBlogVoteRequest $request, string $slug): JsonResponse
     {
         $data = $request->validated();
+        $locale = $request->query('locale', app()->getLocale());
 
-        $post = BlogPost::query()->published()->where('slug', $slug)->firstOrFail();
+        $post = BlogPost::query()->published()->where('slug->'.$locale, $slug)->firstOrFail();
         $userId = $request->user()->id;
         $vote = $data['vote'];
 
@@ -110,7 +108,8 @@ class BlogPostController extends ApiController
 
     public function recordView(Request $request, string $slug): JsonResponse
     {
-        $post = BlogPost::query()->published()->where('slug', $slug)->firstOrFail();
+        $locale = $request->query('locale', app()->getLocale());
+        $post = BlogPost::query()->published()->where('slug->'.$locale, $slug)->firstOrFail();
 
         $ipHash = hash('sha256', ($request->ip() ?? '').($request->header('User-Agent') ?? ''));
         $cutoff = now()->subHours(24);

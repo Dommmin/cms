@@ -6,7 +6,7 @@ export type CreateProps = {
 };
 export type FormData = {
     title: Record<string, string>;
-    slug: string;
+    slug: Record<string, string>;
     excerpt: Record<string, string>;
     content: Record<string, string>;
     content_json: Record<string, string>;
