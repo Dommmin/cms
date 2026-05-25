@@ -262,6 +262,7 @@ Key rules:
 - Prices stay as integer cents/grosze until formatted in `lib/format.ts`.
 - Checkout MVP submits contact/address/delivery/payment/terms data to `/checkout`
   and opens provider redirect URLs through `expo-web-browser`.
+- Account MVP supports login, registration, logout and recent order history.
 
 Checks:
 

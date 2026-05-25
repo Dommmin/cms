@@ -2120,6 +2120,7 @@ Extension points:
 - Cart and checkout mutations must send `Idempotency-Key`.
 - Prices are integer cents/grosze until formatted with `mobile/src/lib/format.ts`.
 - Checkout MVP posts contact, address, shipping method, payment provider and legal acceptance to `/checkout`, then opens provider redirect URLs through `expo-web-browser`.
+- Account MVP uses `/auth/login`, `/auth/register`, `/auth/logout`, `/auth/me` and `/orders` for recent order history.
 
 Run mobile checks from the repo root:
 

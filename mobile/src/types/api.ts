@@ -177,6 +177,40 @@ export interface Cart {
   items_count: number;
 }
 
+export type OrderStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'processing'
+  | 'shipped'
+  | 'delivered'
+  | 'cancelled'
+  | 'refunded';
+
+export interface OrderItem {
+  id: number;
+  product_name: string;
+  variant_sku: string;
+  quantity: number;
+  unit_price: number;
+  subtotal: number;
+}
+
+export interface Order {
+  id: number;
+  reference_number: string;
+  status: OrderStatus;
+  status_label?: string;
+  subtotal: number;
+  shipping_cost: number;
+  discount_amount: number;
+  tax_amount: number;
+  total: number;
+  currency_code: string;
+  notes?: string | null;
+  items: OrderItem[];
+  created_at: string;
+}
+
 export type ReviewStatus = 'pending' | 'approved' | 'rejected';
 
 export interface ProductReview {
