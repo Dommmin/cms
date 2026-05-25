@@ -518,6 +518,9 @@ jobs:
         run: |
           SHA="${{ steps.sha.outputs.short }}"
           IMAGE="${{ steps.images.outputs.server }}"
+          JOB_NAME="${APP_NAME}-migrate-${SHA}"
+
+          kubectl -n "${KUBE_NAMESPACE}" delete job "${JOB_NAME}" --ignore-not-found=true
 
           APP_NAME="${APP_NAME}" \
             KUBE_NAMESPACE="${KUBE_NAMESPACE}" \
@@ -525,7 +528,7 @@ jobs:
             REVISION="${SHA}" \
             ./k8s/render.sh k8s/server/job-migrate.yaml | kubectl apply --validate=false -f -
 
-          kubectl -n "${KUBE_NAMESPACE}" wait job/"${APP_NAME}-migrate-${SHA}" \
+          kubectl -n "${KUBE_NAMESPACE}" wait job/"${JOB_NAME}" \
             --for=condition=complete \
             --timeout=120s
 
