@@ -1007,16 +1007,18 @@ The admin panel uses a full-featured rich text editor (Lexical) for Blog Post co
 - **Alignment** — Left, Center, Right, Justify
 - **Links** — click the link button to add an external URL or search internal Pages, Products, Categories and Blog Posts. Typing a content name in the URL field also shows internal link suggestions.
 - **Insert** — Horizontal Rule, Image (from Media Library), Gallery, File attachment, Embed, Snippets, Table (rows × columns)
-- **Code blocks** — language selector dropdown; "Copy" button appears on hover
+- **Code blocks** — language selector dropdown, including PHP and C#; "Copy" button appears on hover
 - **Export** — download the current content as HTML, plain text, or Markdown.
 
 **Images and media:**
 - Use **Insert > Image** for one image. After selecting it, click the image to set alignment, text wrap, width, caption, credit, link, or mark it as decorative.
+- In the media picker, switch between grid and list view, adjust thumbnail size in grid view, and sort files by date, name, or size.
+- Click an inserted image to show its action toolbar. Use the trash button, Delete, or Backspace to remove selected media from the editor.
 - Drag the image resize handle with a mouse or touch pointer to set a custom width.
 - Use **Insert > Gallery** to select multiple images and reorder them before inserting a grid.
 - Use **Insert > File** for downloadable files such as PDFs, Office documents, spreadsheets, presentations, and ZIP archives.
 - Use **Insert > Embed** for supported public HTTPS URLs from YouTube, Vimeo, Spotify, Loom or TikTok. Instagram and Twitter/X URLs are inserted as safe link previews.
-- Use **Insert > Snippets** to save the current selection as a reusable local snippet, then insert it again later in the same browser.
+- Use **Insert > Snippets** to save the current selection as a reusable local snippet, then insert it again later in the same browser. Stored snippets are cleaned before they are saved or inserted.
 - When pasting from Word or Google Docs, the editor cleans unsafe styles and links before saving.
 - The editor shows content health warnings for common issues such as images without alt text, unsafe link metadata, broken internal links, skipped heading levels, long paragraphs, generic file names, or tables without headers.
 

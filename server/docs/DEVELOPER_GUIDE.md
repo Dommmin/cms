@@ -2087,7 +2087,7 @@ RTE media nodes are registered in `lexical/nodes.ts`:
 - `AttachmentNode` stores media ID, URL, public name, file name, MIME type, size, and optional description. HTML export uses `<a data-rte-attachment>`.
 - `EmbedNode` stores the original URL, provider, label and render mode for supported HTTPS embeds. HTML export uses `<figure data-rte-embed data-embed-platform="...">` with safe iframes for YouTube, Vimeo, Spotify, Loom and TikTok, and safe link placeholders for Instagram and Twitter/X.
 
-`MediaPickerModal` supports explicit modes: `image`, `gallery`, `file`, `video`, and `any`. The admin media search endpoint returns RTE metadata fields (`alt`, `caption`, `credit`, `width`, `height`, `thumb_url`) and accepts `mime_types[]` filtering.
+`MediaPickerModal` supports explicit modes: `image`, `gallery`, `file`, `video`, and `any`. It has grid/list display, grid thumbnail sizing, selected-item rail reordering, and sort controls backed by the admin media search `sort` parameter (`created_*`, `name_*`, `size_*`). The admin media search endpoint returns RTE metadata fields (`alt`, `caption`, `credit`, `width`, `height`, `thumb_url`) and accepts `mime_types[]` filtering.
 
 `HtmlPlugin` can emit both rendered HTML (`onChange`) and canonical Lexical JSON (`onJsonChange`). Blog posts persist JSON in `blog_posts.content_json`; existing HTML-only content remains supported.
 
@@ -2095,7 +2095,7 @@ Internal links use `RteLinkController::search` via the `admin.rte.links.search` 
 
 RTE HTML must remain inside the `HtmlSanitizerService` default allowlist. Add new public node attributes to `config/purifier.php` `HTML.Allowed` and `custom_attributes`, keep iframe sources constrained with `URI.SafeIframeRegexp`, then cover them in `tests/Feature/HtmlSanitizationTest.php`.
 
-Snippets are intentionally browser-local in the first iteration. `snippets-storage.ts` persists `{ id, name, html, createdAt }` under `cms:rte:snippets:v1`; `SnippetsPlugin` imports the stored HTML through Lexical DOM conversion instead of writing raw HTML into the document.
+Snippets are intentionally browser-local in the first iteration. `snippets-storage.ts` persists `{ id, name, html, createdAt }` under `cms:rte:snippets:v1`; snippet HTML is sanitized before save, after localStorage load, and before command-driven insertion. `SnippetsPlugin` imports the sanitized HTML through Lexical DOM conversion instead of writing raw HTML into the document.
 
 ### Adding a new node type
 

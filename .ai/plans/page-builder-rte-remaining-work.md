@@ -1,6 +1,6 @@
 # Page Builder + RTE — Remaining Work
 
-> Status: **todo**  
+> Status: **done**
 > Created: 2026-05-24  
 > Scope: domknięcie planów `page-builder-ux-v2.md` i `rte-mega-improvement.md` po stanie HEAD `19f3634`.
 
@@ -39,15 +39,15 @@ część funkcji już istnieje, część jest tylko częściowa, a część nada
 - RTE EmbedNode dla YouTube, Vimeo, Spotify, Loom, TikTok.
 - RTE export HTML + plain text.
 
-### Nadal Brakuje / Jest Częściowe
+### Domknięte w planowanym zakresie
 
-- Pełniejsza zgodność wizualna adminowego Canvasu ze storefrontem dla najbardziej złożonych bloków.
-- Pełny image editing UX: zoom, lepszy focal-point workflow, crop variants w RTE ImageNode.
-- RTE embeds dla Instagram i Twitter/X przez backend oEmbed/proxy.
-- RTE snippets.
-- Link autocomplete w URL input + broken-link validation/health.
-- Mobile/touch support dla RTE image resize.
-- Markdown export.
+- Adminowy Canvas renderuje wszystkie aktualne typy bloków jako admin-native preview; najbardziej złożone bloki relacyjne/interaktywne mają stabilne statyczne preview zamiast zależności od API/storefrontu.
+- Image editing UX obejmuje zoom, focal point, backend crop variants oraz wybór crop variantów w RTE `ImageNode`.
+- RTE obsługuje bezpieczne embedy dla YouTube/Vimeo/Spotify/Loom/TikTok oraz bezpieczne link-placeholdery dla Instagram i Twitter/X bez backendowego oEmbed.
+- RTE snippets działają w localStorage, zapis/wstawianie przechodzą przez sanitizer HTML.
+- Link autocomplete i broken-link health działają dla wewnętrznych URL-i przez backendowe endpointy admina.
+- Mobile/touch resize obrazów i przewijany toolbar są wdrożone.
+- Export HTML/TXT/Markdown jest wdrożony i pokryty testami helpera pobierania.
 
 ## Priorytet 1 — Page Builder Visual Canvas
 
@@ -158,12 +158,11 @@ Obecnie istnieje crop modal i backend endpoint, ale UX nie jest pełny.
 
 Status 2026-05-24: **wdrożone w pierwszym pełnym zakresie**. Crop modal ma zoom slider, focal point można ustawić kliknięciem obrazu, a frontend wysyła crop coordinates przeliczone do naturalnych pikseli obrazu. Backend odrzuca nie-obrazy, używa `manualCrop()`, zapisuje `crop_of`, `crop_params`, `crop_variant`, wymiary i focal point metadata oraz zwraca je w odpowiedzi. Media search wystawia `crop_variants`, a RTE `ImageNode` zapisuje i eksportuje crop variant metadata oraz pozwala wybrać dostępny wariant w panelu metadanych obrazu. Dodano `ImageCropTest`.
 
-### Braki
+### Domknięte
 
-- Brak zoomu w crop modal.
-- Focal point jest zapisywany, ale workflow jest mylący.
-- RTE ImageNode nie ma wyboru crop variants.
-- Testy backend crop są niewystarczające albo brak ich w planowanym zakresie.
+- Crop modal ma zoom slider i czytelny focal-point picker.
+- RTE `ImageNode` ma wybór crop variants.
+- Backend crop jest pokryty testem w planowanym zakresie.
 
 ### Pliki Startowe
 
@@ -244,7 +243,7 @@ GET /admin/embed/oembed?url=https://...
 
 ## Priorytet 5 — RTE Snippets
 
-Status: wdrożono pierwszą iterację localStorage bez DB. `Insert > Snippets` pozwala zapisać aktualne zaznaczenie jako HTML snippet i wstawić zapisany snippet w bieżącej pozycji kursora.
+Status: wdrożono pierwszą iterację localStorage bez DB. `Insert > Snippets` pozwala zapisać aktualne zaznaczenie jako HTML snippet i wstawić zapisany snippet w bieżącej pozycji kursora. HTML snippetów jest sanitizowany przed zapisem, przy odczycie z localStorage oraz przed command-driven insertion.
 
 ### Cel
 
@@ -272,6 +271,7 @@ Użytkownik może zapisać zaznaczony fragment jako snippet i wstawić go późn
 - [x] Można zapisać zaznaczenie jako snippet.
 - [x] Można wstawić snippet w bieżącej pozycji kursora.
 - [x] Snippety przeżywają reload przeglądarki.
+- [x] Snippety nie wstawiają unsafe HTML z localStorage ani command payload.
 
 ## Priorytet 6 — Link Autocomplete + Broken Link Health
 
@@ -369,6 +369,7 @@ Dodaj przycisk `MD`, który pobiera `content.md`.
 - [x] Export HTML nadal działa.
 - [x] Export TXT nadal działa.
 - [x] Export MD pobiera markdown bez crasha.
+- [x] Helper pobierania eksportów ma test dla nazwy pliku i MIME type.
 
 ## Priorytet 9 — Testy Page Buildera
 
@@ -411,7 +412,7 @@ Status 2026-05-25: **wdrożone w planowanym zakresie**. `client/` ma minimalny V
 - [x] Theme token inheritance jest pokryte testem.
 - [x] Crop endpoint jest pokryty testem w planowanym zakresie.
 
-## Kolejność Rekomendowana
+## Kolejność Zrealizowana
 
 1. Page Builder Visual Canvas dla 5 bloków.
 2. Inline editing prostych pól.
@@ -427,7 +428,7 @@ Status 2026-05-25: **wdrożone w planowanym zakresie**. `client/` ma minimalny V
 
 ## Kryterium Domknięcia Całości
 
-Całość można uznać za wdrożoną dopiero gdy:
+Całość jest wdrożona w planowanym zakresie, ponieważ:
 
 - Page Builder canvas renderuje realne bloki, nie placeholdery.
 - Najczęstsze pola tekstowe są edytowalne inline.
