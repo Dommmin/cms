@@ -6,31 +6,49 @@ namespace App\Console\Commands;
 
 use App\Models\Product;
 use Illuminate\Console\Command;
+use Laravel\Scout\EngineManager;
 
 class ImportProductsToSearch extends Command
 {
-    protected $signature = 'scout:import-products {--chunk=500 : The number of records to import at once}';
+    protected $signature = 'scout:import-products {--chunk=500 : The number of records to import at once}
+                                                    {--fresh : Delete the collection before importing}';
 
     protected $description = 'Import all products to Typesense search index';
 
-    public function handle(): int
+    public function handle(EngineManager $engineManager): int
     {
-        $this->info('Importing products to search index...');
-
         $chunk = (int) $this->option('chunk');
+        $fresh = (bool) $this->option('fresh');
 
-        $this->output->progressStart(
-            Product::query()->count()
-        );
+        if ($fresh) {
+            $this->info('Dropping existing collection…');
+            try {
+                $engine = $engineManager->engine('typesense');
+                $engine->deleteIndex('products');
+                $this->info('Collection deleted.');
+            } catch (\Throwable $e) {
+                $this->warn('Collection did not exist, continuing.');
+            }
+        }
+
+        $this->info('Importing products to search index…');
+
+        $total = Product::query()->count();
+        $this->output->progressStart($total);
+
+        $imported = 0;
+        $removed = 0;
 
         Product::query()
             ->with(['category', 'brand', 'variants', 'media'])
-            ->chunkById($chunk, function ($products): void {
+            ->chunkById($chunk, function ($products) use (&$imported, &$removed): void {
                 foreach ($products as $product) {
                     if ($product->is_active) {
                         $product->searchable();
+                        $imported++;
                     } else {
                         $product->unsearchable();
+                        $removed++;
                     }
                 }
 
@@ -39,7 +57,7 @@ class ImportProductsToSearch extends Command
 
         $this->output->progressFinish();
 
-        $this->info('Products imported successfully!');
+        $this->info("Done! Imported: {$imported}, Removed: {$removed}");
 
         return self::SUCCESS;
     }

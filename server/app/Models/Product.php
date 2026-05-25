@@ -207,9 +207,11 @@ class Product extends Model implements HasMedia
         ];
     }
 
-    /**
-     * Get the name of the index associated with the model.
-     */
+    public function shouldBeSearchable(): bool
+    {
+        return $this->is_active;
+    }
+
     public function searchableAs(): string
     {
         return 'products';

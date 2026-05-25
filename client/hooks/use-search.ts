@@ -3,7 +3,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
-import { getProducts } from '@/api/products';
+import { searchAutocomplete } from '@/api/search';
+import type { SearchSuggestion } from '@/api/search.types';
 
 const STORAGE_KEY = 'recent_searches';
 const MAX_RECENT = 5;
@@ -41,7 +42,8 @@ export function useSearchSuggestions(query: string) {
 
     return useQuery({
         queryKey: ['search-suggestions', debounced],
-        queryFn: () => getProducts({ search: debounced, per_page: 5 }),
+        queryFn: () => searchAutocomplete(debounced, 5),
+        select: (data): SearchSuggestion[] => data.suggestions ?? [],
         enabled: debounced.trim().length >= 2,
         staleTime: 30_000,
     });

@@ -4,14 +4,55 @@ import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import type { ProductFilters } from '@/api/products';
-import { ProductCard } from '@/components/product-card';
+import { searchProducts } from '@/api/search';
+import type { SearchFilters, SearchResult } from '@/api/search.types';
 import { useBrands, useCategories } from '@/hooks/use-cms';
 import { useLocalePath } from '@/hooks/use-locale';
-import { useProducts } from '@/hooks/use-products';
 import { useTranslation } from '@/hooks/use-translation';
 import { trackSearch } from '@/lib/datalayer';
-import type { Brand } from '@/types/api';
+import { formatPrice } from '@/lib/format';
+import type { Brand, Category } from '@/types/api';
+import { useQuery } from '@tanstack/react-query';
+
+function ProductSearchCard({
+    product,
+}: {
+    product: SearchResult['data'][number];
+}) {
+    return (
+        <article className="border-border bg-card overflow-hidden rounded-xl border">
+            <div className="bg-muted aspect-square">
+                {product.thumbnail && (
+                    <img
+                        src={
+                            product.thumbnail.thumb_url || product.thumbnail.url
+                        }
+                        alt={product.thumbnail.alt || product.name}
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                    />
+                )}
+            </div>
+            <div className="space-y-1 p-3">
+                <p className="text-muted-foreground text-xs">
+                    {product.category?.name}
+                </p>
+                <h3 className="text-foreground text-sm leading-tight font-medium">
+                    {product.name}
+                </h3>
+                <p className="text-foreground text-base font-bold">
+                    {formatPrice(product.price_min)}
+                    {product.price_max > product.price_min && (
+                        <span className="text-muted-foreground text-sm font-normal">
+                            {' '}
+                            – {formatPrice(product.price_max)}
+                        </span>
+                    )}
+                </p>
+            </div>
+        </article>
+    );
+}
 
 export function SearchClient() {
     const searchParams = useSearchParams();
@@ -19,37 +60,51 @@ export function SearchClient() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const q = searchParams.get('q') ?? '';
-    const filters: ProductFilters = {
-        search: q || undefined,
-        category: searchParams.get('category') ?? undefined,
-        brand: searchParams.get('brand') ?? undefined,
-        sort: searchParams.get('sort') ?? undefined,
-        min_price: searchParams.get('min_price')
-            ? Number(searchParams.get('min_price'))
-            : undefined,
-        max_price: searchParams.get('max_price')
-            ? Number(searchParams.get('max_price'))
-            : undefined,
-        page: Number(searchParams.get('page') ?? 1),
+    const category = searchParams.get('category') ?? undefined;
+    const brand = searchParams.get('brand') ?? undefined;
+    const sortParam = searchParams.get('sort') ?? undefined;
+    const minPrice = searchParams.get('min_price')
+        ? Number(searchParams.get('min_price'))
+        : undefined;
+    const maxPrice = searchParams.get('max_price')
+        ? Number(searchParams.get('max_price'))
+        : undefined;
+    const page = Number(searchParams.get('page') ?? 1);
+
+    const filters: SearchFilters = {
+        q: q || undefined,
+        category,
+        brand,
+        sort: sortParam,
+        min_price: minPrice,
+        max_price: maxPrice,
+        page,
+        per_page: 20,
     };
+
+    const { data, isLoading } = useQuery({
+        queryKey: ['search', filters],
+        queryFn: () => searchProducts(filters),
+        enabled: !!q || !!category || !!brand,
+    });
+
+    const { data: categories } = useCategories();
+    const { data: brands } = useBrands();
 
     const lp = useLocalePath();
     const { t } = useTranslation();
-    const { data, isLoading } = useProducts(filters);
-    const { data: categories } = useCategories();
-    const { data: brands } = useBrands();
 
     const SORT_OPTIONS = [
         { value: '', label: t('shop.sort_default', 'Default') },
         {
-            value: 'price',
+            value: 'price:asc',
             label: t('shop.sort_price_asc', 'Price: Low to High'),
         },
         {
-            value: '-price',
+            value: 'price:desc',
             label: t('shop.sort_price_desc', 'Price: High to Low'),
         },
-        { value: '-created_at', label: t('shop.sort_newest', 'Newest') },
+        { value: 'created_at:desc', label: t('shop.sort_newest', 'Newest') },
     ];
 
     useEffect(() => {
@@ -76,38 +131,46 @@ export function SearchClient() {
         );
     }
 
-    // Active filter chips (excluding q and page)
+    const facets = data?.meta?.facets;
+    const products = data?.data ?? [];
+    const meta = data?.meta;
+
     const activeFilters: { key: string; label: string }[] = [];
-    if (filters.category) {
-        const cat = categories?.find((c) => c.slug === filters.category);
-        activeFilters.push({
-            key: 'category',
-            label: cat?.name ?? filters.category,
-        });
-    }
-    if (filters.brand) {
-        const brand = brands?.find(
-            (b: Brand) => String(b.id) === filters.brand,
+    if (category) {
+        const cat = categories?.find(
+            (c: Category) => c.slug === category || String(c.id) === category,
         );
         activeFilters.push({
-            key: 'brand',
-            label: brand?.name ?? `Brand #${filters.brand}`,
+            key: 'category',
+            label: cat?.name ?? category,
         });
     }
-    if (filters.min_price != null)
+    if (brand) {
+        const br = brands?.find((b: Brand) => String(b.id) === brand);
+        activeFilters.push({
+            key: 'brand',
+            label: br?.name ?? `Brand #${brand}`,
+        });
+    }
+    if (minPrice != null)
         activeFilters.push({
             key: 'min_price',
-            label: `From $${filters.min_price}`,
+            label: `From ${formatPrice(minPrice)}`,
         });
-    if (filters.max_price != null)
+    if (maxPrice != null)
         activeFilters.push({
             key: 'max_price',
-            label: `To $${filters.max_price}`,
+            label: `To ${formatPrice(maxPrice)}`,
         });
-    if (filters.sort) {
-        const opt = SORT_OPTIONS.find((o) => o.value === filters.sort);
-        activeFilters.push({ key: 'sort', label: opt?.label ?? filters.sort });
+    if (sortParam) {
+        const opt = SORT_OPTIONS.find((o) => o.value === sortParam);
+        activeFilters.push({ key: 'sort', label: opt?.label ?? sortParam });
     }
+
+    const priceRanges = facets?.price_ranges ?? {
+        min: 0,
+        max: 0,
+    };
 
     return (
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -159,7 +222,7 @@ export function SearchClient() {
                     </label>
                     <select
                         id="search-sort"
-                        value={filters.sort ?? ''}
+                        value={sortParam ?? ''}
                         onChange={(e) => setParam('sort', e.target.value)}
                         className="border-input bg-background focus:ring-ring rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                     >
@@ -188,6 +251,20 @@ export function SearchClient() {
                     </button>
                 </div>
             </div>
+
+            {/* Did you mean? */}
+            {meta?.did_you_mean && (
+                <p className="text-muted-foreground mb-4 text-sm">
+                    {t('search.did_you_mean', 'Did you mean')}{' '}
+                    <button
+                        onClick={() => setParam('q', meta.did_you_mean!)}
+                        className="text-primary underline"
+                    >
+                        {meta.did_you_mean}
+                    </button>
+                    ?
+                </p>
+            )}
 
             {/* Active filter chips */}
             {activeFilters.length > 0 && (
@@ -226,8 +303,8 @@ export function SearchClient() {
                     className={`${sidebarOpen ? 'block' : 'hidden'} w-64 shrink-0 lg:block`}
                 >
                     <div className="border-border bg-card space-y-6 rounded-xl border p-4">
-                        {/* Categories */}
-                        {categories && categories.length > 0 && (
+                        {/* Categories from facets */}
+                        {facets && facets.categories.length > 0 && (
                             <div>
                                 <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
                                     {t('search.categories', 'Categories')}
@@ -236,7 +313,7 @@ export function SearchClient() {
                                     <button
                                         onClick={() => setParam('category', '')}
                                         className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
-                                            !filters.category
+                                            !category
                                                 ? 'bg-primary/10 text-primary font-medium'
                                                 : 'text-foreground/70 hover:bg-accent hover:text-foreground'
                                         }`}
@@ -246,27 +323,38 @@ export function SearchClient() {
                                             'All categories',
                                         )}
                                     </button>
-                                    {categories.map((cat) => (
-                                        <button
-                                            key={cat.id}
-                                            onClick={() =>
-                                                setParam('category', cat.slug)
-                                            }
-                                            className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
-                                                filters.category === cat.slug
-                                                    ? 'bg-primary/10 text-primary font-medium'
-                                                    : 'text-foreground/70 hover:bg-accent hover:text-foreground'
-                                            }`}
-                                        >
-                                            {cat.name}
-                                        </button>
-                                    ))}
+                                    {facets.categories.map(
+                                        (cat: {
+                                            id: string;
+                                            slug: string;
+                                            name: string;
+                                            count: number;
+                                        }) => (
+                                            <button
+                                                key={cat.id}
+                                                onClick={() =>
+                                                    setParam(
+                                                        'category',
+                                                        cat.slug,
+                                                    )
+                                                }
+                                                className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
+                                                    category === cat.slug ||
+                                                    category === cat.id
+                                                        ? 'bg-primary/10 text-primary font-medium'
+                                                        : 'text-foreground/70 hover:bg-accent hover:text-foreground'
+                                                }`}
+                                            >
+                                                {cat.name} ({cat.count})
+                                            </button>
+                                        ),
+                                    )}
                                 </div>
                             </div>
                         )}
 
-                        {/* Brands */}
-                        {brands && brands.length > 0 && (
+                        {/* Brands from facets */}
+                        {facets && facets.brands.length > 0 && (
                             <div>
                                 <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
                                     {t('search.brands', 'Brand')}
@@ -275,32 +363,34 @@ export function SearchClient() {
                                     <button
                                         onClick={() => setParam('brand', '')}
                                         className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
-                                            !filters.brand
+                                            !brand
                                                 ? 'bg-primary/10 text-primary font-medium'
                                                 : 'text-foreground/70 hover:bg-accent hover:text-foreground'
                                         }`}
                                     >
                                         {t('search.all_brands', 'All brands')}
                                     </button>
-                                    {brands.map((brand: Brand) => (
-                                        <button
-                                            key={brand.id}
-                                            onClick={() =>
-                                                setParam(
-                                                    'brand',
-                                                    String(brand.id),
-                                                )
-                                            }
-                                            className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
-                                                filters.brand ===
-                                                String(brand.id)
-                                                    ? 'bg-primary/10 text-primary font-medium'
-                                                    : 'text-foreground/70 hover:bg-accent hover:text-foreground'
-                                            }`}
-                                        >
-                                            {brand.name}
-                                        </button>
-                                    ))}
+                                    {facets.brands.map(
+                                        (br: {
+                                            id: string;
+                                            name: string;
+                                            count: number;
+                                        }) => (
+                                            <button
+                                                key={br.id}
+                                                onClick={() =>
+                                                    setParam('brand', br.id)
+                                                }
+                                                className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
+                                                    brand === br.id
+                                                        ? 'bg-primary/10 text-primary font-medium'
+                                                        : 'text-foreground/70 hover:bg-accent hover:text-foreground'
+                                                }`}
+                                            >
+                                                {br.name} ({br.count})
+                                            </button>
+                                        ),
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -309,6 +399,10 @@ export function SearchClient() {
                         <div>
                             <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
                                 {t('search.price_range', 'Price range')}
+                            </p>
+                            <p className="text-muted-foreground mb-2 text-xs">
+                                {formatPrice(priceRanges.min)} –{' '}
+                                {formatPrice(priceRanges.max)}
                             </p>
                             <div className="flex items-center gap-2">
                                 <label htmlFor="price-min" className="sr-only">
@@ -319,7 +413,7 @@ export function SearchClient() {
                                     type="number"
                                     min={0}
                                     placeholder="Min"
-                                    defaultValue={filters.min_price ?? ''}
+                                    defaultValue={minPrice ?? ''}
                                     onBlur={(e) =>
                                         setParam('min_price', e.target.value)
                                     }
@@ -339,7 +433,7 @@ export function SearchClient() {
                                     type="number"
                                     min={0}
                                     placeholder="Max"
-                                    defaultValue={filters.max_price ?? ''}
+                                    defaultValue={maxPrice ?? ''}
                                     onBlur={(e) =>
                                         setParam('max_price', e.target.value)
                                     }
@@ -364,9 +458,7 @@ export function SearchClient() {
                         ) : (
                             <>
                                 <span className="text-foreground font-medium">
-                                    {data?.meta?.total ??
-                                        data?.data?.length ??
-                                        0}
+                                    {meta?.total ?? 0}
                                 </span>{' '}
                                 {q
                                     ? t(
@@ -401,7 +493,7 @@ export function SearchClient() {
                     )}
 
                     {/* Empty */}
-                    {!isLoading && data?.data?.length === 0 && (
+                    {!isLoading && products.length === 0 && (
                         <div className="py-20 text-center">
                             <p className="text-foreground text-lg font-medium">
                                 {t('search.no_results', 'No results found')}
@@ -456,19 +548,22 @@ export function SearchClient() {
                     )}
 
                     {/* Grid */}
-                    {!isLoading && data && data.data.length > 0 && (
+                    {!isLoading && products.length > 0 && (
                         <>
                             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                                {data.data.map((product) => (
-                                    <ProductCard
+                                {products.map((product) => (
+                                    <a
                                         key={product.id}
-                                        product={product}
-                                    />
+                                        href={lp(`/products/${product.slug}`)}
+                                        className="hover:bg-accent/5 rounded-xl transition-colors"
+                                    >
+                                        <ProductSearchCard product={product} />
+                                    </a>
                                 ))}
                             </div>
 
                             {/* Pagination */}
-                            {data.meta && data.meta.last_page > 1 && (
+                            {meta && meta.last_page > 1 && (
                                 <nav
                                     aria-label={t(
                                         'search.pagination',
@@ -477,19 +572,16 @@ export function SearchClient() {
                                     className="mt-8 flex items-center justify-center gap-2"
                                 >
                                     {Array.from(
-                                        { length: data.meta.last_page },
+                                        { length: meta.last_page },
                                         (_, i) => i + 1,
-                                    ).map((page) => {
+                                    ).map((p) => {
                                         const isCurrent =
-                                            page === data.meta!.current_page;
+                                            p === meta.current_page;
                                         return (
                                             <button
-                                                key={page}
+                                                key={p}
                                                 onClick={() =>
-                                                    setParam(
-                                                        'page',
-                                                        String(page),
-                                                    )
+                                                    setParam('page', String(p))
                                                 }
                                                 aria-current={
                                                     isCurrent
@@ -498,15 +590,15 @@ export function SearchClient() {
                                                 }
                                                 aria-label={t(
                                                     'search.page_n',
-                                                    `Page ${page}`,
-                                                ).replace('{n}', String(page))}
+                                                    `Page ${p}`,
+                                                ).replace('{n}', String(p))}
                                                 className={`h-9 w-9 rounded-md text-sm font-medium ${
                                                     isCurrent
                                                         ? 'bg-primary text-primary-foreground'
                                                         : 'border-input hover:bg-accent border'
                                                 }`}
                                             >
-                                                {page}
+                                                {p}
                                             </button>
                                         );
                                     })}

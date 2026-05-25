@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
+import type { SearchSuggestion } from '@/api/search.types';
 import { useCategories } from '@/hooks/use-cms';
 import { useLocalePath } from '@/hooks/use-locale';
 import {
@@ -14,7 +15,7 @@ import {
     useSearchSuggestions,
 } from '@/hooks/use-search';
 import { formatPrice } from '@/lib/format';
-import type { Category, Product } from '@/types/api';
+import type { Category } from '@/types/api';
 
 function HighlightedText({ text, query }: { text: string; query: string }) {
     if (!query) return <span>{text}</span>;
@@ -45,7 +46,7 @@ export function SearchBar() {
     const categories = categoriesData ?? [];
 
     const { data: searchData, isLoading } = useSearchSuggestions(query);
-    const products: Product[] = searchData?.data ?? [];
+    const products: SearchSuggestion[] = searchData ?? [];
 
     const matchedCategories: Category[] =
         query.trim().length >= 1
@@ -370,14 +371,9 @@ export function SearchBar() {
                                                             {product.thumbnail ? (
                                                                 <Image
                                                                     src={
-                                                                        product
-                                                                            .thumbnail
-                                                                            .url
+                                                                        product.thumbnail
                                                                     }
                                                                     alt={
-                                                                        product
-                                                                            .thumbnail
-                                                                            .alt ??
                                                                         product.name
                                                                     }
                                                                     width={40}
@@ -396,19 +392,10 @@ export function SearchBar() {
                                                                         query
                                                                     }
                                                                 />
-                                                                {product.category && (
-                                                                    <p className="text-muted-foreground text-xs">
-                                                                        {
-                                                                            product
-                                                                                .category
-                                                                                .name
-                                                                        }
-                                                                    </p>
-                                                                )}
                                                             </div>
                                                             <span className="shrink-0 text-sm font-medium">
                                                                 {formatPrice(
-                                                                    product.price_min,
+                                                                    product.price,
                                                                 )}
                                                             </span>
                                                         </button>

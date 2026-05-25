@@ -3,10 +3,11 @@
  * e.g. 1999 → "$19.99"
  */
 export function formatPrice(
-    cents: number,
+    cents: number | null | undefined,
     currency = 'USD',
     locale = 'en-US',
 ): string {
+    if (cents == null || Number.isNaN(cents)) return '—';
     return new Intl.NumberFormat(locale, {
         style: 'currency',
         currency,

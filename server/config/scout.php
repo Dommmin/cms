@@ -200,6 +200,8 @@ return [
                         ['name' => 'brand_name', 'type' => 'string', 'optional' => true],
                         ['name' => 'is_active', 'type' => 'bool'],
                         ['name' => 'is_featured', 'type' => 'bool'],
+                        ['name' => 'is_search_promoted', 'type' => 'bool', 'optional' => true],
+                        ['name' => 'slug', 'type' => 'string', 'optional' => true],
                         ['name' => 'created_at', 'type' => 'int64'],
                         ['name' => 'thumbnail', 'type' => 'string', 'optional' => true],
                     ],
