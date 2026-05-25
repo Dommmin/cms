@@ -219,6 +219,19 @@ storefront exposes `POST /api/cms/revalidate` for CMS webhooks:
 - calls `revalidateTag('page:{slug}')` for default and translated slugs,
 - calls `revalidatePath()` for default and locale-prefixed page paths.
 
+### PWA
+
+The public storefront is installable as a PWA:
+
+- `app/manifest.ts` generates the web app manifest.
+- `public/pwa/` contains install icons and maskable icons.
+- `components/pwa-service-worker.tsx` registers `/sw.js` only in production.
+- `app/offline/page.tsx` is the offline fallback.
+- `public/sw.js` uses cache-first for static assets, stale-while-revalidate for
+  public product/blog/store routes, and network-first for navigations.
+- Cart, checkout, account, payment, auth and profile paths are intentionally
+  excluded from service worker cache.
+
 Configure an active CMS webhook with the same secret and the storefront URL
 `https://<storefront-host>/api/cms/revalidate`.
 

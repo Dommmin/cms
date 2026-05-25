@@ -134,6 +134,7 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - **EU/PL Legal Compliance** — checkout terms checkbox (required/accepted validation in `CheckoutRequest`), 14-day withdrawal notice in checkout, ODR platform link in footer legal menu (`https://ec.europa.eu/consumers/odr`), Omnibus price history (30-day low via `PriceHistory` + `ProductVariantPriceObserver`)
 - **Playwright E2E** — `client/tests/e2e/` (smoke, cart, i18n specs), Docker service under `testing` profile, `make e2e` / `make e2e-report` Makefile targets
 - **Client Unit Smoke Tests** — `client/vitest.config.ts` runs `client/tests/unit/**/*.{test,spec}.{ts,tsx}` via `docker compose exec -T node npm run test:ui`; current coverage includes storefront Page Builder block renderer smoke tests
+- **Storefront PWA** — `client/` exposes an App Router `app/manifest.ts`, PWA icons under `client/public/pwa/`, offline fallback at `/offline`, and a production-only service worker registration via `PwaServiceWorker`; `public/sw.js` cache strategy keeps static assets cache-first, public product/blog/store routes stale-while-revalidate, navigations network-first, and excludes cart/checkout/account/payment/auth/profile paths from cache.
 - **k3s deployment templating** — Kubernetes manifests use `k8s/render.sh` placeholders (`APP_NAME`, `KUBE_NAMESPACE`, `IMAGE_SERVER`, `IMAGE_CLIENT`, `REVISION`); defaults preserve `app` namespace/prefix. GitHub Actions is the primary deploy path, GitLab CI is an alternative. MySQL backup CronJob lives at `k8s/mysql/cronjob-backup.yaml`.
 
 ---

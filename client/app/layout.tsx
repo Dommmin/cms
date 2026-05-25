@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono, Playfair_Display } from 'next/font/google';
 import { cookies, headers } from 'next/headers';
 
@@ -20,6 +20,7 @@ import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import { PageTransition } from '@/components/layout/page-transition';
 import { ThemeInit } from '@/components/layout/theme-init';
 import { BlockAnimationObserver } from '@/components/page-builder/block-animation-observer';
+import { PwaServiceWorker } from '@/components/pwa-service-worker';
 import { ThemeStyles } from '@/components/theme-styles';
 import { getI18nConfig } from '@/lib/i18n-server';
 import { buildOrganization, buildWebSite } from '@/lib/schema';
@@ -49,6 +50,10 @@ const playfair = Playfair_Display({
     display: 'swap',
 });
 
+export const viewport: Viewport = {
+    themeColor: process.env.NEXT_PUBLIC_PWA_THEME_COLOR ?? '#111827',
+};
+
 // Cached per-request: both generateMetadata and RootLayout share one fetch
 
 const getPublicSettings = cache(async () =>
@@ -68,11 +73,21 @@ export async function generateMetadata(): Promise<Metadata> {
         publicSettings?.settings.seo?.disable_indexing === true;
 
     return {
+        applicationName: siteName,
         title: {
             default: siteName,
             template: `%s | ${siteName}`,
         },
         description: siteDescription ?? 'Your online store',
+        manifest: '/manifest.webmanifest',
+        appleWebApp: {
+            capable: true,
+            title: siteName,
+            statusBarStyle: 'default',
+        },
+        formatDetection: {
+            telephone: false,
+        },
         robots: disableIndexing ? { index: false, follow: false } : undefined,
         verification: {
             google:
@@ -194,6 +209,7 @@ export default async function RootLayout({
                             <ChatWidgetLoader />
                             <ComparisonBarLoader />
                             <BlockAnimationObserver />
+                            <PwaServiceWorker />
                             <ToastContainer
                                 position="bottom-right"
                                 autoClose={2000}
