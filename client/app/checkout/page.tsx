@@ -146,6 +146,17 @@ export default function CheckoutPage() {
     const selectedShippingMethod = shippingMethods.find(
         (m) => m.id === selectedMethod,
     );
+    const isProviderConfigured = (id: string): boolean =>
+        paymentMethods?.find((method) => method.id === id)?.configured ?? false;
+    const paymentProviderFor = (method: PaymentMethodValue): string => {
+        if (method === 'paynow' || method === 'paypo') return 'paynow';
+        if (method === 'blik') {
+            return isProviderConfigured('payu') ? 'payu' : 'paynow';
+        }
+        if (method === 'apple_pay' || method === 'google_pay') return 'payu';
+
+        return method;
+    };
     const isPickup = selectedShippingMethod?.carrier === 'pickup';
     const shippingCost = selectedShippingMethod?.base_price ?? 0;
     const subtotal = cart?.subtotal ?? 0;
@@ -166,20 +177,13 @@ export default function CheckoutPage() {
         selectedShippingMethod?.configured === true &&
         (!selectedShippingMethod.requires_pickup_point ||
             pickupPointId.trim().length > 0);
-    const selectedPaymentProvider =
-        paymentMethod === 'p24'
-            ? 'p24'
-            : paymentMethod === 'bank_transfer'
-              ? 'bank_transfer'
-              : paymentMethod === 'cash_on_delivery'
-                ? 'cash_on_delivery'
-                : paymentMethod;
+    const selectedPaymentProvider = paymentProviderFor(paymentMethod);
     const selectedPaymentConfig = paymentMethods?.find(
         (method) => method.id === selectedPaymentProvider,
     );
     const paymentProviderConfigured = selectedPaymentConfig?.configured ?? true;
     const paymentInputComplete =
-        paymentMethod === 'blik'
+        paymentMethod === 'blik' && selectedPaymentProvider === 'payu'
             ? blikCode.length === 6
             : paymentMethod === 'apple_pay' || paymentMethod === 'google_pay'
               ? paymentToken.length > 0
@@ -219,8 +223,15 @@ export default function CheckoutPage() {
         );
         if (selectedShippingCfg && !selectedShippingCfg.configured) return;
 
-        // BLIK requires 6-digit code
-        if (paymentMethod === 'blik' && blikCode.length !== 6) return;
+        const selectedProvider = paymentProviderFor(paymentMethod);
+
+        // Native PayU BLIK requires a 6-digit code. Paynow BLIK runs in hosted redirect.
+        if (
+            paymentMethod === 'blik' &&
+            selectedProvider === 'payu' &&
+            blikCode.length !== 6
+        )
+            return;
 
         // Locker method requires a pickup point
         if (selectedShippingMethod?.requires_pickup_point && !pickupPointId)
@@ -228,27 +239,21 @@ export default function CheckoutPage() {
 
         const shippingAddr = sameAddress ? billing : shipping;
 
-        const providerMap: Record<PaymentMethodValue, string> = {
-            blik: 'payu',
-            apple_pay: 'payu',
-            google_pay: 'payu',
-            p24: 'p24',
-            cash_on_delivery: 'cash_on_delivery',
-            bank_transfer: 'bank_transfer',
-        };
-
         checkout(
             {
                 guest_email: !token ? guestEmail : undefined,
                 shipping_method_id: selectedMethod,
                 pickup_point_id: pickupPointId || undefined,
-                payment_provider: providerMap[paymentMethod],
+                payment_provider: selectedProvider,
                 payment_method:
                     paymentMethod !== 'cash_on_delivery' &&
                     paymentMethod !== 'p24'
                         ? paymentMethod
                         : undefined,
-                blik_code: paymentMethod === 'blik' ? blikCode : undefined,
+                blik_code:
+                    paymentMethod === 'blik' && selectedProvider === 'payu'
+                        ? blikCode
+                        : undefined,
                 payment_token: paymentToken || undefined,
                 billing_address: billing,
                 shipping_address: shippingAddr,

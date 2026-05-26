@@ -66,6 +66,24 @@ class CheckoutController extends ApiController
                 ])),
             ],
             [
+                'id' => 'paynow',
+                'configured' => ! empty(config('services.paynow.api_key'))
+                    && ! empty(config('services.paynow.signature_key')),
+                'missing_env' => array_values(array_filter([
+                    empty(config('services.paynow.api_key')) ? 'PAYNOW_API_KEY' : null,
+                    empty(config('services.paynow.signature_key')) ? 'PAYNOW_SIGNATURE_KEY' : null,
+                ])),
+            ],
+            [
+                'id' => 'paypo',
+                'configured' => ! empty(config('services.paynow.api_key'))
+                    && ! empty(config('services.paynow.signature_key')),
+                'missing_env' => array_values(array_filter([
+                    empty(config('services.paynow.api_key')) ? 'PAYNOW_API_KEY' : null,
+                    empty(config('services.paynow.signature_key')) ? 'PAYNOW_SIGNATURE_KEY' : null,
+                ])),
+            ],
+            [
                 'id' => 'apple_pay',
                 'configured' => ! empty(config('services.apple_pay.merchant_id'))
                     && ! empty(config('services.apple_pay.cert_path'))

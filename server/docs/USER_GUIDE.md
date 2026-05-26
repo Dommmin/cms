@@ -33,8 +33,9 @@ This guide is written for content editors and administrators who manage the plat
    - [Promotions](#69-promotions)
    - [Tax Rates](#610-tax-rates)
    - [Shipping Methods](#611-shipping-methods)
-   - [Returns](#612-returns)
-   - [Carts & Wishlists](#613-carts--wishlists)
+   - [Payment Providers](#612-payment-providers)
+   - [Returns](#613-returns)
+   - [Carts & Wishlists](#614-carts--wishlists)
 7. [Newsletter](#7-newsletter)
 8. [Finance](#8-finance)
 9. [Users & Roles](#9-users--roles)
@@ -567,7 +568,27 @@ Pickup-point delivery methods require the customer to select a pickup point duri
 
 ---
 
-### 6.12 Returns
+### 6.12 Payment Providers
+
+Navigate to **Settings > Payments**.
+
+Supported payment providers:
+
+| Provider | Use |
+|----------|-----|
+| PayU | Native BLIK code flow and existing Apple Pay / Google Pay token flow |
+| Przelewy24 | Redirect payment fallback for Polish online payments |
+| Paynow | Hosted/redirect online payments, including PayPo/deferred payment option |
+| Bank Transfer | Manual bank transfer details shown after order placement |
+| Cash on Delivery | Pay on delivery or at pickup |
+
+You can configure more than one online provider at the same time. This is recommended because each provider can cover different payment methods and gives the store a fallback if one operator has an outage. Checkout should expose methods like BLIK, PayPo, card wallets and bank transfer to customers; the system maps those methods to the configured provider behind the scenes.
+
+To disable a provider, clear its required credentials in **Settings > Payments**. Manual methods are available when their required public details are configured.
+
+---
+
+### 6.13 Returns
 
 Navigate to **Shop > Returns** to manage return requests submitted by customers.
 
@@ -586,7 +607,7 @@ Pending → Approved → Return Label Sent → Awaiting Return → Received → 
 
 ---
 
-### 6.13 Carts & Wishlists
+### 6.14 Carts & Wishlists
 
 Navigate to **Shop > Carts** and **Shop > Wishlists** for read-only views of:
 

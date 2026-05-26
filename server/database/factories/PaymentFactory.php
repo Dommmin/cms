@@ -78,6 +78,13 @@ class PaymentFactory extends Factory
         ]);
     }
 
+    public function paynow(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'provider' => PaymentProviderEnum::PAYNOW,
+        ]);
+    }
+
     public function stripe(): static
     {
         return $this->state(fn (array $attributes): array => [

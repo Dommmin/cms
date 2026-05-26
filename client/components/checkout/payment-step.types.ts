@@ -4,6 +4,8 @@ export type PaymentMethodValue =
     | 'blik'
     | 'apple_pay'
     | 'google_pay'
+    | 'paynow'
+    | 'paypo'
     | 'p24'
     | 'cash_on_delivery'
     | 'bank_transfer';

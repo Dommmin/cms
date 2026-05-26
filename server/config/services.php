@@ -66,6 +66,12 @@ return [
         'base_url' => env('P24_BASE_URL', 'https://sandbox.przelewy24.pl'),
     ],
 
+    'paynow' => [
+        'api_key' => env('PAYNOW_API_KEY'),
+        'signature_key' => env('PAYNOW_SIGNATURE_KEY'),
+        'base_url' => env('PAYNOW_BASE_URL', 'https://api.sandbox.paynow.pl'),
+    ],
+
     'apple_pay' => [
         'merchant_id' => env('APPLE_PAY_MERCHANT_ID'),
         'cert_path' => env('APPLE_PAY_CERT_PATH'),

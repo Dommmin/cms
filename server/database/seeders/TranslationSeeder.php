@@ -132,6 +132,11 @@ class TranslationSeeder extends Seeder
             // ── checkout payment methods ────────────────────────────────────────
             ['group' => 'checkout', 'key' => 'method_blik',                    'en' => 'BLIK',                                          'pl' => 'BLIK'],
             ['group' => 'checkout', 'key' => 'method_blik_desc',               'en' => 'Pay with a BLIK code from your banking app',    'pl' => 'Zapłać kodem BLIK z aplikacji bankowej'],
+            ['group' => 'checkout', 'key' => 'method_blik_paynow_desc',        'en' => 'Choose BLIK on the Paynow payment page',        'pl' => 'Wybierz BLIK na stronie płatności Paynow'],
+            ['group' => 'checkout', 'key' => 'method_paynow',                  'en' => 'Fast online payment',                           'pl' => 'Szybka płatność online'],
+            ['group' => 'checkout', 'key' => 'method_paynow_desc',             'en' => 'BLIK, card, Apple Pay, Google Pay and bank transfer via Paynow', 'pl' => 'BLIK, karta, Apple Pay, Google Pay i przelew przez Paynow'],
+            ['group' => 'checkout', 'key' => 'method_paypo',                   'en' => 'Pay later',                                     'pl' => 'Zapłać później'],
+            ['group' => 'checkout', 'key' => 'method_paypo_desc',              'en' => 'Deferred payment via PayPo in Paynow',          'pl' => 'Płatność odroczona PayPo przez Paynow'],
             ['group' => 'checkout', 'key' => 'method_p24',                     'en' => 'Przelewy24',                                    'pl' => 'Przelewy24'],
             ['group' => 'checkout', 'key' => 'method_p24_desc',                'en' => 'Bank transfer, card, BLIK and other methods',   'pl' => 'Przelew, karta, BLIK i inne metody'],
             ['group' => 'checkout', 'key' => 'method_cod',                     'en' => 'Cash on Delivery',                              'pl' => 'Płatność przy dostawie'],

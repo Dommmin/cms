@@ -22,6 +22,8 @@ export interface PaymentMethodConfig {
     id:
         | 'cash_on_delivery'
         | 'payu'
+        | 'paynow'
+        | 'paypo'
         | 'p24'
         | 'apple_pay'
         | 'google_pay'

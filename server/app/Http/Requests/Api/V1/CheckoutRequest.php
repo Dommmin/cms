@@ -39,7 +39,7 @@ class CheckoutRequest extends FormRequest
             'guest_email' => ['nullable', 'email', 'max:255'],
             'shipping_method_id' => ['required', 'integer', 'exists:shipping_methods,id'],
             'payment_provider' => ['required', 'string', new Enum(PaymentProviderEnum::class)],
-            'payment_method' => ['nullable', 'string', Rule::in(['blik', 'card', 'apple_pay', 'google_pay', 'bank_transfer'])],
+            'payment_method' => ['nullable', 'string', Rule::in(['blik', 'card', 'apple_pay', 'google_pay', 'bank_transfer', 'paynow', 'paypo'])],
             'blik_code' => ['nullable', 'string', 'size:6', 'regex:/^\d{6}$/'],
             'payment_token' => ['nullable', 'string', 'max:10000'],
             'notes' => ['nullable', 'string', 'max:1000'],

@@ -514,11 +514,14 @@ To update after an `.env` change, run the same command again (idempotent).
 | `PAYU_CLIENT_ID` | PayU OAuth client ID |
 | `PAYU_CLIENT_SECRET` | PayU OAuth client secret |
 | `PAYU_POS_ID` | PayU POS ID |
-| `PAYU_SECOND_KEY` | PayU webhook MD5 key |
+| `PAYU_MD5_KEY` | PayU webhook MD5 key |
 | `P24_MERCHANT_ID` | Przelewy24 merchant ID |
 | `P24_POS_ID` | P24 POS ID |
 | `P24_CRC` | P24 CRC key |
 | `P24_API_KEY` | P24 API key |
+| `PAYNOW_API_KEY` | Paynow API key |
+| `PAYNOW_SIGNATURE_KEY` | Paynow API/webhook signature key |
+| `PAYNOW_BASE_URL` | Paynow API base URL (`https://api.sandbox.paynow.pl` or `https://api.paynow.pl`) |
 | `CLOUDFLARE_TURNSTILE_SECRET_KEY` | Turnstile server-side secret |
 | `GOOGLE_CLIENT_ID` | OAuth social login |
 | `GOOGLE_CLIENT_SECRET` | OAuth social login |

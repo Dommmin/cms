@@ -18,7 +18,7 @@ const METHOD_DEFS: Array<{
     labelDefault: string;
     descKey: string;
     descDefault: string;
-    providerId: PaymentMethodConfig['id'];
+    providerIds: PaymentMethodConfig['id'][];
 }> = [
     {
         value: 'blik',
@@ -26,7 +26,24 @@ const METHOD_DEFS: Array<{
         labelDefault: 'BLIK',
         descKey: 'checkout.method_blik_desc',
         descDefault: 'Pay with a BLIK code from your banking app',
-        providerId: 'payu',
+        providerIds: ['payu', 'paynow'],
+    },
+    {
+        value: 'paynow',
+        labelKey: 'checkout.method_paynow',
+        labelDefault: 'Fast online payment',
+        descKey: 'checkout.method_paynow_desc',
+        descDefault:
+            'BLIK, card, Apple Pay, Google Pay and bank transfer via Paynow',
+        providerIds: ['paynow'],
+    },
+    {
+        value: 'paypo',
+        labelKey: 'checkout.method_paypo',
+        labelDefault: 'Pay later',
+        descKey: 'checkout.method_paypo_desc',
+        descDefault: 'Deferred payment via PayPo in Paynow',
+        providerIds: ['paypo', 'paynow'],
     },
     {
         value: 'p24',
@@ -34,7 +51,7 @@ const METHOD_DEFS: Array<{
         labelDefault: 'Przelewy24',
         descKey: 'checkout.method_p24_desc',
         descDefault: 'Bank transfer, card, BLIK and other methods',
-        providerId: 'p24',
+        providerIds: ['p24'],
     },
     {
         value: 'bank_transfer',
@@ -42,7 +59,7 @@ const METHOD_DEFS: Array<{
         labelDefault: 'Bank Transfer',
         descKey: 'checkout.method_bank_transfer_desc',
         descDefault: 'Transfer funds to our bank account',
-        providerId: 'bank_transfer',
+        providerIds: ['bank_transfer'],
     },
     {
         value: 'cash_on_delivery',
@@ -50,7 +67,7 @@ const METHOD_DEFS: Array<{
         labelDefault: 'Cash on Delivery',
         descKey: 'checkout.method_cod_desc',
         descDefault: 'Pay the courier upon delivery',
-        providerId: 'cash_on_delivery',
+        providerIds: ['cash_on_delivery'],
     },
 ];
 
@@ -72,6 +89,32 @@ export function PaymentStep({
         id: PaymentMethodConfig['id'],
     ): PaymentMethodConfig | undefined {
         return providerConfig?.find((p) => p.id === id);
+    }
+
+    function methodProviderCfg(
+        ids: PaymentMethodConfig['id'][],
+    ): PaymentMethodConfig | undefined {
+        const configured = ids
+            .map((id) => providerCfg(id))
+            .find(
+                (cfg): cfg is PaymentMethodConfig =>
+                    cfg !== undefined && cfg.configured,
+            );
+
+        return (
+            configured ??
+            ids
+                .map((id) => providerCfg(id))
+                .find((cfg): cfg is PaymentMethodConfig => cfg !== undefined)
+        );
+    }
+
+    function isMethodConfigured(ids: PaymentMethodConfig['id'][]): boolean {
+        if (!providerConfig) {
+            return true;
+        }
+
+        return ids.some((id) => providerCfg(id)?.configured === true);
     }
 
     const applePayCfg = providerCfg('apple_pay');
@@ -116,8 +159,10 @@ export function PaymentStep({
             {/* Radio options */}
             <div className="space-y-2">
                 {METHOD_DEFS.map((method) => {
-                    const cfg = providerCfg(method.providerId);
-                    const isUnconfigured = cfg !== undefined && !cfg.configured;
+                    const cfg = methodProviderCfg(method.providerIds);
+                    const isUnconfigured = !isMethodConfigured(
+                        method.providerIds,
+                    );
 
                     // Dynamic label for Cash on Delivery when personal pickup is selected
                     const labelKey =
@@ -131,11 +176,19 @@ export function PaymentStep({
                     const descKey =
                         method.value === 'cash_on_delivery' && isPickup
                             ? 'checkout.method_cod_pickup_desc'
-                            : method.descKey;
+                            : method.value === 'blik' &&
+                                !providerCfg('payu')?.configured &&
+                                providerCfg('paynow')?.configured
+                              ? 'checkout.method_blik_paynow_desc'
+                              : method.descKey;
                     const descDefault =
                         method.value === 'cash_on_delivery' && isPickup
                             ? 'Pay in-store when collecting your order'
-                            : method.descDefault;
+                            : method.value === 'blik' &&
+                                !providerCfg('payu')?.configured &&
+                                providerCfg('paynow')?.configured
+                              ? 'Choose BLIK on the Paynow payment page'
+                              : method.descDefault;
 
                     return (
                         <label
@@ -171,6 +224,7 @@ export function PaymentStep({
 
                                     {/* Missing config notice */}
                                     {isUnconfigured &&
+                                        cfg !== undefined &&
                                         cfg.missing_env.length > 0 && (
                                             <div className="mt-1.5 flex items-start gap-1.5 rounded-md bg-amber-50 px-2 py-1.5 dark:bg-amber-950">
                                                 <AlertTriangle className="mt-px h-3 w-3 shrink-0 text-amber-600 dark:text-amber-400" />
@@ -190,7 +244,7 @@ export function PaymentStep({
                             {/* BLIK code input — shown inline when BLIK is selected */}
                             {method.value === 'blik' &&
                                 selected === 'blik' &&
-                                !isUnconfigured && (
+                                providerCfg('payu')?.configured && (
                                     <BlikInput
                                         value={blikCode}
                                         onChange={onBlikCode}

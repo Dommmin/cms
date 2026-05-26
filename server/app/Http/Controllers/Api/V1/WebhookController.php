@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\ApiController;
 use App\Infrastructure\Payments\P24\P24SignatureService;
+use App\Infrastructure\Payments\Paynow\PaynowSignatureService;
 use App\Infrastructure\Payments\PayU\PayUWebhookVerifier;
 use App\Jobs\ProcessPaymentWebhook;
 use Illuminate\Http\JsonResponse;
@@ -38,6 +39,20 @@ class WebhookController extends ApiController
         $signature = (string) ($payload['sign'] ?? '');
 
         dispatch(new ProcessPaymentWebhook('p24', $payload, $body, $signature));
+
+        return $this->ok(['message' => 'OK']);
+    }
+
+    public function paynow(Request $request, PaynowSignatureService $verifier): JsonResponse
+    {
+        $body = $request->getContent();
+        $signature = (string) $request->header('Signature', '');
+
+        abort_unless($verifier->verifyNotification($body, $signature), 400, 'Invalid signature');
+
+        $payload = json_decode($body, true) ?? [];
+
+        dispatch(new ProcessPaymentWebhook('paynow', $payload, $body, $signature));
 
         return $this->ok(['message' => 'OK']);
     }

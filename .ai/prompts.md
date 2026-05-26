@@ -130,3 +130,30 @@ Refactor [component/file]:
 - Run pint after changes
 - Minimal diff — only change what's necessary
 ```
+
+---
+
+## Implement Paynow Gateway
+
+```
+Implement the next phase from docs/PAYNOW_IMPLEMENTATION_PLAN.md.
+
+Before coding:
+- Read AGENTS.md, .ai/guide.md, .ai/rules.md, and docs/PAYNOW_IMPLEMENTATION_PLAN.md
+- Read existing PayU/P24 gateway, client, webhook and test code
+- Verify current official Paynow API v3 docs at docs.paynow.pl
+
+Rules:
+- Use the existing PaymentGatewayInterface / PaymentGatewayManager pattern
+- Verify webhook signatures synchronously before queue dispatch
+- Keep PayU/P24/manual payment methods working
+- Expose customer-facing methods (BLIK, Apple Pay, Google Pay, PayPo), not only provider names
+- Use Docker for all PHP/Node commands
+- Update .ai/guide.md and server/docs/* when behavior changes
+
+Run relevant focused tests first, then full quality gates before commit:
+- docker compose exec php vendor/bin/pint --dirty
+- docker compose exec php php artisan test --compact --filter=Paynow
+- make fix
+- make check
+```

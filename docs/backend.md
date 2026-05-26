@@ -132,7 +132,9 @@ Business logic goes in `app/Services/`. Controllers should be thin.
 | `PagePublicationWebhookService` | Page publish/unpublish webhook dispatch |
 | `ModuleRegistryService`  | Page module type registry              |
 
-Payment gateways currently registered in `EcommerceServiceProvider`: P24, PayU, cash on delivery, and bank transfer. `stripe` exists in `PaymentProviderEnum`, but no Stripe gateway is registered yet. Paynow and Autopay are not implemented.
+Payment gateways currently registered in `EcommerceServiceProvider`: P24, PayU, Paynow, cash on delivery, and bank transfer. `stripe` exists in `PaymentProviderEnum`, but no Stripe gateway is registered yet. Autopay is not implemented.
+
+Payment operations are multi-provider by design. Keep several providers configured for fallback, but map customer-facing methods to the preferred provider in checkout. A single global radio setting for "active provider" is too coarse because BLIK, card wallets, deferred payments, P24 redirect, bank transfer, and COD have different operational needs.
 
 Shipping carriers currently registered in `EcommerceServiceProvider`: InPost Courier, DPD Courier, DPD Pickup, DHL Parcel, DHL ServicePoint and GLS through Furgonetka; InPost Paczkomat directly through ShipX; local pickup through `PickupCarrier`.
 

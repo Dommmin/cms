@@ -12,6 +12,9 @@ use App\Infrastructure\Payments\CashOnDeliveryGateway;
 use App\Infrastructure\Payments\P24\P24Client;
 use App\Infrastructure\Payments\P24\P24Gateway;
 use App\Infrastructure\Payments\P24\P24SignatureService;
+use App\Infrastructure\Payments\Paynow\PaynowClient;
+use App\Infrastructure\Payments\Paynow\PaynowGateway;
+use App\Infrastructure\Payments\Paynow\PaynowSignatureService;
 use App\Infrastructure\Payments\PayU\PayUClient;
 use App\Infrastructure\Payments\PayU\PayUGateway;
 use App\Infrastructure\Payments\PayU\PayUTokenService;
@@ -54,6 +57,9 @@ class EcommerceServiceProvider extends ServiceProvider
         $this->app->singleton(P24SignatureService::class);
         $this->app->singleton(P24Client::class);
         $this->app->singleton(P24Gateway::class);
+        $this->app->singleton(PaynowSignatureService::class);
+        $this->app->singleton(PaynowClient::class);
+        $this->app->singleton(PaynowGateway::class);
 
         $this->app->singleton(FurgonetkaTokenService::class);
         $this->app->singleton(FurgonetkaClient::class);
@@ -74,6 +80,7 @@ class EcommerceServiceProvider extends ServiceProvider
         $this->app->singleton(fn ($app): PaymentGatewayManager => new PaymentGatewayManager([
             PaymentProviderEnum::P24->value => $app->make(P24Gateway::class),
             PaymentProviderEnum::PAYU->value => $app->make(PayUGateway::class),
+            PaymentProviderEnum::PAYNOW->value => $app->make(PaynowGateway::class),
             PaymentProviderEnum::CASH_ON_DELIVERY->value => new CashOnDeliveryGateway(),
             PaymentProviderEnum::BANK_TRANSFER->value => new BankTransferGateway(),
         ]));
@@ -182,6 +189,18 @@ class EcommerceServiceProvider extends ServiceProvider
 
             $p24Sandbox = $decode($rows['p24_sandbox'] ?? null) ?? true;
             config(['services.p24.base_url' => $p24Sandbox ? 'https://sandbox.przelewy24.pl' : 'https://secure.przelewy24.pl']);
+
+            // Paynow
+            if ($v = $decode($rows['paynow_api_key'] ?? null)) {
+                config(['services.paynow.api_key' => $v]);
+            }
+
+            if ($v = $decrypt($decode($rows['paynow_signature_key'] ?? null))) {
+                config(['services.paynow.signature_key' => $v]);
+            }
+
+            $paynowSandbox = $decode($rows['paynow_sandbox'] ?? null) ?? true;
+            config(['services.paynow.base_url' => $paynowSandbox ? 'https://api.sandbox.paynow.pl' : 'https://api.paynow.pl']);
 
             // Bank Transfer
             foreach (['account_name', 'iban', 'swift', 'bank_name'] as $field) {

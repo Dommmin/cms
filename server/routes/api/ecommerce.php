@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1/webhooks')->name('api.v1.webhooks.')->group(function (): void {
     Route::post('payu', [WebhookController::class, 'payu'])->name('payu');
     Route::post('p24', [WebhookController::class, 'p24'])->name('p24');
+    Route::post('paynow', [WebhookController::class, 'paynow'])->name('paynow');
 });
 
 Route::prefix('v1')->name('api.v1.')->group(function (): void {
