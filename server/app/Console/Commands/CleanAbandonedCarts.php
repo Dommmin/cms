@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\Cart;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
+#[Description('Delete old abandoned carts (30 days for auth, 7 days for guest)')]
+#[Signature('cart:clean
+                            {--auth-days=30 : Days before authenticated cart is deleted}
+                            {--guest-days=7 : Days before guest cart is deleted}')]
 class CleanAbandonedCarts extends Command
 {
-    protected $signature = 'cart:clean
-                            {--auth-days=30 : Days before authenticated cart is deleted}
-                            {--guest-days=7 : Days before guest cart is deleted}';
-
-    protected $description = 'Delete old abandoned carts (30 days for auth, 7 days for guest)';
-
     public function handle(): int
     {
         $authDays = (int) $this->option('auth-days');

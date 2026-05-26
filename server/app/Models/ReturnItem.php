@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Enums\ReturnItemConditionEnum;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,11 +16,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'return_id', 'order_item_id', 'quantity', 'condition', 'notes',
 ])]
 #[Table(name: 'return_items')]
+#[WithoutTimestamps]
 class ReturnItem extends Model
 {
     use HasFactory;
-
-    public $timestamps = false;
 
     protected $casts = [
         'condition' => ReturnItemConditionEnum::class,

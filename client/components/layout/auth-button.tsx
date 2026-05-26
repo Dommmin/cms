@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useLogout, useMe } from '@/hooks/use-auth';
+import { useIsMounted } from '@/hooks/use-is-mounted';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
 
@@ -22,15 +23,13 @@ export function AuthButton() {
     const { mutate: logout, isPending } = useLogout();
     const { t } = useTranslation();
     const lp = useLocalePath();
+    const mounted = useIsMounted();
     const [open, setOpen] = useState(false);
-    const [mounted, setMounted] = useState(false);
     const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
     const ref = useRef<HTMLDivElement>(null);
 
     // Close dropdown when clicking outside or pressing Escape
     useEffect(() => {
-        setMounted(true);
-
         function handleClick(e: MouseEvent) {
             const target = e.target as Node;
             if (ref.current && !ref.current.contains(target)) setOpen(false);

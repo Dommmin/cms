@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Enums\AttributeTypeEnum;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,11 +16,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'attribute_id', 'value', 'slug', 'color_hex', 'position',
 ])]
 #[Table(name: 'attribute_values')]
+#[WithoutTimestamps]
 class AttributeValue extends Model
 {
     use HasFactory;
-
-    public $timestamps = false;
 
     public function attribute(): BelongsTo
     {

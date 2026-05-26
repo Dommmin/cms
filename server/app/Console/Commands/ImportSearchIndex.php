@@ -8,20 +8,20 @@ use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Setting;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\EngineManager;
 use Throwable;
 
-class ImportSearchIndex extends Command
-{
-    protected $signature = 'scout:import-search
+#[Description('Import all enabled search indexes to Typesense')]
+#[Signature('scout:import-search
         {--chunk=500 : The number of records to import at once}
         {--fresh : Delete collections before importing}
-        {--only= : Comma-separated list of indexes to import (products,categories,blog_posts)}';
-
-    protected $description = 'Import all enabled search indexes to Typesense';
-
+        {--only= : Comma-separated list of indexes to import (products,categories,blog_posts)}')]
+class ImportSearchIndex extends Command
+{
     /** @var array<string, class-string<Model>> */
     protected array $indexes = [
         'products' => Product::class,

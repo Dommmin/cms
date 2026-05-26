@@ -10,6 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.4",
+        "brianium/paratest": "^7.20",
         "dedoc/scramble": "^0.13.14",
         "gusapi/gusapi": "^3.3",
         "inertiajs/inertia-laravel": "^3.0",

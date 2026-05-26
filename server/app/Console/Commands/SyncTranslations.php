@@ -7,19 +7,19 @@ namespace App\Console\Commands;
 use App\Models\Locale;
 use App\Models\Translation;
 use FilesystemIterator;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
+#[Description('Scan frontend files for t("key", "fallback") calls and sync keys into the translations table')]
+#[Signature('translations:sync
+                            {--dry-run : Show what would be added without writing to DB}
+                            {--path= : Path to scan for translation keys (default: ../client)}')]
 class SyncTranslations extends Command
 {
-    protected $signature = 'translations:sync
-                            {--dry-run : Show what would be added without writing to DB}
-                            {--path= : Path to scan for translation keys (default: ../client)}';
-
-    protected $description = 'Scan frontend files for t("key", "fallback") calls and sync keys into the translations table';
-
     public function handle(): int
     {
         $basePath = $this->option('path')

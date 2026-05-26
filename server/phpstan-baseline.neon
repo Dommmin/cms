@@ -49,6 +49,30 @@ parameters:
 			path: app/Console/Commands/GenerateSitemap.php
 
 		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:searchable\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Console/Commands/ImportSearchIndex.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:searchableAs\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Console/Commands/ImportSearchIndex.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:shouldBeSearchable\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Console/Commands/ImportSearchIndex.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:unsearchable\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Console/Commands/ImportSearchIndex.php
+
+		-
 			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Query\\Builder\:\:each\(\) expects callable\(stdClass, int\)\: mixed, Closure\(App\\Models\\Page\)\: void given\.$#'
 			identifier: argument.type
 			count: 2
@@ -361,18 +385,6 @@ parameters:
 			path: app/Http/Controllers/Admin/BlockRelationController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$is_featured\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Http/Controllers/Admin/BlogPostController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$published_at\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/BlogPostController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$tags\.$#'
 			identifier: property.notFound
 			count: 1
@@ -608,12 +620,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Category\:\:\$og_image\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Admin/Ecommerce/CategoryController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Category\:\:\$parent_id\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Controllers/Admin/Ecommerce/CategoryController.php
@@ -1615,14 +1621,8 @@ parameters:
 			path: app/Http/Controllers/Api/V1/ReviewController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Product\:\:\$category\.$#'
+			message: '#^Access to an undefined property App\\Models\\Brand\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/V1/SearchController.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Query\\Builder\:\:with\(\)\.$#'
-			identifier: method.notFound
 			count: 1
 			path: app/Http/Controllers/Api/V1/SearchController.php
 
@@ -1657,7 +1657,13 @@ parameters:
 			path: app/Http/Controllers/Api/V1/SupportController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\BlogPost\:\:\$published_at\.$#'
+			message: '#^Access to an undefined property App\\Models\\Wishlist\:\:\$session_token\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Api/V1/WishlistController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$name\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Controllers/BlogFeedController.php
@@ -1739,12 +1745,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Requests/Admin/Ecommerce/UpdateBrandRequest.php
-
-		-
-			message: '#^Access to an undefined property App\\Http\\Requests\\Admin\\Ecommerce\\UpdateCategoryRequest\:\:\$category\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Requests/Admin/Ecommerce/UpdateCategoryRequest.php
 
 		-
 			message: '#^Access to an undefined property App\\Http\\Requests\\Admin\\Ecommerce\\UpdateCustomerRequest\:\:\$customer\.$#'
@@ -2107,12 +2107,6 @@ parameters:
 			path: app/Http/Resources/Api/V1/BlogCommentResource.php
 
 		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$author\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Http/Resources/Api/V1/BlogPostResource.php
-
-		-
 			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$category\.$#'
 			identifier: property.notFound
 			count: 1
@@ -2125,31 +2119,7 @@ parameters:
 			path: app/Http/Resources/Api/V1/BlogPostResource.php
 
 		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$created_at\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/BlogPostResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$featured_image\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/BlogPostResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$is_featured\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/BlogPostResource.php
-
-		-
 			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$og_image\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Api/V1/BlogPostResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$published_at\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Resources/Api/V1/BlogPostResource.php
@@ -2182,6 +2152,12 @@ parameters:
 			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\BlogPostResource\:\:\$votes\.$#'
 			identifier: property.notFound
 			count: 3
+			path: app/Http/Resources/Api/V1/BlogPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
 			path: app/Http/Resources/Api/V1/BlogPostResource.php
 
 		-
@@ -2847,11 +2823,17 @@ parameters:
 		-
 			message: '#^Access to an undefined property App\\Models\\Wishlist\:\:\$items\.$#'
 			identifier: property.notFound
-			count: 1
+			count: 2
 			path: app/Http/Resources/Api/V1/WishlistResource.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Wishlist\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/WishlistResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Wishlist\:\:\$session_token\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Resources/Api/V1/WishlistResource.php
@@ -3095,6 +3077,84 @@ parameters:
 			identifier: nullsafe.neverNull
 			count: 1
 			path: app/Infrastructure/Payments/PayU/PayUGateway.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Address\:\:\$city\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Infrastructure/Payments/Paynow/PaynowGateway.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Address\:\:\$country_code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Infrastructure/Payments/Paynow/PaynowGateway.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Address\:\:\$postal_code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Infrastructure/Payments/Paynow/PaynowGateway.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Address\:\:\$street\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Infrastructure/Payments/Paynow/PaynowGateway.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Order\:\:\$billingAddress\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Infrastructure/Payments/Paynow/PaynowGateway.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Order\:\:\$shippingAddress\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Infrastructure/Payments/Paynow/PaynowGateway.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Payment\:\:\$amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Infrastructure/Payments/Paynow/PaynowGateway.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Payment\:\:\$currency_code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Infrastructure/Payments/Paynow/PaynowGateway.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Payment\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Infrastructure/Payments/Paynow/PaynowGateway.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Payment\:\:\$order\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Infrastructure/Payments/Paynow/PaynowGateway.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Payment\:\:\$provider_transaction_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Infrastructure/Payments/Paynow/PaynowGateway.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Payment\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Infrastructure/Payments/Paynow/PaynowGateway.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>email" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Infrastructure/Payments/Paynow/PaynowGateway.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Order\:\:\$billingAddress\.$#'
@@ -3446,6 +3506,12 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property App\\Models\\ModelVersion\:\:\$version_number\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/BlogPost.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$name\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Models/BlogPost.php
@@ -5341,12 +5407,6 @@ parameters:
 			path: app/Services/PageCacheService.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/PageCacheService.php
-
-		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Page\>\:\:withFullContent\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -5527,6 +5587,42 @@ parameters:
 			path: app/Services/WebhookService.php
 
 		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/WishlistService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/WishlistService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Wishlist\:\:\$items\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/WishlistService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/WishlistService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$items\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/WishlistService.php
+
+		-
+			message: '#^Method App\\Services\\WishlistService\:\:getOrCreateWishlist\(\) should return App\\Models\\Wishlist but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/WishlistService.php
+
+		-
 			message: '#^PHPDoc tag @implements contains generic type Spatie\\QueryBuilder\\Sorts\\Sort\<App\\Models\\Product\> but interface Spatie\\QueryBuilder\\Sorts\\Sort is not generic\.$#'
 			identifier: generics.notGeneric
 			count: 1
@@ -5620,12 +5716,6 @@ parameters:
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 2
-			path: database/seeders/EcommerceDemoSeeder.php
-
-		-
-			message: '#^Using nullsafe property access "\?\-\>slug" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 1
 			path: database/seeders/EcommerceDemoSeeder.php
 
 		-

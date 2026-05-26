@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,11 +15,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'product_type_id', 'attribute_id', 'is_required', 'position',
 ])]
 #[Table(name: 'product_type_attributes')]
+#[WithoutTimestamps]
 class ProductTypeAttribute extends Model
 {
     use HasFactory;
-
-    public $timestamps = false;
 
     protected $casts = [
         'is_required' => 'boolean',

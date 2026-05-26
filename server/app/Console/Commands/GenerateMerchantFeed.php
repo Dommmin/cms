@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\Product;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 use SimpleXMLElement;
 
-class GenerateMerchantFeed extends Command
-{
-    protected $signature = 'merchant:generate-feed
+#[Description('Generate product feed for merchant centers (Google, Facebook)')]
+#[Signature('merchant:generate-feed
         {--type=google : Feed type (google, facebook)}
         {--locale=en : Target locale}
-        {--output=storage : Output location (storage, stdout)}';
-
-    protected $description = 'Generate product feed for merchant centers (Google, Facebook)';
-
+        {--output=storage : Output location (storage, stdout)}')]
+class GenerateMerchantFeed extends Command
+{
     public function handle(): int
     {
         $type = $this->option('type');

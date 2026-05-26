@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use RecursiveDirectoryIterator;
@@ -18,18 +20,16 @@ use RecursiveIteratorIterator;
  *   php artisan admin:sync-translations --dry-run
  *   php artisan admin:sync-translations --locale=pl
  */
+#[Description('Sync translation keys from admin TSX files into lang/*/admin.php')]
+#[Signature('admin:sync-translations
+        {--dry-run : Show what would change without writing files}
+        {--locale= : Only process a specific locale}')]
 class SyncAdminTranslations extends Command
 {
     /** Regex patterns to extract __('key', 'fallback') calls from TSX. */
     private const array PATTERNS = [
         '/__\([\'"]([a-z][a-z0-9._-]+)[\'"](?:,\s*[\'"]([^\'"]*)[\'"]\s*)?\)/u',
     ];
-
-    protected $signature = 'admin:sync-translations
-        {--dry-run : Show what would change without writing files}
-        {--locale= : Only process a specific locale}';
-
-    protected $description = 'Sync translation keys from admin TSX files into lang/*/admin.php';
 
     public function handle(): int
     {

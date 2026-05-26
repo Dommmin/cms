@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\User;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
+#[Description('Permanently remove soft-deleted users older than the specified number of days')]
+#[Signature('user:prune {--days=30 : Number of days after deletion to permanently remove}')]
 class PruneDeletedUsers extends Command
 {
-    protected $signature = 'user:prune {--days=30 : Number of days after deletion to permanently remove}';
-
-    protected $description = 'Permanently remove soft-deleted users older than the specified number of days';
-
     public function handle(): int
     {
         $days = (int) $this->option('days');

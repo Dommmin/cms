@@ -7,17 +7,17 @@ namespace App\Console\Commands;
 use App\Models\Category;
 use App\Models\Page;
 use App\Models\Product;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Date;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
 
+#[Description('Generate sitemap.xml (products, categories, pages)')]
+#[Signature('sitemap:generate')]
 class GenerateSitemap extends Command
 {
-    protected $signature = 'sitemap:generate';
-
-    protected $description = 'Generate sitemap.xml (products, categories, pages)';
-
     public function handle(): int
     {
         $baseUrl = mb_rtrim(config('app.frontend_url'), '/');

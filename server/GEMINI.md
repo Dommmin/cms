@@ -19,6 +19,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/socialite (SOCIALITE) - v5
 - laravel/telescope (TELESCOPE) - v5
 - laravel/wayfinder (WAYFINDER) - v0
+- phpunit/phpunit (PHPUNIT) - v12
 - larastan/larastan (LARASTAN) - v3
 - laravel/boost (BOOST) - v2
 - laravel/mcp (MCP) - v0
@@ -26,7 +27,6 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/pint (PINT) - v1
 - laravel/sail (SAIL) - v1
 - pestphp/pest (PEST) - v4
-- phpunit/phpunit (PHPUNIT) - v12
 - rector/rector (RECTOR) - v2
 - \@inertiajs/react (INERTIA_REACT) - v3
 - react (REACT) - v19

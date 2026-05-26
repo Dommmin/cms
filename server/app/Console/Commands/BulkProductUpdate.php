@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\Product;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
-class BulkProductUpdate extends Command
-{
-    protected $signature = 'products:bulk-update
+#[Description('Bulk update products (status, price, stock)')]
+#[Signature('products:bulk-update
         {--action=status : Action to perform (status, price, stock)}
         {--value= : New value to set}
-        {--ids=* : Product IDs to update (optional)}';
-
-    protected $description = 'Bulk update products (status, price, stock)';
-
+        {--ids=* : Product IDs to update (optional)}')]
+class BulkProductUpdate extends Command
+{
     public function handle(): int
     {
         $action = $this->option('action');

@@ -1,5 +1,6 @@
 'use client';
 
+import { useIsMounted } from '@/hooks/use-is-mounted';
 import { useTranslation } from '@/hooks/use-translation';
 import { api } from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query';
@@ -16,7 +17,7 @@ export function LocaleSwitcher() {
     const { locale, setLocale } = useTranslation();
     const [open, setOpen] = useState(false);
     const [alignRight, setAlignRight] = useState(true);
-    const [mounted, setMounted] = useState(false);
+    const mounted = useIsMounted();
     const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
     const ref = useRef<HTMLDivElement>(null);
     const menuRef = useRef<HTMLUListElement>(null);
@@ -43,10 +44,6 @@ export function LocaleSwitcher() {
             document.removeEventListener('mousedown', handleClickOutside);
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, []);
-
-    useEffect(() => {
-        setMounted(true);
     }, []);
 
     useLayoutEffect(() => {

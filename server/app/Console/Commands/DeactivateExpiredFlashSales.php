@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\FlashSale;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Date;
 
+#[Description('Mark expired or stock-exhausted flash sales as inactive')]
+#[Signature('flash-sales:deactivate-expired')]
 class DeactivateExpiredFlashSales extends Command
 {
-    protected $signature = 'flash-sales:deactivate-expired';
-
-    protected $description = 'Mark expired or stock-exhausted flash sales as inactive';
-
     public function handle(): int
     {
         $now = Date::now();

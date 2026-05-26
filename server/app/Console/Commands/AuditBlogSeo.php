@@ -6,18 +6,18 @@ namespace App\Console\Commands;
 
 use App\Enums\BlogPostStatusEnum;
 use App\Models\BlogPost;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
-class AuditBlogSeo extends Command
-{
-    protected $signature = 'blog:seo-audit
+#[Description('Audit blog posts for multilingual SEO metadata and optionally fill safe generated fields')]
+#[Signature('blog:seo-audit
         {--fix : Fill missing generated SEO fields}
         {--force : Overwrite generated SEO fields even when they already have values}
-        {--format=table : Output format: table or markdown}';
-
-    protected $description = 'Audit blog posts for multilingual SEO metadata and optionally fill safe generated fields';
-
+        {--format=table : Output format: table or markdown}')]
+class AuditBlogSeo extends Command
+{
     public function handle(): int
     {
         $force = (bool) $this->option('force');

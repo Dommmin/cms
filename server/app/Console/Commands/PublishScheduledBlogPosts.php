@@ -6,14 +6,14 @@ namespace App\Console\Commands;
 
 use App\Enums\BlogPostStatusEnum;
 use App\Models\BlogPost;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
+#[Description('Publish scheduled blog posts whose publish date has passed')]
+#[Signature('blog:publish-scheduled')]
 class PublishScheduledBlogPosts extends Command
 {
-    protected $signature = 'blog:publish-scheduled';
-
-    protected $description = 'Publish scheduled blog posts whose publish date has passed';
-
     public function handle(): int
     {
         $count = BlogPost::query()

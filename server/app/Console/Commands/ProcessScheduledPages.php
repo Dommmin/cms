@@ -6,14 +6,14 @@ namespace App\Console\Commands;
 
 use App\Models\Page;
 use App\Services\PagePublicationWebhookService;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
+#[Description('Publish and unpublish pages based on scheduled dates')]
+#[Signature('cms:process-scheduled-pages')]
 class ProcessScheduledPages extends Command
 {
-    protected $signature = 'cms:process-scheduled-pages';
-
-    protected $description = 'Publish and unpublish pages based on scheduled dates';
-
     public function handle(PagePublicationWebhookService $publicationWebhookService): void
     {
         $this->publishScheduled($publicationWebhookService);
