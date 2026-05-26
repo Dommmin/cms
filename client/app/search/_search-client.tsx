@@ -1,6 +1,6 @@
 'use client';
 
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -54,10 +54,15 @@ function ProductSearchCard({
     );
 }
 
+const VISIBLE_DEFAULT = 5;
+
 export function SearchClient() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [expandedFilters, setExpandedFilters] = useState<
+        Record<string, boolean>
+    >({});
 
     const q = searchParams.get('q') ?? '';
     const category = searchParams.get('category') ?? undefined;
@@ -93,6 +98,10 @@ export function SearchClient() {
 
     const lp = useLocalePath();
     const { t } = useTranslation();
+
+    function toggleFilter(key: string) {
+        setExpandedFilters((prev) => ({ ...prev, [key]: !prev[key] }));
+    }
 
     const SORT_OPTIONS = [
         { value: '', label: t('shop.sort_default', 'Default') },
@@ -323,31 +332,67 @@ export function SearchClient() {
                                             'All categories',
                                         )}
                                     </button>
-                                    {facets.categories.map(
-                                        (cat: {
-                                            id: string;
-                                            slug: string;
-                                            name: string;
-                                            count: number;
-                                        }) => (
-                                            <button
-                                                key={cat.id}
-                                                onClick={() =>
-                                                    setParam(
-                                                        'category',
-                                                        cat.slug,
-                                                    )
-                                                }
-                                                className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
-                                                    category === cat.slug ||
-                                                    category === cat.id
-                                                        ? 'bg-primary/10 text-primary font-medium'
-                                                        : 'text-foreground/70 hover:bg-accent hover:text-foreground'
+                                    {facets.categories
+                                        .slice(
+                                            0,
+                                            expandedFilters['categories']
+                                                ? undefined
+                                                : VISIBLE_DEFAULT,
+                                        )
+                                        .map(
+                                            (cat: {
+                                                id: string;
+                                                slug: string;
+                                                name: string;
+                                                count: number;
+                                            }) => (
+                                                <button
+                                                    key={cat.id}
+                                                    onClick={() =>
+                                                        setParam(
+                                                            'category',
+                                                            cat.slug,
+                                                        )
+                                                    }
+                                                    className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
+                                                        category === cat.slug ||
+                                                        category === cat.id
+                                                            ? 'bg-primary/10 text-primary font-medium'
+                                                            : 'text-foreground/70 hover:bg-accent hover:text-foreground'
+                                                    }`}
+                                                >
+                                                    {cat.name} ({cat.count})
+                                                </button>
+                                            ),
+                                        )}
+                                    {facets.categories.length >
+                                        VISIBLE_DEFAULT && (
+                                        <button
+                                            onClick={() =>
+                                                toggleFilter('categories')
+                                            }
+                                            className="text-muted-foreground hover:text-foreground mt-1 flex w-full items-center justify-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors"
+                                        >
+                                            {expandedFilters['categories']
+                                                ? t(
+                                                      'search.show_less',
+                                                      'Show less',
+                                                  )
+                                                : t(
+                                                      'search.show_more',
+                                                      'Show more',
+                                                  )}
+                                            <ChevronDown
+                                                className={`h-3 w-3 transition-transform ${
+                                                    expandedFilters[
+                                                        'categories'
+                                                    ]
+                                                        ? 'rotate-180'
+                                                        : ''
                                                 }`}
-                                            >
-                                                {cat.name} ({cat.count})
-                                            </button>
-                                        ),
+                                                aria-hidden="true"
+                                            />
+                                        </button>
                                     )}
                                 </div>
                             </div>
@@ -370,26 +415,59 @@ export function SearchClient() {
                                     >
                                         {t('search.all_brands', 'All brands')}
                                     </button>
-                                    {facets.brands.map(
-                                        (br: {
-                                            id: string;
-                                            name: string;
-                                            count: number;
-                                        }) => (
-                                            <button
-                                                key={br.id}
-                                                onClick={() =>
-                                                    setParam('brand', br.id)
-                                                }
-                                                className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
-                                                    brand === br.id
-                                                        ? 'bg-primary/10 text-primary font-medium'
-                                                        : 'text-foreground/70 hover:bg-accent hover:text-foreground'
+                                    {facets.brands
+                                        .slice(
+                                            0,
+                                            expandedFilters['brands']
+                                                ? undefined
+                                                : VISIBLE_DEFAULT,
+                                        )
+                                        .map(
+                                            (br: {
+                                                id: string;
+                                                name: string;
+                                                count: number;
+                                            }) => (
+                                                <button
+                                                    key={br.id}
+                                                    onClick={() =>
+                                                        setParam('brand', br.id)
+                                                    }
+                                                    className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
+                                                        brand === br.id
+                                                            ? 'bg-primary/10 text-primary font-medium'
+                                                            : 'text-foreground/70 hover:bg-accent hover:text-foreground'
+                                                    }`}
+                                                >
+                                                    {br.name} ({br.count})
+                                                </button>
+                                            ),
+                                        )}
+                                    {facets.brands.length > VISIBLE_DEFAULT && (
+                                        <button
+                                            onClick={() =>
+                                                toggleFilter('brands')
+                                            }
+                                            className="text-muted-foreground hover:text-foreground mt-1 flex w-full items-center justify-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors"
+                                        >
+                                            {expandedFilters['brands']
+                                                ? t(
+                                                      'search.show_less',
+                                                      'Show less',
+                                                  )
+                                                : t(
+                                                      'search.show_more',
+                                                      'Show more',
+                                                  )}
+                                            <ChevronDown
+                                                className={`h-3 w-3 transition-transform ${
+                                                    expandedFilters['brands']
+                                                        ? 'rotate-180'
+                                                        : ''
                                                 }`}
-                                            >
-                                                {br.name} ({br.count})
-                                            </button>
-                                        ),
+                                                aria-hidden="true"
+                                            />
+                                        </button>
                                     )}
                                 </div>
                             </div>

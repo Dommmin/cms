@@ -65,11 +65,14 @@ export interface SearchResult {
 }
 
 export interface SearchSuggestion {
+    type: 'product' | 'category' | 'blog_post';
     id: number;
     name: string;
     slug: string;
     thumbnail: string;
-    price: number;
+    price?: number;
+    products_count?: number;
+    excerpt?: string;
 }
 
 export interface AutocompleteResult {

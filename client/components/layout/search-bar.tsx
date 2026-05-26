@@ -1,12 +1,18 @@
 'use client';
 
-import { ArrowRight, Clock, Search, X } from 'lucide-react';
+import {
+    ArrowRight,
+    Clock,
+    FileText,
+    FolderOpen,
+    Search,
+    X,
+} from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import type { SearchSuggestion } from '@/api/search.types';
-import { useCategories } from '@/hooks/use-cms';
 import { useLocalePath } from '@/hooks/use-locale';
 import {
     addRecentSearch,
@@ -15,7 +21,6 @@ import {
     useSearchSuggestions,
 } from '@/hooks/use-search';
 import { formatPrice } from '@/lib/format';
-import type { Category } from '@/types/api';
 
 function HighlightedText({ text, query }: { text: string; query: string }) {
     if (!query) return <span>{text}</span>;
@@ -32,6 +37,20 @@ function HighlightedText({ text, query }: { text: string; query: string }) {
     );
 }
 
+function suggestionUrl(
+    s: SearchSuggestion,
+    lp: (path: string) => string,
+): string {
+    switch (s.type) {
+        case 'category':
+            return lp(`/products?category=${s.slug}`);
+        case 'blog_post':
+            return lp(`/blog/${s.slug}`);
+        default:
+            return lp(`/products/${s.slug}`);
+    }
+}
+
 export function SearchBar() {
     const router = useRouter();
     const lp = useLocalePath();
@@ -42,27 +61,16 @@ export function SearchBar() {
     const [activeIndex, setActiveIndex] = useState(-1);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const { data: categoriesData } = useCategories();
-    const categories = categoriesData ?? [];
-
     const { data: searchData, isLoading } = useSearchSuggestions(query);
-    const products: SearchSuggestion[] = searchData ?? [];
+    const suggestions: SearchSuggestion[] = searchData ?? [];
 
-    const matchedCategories: Category[] =
-        query.trim().length >= 1
-            ? categories
-                  .filter((c) =>
-                      c.name.toLowerCase().includes(query.toLowerCase()),
-                  )
-                  .slice(0, 3)
-            : [];
+    const categories = suggestions.filter((s) => s.type === 'category');
+    const blogPosts = suggestions.filter((s) => s.type === 'blog_post');
+    const products = suggestions.filter((s) => s.type === 'product');
 
-    const allItems = [
-        ...matchedCategories.map((c) => ({
-            url: lp(`/products?category=${c.slug}`),
-        })),
-        ...products.map((p) => ({ url: lp(`/products/${p.slug}`) })),
-    ];
+    const allItems = suggestions.map((s) => ({
+        url: suggestionUrl(s, lp),
+    }));
 
     const showRecent = query.trim().length === 0 && recentSearches.length > 0;
     const showResults = query.trim().length >= 2;
@@ -126,6 +134,15 @@ export function SearchBar() {
         return () => window.removeEventListener('open-search', onOpenSearch);
     }, []);
 
+    const globalIndex = (type: SearchSuggestion['type'], i: number): number => {
+        let offset = 0;
+        if (type === 'category') return i;
+        offset += categories.length;
+        if (type === 'blog_post') return offset + i;
+        offset += blogPosts.length;
+        return offset + i;
+    };
+
     return (
         <>
             <button
@@ -140,7 +157,7 @@ export function SearchBar() {
                 <>
                     {/* Backdrop */}
                     <div
-                        className="fixed inset-0 z-40 bg-black/30"
+                        className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
                         onClick={closeSearch}
                     />
 
@@ -149,9 +166,9 @@ export function SearchBar() {
                         role="dialog"
                         aria-label="Search"
                         aria-modal="true"
-                        className="border-border/50 bg-background/80 fixed top-16 right-0 left-0 z-50 overflow-hidden rounded-b-2xl border shadow-[0_20px_60px_-10px_oklch(0_0_0_/_0.2)] backdrop-blur-2xl backdrop-saturate-150 dark:shadow-[0_20px_60px_-10px_oklch(0_0_0_/_0.5)]"
+                        className="fixed top-16 right-0 left-0 z-50 overflow-hidden rounded-b-2xl border border-white/20 bg-white/80 shadow-[0_20px_60px_-10px_oklch(0_0_0_/_0.2)] backdrop-blur-2xl backdrop-saturate-150 dark:border-white/10 dark:bg-neutral-900/80 dark:shadow-[0_20px_60px_-10px_oklch(0_0_0_/_0.5)]"
                     >
-                        <div className="mx-auto max-w-2xl px-4 py-4">
+                        <div className="mx-auto max-h-[70vh] max-w-2xl overflow-y-auto px-4 py-4">
                             {/* Input row */}
                             <form
                                 onSubmit={handleSubmit}
@@ -166,7 +183,7 @@ export function SearchBar() {
                                     htmlFor="header-search-input"
                                     className="sr-only"
                                 >
-                                    Search products and categories
+                                    Search products
                                 </label>
                                 <input
                                     id="header-search-input"
@@ -177,7 +194,7 @@ export function SearchBar() {
                                         setActiveIndex(-1);
                                     }}
                                     onKeyDown={handleKeyDown}
-                                    placeholder="Search products, categories…"
+                                    placeholder="Search products…"
                                     aria-autocomplete="list"
                                     aria-controls="search-listbox"
                                     autoComplete="off"
@@ -205,7 +222,7 @@ export function SearchBar() {
                                 </button>
                             </form>
 
-                            {/* Live region for screen reader result announcements */}
+                            {/* Live region */}
                             <div
                                 aria-live="polite"
                                 aria-atomic="true"
@@ -213,10 +230,9 @@ export function SearchBar() {
                             >
                                 {showResults && !isLoading && (
                                     <>
-                                        {products.length === 0 &&
-                                        matchedCategories.length === 0
+                                        {suggestions.length === 0
                                             ? `No results for ${query}`
-                                            : `${products.length + matchedCategories.length} results found`}
+                                            : `${suggestions.length} results found`}
                                     </>
                                 )}
                             </div>
@@ -268,63 +284,7 @@ export function SearchBar() {
                                     id="search-listbox"
                                     className="mt-4 space-y-4"
                                 >
-                                    {/* Categories */}
-                                    {matchedCategories.length > 0 && (
-                                        <div>
-                                            <span className="text-muted-foreground mb-2 block text-xs font-semibold tracking-wide uppercase">
-                                                Categories
-                                            </span>
-                                            <div className="space-y-0.5">
-                                                {matchedCategories.map(
-                                                    (cat, i) => (
-                                                        <button
-                                                            key={cat.id}
-                                                            onClick={() =>
-                                                                navigate(
-                                                                    lp(
-                                                                        `/products?category=${cat.slug}`,
-                                                                    ),
-                                                                )
-                                                            }
-                                                            className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm ${
-                                                                activeIndex ===
-                                                                i
-                                                                    ? 'bg-accent'
-                                                                    : 'hover:bg-accent'
-                                                            }`}
-                                                        >
-                                                            {cat.image_url ? (
-                                                                <Image
-                                                                    src={
-                                                                        cat.image_url
-                                                                    }
-                                                                    alt={
-                                                                        cat.name
-                                                                    }
-                                                                    width={20}
-                                                                    height={20}
-                                                                    className="h-5 w-5 rounded object-cover"
-                                                                />
-                                                            ) : (
-                                                                <span className="bg-muted flex h-5 w-5 items-center justify-center rounded text-xs">
-                                                                    {
-                                                                        cat
-                                                                            .name[0]
-                                                                    }
-                                                                </span>
-                                                            )}
-                                                            <HighlightedText
-                                                                text={cat.name}
-                                                                query={query}
-                                                            />
-                                                        </button>
-                                                    ),
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Products — skeleton */}
+                                    {/* Skeleton */}
                                     {isLoading && (
                                         <div className="space-y-2">
                                             {[1, 2, 3].map((i) => (
@@ -340,6 +300,151 @@ export function SearchBar() {
                                         </div>
                                     )}
 
+                                    {/* Categories */}
+                                    {!isLoading && categories.length > 0 && (
+                                        <div>
+                                            <span className="text-muted-foreground mb-2 block text-xs font-semibold tracking-wide uppercase">
+                                                Categories
+                                            </span>
+                                            <div className="space-y-0.5">
+                                                {categories.map((cat, i) => {
+                                                    const idx = globalIndex(
+                                                        'category',
+                                                        i,
+                                                    );
+                                                    return (
+                                                        <button
+                                                            key={`cat-${cat.id}`}
+                                                            onClick={() =>
+                                                                navigate(
+                                                                    suggestionUrl(
+                                                                        cat,
+                                                                        lp,
+                                                                    ),
+                                                                )
+                                                            }
+                                                            className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm ${
+                                                                activeIndex ===
+                                                                idx
+                                                                    ? 'bg-accent'
+                                                                    : 'hover:bg-accent'
+                                                            }`}
+                                                        >
+                                                            {cat.thumbnail ? (
+                                                                <Image
+                                                                    src={
+                                                                        cat.thumbnail
+                                                                    }
+                                                                    alt={
+                                                                        cat.name
+                                                                    }
+                                                                    width={32}
+                                                                    height={32}
+                                                                    className="h-8 w-8 rounded object-cover"
+                                                                />
+                                                            ) : (
+                                                                <span className="bg-muted flex h-8 w-8 shrink-0 items-center justify-center rounded text-xs">
+                                                                    <FolderOpen className="h-4 w-4" />
+                                                                </span>
+                                                            )}
+                                                            <div className="flex-1 text-left">
+                                                                <HighlightedText
+                                                                    text={
+                                                                        cat.name
+                                                                    }
+                                                                    query={
+                                                                        query
+                                                                    }
+                                                                />
+                                                                {cat.products_count !=
+                                                                    null && (
+                                                                    <span className="text-muted-foreground ml-1 text-xs">
+                                                                        (
+                                                                        {
+                                                                            cat.products_count
+                                                                        }
+                                                                        )
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Blog posts */}
+                                    {!isLoading && blogPosts.length > 0 && (
+                                        <div>
+                                            <span className="text-muted-foreground mb-2 block text-xs font-semibold tracking-wide uppercase">
+                                                Blog
+                                            </span>
+                                            <div className="space-y-0.5">
+                                                {blogPosts.map((post, i) => {
+                                                    const idx = globalIndex(
+                                                        'blog_post',
+                                                        i,
+                                                    );
+                                                    return (
+                                                        <button
+                                                            key={`post-${post.id}`}
+                                                            onClick={() =>
+                                                                navigate(
+                                                                    suggestionUrl(
+                                                                        post,
+                                                                        lp,
+                                                                    ),
+                                                                )
+                                                            }
+                                                            className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm ${
+                                                                activeIndex ===
+                                                                idx
+                                                                    ? 'bg-accent'
+                                                                    : 'hover:bg-accent'
+                                                            }`}
+                                                        >
+                                                            {post.thumbnail ? (
+                                                                <Image
+                                                                    src={
+                                                                        post.thumbnail
+                                                                    }
+                                                                    alt={
+                                                                        post.name
+                                                                    }
+                                                                    width={32}
+                                                                    height={32}
+                                                                    className="h-8 w-8 rounded object-cover"
+                                                                />
+                                                            ) : (
+                                                                <span className="bg-muted flex h-8 w-8 shrink-0 items-center justify-center rounded text-xs">
+                                                                    <FileText className="h-4 w-4" />
+                                                                </span>
+                                                            )}
+                                                            <div className="flex-1 text-left">
+                                                                <HighlightedText
+                                                                    text={
+                                                                        post.name
+                                                                    }
+                                                                    query={
+                                                                        query
+                                                                    }
+                                                                />
+                                                                {post.excerpt && (
+                                                                    <p className="text-muted-foreground line-clamp-1 text-xs">
+                                                                        {
+                                                                            post.excerpt
+                                                                        }
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {/* Products */}
                                     {!isLoading && products.length > 0 && (
                                         <div>
@@ -348,16 +453,18 @@ export function SearchBar() {
                                             </span>
                                             <div className="space-y-0.5">
                                                 {products.map((product, i) => {
-                                                    const idx =
-                                                        matchedCategories.length +
-                                                        i;
+                                                    const idx = globalIndex(
+                                                        'product',
+                                                        i,
+                                                    );
                                                     return (
                                                         <button
-                                                            key={product.id}
+                                                            key={`prod-${product.id}`}
                                                             onClick={() =>
                                                                 navigate(
-                                                                    lp(
-                                                                        `/products/${product.slug}`,
+                                                                    suggestionUrl(
+                                                                        product,
+                                                                        lp,
                                                                     ),
                                                                 )
                                                             }
@@ -393,11 +500,14 @@ export function SearchBar() {
                                                                     }
                                                                 />
                                                             </div>
-                                                            <span className="shrink-0 text-sm font-medium">
-                                                                {formatPrice(
-                                                                    product.price,
-                                                                )}
-                                                            </span>
+                                                            {product.price !=
+                                                                null && (
+                                                                <span className="shrink-0 text-sm font-medium">
+                                                                    {formatPrice(
+                                                                        product.price,
+                                                                    )}
+                                                                </span>
+                                                            )}
                                                         </button>
                                                     );
                                                 })}
@@ -406,18 +516,15 @@ export function SearchBar() {
                                     )}
 
                                     {/* No results */}
-                                    {!isLoading &&
-                                        products.length === 0 &&
-                                        matchedCategories.length === 0 && (
-                                            <p className="text-muted-foreground py-4 text-center text-sm">
-                                                No results for &ldquo;{query}
-                                                &rdquo;
-                                            </p>
-                                        )}
+                                    {!isLoading && suggestions.length === 0 && (
+                                        <p className="text-muted-foreground py-4 text-center text-sm">
+                                            No results for &ldquo;{query}
+                                            &rdquo;
+                                        </p>
+                                    )}
 
                                     {/* View all */}
-                                    {(products.length > 0 ||
-                                        matchedCategories.length > 0) && (
+                                    {suggestions.length > 0 && (
                                         <button
                                             onClick={() =>
                                                 navigate(
