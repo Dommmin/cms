@@ -6,13 +6,6 @@
                 "artisan",
                 "boost:mcp"
             ]
-        },
-        "shadcn": {
-            "command": "npx",
-            "args": [
-                "shadcn@latest",
-                "mcp"
-            ]
         }
     }
 }

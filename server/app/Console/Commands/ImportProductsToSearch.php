@@ -7,6 +7,7 @@ namespace App\Console\Commands;
 use App\Models\Product;
 use Illuminate\Console\Command;
 use Laravel\Scout\EngineManager;
+use Throwable;
 
 class ImportProductsToSearch extends Command
 {
@@ -26,7 +27,7 @@ class ImportProductsToSearch extends Command
                 $engine = $engineManager->engine('typesense');
                 $engine->deleteIndex('products');
                 $this->info('Collection deleted.');
-            } catch (\Throwable $e) {
+            } catch (Throwable) {
                 $this->warn('Collection did not exist, continuing.');
             }
         }
@@ -57,7 +58,7 @@ class ImportProductsToSearch extends Command
 
         $this->output->progressFinish();
 
-        $this->info("Done! Imported: {$imported}, Removed: {$removed}");
+        $this->info(sprintf('Done! Imported: %d, Removed: %d', $imported, $removed));
 
         return self::SUCCESS;
     }

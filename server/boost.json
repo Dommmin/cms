@@ -5,16 +5,19 @@
         "claude_code",
         "junie",
         "opencode",
-        "gemini"
+        "gemini",
+        "kiro"
     ],
     "cloud": false,
     "guidelines": true,
     "mcp": true,
-    "nightwatch_mcp": false,
+    "nightwatch": false,
     "packages": [
         "spatie/laravel-medialibrary",
         "spatie/laravel-permission",
-        "spatie/laravel-pdf"
+        "spatie/laravel-pdf",
+        "spatie/laravel-translatable",
+        "fruitcake/laravel-debugbar"
     ],
     "sail": false,
     "skills": [
@@ -28,6 +31,8 @@
         "tailwindcss-development",
         "medialibrary-development",
         "laravel-pdf",
-        "laravel-permission-development"
+        "laravel-permission-development",
+        "translatable-development",
+        "debug-using-debugbar"
     ]
 }
