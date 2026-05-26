@@ -7,8 +7,6 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreWishlistItemRequest;
 use App\Http\Resources\Api\V1\WishlistResource;
-use App\Models\Customer;
-use App\Models\Wishlist;
 use App\Services\WishlistService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,7 +15,7 @@ class WishlistController extends ApiController
 {
     public function show(Request $request): JsonResponse
     {
-        $wishlist = app(WishlistService::class)->getOrCreateWishlist(
+        $wishlist = resolve(WishlistService::class)->getOrCreateWishlist(
             $request->user(),
             $request->header('X-Wishlist-Token'),
         );
@@ -34,7 +32,7 @@ class WishlistController extends ApiController
 
     public function addItem(StoreWishlistItemRequest $request): JsonResponse
     {
-        $wishlist = app(WishlistService::class)->getOrCreateWishlist(
+        $wishlist = resolve(WishlistService::class)->getOrCreateWishlist(
             $request->user(),
             $request->header('X-Wishlist-Token'),
         );
@@ -60,7 +58,7 @@ class WishlistController extends ApiController
 
     public function removeItem(Request $request, int $variantId): JsonResponse
     {
-        $wishlist = app(WishlistService::class)->getOrCreateWishlist(
+        $wishlist = resolve(WishlistService::class)->getOrCreateWishlist(
             $request->user(),
             $request->header('X-Wishlist-Token'),
         );

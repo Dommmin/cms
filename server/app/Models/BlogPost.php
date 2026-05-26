@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -37,10 +38,10 @@ use Spatie\Translatable\HasTranslations;
  * @property string|null $translation_group_id
  * @property array<string, string>|null $available_locales
  * @property bool $is_featured
- * @property \Illuminate\Support\Carbon|null $published_at
+ * @property Carbon|null $published_at
  * @property string|null $featured_image
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \App\Models\User|null $author
+ * @property Carbon|null $created_at
+ * @property User|null $author
  */
 #[Fillable([
     'user_id',

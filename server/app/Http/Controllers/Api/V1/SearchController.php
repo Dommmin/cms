@@ -6,8 +6,8 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Api\V1\ProductResource;
-use App\Models\Brand;
 use App\Models\BlogPost;
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -116,7 +116,7 @@ class SearchController extends ApiController
         $facetCounts = $rawResults['facet_counts'] ?? [];
 
         if ($useFacets && $facetCounts !== []) {
-            $facets = $this->getFacetsFromTypesense($facetCounts, $filters);
+            $facets = $this->getFacetsFromTypesense($facetCounts);
         } else {
             $matchingIds = $this->getAllMatchingIds($expandedQuery, $filters);
             $facets = $this->getFacetFallback($matchingIds, $filters);
@@ -445,9 +445,8 @@ class SearchController extends ApiController
      * Build facets from Typesense facet_counts, resolving IDs to names/slugs.
      *
      * @param  array  $facetCounts  Raw facet_counts from Typesense response
-     * @param  array{category_id?: string[], brand_id?: string[], price_min?: int, price_max?: int}  $activeFilters
      */
-    private function getFacetsFromTypesense(array $facetCounts, array $activeFilters): array
+    private function getFacetsFromTypesense(array $facetCounts): array
     {
         $categoryFacet = null;
         $brandFacet = null;
@@ -467,7 +466,7 @@ class SearchController extends ApiController
         return [
             'categories' => $this->buildCategoryFacets($categoryFacet),
             'brands' => $this->buildBrandFacets($brandFacet),
-            'price_ranges' => $this->buildPriceRanges($priceFacet),
+            'price_ranges' => $this->buildPriceRanges(),
         ];
     }
 
@@ -549,7 +548,7 @@ class SearchController extends ApiController
             ->all();
     }
 
-    private function buildPriceRanges(?array $facet): array
+    private function buildPriceRanges(): array
     {
         $query = ProductVariant::query()
             ->whereHas('product', fn (EloquentBuilder $q) => $q->where('is_active', true))

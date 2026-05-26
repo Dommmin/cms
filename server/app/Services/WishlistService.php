@@ -32,7 +32,7 @@ class WishlistService
             $wishlist = $user->customer->wishlists()->first();
 
             if (! $wishlist) {
-                $wishlist = $user->customer->wishlists()->create([
+                return $user->customer->wishlists()->create([
                     'name' => 'Wishlist',
                     'is_public' => false,
                 ]);
