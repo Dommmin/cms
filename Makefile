@@ -125,6 +125,9 @@ fix:
 	docker compose exec node npx eslint . --fix
 	docker compose exec node npm run types
 	docker compose exec node npm run format
+	@echo ">>> Mobile TS: ESLint + Types"
+	npm --prefix mobile run lint
+	npm --prefix mobile run types
 	@echo ">>> Done. Run 'make check' to verify nothing remains."
 
 # Read-only CI check — mirrors GitHub Actions exactly (fails if anything is wrong)
@@ -145,6 +148,10 @@ check:
 	@echo ">>> [7/8] Client TS: ESLint + Prettier (check)"
 	docker compose exec node npm run lint
 	docker compose exec node npm run format:check
+	@echo ">>> [9/10] Mobile TS: Type check"
+	npm --prefix mobile run types
+	@echo ">>> [10/10] Mobile TS: ESLint"
+	npm --prefix mobile run lint
 	@echo ">>> [8/8] Tests (Pest parallel)"
 	docker compose exec php php -d memory_limit=512M vendor/bin/pest --parallel --processes=$(PEST_PARALLEL_PROCESSES)
 	@echo ">>> All checks passed. Safe to push."
