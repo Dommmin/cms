@@ -539,6 +539,34 @@ Sekrety i API URL maja isc przez env, nie hardcoded config.
 
 ## Backend gaps do sprawdzenia
 
+## Aktualny status parity mobile vs client
+
+Stan po ostatniej rundzie prac: `mobile/` nie powinno byc traktowane jako "100% parity" z `client/`. Jest to dzialajacy commerce MVP z rosnaca warstwa UX, ale nadal wymaga domkniecia kilku obszarow przed oznaczeniem jako storefront-ready.
+
+| Obszar | Mobile status | Parity z `client/` | Priorytet | Braki / nastepny krok |
+|--------|---------------|--------------------|-----------|------------------------|
+| Home | Sekcja hero, quick links, nowosci, recently viewed | Czesciowe | P1 | Podpiac realne sekcje CMS/home modules zamiast statycznego hero copy |
+| Produkty listing | Kategorie, search po nazwie, sort, in-stock, brand facets, active chips | Dobre MVP | P0 | Dodac price range i attribute facets z `available_filters.attributes` |
+| Search | Osobny ekran `/search`, endpoint `/search`, facets, did-you-mean | Dobre MVP | P0 | Dodac autocomplete i paginacje/infinite scroll |
+| Product detail | Galeria MVP, warianty, opinie, wishlist, sticky add-to-cart | Czesciowe | P0 | Rozbudowac galerie, delivery panel, powiazane produkty, pelniejsze promocje |
+| Cart | Guest cart, quantity, remove, discount code, summary | Dobre MVP | P0 | Lepsze bledy mutacji i synchronizacja po logowaniu do przetestowania |
+| Checkout | Kontakt, adres, dostawa, platnosc, zgody prawne, redirect payment | MVP | P0 | Rozbic na bardziej ergonomiczne kroki, dodac pickup points/InPost, success/failure states |
+| Account | Login/register/profile, recent orders, order detail, wishlist | MVP | P1 | Forgot/reset password, pelna lista zamowien, GDPR export/restriction/consents |
+| CMS pages | MVP renderer | Niskie/czesciowe | P1 | Zweryfikowac pokrycie blokow vs `client/components/page-builder/` |
+| Blog/stores/newsletter | Ekrany istnieja | Czesciowe | P2 | Dopracowac UI, filtry/kategorie bloga, stores map UX |
+| Compare | Brak | Brak | P2 | Mobile-native comparison albo swiadoma rezygnacja |
+| Push/deep links | Brak | Mobile-only future | P2 | Expo Notifications + device-token API po stabilizacji commerce |
+| QA/CI | Lokalne `types` i `lint`; brak Docker/CI dla mobile | Niskie | P0 | Dodac mobile do compose/CI albo osobny workflow npm ci/types/lint/test |
+
+Zmiany wykonane w tej rundzie:
+
+- dodano storefrontowe tokeny mobile (`Storefront`) i odswiezono shell/tabs/header,
+- poprawiono home, product listing, product detail, cart i checkout pod mobile UX,
+- dodano ekran `/search` korzystajacy z API `/search`,
+- rozszerzono listing produktow o brand facets i aktywne filtry,
+- dodano ekran `/account/wishlist`,
+- usunieto widoczne pozostalosci Expo startera z webowego tabbara.
+
 AI powinno zweryfikowac przed implementacja mobile:
 
 - czy wszystkie endpointy publicznego storefrontu sa dostepne przez `/api/v1/*`,
@@ -584,4 +612,3 @@ Nie traktowac PWA i React Native jako alternatyw absolutnych. Najrozsadniejsza s
 2. Rownolegle przygotowac kontrakty i mapowanie funkcji.
 3. Dopiero potem scaffold `mobile/` w Expo.
 4. Budowac mobile etapami, zaczynajac od commerce P0.
-
