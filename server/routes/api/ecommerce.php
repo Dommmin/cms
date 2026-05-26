@@ -73,15 +73,15 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::delete('discount', [CartController::class, 'removeDiscount'])->name('discount.remove');
     });
 
+    // ── Wishlist (guest + auth) ─────────────────────────────────────────────
+    Route::prefix('wishlist')->name('wishlist.')->middleware('throttle:api.public')->group(function (): void {
+        Route::get('/', [WishlistController::class, 'show'])->name('show');
+        Route::post('items', [WishlistController::class, 'addItem'])->name('items.store');
+        Route::delete('items/{variantId}', [WishlistController::class, 'removeItem'])->name('items.destroy');
+    });
+
     // ── Authenticated e-commerce ─────────────────────────────────────────────
     Route::middleware(['auth:sanctum', 'throttle:api.auth'])->group(function (): void {
-
-        // Wishlist
-        Route::prefix('wishlist')->name('wishlist.')->group(function (): void {
-            Route::get('/', [WishlistController::class, 'show'])->name('show');
-            Route::post('items', [WishlistController::class, 'addItem'])->name('items.store');
-            Route::delete('items/{variantId}', [WishlistController::class, 'removeItem'])->name('items.destroy');
-        });
 
         // Payments
         Route::get('payments/{payment}/status', [PaymentController::class, 'status'])->name('payments.status');

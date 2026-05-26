@@ -12,6 +12,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @property string $email
  * @property string $password
  * @property string|null $cart_token
+ * @property string|null $wishlist_token
  */
 class LoginRequest extends FormRequest
 {
@@ -29,6 +30,7 @@ class LoginRequest extends FormRequest
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
             'cart_token' => ['nullable', 'string', 'max:255'],
+            'wishlist_token' => ['nullable', 'string', 'max:255'],
             'cf_turnstile_response' => ['nullable', 'string', new TurnstileRule],
         ];
     }

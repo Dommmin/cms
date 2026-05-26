@@ -47,19 +47,40 @@ function wlVariant(): ProductVariant
 // Authentication gate
 // ---------------------------------------------------------------------------
 
-describe('Wishlist – authentication', function (): void {
-    it('guest cannot view wishlist — requires auth', function (): void {
-        $this->getJson('/api/v1/wishlist')->assertUnauthorized();
+describe('Wishlist – guest access', function (): void {
+    it('guest can view wishlist — creates an empty one with token', function (): void {
+        $this->getJson('/api/v1/wishlist')
+            ->assertOk()
+            ->assertJsonStructure(['id', 'items', 'token']);
     });
 
-    it('guest cannot add item to wishlist — requires auth', function (): void {
+    it('guest can add item to wishlist via X-Wishlist-Token', function (): void {
         $variant = wlVariant();
-        $this->postJson('/api/v1/wishlist/items', ['variant_id' => $variant->id])
-            ->assertUnauthorized();
+
+        $response = $this->postJson('/api/v1/wishlist/items', ['variant_id' => $variant->id]);
+        $response->assertOk()
+            ->assertJsonCount(1, 'items');
+
+        $token = $response->headers->get('X-Wishlist-Token');
+        expect($token)->not->toBeEmpty();
+
+        // Subsequent requests with token return the same wishlist
+        $this->withHeaders(['X-Wishlist-Token' => $token])
+            ->getJson('/api/v1/wishlist')
+            ->assertOk()
+            ->assertJsonCount(1, 'items');
     });
 
-    it('guest cannot remove item from wishlist — requires auth', function (): void {
-        $this->deleteJson('/api/v1/wishlist/items/1')->assertUnauthorized();
+    it('guest can remove item from wishlist', function (): void {
+        $variant = wlVariant();
+
+        $response = $this->postJson('/api/v1/wishlist/items', ['variant_id' => $variant->id]);
+        $token = $response->headers->get('X-Wishlist-Token');
+
+        $this->withHeaders(['X-Wishlist-Token' => $token])
+            ->deleteJson('/api/v1/wishlist/items/'.$variant->id)
+            ->assertOk()
+            ->assertJsonPath('items', []);
     });
 });
 

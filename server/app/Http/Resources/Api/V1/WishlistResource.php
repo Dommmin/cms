@@ -22,6 +22,8 @@ class WishlistResource extends JsonResource
         return [
             'id' => $wishlist->id,
             'name' => $wishlist->name,
+            'token' => $wishlist->session_token,
+            'items_count' => $wishlist->items->count(),
             'items' => $wishlist->items->map(fn (WishlistItem $item): array => [
                 'id' => $item->id,
                 'variant_id' => $item->product_variant_id,

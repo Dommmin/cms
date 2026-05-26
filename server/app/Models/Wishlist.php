@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
-    'customer_id', 'name', 'token', 'is_public',
+    'customer_id', 'name', 'session_token', 'token', 'is_public',
 ])]
 #[Table(name: 'wishlists')]
 class Wishlist extends Model

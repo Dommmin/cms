@@ -12,6 +12,7 @@ use App\Http\Requests\Api\V1\ResetPasswordRequest;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Models\User;
 use App\Services\CartService;
+use App\Services\WishlistService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -23,6 +24,7 @@ class AuthController extends ApiController
 {
     public function __construct(
         private readonly CartService $cartService,
+        private readonly WishlistService $wishlistService,
     ) {}
 
     public function register(RegisterRequest $request): JsonResponse
@@ -36,6 +38,7 @@ class AuthController extends ApiController
         event(new Registered($user));
 
         $this->cartService->mergeGuestCartIntoCustomer($user, $request->cart_token);
+        $this->wishlistService->mergeGuestWishlistIntoCustomer($user, $request->wishlist_token);
 
         $token = $user->createToken('api')->plainTextToken;
 
@@ -56,6 +59,7 @@ class AuthController extends ApiController
         }
 
         $this->cartService->mergeGuestCartIntoCustomer($user, $request->cart_token);
+        $this->wishlistService->mergeGuestWishlistIntoCustomer($user, $request->wishlist_token);
 
         $token = $user->createToken('api')->plainTextToken;
 
