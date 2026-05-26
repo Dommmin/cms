@@ -156,6 +156,7 @@ Homestead.json
 
 
 .idea/
+server/.idea/
 /client_old/
 /server_old/
 

@@ -545,18 +545,18 @@ Stan po ostatniej rundzie prac: `mobile/` nie powinno byc traktowane jako "100% 
 
 | Obszar | Mobile status | Parity z `client/` | Priorytet | Braki / nastepny krok |
 |--------|---------------|--------------------|-----------|------------------------|
-| Home | Sekcja hero, quick links, nowosci, recently viewed | Czesciowe | P1 | Podpiac realne sekcje CMS/home modules zamiast statycznego hero copy |
+| Home | CMS `home` renderer z fallbackiem commerce hero, quick links, nowosci, recently viewed | Dobre MVP | P1 | Zweryfikowac content parity na realnych blokach produkcyjnej strony glownej |
 | Produkty listing | Kategorie, search po nazwie, sort, in-stock, brand facets, attribute facets, price range, active chips, infinite scroll | Dobre MVP | P0 | Dopracowac bledy mutacji i skeleton states |
 | Search | Osobny ekran `/search`, endpoint `/search`, facets, did-you-mean, autocomplete, price range, infinite scroll | Dobre MVP | P0 | Ujednolicic tracking search i puste stany z webem |
-| Product detail | Galeria z miniaturami, warianty/atrybuty, quantity, delivery/returns panel, opinie, review submit, helpful votes, share, wishlist, related products, sticky add-to-cart | Dobre MVP | P0 | Pelniejsze promocje, live viewers, review form polish |
+| Product detail | Galeria z miniaturami, warianty/atrybuty, quantity, promo badge/cena przekreslona, stock, delivery/returns panel, opinie z verified/date, review submit, helpful votes, share, wishlist, related products, sticky add-to-cart | Dobre MVP+ | P0 | Live viewers tylko po dodaniu wiarygodnego pola/API |
 | Cart | Guest cart, quantity, remove, discount code, summary | Dobre MVP | P0 | Lepsze bledy mutacji i synchronizacja po logowaniu do przetestowania |
-| Checkout | Kontakt, adres, dostawa, pickup point ID dla metod wymagajacych punktu, platnosc, zgody prawne, redirect payment, pending/success/failure status | MVP | P0 | Dodac natywny picker/mapa InPost/pickup points |
+| Checkout | Kontakt, adres, dostawa, pickup point ID z map link, BLIK/P24/przelew/pobranie, notes, zgody prawne, redirect payment, pending/success/failure status | MVP+ | P0 | Dodac w pelni natywny InPost/geolocation picker |
 | Account | Login/register/forgot/reset/profile, password change, addresses, full orders list, order detail, wishlist, GDPR export/restriction/consents, delete account flow | MVP+ | P1 | Dopracowac bledy walidacji i osobne widoki ustawien |
-| CMS pages | Rozszerzony renderer blokow z glass UI, CTA, galerie, relacje i fallbacki | Czesciowe+ | P1 | Zweryfikowac 1:1 pokrycie wszystkich blokow i interakcji vs `client/components/page-builder/` |
-| Blog/stores/newsletter | Infinite blog list z kategoriami, detal z metadanymi/share/tagami, stores contact actions/godziny, glass newsletter signup | MVP+ | P2 | Dodac natywny stores map UX i pelniejsze powiazane wpisy |
+| CMS pages | Rozszerzony renderer blokow z glass UI, CTA, galerie, relacje, video/map WebView i fallbacki | Czesciowe+ | P1 | Zweryfikowac 1:1 pokrycie wszystkich blokow i interakcji vs `client/components/page-builder/` |
+| Blog/stores/newsletter | Infinite blog list z kategoriami, detal z metadanymi/share/tagami/powiazanymi wpisami, stores contact actions/godziny/map preview, glass newsletter signup | MVP+ | P2 | Dodac geolocation nearest-store |
 | Compare | Lokalna porownywarka do 4 produktow, endpoint `/products/compare`, ekran `/compare`, bottom comparison bar, miniatury produktow | MVP+ | P2 | Dopracowac tabele atrybutow i roznice produktow |
 | Push/deep links | Brak | Mobile-only future | P2 | Expo Notifications + device-token API po stabilizacji commerce |
-| QA/CI | Lokalne `types` i `lint`; brak Docker/CI dla mobile | Niskie | P0 | Dodac mobile do compose/CI albo osobny workflow npm ci/types/lint/test |
+| QA/CI | Lokalne `types` i `lint`; GitHub Actions `lint-mobile` dla npm ci/types/lint | Srednie | P0 | Dodac test runner i EAS Build profiles |
 
 Zmiany wykonane w tej rundzie:
 
@@ -566,17 +566,23 @@ Zmiany wykonane w tej rundzie:
 - rozszerzono listing produktow o brand facets, attribute facets, price range i aktywne filtry,
 - dodano autocomplete i infinite scroll do mobile search,
 - rozbudowano product detail o galerie z miniaturami, quantity, delivery/returns panel i related products,
+- dodano promo badge, compare-at price, stock quantity oraz verified/date metadata do opinii na product detail,
 - dodano review submit, helpful votes i share action na product detail,
 - dodano infinite scroll do listingu produktow,
 - rozbudowano konto o password change, addresses, consent management, data export i processing restriction,
 - dodano forgot/reset password, pelna liste zamowien, delete account flow i comparison bottom bar,
 - dodano pickup point ID field do checkoutu dla metod wymagajacych punktu odbioru,
+- rozszerzono checkout mobile o BLIK, P24, przelew, pobranie, kod BLIK, notatki i link do mapy punktow odbioru,
 - dopracowano payment pending o success/failure states,
 - dodano mobile comparison flow (`/compare`) zgodny z webowym limitem 4 produktow,
 - dodano miniatury produktow do mobile comparison,
 - dodano ekran `/account/wishlist`,
 - rozbudowano renderer CMS Page Builder o popularne bloki storefrontowe, relacje, CTA i newsletter placeholder,
 - odswiezono blog list/detail, stores i newsletter do glassmorphism oraz dodano infinite scroll, kategorie bloga, metadane, tagi, share i godziny otwarcia,
+- dodano powiazane wpisy na mobile blog detail,
+- podpieto mobile home pod CMS page `home` z fallbackiem commerce hero,
+- dodano WebView embed dla blokow CMS video/map oraz map preview na ekranie stores,
+- dodano `lint-mobile` do GitHub Actions (`npm ci`, `npm run types`, `npm run lint`),
 - usunieto widoczne pozostalosci Expo startera z webowego tabbara.
 
 AI powinno zweryfikowac przed implementacja mobile:

@@ -31,9 +31,9 @@ return [
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With', 'X-Cart-Token', 'Idempotency-Key', 'X-Idempotency-Key', 'X-XSRF-TOKEN'],
+    'allowed_headers' => ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With', 'X-Cart-Token', 'X-Wishlist-Token', 'Idempotency-Key', 'X-Idempotency-Key', 'X-XSRF-TOKEN'],
 
-    'exposed_headers' => [],
+    'exposed_headers' => ['X-Cart-Token', 'X-Wishlist-Token'],
 
     'max_age' => 3600,
 

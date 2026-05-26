@@ -302,7 +302,9 @@ $gateway = app(PaymentGatewayManager::class)->driver(PaymentProviderEnum::P24);
 $payment = $gateway->createPayment($order, $data);
 ```
 
-Registered gateways: `P24Gateway` (in `Infrastructure/Payments/P24/`), `PayUGateway` (in `Infrastructure/Payments/PayU/`), `CashOnDeliveryGateway`.
+Registered gateways: `P24Gateway` (in `Infrastructure/Payments/P24/`), `PayUGateway` (in `Infrastructure/Payments/PayU/`), `CashOnDeliveryGateway`, and `BankTransferGateway`.
+
+Paynow and Autopay are not implemented yet. If added, they should follow the same gateway/client/verifier shape as PayU and P24, including a dedicated enum value, config keys, webhook route, synchronous signature verification before queue dispatch, feature tests, and admin settings fields for credentials.
 
 `processPayment(Payment $payment, array $options = [])` accepts: `customer_ip`, `payment_method` (`blik`|`card`|`apple_pay`|`google_pay`|`bank_transfer`), `blik_code`, `payment_token`, `return_url`, `continue_url`. Returns `['action' => 'redirect'|'wait'|'none', 'redirect_url' => ?string, 'message' => string]`.
 
@@ -316,7 +318,22 @@ Registered gateways: `P24Gateway` (in `Infrastructure/Payments/P24/`), `PayUGate
 
 ### ShippingCarrierManager
 
-Same strategy pattern for shipping carriers. Implementations: `InpostCarrier`, `DpdCarrier`, `DhlCarrier`.
+Same strategy pattern for shipping carriers.
+
+Registered carriers:
+
+| Carrier enum | Implementation | Notes |
+|--------------|----------------|-------|
+| `inpost` | `FurgonetkaCarrier` | InPost courier via Furgonetka service code `inpost_kurier` |
+| `inpost_locker` | `InPostLockerCarrier` | Direct InPost ShipX API for Paczkomat/locker shipments; requires `pickup_point_id` and uses the InPost GeoWidget token in checkout |
+| `dpd` | `FurgonetkaCarrier` | DPD courier via Furgonetka service code `dpd_classic` |
+| `dpd_pickup` | `FurgonetkaCarrier` | DPD Pickup via Furgonetka service code `dpd_pickup`; checkout point selection uses the unified Furgonetka/Leaflet picker |
+| `dhl` | `FurgonetkaCarrier` | DHL Parcel via Furgonetka service code `dhl_parcel` |
+| `dhl_servicepoint` | `FurgonetkaCarrier` | DHL ServicePoint via Furgonetka service code `dhl_servicepoint`; checkout point selection uses the unified Furgonetka/Leaflet picker |
+| `gls` | `FurgonetkaCarrier` | GLS courier via Furgonetka service code `gls_business` |
+| `pickup` | `PickupCarrier` | Local pickup; no external provider call |
+
+Credentials are loaded from `services.furgonetka.*` and `services.inpost_shipx.*`, with admin settings overriding env config at boot. Pickup-point checkout methods expose required env names through `ShippingCarrierEnum::checkoutEnvVars()`.
 
 ### PromotionService
 
@@ -585,13 +602,13 @@ All enums are in `app/Enums/` and use PHP 8.1+ backed enum syntax.
 | `OrderStatusEnum`         | `pending`, `awaiting_payment`, `paid`, `processing`, `shipped`, `delivered`, `cancelled`, `refunded` — used for labels, colors, and admin form validation. **Not** used as a model cast (see Order State Machine below).                               |
 | `PageBlockTypeEnum`       | `hero_banner`, `rich_text`, `featured_products`, `categories_grid`, `promotional_banner`, `newsletter_signup`, `testimonials`, `image_gallery`, `video_embed`, `custom_html`, `two_columns`, `three_columns`, `accordion`, `tabs`, `form_embed`, `map`, `featured_posts`, `stats_counter`, `call_to_action`, `pricing_table`, `brands_slider`, `logo_cloud`, `countdown_timer`, `timeline`, `team_members` |
 | `PageTypeEnum`            | `blocks`, `module`                                                                                                                                                                                                                                     |
-| `PaymentProviderEnum`     | `p24`, `payu`, `stripe`, `cash_on_delivery`                                                                                                                                                                                                            |
+| `PaymentProviderEnum`     | `p24`, `payu`, `stripe`, `cash_on_delivery`, `bank_transfer`                                                                                                                                                                                           |
 | `ReturnStatusEnum`        | `pending`, `approved`, `rejected`, `return_label_sent`, `awaiting_return`, `received`, `inspected`, `refunded`, `closed`                                                                                                                               |
 | `ReturnTypeEnum`          | (return request types)                                                                                                                                                                                                                                 |
 | `ReviewStatusEnum`        | (review moderation states)                                                                                                                                                                                                                             |
 | `SettingTypeEnum`         | (setting value types including encrypted)                                                                                                                                                                                                              |
 | `ShipmentStatusEnum`      | (shipment tracking states)                                                                                                                                                                                                                             |
-| `ShippingCarrierEnum`     | `inpost`, `dpd`, `dhl`, `pickup`                                                                                                                                                                                                                       |
+| `ShippingCarrierEnum`     | `inpost`, `inpost_locker`, `dpd`, `dpd_pickup`, `dhl`, `dhl_servicepoint`, `gls`, `pickup`                                                                                                                                                             |
 | `WidgetSize`              | (dashboard widget size options)                                                                                                                                                                                                                        |
 | `WidgetType`              | `stat`, `chart`, `table`, `recent_activity`, `quick_actions`                                                                                                                                                                                           |
 

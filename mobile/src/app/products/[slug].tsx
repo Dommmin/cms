@@ -145,6 +145,20 @@ export default function ProductDetailScreen() {
               </ThemedText>
             </ThemedView>
           ) : null}
+          {(product.is_on_sale || product.discount_percentage) ? (
+            <ThemedView style={styles.promoRow}>
+              <ThemedView style={styles.salePill}>
+                <ThemedText type="code" style={styles.saleText}>
+                  {product.discount_percentage ? `-${product.discount_percentage}%` : 'PROMOCJA'}
+                </ThemedText>
+              </ThemedView>
+              {product.compare_at_price_min ? (
+                <ThemedText type="small" themeColor="textSecondary" style={styles.comparePrice}>
+                  {formatMoney(product.compare_at_price_min)}
+                </ThemedText>
+              ) : null}
+            </ThemedView>
+          ) : null}
           <ThemedText type="title">{formatMoney(selectedVariant?.price ?? product.price_min)}</ThemedText>
           {product.omnibus_price_min ? (
             <ThemedText type="small" themeColor="textSecondary">
@@ -209,9 +223,11 @@ export default function ProductDetailScreen() {
         <GlassSurface style={styles.deliveryPanel}>
           <ThemedView style={styles.deliveryItem}>
             <ThemedView style={[styles.statusDot, selectedVariant?.is_available ? styles.statusAvailable : styles.statusUnavailable]} />
-            <ThemedView style={styles.deliveryCopy}>
-              <ThemedText type="smallBold">{selectedVariant?.is_available ? 'Dostępny' : 'Niedostępny'}</ThemedText>
-              <ThemedText type="small" themeColor="textSecondary">Wysyłka i odbiór zależą od wybranej metody dostawy.</ThemedText>
+              <ThemedView style={styles.deliveryCopy}>
+                <ThemedText type="smallBold">{selectedVariant?.is_available ? 'Dostępny' : 'Niedostępny'}</ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                {selectedVariant ? `${selectedVariant.stock_quantity} szt. · wysyłka i odbiór zależą od wybranej metody dostawy.` : 'Wysyłka i odbiór zależą od wybranej metody dostawy.'}
+              </ThemedText>
             </ThemedView>
           </ThemedView>
           <ThemedView style={styles.deliveryItem}>
@@ -253,9 +269,21 @@ export default function ProductDetailScreen() {
           ) : null}
           {reviewsQuery.data?.data.map((review) => (
             <ThemedView key={review.id} style={styles.review}>
-              <ThemedText type="smallBold">
-                {review.author} · {renderStars(review.rating)}
-              </ThemedText>
+              <ThemedView style={styles.reviewHeader}>
+                <ThemedView style={styles.reviewAuthor}>
+                  <ThemedText type="smallBold">
+                    {review.author} · {renderStars(review.rating)}
+                  </ThemedText>
+                  <ThemedText type="code" themeColor="textSecondary">
+                    {new Date(review.created_at).toLocaleDateString('pl-PL')}
+                  </ThemedText>
+                </ThemedView>
+                {review.is_verified_purchase ? (
+                  <ThemedView style={styles.verifiedPill}>
+                    <ThemedText type="code" style={styles.verifiedText}>Zweryfikowany</ThemedText>
+                  </ThemedView>
+                ) : null}
+              </ThemedView>
               {review.title ? <ThemedText type="smallBold">{review.title}</ThemedText> : null}
               <ThemedText themeColor="textSecondary">{review.body}</ThemedText>
               <Pressable onPress={() => helpfulMutation.mutate(review.id)} style={styles.helpfulButton}>
@@ -415,6 +443,25 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
     backgroundColor: 'transparent',
   },
+  promoRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: Spacing.two,
+    backgroundColor: 'transparent',
+  },
+  salePill: {
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.rose,
+    paddingHorizontal: Spacing.two,
+    paddingVertical: Spacing.one,
+  },
+  saleText: {
+    color: '#FFFFFF',
+  },
+  comparePrice: {
+    textDecorationLine: 'line-through',
+  },
   stepper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -506,6 +553,27 @@ const styles = StyleSheet.create({
     borderColor: Storefront.colors.border,
     borderRadius: Storefront.radius.lg,
     backgroundColor: Storefront.colors.glassStrong,
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: Spacing.two,
+    backgroundColor: 'transparent',
+  },
+  reviewAuthor: {
+    flex: 1,
+    gap: Spacing.one,
+    backgroundColor: 'transparent',
+  },
+  verifiedPill: {
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.primarySoft,
+    paddingHorizontal: Spacing.two,
+    paddingVertical: Spacing.one,
+  },
+  verifiedText: {
+    color: Storefront.colors.primaryDark,
   },
   helpfulButton: {
     alignSelf: 'flex-start',

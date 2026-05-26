@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { FlatList, Linking, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { WebView } from 'react-native-webview';
 
 import { getStores } from '@/api/stores';
 import { GlassSurface } from '@/components/ui/glass-surface';
@@ -15,6 +17,7 @@ function openingHours(store: Store): [string, string][] {
 }
 
 export default function StoresScreen() {
+  const [expandedStoreId, setExpandedStoreId] = useState<number | null>(null);
   const storesQuery = useQuery({
     queryKey: ['stores'],
     queryFn: getStores,
@@ -38,6 +41,8 @@ export default function StoresScreen() {
         ListEmptyComponent={<EmptyState title="Brak sklepów" />}
         renderItem={({ item }) => {
           const hours = openingHours(item);
+          const isExpanded = expandedStoreId === item.id;
+          const mapUrl = `https://maps.google.com/maps?q=${item.lat},${item.lng}&z=15&output=embed`;
 
           return (
             <GlassSurface style={styles.store}>
@@ -66,7 +71,23 @@ export default function StoresScreen() {
                   ))}
                 </ThemedView>
               ) : null}
+              {isExpanded ? (
+                <ThemedView style={styles.mapPreview}>
+                  <WebView
+                    source={{ uri: mapUrl }}
+                    style={styles.mapWebView}
+                    scrollEnabled={false}
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+                  />
+                </ThemedView>
+              ) : null}
               <ThemedView style={styles.actions}>
+                <Pressable
+                  onPress={() => setExpandedStoreId((current) => (current === item.id ? null : item.id))}
+                  style={styles.secondaryButton}>
+                  <ThemedText type="smallBold">{isExpanded ? 'Ukryj mapę' : 'Podgląd mapy'}</ThemedText>
+                </Pressable>
                 <Pressable
                   onPress={() => Linking.openURL(`https://maps.google.com/?q=${item.lat},${item.lng}`)}
                   style={styles.primaryButton}>
@@ -126,6 +147,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: Spacing.two,
     backgroundColor: 'transparent',
+  },
+  mapPreview: {
+    height: 180,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.lg,
+    backgroundColor: Storefront.colors.glassStrong,
+  },
+  mapWebView: {
+    flex: 1,
+    backgroundColor: Storefront.colors.surfaceWarm,
   },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two, backgroundColor: 'transparent' },
   primaryButton: {

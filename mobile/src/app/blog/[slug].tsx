@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { Link, type Href, useLocalSearchParams } from 'expo-router';
-import { Pressable, ScrollView, Share, StyleSheet } from 'react-native';
+import { FlatList, Pressable, ScrollView, Share, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getBlogPost } from '@/api/cms';
+import { getBlogPost, getBlogPosts } from '@/api/cms';
 import { GlassSurface } from '@/components/ui/glass-surface';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
@@ -19,10 +19,16 @@ export default function BlogPostScreen() {
     queryFn: () => getBlogPost(slug),
     enabled: Boolean(slug),
   });
+  const relatedQuery = useQuery({
+    queryKey: ['blog-posts', 'related', postQuery.data?.category?.slug, slug],
+    queryFn: () => getBlogPosts({ category: postQuery.data?.category?.slug, per_page: 4 }),
+    enabled: Boolean(postQuery.data?.category?.slug),
+  });
 
   if (postQuery.isLoading) return <LoadingState />;
   if (postQuery.isError || !postQuery.data) return <ErrorState onRetry={() => postQuery.refetch()} />;
   const post = postQuery.data;
+  const relatedPosts = relatedQuery.data?.data.filter((item) => item.id !== post.id).slice(0, 3) ?? [];
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -95,6 +101,38 @@ export default function BlogPostScreen() {
             </Link>
           </ThemedView>
         </GlassSurface>
+        {relatedPosts.length > 0 ? (
+          <ThemedView style={styles.relatedSection}>
+            <ThemedView style={styles.relatedHeader}>
+              <ThemedText type="smallBold">Powiązane wpisy</ThemedText>
+              <Link href={'/blog' as Href} asChild>
+                <Pressable>
+                  <ThemedText type="small" style={styles.pillText}>Blog</ThemedText>
+                </Pressable>
+              </Link>
+            </ThemedView>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={relatedPosts}
+              keyExtractor={(item) => String(item.id)}
+              contentContainerStyle={styles.relatedList}
+              renderItem={({ item }) => (
+                <Link href={`/blog/${item.slug}` as Href} asChild>
+                  <Pressable>
+                    <GlassSurface style={styles.relatedCard} interactive>
+                      {item.featured_image ? <Image source={item.featured_image} style={styles.relatedImage} contentFit="cover" /> : null}
+                      <ThemedText type="smallBold" numberOfLines={2}>{item.title}</ThemedText>
+                      {item.reading_time ? (
+                        <ThemedText type="code" themeColor="textSecondary">{item.reading_time} min</ThemedText>
+                      ) : null}
+                    </GlassSurface>
+                  </Pressable>
+                </Link>
+              )}
+            />
+          </ThemedView>
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );
@@ -159,5 +197,25 @@ const styles = StyleSheet.create({
     backgroundColor: Storefront.colors.glassStrong,
     paddingHorizontal: Spacing.four,
     paddingVertical: Spacing.three,
+  },
+  relatedSection: { gap: Spacing.three, backgroundColor: 'transparent' },
+  relatedHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'transparent',
+  },
+  relatedList: { gap: Spacing.three },
+  relatedCard: {
+    width: 190,
+    gap: Spacing.two,
+    padding: Spacing.three,
+    borderRadius: Storefront.radius.lg,
+  },
+  relatedImage: {
+    width: '100%',
+    aspectRatio: 16 / 10,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.surfaceWarm,
   },
 });

@@ -56,12 +56,12 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 
 ### E-commerce
 - **Products** — variants, attributes, product types, categories, flags, images (spatie/medialibrary), price history
-- **Mobile storefront MVP** — `mobile/` Expo Router app with typed API client, TanStack Query provider, SecureStore-backed bearer auth, guest cart token persistence, idempotency keys for cart/checkout mutations, tab navigation (Home, Products, Cart, Account), refreshed glassmorphism storefront visual tokens/shell, product listing/detail with native filters/sort, brand + attribute facets, price range, infinite scroll, standalone `/search` screen with autocomplete/infinite scroll, reviews with submit/helpful votes, wishlist, comparison flow with thumbnails and bottom bar, recently viewed products, cart quantity/remove/discount actions, MVP checkout submit with pickup point ID support, payment redirect and pending/success/failure status polling, login/register/forgot/reset/profile/password change/addresses, full orders list and order detail, account wishlist and GDPR consent/export/restriction/delete controls, blog infinite list/detail with category chips/metadata/share/tags, stores contact cards with opening hours, glass newsletter signup, and expanded CMS Page Builder renderer for common storefront blocks/relations. Still not full `client/` parity; track gaps in `docs/MOBILE_REACT_NATIVE_IMPLEMENTATION_PLAN.md`.
+- **Mobile storefront MVP** — `mobile/` Expo Router app with typed API client, TanStack Query provider, SecureStore-backed bearer auth, guest cart token persistence, idempotency keys for cart/checkout mutations, tab navigation (Home, Products, Cart, Account), refreshed glassmorphism storefront visual tokens/shell, CMS-backed home page fallback, product listing/detail with native filters/sort, brand + attribute facets, price range, infinite scroll, product promo/stock/review metadata, standalone `/search` screen with autocomplete/infinite scroll, reviews with submit/helpful votes, wishlist, comparison flow with thumbnails and bottom bar, recently viewed products, cart quantity/remove/discount actions, checkout submit with pickup point ID/map link, BLIK/P24/bank transfer/COD methods, notes, payment redirect and pending/success/failure status polling, login/register/forgot/reset/profile/password change/addresses, full orders list and order detail, account wishlist and GDPR consent/export/restriction/delete controls, blog infinite list/detail with category chips/metadata/share/tags/related posts, stores contact cards with opening hours/map preview, glass newsletter signup, expanded CMS Page Builder renderer for common storefront blocks/relations/video/map embeds, and GitHub Actions `lint-mobile` job. Still not full `client/` parity; track gaps in `docs/MOBILE_REACT_NATIVE_IMPLEMENTATION_PLAN.md`.
 - **Orders** — full lifecycle, status machine, invoices (PDF), export
 - **Cart** — token-based guest cart, abandoned cart cleanup + emails
 - **Checkout** — multi-step, shipping, payment providers, idempotency
 - **Discounts + Promotions** — conditions, stackable, product/category targeting
-- **Shipping Methods** — carriers, pickup
+- **Shipping Methods** — carrier strategy with Furgonetka aggregation for InPost Courier, DPD Courier, DPD Pickup, DHL Parcel, DHL ServicePoint and GLS; direct InPost ShipX integration for Paczkomat/locker shipments with GeoWidget token support; pickup-point methods expose checkout env requirements to the storefront; local pickup uses a no-op carrier
 - **Returns** — return requests, status history
 - **Wishlists** — per customer
 - **Reviews** — with images, helpful votes, moderation
@@ -79,6 +79,8 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 ### Payments
 - **PayU** — BLIK native, Apple Pay, Google Pay, redirect; OAuth2 token caching; MD5 webhook verification; `POST /api/v1/webhooks/payu`
 - **P24** — Basic Auth, SHA256 signature; Apple/Google Pay on P24 page; `POST /api/v1/webhooks/p24`
+- **Manual methods** — cash on delivery and bank transfer gateways are registered for checkout without redirect/webhook flow
+- **Not implemented yet** — Paynow and Autopay are candidates for future payment gateways; both cover the key PL methods (BLIK, card wallets, BNPL), but no gateway/client/webhook code is currently present
 - **Payment status**: `GET /api/v1/payments/{payment}/status` (auth + policy)
 - Checkout response: `{ order, payment: { id, action, redirect_url } }`
 - Infrastructure: `app/Infrastructure/Payments/PayU/` + `app/Infrastructure/Payments/P24/`

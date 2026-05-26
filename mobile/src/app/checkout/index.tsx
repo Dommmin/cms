@@ -26,6 +26,40 @@ const emptyAddress: AddressPayload = {
   phone: '',
 };
 
+type PaymentMethodValue = 'blik' | 'p24' | 'bank_transfer' | 'cash_on_delivery' | 'apple_pay' | 'google_pay';
+
+const paymentMethodDefs: {
+  value: PaymentMethodValue;
+  label: string;
+  description: string;
+  providerId: PaymentMethodConfig['id'];
+}[] = [
+  {
+    value: 'blik',
+    label: 'BLIK',
+    description: 'Kod BLIK z aplikacji banku, obsługiwany przez PayU.',
+    providerId: 'payu',
+  },
+  {
+    value: 'p24',
+    label: 'Przelewy24',
+    description: 'Bank, karta, BLIK i pozostałe metody na stronie P24.',
+    providerId: 'p24',
+  },
+  {
+    value: 'bank_transfer',
+    label: 'Przelew tradycyjny',
+    description: 'Dane do przelewu pojawią się po złożeniu zamówienia.',
+    providerId: 'bank_transfer',
+  },
+  {
+    value: 'cash_on_delivery',
+    label: 'Pobranie',
+    description: 'Płatność przy odbiorze lub u kuriera.',
+    providerId: 'cash_on_delivery',
+  },
+];
+
 export default function CheckoutScreen() {
   const { cart } = useCart();
   const auth = useAuth();
@@ -33,8 +67,10 @@ export default function CheckoutScreen() {
   const [address, setAddress] = useState<AddressPayload>(emptyAddress);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [selectedShippingId, setSelectedShippingId] = useState<number | null>(null);
-  const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodValue | null>(null);
+  const [blikCode, setBlikCode] = useState('');
   const [pickupPointId, setPickupPointId] = useState('');
+  const [notes, setNotes] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
 
   const shippingQuery = useQuery({ queryKey: ['checkout', 'shipping'], queryFn: getShippingMethods });
@@ -64,8 +100,13 @@ export default function CheckoutScreen() {
     [selectedShippingId, shippingMethods],
   );
   const selectedPayment = useMemo(
-    () => resolvePaymentMethod(paymentMethods, selectedPaymentId),
-    [paymentMethods, selectedPaymentId],
+    () => resolvePaymentMethod(paymentMethods, paymentMethod),
+    [paymentMethods, paymentMethod],
+  );
+  const availablePaymentMethods = useMemo(
+    () =>
+      paymentMethodDefs.filter((method) => paymentMethods.some((provider) => provider.id === method.providerId)),
+    [paymentMethods],
   );
 
   if (shippingQuery.isLoading || paymentQuery.isLoading) return <LoadingState />;
@@ -89,6 +130,10 @@ export default function CheckoutScreen() {
       setFormError('Wybierz dostawę i płatność.');
       return;
     }
+    if (paymentMethod === 'blik' && blikCode.length !== 6) {
+      setFormError('Podaj 6-cyfrowy kod BLIK.');
+      return;
+    }
     if (selectedShipping.requires_pickup_point && !pickupPointId.trim()) {
       setFormError('Podaj punkt odbioru dla wybranej dostawy.');
       return;
@@ -103,8 +148,11 @@ export default function CheckoutScreen() {
       shipping_method_id: selectedShipping.id,
       pickup_point_id: selectedShipping.requires_pickup_point ? pickupPointId.trim() : undefined,
       payment_provider: selectedPayment.id,
+      payment_method: paymentMethod ?? selectedPayment.id,
+      blik_code: paymentMethod === 'blik' ? blikCode : undefined,
       billing_address: address,
       shipping_address: address,
+      notes: notes.trim() || undefined,
       terms_accepted: true,
     });
   }
@@ -170,11 +218,21 @@ export default function CheckoutScreen() {
               key={method.id}
               selected={(selectedShipping?.id ?? shippingMethods[0]?.id) === method.id}
               label={`${method.name} · ${formatMoney(method.base_price)}${method.requires_pickup_point ? ' · punkt odbioru' : ''}`}
+              description={shippingDescription(method)}
               onPress={() => setSelectedShippingId(method.id)}
             />
           ))}
           {selectedShipping?.requires_pickup_point ? (
             <>
+              <ThemedView style={styles.pickupPanel}>
+                <ThemedText type="smallBold">Punkt odbioru</ThemedText>
+                <ThemedText type="small" themeColor="textSecondary">
+                  Wpisz kod punktu albo otwórz mapę operatora, wybierz punkt i wróć z jego ID.
+                </ThemedText>
+                <Pressable onPress={() => void WebBrowser.openBrowserAsync('https://inpost.pl/znajdz-paczkomat')} style={styles.secondaryButton}>
+                  <ThemedText type="smallBold">Otwórz mapę punktów</ThemedText>
+                </Pressable>
+              </ThemedView>
               <TextInput
                 value={pickupPointId}
                 onChangeText={setPickupPointId}
@@ -192,15 +250,46 @@ export default function CheckoutScreen() {
 
         <GlassSurface style={styles.panel}>
           <ThemedText type="smallBold">Płatność</ThemedText>
-          {paymentMethods.map((method) => (
-            <SelectableRow
-              key={method.id}
-              selected={(selectedPayment?.id ?? paymentMethods[0]?.id) === method.id}
-              label={method.id}
-              disabled={!method.configured}
-              onPress={() => setSelectedPaymentId(method.id)}
-            />
-          ))}
+          {availablePaymentMethods.map((method) => {
+            const provider = paymentMethods.find((paymentProvider) => paymentProvider.id === method.providerId);
+            const selected = (paymentMethod ?? availablePaymentMethods[0]?.value) === method.value;
+
+            return (
+              <ThemedView key={method.value} style={styles.paymentOption}>
+                <SelectableRow
+                  selected={selected}
+                  label={method.label}
+                  description={provider?.configured === false ? missingPaymentDescription(provider) : method.description}
+                  disabled={!provider?.configured}
+                  onPress={() => setPaymentMethod(method.value)}
+                />
+                {method.value === 'blik' && selected && provider?.configured ? (
+                  <TextInput
+                    value={blikCode}
+                    onChangeText={(value) => setBlikCode(value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="Kod BLIK"
+                    placeholderTextColor={Storefront.colors.muted}
+                    keyboardType="number-pad"
+                    maxLength={6}
+                    style={styles.input}
+                  />
+                ) : null}
+              </ThemedView>
+            );
+          })}
+        </GlassSurface>
+
+        <GlassSurface style={styles.panel}>
+          <ThemedText type="smallBold">Uwagi do zamówienia</ThemedText>
+          <TextInput
+            value={notes}
+            onChangeText={setNotes}
+            placeholder="Opcjonalne informacje dla obsługi lub kuriera"
+            placeholderTextColor={Storefront.colors.muted}
+            multiline
+            textAlignVertical="top"
+            style={[styles.input, styles.textarea]}
+          />
         </GlassSurface>
 
         <Pressable
@@ -236,22 +325,42 @@ function resolveShippingMethod(methods: ShippingMethod[], selectedId: number | n
   return methods.find((method) => method.id === selectedId) ?? methods[0] ?? null;
 }
 
-function resolvePaymentMethod(methods: PaymentMethodConfig[], selectedId: string | null) {
+function resolvePaymentMethod(methods: PaymentMethodConfig[], selectedMethod: PaymentMethodValue | null) {
+  const selectedDefinition = paymentMethodDefs.find((method) => method.value === selectedMethod);
   return (
-    methods.find((method) => method.id === selectedId) ??
+    methods.find((method) => method.id === selectedDefinition?.providerId && method.configured) ??
     methods.find((method) => method.configured) ??
     methods[0] ??
     null
   );
 }
 
+function shippingDescription(method: ShippingMethod): string {
+  const parts = [];
+  if (method.description) parts.push(method.description);
+  if (method.estimated_days_min && method.estimated_days_max) {
+    parts.push(`${method.estimated_days_min}-${method.estimated_days_max} dni`);
+  }
+  if (method.free_shipping_threshold) parts.push(`Darmowo od ${formatMoney(method.free_shipping_threshold)}`);
+  if (method.uses_native_widget) parts.push('Wymaga wyboru punktu');
+  return parts.join(' · ');
+}
+
+function missingPaymentDescription(method: PaymentMethodConfig): string {
+  return method.missing_env.length > 0
+    ? `Brak konfiguracji: ${method.missing_env.join(', ')}`
+    : 'Metoda płatności jest niedostępna.';
+}
+
 function SelectableRow({
   label,
+  description,
   selected,
   disabled,
   onPress,
 }: {
   label: string;
+  description?: string | null;
   selected: boolean;
   disabled?: boolean;
   onPress: () => void;
@@ -261,6 +370,11 @@ function SelectableRow({
       <ThemedText type="smallBold" style={selected && styles.selectedText}>
         {label}
       </ThemedText>
+      {description ? (
+        <ThemedText type="small" themeColor={selected ? undefined : 'textSecondary'} style={selected && styles.selectedText}>
+          {description}
+        </ThemedText>
+      ) : null}
     </Pressable>
   );
 }
@@ -330,7 +444,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     fontSize: 16,
   },
+  textarea: {
+    minHeight: 104,
+    paddingVertical: Spacing.three,
+  },
   selectRow: {
+    gap: Spacing.one,
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.three,
     borderWidth: 1,
@@ -344,6 +463,24 @@ const styles = StyleSheet.create({
   },
   selectedText: {
     color: '#FFFFFF',
+  },
+  paymentOption: {
+    gap: Spacing.two,
+    backgroundColor: 'transparent',
+  },
+  pickupPanel: {
+    gap: Spacing.two,
+    padding: Spacing.three,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.glassStrong,
+  },
+  secondaryButton: {
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.surface,
+    paddingVertical: Spacing.three,
   },
   termsRow: {
     flexDirection: 'row',

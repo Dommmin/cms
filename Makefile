@@ -1,4 +1,4 @@
-.PHONY: up stop down build install shell migrate fresh test setup-test-db logs pail seed fresh-seed scout-import clear sync-translations npm-build pint fix check e2e e2e-report glitchtip-up glitchtip-down glitchtip-logs nuke-volumes help
+.PHONY: up stop down build install shell migrate fresh test setup-test-db logs pail seed fresh-seed scout-import clear sync-translations npm-build pint fix check mobile-install mobile-start mobile-start-lan mobile-start-tunnel mobile-ios mobile-android mobile-web mobile-types mobile-lint mobile-check e2e e2e-report glitchtip-up glitchtip-down glitchtip-logs nuke-volumes help
 
 # Set environment variables
 export UID = $(shell id -u)
@@ -27,6 +27,14 @@ help:
 	@echo "  pint               - Format PHP files with Pint"
 	@echo "  fix                - Auto-fix all code style issues (pint, rector, eslint --fix, prettier)"
 	@echo "  check              - Run all CI checks read-only — fails if anything is wrong (mirrors GitHub Actions)"
+	@echo "  mobile-install     - Install Expo mobile dependencies"
+	@echo "  mobile-start       - Start Expo dev server"
+	@echo "  mobile-start-lan   - Start Expo for a phone on the same Wi-Fi"
+	@echo "  mobile-start-tunnel- Start Expo through a tunnel for remote/blocked networks"
+	@echo "  mobile-ios         - Start Expo for iOS simulator"
+	@echo "  mobile-android     - Start Expo for Android emulator/device"
+	@echo "  mobile-web         - Start Expo web"
+	@echo "  mobile-check       - Run mobile TypeScript and lint checks"
 	@echo "  quality            - Run all quality checks (Pint, PHPStan, ESLint)"
 	@echo "  logs               - Show logs"
 	@echo "  pail               - Inspect php logs in live mode"
@@ -140,6 +148,36 @@ check:
 	@echo ">>> [8/8] Tests (Pest parallel)"
 	docker compose exec php php -d memory_limit=512M vendor/bin/pest --parallel --processes=$(PEST_PARALLEL_PROCESSES)
 	@echo ">>> All checks passed. Safe to push."
+
+# Mobile / Expo app
+mobile-install:
+	npm --prefix mobile install
+
+mobile-start:
+	npm --prefix mobile run start
+
+mobile-start-lan:
+	npm --prefix mobile run start -- --host lan
+
+mobile-start-tunnel:
+	npm --prefix mobile run start -- --tunnel
+
+mobile-ios:
+	npm --prefix mobile run ios
+
+mobile-android:
+	npm --prefix mobile run android
+
+mobile-web:
+	npm --prefix mobile run web
+
+mobile-types:
+	npm --prefix mobile run types
+
+mobile-lint:
+	npm --prefix mobile run lint
+
+mobile-check: mobile-types mobile-lint
 
 # Run quality tools
 quality:

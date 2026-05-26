@@ -3,7 +3,9 @@ import { Link, type Href } from 'expo-router';
 import { FlatList, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { getPage } from '@/api/cms';
 import { getProducts } from '@/api/products';
+import { MobilePageRenderer } from '@/components/cms/mobile-page-renderer';
 import { ProductCard } from '@/components/product/product-card';
 import { GlassSurface } from '@/components/ui/glass-surface';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
@@ -20,26 +22,38 @@ export default function HomeScreen() {
     queryKey: ['products', 'home-featured'],
     queryFn: () => getProducts({ per_page: 8, sort: '-created_at' }),
   });
+  const homePageQuery = useQuery({
+    queryKey: ['pages', 'home'],
+    queryFn: () => getPage('home'),
+  });
+  const homePage = homePageQuery.data;
+  const hasCmsHome = Boolean(homePage && (homePage.content || homePage.sections.some((section) => section.is_active)));
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content}>
-        <GlassSurface style={styles.hero}>
-          <ThemedText type="code" style={styles.kicker}>
-            MOBILE STOREFRONT
-          </ThemedText>
-          <ThemedText type="title">Zakupy bez tarcia.</ThemedText>
-          <ThemedText themeColor="textSecondary">
-            Produkty, promocje i koszyk działają na tym samym API co publiczny sklep, ale w układzie zbudowanym pod telefon.
-          </ThemedText>
-          <Link href={'/categories' as Href} asChild>
-            <Pressable style={styles.primaryButton}>
-              <ThemedText type="smallBold" style={styles.primaryButtonText}>
-                Przeglądaj produkty
-              </ThemedText>
-            </Pressable>
-          </Link>
-        </GlassSurface>
+        {hasCmsHome && homePage ? (
+          <ThemedView style={styles.cmsHome}>
+            <MobilePageRenderer page={homePage} />
+          </ThemedView>
+        ) : (
+          <GlassSurface style={styles.hero}>
+            <ThemedText type="code" style={styles.kicker}>
+              MOBILE STOREFRONT
+            </ThemedText>
+            <ThemedText type="title">Zakupy bez tarcia.</ThemedText>
+            <ThemedText themeColor="textSecondary">
+              Produkty, promocje i koszyk działają na tym samym API co publiczny sklep, ale w układzie zbudowanym pod telefon.
+            </ThemedText>
+            <Link href={'/categories' as Href} asChild>
+              <Pressable style={styles.primaryButton}>
+                <ThemedText type="smallBold" style={styles.primaryButtonText}>
+                  Przeglądaj produkty
+                </ThemedText>
+              </Pressable>
+            </Link>
+          </GlassSurface>
+        )}
 
         <ThemedView style={styles.quickLinks}>
           <QuickLink href="/search" label="Szukaj" />
@@ -61,6 +75,15 @@ export default function HomeScreen() {
               contentContainerStyle={styles.recentList}
             />
           </>
+        ) : null}
+
+        {homePageQuery.isError && !hasCmsHome ? (
+          <GlassSurface style={styles.notice}>
+            <ThemedText type="smallBold">Strona główna CMS jest niedostępna.</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">
+              Pokazuję fallback commerce, żeby start aplikacji nadal działał.
+            </ThemedText>
+          </GlassSurface>
         ) : null}
 
         {featuredQuery.isLoading ? <LoadingState /> : null}
@@ -126,6 +149,15 @@ const styles = StyleSheet.create({
     gap: Spacing.three,
     padding: Spacing.five,
     borderRadius: Storefront.radius.xl,
+  },
+  cmsHome: {
+    marginHorizontal: -Spacing.four,
+    backgroundColor: 'transparent',
+  },
+  notice: {
+    gap: Spacing.one,
+    padding: Spacing.three,
+    borderRadius: Storefront.radius.lg,
   },
   kicker: {
     color: Storefront.colors.primary,

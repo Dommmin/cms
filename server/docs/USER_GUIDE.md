@@ -545,12 +545,16 @@ Navigate to **Shop > Shipping Methods**.
 
 **Supported carriers:**
 
-| Carrier | Description            |
-|---------|------------------------|
-| InPost  | Parcel locker delivery |
-| DPD     | Courier delivery       |
-| DHL     | Courier delivery       |
-| Pickup  | In-store pickup        |
+| Carrier | Description |
+|---------|-------------|
+| InPost Kurier | Courier delivery through Furgonetka |
+| InPost Paczkomat | Parcel locker delivery through direct InPost ShipX integration |
+| DPD Kurier | Courier delivery through Furgonetka |
+| DPD Pickup | Pickup-point delivery through Furgonetka |
+| DHL Parcel | Courier delivery through Furgonetka |
+| DHL ServicePoint | Pickup-point delivery through Furgonetka |
+| GLS Parcel | Courier delivery through Furgonetka |
+| Pickup | In-store/local pickup |
 
 Each shipping method has:
 - Name and description
@@ -558,6 +562,8 @@ Each shipping method has:
 - Price
 - Pickup option (for click-and-collect)
 - Active toggle
+
+Pickup-point delivery methods require the customer to select a pickup point during checkout. InPost Paczkomat uses the InPost GeoWidget, while DPD Pickup and DHL ServicePoint use the unified Furgonetka pickup-point picker.
 
 ---
 

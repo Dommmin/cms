@@ -132,6 +132,10 @@ Business logic goes in `app/Services/`. Controllers should be thin.
 | `PagePublicationWebhookService` | Page publish/unpublish webhook dispatch |
 | `ModuleRegistryService`  | Page module type registry              |
 
+Payment gateways currently registered in `EcommerceServiceProvider`: P24, PayU, cash on delivery, and bank transfer. `stripe` exists in `PaymentProviderEnum`, but no Stripe gateway is registered yet. Paynow and Autopay are not implemented.
+
+Shipping carriers currently registered in `EcommerceServiceProvider`: InPost Courier, DPD Courier, DPD Pickup, DHL Parcel, DHL ServicePoint and GLS through Furgonetka; InPost Paczkomat directly through ShipX; local pickup through `PickupCarrier`.
+
 ---
 
 ## Model Conventions

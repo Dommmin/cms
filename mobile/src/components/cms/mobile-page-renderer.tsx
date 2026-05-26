@@ -1,6 +1,7 @@
 import { Image } from 'expo-image';
 import { Link, type Href } from 'expo-router';
 import { FlatList, Pressable, StyleSheet } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 import { ProductCard } from '@/components/product/product-card';
 import { GlassSurface } from '@/components/ui/glass-surface';
@@ -161,13 +162,27 @@ function BlockRenderer({ block }: { block: PageBlock }) {
   }
 
   if (block.type === 'video_embed' || block.type === 'map') {
+    const embedUrl = block.type === 'video_embed' ? getVideoEmbedUrl(config) : getMapEmbedUrl(config);
     return (
       <GlassSurface style={styles.block}>
         <BlockHeader title={title ?? humanizeBlockType(block.type)} subtitle={subtitle ?? body} />
-        <ThemedView style={styles.placeholder}>
-          <ThemedText type="smallBold">{block.type === 'video_embed' ? 'Video' : 'Mapa'}</ThemedText>
-          <ThemedText type="small" themeColor="textSecondary">Treść dostępna w wersji webowej.</ThemedText>
-        </ThemedView>
+        {embedUrl ? (
+          <ThemedView style={styles.embedFrame}>
+            <WebView
+              source={{ uri: embedUrl }}
+              style={styles.embedWebView}
+              allowsFullscreenVideo
+              scrollEnabled={false}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+            />
+          </ThemedView>
+        ) : (
+          <ThemedView style={styles.placeholder}>
+            <ThemedText type="smallBold">{block.type === 'video_embed' ? 'Video' : 'Mapa'}</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">Brak poprawnego adresu osadzenia.</ThemedText>
+          </ThemedView>
+        )}
       </GlassSurface>
     );
   }
@@ -330,6 +345,33 @@ function getArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
 }
 
+function getVideoEmbedUrl(config: Record<string, unknown>): string | null {
+  const url = getString(config.embed_url) ?? getString(config.url) ?? getString(config.video_url);
+  if (!url) return null;
+
+  if (url.includes('youtube.com/embed/') || url.includes('player.vimeo.com')) return url;
+
+  const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?/]+)/);
+  if (youtubeMatch?.[1]) return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+
+  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeoMatch?.[1]) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+
+  return url.startsWith('https://') ? url : null;
+}
+
+function getMapEmbedUrl(config: Record<string, unknown>): string | null {
+  const embedUrl = getString(config.embed_url) ?? getString(config.map_url);
+  if (embedUrl?.startsWith('https://')) return embedUrl;
+
+  const lat = typeof config.lat === 'number' ? config.lat : typeof config.latitude === 'number' ? config.latitude : null;
+  const lng = typeof config.lng === 'number' ? config.lng : typeof config.longitude === 'number' ? config.longitude : null;
+  if (lat !== null && lng !== null) return `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+
+  const address = getString(config.address) ?? getString(config.location);
+  return address ? `https://maps.google.com/maps?q=${encodeURIComponent(address)}&z=15&output=embed` : null;
+}
+
 function humanizeBlockType(type: string): string {
   return type.replaceAll('_', ' ');
 }
@@ -436,5 +478,15 @@ const styles = StyleSheet.create({
     padding: Spacing.four,
     borderRadius: Storefront.radius.md,
     backgroundColor: Storefront.colors.glassStrong,
+  },
+  embedFrame: {
+    height: 210,
+    overflow: 'hidden',
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.glassStrong,
+  },
+  embedWebView: {
+    flex: 1,
+    backgroundColor: Storefront.colors.surfaceWarm,
   },
 });
