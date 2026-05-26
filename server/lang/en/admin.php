@@ -712,6 +712,7 @@ return
     ],
     'settings' => [
         'group_mail' => 'Mail',
+        'group_search' => 'Search',
         'group_social' => 'Social Media',
         'group_integrations' => 'Integrations',
         'saved' => 'Settings saved',

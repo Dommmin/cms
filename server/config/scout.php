@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Models\BlogPost;
+use App\Models\Category;
 use App\Models\Product;
 
 return [
@@ -211,6 +213,50 @@ return [
                     'query_by' => 'name,description,short_description,sku',
                     'filter_by' => 'is_active:true',
                     'facet_by' => 'category_id,brand_id,price',
+                    'sort_by' => 'created_at:desc',
+                ],
+            ],
+            Category::class => [
+                'collection-schema' => [
+                    'fields' => [
+                        ['name' => 'id', 'type' => 'string'],
+                        ['name' => 'name', 'type' => 'string'],
+                        ['name' => 'slug', 'type' => 'string'],
+                        ['name' => 'description', 'type' => 'string', 'optional' => true],
+                        ['name' => 'is_active', 'type' => 'bool'],
+                        ['name' => 'parent_id', 'type' => 'string', 'optional' => true],
+                        ['name' => 'thumbnail', 'type' => 'string', 'optional' => true],
+                        ['name' => 'products_count', 'type' => 'int64', 'optional' => true],
+                        ['name' => 'created_at', 'type' => 'int64'],
+                    ],
+                    'default_sorting_field' => 'created_at',
+                ],
+                'search-parameters' => [
+                    'query_by' => 'name,slug,description',
+                    'filter_by' => 'is_active:true',
+                    'sort_by' => 'created_at:desc',
+                ],
+            ],
+            BlogPost::class => [
+                'collection-schema' => [
+                    'fields' => [
+                        ['name' => 'id', 'type' => 'string'],
+                        ['name' => 'title', 'type' => 'string'],
+                        ['name' => 'slug', 'type' => 'string'],
+                        ['name' => 'excerpt', 'type' => 'string', 'optional' => true],
+                        ['name' => 'content', 'type' => 'string', 'optional' => true],
+                        ['name' => 'is_featured', 'type' => 'bool', 'optional' => true],
+                        ['name' => 'status', 'type' => 'string'],
+                        ['name' => 'published_at', 'type' => 'int64', 'optional' => true],
+                        ['name' => 'author_name', 'type' => 'string', 'optional' => true],
+                        ['name' => 'featured_image', 'type' => 'string', 'optional' => true],
+                        ['name' => 'created_at', 'type' => 'int64'],
+                    ],
+                    'default_sorting_field' => 'created_at',
+                ],
+                'search-parameters' => [
+                    'query_by' => 'title,excerpt,content,slug',
+                    'filter_by' => 'status:published',
                     'sort_by' => 'created_at:desc',
                 ],
             ],

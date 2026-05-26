@@ -36,12 +36,13 @@ const GROUP_ICONS: Record<
 > = {
     general: SettingsIcon,
     mail: MailIcon,
-    seo: SearchIcon,
+    seo: GlobeIcon,
     social: ShareIcon,
     ecommerce: ShoppingBagIcon,
     payments: CreditCardIcon,
     shipping: TruckIcon,
     integrations: ZapIcon,
+    search: SearchIcon,
 };
 
 function SettingField({
@@ -154,6 +155,7 @@ export default function Index({ settings, groups, currentGroup }: IndexProps) {
         payments: __('settings.group_payments', 'Payments'),
         shipping: __('settings.group_shipping', 'Shipping'),
         integrations: __('settings.group_integrations', 'Integrations'),
+        search: __('settings.group_search', 'Search'),
     };
 
     function groupLabel(group: string): string {

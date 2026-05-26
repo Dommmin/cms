@@ -209,7 +209,8 @@ class Product extends Model implements HasMedia
 
     public function shouldBeSearchable(): bool
     {
-        return $this->is_active;
+        return $this->is_active
+            && (bool) Setting::get('search', 'index_products', true);
     }
 
     public function searchableAs(): string

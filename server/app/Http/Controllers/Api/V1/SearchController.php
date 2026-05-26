@@ -6,11 +6,13 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Api\V1\ProductResource;
+use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\SearchLog;
 use App\Models\SearchSynonym;
+use App\Models\Setting;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -117,39 +119,100 @@ class SearchController extends ApiController
             return $this->ok(['suggestions' => []]);
         }
 
-$results = Product::search($query)
-            ->where('is_active', true)
-            ->take($limit)
-            ->get();
+        $suggestions = collect();
+        $categoryLimit = 3;
+        $blogPostLimit = 3;
+        $productLimit = max(1, $limit - $categoryLimit - $blogPostLimit);
 
-        $productIds = $results->map(fn (Product $p): int => $p->id);
-        $loaded = Product::query()
-            ->with(['category', 'brand', 'activeVariants', 'media', 'thumbnail.media'])
-            ->whereIn('id', $productIds)
-            ->get()
-            ->keyBy('id');
+        // Products (always active)
+        if ((bool) Setting::get('search', 'index_products', true)) {
+            $productResults = Product::search($query)
+                ->where('is_active', true)
+                ->take($productLimit)
+                ->get();
 
-        $suggestions = $results->map(function (Product $product) use ($loaded): array {
-            $fresh = $loaded->get($product->id, $product);
+            $productIds = $productResults->map(fn (Product $p): int => $p->id);
+            $loaded = Product::query()
+                ->with(['category', 'brand', 'activeVariants', 'media', 'thumbnail.media'])
+                ->whereIn('id', $productIds)
+                ->get()
+                ->keyBy('id');
 
-            return [
-                'id' => $fresh->id,
-                'name' => $fresh->name,
-                'slug' => $fresh->slug,
-                'thumbnail' => $fresh->getFirstMediaUrl('images', 'thumb') ?: null,
-                'price' => $fresh->priceRange()['min'],
-            ];
-        });
+            foreach ($productResults as $product) {
+                $fresh = $loaded->get($product->id, $product);
+                $suggestions->push([
+                    'type' => 'product',
+                    'id' => $fresh->id,
+                    'name' => $fresh->name,
+                    'slug' => $fresh->slug,
+                    'thumbnail' => $fresh->getFirstMediaUrl('images', 'thumb') ?: null,
+                    'price' => $fresh->priceRange()['min'],
+                ]);
+            }
+        }
+
+        // Categories (if enabled)
+        if ((bool) Setting::get('search', 'index_categories', true)) {
+            $categoryResults = Category::search($query)
+                ->where('is_active', true)
+                ->take($categoryLimit)
+                ->get();
+
+            $categoryIds = $categoryResults->map(fn (Category $c): int => $c->id);
+            $loadedCategories = Category::query()
+                ->whereIn('id', $categoryIds)
+                ->get()
+                ->keyBy('id');
+
+            foreach ($categoryResults as $category) {
+                $fresh = $loadedCategories->get($category->id, $category);
+                $suggestions->push([
+                    'type' => 'category',
+                    'id' => $fresh->id,
+                    'name' => $fresh->name,
+                    'slug' => $fresh->slug,
+                    'thumbnail' => $fresh->image_path ?: null,
+                    'products_count' => $fresh->products()->count(),
+                ]);
+            }
+        }
+
+        // Blog posts (if enabled)
+        if ((bool) Setting::get('search', 'index_blog_posts', true)) {
+            $blogResults = BlogPost::search($query)
+                ->where('status', 'published')
+                ->take($blogPostLimit)
+                ->get();
+
+            $blogIds = $blogResults->map(fn (BlogPost $p): int => $p->id);
+            $loadedPosts = BlogPost::query()
+                ->with('author')
+                ->whereIn('id', $blogIds)
+                ->get()
+                ->keyBy('id');
+
+            foreach ($blogResults as $post) {
+                $fresh = $loadedPosts->get($post->id, $post);
+                $suggestions->push([
+                    'type' => 'blog_post',
+                    'id' => $fresh->id,
+                    'name' => $fresh->title,
+                    'slug' => $fresh->slug,
+                    'thumbnail' => $fresh->featured_image,
+                    'excerpt' => is_array($fresh->excerpt) ? ($fresh->excerpt[app()->getLocale()] ?? reset($fresh->excerpt)) : $fresh->excerpt,
+                ]);
+            }
+        }
 
         SearchLog::query()->create([
             'query' => mb_strtolower(mb_trim($query)),
-            'results_count' => $results->count(),
+            'results_count' => $suggestions->count(),
             'is_autocomplete' => true,
             'locale' => $request->input('locale'),
             'ip' => $request->ip(),
         ]);
 
-        return $this->ok(['suggestions' => $suggestions]);
+        return $this->ok(['suggestions' => $suggestions->values()->all()]);
     }
 
     /**
@@ -177,6 +240,7 @@ $results = Product::search($query)
                     }
                 }
             }
+
             if ($ids !== []) {
                 $result['category_id'] = $ids;
             }
@@ -184,7 +248,7 @@ $results = Product::search($query)
 
         $brandInput = $request->input('brand', $filters['brand_id'] ?? null);
         if ($brandInput) {
-            $result['brand_id'] = array_map('strval', (array) $brandInput);
+            $result['brand_id'] = array_map(strval(...), (array) $brandInput);
         }
 
         $priceMin = $request->input('min_price', $filters['price_min'] ?? null);
@@ -192,6 +256,7 @@ $results = Product::search($query)
         if ($priceMin !== null) {
             $result['price_min'] = (int) $priceMin;
         }
+
         if ($priceMax !== null) {
             $result['price_max'] = (int) $priceMax;
         }

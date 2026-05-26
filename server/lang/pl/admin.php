@@ -784,6 +784,7 @@ return
     ],
     'settings' => [
         'group_mail' => 'Poczta',
+        'group_search' => 'Wyszukiwanie',
         'group_social' => 'Media społecznościowe',
         'group_integrations' => 'Integracje',
         'saved' => 'Ustawienia zapisane',

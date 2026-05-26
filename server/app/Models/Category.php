@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
@@ -22,10 +23,14 @@ use Spatie\Translatable\HasTranslations;
  * Moved to Ecommerce module
  *
  * @property int $id
- * @property string $name
- * @property string $slug
+ * @property array<string, string>|string $name
+ * @property array<string, string>|string $slug
+ * @property array<string, string>|string|null $description
  * @property bool $is_active
  * @property string|null $collection_type
+ * @property int|null $parent_id
+ * @property string|null $image_path
+ * @property \Illuminate\Support\Carbon|null $created_at
  */
 #[Guarded(['id'])]
 #[Table(name: 'categories')]
@@ -37,6 +42,7 @@ class Category extends Model
     use HasTranslations;
     use HasVersions;
     use LogsActivity;
+    use Searchable;
 
     /** @var array<int, string> */
     public array $translatable = ['name', 'slug', 'description'];
@@ -55,6 +61,32 @@ class Category extends Model
     public static function roots()
     {
         return self::query()->where('parent_id')->orderBy('position')->get();
+    }
+
+    public function searchableAs(): string
+    {
+        return 'categories';
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => (string) $this->id,
+            'name' => is_array($this->name) ? ($this->name[app()->getLocale()] ?? reset($this->name)) : (string) $this->name,
+            'slug' => is_array($this->slug) ? ($this->slug[app()->getLocale()] ?? reset($this->slug)) : (string) $this->slug,
+            'description' => is_array($this->description) ? strip_tags((string) ($this->description[app()->getLocale()] ?? reset($this->description))) : strip_tags((string) $this->description),
+            'is_active' => $this->is_active,
+            'parent_id' => $this->parent_id ? (string) $this->parent_id : null,
+            'thumbnail' => $this->image_path ?: null,
+            'products_count' => $this->products()->count(),
+            'created_at' => $this->created_at?->timestamp,
+        ];
+    }
+
+    public function shouldBeSearchable(): bool
+    {
+        return $this->is_active
+            && (bool) Setting::get('search', 'index_categories', true);
     }
 
     public function isSmartCollection(): bool

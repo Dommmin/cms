@@ -16,17 +16,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
 /**
  * @property int $id
- * @property string $title
- * @property string $slug
+ * @property array<string, string>|string $title
+ * @property array<string, string>|string $slug
  * @property array<string, string>|null $slug_translations
- * @property string|null $content
- * @property string|null $excerpt
+ * @property array<string, string>|string|null $content
+ * @property array<string, string>|string|null $excerpt
  * @property array<string, mixed>|null $content_json
  * @property BlogPostStatusEnum|string|null $status
  * @property string|null $seo_title
@@ -35,6 +36,11 @@ use Spatie\Translatable\HasTranslations;
  * @property int|null $reading_time
  * @property string|null $translation_group_id
  * @property array<string, string>|null $available_locales
+ * @property bool $is_featured
+ * @property \Illuminate\Support\Carbon|null $published_at
+ * @property string|null $featured_image
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \App\Models\User|null $author
  */
 #[Fillable([
     'user_id',
@@ -69,6 +75,7 @@ class BlogPost extends Model
     use HasVersions;
     use LogsActivity;
     use SanitizesTranslatableHtml;
+    use Searchable;
 
     /** @var array<int, string> */
     public array $translatable = ['title', 'slug', 'excerpt', 'content'];
@@ -153,6 +160,34 @@ class BlogPost extends Model
         ));
 
         return array_values(array_filter($locales, fn (string $locale): bool => $locale !== ''));
+    }
+
+    public function searchableAs(): string
+    {
+        return 'blog_posts';
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => (string) $this->id,
+            'title' => is_array($this->title) ? ($this->title[app()->getLocale()] ?? reset($this->title)) : (string) $this->title,
+            'slug' => is_array($this->slug) ? ($this->slug[app()->getLocale()] ?? reset($this->slug)) : (string) $this->slug,
+            'excerpt' => is_array($this->excerpt) ? strip_tags((string) ($this->excerpt[app()->getLocale()] ?? reset($this->excerpt))) : strip_tags((string) $this->excerpt),
+            'content' => is_array($this->content) ? strip_tags((string) ($this->content[app()->getLocale()] ?? reset($this->content))) : strip_tags((string) $this->content),
+            'is_featured' => $this->is_featured ?? false,
+            'status' => $this->status instanceof BlogPostStatusEnum ? $this->status->value : (string) $this->status,
+            'published_at' => $this->published_at?->timestamp,
+            'author_name' => $this->author?->name,
+            'featured_image' => $this->featured_image,
+            'created_at' => $this->created_at?->timestamp,
+        ];
+    }
+
+    public function shouldBeSearchable(): bool
+    {
+        return $this->status === BlogPostStatusEnum::Published
+            && (bool) Setting::get('search', 'index_blog_posts', true);
     }
 
     #[Scope]
