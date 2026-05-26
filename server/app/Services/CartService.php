@@ -178,15 +178,9 @@ class CartService
 
     private function ensureCustomerForUser(User $user): Customer
     {
-        $customer = $user->customer;
-        if ($customer) {
-            return $customer;
-        }
-
-        return Customer::query()->create([
-            'user_id' => $user->id,
-            'email' => $user->email,
-            'first_name' => $user->name,
-        ]);
+        return Customer::query()->firstOrCreate(
+            ['user_id' => $user->id],
+            ['email' => $user->email, 'first_name' => $user->name],
+        );
     }
 }

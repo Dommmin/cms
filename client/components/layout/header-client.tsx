@@ -2,29 +2,62 @@
 import { useEffect, useState } from 'react';
 
 interface HeaderClientProps {
-    children: React.ReactNode;
+    top: React.ReactNode;
+    bottom: React.ReactNode;
     className?: string;
 }
 
-export function HeaderClient({ children, className = '' }: HeaderClientProps) {
-    const [scrolled, setScrolled] = useState(false);
+export function HeaderClient({
+    top,
+    bottom,
+    className = '',
+}: HeaderClientProps) {
+    const [collapsed, setCollapsed] = useState(false);
 
     useEffect(() => {
-        const handler = () => setScrolled(window.scrollY > 20);
+        const mql = window.matchMedia('(min-width: 768px)');
+
+        const handler = () => {
+            setCollapsed(mql.matches && window.scrollY > 20);
+        };
+
         window.addEventListener('scroll', handler, { passive: true });
-        return () => window.removeEventListener('scroll', handler);
+        handler();
+
+        mql.addEventListener('change', handler);
+        return () => {
+            window.removeEventListener('scroll', handler);
+            mql.removeEventListener('change', handler);
+        };
     }, []);
 
     return (
         <header
             aria-label="Site header"
-            className={`sticky top-0 z-50 transition-all duration-300 ${
-                scrolled
-                    ? 'bg-background/90 border-border border-b shadow-sm backdrop-blur-xl'
-                    : 'bg-background/95 border-border border-b backdrop-blur'
+            className={`border-border bg-background/95 sticky top-0 z-50 border-b backdrop-blur transition-shadow duration-300 ${
+                collapsed ? 'shadow-sm' : ''
             } ${className}`}
         >
-            {children}
+            <div className="relative" style={{ zIndex: 60 }}>
+                <div
+                    className={`transition-[padding] duration-300 ${
+                        collapsed ? 'py-1' : 'py-3'
+                    }`}
+                >
+                    {top}
+                </div>
+            </div>
+            <div className="relative" style={{ zIndex: 10 }}>
+                <div
+                    className="transition-[grid-template-rows] duration-300 ease-out"
+                    style={{
+                        display: 'grid',
+                        gridTemplateRows: collapsed ? '0fr' : '1fr',
+                    }}
+                >
+                    <div className="min-h-0 overflow-hidden">{bottom}</div>
+                </div>
+            </div>
         </header>
     );
 }

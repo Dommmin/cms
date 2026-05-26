@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { getCategories, getMenu } from '@/api/cms';
 import type { Category, MenuItem } from '@/types/api';
 
+import { LocaleSwitcher } from '@/components/layout/locale-switcher';
+import { MegaMenu } from '@/components/layout/mega-menu';
 import { AuthButton } from './auth-button';
 import { CartButton } from './cart-button';
 import { HeaderClient } from './header-client';
 import type { HeaderProps } from './header.types';
-import { LocaleSwitcher } from './locale-switcher';
-import { MegaMenu } from './mega-menu';
 import { MobileMenu } from './mobile-menu';
 import { SearchBar } from './search-bar';
 import { ThemeToggle } from './theme-toggle';
@@ -41,38 +41,57 @@ export async function Header({ modules, siteName = 'Store' }: HeaderProps) {
             : []),
     ]);
 
-    return (
-        <HeaderClient>
-            <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-                {/* Logo */}
+    const top = (
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-4">
+                <div className="hidden flex-1 items-center justify-start md:flex">
+                    <LocaleSwitcher />
+                </div>
                 <Link
                     href={`/${locale}`}
                     className="text-primary shrink-0 text-xl font-bold tracking-tight"
                 >
                     {siteName}
                 </Link>
+                <div className="flex flex-1 items-center justify-end">
+                    <div className="flex items-center gap-2">
+                        {modules?.ecommerce && <SearchBar />}
+                        <div className="hidden md:block">
+                            <ThemeToggle />
+                        </div>
 
-                {/* Desktop mega menu */}
-                <MegaMenu
-                    items={items}
-                    categories={modules?.ecommerce ? categories : []}
-                />
+                        {modules?.ecommerce && (
+                            <>
+                                <span className="hidden md:block">
+                                    <WishlistButton />
+                                </span>
+                                <span className="hidden md:block">
+                                    <CartButton />
+                                </span>
+                            </>
+                        )}
 
-                {/* Actions */}
-                <div className="flex items-center gap-2">
-                    {modules?.ecommerce && <SearchBar />}
-                    <LocaleSwitcher />
-                    <ThemeToggle />
-                    {modules?.ecommerce && <WishlistButton />}
-                    {modules?.ecommerce && <CartButton />}
-                    <AuthButton />
-                    {/* Mobile menu trigger */}
-                    <MobileMenu
-                        items={items}
-                        categories={modules?.ecommerce ? categories : []}
-                    />
+                        <AuthButton />
+
+                        <MobileMenu
+                            items={items}
+                            categories={modules?.ecommerce ? categories : []}
+                            siteName={siteName}
+                        />
+                    </div>
                 </div>
             </div>
-        </HeaderClient>
+        </div>
     );
+
+    const bottom = (
+        <div className="mx-auto flex max-w-7xl justify-center px-4 py-0 sm:px-6 lg:px-8">
+            <MegaMenu
+                items={items}
+                categories={modules?.ecommerce ? categories : []}
+            />
+        </div>
+    );
+
+    return <HeaderClient top={top} bottom={bottom} />;
 }

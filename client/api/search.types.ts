@@ -7,6 +7,7 @@ export interface SearchFacetCategory {
 
 export interface SearchFacetBrand {
     id: string;
+    slug: string;
     name: string;
     count: number;
 }

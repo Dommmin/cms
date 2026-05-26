@@ -2,16 +2,17 @@
 
 import { ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import { searchProducts } from '@/api/search';
 import type { SearchFilters, SearchResult } from '@/api/search.types';
-import { useBrands, useCategories } from '@/hooks/use-cms';
+import { useCategories } from '@/hooks/use-cms';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
 import { trackSearch } from '@/lib/datalayer';
 import { formatPrice } from '@/lib/format';
-import type { Brand, Category } from '@/types/api';
+import type { Category } from '@/types/api';
 import { useQuery } from '@tanstack/react-query';
 
 function ProductSearchCard({
@@ -87,15 +88,17 @@ export function SearchClient() {
         per_page: 20,
     };
 
-    const { data, isLoading } = useQuery({
+    const { data, isFetching } = useQuery({
         queryKey: ['search', filters],
         queryFn: () => searchProducts(filters),
         enabled: !!q || !!category || !!brand,
+        placeholderData: (prev) => prev,
     });
 
     const { data: categories } = useCategories();
-    const { data: brands } = useBrands();
 
+    const isLoading = !data && isFetching;
+    const isBlurring = isFetching && !!data;
     const lp = useLocalePath();
     const { t } = useTranslation();
 
@@ -146,19 +149,32 @@ export function SearchClient() {
 
     const activeFilters: { key: string; label: string }[] = [];
     if (category) {
-        const cat = categories?.find(
-            (c: Category) => c.slug === category || String(c.id) === category,
-        );
+        const cat =
+            facets?.categories?.find(
+                (c: {
+                    id: string;
+                    slug: string;
+                    name: string;
+                    count: number;
+                }) => c.slug === category || c.id === category,
+            ) ??
+            categories?.find(
+                (c: Category) =>
+                    c.slug === category || String(c.id) === category,
+            );
         activeFilters.push({
             key: 'category',
             label: cat?.name ?? category,
         });
     }
     if (brand) {
-        const br = brands?.find((b: Brand) => String(b.id) === brand);
+        const br = facets?.brands?.find(
+            (b: { id: string; slug: string; name: string; count: number }) =>
+                b.slug === brand || b.id === brand,
+        );
         activeFilters.push({
             key: 'brand',
-            label: br?.name ?? `Brand #${brand}`,
+            label: br?.name ?? `Brand: ${brand}`,
         });
     }
     if (minPrice != null)
@@ -180,6 +196,229 @@ export function SearchClient() {
         min: 0,
         max: 0,
     };
+
+    const closeSidebar = useCallback(() => setSidebarOpen(false), []);
+
+    useEffect(() => {
+        if (!sidebarOpen) return;
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [sidebarOpen]);
+
+    const filterPanel = (
+        <div className="border-border bg-card space-y-6 rounded-xl border p-4">
+            {/* Categories from facets */}
+            {!facets ? (
+                <div className="space-y-2">
+                    <div className="bg-muted h-3 w-24 animate-pulse rounded" />
+                    <div className="bg-muted h-6 w-full animate-pulse rounded-lg" />
+                    <div className="bg-muted h-6 w-full animate-pulse rounded-lg" />
+                    <div className="bg-muted h-6 w-full animate-pulse rounded-lg" />
+                </div>
+            ) : facets.categories.length > 0 ? (
+                <div>
+                    <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
+                        {t('search.categories', 'Categories')}
+                    </p>
+                    <div className="space-y-1">
+                        <button
+                            onClick={() => {
+                                setParam('category', '');
+                                closeSidebar();
+                            }}
+                            className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
+                                !category
+                                    ? 'bg-primary/10 text-primary font-medium'
+                                    : 'text-foreground/70 hover:bg-accent hover:text-foreground'
+                            }`}
+                        >
+                            {t('search.all_categories', 'All categories')}
+                        </button>
+                        {facets.categories
+                            .slice(
+                                0,
+                                expandedFilters['categories']
+                                    ? undefined
+                                    : VISIBLE_DEFAULT,
+                            )
+                            .map(
+                                (cat: {
+                                    id: string;
+                                    slug: string;
+                                    name: string;
+                                    count: number;
+                                }) => (
+                                    <button
+                                        key={cat.id}
+                                        onClick={() => {
+                                            setParam('category', cat.slug);
+                                            closeSidebar();
+                                        }}
+                                        className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
+                                            category === cat.slug ||
+                                            category === cat.id
+                                                ? 'bg-primary/10 text-primary font-medium'
+                                                : 'text-foreground/70 hover:bg-accent hover:text-foreground'
+                                        }`}
+                                    >
+                                        {cat.name} ({cat.count})
+                                    </button>
+                                ),
+                            )}
+                        {facets.categories.length > VISIBLE_DEFAULT && (
+                            <button
+                                onClick={() => toggleFilter('categories')}
+                                className="text-muted-foreground hover:text-foreground mt-1 flex w-full items-center justify-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors"
+                            >
+                                {expandedFilters['categories']
+                                    ? t('search.show_less', 'Show less')
+                                    : t('search.show_more', 'Show more')}
+                                <ChevronDown
+                                    className={`h-3 w-3 transition-transform ${
+                                        expandedFilters['categories']
+                                            ? 'rotate-180'
+                                            : ''
+                                    }`}
+                                    aria-hidden="true"
+                                />
+                            </button>
+                        )}
+                    </div>
+                </div>
+            ) : null}
+
+            {/* Brands from facets */}
+            {!facets ? (
+                <div className="space-y-2">
+                    <div className="bg-muted h-3 w-16 animate-pulse rounded" />
+                    <div className="bg-muted h-6 w-full animate-pulse rounded-lg" />
+                    <div className="bg-muted h-6 w-full animate-pulse rounded-lg" />
+                    <div className="bg-muted h-6 w-full animate-pulse rounded-lg" />
+                </div>
+            ) : facets.brands.length > 0 ? (
+                <div>
+                    <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
+                        {t('search.brands', 'Brand')}
+                    </p>
+                    <div className="space-y-1">
+                        <button
+                            onClick={() => {
+                                setParam('brand', '');
+                                closeSidebar();
+                            }}
+                            className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
+                                !brand
+                                    ? 'bg-primary/10 text-primary font-medium'
+                                    : 'text-foreground/70 hover:bg-accent hover:text-foreground'
+                            }`}
+                        >
+                            {t('search.all_brands', 'All brands')}
+                        </button>
+                        {facets.brands
+                            .slice(
+                                0,
+                                expandedFilters['brands']
+                                    ? undefined
+                                    : VISIBLE_DEFAULT,
+                            )
+                            .map(
+                                (br: {
+                                    id: string;
+                                    slug: string;
+                                    name: string;
+                                    count: number;
+                                }) => (
+                                    <button
+                                        key={br.id}
+                                        onClick={() => {
+                                            setParam('brand', br.slug);
+                                            closeSidebar();
+                                        }}
+                                        className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
+                                            brand === br.slug || brand === br.id
+                                                ? 'bg-primary/10 text-primary font-medium'
+                                                : 'text-foreground/70 hover:bg-accent hover:text-foreground'
+                                        }`}
+                                    >
+                                        {br.name} ({br.count})
+                                    </button>
+                                ),
+                            )}
+                        {facets.brands.length > VISIBLE_DEFAULT && (
+                            <button
+                                onClick={() => toggleFilter('brands')}
+                                className="text-muted-foreground hover:text-foreground mt-1 flex w-full items-center justify-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors"
+                            >
+                                {expandedFilters['brands']
+                                    ? t('search.show_less', 'Show less')
+                                    : t('search.show_more', 'Show more')}
+                                <ChevronDown
+                                    className={`h-3 w-3 transition-transform ${
+                                        expandedFilters['brands']
+                                            ? 'rotate-180'
+                                            : ''
+                                    }`}
+                                    aria-hidden="true"
+                                />
+                            </button>
+                        )}
+                    </div>
+                </div>
+            ) : null}
+
+            {/* Price range */}
+            <div>
+                <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
+                    {t('search.price_range', 'Price range')}
+                </p>
+                <p className="text-muted-foreground mb-2 text-xs">
+                    {formatPrice(priceRanges.min)} –{' '}
+                    {formatPrice(priceRanges.max)}
+                </p>
+                <div className="flex items-center gap-2">
+                    <label htmlFor="price-min" className="sr-only">
+                        {t('search.price_min', 'Minimum price')}
+                    </label>
+                    <input
+                        id="price-min"
+                        type="number"
+                        min={0}
+                        placeholder="Min"
+                        defaultValue={minPrice ?? ''}
+                        onBlur={(e) => setParam('min_price', e.target.value)}
+                        className="border-input bg-background focus:ring-ring w-full rounded-lg border px-2 py-1.5 text-sm focus:ring-2 focus:outline-none"
+                    />
+                    <span className="text-muted-foreground" aria-hidden="true">
+                        –
+                    </span>
+                    <label htmlFor="price-max" className="sr-only">
+                        {t('search.price_max', 'Maximum price')}
+                    </label>
+                    <input
+                        id="price-max"
+                        type="number"
+                        min={0}
+                        placeholder="Max"
+                        defaultValue={maxPrice ?? ''}
+                        onBlur={(e) => setParam('max_price', e.target.value)}
+                        className="border-input bg-background focus:ring-ring w-full rounded-lg border px-2 py-1.5 text-sm focus:ring-2 focus:outline-none"
+                    />
+                </div>
+            </div>
+
+            {/* Mobile: close button */}
+            <div className="md:hidden">
+                <button
+                    onClick={closeSidebar}
+                    className="bg-primary text-primary-foreground w-full rounded-xl py-2.5 text-sm font-medium"
+                >
+                    {t('search.show_results', 'Show results')}
+                </button>
+            </div>
+        </div>
+    );
 
     return (
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -245,7 +484,7 @@ export function SearchClient() {
                         onClick={() => setSidebarOpen((v) => !v)}
                         aria-expanded={sidebarOpen}
                         aria-controls="search-filters-sidebar"
-                        className="border-input bg-background hover:bg-accent inline-flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm lg:hidden"
+                        className="border-input bg-background hover:bg-accent inline-flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm md:hidden"
                     >
                         <SlidersHorizontal
                             className="h-4 w-4"
@@ -305,221 +544,13 @@ export function SearchClient() {
             )}
 
             <div className="flex gap-6">
-                {/* Sidebar */}
+                {/* Desktop sidebar */}
                 <aside
                     id="search-filters-sidebar"
                     aria-label={t('shop.filters_label', 'Search filters')}
-                    className={`${sidebarOpen ? 'block' : 'hidden'} w-64 shrink-0 lg:block`}
+                    className="hidden w-64 shrink-0 md:block"
                 >
-                    <div className="border-border bg-card space-y-6 rounded-xl border p-4">
-                        {/* Categories from facets */}
-                        {facets && facets.categories.length > 0 && (
-                            <div>
-                                <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
-                                    {t('search.categories', 'Categories')}
-                                </p>
-                                <div className="space-y-1">
-                                    <button
-                                        onClick={() => setParam('category', '')}
-                                        className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
-                                            !category
-                                                ? 'bg-primary/10 text-primary font-medium'
-                                                : 'text-foreground/70 hover:bg-accent hover:text-foreground'
-                                        }`}
-                                    >
-                                        {t(
-                                            'search.all_categories',
-                                            'All categories',
-                                        )}
-                                    </button>
-                                    {facets.categories
-                                        .slice(
-                                            0,
-                                            expandedFilters['categories']
-                                                ? undefined
-                                                : VISIBLE_DEFAULT,
-                                        )
-                                        .map(
-                                            (cat: {
-                                                id: string;
-                                                slug: string;
-                                                name: string;
-                                                count: number;
-                                            }) => (
-                                                <button
-                                                    key={cat.id}
-                                                    onClick={() =>
-                                                        setParam(
-                                                            'category',
-                                                            cat.slug,
-                                                        )
-                                                    }
-                                                    className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
-                                                        category === cat.slug ||
-                                                        category === cat.id
-                                                            ? 'bg-primary/10 text-primary font-medium'
-                                                            : 'text-foreground/70 hover:bg-accent hover:text-foreground'
-                                                    }`}
-                                                >
-                                                    {cat.name} ({cat.count})
-                                                </button>
-                                            ),
-                                        )}
-                                    {facets.categories.length >
-                                        VISIBLE_DEFAULT && (
-                                        <button
-                                            onClick={() =>
-                                                toggleFilter('categories')
-                                            }
-                                            className="text-muted-foreground hover:text-foreground mt-1 flex w-full items-center justify-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors"
-                                        >
-                                            {expandedFilters['categories']
-                                                ? t(
-                                                      'search.show_less',
-                                                      'Show less',
-                                                  )
-                                                : t(
-                                                      'search.show_more',
-                                                      'Show more',
-                                                  )}
-                                            <ChevronDown
-                                                className={`h-3 w-3 transition-transform ${
-                                                    expandedFilters[
-                                                        'categories'
-                                                    ]
-                                                        ? 'rotate-180'
-                                                        : ''
-                                                }`}
-                                                aria-hidden="true"
-                                            />
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Brands from facets */}
-                        {facets && facets.brands.length > 0 && (
-                            <div>
-                                <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
-                                    {t('search.brands', 'Brand')}
-                                </p>
-                                <div className="space-y-1">
-                                    <button
-                                        onClick={() => setParam('brand', '')}
-                                        className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
-                                            !brand
-                                                ? 'bg-primary/10 text-primary font-medium'
-                                                : 'text-foreground/70 hover:bg-accent hover:text-foreground'
-                                        }`}
-                                    >
-                                        {t('search.all_brands', 'All brands')}
-                                    </button>
-                                    {facets.brands
-                                        .slice(
-                                            0,
-                                            expandedFilters['brands']
-                                                ? undefined
-                                                : VISIBLE_DEFAULT,
-                                        )
-                                        .map(
-                                            (br: {
-                                                id: string;
-                                                name: string;
-                                                count: number;
-                                            }) => (
-                                                <button
-                                                    key={br.id}
-                                                    onClick={() =>
-                                                        setParam('brand', br.id)
-                                                    }
-                                                    className={`w-full rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
-                                                        brand === br.id
-                                                            ? 'bg-primary/10 text-primary font-medium'
-                                                            : 'text-foreground/70 hover:bg-accent hover:text-foreground'
-                                                    }`}
-                                                >
-                                                    {br.name} ({br.count})
-                                                </button>
-                                            ),
-                                        )}
-                                    {facets.brands.length > VISIBLE_DEFAULT && (
-                                        <button
-                                            onClick={() =>
-                                                toggleFilter('brands')
-                                            }
-                                            className="text-muted-foreground hover:text-foreground mt-1 flex w-full items-center justify-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors"
-                                        >
-                                            {expandedFilters['brands']
-                                                ? t(
-                                                      'search.show_less',
-                                                      'Show less',
-                                                  )
-                                                : t(
-                                                      'search.show_more',
-                                                      'Show more',
-                                                  )}
-                                            <ChevronDown
-                                                className={`h-3 w-3 transition-transform ${
-                                                    expandedFilters['brands']
-                                                        ? 'rotate-180'
-                                                        : ''
-                                                }`}
-                                                aria-hidden="true"
-                                            />
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Price range */}
-                        <div>
-                            <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
-                                {t('search.price_range', 'Price range')}
-                            </p>
-                            <p className="text-muted-foreground mb-2 text-xs">
-                                {formatPrice(priceRanges.min)} –{' '}
-                                {formatPrice(priceRanges.max)}
-                            </p>
-                            <div className="flex items-center gap-2">
-                                <label htmlFor="price-min" className="sr-only">
-                                    {t('search.price_min', 'Minimum price')}
-                                </label>
-                                <input
-                                    id="price-min"
-                                    type="number"
-                                    min={0}
-                                    placeholder="Min"
-                                    defaultValue={minPrice ?? ''}
-                                    onBlur={(e) =>
-                                        setParam('min_price', e.target.value)
-                                    }
-                                    className="border-input bg-background focus:ring-ring w-full rounded-lg border px-2 py-1.5 text-sm focus:ring-2 focus:outline-none"
-                                />
-                                <span
-                                    className="text-muted-foreground"
-                                    aria-hidden="true"
-                                >
-                                    –
-                                </span>
-                                <label htmlFor="price-max" className="sr-only">
-                                    {t('search.price_max', 'Maximum price')}
-                                </label>
-                                <input
-                                    id="price-max"
-                                    type="number"
-                                    min={0}
-                                    placeholder="Max"
-                                    defaultValue={maxPrice ?? ''}
-                                    onBlur={(e) =>
-                                        setParam('max_price', e.target.value)
-                                    }
-                                    className="border-input bg-background focus:ring-ring w-full rounded-lg border px-2 py-1.5 text-sm focus:ring-2 focus:outline-none"
-                                />
-                            </div>
-                        </div>
-                    </div>
+                    {filterPanel}
                 </aside>
 
                 {/* Results */}
@@ -551,27 +582,27 @@ export function SearchClient() {
                         )}
                     </p>
 
-                    {/* Skeleton */}
+                    {/* Skeleton – first load only (no data at all yet) */}
                     {isLoading && (
-                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                             {Array.from({ length: 6 }).map((_, i) => (
                                 <div
                                     key={i}
                                     className="border-border bg-card overflow-hidden rounded-xl border"
                                 >
                                     <div className="bg-muted aspect-square animate-pulse" />
-                                    <div className="space-y-2 p-4">
-                                        <div className="bg-muted h-3 w-1/3 animate-pulse rounded" />
-                                        <div className="bg-muted h-4 w-3/4 animate-pulse rounded" />
-                                        <div className="bg-muted mt-2 h-8 animate-pulse rounded-lg" />
+                                    <div className="space-y-1.5 p-3">
+                                        <div className="bg-muted h-3 w-2/5 animate-pulse rounded" />
+                                        <div className="bg-muted h-4 w-4/5 animate-pulse rounded" />
+                                        <div className="bg-muted mt-1 h-5 w-1/3 animate-pulse rounded" />
                                     </div>
                                 </div>
                             ))}
                         </div>
                     )}
 
-                    {/* Empty */}
-                    {!isLoading && products.length === 0 && (
+                    {/* Empty – only when fetch settled and results are empty */}
+                    {!isFetching && products.length === 0 && (
                         <div className="py-20 text-center">
                             <p className="text-foreground text-lg font-medium">
                                 {t('search.no_results', 'No results found')}
@@ -625,10 +656,12 @@ export function SearchClient() {
                         </div>
                     )}
 
-                    {/* Grid */}
-                    {!isLoading && products.length > 0 && (
-                        <>
-                            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                    {/* Grid – show products (old data while refetching, new data when ready) */}
+                    {products.length > 0 && (
+                        <div
+                            className={`transition-opacity duration-200 ${isBlurring ? 'pointer-events-none opacity-50' : ''}`}
+                        >
+                            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                                 {products.map((product) => (
                                     <a
                                         key={product.id}
@@ -682,10 +715,41 @@ export function SearchClient() {
                                     })}
                                 </nav>
                             )}
-                        </>
+                        </div>
                     )}
                 </div>
             </div>
+
+            {/* Mobile filter drawer */}
+            {sidebarOpen &&
+                createPortal(
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label={t('shop.filters_label', 'Search filters')}
+                        className="bg-background fixed inset-0 flex flex-col overflow-y-auto md:hidden"
+                        style={{ zIndex: 200 }}
+                    >
+                        <div className="border-border flex h-14 shrink-0 items-center justify-between border-b px-4 sm:px-6">
+                            <h2 className="text-lg font-semibold">
+                                {t('shop.filters', 'Filters')}
+                            </h2>
+                            <button
+                                type="button"
+                                onClick={closeSidebar}
+                                className="hover:bg-accent inline-flex h-9 w-9 items-center justify-center rounded-md"
+                                aria-label={t(
+                                    'search.close_filters',
+                                    'Close filters',
+                                )}
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+                        <div className="p-4">{filterPanel}</div>
+                    </div>,
+                    document.body,
+                )}
         </div>
     );
 }

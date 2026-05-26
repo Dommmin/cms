@@ -38,8 +38,9 @@ function localiseUrl(
     return lp(url);
 }
 
-export function MobileMenu({ items, categories }: MobileMenuProps) {
-    const [open, setOpen] = useState(false);
+export function MobileMenu({ items, categories, siteName }: MobileMenuProps) {
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [accountOpen, setAccountOpen] = useState(false);
     const [query, setQuery] = useState('');
     const [expandedCatId, setExpandedCatId] = useState<number | null>(null);
     const [mounted] = useState(() => typeof window !== 'undefined');
@@ -50,13 +51,18 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
     const { t } = useTranslation();
     const lp = useLocalePath();
 
-    function close() {
-        setOpen(false);
+    function closeMenu() {
+        setMenuOpen(false);
         setQuery('');
+        setExpandedCatId(null);
     }
 
-    function handleOpen() {
-        setOpen(true);
+    function closeAccount() {
+        setAccountOpen(false);
+    }
+
+    function handleMenuOpen() {
+        setMenuOpen(true);
         setTimeout(() => searchRef.current?.focus(), 80);
     }
 
@@ -64,53 +70,92 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
         e.preventDefault();
         const q = query.trim();
         if (!q) return;
-        close();
+        closeMenu();
         router.push(lp(`/search?q=${encodeURIComponent(q)}`));
     }
 
-    // Close on Escape
     useEffect(() => {
-        if (!open) return;
+        const anyOpen = menuOpen || accountOpen;
+        if (!anyOpen) return;
+        document.body.style.overflow = 'hidden';
+
         function onKey(e: KeyboardEvent) {
-            if (e.key === 'Escape') close();
+            if (e.key === 'Escape') {
+                setMenuOpen(false);
+                setAccountOpen(false);
+                setQuery('');
+            }
         }
         document.addEventListener('keydown', onKey);
-        // Prevent body scroll while open
-        document.body.style.overflow = 'hidden';
         return () => {
             document.removeEventListener('keydown', onKey);
             document.body.style.overflow = '';
         };
-    }, [open]);
+    }, [menuOpen, accountOpen]);
+
+    useEffect(() => {
+        function onOpenMenu() {
+            setMenuOpen(true);
+            setTimeout(() => searchRef.current?.focus(), 80);
+        }
+        window.addEventListener('open-mobile-menu', onOpenMenu);
+        return () => window.removeEventListener('open-mobile-menu', onOpenMenu);
+    }, []);
+
+    useEffect(() => {
+        function onOpenAccount() {
+            setAccountOpen(true);
+        }
+        window.addEventListener('open-mobile-account', onOpenAccount);
+        return () =>
+            window.removeEventListener('open-mobile-account', onOpenAccount);
+    }, []);
 
     return (
         <>
-            {/* Hamburger / Close trigger */}
             <button
                 type="button"
-                onClick={open ? close : handleOpen}
+                onClick={menuOpen ? closeMenu : handleMenuOpen}
                 className="hover:bg-accent inline-flex h-9 w-9 items-center justify-center rounded-md md:hidden"
-                aria-label={open ? 'Close menu' : 'Open menu'}
-                aria-expanded={open}
+                aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={menuOpen}
             >
-                {open ? (
+                {menuOpen ? (
                     <X className="h-5 w-5" />
                 ) : (
                     <Menu className="h-5 w-5" />
                 )}
             </button>
 
-            {/* Full-screen panel — rendered via portal to escape header stacking context */}
-            {open &&
+            {/* ── Menu panel ─────────────────────────────────── */}
+            {menuOpen &&
                 mounted &&
                 createPortal(
                     <div
                         role="dialog"
                         aria-modal="true"
                         aria-label={t('nav.mobile_menu', 'Navigation menu')}
-                        className="bg-background fixed inset-x-0 top-16 bottom-0 z-[200] flex flex-col overflow-y-auto md:hidden"
+                        className="bg-background fixed inset-0 flex flex-col overflow-y-auto md:hidden"
+                        style={{ zIndex: 200 }}
                     >
-                        {/* ── Search ─────────────────────────────────────── */}
+                        <div className="border-border flex h-14 shrink-0 items-center justify-between border-b px-4 sm:px-6">
+                            <Link
+                                href={lp('/')}
+                                onClick={closeMenu}
+                                className="text-primary text-xl font-bold tracking-tight"
+                            >
+                                {siteName}
+                            </Link>
+                            <button
+                                type="button"
+                                onClick={closeMenu}
+                                className="hover:bg-accent inline-flex h-9 w-9 items-center justify-center rounded-md"
+                                aria-label={t('nav.close_menu', 'Close menu')}
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+
                         <div className="border-border border-b px-4 py-3">
                             <form onSubmit={handleSearch} noValidate>
                                 <div className="border-border bg-muted/50 flex items-center gap-3 rounded-xl border px-3 py-2.5">
@@ -157,13 +202,11 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
                             </form>
                         </div>
 
-                        {/* ── Categories ─────────────────────────────────── */}
                         {categories.length > 0 && (
                             <div className="border-border border-b">
-                                {/* "All products" row */}
                                 <Link
                                     href={lp('/products')}
-                                    onClick={close}
+                                    onClick={closeMenu}
                                     className="border-border flex items-center gap-3 border-b px-4 py-3.5"
                                 >
                                     <div className="bg-muted flex h-9 w-9 items-center justify-center rounded-lg">
@@ -174,7 +217,6 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
                                     </span>
                                 </Link>
 
-                                {/* Accordion per parent category */}
                                 {categories.map((cat) => {
                                     const hasChildren =
                                         (cat.children?.length ?? 0) > 0;
@@ -186,7 +228,6 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
                                             className="border-border border-b last:border-0"
                                         >
                                             {hasChildren ? (
-                                                /* Toggle button for category with children */
                                                 <button
                                                     type="button"
                                                     onClick={() =>
@@ -225,12 +266,11 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
                                                     />
                                                 </button>
                                             ) : (
-                                                /* Direct link for category without children */
                                                 <Link
                                                     href={lp(
                                                         `/products?category=${cat.slug}`,
                                                     )}
-                                                    onClick={close}
+                                                    onClick={closeMenu}
                                                     className="flex items-center gap-3 px-4 py-3.5"
                                                 >
                                                     <div className="bg-muted flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg">
@@ -256,15 +296,13 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
                                                 </Link>
                                             )}
 
-                                            {/* Expanded subcategories */}
                                             {hasChildren && isExpanded && (
                                                 <div className="bg-muted/30 px-4 pb-3">
-                                                    {/* Link to parent category */}
                                                     <Link
                                                         href={lp(
                                                             `/products?category=${cat.slug}`,
                                                         )}
-                                                        onClick={close}
+                                                        onClick={closeMenu}
                                                         className="text-primary mb-2 block py-1.5 text-xs font-medium"
                                                     >
                                                         {t(
@@ -283,7 +321,7 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
                                                                         `/products?category=${child.slug}`,
                                                                     )}
                                                                     onClick={
-                                                                        close
+                                                                        closeMenu
                                                                     }
                                                                     className="hover:bg-accent flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm"
                                                                 >
@@ -330,7 +368,6 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
                             </div>
                         )}
 
-                        {/* ── CMS nav links ───────────────────────────────── */}
                         {items.length > 0 && (
                             <nav
                                 aria-label={t(
@@ -343,7 +380,7 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
                                     <Link
                                         key={item.id}
                                         href={localiseUrl(item.url, lp)}
-                                        onClick={close}
+                                        onClick={closeMenu}
                                         className="text-foreground/80 hover:text-foreground [&:not(:last-child)]:border-border/60 flex items-center py-3.5 text-base font-medium [&:not(:last-child)]:border-b"
                                     >
                                         {item.label}
@@ -352,11 +389,49 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
                             </nav>
                         )}
 
-                        {/* ── Account ────────────────────────────────────── */}
-                        <div className="px-4 py-4">
+                        <div className="border-border mt-auto border-t px-4 py-4">
+                            <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground text-xs">
+                                    {t('nav.language', 'Language & Theme')}
+                                </span>
+                                <div className="flex items-center gap-2">
+                                    <LocaleSwitcher />
+                                    <ThemeToggle />
+                                </div>
+                            </div>
+                        </div>
+                    </div>,
+                    document.body,
+                )}
+
+            {/* ── Account panel ───────────────────────────────── */}
+            {accountOpen &&
+                mounted &&
+                createPortal(
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label={t('nav.account', 'Account')}
+                        className="bg-background fixed inset-0 flex flex-col overflow-y-auto md:hidden"
+                        style={{ zIndex: 200 }}
+                    >
+                        <div className="border-border flex h-14 shrink-0 items-center justify-between border-b px-4 sm:px-6">
+                            <span className="text-foreground text-lg font-semibold">
+                                {t('nav.account', 'Account')}
+                            </span>
+                            <button
+                                type="button"
+                                onClick={closeAccount}
+                                className="hover:bg-accent inline-flex h-9 w-9 items-center justify-center rounded-md"
+                                aria-label={t('nav.close_menu', 'Close menu')}
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        <div className="flex-1 px-4 py-4">
                             {user ? (
                                 <>
-                                    {/* User info */}
                                     <div className="border-border bg-muted/30 mb-3 flex items-center gap-3 rounded-xl border px-3 py-3">
                                         <div className="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold">
                                             {user.name?.[0]?.toUpperCase() ??
@@ -375,7 +450,7 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
                                     <div className="space-y-1">
                                         <Link
                                             href={lp('/account/orders')}
-                                            onClick={close}
+                                            onClick={closeAccount}
                                             className="hover:bg-accent flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium"
                                         >
                                             <Package className="text-muted-foreground h-4 w-4" />
@@ -386,7 +461,7 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
                                         </Link>
                                         <Link
                                             href={lp('/account/wishlist')}
-                                            onClick={close}
+                                            onClick={closeAccount}
                                             className="hover:bg-accent flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium"
                                         >
                                             <Heart className="text-muted-foreground h-4 w-4" />
@@ -394,7 +469,7 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
                                         </Link>
                                         <Link
                                             href={lp('/account/profile')}
-                                            onClick={close}
+                                            onClick={closeAccount}
                                             className="hover:bg-accent flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium"
                                         >
                                             <User className="text-muted-foreground h-4 w-4" />
@@ -403,7 +478,7 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                close();
+                                                closeAccount();
                                                 logout();
                                             }}
                                             className="text-destructive hover:bg-destructive/10 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium"
@@ -417,14 +492,14 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
                                 <div className="flex flex-col gap-2">
                                     <Link
                                         href={lp('/login')}
-                                        onClick={close}
+                                        onClick={closeAccount}
                                         className="bg-primary text-primary-foreground flex items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold"
                                     >
                                         {t('nav.login', 'Sign in')}
                                     </Link>
                                     <Link
                                         href={lp('/register')}
-                                        onClick={close}
+                                        onClick={closeAccount}
                                         className="border-border hover:bg-accent flex items-center justify-center rounded-xl border px-4 py-3 text-sm font-semibold"
                                     >
                                         {t('auth.sign_up', 'Create account')}
@@ -433,7 +508,6 @@ export function MobileMenu({ items, categories }: MobileMenuProps) {
                             )}
                         </div>
 
-                        {/* ── Bottom bar: locale + theme ──────────────────── */}
                         <div className="border-border mt-auto border-t px-4 py-4">
                             <div className="flex items-center justify-between">
                                 <span className="text-muted-foreground text-xs">

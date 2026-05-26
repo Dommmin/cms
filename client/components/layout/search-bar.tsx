@@ -157,7 +157,8 @@ export function SearchBar() {
                 <>
                     {/* Backdrop */}
                     <div
-                        className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
+                        className="fixed inset-0 bg-black/20 backdrop-blur-sm"
+                        style={{ zIndex: 39 }}
                         onClick={closeSearch}
                     />
 
@@ -166,7 +167,8 @@ export function SearchBar() {
                         role="dialog"
                         aria-label="Search"
                         aria-modal="true"
-                        className="fixed top-16 right-0 left-0 z-50 overflow-hidden rounded-b-2xl border border-white/20 bg-white/80 shadow-[0_20px_60px_-10px_oklch(0_0_0_/_0.2)] backdrop-blur-2xl backdrop-saturate-150 dark:border-white/10 dark:bg-neutral-900/80 dark:shadow-[0_20px_60px_-10px_oklch(0_0_0_/_0.5)]"
+                        className="fixed top-16 right-0 left-0 overflow-hidden rounded-b-2xl border border-white/20 bg-white/80 shadow-[0_20px_60px_-10px_oklch(0_0_0_/_0.2)] backdrop-blur-2xl backdrop-saturate-150 dark:border-white/10 dark:bg-neutral-900/80 dark:shadow-[0_20px_60px_-10px_oklch(0_0_0_/_0.5)]"
+                        style={{ zIndex: 210 }}
                     >
                         <div className="mx-auto max-h-[70vh] max-w-2xl overflow-y-auto px-4 py-4">
                             {/* Input row */}

@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Api\V1\ProductResource;
+use App\Models\Brand;
 use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\Product;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Laravel\Scout\Builder;
+use Typesense\Exceptions\ObjectNotFound;
 
 class SearchController extends ApiController
 {
@@ -24,7 +26,7 @@ class SearchController extends ApiController
      * Search products with faceting and filters via Typesense.
      *
      * Accepts flat query params:
-     *   q=shoes&category=boots&brand=5&min_price=1000&max_price=5000&sort=price:asc&page=2
+     *   q=shoes&category=boots&brand=samsung&min_price=1000&max_price=5000&sort=price:asc&page=2
      *
      * Or nested filters (backward compat):
      *   q=shoes&filters[category_id]=5&filters[brand_id]=3&filters[price_min]=1000&filters[price_max]=5000
@@ -48,22 +50,39 @@ class SearchController extends ApiController
                     'per_page' => $perPage,
                     'current_page' => $page,
                     'last_page' => 1,
-                    'facets' => $this->getFacets($filters),
+                    'facets' => $this->getFacetFallback([], $filters),
                     'did_you_mean' => null,
                 ],
             ]);
         }
 
+        $rawResults = null;
+        $useFacets = true;
         $searchBuilder = Product::search($expandedQuery);
 
-        $this->applyFilters($searchBuilder, $filters);
+        $this->applyFilters($searchBuilder, $filters, withFacets: true);
         $this->applySorting($searchBuilder, $sort);
 
-        $results = $searchBuilder->paginate($perPage, 'page', $page);
+        $searchBuilder->withRawResults(function (array $results) use (&$rawResults): void {
+            $rawResults = $results;
+        });
+
+        try {
+            $results = $searchBuilder->paginate($perPage, 'page', $page);
+        } catch (ObjectNotFound) {
+            $useFacets = false;
+            $rawResults = null;
+            $searchBuilder = Product::search($expandedQuery);
+            $this->applyFilters($searchBuilder, $filters, withFacets: false);
+            $this->applySorting($searchBuilder, $sort);
+            $searchBuilder->withRawResults(function (array $results) use (&$rawResults): void {
+                $rawResults = $results;
+            });
+            $results = $searchBuilder->paginate($perPage, 'page', $page);
+        }
 
         $items = $results->items();
 
-        // Eager-load relations needed by ProductResource (Scout returns bare models)
         if ($items !== []) {
             $productIds = array_map(fn (Product $p): int => $p->id, $items);
             $loaded = Product::query()
@@ -94,6 +113,15 @@ class SearchController extends ApiController
             ]);
         }
 
+        $facetCounts = $rawResults['facet_counts'] ?? [];
+
+        if ($useFacets && $facetCounts !== []) {
+            $facets = $this->getFacetsFromTypesense($facetCounts, $filters);
+        } else {
+            $matchingIds = $this->getAllMatchingIds($expandedQuery, $filters);
+            $facets = $this->getFacetFallback($matchingIds, $filters);
+        }
+
         return $this->ok([
             'data' => ProductResource::collection($items),
             'meta' => [
@@ -101,7 +129,7 @@ class SearchController extends ApiController
                 'per_page' => $results->perPage(),
                 'current_page' => $results->currentPage(),
                 'last_page' => $results->lastPage(),
-                'facets' => $this->getFacets($filters),
+                'facets' => $facets,
                 'did_you_mean' => $didYouMean,
             ],
         ]);
@@ -124,7 +152,6 @@ class SearchController extends ApiController
         $blogPostLimit = 3;
         $productLimit = max(1, $limit - $categoryLimit - $blogPostLimit);
 
-        // Products (always active)
         if ((bool) Setting::get('search', 'index_products', true)) {
             $productResults = Product::search($query)
                 ->where('is_active', true)
@@ -151,7 +178,6 @@ class SearchController extends ApiController
             }
         }
 
-        // Categories (if enabled)
         if ((bool) Setting::get('search', 'index_categories', true)) {
             $categoryResults = Category::search($query)
                 ->where('is_active', true)
@@ -177,7 +203,6 @@ class SearchController extends ApiController
             }
         }
 
-        // Blog posts (if enabled)
         if ((bool) Setting::get('search', 'index_blog_posts', true)) {
             $blogResults = BlogPost::search($query)
                 ->where('status', 'published')
@@ -217,7 +242,7 @@ class SearchController extends ApiController
 
     /**
      * Resolve filters from flat query params or nested filters array.
-     * Supports: category (slug or ID), brand (ID), min_price/max_price (in cents).
+     * Supports: category (slug or ID), brand (slug or ID), min_price/max_price (in cents).
      *
      * @return array{category_id?: string[], brand_id?: string[], price_min?: int, price_max?: int}
      */
@@ -234,7 +259,12 @@ class SearchController extends ApiController
                 if (is_numeric($slug)) {
                     $ids[] = (string) $slug;
                 } else {
-                    $category = Category::query()->where('slug', $slug)->first();
+                    $category = Category::query()
+                        ->where(function ($q) use ($slug): void {
+                            $q->where('slug->en', $slug)
+                                ->orWhere('slug->pl', $slug);
+                        })
+                        ->first();
                     if ($category) {
                         $ids[] = (string) $category->id;
                     }
@@ -248,7 +278,22 @@ class SearchController extends ApiController
 
         $brandInput = $request->input('brand', $filters['brand_id'] ?? null);
         if ($brandInput) {
-            $result['brand_id'] = array_map(strval(...), (array) $brandInput);
+            $brandSlugs = (array) $brandInput;
+            $ids = [];
+            foreach ($brandSlugs as $slugOrId) {
+                if (is_numeric($slugOrId)) {
+                    $ids[] = (string) $slugOrId;
+                } else {
+                    $brand = Brand::query()->where('slug', $slugOrId)->first();
+                    if ($brand) {
+                        $ids[] = (string) $brand->id;
+                    }
+                }
+            }
+
+            if ($ids !== []) {
+                $result['brand_id'] = $ids;
+            }
         }
 
         $priceMin = $request->input('min_price', $filters['price_min'] ?? null);
@@ -266,7 +311,6 @@ class SearchController extends ApiController
 
     /**
      * Expand search query with synonyms from DB.
-     * If the query matches a synonym word, also include the main term.
      */
     private function expandWithSynonyms(string $query): string
     {
@@ -328,11 +372,27 @@ class SearchController extends ApiController
     }
 
     /**
+     * Get all matching product IDs from Typesense for facet computation.
+     *
+     * @param  array{category_id?: string[], brand_id?: string[], price_min?: int, price_max?: int}  $filters
+     * @return int[]
+     */
+    private function getAllMatchingIds(string $expandedQuery, array $filters): array
+    {
+        $builder = Product::search($expandedQuery);
+        $this->applyFilters($builder, $filters, withFacets: false);
+        $matching = $builder->take(250)->get();
+
+        return $matching->map(fn (Product $p): int => $p->id)->all();
+    }
+
+    /**
      * Apply filters to the Scout/Typesense search builder.
      *
      * @param  array{category_id?: string[], brand_id?: string[], price_min?: int, price_max?: int}  $filters
+     * @param  bool  $withFacets  Whether to request facet_counts from Typesense
      */
-    private function applyFilters(Builder $builder, array $filters): void
+    private function applyFilters(Builder $builder, array $filters, bool $withFacets = true): void
     {
         $filterParts = ['is_active:true'];
 
@@ -352,7 +412,16 @@ class SearchController extends ApiController
             $filterParts[] = 'price:<='.$filters['price_max'];
         }
 
-        $builder->options(['filter_by' => implode(' && ', $filterParts)]);
+        $options = [
+            'filter_by' => implode(' && ', $filterParts),
+        ];
+
+        if ($withFacets) {
+            $options['facet_by'] = 'category_id,brand_id,price';
+            $options['max_facet_values'] = 100;
+        }
+
+        $builder->options($options);
     }
 
     private function applySorting(Builder $builder, string $sort): void
@@ -373,81 +442,258 @@ class SearchController extends ApiController
     }
 
     /**
+     * Build facets from Typesense facet_counts, resolving IDs to names/slugs.
+     *
+     * @param  array  $facetCounts  Raw facet_counts from Typesense response
      * @param  array{category_id?: string[], brand_id?: string[], price_min?: int, price_max?: int}  $activeFilters
      */
-    private function getFacets(array $activeFilters): array
+    private function getFacetsFromTypesense(array $facetCounts, array $activeFilters): array
     {
+        $categoryFacet = null;
+        $brandFacet = null;
+        $priceFacet = null;
+
+        foreach ($facetCounts as $facet) {
+            $fieldName = $facet['field_name'] ?? ($facet['field'] ?? null);
+            if ($fieldName === 'category_id') {
+                $categoryFacet = $facet;
+            } elseif ($fieldName === 'brand_id') {
+                $brandFacet = $facet;
+            } elseif ($fieldName === 'price') {
+                $priceFacet = $facet;
+            }
+        }
+
         return [
-            'categories' => $this->getCategoryFacets($activeFilters),
-            'brands' => $this->getBrandFacets($activeFilters),
-            'price_ranges' => $this->getPriceRanges(),
+            'categories' => $this->buildCategoryFacets($categoryFacet),
+            'brands' => $this->buildBrandFacets($brandFacet),
+            'price_ranges' => $this->buildPriceRanges($priceFacet),
         ];
     }
 
-    /**
-     * @param  array{category_id?: string[], brand_id?: string[], price_min?: int, price_max?: int}  $activeFilters
-     */
-    private function getCategoryFacets(array $activeFilters): array
+    private function buildCategoryFacets(?array $facet): array
     {
-        $query = Category::query()
-            ->whereHas('products', fn (EloquentBuilder $q) => $q->where('is_active', true))
-            ->withCount(['products' => fn (EloquentBuilder $q) => $q->where('is_active', true)]);
-
-        if (isset($activeFilters['brand_id'])) {
-            $query->whereHas('products', fn (EloquentBuilder $q) => $q->where('is_active', true)->whereIn('brand_id', $activeFilters['brand_id']));
+        if ($facet === null) {
+            return [];
         }
 
-        return $query
+        $counts = collect($facet['counts'] ?? []);
+        if ($counts->isEmpty()) {
+            return [];
+        }
+
+        $categoryIds = $counts->pluck('value')->map(fn (string $v): int => (int) $v)->all();
+
+        $categories = Category::query()
+            ->whereIn('id', $categoryIds)
             ->get()
-            ->map(fn (Category $category): array => [
-                'id' => (string) $category->id,
-                'slug' => $category->slug,
-                'name' => $category->name,
-                'count' => $category->products_count,
-            ])
+            ->keyBy('id');
+
+        return $counts
+            ->map(function (array $item) use ($categories): ?array {
+                $id = (int) $item['value'];
+                $category = $categories->get($id);
+                if ($category === null) {
+                    return null;
+                }
+
+                return [
+                    'id' => (string) $id,
+                    'slug' => $category->slug,
+                    'name' => $category->name,
+                    'count' => $item['count'],
+                ];
+            })
+            ->filter()
             ->sortByDesc('count')
             ->values()
             ->all();
     }
 
-    /**
-     * @param  array{category_id?: string[], brand_id?: string[], price_min?: int, price_max?: int}  $activeFilters
-     */
-    private function getBrandFacets(array $activeFilters): array
+    private function buildBrandFacets(?array $facet): array
     {
-        $query = Product::query()
-            ->where('is_active', true)
-            ->whereNotNull('brand_id')
-            ->with('brand');
-
-        if (isset($activeFilters['category_id'])) {
-            $query->whereIn('category_id', $activeFilters['category_id']);
+        if ($facet === null) {
+            return [];
         }
 
-        $products = $query->get();
+        $counts = collect($facet['counts'] ?? []);
+        if ($counts->isEmpty()) {
+            return [];
+        }
 
-        return $products
-            ->groupBy('brand_id')
-            ->map(fn ($products, $brandId): array => [
-                'id' => (string) $brandId,
-                'name' => $products->first()?->brand?->name,
-                'count' => $products->count(),
-            ])
+        $brandIds = $counts->pluck('value')->map(fn (string $v): int => (int) $v)->all();
+
+        $brands = Brand::query()
+            ->whereIn('id', $brandIds)
+            ->get()
+            ->keyBy('id');
+
+        return $counts
+            ->map(function (array $item) use ($brands): ?array {
+                $id = (int) $item['value'];
+                $brand = $brands->get($id);
+                if ($brand === null) {
+                    return null;
+                }
+
+                return [
+                    'id' => (string) $id,
+                    'slug' => $brand->slug,
+                    'name' => $brand->name,
+                    'count' => $item['count'],
+                ];
+            })
+            ->filter()
             ->sortByDesc('count')
             ->values()
             ->all();
     }
 
-    private function getPriceRanges(): array
+    private function buildPriceRanges(?array $facet): array
     {
-        $prices = ProductVariant::query()
+        $query = ProductVariant::query()
             ->whereHas('product', fn (EloquentBuilder $q) => $q->where('is_active', true))
             ->selectRaw('MIN(price) AS min_price, MAX(price) AS max_price')
             ->first();
 
         return [
-            'min' => (int) ($prices->min_price ?? 0),
-            'max' => (int) ($prices->max_price ?? 0),
+            'min' => (int) ($query->min_price ?? 0),
+            'max' => (int) ($query->max_price ?? 0),
+        ];
+    }
+
+    /**
+     * DB-based facet fallback when Typesense facets are unavailable.
+     * Filters by matching product IDs so counts reflect search results.
+     *
+     * @param  int[]  $matchingIds  Product IDs from Typesense search (empty = no search query)
+     * @param  array{category_id?: string[], brand_id?: string[], price_min?: int, price_max?: int}  $activeFilters
+     */
+    private function getFacetFallback(array $matchingIds, array $activeFilters): array
+    {
+        return [
+            'categories' => $this->getCategoryFacetsFallback($matchingIds, $activeFilters),
+            'brands' => $this->getBrandFacetsFallback($matchingIds, $activeFilters),
+            'price_ranges' => $this->getPriceRangesFallback(),
+        ];
+    }
+
+    /**
+     * @param  int[]  $matchingIds
+     * @param  array{category_id?: string[], brand_id?: string[], price_min?: int, price_max?: int}  $activeFilters
+     */
+    private function getCategoryFacetsFallback(array $matchingIds, array $activeFilters): array
+    {
+        $productsQuery = Product::query()->where('is_active', true);
+
+        if ($matchingIds !== []) {
+            $productsQuery->whereIn('id', $matchingIds);
+        }
+
+        if (isset($activeFilters['brand_id'])) {
+            $productsQuery->whereIn('brand_id', $activeFilters['brand_id']);
+        }
+
+        $categoryCounts = $productsQuery
+            ->selectRaw('category_id, COUNT(*) as count')
+            ->groupBy('category_id')
+            ->pluck('count', 'category_id');
+
+        $categoryIds = $categoryCounts->keys()->all();
+
+        if ($categoryIds === []) {
+            return [];
+        }
+
+        $categories = Category::query()
+            ->whereIn('id', $categoryIds)
+            ->get()
+            ->keyBy('id');
+
+        return collect($categoryIds)
+            ->map(function ($id) use ($categories, $categoryCounts): ?array {
+                $category = $categories->get($id);
+                if ($category === null) {
+                    return null;
+                }
+
+                return [
+                    'id' => (string) $id,
+                    'slug' => $category->slug,
+                    'name' => $category->name,
+                    'count' => $categoryCounts[$id],
+                ];
+            })
+            ->filter()
+            ->sortByDesc('count')
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  int[]  $matchingIds
+     * @param  array{category_id?: string[], brand_id?: string[], price_min?: int, price_max?: int}  $activeFilters
+     */
+    private function getBrandFacetsFallback(array $matchingIds, array $activeFilters): array
+    {
+        $productsQuery = Product::query()
+            ->where('is_active', true)
+            ->whereNotNull('brand_id');
+
+        if ($matchingIds !== []) {
+            $productsQuery->whereIn('id', $matchingIds);
+        }
+
+        if (isset($activeFilters['category_id'])) {
+            $productsQuery->whereIn('category_id', $activeFilters['category_id']);
+        }
+
+        $brandCounts = $productsQuery
+            ->selectRaw('brand_id, COUNT(*) as count')
+            ->groupBy('brand_id')
+            ->pluck('count', 'brand_id');
+
+        $brandIds = $brandCounts->keys()->all();
+
+        if ($brandIds === []) {
+            return [];
+        }
+
+        $brands = Brand::query()
+            ->whereIn('id', $brandIds)
+            ->get()
+            ->keyBy('id');
+
+        return collect($brandIds)
+            ->map(function ($id) use ($brands, $brandCounts): ?array {
+                $brand = $brands->get($id);
+                if ($brand === null) {
+                    return null;
+                }
+
+                return [
+                    'id' => (string) $id,
+                    'slug' => $brand->slug,
+                    'name' => $brand->name,
+                    'count' => $brandCounts[$id],
+                ];
+            })
+            ->filter()
+            ->sortByDesc('count')
+            ->values()
+            ->all();
+    }
+
+    private function getPriceRangesFallback(): array
+    {
+        $query = ProductVariant::query()
+            ->whereHas('product', fn (EloquentBuilder $q) => $q->where('is_active', true))
+            ->selectRaw('MIN(price) AS min_price, MAX(price) AS max_price')
+            ->first();
+
+        return [
+            'min' => (int) ($query->min_price ?? 0),
+            'max' => (int) ($query->max_price ?? 0),
         ];
     }
 }

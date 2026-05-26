@@ -203,7 +203,7 @@ export default async function RootLayout({
                                     <PageTransition>{children}</PageTransition>
                                 </main>
                                 <Footer />
-                                <MobileBottomNav />
+                                <MobileBottomNav modules={modules} />
                             </div>
                             <CookieConsent settings={cookieSettings} />
                             <ChatWidgetLoader />

@@ -49,11 +49,10 @@ class CheckoutService
     ): Order {
         if ($user instanceof User) {
             if (! $user->customer) {
-                Customer::query()->create([
-                    'user_id' => $user->id,
-                    'email' => $user->email,
-                    'first_name' => $user->name,
-                ]);
+                Customer::query()->firstOrCreate(
+                    ['user_id' => $user->id],
+                    ['email' => $user->email, 'first_name' => $user->name],
+                );
 
                 $user->load('customer');
             }

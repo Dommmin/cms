@@ -180,6 +180,36 @@ class Product extends Model implements HasMedia
     }
 
     /**
+     * Typesense collection schema. Overrides config/scout.php to ensure
+     * facet fields are set correctly regardless of config caching.
+     */
+    public function typesenseCollectionSchema(): array
+    {
+        return [
+            'name' => $this->searchableAs(),
+            'fields' => [
+                ['name' => 'id', 'type' => 'string'],
+                ['name' => 'name', 'type' => 'string'],
+                ['name' => 'description', 'type' => 'string', 'optional' => true],
+                ['name' => 'short_description', 'type' => 'string', 'optional' => true],
+                ['name' => 'sku', 'type' => 'string', 'optional' => true],
+                ['name' => 'price', 'type' => 'int64'],
+                ['name' => 'category_id', 'type' => 'string', 'facet' => true],
+                ['name' => 'category_name', 'type' => 'string', 'optional' => true],
+                ['name' => 'brand_id', 'type' => 'string', 'optional' => true, 'facet' => true],
+                ['name' => 'brand_name', 'type' => 'string', 'optional' => true],
+                ['name' => 'is_active', 'type' => 'bool'],
+                ['name' => 'is_featured', 'type' => 'bool'],
+                ['name' => 'is_search_promoted', 'type' => 'bool', 'optional' => true],
+                ['name' => 'slug', 'type' => 'string', 'optional' => true],
+                ['name' => 'created_at', 'type' => 'int64'],
+                ['name' => 'thumbnail', 'type' => 'string', 'optional' => true],
+            ],
+            'default_sorting_field' => 'created_at',
+        ];
+    }
+
+    /**
      * Get the indexable data array for the model.
      */
     public function toSearchableArray(): array

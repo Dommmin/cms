@@ -77,17 +77,15 @@ class AddressController extends ApiController
     private function ensureCustomer(Request $request): Customer
     {
         $user = $request->user();
-        $customer = $user->customer;
 
-        if (! $customer) {
-            return Customer::query()->create([
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'first_name' => $user->name,
-            ]);
+        if ($user->customer) {
+            return $user->customer;
         }
 
-        return $customer;
+        return Customer::query()->firstOrCreate(
+            ['user_id' => $user->id],
+            ['email' => $user->email, 'first_name' => $user->name],
+        );
     }
 
     private function authorizeAddress(Request $request, Address $address): void
