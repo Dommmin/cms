@@ -546,15 +546,15 @@ Stan po ostatniej rundzie prac: `mobile/` nie powinno byc traktowane jako "100% 
 | Obszar | Mobile status | Parity z `client/` | Priorytet | Braki / nastepny krok |
 |--------|---------------|--------------------|-----------|------------------------|
 | Home | Sekcja hero, quick links, nowosci, recently viewed | Czesciowe | P1 | Podpiac realne sekcje CMS/home modules zamiast statycznego hero copy |
-| Produkty listing | Kategorie, search po nazwie, sort, in-stock, brand facets, active chips | Dobre MVP | P0 | Dodac price range i attribute facets z `available_filters.attributes` |
-| Search | Osobny ekran `/search`, endpoint `/search`, facets, did-you-mean | Dobre MVP | P0 | Dodac autocomplete i paginacje/infinite scroll |
-| Product detail | Galeria MVP, warianty, opinie, wishlist, sticky add-to-cart | Czesciowe | P0 | Rozbudowac galerie, delivery panel, powiazane produkty, pelniejsze promocje |
+| Produkty listing | Kategorie, search po nazwie, sort, in-stock, brand facets, attribute facets, price range, active chips | Dobre MVP | P0 | Dodac paginacje/infinite scroll na listingu kategorii i dopracowac bledy mutacji |
+| Search | Osobny ekran `/search`, endpoint `/search`, facets, did-you-mean, autocomplete, price range, infinite scroll | Dobre MVP | P0 | Ujednolicic tracking search i puste stany z webem |
+| Product detail | Galeria z miniaturami, warianty/atrybuty, quantity, delivery/returns panel, opinie, wishlist, related products, sticky add-to-cart | Dobre MVP | P0 | Pelniejsze promocje, review submit/helpful, share action |
 | Cart | Guest cart, quantity, remove, discount code, summary | Dobre MVP | P0 | Lepsze bledy mutacji i synchronizacja po logowaniu do przetestowania |
 | Checkout | Kontakt, adres, dostawa, platnosc, zgody prawne, redirect payment | MVP | P0 | Rozbic na bardziej ergonomiczne kroki, dodac pickup points/InPost, success/failure states |
 | Account | Login/register/profile, recent orders, order detail, wishlist | MVP | P1 | Forgot/reset password, pelna lista zamowien, GDPR export/restriction/consents |
 | CMS pages | MVP renderer | Niskie/czesciowe | P1 | Zweryfikowac pokrycie blokow vs `client/components/page-builder/` |
 | Blog/stores/newsletter | Ekrany istnieja | Czesciowe | P2 | Dopracowac UI, filtry/kategorie bloga, stores map UX |
-| Compare | Brak | Brak | P2 | Mobile-native comparison albo swiadoma rezygnacja |
+| Compare | Lokalna porownywarka do 4 produktow, endpoint `/products/compare`, ekran `/compare` | MVP | P2 | Dopracowac tabele atrybutow i dolny comparison bar jak w webie |
 | Push/deep links | Brak | Mobile-only future | P2 | Expo Notifications + device-token API po stabilizacji commerce |
 | QA/CI | Lokalne `types` i `lint`; brak Docker/CI dla mobile | Niskie | P0 | Dodac mobile do compose/CI albo osobny workflow npm ci/types/lint/test |
 
@@ -563,7 +563,10 @@ Zmiany wykonane w tej rundzie:
 - dodano storefrontowe tokeny mobile (`Storefront`) i odswiezono shell/tabs/header,
 - poprawiono home, product listing, product detail, cart i checkout pod mobile UX,
 - dodano ekran `/search` korzystajacy z API `/search`,
-- rozszerzono listing produktow o brand facets i aktywne filtry,
+- rozszerzono listing produktow o brand facets, attribute facets, price range i aktywne filtry,
+- dodano autocomplete i infinite scroll do mobile search,
+- rozbudowano product detail o galerie z miniaturami, quantity, delivery/returns panel i related products,
+- dodano mobile comparison flow (`/compare`) zgodny z webowym limitem 4 produktow,
 - dodano ekran `/account/wishlist`,
 - usunieto widoczne pozostalosci Expo startera z webowego tabbara.
 
