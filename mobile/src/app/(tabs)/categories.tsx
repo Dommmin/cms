@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getCategories, getProducts } from '@/api/products';
 import { ProductCard } from '@/components/product/product-card';
+import { GlassSurface } from '@/components/ui/glass-surface';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -14,6 +15,9 @@ export default function CategoriesScreen() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string | undefined>();
   const [brand, setBrand] = useState<string | undefined>();
+  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string[]>>({});
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   const [sort, setSort] = useState('-created_at');
   const [inStock, setInStock] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -25,13 +29,16 @@ export default function CategoriesScreen() {
   });
 
   const productsQuery = useQuery({
-    queryKey: ['products', { search: deferredSearch, category, brand, sort, inStock }],
+    queryKey: ['products', { search: deferredSearch, category, brand, selectedAttributes, minPrice, maxPrice, sort, inStock }],
     queryFn: () =>
       getProducts({
         per_page: 20,
         search: deferredSearch || undefined,
         category,
         brand,
+        attributes: selectedAttributes,
+        min_price: minPrice ? Number(minPrice) : undefined,
+        max_price: maxPrice ? Number(maxPrice) : undefined,
         sort,
         in_stock: inStock,
       }),
@@ -39,7 +46,20 @@ export default function CategoriesScreen() {
 
   const categories = useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data]);
   const availableFilters = productsQuery.data?.meta.available_filters;
-  const activeFiltersCount = [category, brand, inStock ? 'stock' : undefined].filter(Boolean).length;
+  const activeAttributeCount = Object.values(selectedAttributes).reduce((total, values) => total + values.length, 0);
+  const activeFiltersCount = [category, brand, minPrice, maxPrice, inStock ? 'stock' : undefined].filter(Boolean).length + activeAttributeCount;
+
+  function toggleAttribute(attributeSlug: string, valueSlug: string) {
+    setSelectedAttributes((current) => {
+      const currentValues = current[attributeSlug] ?? [];
+      const nextValues = currentValues.includes(valueSlug)
+        ? currentValues.filter((value) => value !== valueSlug)
+        : [...currentValues, valueSlug];
+      const next = { ...current, [attributeSlug]: nextValues };
+      if (nextValues.length === 0) delete next[attributeSlug];
+      return next;
+    });
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -100,6 +120,17 @@ export default function CategoriesScreen() {
               />
             ) : null}
             {inStock ? <ActiveFilter label="Tylko dostępne" onPress={() => setInStock(false)} /> : null}
+            {minPrice ? <ActiveFilter label={`Od ${minPrice}`} onPress={() => setMinPrice('')} /> : null}
+            {maxPrice ? <ActiveFilter label={`Do ${maxPrice}`} onPress={() => setMaxPrice('')} /> : null}
+            {Object.entries(selectedAttributes).flatMap(([attributeSlug, values]) =>
+              values.map((value) => (
+                <ActiveFilter
+                  key={`${attributeSlug}-${value}`}
+                  label={availableFilters?.attributes.find((item) => item.slug === attributeSlug)?.values.find((item) => item.slug === value)?.label ?? value}
+                  onPress={() => toggleAttribute(attributeSlug, value)}
+                />
+              )),
+            )}
           </ThemedView>
         ) : null}
 
@@ -126,7 +157,7 @@ export default function CategoriesScreen() {
           animationType="slide"
           onRequestClose={() => setFiltersOpen(false)}>
           <Pressable style={styles.sheetBackdrop} onPress={() => setFiltersOpen(false)} />
-          <ThemedView style={styles.sheet}>
+          <GlassSurface style={styles.sheet}>
             <ThemedText type="smallBold">Sortowanie</ThemedText>
             {[
               { label: 'Najnowsze', value: '-created_at' },
@@ -171,6 +202,51 @@ export default function CategoriesScreen() {
                 />
               </>
             ) : null}
+            {availableFilters?.attributes.map((attribute) => (
+              <ThemedView key={attribute.slug} style={styles.sheetGroup}>
+                <ThemedText type="smallBold">{attribute.label}</ThemedText>
+                <FlatList
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  data={attribute.values}
+                  keyExtractor={(item) => item.slug}
+                  renderItem={({ item }) => {
+                    const isActive = selectedAttributes[attribute.slug]?.includes(item.slug) ?? false;
+                    return (
+                      <Pressable
+                        onPress={() => toggleAttribute(attribute.slug, item.slug)}
+                        style={[styles.sheetChip, isActive && styles.sheetOptionActive]}>
+                        <ThemedText type="smallBold" style={isActive && styles.activeChipText}>
+                          {item.label} ({item.count})
+                        </ThemedText>
+                      </Pressable>
+                    );
+                  }}
+                  contentContainerStyle={styles.sheetChips}
+                />
+              </ThemedView>
+            ))}
+            <ThemedView style={styles.sheetGroup}>
+              <ThemedText type="smallBold">Cena</ThemedText>
+              <ThemedView style={styles.priceInputs}>
+                <TextInput
+                  value={minPrice}
+                  onChangeText={setMinPrice}
+                  placeholder="Min"
+                  placeholderTextColor={Storefront.colors.muted}
+                  keyboardType="numeric"
+                  style={styles.priceInput}
+                />
+                <TextInput
+                  value={maxPrice}
+                  onChangeText={setMaxPrice}
+                  placeholder="Max"
+                  placeholderTextColor={Storefront.colors.muted}
+                  keyboardType="numeric"
+                  style={styles.priceInput}
+                />
+              </ThemedView>
+            </ThemedView>
             <Pressable
               onPress={() => setInStock((value) => !value)}
               style={[styles.sheetOption, inStock && styles.sheetOptionActive]}>
@@ -181,6 +257,9 @@ export default function CategoriesScreen() {
             <Pressable
               onPress={() => {
                 setBrand(undefined);
+                setSelectedAttributes({});
+                setMinPrice('');
+                setMaxPrice('');
                 setInStock(false);
                 setSort('-created_at');
               }}
@@ -192,7 +271,7 @@ export default function CategoriesScreen() {
                 Zastosuj
               </ThemedText>
             </Pressable>
-          </ThemedView>
+          </GlassSurface>
         </Modal>
       </ThemedView>
     </SafeAreaView>
@@ -225,7 +304,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Storefront.colors.border,
     borderRadius: Storefront.radius.lg,
-    backgroundColor: Storefront.colors.surface,
+    backgroundColor: Storefront.colors.glassStrong,
     paddingHorizontal: Spacing.four,
     fontSize: 16,
   },
@@ -262,7 +341,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: Spacing.three,
     borderRadius: 18,
-    backgroundColor: Storefront.colors.surface,
+    backgroundColor: Storefront.colors.glassStrong,
     borderWidth: 1,
     borderColor: Storefront.colors.border,
   },
@@ -296,7 +375,7 @@ const styles = StyleSheet.create({
     padding: Spacing.four,
     borderTopLeftRadius: Storefront.radius.xl,
     borderTopRightRadius: Storefront.radius.xl,
-    backgroundColor: Storefront.colors.surface,
+    backgroundColor: Storefront.colors.glassStrong,
   },
   sheetOption: {
     paddingHorizontal: Spacing.four,
@@ -310,6 +389,10 @@ const styles = StyleSheet.create({
   sheetChips: {
     gap: Spacing.two,
   },
+  sheetGroup: {
+    gap: Spacing.two,
+    backgroundColor: 'transparent',
+  },
   sheetChip: {
     justifyContent: 'center',
     paddingHorizontal: Spacing.three,
@@ -317,13 +400,28 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Storefront.colors.border,
     borderRadius: 999,
-    backgroundColor: Storefront.colors.surface,
+    backgroundColor: Storefront.colors.glassStrong,
   },
   clearButton: {
     alignItems: 'center',
     paddingVertical: Spacing.three,
     borderRadius: Storefront.radius.md,
     backgroundColor: Storefront.colors.primarySoft,
+  },
+  priceInputs: {
+    flexDirection: 'row',
+    gap: Spacing.two,
+    backgroundColor: 'transparent',
+  },
+  priceInput: {
+    flex: 1,
+    minHeight: 48,
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.glassStrong,
+    paddingHorizontal: Spacing.three,
+    fontSize: 16,
   },
   doneButton: {
     alignItems: 'center',

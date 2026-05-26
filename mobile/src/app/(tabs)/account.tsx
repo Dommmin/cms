@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getOrders } from '@/api/orders';
 import { updateProfile } from '@/api/profile';
+import { GlassSurface } from '@/components/ui/glass-surface';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -61,15 +62,15 @@ export default function AccountScreen() {
         {auth.isAuthenticated && auth.user ? (
           <>
             <ThemedText type="subtitle">Konto</ThemedText>
-            <ThemedView style={styles.panel}>
+            <GlassSurface style={styles.panel}>
               <ThemedText type="smallBold">{auth.user.name}</ThemedText>
               <ThemedText themeColor="textSecondary">{auth.user.email}</ThemedText>
-            </ThemedView>
+            </GlassSurface>
             <ThemedView style={styles.quickActions}>
               <AccountLink href="/account/wishlist" label="Wishlist" />
               <AccountLink href="/checkout" label="Checkout" />
             </ThemedView>
-            <ThemedView style={styles.panel}>
+            <GlassSurface style={styles.panel}>
               <ThemedText type="smallBold">Profil</ThemedText>
               <TextInput
                 defaultValue={auth.user.name}
@@ -101,8 +102,8 @@ export default function AccountScreen() {
                   Zapisz profil
                 </ThemedText>
               </Pressable>
-            </ThemedView>
-            <ThemedView style={styles.panel}>
+            </GlassSurface>
+            <GlassSurface style={styles.panel}>
               <ThemedText type="smallBold">Ostatnie zamówienia</ThemedText>
               {ordersQuery.isLoading ? <ThemedText themeColor="textSecondary">Ładowanie</ThemedText> : null}
               {ordersQuery.isError ? <ThemedText style={styles.errorText}>Nie udało się pobrać zamówień.</ThemedText> : null}
@@ -129,7 +130,7 @@ export default function AccountScreen() {
                   )}
                 />
               ) : null}
-            </ThemedView>
+            </GlassSurface>
             <Pressable onPress={() => auth.logout()} style={styles.secondaryButton}>
               <ThemedText type="smallBold">Wyloguj</ThemedText>
             </Pressable>
@@ -211,10 +212,7 @@ const styles = StyleSheet.create({
   panel: {
     gap: Spacing.two,
     padding: Spacing.three,
-    borderWidth: 1,
-    borderColor: Storefront.colors.border,
     borderRadius: Storefront.radius.lg,
-    backgroundColor: Storefront.colors.surface,
   },
   quickActions: {
     flexDirection: 'row',

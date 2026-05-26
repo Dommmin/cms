@@ -1,5 +1,5 @@
 import { apiGet, apiGetMany, apiGetPage } from '@/api/client';
-import type { Category, PaginatedResponse, Product, ProductReview } from '@/types/api';
+import type { Category, CompareResponse, PaginatedResponse, Product, ProductReview } from '@/types/api';
 
 export interface ProductFilters {
   page?: number;
@@ -59,4 +59,18 @@ export function getProductReviews(
 
 export function getCategories(): Promise<Category[]> {
   return apiGetMany<Category>('/categories');
+}
+
+export async function getComparisonProducts(ids: number[]): Promise<CompareResponse> {
+  if (ids.length === 0) return { products: [], attributeKeys: [] };
+  const params = ids.reduce<Record<string, number>>((accumulator, id, index) => {
+    accumulator[`ids[${index}]`] = id;
+    return accumulator;
+  }, {});
+  const response = await apiGet<{ data: Product[]; meta?: { attribute_keys?: string[] } }>('/products/compare', { params });
+
+  return {
+    products: response?.data ?? [],
+    attributeKeys: response?.meta?.attribute_keys ?? [],
+  };
 }

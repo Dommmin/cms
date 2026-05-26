@@ -1,11 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { Link, type Href } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { FlatList, Modal, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { searchProducts } from '@/api/search';
+import { searchAutocomplete, searchProducts } from '@/api/search';
+import { GlassSurface } from '@/components/ui/glass-surface';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -25,6 +26,8 @@ export default function SearchScreen() {
   const [submittedQuery, setSubmittedQuery] = useState('');
   const [category, setCategory] = useState<string | undefined>();
   const [brand, setBrand] = useState<string | undefined>();
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   const [sort, setSort] = useState('');
   const [filtersOpen, setFiltersOpen] = useState(false);
 
@@ -33,21 +36,35 @@ export default function SearchScreen() {
       q: submittedQuery || undefined,
       category,
       brand,
+      min_price: minPrice ? Number(minPrice) : undefined,
+      max_price: maxPrice ? Number(maxPrice) : undefined,
       sort: sort || undefined,
       per_page: 24,
     }),
-    [brand, category, sort, submittedQuery],
+    [brand, category, maxPrice, minPrice, sort, submittedQuery],
   );
 
-  const searchQuery = useQuery({
+  const searchQuery = useInfiniteQuery({
     queryKey: ['search', filters],
-    queryFn: () => searchProducts(filters),
+    queryFn: ({ pageParam }) => searchProducts({ ...filters, page: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || lastPage.meta.current_page >= lastPage.meta.last_page) return undefined;
+      return lastPage.meta.current_page + 1;
+    },
     enabled: Boolean(submittedQuery || category || brand),
   });
 
-  const result = searchQuery.data;
+  const autocompleteQuery = useQuery({
+    queryKey: ['search-autocomplete', query],
+    queryFn: () => searchAutocomplete(query, 5),
+    enabled: query.trim().length >= 2 && query.trim() !== submittedQuery,
+  });
+
+  const result = searchQuery.data?.pages[0] ?? null;
+  const products = searchQuery.data?.pages.flatMap((page) => page?.data ?? []) ?? [];
   const facets = result?.meta.facets;
-  const activeCount = [category, brand, sort].filter(Boolean).length;
+  const activeCount = [category, brand, minPrice, maxPrice, sort].filter(Boolean).length;
 
   function submitSearch() {
     setSubmittedQuery(query.trim());
@@ -63,22 +80,47 @@ export default function SearchScreen() {
           </ThemedText>
         </ThemedView>
 
-        <ThemedView style={styles.searchRow}>
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            onSubmitEditing={submitSearch}
-            placeholder="Nazwa produktu, kategoria, marka"
-            placeholderTextColor={Storefront.colors.muted}
-            autoCapitalize="none"
-            returnKeyType="search"
-            style={styles.searchInput}
-          />
-          <Pressable onPress={submitSearch} style={styles.searchButton}>
-            <ThemedText type="smallBold" style={styles.searchButtonText}>
-              Szukaj
-            </ThemedText>
-          </Pressable>
+        <ThemedView style={styles.searchStack}>
+          <ThemedView style={styles.searchRow}>
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              onSubmitEditing={submitSearch}
+              placeholder="Nazwa produktu, kategoria, marka"
+              placeholderTextColor={Storefront.colors.muted}
+              autoCapitalize="none"
+              returnKeyType="search"
+              style={styles.searchInput}
+            />
+            <Pressable onPress={submitSearch} style={styles.searchButton}>
+              <ThemedText type="smallBold" style={styles.searchButtonText}>
+                Szukaj
+              </ThemedText>
+            </Pressable>
+          </ThemedView>
+          {autocompleteQuery.data?.suggestions.length ? (
+            <GlassSurface style={styles.suggestions}>
+              {autocompleteQuery.data.suggestions.map((suggestion) => (
+                <Pressable
+                  key={suggestion.id}
+                  onPress={() => {
+                    setQuery(suggestion.name);
+                    setSubmittedQuery(suggestion.name);
+                  }}
+                  style={styles.suggestionRow}>
+                  <Image source={suggestion.thumbnail || undefined} style={styles.suggestionImage} contentFit="contain" />
+                  <ThemedView style={styles.suggestionBody}>
+                    <ThemedText type="smallBold" numberOfLines={1}>
+                      {suggestion.name}
+                    </ThemedText>
+                    <ThemedText type="small" themeColor="textSecondary">
+                      {formatMoney(suggestion.price)}
+                    </ThemedText>
+                  </ThemedView>
+                </Pressable>
+              ))}
+            </GlassSurface>
+          ) : null}
         </ThemedView>
 
         <ThemedView style={styles.toolbar}>
@@ -108,16 +150,26 @@ export default function SearchScreen() {
         ) : null}
         {searchQuery.isLoading ? <LoadingState /> : null}
         {searchQuery.isError ? <ErrorState onRetry={() => searchQuery.refetch()} /> : null}
-        {result && result.data.length === 0 ? (
+        {result && products.length === 0 ? (
           <EmptyState title="Brak wyników" body="Zmień frazę lub zdejmij część filtrów." />
         ) : null}
         {result ? (
           <FlatList
-            data={result.data}
+            data={products}
             keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) => <SearchProductCard product={item} />}
             contentContainerStyle={styles.results}
-            ListFooterComponent={<ThemedView style={styles.footer} />}
+            onEndReached={() => {
+              if (searchQuery.hasNextPage && !searchQuery.isFetchingNextPage) {
+                void searchQuery.fetchNextPage();
+              }
+            }}
+            onEndReachedThreshold={0.45}
+            ListFooterComponent={
+              <ThemedView style={styles.footer}>
+                {searchQuery.isFetchingNextPage ? <ThemedText themeColor="textSecondary">Ładowanie kolejnych produktów</ThemedText> : null}
+              </ThemedView>
+            }
           />
         ) : null}
       </ThemedView>
@@ -167,11 +219,40 @@ export default function SearchScreen() {
             </>
           ) : null}
 
+          {facets ? (
+            <>
+              <ThemedText type="smallBold">Cena</ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                Zakres w wynikach: {formatMoney(facets.price_ranges.min)} - {formatMoney(facets.price_ranges.max)}
+              </ThemedText>
+              <ThemedView style={styles.priceInputs}>
+                <TextInput
+                  value={minPrice}
+                  onChangeText={setMinPrice}
+                  placeholder="Min"
+                  placeholderTextColor={Storefront.colors.muted}
+                  keyboardType="numeric"
+                  style={styles.priceInput}
+                />
+                <TextInput
+                  value={maxPrice}
+                  onChangeText={setMaxPrice}
+                  placeholder="Max"
+                  placeholderTextColor={Storefront.colors.muted}
+                  keyboardType="numeric"
+                  style={styles.priceInput}
+                />
+              </ThemedView>
+            </>
+          ) : null}
+
           <ThemedView style={styles.sheetActions}>
             <Pressable
               onPress={() => {
                 setCategory(undefined);
                 setBrand(undefined);
+                setMinPrice('');
+                setMaxPrice('');
                 setSort('');
               }}
               style={styles.secondaryButton}>
@@ -192,7 +273,8 @@ export default function SearchScreen() {
 function SearchProductCard({ product }: { product: SearchProduct }) {
   return (
     <Link href={`/products/${product.slug}` as Href} asChild>
-      <Pressable style={({ pressed }) => [styles.resultCard, pressed && styles.pressed]}>
+      <Pressable style={({ pressed }) => [pressed && styles.pressed]}>
+        <GlassSurface style={styles.resultCard} interactive>
         <Image
           source={product.thumbnail?.thumb_url ?? product.thumbnail?.url ?? undefined}
           style={styles.resultImage}
@@ -219,6 +301,7 @@ function SearchProductCard({ product }: { product: SearchProduct }) {
             ) : null}
           </ThemedView>
         </ThemedView>
+        </GlassSurface>
       </Pressable>
     </Link>
   );
@@ -262,13 +345,17 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
     backgroundColor: 'transparent',
   },
+  searchStack: {
+    gap: Spacing.two,
+    backgroundColor: 'transparent',
+  },
   searchInput: {
     flex: 1,
     minHeight: 52,
     borderWidth: 1,
     borderColor: Storefront.colors.border,
     borderRadius: Storefront.radius.lg,
-    backgroundColor: Storefront.colors.surface,
+    backgroundColor: Storefront.colors.glassStrong,
     paddingHorizontal: Spacing.four,
     fontSize: 16,
   },
@@ -300,6 +387,26 @@ const styles = StyleSheet.create({
     borderRadius: Storefront.radius.md,
     backgroundColor: Storefront.colors.primarySoft,
   },
+  suggestions: {
+    overflow: 'hidden',
+    borderRadius: Storefront.radius.lg,
+  },
+  suggestionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.three,
+    padding: Spacing.three,
+  },
+  suggestionImage: {
+    width: 44,
+    height: 44,
+    borderRadius: Storefront.radius.sm,
+    backgroundColor: Storefront.colors.surfaceWarm,
+  },
+  suggestionBody: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
   results: {
     gap: Spacing.three,
   },
@@ -307,10 +414,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: Spacing.three,
     padding: Spacing.three,
-    borderWidth: 1,
-    borderColor: Storefront.colors.border,
+    overflow: 'hidden',
     borderRadius: Storefront.radius.lg,
-    backgroundColor: Storefront.colors.surface,
   },
   resultImage: {
     width: 96,
@@ -334,7 +439,9 @@ const styles = StyleSheet.create({
     opacity: 0.78,
   },
   footer: {
-    height: Spacing.six,
+    minHeight: Spacing.six,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: 'transparent',
   },
   sheetBackdrop: {
@@ -351,7 +458,7 @@ const styles = StyleSheet.create({
     padding: Spacing.four,
     borderTopLeftRadius: Storefront.radius.xl,
     borderTopRightRadius: Storefront.radius.xl,
-    backgroundColor: Storefront.colors.surface,
+    backgroundColor: Storefront.colors.glassStrong,
   },
   sheetOption: {
     paddingHorizontal: Spacing.four,
@@ -378,6 +485,21 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
     marginTop: Spacing.two,
     backgroundColor: 'transparent',
+  },
+  priceInputs: {
+    flexDirection: 'row',
+    gap: Spacing.two,
+    backgroundColor: 'transparent',
+  },
+  priceInput: {
+    flex: 1,
+    minHeight: 48,
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.glassStrong,
+    paddingHorizontal: Spacing.three,
+    fontSize: 16,
   },
   secondaryButton: {
     flex: 1,

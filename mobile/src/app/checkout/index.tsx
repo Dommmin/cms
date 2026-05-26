@@ -6,6 +6,7 @@ import { Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getPaymentMethods, getShippingMethods, submitCheckout } from '@/api/checkout';
+import { GlassSurface } from '@/components/ui/glass-surface';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -119,7 +120,7 @@ export default function CheckoutScreen() {
           <StepPill label="Płatność" active={Boolean(selectedPayment)} />
         </ThemedView>
 
-        <ThemedView style={styles.summaryPanel}>
+        <GlassSurface style={styles.summaryPanel}>
           <ThemedView style={styles.summaryRow}>
             <ThemedText type="smallBold">Koszyk</ThemedText>
             <ThemedText type="smallBold">
@@ -129,10 +130,10 @@ export default function CheckoutScreen() {
           <ThemedText themeColor="textSecondary">
             {cart ? `${cart.items_count} szt. · rabaty ${formatMoney(cart.discount_amount, cart.currency)}` : 'Brak danych koszyka'}
           </ThemedText>
-        </ThemedView>
+        </GlassSurface>
 
         {!auth.user ? (
-          <ThemedView style={styles.panel}>
+          <GlassSurface style={styles.panel}>
             <ThemedText type="smallBold">Kontakt</ThemedText>
             <TextInput
               value={email}
@@ -143,10 +144,10 @@ export default function CheckoutScreen() {
               autoCapitalize="none"
               style={styles.input}
             />
-          </ThemedView>
+          </GlassSurface>
         ) : null}
 
-        <ThemedView style={styles.panel}>
+        <GlassSurface style={styles.panel}>
           <ThemedText type="smallBold">Adres dostawy</ThemedText>
           <TextInput value={address.first_name} onChangeText={(value) => updateAddressField('first_name', value)} placeholder="Imię" placeholderTextColor={Storefront.colors.muted} style={styles.input} />
           <TextInput value={address.last_name} onChangeText={(value) => updateAddressField('last_name', value)} placeholder="Nazwisko" placeholderTextColor={Storefront.colors.muted} style={styles.input} />
@@ -154,9 +155,9 @@ export default function CheckoutScreen() {
           <TextInput value={address.postal_code} onChangeText={(value) => updateAddressField('postal_code', value)} placeholder="Kod pocztowy" placeholderTextColor={Storefront.colors.muted} style={styles.input} />
           <TextInput value={address.city} onChangeText={(value) => updateAddressField('city', value)} placeholder="Miasto" placeholderTextColor={Storefront.colors.muted} style={styles.input} />
           <TextInput value={address.phone} onChangeText={(value) => updateAddressField('phone', value)} placeholder="Telefon" placeholderTextColor={Storefront.colors.muted} keyboardType="phone-pad" style={styles.input} />
-        </ThemedView>
+        </GlassSurface>
 
-        <ThemedView style={styles.panel}>
+        <GlassSurface style={styles.panel}>
           <ThemedText type="smallBold">Dostawa</ThemedText>
           {shippingMethods.map((method) => (
             <SelectableRow
@@ -166,9 +167,9 @@ export default function CheckoutScreen() {
               onPress={() => setSelectedShippingId(method.id)}
             />
           ))}
-        </ThemedView>
+        </GlassSurface>
 
-        <ThemedView style={styles.panel}>
+        <GlassSurface style={styles.panel}>
           <ThemedText type="smallBold">Płatność</ThemedText>
           {paymentMethods.map((method) => (
             <SelectableRow
@@ -179,7 +180,7 @@ export default function CheckoutScreen() {
               onPress={() => setSelectedPaymentId(method.id)}
             />
           ))}
-        </ThemedView>
+        </GlassSurface>
 
         <Pressable
           onPress={() => setTermsAccepted((value) => !value)}
@@ -286,16 +287,13 @@ const styles = StyleSheet.create({
   panel: {
     gap: Spacing.two,
     padding: Spacing.four,
-    borderWidth: 1,
-    borderColor: Storefront.colors.border,
     borderRadius: Storefront.radius.lg,
-    backgroundColor: Storefront.colors.surface,
   },
   summaryPanel: {
     gap: Spacing.two,
     padding: Spacing.four,
     borderRadius: Storefront.radius.xl,
-    backgroundColor: Storefront.colors.surfaceWarm,
+    backgroundColor: Storefront.colors.glass,
   },
   summaryRow: {
     flexDirection: 'row',

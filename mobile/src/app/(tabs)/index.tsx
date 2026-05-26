@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getProducts } from '@/api/products';
 import { ProductCard } from '@/components/product/product-card';
+import { GlassSurface } from '@/components/ui/glass-surface';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -23,7 +24,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content}>
-        <ThemedView style={styles.hero}>
+        <GlassSurface style={styles.hero}>
           <ThemedText type="code" style={styles.kicker}>
             MOBILE STOREFRONT
           </ThemedText>
@@ -38,12 +39,12 @@ export default function HomeScreen() {
               </ThemedText>
             </Pressable>
           </Link>
-        </ThemedView>
+        </GlassSurface>
 
         <ThemedView style={styles.quickLinks}>
           <QuickLink href="/search" label="Szukaj" />
+          <QuickLink href="/compare" label="Porównaj" />
           <QuickLink href="/blog" label="Blog" />
-          <QuickLink href="/stores" label="Sklepy" />
         </ThemedView>
 
         {recentlyViewed.products.length > 0 ? (
@@ -124,11 +125,7 @@ const styles = StyleSheet.create({
   hero: {
     gap: Spacing.three,
     padding: Spacing.five,
-    borderWidth: 1,
-    borderColor: Storefront.colors.border,
     borderRadius: Storefront.radius.xl,
-    backgroundColor: Storefront.colors.surfaceWarm,
-    ...Storefront.shadow.card,
   },
   kicker: {
     color: Storefront.colors.primary,
@@ -161,7 +158,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Storefront.colors.border,
     borderRadius: Storefront.radius.md,
-    backgroundColor: Storefront.colors.surface,
+    backgroundColor: Storefront.colors.glassStrong,
   },
   recentList: {
     gap: Spacing.two,
@@ -173,7 +170,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Storefront.colors.border,
     borderRadius: Storefront.radius.lg,
-    backgroundColor: Storefront.colors.surface,
+    backgroundColor: Storefront.colors.glassStrong,
   },
   grid: {
     gap: Spacing.three,

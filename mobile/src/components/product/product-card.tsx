@@ -4,7 +4,9 @@ import { Pressable, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { GlassSurface } from '@/components/ui/glass-surface';
 import { Spacing, Storefront } from '@/constants/theme';
+import { useComparison } from '@/hooks/use-comparison';
 import { useCart } from '@/hooks/use-cart';
 import { useWishlist } from '@/hooks/use-wishlist';
 import { formatMoney } from '@/lib/format';
@@ -14,6 +16,7 @@ import type { Product } from '@/types/api';
 export function ProductCard({ product }: { product: Product }) {
   const firstVariant = product.variants.find((variant) => variant.is_available) ?? product.variants[0];
   const { addItem } = useCart();
+  const comparison = useComparison();
   const auth = useAuth();
   const wishlist = useWishlist(auth.isAuthenticated);
   const isWishlisted = firstVariant
@@ -21,7 +24,7 @@ export function ProductCard({ product }: { product: Product }) {
     : false;
 
   return (
-    <ThemedView style={styles.card}>
+    <GlassSurface style={styles.card} interactive>
       <Link href={`/products/${product.slug}` as Href} asChild>
         <Pressable style={({ pressed }) => [styles.link, pressed && styles.pressed]}>
           <ThemedView style={styles.imageWrap}>
@@ -52,6 +55,14 @@ export function ProductCard({ product }: { product: Product }) {
           </ThemedText>
         </Pressable>
       ) : null}
+      <Pressable
+        onPress={() => (comparison.includes(product.id) ? comparison.remove(product.id) : comparison.add(product.id))}
+        disabled={!comparison.includes(product.id) && comparison.isFull}
+        style={[styles.compare, comparison.includes(product.id) && styles.compareActive]}>
+        <ThemedText type="smallBold" style={comparison.includes(product.id) && styles.compareActiveText}>
+          ⇄
+        </ThemedText>
+      </Pressable>
 
       <Link href={`/products/${product.slug}` as Href} asChild>
         <Pressable style={({ pressed }) => [styles.body, pressed && styles.pressed]}>
@@ -82,7 +93,7 @@ export function ProductCard({ product }: { product: Product }) {
           {firstVariant?.is_available ? 'Dodaj' : 'Niedostępny'}
         </ThemedText>
       </Pressable>
-    </ThemedView>
+    </GlassSurface>
   );
 }
 
@@ -91,11 +102,7 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 150,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: Storefront.colors.border,
     borderRadius: Storefront.radius.lg,
-    backgroundColor: Storefront.colors.surface,
-    ...Storefront.shadow.card,
   },
   link: {
     backgroundColor: 'transparent',
@@ -107,7 +114,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: '100%',
     aspectRatio: 0.92,
-    backgroundColor: Storefront.colors.surfaceWarm,
+    backgroundColor: 'rgba(244,241,234,0.68)',
   },
   image: {
     width: '100%',
@@ -140,6 +147,23 @@ const styles = StyleSheet.create({
     backgroundColor: Storefront.colors.rose,
   },
   wishlistActiveText: {
+    color: '#FFFFFF',
+  },
+  compare: {
+    position: 'absolute',
+    top: 48,
+    right: Spacing.two,
+    width: 34,
+    height: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.92)',
+  },
+  compareActive: {
+    backgroundColor: Storefront.colors.primary,
+  },
+  compareActiveText: {
     color: '#FFFFFF',
   },
   body: {

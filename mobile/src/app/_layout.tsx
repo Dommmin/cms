@@ -25,6 +25,7 @@ export default function RootLayout() {
             <Stack.Screen name="checkout/index" options={{ title: 'Checkout' }} />
             <Stack.Screen name="checkout/pending" options={{ title: 'Płatność' }} />
             <Stack.Screen name="search/index" options={{ title: 'Szukaj' }} />
+            <Stack.Screen name="compare/index" options={{ title: 'Porównanie' }} />
             <Stack.Screen name="account/orders/[reference]" options={{ title: 'Zamówienie' }} />
             <Stack.Screen name="account/wishlist" options={{ title: 'Wishlist' }} />
             <Stack.Screen name="blog/index" options={{ title: 'Blog' }} />

@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
-import { useLocalSearchParams } from 'expo-router';
+import { Link, type Href, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet } from 'react-native';
+import { FlatList, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getProduct, getProductReviews } from '@/api/products';
+import { getProduct, getProductReviews, getProducts } from '@/api/products';
+import { ProductCard } from '@/components/product/product-card';
+import { GlassSurface } from '@/components/ui/glass-surface';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -19,6 +21,8 @@ import { useAuth } from '@/providers/auth-provider';
 export default function ProductDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const { addItem } = useCart();
   const auth = useAuth();
@@ -36,6 +40,11 @@ export default function ProductDetailScreen() {
     queryKey: ['product-reviews', slug],
     queryFn: () => getProductReviews(slug, { per_page: 3 }),
     enabled: Boolean(slug),
+  });
+  const relatedQuery = useQuery({
+    queryKey: ['products', 'related', product?.category?.slug, product?.id],
+    queryFn: () => getProducts({ category: product?.category?.slug, per_page: 5 }),
+    enabled: Boolean(product?.category?.slug),
   });
   const selectedVariant = useMemo(() => {
     if (!product) return null;
@@ -56,7 +65,18 @@ export default function ProductDetailScreen() {
   if (productQuery.isLoading) return <LoadingState />;
   if (productQuery.isError || !product) return <ErrorState onRetry={() => productQuery.refetch()} />;
 
-  const image = product.images[0] ?? product.thumbnail;
+  const images = product.images.length > 0 ? product.images : product.thumbnail ? [product.thumbnail] : [];
+  const image = images[activeImageIndex] ?? images[0] ?? null;
+  const variantAttributeGroups = Object.entries(
+    product.variants.reduce<Record<string, string[]>>((groups, variant) => {
+      Object.entries(variant.attributes).forEach(([name, value]) => {
+        groups[name] ??= [];
+        if (!groups[name].includes(value)) groups[name].push(value);
+      });
+      return groups;
+    }, {}),
+  );
+  const relatedProducts = relatedQuery.data?.data.filter((item) => item.id !== product.id).slice(0, 4) ?? [];
   const isWishlisted = selectedVariant
     ? wishlist.wishlist?.items.some((item) => item.variant_id === selectedVariant.id)
     : false;
@@ -64,10 +84,27 @@ export default function ProductDetailScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content}>
-        <ThemedView style={styles.gallery}>
+        <GlassSurface style={styles.gallery}>
           <Image source={image?.url ?? undefined} style={styles.image} contentFit="contain" />
-        </ThemedView>
-        <ThemedView style={styles.header}>
+        </GlassSurface>
+        {images.length > 1 ? (
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={images}
+            keyExtractor={(item) => String(item.id)}
+            renderItem={({ item, index }) => (
+              <Pressable
+                onPress={() => setActiveImageIndex(index)}
+                style={[styles.thumbnailButton, index === activeImageIndex && styles.thumbnailActive]}>
+                <Image source={item.thumb_url ?? item.url} style={styles.thumbnail} contentFit="contain" />
+              </Pressable>
+            )}
+            contentContainerStyle={styles.thumbnails}
+          />
+        ) : null}
+
+        <GlassSurface style={styles.header}>
           {product.brand ? (
             <ThemedText type="code" style={styles.kicker}>
               {product.brand.name.toUpperCase()}
@@ -80,33 +117,67 @@ export default function ProductDetailScreen() {
               Najniższa cena 30 dni: {formatMoney(product.omnibus_price_min)}
             </ThemedText>
           ) : null}
-        </ThemedView>
+          <ThemedView style={styles.quantityRow}>
+            <ThemedText type="smallBold">Ilość</ThemedText>
+            <ThemedView style={styles.stepper}>
+              <Pressable onPress={() => setQuantity((value) => Math.max(1, value - 1))} style={styles.stepperButton}>
+                <ThemedText type="smallBold">-</ThemedText>
+              </Pressable>
+              <ThemedText type="smallBold">{quantity}</ThemedText>
+              <Pressable onPress={() => setQuantity((value) => value + 1)} style={styles.stepperButton}>
+                <ThemedText type="smallBold">+</ThemedText>
+              </Pressable>
+            </ThemedView>
+          </ThemedView>
+        </GlassSurface>
 
-        {product.variants.length > 1 ? (
-          <ThemedView style={styles.section}>
+        {variantAttributeGroups.length > 0 ? (
+          <GlassSurface style={styles.section}>
             <ThemedText type="smallBold">Wariant</ThemedText>
-            <ThemedView style={styles.variants}>
-              {product.variants.map((variant) => {
-                const isActive = variant.id === selectedVariant?.id;
-                const label = Object.values(variant.attributes).join(' / ') || variant.sku;
+            {variantAttributeGroups.map(([attributeName, values]) => (
+              <ThemedView key={attributeName} style={styles.variantGroup}>
+                <ThemedText type="small" themeColor="textSecondary">
+                  {attributeName}
+                </ThemedText>
+                <ThemedView style={styles.variants}>
+                  {values.map((value) => {
+                    const matchingVariant = product.variants.find((variant) => variant.attributes[attributeName] === value);
+                    const isActive = selectedVariant?.attributes[attributeName] === value;
+                    const isAvailable = matchingVariant?.is_available ?? false;
                 return (
                   <Pressable
-                    key={variant.id}
-                    disabled={!variant.is_available}
-                    onPress={() => setSelectedVariantId(variant.id)}
-                    style={[styles.variant, isActive && styles.activeVariant, !variant.is_available && styles.disabled]}>
+                        key={`${attributeName}-${value}`}
+                        disabled={!isAvailable}
+                        onPress={() => matchingVariant && setSelectedVariantId(matchingVariant.id)}
+                        style={[styles.variant, isActive && styles.activeVariant, !isAvailable && styles.disabled]}>
                     <ThemedText type="smallBold" style={isActive && styles.activeText}>
-                      {label}
+                          {value}
                     </ThemedText>
                   </Pressable>
                 );
               })}
-            </ThemedView>
-          </ThemedView>
+                </ThemedView>
+              </ThemedView>
+            ))}
+          </GlassSurface>
         ) : null}
 
+        <GlassSurface style={styles.deliveryPanel}>
+          <ThemedView style={styles.deliveryItem}>
+            <ThemedView style={[styles.statusDot, selectedVariant?.is_available ? styles.statusAvailable : styles.statusUnavailable]} />
+            <ThemedView style={styles.deliveryCopy}>
+              <ThemedText type="smallBold">{selectedVariant?.is_available ? 'Dostępny' : 'Niedostępny'}</ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">Wysyłka i odbiór zależą od wybranej metody dostawy.</ThemedText>
+            </ThemedView>
+          </ThemedView>
+          <ThemedView style={styles.deliveryItem}>
+            <ThemedText type="smallBold">14 dni</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">Zwrot zgodny z warunkami checkoutu.</ThemedText>
+          </ThemedView>
+        </GlassSurface>
+
         {auth.isAuthenticated && selectedVariant ? (
-          <ThemedView style={styles.section}>
+          <GlassSurface style={styles.section}>
             <Pressable
               onPress={() =>
                 isWishlisted
@@ -118,19 +189,19 @@ export default function ProductDetailScreen() {
                 {isWishlisted ? 'Usuń z wishlisty' : 'Dodaj do wishlisty'}
               </ThemedText>
             </Pressable>
-          </ThemedView>
+          </GlassSurface>
         ) : null}
 
         {product.short_description || product.description ? (
-          <ThemedView style={styles.section}>
+          <GlassSurface style={styles.section}>
             <ThemedText type="smallBold">Opis</ThemedText>
             <ThemedText themeColor="textSecondary">
               {stripHtml(product.short_description ?? product.description)}
             </ThemedText>
-          </ThemedView>
+          </GlassSurface>
         ) : null}
 
-        <ThemedView style={styles.section}>
+        <GlassSurface style={styles.section}>
           <ThemedText type="smallBold">Opinie</ThemedText>
           {reviewsQuery.isLoading ? <ThemedText themeColor="textSecondary">Ładowanie</ThemedText> : null}
           {reviewsQuery.data?.data.length === 0 ? (
@@ -145,15 +216,36 @@ export default function ProductDetailScreen() {
               <ThemedText themeColor="textSecondary">{review.body}</ThemedText>
             </ThemedView>
           ))}
-        </ThemedView>
+        </GlassSurface>
+
+        {relatedProducts.length > 0 ? (
+          <ThemedView style={styles.relatedSection}>
+            <ThemedView style={styles.relatedHeader}>
+              <ThemedText type="smallBold">Powiązane produkty</ThemedText>
+              <Link href={`/categories` as Href} asChild>
+                <Pressable>
+                  <ThemedText type="small" style={styles.kicker}>Zobacz więcej</ThemedText>
+                </Pressable>
+              </Link>
+            </ThemedView>
+            <FlatList
+              data={relatedProducts}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item) => String(item.id)}
+              renderItem={({ item }) => <ThemedView style={styles.relatedCard}><ProductCard product={item} /></ThemedView>}
+              contentContainerStyle={styles.relatedList}
+            />
+          </ThemedView>
+        ) : null}
       </ScrollView>
-      <ThemedView style={styles.stickyBar}>
+      <GlassSurface style={styles.stickyBar}>
         <Pressable
           disabled={!selectedVariant?.is_available || addItem.isPending}
           onPress={() =>
             selectedVariant &&
             addItem.mutate(
-              { variant_id: selectedVariant.id, quantity: 1 },
+              { variant_id: selectedVariant.id, quantity },
               {
                 onSuccess: () => {
                   setAdded(true);
@@ -167,7 +259,7 @@ export default function ProductDetailScreen() {
             {added ? 'Dodano do koszyka' : selectedVariant?.is_available ? 'Dodaj do koszyka' : 'Niedostępny'}
           </ThemedText>
         </Pressable>
-      </ThemedView>
+      </GlassSurface>
     </SafeAreaView>
   );
 }
@@ -177,14 +269,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingBottom: 112,
+    gap: Spacing.three,
+    padding: Spacing.four,
+    paddingBottom: 128,
   },
   gallery: {
     width: '100%',
     aspectRatio: 0.94,
-    borderBottomWidth: 1,
-    borderBottomColor: Storefront.colors.border,
-    backgroundColor: Storefront.colors.surfaceWarm,
+    overflow: 'hidden',
+    borderRadius: Storefront.radius.xl,
   },
   image: {
     width: '100%',
@@ -193,16 +286,63 @@ const styles = StyleSheet.create({
   header: {
     gap: Spacing.two,
     padding: Spacing.four,
-    backgroundColor: Storefront.colors.canvas,
+    borderRadius: Storefront.radius.xl,
   },
   kicker: {
     color: Storefront.colors.primary,
   },
   section: {
     gap: Spacing.two,
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.three,
-    backgroundColor: Storefront.colors.canvas,
+    padding: Spacing.four,
+    borderRadius: Storefront.radius.lg,
+  },
+  thumbnails: {
+    gap: Spacing.two,
+  },
+  thumbnailButton: {
+    width: 72,
+    height: 72,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: 'transparent',
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.glassStrong,
+  },
+  thumbnailActive: {
+    borderColor: Storefront.colors.primary,
+  },
+  thumbnail: {
+    width: '100%',
+    height: '100%',
+  },
+  quantityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: Spacing.two,
+    backgroundColor: 'transparent',
+  },
+  stepper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.three,
+    padding: Spacing.one,
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.glassStrong,
+  },
+  stepperButton: {
+    width: 34,
+    height: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Storefront.radius.sm,
+    backgroundColor: Storefront.colors.primarySoft,
+  },
+  variantGroup: {
+    gap: Spacing.two,
+    backgroundColor: 'transparent',
   },
   variants: {
     flexDirection: 'row',
@@ -215,7 +355,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Storefront.colors.border,
     borderRadius: Storefront.radius.md,
-    backgroundColor: Storefront.colors.surface,
+    backgroundColor: Storefront.colors.glassStrong,
   },
   activeVariant: {
     backgroundColor: Storefront.colors.primary,
@@ -233,13 +373,56 @@ const styles = StyleSheet.create({
     borderRadius: Storefront.radius.md,
     backgroundColor: Storefront.colors.primarySoft,
   },
+  deliveryPanel: {
+    gap: Spacing.three,
+    padding: Spacing.four,
+    borderRadius: Storefront.radius.lg,
+  },
+  deliveryItem: {
+    flexDirection: 'row',
+    gap: Spacing.three,
+    backgroundColor: 'transparent',
+  },
+  deliveryCopy: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  statusDot: {
+    width: 10,
+    height: 10,
+    marginTop: 5,
+    borderRadius: 999,
+  },
+  statusAvailable: {
+    backgroundColor: Storefront.colors.primary,
+  },
+  statusUnavailable: {
+    backgroundColor: Storefront.colors.muted,
+  },
   review: {
     gap: Spacing.one,
     padding: Spacing.four,
     borderWidth: 1,
     borderColor: Storefront.colors.border,
     borderRadius: Storefront.radius.lg,
-    backgroundColor: Storefront.colors.surface,
+    backgroundColor: Storefront.colors.glassStrong,
+  },
+  relatedSection: {
+    gap: Spacing.three,
+    backgroundColor: 'transparent',
+  },
+  relatedHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'transparent',
+  },
+  relatedList: {
+    gap: Spacing.three,
+  },
+  relatedCard: {
+    width: 176,
+    backgroundColor: 'transparent',
   },
   stickyBar: {
     position: 'absolute',
@@ -247,9 +430,8 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     padding: Spacing.four,
-    borderTopWidth: 1,
-    borderTopColor: Storefront.colors.border,
-    backgroundColor: Storefront.colors.surface,
+    borderTopLeftRadius: Storefront.radius.xl,
+    borderTopRightRadius: Storefront.radius.xl,
   },
   primaryButton: {
     alignItems: 'center',

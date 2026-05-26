@@ -4,6 +4,7 @@ import { FlatList, Pressable, StyleSheet, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CartRow } from '@/components/cart/cart-row';
+import { GlassSurface } from '@/components/ui/glass-surface';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -47,7 +48,7 @@ export default function CartScreen() {
             )}
             ItemSeparatorComponent={() => <ThemedView style={styles.separator} />}
           />
-          <ThemedView style={styles.summary}>
+          <GlassSurface style={styles.summary}>
             <ThemedView style={styles.discountRow}>
               <TextInput
                 value={discountCode}
@@ -85,7 +86,7 @@ export default function CartScreen() {
                 </ThemedText>
               </Pressable>
             </Link>
-          </ThemedView>
+          </GlassSurface>
         </ThemedView>
       )}
     </SafeAreaView>
@@ -112,8 +113,7 @@ const styles = StyleSheet.create({
   summary: {
     gap: Spacing.three,
     paddingVertical: Spacing.four,
-    borderTopWidth: 1,
-    borderTopColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.xl,
   },
   summaryRow: {
     flexDirection: 'row',

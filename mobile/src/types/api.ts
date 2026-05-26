@@ -230,6 +230,11 @@ export interface ProductReview {
   created_at: string;
 }
 
+export interface CompareResponse {
+  products: Product[];
+  attributeKeys: string[];
+}
+
 export interface SearchFacetCategory {
   id: string;
   slug: string;

@@ -3,6 +3,7 @@ import { Link, type Href } from 'expo-router';
 import { FlatList, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { GlassSurface } from '@/components/ui/glass-surface';
 import { EmptyState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -45,7 +46,7 @@ export default function WishlistScreen() {
 
 function WishlistRow({ item, onRemove }: { item: WishlistItem; onRemove: () => void }) {
   return (
-    <ThemedView style={styles.row}>
+    <GlassSurface style={styles.row}>
       <Link href={`/products/${item.product.slug}` as Href} asChild>
         <Pressable style={({ pressed }) => [styles.productLink, pressed && styles.pressed]}>
           <Image
@@ -67,7 +68,7 @@ function WishlistRow({ item, onRemove }: { item: WishlistItem; onRemove: () => v
       <Pressable onPress={onRemove} style={styles.removeButton}>
         <ThemedText type="smallBold">Usuń</ThemedText>
       </Pressable>
-    </ThemedView>
+    </GlassSurface>
   );
 }
 
@@ -90,10 +91,7 @@ const styles = StyleSheet.create({
   row: {
     gap: Spacing.three,
     padding: Spacing.three,
-    borderWidth: 1,
-    borderColor: Storefront.colors.border,
     borderRadius: Storefront.radius.lg,
-    backgroundColor: Storefront.colors.surface,
   },
   productLink: {
     flexDirection: 'row',
