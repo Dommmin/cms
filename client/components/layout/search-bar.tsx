@@ -10,9 +10,11 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import type { SearchSuggestion } from '@/api/search.types';
+import { useIsMounted } from '@/hooks/use-is-mounted';
 import { useLocalePath } from '@/hooks/use-locale';
 import {
     addRecentSearch,
@@ -59,7 +61,10 @@ export function SearchBar() {
     const [query, setQuery] = useState('');
     const [recentSearches, setRecentSearches] = useState<string[]>([]);
     const [activeIndex, setActiveIndex] = useState(-1);
+    const [headerBottom, setHeaderBottom] = useState(0);
     const inputRef = useRef<HTMLInputElement>(null);
+    const panelRef = useRef<HTMLDivElement>(null);
+    const mounted = useIsMounted();
 
     const { data: searchData, isLoading } = useSearchSuggestions(query);
     const suggestions: SearchSuggestion[] = searchData ?? [];
@@ -75,17 +80,23 @@ export function SearchBar() {
     const showRecent = query.trim().length === 0 && recentSearches.length > 0;
     const showResults = query.trim().length >= 2;
 
-    function openSearch() {
+    const openSearch = useCallback(() => {
         setRecentSearches(getRecentSearches());
+        const header = document.querySelector(
+            'header[aria-label="Site header"]',
+        );
+        if (header) {
+            setHeaderBottom(header.getBoundingClientRect().bottom);
+        }
         setOpen(true);
         setTimeout(() => inputRef.current?.focus(), 50);
-    }
+    }, []);
 
-    function closeSearch() {
+    const closeSearch = useCallback(() => {
         setOpen(false);
         setQuery('');
         setActiveIndex(-1);
-    }
+    }, []);
 
     function navigate(url: string, searchQuery?: string) {
         if (searchQuery) addRecentSearch(searchQuery);
@@ -124,7 +135,26 @@ export function SearchBar() {
         }
         document.addEventListener('keydown', onKey);
         return () => document.removeEventListener('keydown', onKey);
-    }, [open]);
+    }, [open, closeSearch]);
+
+    useEffect(() => {
+        function handleClickOutside(e: MouseEvent) {
+            if (
+                panelRef.current &&
+                !panelRef.current.contains(e.target as Node)
+            ) {
+                closeSearch();
+            }
+        }
+        if (!open) return;
+        const id = setTimeout(() => {
+            document.addEventListener('mousedown', handleClickOutside);
+        }, 0);
+        return () => {
+            clearTimeout(id);
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [open, closeSearch]);
 
     useEffect(() => {
         function onOpenSearch() {
@@ -132,7 +162,21 @@ export function SearchBar() {
         }
         window.addEventListener('open-search', onOpenSearch);
         return () => window.removeEventListener('open-search', onOpenSearch);
-    }, []);
+    }, [openSearch]);
+
+    useEffect(() => {
+        if (!open) return;
+        function onScroll() {
+            const header = document.querySelector(
+                'header[aria-label="Site header"]',
+            );
+            if (header) {
+                setHeaderBottom(header.getBoundingClientRect().bottom);
+            }
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
+    }, [open]);
 
     const globalIndex = (type: SearchSuggestion['type'], i: number): number => {
         let offset = 0;
@@ -153,402 +197,436 @@ export function SearchBar() {
                 <Search className="h-4 w-4" />
             </button>
 
-            {open && (
-                <>
-                    {/* Backdrop */}
-                    <div
-                        className="fixed inset-0 bg-black/20 backdrop-blur-sm"
-                        style={{ zIndex: 39 }}
-                        onClick={closeSearch}
-                    />
+            {open &&
+                mounted &&
+                typeof document !== 'undefined' &&
+                createPortal(
+                    <>
+                        {/* Backdrop — above content, below panel */}
+                        <div
+                            className="fixed inset-0 bg-black/20 backdrop-blur-sm"
+                            style={{ zIndex: 39 }}
+                            onClick={closeSearch}
+                        />
 
-                    {/* Panel */}
-                    <div
-                        role="dialog"
-                        aria-label="Search"
-                        aria-modal="true"
-                        className="fixed top-16 right-0 left-0 overflow-hidden rounded-b-2xl border border-white/20 bg-white/80 shadow-[0_20px_60px_-10px_oklch(0_0_0_/_0.2)] backdrop-blur-2xl backdrop-saturate-150 dark:border-white/10 dark:bg-neutral-900/80 dark:shadow-[0_20px_60px_-10px_oklch(0_0_0_/_0.5)]"
-                        style={{ zIndex: 210 }}
-                    >
-                        <div className="mx-auto max-h-[70vh] max-w-2xl overflow-y-auto px-4 py-4">
-                            {/* Input row */}
-                            <form
-                                onSubmit={handleSubmit}
-                                role="search"
-                                className="flex items-center gap-2"
-                            >
-                                <Search
-                                    className="text-muted-foreground h-5 w-5 shrink-0"
-                                    aria-hidden="true"
-                                />
-                                <label
-                                    htmlFor="header-search-input"
-                                    className="sr-only"
+                        {/* Panel — above backdrop and header */}
+                        <div
+                            ref={panelRef}
+                            role="dialog"
+                            aria-label="Search"
+                            aria-modal="true"
+                            className="fixed right-0 left-0 overflow-hidden rounded-b-2xl border border-white/20 bg-white/80 shadow-[0_20px_60px_-10px_oklch(0_0_0_/_0.2)] backdrop-blur-2xl backdrop-saturate-150 dark:border-white/10 dark:bg-neutral-900/80 dark:shadow-[0_20px_60px_-10px_oklch(0_0_0_/_0.5)]"
+                            style={{
+                                zIndex: 60,
+                                top: headerBottom,
+                            }}
+                        >
+                            <div className="mx-auto max-h-[70vh] max-w-2xl overflow-y-auto px-4 py-4">
+                                {/* Input row */}
+                                <form
+                                    onSubmit={handleSubmit}
+                                    role="search"
+                                    className="flex items-center gap-2"
                                 >
-                                    Search products
-                                </label>
-                                <input
-                                    id="header-search-input"
-                                    ref={inputRef}
-                                    value={query}
-                                    onChange={(e) => {
-                                        setQuery(e.target.value);
-                                        setActiveIndex(-1);
-                                    }}
-                                    onKeyDown={handleKeyDown}
-                                    placeholder="Search products…"
-                                    aria-autocomplete="list"
-                                    aria-controls="search-listbox"
-                                    autoComplete="off"
-                                    className="placeholder:text-muted-foreground flex-1 bg-transparent text-base outline-none"
-                                />
-                                {query && (
+                                    <Search
+                                        className="text-muted-foreground h-5 w-5 shrink-0"
+                                        aria-hidden="true"
+                                    />
+                                    <label
+                                        htmlFor="header-search-input"
+                                        className="sr-only"
+                                    >
+                                        Search products
+                                    </label>
+                                    <input
+                                        id="header-search-input"
+                                        ref={inputRef}
+                                        value={query}
+                                        onChange={(e) => {
+                                            setQuery(e.target.value);
+                                            setActiveIndex(-1);
+                                        }}
+                                        onKeyDown={handleKeyDown}
+                                        placeholder="Search products…"
+                                        aria-autocomplete="list"
+                                        aria-controls="search-listbox"
+                                        autoComplete="off"
+                                        className="placeholder:text-muted-foreground flex-1 bg-transparent text-base outline-none"
+                                    />
+                                    {query && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setQuery('')}
+                                            aria-label="Clear search"
+                                            className="hover:bg-accent rounded p-1"
+                                        >
+                                            <X
+                                                className="h-4 w-4"
+                                                aria-hidden="true"
+                                            />
+                                        </button>
+                                    )}
                                     <button
                                         type="button"
-                                        onClick={() => setQuery('')}
-                                        aria-label="Clear search"
-                                        className="hover:bg-accent rounded p-1"
+                                        onClick={closeSearch}
+                                        className="text-muted-foreground hover:text-foreground ml-1 text-sm"
                                     >
-                                        <X
-                                            className="h-4 w-4"
-                                            aria-hidden="true"
-                                        />
+                                        Cancel
                                     </button>
-                                )}
-                                <button
-                                    type="button"
-                                    onClick={closeSearch}
-                                    className="text-muted-foreground hover:text-foreground ml-1 text-sm"
+                                </form>
+
+                                {/* Live region */}
+                                <div
+                                    aria-live="polite"
+                                    aria-atomic="true"
+                                    className="sr-only"
                                 >
-                                    Cancel
-                                </button>
-                            </form>
+                                    {showResults && !isLoading && (
+                                        <>
+                                            {suggestions.length === 0
+                                                ? `No results for ${query}`
+                                                : `${suggestions.length} results found`}
+                                        </>
+                                    )}
+                                </div>
 
-                            {/* Live region */}
-                            <div
-                                aria-live="polite"
-                                aria-atomic="true"
-                                className="sr-only"
-                            >
-                                {showResults && !isLoading && (
-                                    <>
-                                        {suggestions.length === 0
-                                            ? `No results for ${query}`
-                                            : `${suggestions.length} results found`}
-                                    </>
-                                )}
-                            </div>
-
-                            {/* Recent searches */}
-                            {showRecent && (
-                                <div className="mt-4">
-                                    <div className="mb-2 flex items-center justify-between">
-                                        <span className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-                                            Recent
-                                        </span>
-                                        <button
-                                            onClick={() => {
-                                                clearRecentSearches();
-                                                setRecentSearches([]);
-                                            }}
-                                            aria-label="Clear recent searches"
-                                            className="text-muted-foreground hover:text-foreground text-xs"
-                                        >
-                                            Clear
-                                        </button>
-                                    </div>
-                                    <div className="space-y-0.5">
-                                        {recentSearches.map((q) => (
+                                {/* Recent searches */}
+                                {showRecent && (
+                                    <div className="mt-4">
+                                        <div className="mb-2 flex items-center justify-between">
+                                            <span className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+                                                Recent
+                                            </span>
                                             <button
-                                                key={q}
+                                                onClick={() => {
+                                                    clearRecentSearches();
+                                                    setRecentSearches([]);
+                                                }}
+                                                aria-label="Clear recent searches"
+                                                className="text-muted-foreground hover:text-foreground text-xs"
+                                            >
+                                                Clear
+                                            </button>
+                                        </div>
+                                        <div className="space-y-0.5">
+                                            {recentSearches.map((q) => (
+                                                <button
+                                                    key={q}
+                                                    onClick={() =>
+                                                        navigate(
+                                                            lp(
+                                                                `/search?q=${encodeURIComponent(q)}`,
+                                                            ),
+                                                            q,
+                                                        )
+                                                    }
+                                                    className="hover:bg-accent flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm"
+                                                >
+                                                    <Clock className="text-muted-foreground h-3.5 w-3.5" />
+                                                    <span>{q}</span>
+                                                    <ArrowRight className="text-muted-foreground ml-auto h-3.5 w-3.5" />
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Results */}
+                                {showResults && (
+                                    <div
+                                        id="search-listbox"
+                                        className="mt-4 space-y-4"
+                                    >
+                                        {/* Skeleton */}
+                                        {isLoading && (
+                                            <div className="space-y-2">
+                                                {[1, 2, 3].map((i) => (
+                                                    <div
+                                                        key={i}
+                                                        className="flex animate-pulse items-center gap-3"
+                                                    >
+                                                        <div className="bg-muted h-10 w-10 rounded-lg" />
+                                                        <div className="bg-muted h-4 flex-1 rounded" />
+                                                        <div className="bg-muted h-4 w-16 rounded" />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {/* Categories */}
+                                        {!isLoading &&
+                                            categories.length > 0 && (
+                                                <div>
+                                                    <span className="text-muted-foreground mb-2 block text-xs font-semibold tracking-wide uppercase">
+                                                        Categories
+                                                    </span>
+                                                    <div className="space-y-0.5">
+                                                        {categories.map(
+                                                            (cat, i) => {
+                                                                const idx =
+                                                                    globalIndex(
+                                                                        'category',
+                                                                        i,
+                                                                    );
+                                                                return (
+                                                                    <button
+                                                                        key={`cat-${cat.id}`}
+                                                                        onClick={() =>
+                                                                            navigate(
+                                                                                suggestionUrl(
+                                                                                    cat,
+                                                                                    lp,
+                                                                                ),
+                                                                            )
+                                                                        }
+                                                                        className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm ${
+                                                                            activeIndex ===
+                                                                            idx
+                                                                                ? 'bg-accent'
+                                                                                : 'hover:bg-accent'
+                                                                        }`}
+                                                                    >
+                                                                        {cat.thumbnail ? (
+                                                                            <Image
+                                                                                src={
+                                                                                    cat.thumbnail
+                                                                                }
+                                                                                alt={
+                                                                                    cat.name
+                                                                                }
+                                                                                width={
+                                                                                    32
+                                                                                }
+                                                                                height={
+                                                                                    32
+                                                                                }
+                                                                                className="h-8 w-8 rounded object-cover"
+                                                                            />
+                                                                        ) : (
+                                                                            <span className="bg-muted flex h-8 w-8 shrink-0 items-center justify-center rounded text-xs">
+                                                                                <FolderOpen className="h-4 w-4" />
+                                                                            </span>
+                                                                        )}
+                                                                        <div className="flex-1 text-left">
+                                                                            <HighlightedText
+                                                                                text={
+                                                                                    cat.name
+                                                                                }
+                                                                                query={
+                                                                                    query
+                                                                                }
+                                                                            />
+                                                                            {cat.products_count !=
+                                                                                null && (
+                                                                                <span className="text-muted-foreground ml-1 text-xs">
+                                                                                    (
+                                                                                    {
+                                                                                        cat.products_count
+                                                                                    }
+
+                                                                                    )
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                    </button>
+                                                                );
+                                                            },
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                        {/* Blog posts */}
+                                        {!isLoading && blogPosts.length > 0 && (
+                                            <div>
+                                                <span className="text-muted-foreground mb-2 block text-xs font-semibold tracking-wide uppercase">
+                                                    Blog
+                                                </span>
+                                                <div className="space-y-0.5">
+                                                    {blogPosts.map(
+                                                        (post, i) => {
+                                                            const idx =
+                                                                globalIndex(
+                                                                    'blog_post',
+                                                                    i,
+                                                                );
+                                                            return (
+                                                                <button
+                                                                    key={`post-${post.id}`}
+                                                                    onClick={() =>
+                                                                        navigate(
+                                                                            suggestionUrl(
+                                                                                post,
+                                                                                lp,
+                                                                            ),
+                                                                        )
+                                                                    }
+                                                                    className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm ${
+                                                                        activeIndex ===
+                                                                        idx
+                                                                            ? 'bg-accent'
+                                                                            : 'hover:bg-accent'
+                                                                    }`}
+                                                                >
+                                                                    {post.thumbnail ? (
+                                                                        <Image
+                                                                            src={
+                                                                                post.thumbnail
+                                                                            }
+                                                                            alt={
+                                                                                post.name
+                                                                            }
+                                                                            width={
+                                                                                32
+                                                                            }
+                                                                            height={
+                                                                                32
+                                                                            }
+                                                                            className="h-8 w-8 rounded object-cover"
+                                                                        />
+                                                                    ) : (
+                                                                        <span className="bg-muted flex h-8 w-8 shrink-0 items-center justify-center rounded text-xs">
+                                                                            <FileText className="h-4 w-4" />
+                                                                        </span>
+                                                                    )}
+                                                                    <div className="flex-1 text-left">
+                                                                        <HighlightedText
+                                                                            text={
+                                                                                post.name
+                                                                            }
+                                                                            query={
+                                                                                query
+                                                                            }
+                                                                        />
+                                                                        {post.excerpt && (
+                                                                            <p className="text-muted-foreground line-clamp-1 text-xs">
+                                                                                {
+                                                                                    post.excerpt
+                                                                                }
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                </button>
+                                                            );
+                                                        },
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Products */}
+                                        {!isLoading && products.length > 0 && (
+                                            <div>
+                                                <span className="text-muted-foreground mb-2 block text-xs font-semibold tracking-wide uppercase">
+                                                    Products
+                                                </span>
+                                                <div className="space-y-0.5">
+                                                    {products.map(
+                                                        (product, i) => {
+                                                            const idx =
+                                                                globalIndex(
+                                                                    'product',
+                                                                    i,
+                                                                );
+                                                            return (
+                                                                <button
+                                                                    key={`prod-${product.id}`}
+                                                                    onClick={() =>
+                                                                        navigate(
+                                                                            suggestionUrl(
+                                                                                product,
+                                                                                lp,
+                                                                            ),
+                                                                        )
+                                                                    }
+                                                                    className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm ${
+                                                                        activeIndex ===
+                                                                        idx
+                                                                            ? 'bg-accent'
+                                                                            : 'hover:bg-accent'
+                                                                    }`}
+                                                                >
+                                                                    {product.thumbnail ? (
+                                                                        <Image
+                                                                            src={
+                                                                                product.thumbnail
+                                                                            }
+                                                                            alt={
+                                                                                product.name
+                                                                            }
+                                                                            width={
+                                                                                40
+                                                                            }
+                                                                            height={
+                                                                                40
+                                                                            }
+                                                                            className="h-10 w-10 rounded-lg object-cover"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="bg-muted h-10 w-10 shrink-0 rounded-lg" />
+                                                                    )}
+                                                                    <div className="flex-1 text-left">
+                                                                        <HighlightedText
+                                                                            text={
+                                                                                product.name
+                                                                            }
+                                                                            query={
+                                                                                query
+                                                                            }
+                                                                        />
+                                                                    </div>
+                                                                    {product.price !=
+                                                                        null && (
+                                                                        <span className="shrink-0 text-sm font-medium">
+                                                                            {formatPrice(
+                                                                                product.price,
+                                                                            )}
+                                                                        </span>
+                                                                    )}
+                                                                </button>
+                                                            );
+                                                        },
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* No results */}
+                                        {!isLoading &&
+                                            suggestions.length === 0 && (
+                                                <p className="text-muted-foreground py-4 text-center text-sm">
+                                                    No results for &ldquo;
+                                                    {query}
+                                                    &rdquo;
+                                                </p>
+                                            )}
+
+                                        {/* View all */}
+                                        {suggestions.length > 0 && (
+                                            <button
                                                 onClick={() =>
                                                     navigate(
                                                         lp(
-                                                            `/search?q=${encodeURIComponent(q)}`,
+                                                            `/search?q=${encodeURIComponent(query.trim())}`,
                                                         ),
-                                                        q,
+                                                        query.trim(),
                                                     )
                                                 }
-                                                className="hover:bg-accent flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm"
+                                                className="border-border hover:bg-accent flex w-full items-center justify-center gap-1 rounded-lg border py-2 text-sm font-medium"
                                             >
-                                                <Clock className="text-muted-foreground h-3.5 w-3.5" />
-                                                <span>{q}</span>
-                                                <ArrowRight className="text-muted-foreground ml-auto h-3.5 w-3.5" />
+                                                View all results for &ldquo;
+                                                {query}
+                                                &rdquo;
+                                                <ArrowRight className="h-3.5 w-3.5" />
                                             </button>
-                                        ))}
+                                        )}
                                     </div>
-                                </div>
-                            )}
-
-                            {/* Results */}
-                            {showResults && (
-                                <div
-                                    id="search-listbox"
-                                    className="mt-4 space-y-4"
-                                >
-                                    {/* Skeleton */}
-                                    {isLoading && (
-                                        <div className="space-y-2">
-                                            {[1, 2, 3].map((i) => (
-                                                <div
-                                                    key={i}
-                                                    className="flex animate-pulse items-center gap-3"
-                                                >
-                                                    <div className="bg-muted h-10 w-10 rounded-lg" />
-                                                    <div className="bg-muted h-4 flex-1 rounded" />
-                                                    <div className="bg-muted h-4 w-16 rounded" />
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    {/* Categories */}
-                                    {!isLoading && categories.length > 0 && (
-                                        <div>
-                                            <span className="text-muted-foreground mb-2 block text-xs font-semibold tracking-wide uppercase">
-                                                Categories
-                                            </span>
-                                            <div className="space-y-0.5">
-                                                {categories.map((cat, i) => {
-                                                    const idx = globalIndex(
-                                                        'category',
-                                                        i,
-                                                    );
-                                                    return (
-                                                        <button
-                                                            key={`cat-${cat.id}`}
-                                                            onClick={() =>
-                                                                navigate(
-                                                                    suggestionUrl(
-                                                                        cat,
-                                                                        lp,
-                                                                    ),
-                                                                )
-                                                            }
-                                                            className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm ${
-                                                                activeIndex ===
-                                                                idx
-                                                                    ? 'bg-accent'
-                                                                    : 'hover:bg-accent'
-                                                            }`}
-                                                        >
-                                                            {cat.thumbnail ? (
-                                                                <Image
-                                                                    src={
-                                                                        cat.thumbnail
-                                                                    }
-                                                                    alt={
-                                                                        cat.name
-                                                                    }
-                                                                    width={32}
-                                                                    height={32}
-                                                                    className="h-8 w-8 rounded object-cover"
-                                                                />
-                                                            ) : (
-                                                                <span className="bg-muted flex h-8 w-8 shrink-0 items-center justify-center rounded text-xs">
-                                                                    <FolderOpen className="h-4 w-4" />
-                                                                </span>
-                                                            )}
-                                                            <div className="flex-1 text-left">
-                                                                <HighlightedText
-                                                                    text={
-                                                                        cat.name
-                                                                    }
-                                                                    query={
-                                                                        query
-                                                                    }
-                                                                />
-                                                                {cat.products_count !=
-                                                                    null && (
-                                                                    <span className="text-muted-foreground ml-1 text-xs">
-                                                                        (
-                                                                        {
-                                                                            cat.products_count
-                                                                        }
-                                                                        )
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Blog posts */}
-                                    {!isLoading && blogPosts.length > 0 && (
-                                        <div>
-                                            <span className="text-muted-foreground mb-2 block text-xs font-semibold tracking-wide uppercase">
-                                                Blog
-                                            </span>
-                                            <div className="space-y-0.5">
-                                                {blogPosts.map((post, i) => {
-                                                    const idx = globalIndex(
-                                                        'blog_post',
-                                                        i,
-                                                    );
-                                                    return (
-                                                        <button
-                                                            key={`post-${post.id}`}
-                                                            onClick={() =>
-                                                                navigate(
-                                                                    suggestionUrl(
-                                                                        post,
-                                                                        lp,
-                                                                    ),
-                                                                )
-                                                            }
-                                                            className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm ${
-                                                                activeIndex ===
-                                                                idx
-                                                                    ? 'bg-accent'
-                                                                    : 'hover:bg-accent'
-                                                            }`}
-                                                        >
-                                                            {post.thumbnail ? (
-                                                                <Image
-                                                                    src={
-                                                                        post.thumbnail
-                                                                    }
-                                                                    alt={
-                                                                        post.name
-                                                                    }
-                                                                    width={32}
-                                                                    height={32}
-                                                                    className="h-8 w-8 rounded object-cover"
-                                                                />
-                                                            ) : (
-                                                                <span className="bg-muted flex h-8 w-8 shrink-0 items-center justify-center rounded text-xs">
-                                                                    <FileText className="h-4 w-4" />
-                                                                </span>
-                                                            )}
-                                                            <div className="flex-1 text-left">
-                                                                <HighlightedText
-                                                                    text={
-                                                                        post.name
-                                                                    }
-                                                                    query={
-                                                                        query
-                                                                    }
-                                                                />
-                                                                {post.excerpt && (
-                                                                    <p className="text-muted-foreground line-clamp-1 text-xs">
-                                                                        {
-                                                                            post.excerpt
-                                                                        }
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Products */}
-                                    {!isLoading && products.length > 0 && (
-                                        <div>
-                                            <span className="text-muted-foreground mb-2 block text-xs font-semibold tracking-wide uppercase">
-                                                Products
-                                            </span>
-                                            <div className="space-y-0.5">
-                                                {products.map((product, i) => {
-                                                    const idx = globalIndex(
-                                                        'product',
-                                                        i,
-                                                    );
-                                                    return (
-                                                        <button
-                                                            key={`prod-${product.id}`}
-                                                            onClick={() =>
-                                                                navigate(
-                                                                    suggestionUrl(
-                                                                        product,
-                                                                        lp,
-                                                                    ),
-                                                                )
-                                                            }
-                                                            className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm ${
-                                                                activeIndex ===
-                                                                idx
-                                                                    ? 'bg-accent'
-                                                                    : 'hover:bg-accent'
-                                                            }`}
-                                                        >
-                                                            {product.thumbnail ? (
-                                                                <Image
-                                                                    src={
-                                                                        product.thumbnail
-                                                                    }
-                                                                    alt={
-                                                                        product.name
-                                                                    }
-                                                                    width={40}
-                                                                    height={40}
-                                                                    className="h-10 w-10 rounded-lg object-cover"
-                                                                />
-                                                            ) : (
-                                                                <div className="bg-muted h-10 w-10 shrink-0 rounded-lg" />
-                                                            )}
-                                                            <div className="flex-1 text-left">
-                                                                <HighlightedText
-                                                                    text={
-                                                                        product.name
-                                                                    }
-                                                                    query={
-                                                                        query
-                                                                    }
-                                                                />
-                                                            </div>
-                                                            {product.price !=
-                                                                null && (
-                                                                <span className="shrink-0 text-sm font-medium">
-                                                                    {formatPrice(
-                                                                        product.price,
-                                                                    )}
-                                                                </span>
-                                                            )}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* No results */}
-                                    {!isLoading && suggestions.length === 0 && (
-                                        <p className="text-muted-foreground py-4 text-center text-sm">
-                                            No results for &ldquo;{query}
-                                            &rdquo;
-                                        </p>
-                                    )}
-
-                                    {/* View all */}
-                                    {suggestions.length > 0 && (
-                                        <button
-                                            onClick={() =>
-                                                navigate(
-                                                    lp(
-                                                        `/search?q=${encodeURIComponent(query.trim())}`,
-                                                    ),
-                                                    query.trim(),
-                                                )
-                                            }
-                                            className="border-border hover:bg-accent flex w-full items-center justify-center gap-1 rounded-lg border py-2 text-sm font-medium"
-                                        >
-                                            View all results for &ldquo;{query}
-                                            &rdquo;
-                                            <ArrowRight className="h-3.5 w-3.5" />
-                                        </button>
-                                    )}
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
-                    </div>
-                </>
-            )}
+                    </>,
+                    document.body,
+                )}
         </>
     );
 }

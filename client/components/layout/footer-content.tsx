@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useTranslation } from '@/hooks/use-translation';
 import { openCookiePreferences } from '@/providers/cookie-consent-provider';
 import type { FooterContentProps } from './footer-content.types';
+import { LocaleSwitcher } from './locale-switcher';
 import { NewsletterForm } from './newsletter-form';
 
 export function FooterContent({
@@ -100,29 +101,32 @@ export function FooterContent({
                         © {currentYear} Store.{' '}
                         {t('footer.rights', 'All rights reserved.')}
                     </p>
-                    <nav
-                        aria-label={t('footer.legal_nav', 'Legal links')}
-                        className="flex flex-wrap gap-4"
-                    >
-                        {legalItems.map((item) => (
-                            <Link
-                                key={item.id}
-                                href={item.url ?? '#'}
+                    <div className="flex items-center gap-4">
+                        <LocaleSwitcher />
+                        <nav
+                            aria-label={t('footer.legal_nav', 'Legal links')}
+                            className="flex flex-wrap gap-4"
+                        >
+                            {legalItems.map((item) => (
+                                <Link
+                                    key={item.id}
+                                    href={item.url ?? '#'}
+                                    className="text-muted-foreground hover:text-foreground text-xs transition-colors"
+                                >
+                                    {item.label}
+                                </Link>
+                            ))}
+                            <button
+                                onClick={openCookiePreferences}
                                 className="text-muted-foreground hover:text-foreground text-xs transition-colors"
                             >
-                                {item.label}
-                            </Link>
-                        ))}
-                        <button
-                            onClick={openCookiePreferences}
-                            className="text-muted-foreground hover:text-foreground text-xs transition-colors"
-                        >
-                            {t(
-                                'footer.cookie_preferences',
-                                'Cookie Preferences',
-                            )}
-                        </button>
-                    </nav>
+                                {t(
+                                    'footer.cookie_preferences',
+                                    'Cookie Preferences',
+                                )}
+                            </button>
+                        </nav>
+                    </div>
                 </div>
             </div>
         </footer>

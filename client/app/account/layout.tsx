@@ -31,7 +31,7 @@ export default function AccountLayout({
             icon: Package,
         },
         {
-            href: '/account/wishlist',
+            href: '/wishlist',
             label: t('account.wishlist', 'Wishlist'),
             icon: Heart,
         },

@@ -27,12 +27,18 @@ export function AuthButton() {
     const [open, setOpen] = useState(false);
     const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
     const ref = useRef<HTMLDivElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Close dropdown when clicking outside or pressing Escape
     useEffect(() => {
         function handleClick(e: MouseEvent) {
             const target = e.target as Node;
-            if (ref.current && !ref.current.contains(target)) setOpen(false);
+            if (
+                ref.current &&
+                !ref.current.contains(target) &&
+                !(dropdownRef.current && dropdownRef.current.contains(target))
+            ) {
+                setOpen(false);
+            }
         }
 
         function handleKeyDown(e: KeyboardEvent) {
@@ -102,6 +108,7 @@ export function AuthButton() {
                 {open && mounted && typeof document !== 'undefined'
                     ? createPortal(
                           <div
+                              ref={dropdownRef}
                               id="account-dropdown"
                               className="border-border bg-popover fixed w-52 rounded-xl border shadow-lg"
                               style={{
@@ -179,7 +186,6 @@ export function AuthButton() {
             className="text-foreground/80 hover:text-foreground hidden items-center gap-1.5 text-sm font-medium transition-colors md:flex"
         >
             <UserCircle className="h-5 w-5" aria-hidden="true" />
-            {/*{t('nav.login', 'Login')}*/}
         </Link>
     );
 }
