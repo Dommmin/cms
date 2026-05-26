@@ -7,7 +7,7 @@ import { CartRow } from '@/components/cart/cart-row';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
+import { Spacing, Storefront } from '@/constants/theme';
 import { useCart } from '@/hooks/use-cart';
 import { formatMoney } from '@/lib/format';
 
@@ -24,6 +24,12 @@ export default function CartScreen() {
         <EmptyState title="Koszyk jest pusty" body="Dodaj produkt, żeby rozpocząć checkout." />
       ) : (
         <ThemedView style={styles.content}>
+          <ThemedView style={styles.heading}>
+            <ThemedText type="subtitle">Koszyk</ThemedText>
+            <ThemedText themeColor="textSecondary">
+              {cart.items_count} produktów gotowych do zamówienia
+            </ThemedText>
+          </ThemedView>
           <FlatList
             data={cart.items}
             keyExtractor={(item) => String(item.id)}
@@ -47,6 +53,7 @@ export default function CartScreen() {
                 value={discountCode}
                 onChangeText={setDiscountCode}
                 placeholder="Kod rabatowy"
+                placeholderTextColor={Storefront.colors.muted}
                 autoCapitalize="characters"
                 style={styles.discountInput}
               />
@@ -91,17 +98,22 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: Spacing.three,
+    paddingHorizontal: Spacing.four,
+  },
+  heading: {
+    gap: Spacing.one,
+    paddingVertical: Spacing.four,
+    backgroundColor: 'transparent',
   },
   separator: {
     height: 1,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: Storefront.colors.border,
   },
   summary: {
     gap: Spacing.three,
-    paddingVertical: Spacing.three,
+    paddingVertical: Spacing.four,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: Storefront.colors.border,
   },
   summaryRow: {
     flexDirection: 'row',
@@ -115,8 +127,10 @@ const styles = StyleSheet.create({
   discountInput: {
     flex: 1,
     minHeight: 44,
-    borderRadius: 8,
-    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.surface,
     paddingHorizontal: Spacing.three,
     fontSize: 16,
   },
@@ -124,14 +138,14 @@ const styles = StyleSheet.create({
     minWidth: 72,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8,
-    backgroundColor: '#E5E7EB',
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.primarySoft,
   },
   primaryButton: {
     alignItems: 'center',
-    paddingVertical: Spacing.three,
-    borderRadius: 8,
-    backgroundColor: '#111827',
+    paddingVertical: Spacing.four,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.primary,
   },
   primaryButtonText: {
     color: '#FFFFFF',

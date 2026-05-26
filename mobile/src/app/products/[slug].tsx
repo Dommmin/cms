@@ -9,7 +9,7 @@ import { getProduct, getProductReviews } from '@/api/products';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
+import { Spacing, Storefront } from '@/constants/theme';
 import { useCart } from '@/hooks/use-cart';
 import { useRecentlyViewed } from '@/hooks/use-recently-viewed';
 import { useWishlist } from '@/hooks/use-wishlist';
@@ -64,10 +64,17 @@ export default function ProductDetailScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Image source={image?.url ?? undefined} style={styles.image} contentFit="cover" />
+        <ThemedView style={styles.gallery}>
+          <Image source={image?.url ?? undefined} style={styles.image} contentFit="contain" />
+        </ThemedView>
         <ThemedView style={styles.header}>
+          {product.brand ? (
+            <ThemedText type="code" style={styles.kicker}>
+              {product.brand.name.toUpperCase()}
+            </ThemedText>
+          ) : null}
           <ThemedText type="subtitle">{product.name}</ThemedText>
-          <ThemedText type="smallBold">{formatMoney(selectedVariant?.price ?? product.price_min)}</ThemedText>
+          <ThemedText type="title">{formatMoney(selectedVariant?.price ?? product.price_min)}</ThemedText>
           {product.omnibus_price_min ? (
             <ThemedText type="small" themeColor="textSecondary">
               Najniższa cena 30 dni: {formatMoney(product.omnibus_price_min)}
@@ -172,19 +179,30 @@ const styles = StyleSheet.create({
   content: {
     paddingBottom: 112,
   },
+  gallery: {
+    width: '100%',
+    aspectRatio: 0.94,
+    borderBottomWidth: 1,
+    borderBottomColor: Storefront.colors.border,
+    backgroundColor: Storefront.colors.surfaceWarm,
+  },
   image: {
     width: '100%',
-    aspectRatio: 1,
-    backgroundColor: '#E5E7EB',
+    height: '100%',
   },
   header: {
     gap: Spacing.two,
-    padding: Spacing.three,
+    padding: Spacing.four,
+    backgroundColor: Storefront.colors.canvas,
+  },
+  kicker: {
+    color: Storefront.colors.primary,
   },
   section: {
     gap: Spacing.two,
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two,
+    paddingHorizontal: Spacing.four,
+    paddingVertical: Spacing.three,
+    backgroundColor: Storefront.colors.canvas,
   },
   variants: {
     flexDirection: 'row',
@@ -194,11 +212,14 @@ const styles = StyleSheet.create({
   variant: {
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.two,
-    borderRadius: 8,
-    backgroundColor: '#E5E7EB',
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.surface,
   },
   activeVariant: {
-    backgroundColor: '#111827',
+    backgroundColor: Storefront.colors.primary,
+    borderColor: Storefront.colors.primary,
   },
   activeText: {
     color: '#FFFFFF',
@@ -208,30 +229,33 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     alignItems: 'center',
-    paddingVertical: Spacing.three,
-    borderRadius: 8,
-    backgroundColor: '#E5E7EB',
+    paddingVertical: Spacing.four,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.primarySoft,
   },
   review: {
     gap: Spacing.one,
-    padding: Spacing.three,
-    borderRadius: 8,
-    backgroundColor: '#F3F4F6',
+    padding: Spacing.four,
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.lg,
+    backgroundColor: Storefront.colors.surface,
   },
   stickyBar: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    padding: Spacing.three,
+    padding: Spacing.four,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: Storefront.colors.border,
+    backgroundColor: Storefront.colors.surface,
   },
   primaryButton: {
     alignItems: 'center',
-    paddingVertical: Spacing.three,
-    borderRadius: 8,
-    backgroundColor: '#111827',
+    paddingVertical: Spacing.four,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.primary,
   },
   primaryButtonText: {
     color: '#FFFFFF',

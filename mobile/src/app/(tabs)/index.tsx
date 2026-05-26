@@ -8,7 +8,7 @@ import { ProductCard } from '@/components/product/product-card';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
+import { Spacing, Storefront } from '@/constants/theme';
 import { useRecentlyViewed } from '@/hooks/use-recently-viewed';
 import { formatMoney } from '@/lib/format';
 import type { RecentlyViewedProduct } from '@/lib/recently-viewed';
@@ -24,9 +24,12 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content}>
         <ThemedView style={styles.hero}>
-          <ThemedText type="subtitle">Sklep mobilny</ThemedText>
+          <ThemedText type="code" style={styles.kicker}>
+            MOBILE STOREFRONT
+          </ThemedText>
+          <ThemedText type="title">Zakupy bez tarcia.</ThemedText>
           <ThemedText themeColor="textSecondary">
-            Produkty, koszyk i konto podpięte do tego samego API co storefront.
+            Produkty, promocje i koszyk działają na tym samym API co publiczny sklep, ale w układzie zbudowanym pod telefon.
           </ThemedText>
           <Link href={'/categories' as Href} asChild>
             <Pressable style={styles.primaryButton}>
@@ -37,14 +40,10 @@ export default function HomeScreen() {
           </Link>
         </ThemedView>
 
-        <ThemedView style={styles.sectionHeader}>
-          <ThemedText type="smallBold">Nowości</ThemedText>
-        </ThemedView>
-
         <ThemedView style={styles.quickLinks}>
+          <QuickLink href="/search" label="Szukaj" />
           <QuickLink href="/blog" label="Blog" />
           <QuickLink href="/stores" label="Sklepy" />
-          <QuickLink href="/newsletter" label="Newsletter" />
         </ThemedView>
 
         {recentlyViewed.products.length > 0 ? (
@@ -66,15 +65,23 @@ export default function HomeScreen() {
         {featuredQuery.isLoading ? <LoadingState /> : null}
         {featuredQuery.isError ? <ErrorState onRetry={() => featuredQuery.refetch()} /> : null}
         {featuredQuery.data ? (
-          <FlatList
-            data={featuredQuery.data.data}
-            keyExtractor={(item) => String(item.id)}
-            renderItem={({ item }) => <ProductCard product={item} />}
-            numColumns={2}
-            scrollEnabled={false}
-            columnWrapperStyle={styles.gridRow}
-            contentContainerStyle={styles.grid}
-          />
+          <>
+            <ThemedView style={styles.sectionHeader}>
+              <ThemedText type="smallBold">Nowości</ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                {featuredQuery.data.meta.total} produktów
+              </ThemedText>
+            </ThemedView>
+            <FlatList
+              data={featuredQuery.data.data}
+              keyExtractor={(item) => String(item.id)}
+              renderItem={({ item }) => <ProductCard product={item} />}
+              numColumns={2}
+              scrollEnabled={false}
+              columnWrapperStyle={styles.gridRow}
+              contentContainerStyle={styles.grid}
+            />
+          </>
         ) : null}
       </ScrollView>
     </SafeAreaView>
@@ -111,26 +118,35 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: Spacing.three,
-    gap: Spacing.three,
+    padding: Spacing.four,
+    gap: Spacing.four,
   },
   hero: {
     gap: Spacing.three,
-    padding: Spacing.four,
-    borderRadius: 8,
-    backgroundColor: '#EEF2FF',
+    padding: Spacing.five,
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.xl,
+    backgroundColor: Storefront.colors.surfaceWarm,
+    ...Storefront.shadow.card,
+  },
+  kicker: {
+    color: Storefront.colors.primary,
   },
   primaryButton: {
     alignSelf: 'flex-start',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two,
-    borderRadius: 8,
-    backgroundColor: '#111827',
+    paddingHorizontal: Spacing.four,
+    paddingVertical: Spacing.three,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.primary,
   },
   primaryButtonText: {
     color: '#FFFFFF',
   },
   sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: 'transparent',
   },
   quickLinks: {
@@ -141,9 +157,11 @@ const styles = StyleSheet.create({
   quickLink: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: Spacing.three,
-    borderRadius: 8,
-    backgroundColor: '#E5E7EB',
+    paddingVertical: Spacing.four,
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.surface,
   },
   recentList: {
     gap: Spacing.two,
@@ -151,9 +169,11 @@ const styles = StyleSheet.create({
   recentCard: {
     width: 152,
     gap: Spacing.one,
-    padding: Spacing.three,
-    borderRadius: 8,
-    backgroundColor: '#F3F4F6',
+    padding: Spacing.four,
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.lg,
+    backgroundColor: Storefront.colors.surface,
   },
   grid: {
     gap: Spacing.three,

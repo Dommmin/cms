@@ -3,7 +3,7 @@ import { Pressable, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
+import { Spacing, Storefront } from '@/constants/theme';
 import { formatMoney } from '@/lib/format';
 import type { CartItem } from '@/types/api';
 
@@ -20,6 +20,7 @@ export function CartRow({ item, onIncrement, onDecrement, onRemove }: CartRowPro
       <Image
         source={item.product.thumbnail?.thumb_url ?? item.product.thumbnail?.url ?? undefined}
         style={styles.image}
+        contentFit="contain"
       />
       <ThemedView style={styles.content}>
         <ThemedText type="smallBold" numberOfLines={2}>
@@ -50,13 +51,14 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     gap: Spacing.three,
-    paddingVertical: Spacing.three,
+    paddingVertical: Spacing.four,
+    backgroundColor: 'transparent',
   },
   image: {
-    width: 72,
-    height: 72,
-    borderRadius: 8,
-    backgroundColor: '#E5E7EB',
+    width: 82,
+    height: 92,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.surfaceWarm,
   },
   content: {
     flex: 1,
@@ -72,8 +74,8 @@ const styles = StyleSheet.create({
     height: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8,
-    backgroundColor: '#E5E7EB',
+    borderRadius: Storefront.radius.sm,
+    backgroundColor: Storefront.colors.primarySoft,
   },
   remove: {
     marginLeft: Spacing.two,

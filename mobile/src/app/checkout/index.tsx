@@ -9,7 +9,7 @@ import { getPaymentMethods, getShippingMethods, submitCheckout } from '@/api/che
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
+import { Spacing, Storefront } from '@/constants/theme';
 import { useCart } from '@/hooks/use-cart';
 import { formatMoney } from '@/lib/format';
 import { useAuth } from '@/providers/auth-provider';
@@ -105,13 +105,29 @@ export default function CheckoutScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content}>
-        <ThemedText type="subtitle">Checkout</ThemedText>
+        <ThemedView style={styles.heading}>
+          <ThemedText type="subtitle">Checkout</ThemedText>
+          <ThemedText themeColor="textSecondary">
+            Dane, dostawa i płatność w jednym mobilnym flow z tym samym idempotentnym API co storefront.
+          </ThemedText>
+        </ThemedView>
         {formError ? <ThemedText style={styles.errorText}>{formError}</ThemedText> : null}
 
-        <ThemedView style={styles.panel}>
-          <ThemedText type="smallBold">Koszyk</ThemedText>
+        <ThemedView style={styles.steps}>
+          <StepPill label="Kontakt" active={Boolean(auth.user || email.trim())} />
+          <StepPill label="Dostawa" active={Boolean(selectedShipping)} />
+          <StepPill label="Płatność" active={Boolean(selectedPayment)} />
+        </ThemedView>
+
+        <ThemedView style={styles.summaryPanel}>
+          <ThemedView style={styles.summaryRow}>
+            <ThemedText type="smallBold">Koszyk</ThemedText>
+            <ThemedText type="smallBold">
+              {cart ? formatMoney(cart.total, cart.currency) : 'Brak danych'}
+            </ThemedText>
+          </ThemedView>
           <ThemedText themeColor="textSecondary">
-            {cart ? `${cart.items_count} szt. · ${formatMoney(cart.total, cart.currency)}` : 'Brak danych koszyka'}
+            {cart ? `${cart.items_count} szt. · rabaty ${formatMoney(cart.discount_amount, cart.currency)}` : 'Brak danych koszyka'}
           </ThemedText>
         </ThemedView>
 
@@ -122,6 +138,7 @@ export default function CheckoutScreen() {
               value={email}
               onChangeText={setEmail}
               placeholder="Email"
+              placeholderTextColor={Storefront.colors.muted}
               keyboardType="email-address"
               autoCapitalize="none"
               style={styles.input}
@@ -131,12 +148,12 @@ export default function CheckoutScreen() {
 
         <ThemedView style={styles.panel}>
           <ThemedText type="smallBold">Adres dostawy</ThemedText>
-          <TextInput value={address.first_name} onChangeText={(value) => updateAddressField('first_name', value)} placeholder="Imię" style={styles.input} />
-          <TextInput value={address.last_name} onChangeText={(value) => updateAddressField('last_name', value)} placeholder="Nazwisko" style={styles.input} />
-          <TextInput value={address.street} onChangeText={(value) => updateAddressField('street', value)} placeholder="Ulica i numer" style={styles.input} />
-          <TextInput value={address.postal_code} onChangeText={(value) => updateAddressField('postal_code', value)} placeholder="Kod pocztowy" style={styles.input} />
-          <TextInput value={address.city} onChangeText={(value) => updateAddressField('city', value)} placeholder="Miasto" style={styles.input} />
-          <TextInput value={address.phone} onChangeText={(value) => updateAddressField('phone', value)} placeholder="Telefon" keyboardType="phone-pad" style={styles.input} />
+          <TextInput value={address.first_name} onChangeText={(value) => updateAddressField('first_name', value)} placeholder="Imię" placeholderTextColor={Storefront.colors.muted} style={styles.input} />
+          <TextInput value={address.last_name} onChangeText={(value) => updateAddressField('last_name', value)} placeholder="Nazwisko" placeholderTextColor={Storefront.colors.muted} style={styles.input} />
+          <TextInput value={address.street} onChangeText={(value) => updateAddressField('street', value)} placeholder="Ulica i numer" placeholderTextColor={Storefront.colors.muted} style={styles.input} />
+          <TextInput value={address.postal_code} onChangeText={(value) => updateAddressField('postal_code', value)} placeholder="Kod pocztowy" placeholderTextColor={Storefront.colors.muted} style={styles.input} />
+          <TextInput value={address.city} onChangeText={(value) => updateAddressField('city', value)} placeholder="Miasto" placeholderTextColor={Storefront.colors.muted} style={styles.input} />
+          <TextInput value={address.phone} onChangeText={(value) => updateAddressField('phone', value)} placeholder="Telefon" placeholderTextColor={Storefront.colors.muted} keyboardType="phone-pad" style={styles.input} />
         </ThemedView>
 
         <ThemedView style={styles.panel}>
@@ -167,10 +184,18 @@ export default function CheckoutScreen() {
         <Pressable
           onPress={() => setTermsAccepted((value) => !value)}
           style={[styles.termsRow, termsAccepted && styles.selectedRow]}>
+          <ThemedView style={[styles.checkbox, termsAccepted && styles.checkboxSelected]}>
+            <ThemedText type="smallBold" style={termsAccepted && styles.selectedText}>
+              {termsAccepted ? '✓' : ''}
+            </ThemedText>
+          </ThemedView>
           <ThemedText type="smallBold" style={termsAccepted && styles.selectedText}>
             Akceptuję regulamin i informację o 14-dniowym odstąpieniu
           </ThemedText>
         </Pressable>
+        <ThemedText type="small" themeColor="textSecondary">
+          Przed złożeniem zamówienia potwierdzasz warunki sprzedaży, obowiązek zapłaty oraz prawo odstąpienia zgodne z checkoutem webowym.
+        </ThemedText>
 
         <Pressable
           disabled={checkoutMutation.isPending}
@@ -218,50 +243,118 @@ function SelectableRow({
   );
 }
 
+function StepPill({ label, active }: { label: string; active: boolean }) {
+  return (
+    <ThemedView style={[styles.stepPill, active && styles.stepPillActive]}>
+      <ThemedText type="smallBold" style={active && styles.selectedText}>
+        {label}
+      </ThemedText>
+    </ThemedView>
+  );
+}
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
   content: {
     gap: Spacing.three,
-    padding: Spacing.three,
+    padding: Spacing.four,
+  },
+  heading: {
+    gap: Spacing.one,
+    backgroundColor: 'transparent',
+  },
+  steps: {
+    flexDirection: 'row',
+    gap: Spacing.two,
+    backgroundColor: 'transparent',
+  },
+  stepPill: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: Spacing.two,
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: 999,
+    backgroundColor: Storefront.colors.surface,
+  },
+  stepPillActive: {
+    borderColor: Storefront.colors.primary,
+    backgroundColor: Storefront.colors.primary,
   },
   panel: {
     gap: Spacing.two,
-    padding: Spacing.three,
-    borderRadius: 8,
-    backgroundColor: '#F3F4F6',
+    padding: Spacing.four,
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.lg,
+    backgroundColor: Storefront.colors.surface,
+  },
+  summaryPanel: {
+    gap: Spacing.two,
+    padding: Spacing.four,
+    borderRadius: Storefront.radius.xl,
+    backgroundColor: Storefront.colors.surfaceWarm,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: 'transparent',
   },
   input: {
     minHeight: 48,
-    borderRadius: 8,
-    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.canvas,
     paddingHorizontal: Spacing.three,
     fontSize: 16,
   },
   selectRow: {
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.three,
-    borderRadius: 8,
-    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.canvas,
   },
   selectedRow: {
-    backgroundColor: '#111827',
+    borderColor: Storefront.colors.primary,
+    backgroundColor: Storefront.colors.primary,
   },
   selectedText: {
     color: '#FFFFFF',
   },
   termsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.three,
-    borderRadius: 8,
-    backgroundColor: '#E5E7EB',
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.primarySoft,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: Storefront.colors.primary,
+    borderRadius: Storefront.radius.sm,
+    backgroundColor: Storefront.colors.surface,
+  },
+  checkboxSelected: {
+    backgroundColor: Storefront.colors.primaryDark,
   },
   primaryButton: {
     alignItems: 'center',
-    paddingVertical: Spacing.three,
-    borderRadius: 8,
-    backgroundColor: '#111827',
+    paddingVertical: Spacing.four,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.primary,
   },
   primaryButtonText: {
     color: '#FFFFFF',

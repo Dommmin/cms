@@ -8,11 +8,12 @@ import { ProductCard } from '@/components/product/product-card';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
+import { Spacing, Storefront } from '@/constants/theme';
 
 export default function CategoriesScreen() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string | undefined>();
+  const [brand, setBrand] = useState<string | undefined>();
   const [sort, setSort] = useState('-created_at');
   const [inStock, setInStock] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -24,33 +25,43 @@ export default function CategoriesScreen() {
   });
 
   const productsQuery = useQuery({
-    queryKey: ['products', { search: deferredSearch, category, sort, inStock }],
+    queryKey: ['products', { search: deferredSearch, category, brand, sort, inStock }],
     queryFn: () =>
       getProducts({
         per_page: 20,
         search: deferredSearch || undefined,
         category,
+        brand,
         sort,
         in_stock: inStock,
       }),
   });
 
   const categories = useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data]);
+  const availableFilters = productsQuery.data?.meta.available_filters;
+  const activeFiltersCount = [category, brand, inStock ? 'stock' : undefined].filter(Boolean).length;
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ThemedView style={styles.content}>
+        <ThemedView style={styles.heading}>
+          <ThemedText type="subtitle">Produkty</ThemedText>
+          <ThemedText themeColor="textSecondary">
+            Szybkie filtrowanie, sortowanie i dodawanie do koszyka bez opuszczania listy.
+          </ThemedText>
+        </ThemedView>
         <TextInput
           value={search}
           onChangeText={setSearch}
           placeholder="Szukaj produktów"
+          placeholderTextColor={Storefront.colors.muted}
           autoCapitalize="none"
           style={styles.search}
         />
 
         <ThemedView style={styles.toolbar}>
           <Pressable onPress={() => setFiltersOpen(true)} style={styles.toolbarButton}>
-            <ThemedText type="smallBold">Filtry</ThemedText>
+            <ThemedText type="smallBold">Filtry{activeFiltersCount ? ` (${activeFiltersCount})` : ''}</ThemedText>
           </Pressable>
           <ThemedText type="small" themeColor="textSecondary">
             {productsQuery.data?.meta.total ?? 0} produktów
@@ -76,6 +87,21 @@ export default function CategoriesScreen() {
           }}
           contentContainerStyle={styles.chips}
         />
+
+        {activeFiltersCount > 0 ? (
+          <ThemedView style={styles.activeFilters}>
+            {category ? (
+              <ActiveFilter label={categories.find((item) => item.slug === category)?.name ?? category} onPress={() => setCategory(undefined)} />
+            ) : null}
+            {brand ? (
+              <ActiveFilter
+                label={availableFilters?.brands.find((item) => String(item.id) === brand)?.label ?? `Marka ${brand}`}
+                onPress={() => setBrand(undefined)}
+              />
+            ) : null}
+            {inStock ? <ActiveFilter label="Tylko dostępne" onPress={() => setInStock(false)} /> : null}
+          </ThemedView>
+        ) : null}
 
         {productsQuery.isLoading ? <LoadingState /> : null}
         {productsQuery.isError ? <ErrorState onRetry={() => productsQuery.refetch()} /> : null}
@@ -120,12 +146,46 @@ export default function CategoriesScreen() {
                 </Pressable>
               );
             })}
+            {availableFilters?.brands.length ? (
+              <>
+                <ThemedText type="smallBold">Marka</ThemedText>
+                <FlatList
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  data={availableFilters.brands}
+                  keyExtractor={(item) => String(item.id)}
+                  renderItem={({ item }) => {
+                    const value = String(item.id);
+                    const isActive = value === brand;
+                    return (
+                      <Pressable
+                        onPress={() => setBrand((current) => (current === value ? undefined : value))}
+                        style={[styles.sheetChip, isActive && styles.sheetOptionActive]}>
+                        <ThemedText type="smallBold" style={isActive && styles.activeChipText}>
+                          {item.label} ({item.count})
+                        </ThemedText>
+                      </Pressable>
+                    );
+                  }}
+                  contentContainerStyle={styles.sheetChips}
+                />
+              </>
+            ) : null}
             <Pressable
               onPress={() => setInStock((value) => !value)}
               style={[styles.sheetOption, inStock && styles.sheetOptionActive]}>
               <ThemedText type="smallBold" style={inStock && styles.activeChipText}>
                 Tylko dostępne
               </ThemedText>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                setBrand(undefined);
+                setInStock(false);
+                setSort('-created_at');
+              }}
+              style={styles.clearButton}>
+              <ThemedText type="smallBold">Wyczyść filtry</ThemedText>
             </Pressable>
             <Pressable onPress={() => setFiltersOpen(false)} style={styles.doneButton}>
               <ThemedText type="smallBold" style={styles.doneButtonText}>
@@ -139,20 +199,34 @@ export default function CategoriesScreen() {
   );
 }
 
+function ActiveFilter({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <Pressable onPress={onPress} style={styles.activeFilter}>
+      <ThemedText type="smallBold">{label} ×</ThemedText>
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
   content: {
     flex: 1,
-    padding: Spacing.three,
+    padding: Spacing.four,
     gap: Spacing.three,
   },
+  heading: {
+    gap: Spacing.one,
+    backgroundColor: 'transparent',
+  },
   search: {
-    minHeight: 48,
-    borderRadius: 8,
-    backgroundColor: '#F3F4F6',
-    paddingHorizontal: Spacing.three,
+    minHeight: 52,
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.lg,
+    backgroundColor: Storefront.colors.surface,
+    paddingHorizontal: Spacing.four,
     fontSize: 16,
   },
   toolbar: {
@@ -164,22 +238,37 @@ const styles = StyleSheet.create({
   toolbarButton: {
     height: 40,
     justifyContent: 'center',
-    paddingHorizontal: Spacing.three,
-    borderRadius: 8,
-    backgroundColor: '#E5E7EB',
+    paddingHorizontal: Spacing.four,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.primarySoft,
   },
   chips: {
     gap: Spacing.two,
+  },
+  activeFilters: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.two,
+    backgroundColor: 'transparent',
+  },
+  activeFilter: {
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.two,
+    borderRadius: 999,
+    backgroundColor: Storefront.colors.primarySoft,
   },
   chip: {
     height: 36,
     justifyContent: 'center',
     paddingHorizontal: Spacing.three,
     borderRadius: 18,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: Storefront.colors.surface,
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
   },
   activeChip: {
-    backgroundColor: '#111827',
+    backgroundColor: Storefront.colors.primary,
+    borderColor: Storefront.colors.primary,
   },
   activeChipText: {
     color: '#FFFFFF',
@@ -204,25 +293,44 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     gap: Spacing.two,
-    padding: Spacing.three,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
+    padding: Spacing.four,
+    borderTopLeftRadius: Storefront.radius.xl,
+    borderTopRightRadius: Storefront.radius.xl,
+    backgroundColor: Storefront.colors.surface,
   },
   sheetOption: {
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.three,
-    borderRadius: 8,
-    backgroundColor: '#F3F4F6',
+    paddingHorizontal: Spacing.four,
+    paddingVertical: Spacing.four,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.primarySoft,
   },
   sheetOptionActive: {
-    backgroundColor: '#111827',
+    backgroundColor: Storefront.colors.primary,
+  },
+  sheetChips: {
+    gap: Spacing.two,
+  },
+  sheetChip: {
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.two,
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: 999,
+    backgroundColor: Storefront.colors.surface,
+  },
+  clearButton: {
+    alignItems: 'center',
+    paddingVertical: Spacing.three,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.primarySoft,
   },
   doneButton: {
     alignItems: 'center',
     marginTop: Spacing.two,
-    paddingVertical: Spacing.three,
-    borderRadius: 8,
-    backgroundColor: '#111827',
+    paddingVertical: Spacing.four,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.primary,
   },
   doneButtonText: {
     color: '#FFFFFF',

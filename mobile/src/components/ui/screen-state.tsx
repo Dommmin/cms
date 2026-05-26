@@ -2,7 +2,7 @@ import { Pressable, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
+import { Spacing, Storefront } from '@/constants/theme';
 
 export function LoadingState({ label = 'Ładowanie' }: { label?: string }) {
   return (
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   button: {
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.two,
-    borderRadius: 8,
-    backgroundColor: '#111827',
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.primary,
   },
 });

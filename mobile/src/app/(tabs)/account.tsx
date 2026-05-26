@@ -9,7 +9,7 @@ import { updateProfile } from '@/api/profile';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
+import { Spacing, Storefront } from '@/constants/theme';
 import { formatMoney } from '@/lib/format';
 import { useAuth } from '@/providers/auth-provider';
 
@@ -64,6 +64,10 @@ export default function AccountScreen() {
             <ThemedView style={styles.panel}>
               <ThemedText type="smallBold">{auth.user.name}</ThemedText>
               <ThemedText themeColor="textSecondary">{auth.user.email}</ThemedText>
+            </ThemedView>
+            <ThemedView style={styles.quickActions}>
+              <AccountLink href="/account/wishlist" label="Wishlist" />
+              <AccountLink href="/checkout" label="Checkout" />
             </ThemedView>
             <ThemedView style={styles.panel}>
               <ThemedText type="smallBold">Profil</ThemedText>
@@ -186,6 +190,16 @@ export default function AccountScreen() {
   );
 }
 
+function AccountLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link href={href as Href} asChild>
+      <Pressable style={styles.accountLink}>
+        <ThemedText type="smallBold">{label}</ThemedText>
+      </Pressable>
+    </Link>
+  );
+}
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -197,21 +211,37 @@ const styles = StyleSheet.create({
   panel: {
     gap: Spacing.two,
     padding: Spacing.three,
-    borderRadius: 8,
-    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.lg,
+    backgroundColor: Storefront.colors.surface,
+  },
+  quickActions: {
+    flexDirection: 'row',
+    gap: Spacing.two,
+    backgroundColor: 'transparent',
+  },
+  accountLink: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: Spacing.four,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.primarySoft,
   },
   input: {
     minHeight: 48,
-    borderRadius: 8,
-    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.canvas,
     paddingHorizontal: Spacing.three,
     fontSize: 16,
   },
   primaryButton: {
     alignItems: 'center',
     paddingVertical: Spacing.three,
-    borderRadius: 8,
-    backgroundColor: '#111827',
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.primary,
   },
   primaryButtonText: {
     color: '#FFFFFF',
@@ -219,8 +249,8 @@ const styles = StyleSheet.create({
   secondaryButton: {
     alignItems: 'center',
     paddingVertical: Spacing.three,
-    borderRadius: 8,
-    backgroundColor: '#E5E7EB',
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.primarySoft,
   },
   disabled: {
     opacity: 0.45,
