@@ -12,6 +12,7 @@ import {
     register,
 } from '@/api/auth';
 import { cartKeys } from '@/hooks/use-cart';
+import { wishlistKeys } from '@/hooks/use-wishlist';
 import { getToken, removeToken, setToken } from '@/lib/axios';
 import { trackLogin, trackSignUp } from '@/lib/datalayer';
 import type { LoginPayload, RegisterPayload } from '@/types/api';
@@ -49,6 +50,7 @@ export function useLogin() {
             setToken(token);
             queryClient.setQueryData(authKeys.me, user);
             queryClient.invalidateQueries({ queryKey: cartKeys.cart });
+            queryClient.invalidateQueries({ queryKey: wishlistKeys.wishlist });
             trackLogin();
             window.location.href = getLocalePath('/');
         },
@@ -64,6 +66,7 @@ export function useRegister() {
             setToken(token);
             queryClient.setQueryData(authKeys.me, user);
             queryClient.invalidateQueries({ queryKey: cartKeys.cart });
+            queryClient.invalidateQueries({ queryKey: wishlistKeys.wishlist });
             trackSignUp();
             window.location.href = getLocalePath('/');
         },
@@ -106,6 +109,7 @@ export function useSocialCallback(provider: SocialProvider) {
             setToken(token);
             queryClient.setQueryData(authKeys.me, user);
             queryClient.invalidateQueries({ queryKey: cartKeys.cart });
+            queryClient.invalidateQueries({ queryKey: wishlistKeys.wishlist });
             trackLogin();
         },
     });

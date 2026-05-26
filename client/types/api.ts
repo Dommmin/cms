@@ -374,6 +374,7 @@ export interface WishlistItem {
 
 export interface Wishlist {
     id: number;
+    token: string | null;
     items: WishlistItem[];
     items_count: number;
 }

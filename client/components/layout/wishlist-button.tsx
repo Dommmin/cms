@@ -3,17 +3,13 @@
 import { Heart } from 'lucide-react';
 import Link from 'next/link';
 
-import { useMe } from '@/hooks/use-auth';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useWishlist } from '@/hooks/use-wishlist';
 
 export function WishlistButton() {
-    const { data: user } = useMe();
     const { data: wishlist } = useWishlist();
     const lp = useLocalePath();
     const count = wishlist?.items?.length ?? 0;
-
-    if (!user) return null;
 
     return (
         <Link

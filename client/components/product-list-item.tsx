@@ -7,7 +7,6 @@ import { toast } from 'react-toastify';
 
 import { CompareButton } from '@/components/compare-button';
 import { PriceDisplay } from '@/components/price-display';
-import { useMe } from '@/hooks/use-auth';
 import { useAddToCart } from '@/hooks/use-cart';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
@@ -25,7 +24,6 @@ export function ProductListItem({
     const { t } = useTranslation();
     const lp = useLocalePath();
     const firstVariantId = product.variants?.[0]?.id ?? 0;
-    const { data: user } = useMe();
     const { mutate: addToCart, isPending } = useAddToCart();
     const inWishlist = useIsInWishlist(firstVariantId);
     const { mutate: addToWishlist } = useAddToWishlist();
@@ -36,10 +34,6 @@ export function ProductListItem({
 
     function handleWishlistToggle(e: React.MouseEvent) {
         e.preventDefault();
-        if (!user) {
-            window.location.href = lp('/login');
-            return;
-        }
         if (inWishlist) {
             removeFromWishlist(firstVariantId);
         } else {
