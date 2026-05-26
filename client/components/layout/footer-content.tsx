@@ -17,7 +17,7 @@ export function FooterContent({
     const { t } = useTranslation();
 
     return (
-        <footer className="border-border relative overflow-hidden border-t">
+        <footer className="border-border relative [margin-bottom:calc(5rem+env(safe-area-inset-bottom))] overflow-hidden border-t md:mb-0">
             <div className="via-primary/50 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent" />
 
             <div

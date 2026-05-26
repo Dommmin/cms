@@ -35,7 +35,7 @@ export function ComparisonBar() {
     if (ids.length === 0) return null;
 
     return (
-        <div className="border-border bg-background/95 fixed right-0 bottom-0 left-0 z-40 border-t shadow-lg backdrop-blur-sm">
+        <div className="border-border bg-background/95 fixed right-0 bottom-0 left-0 z-40 border-t [padding-bottom:calc(0.75rem+env(safe-area-inset-bottom))] shadow-lg backdrop-blur-sm">
             <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
                 <span className="text-muted-foreground shrink-0 text-sm font-medium">
                     {t('compare.title', 'Compare')} ({ids.length})

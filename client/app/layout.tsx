@@ -52,6 +52,7 @@ const playfair = Playfair_Display({
 
 export const viewport: Viewport = {
     themeColor: process.env.NEXT_PUBLIC_PWA_THEME_COLOR ?? '#111827',
+    viewportFit: 'cover',
 };
 
 // Cached per-request: both generateMetadata and RootLayout share one fetch
@@ -198,7 +199,7 @@ export default async function RootLayout({
                                 <Header modules={modules} siteName={siteName} />
                                 <main
                                     id="main-content"
-                                    className="flex-1 pb-20 md:pb-0"
+                                    className="flex-1 [padding-bottom:calc(5rem+env(safe-area-inset-bottom))] md:pb-0"
                                 >
                                     <PageTransition>{children}</PageTransition>
                                 </main>
