@@ -34,6 +34,7 @@ export default function CheckoutScreen() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [selectedShippingId, setSelectedShippingId] = useState<number | null>(null);
   const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
+  const [pickupPointId, setPickupPointId] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
 
   const shippingQuery = useQuery({ queryKey: ['checkout', 'shipping'], queryFn: getShippingMethods });
@@ -88,6 +89,10 @@ export default function CheckoutScreen() {
       setFormError('Wybierz dostawę i płatność.');
       return;
     }
+    if (selectedShipping.requires_pickup_point && !pickupPointId.trim()) {
+      setFormError('Podaj punkt odbioru dla wybranej dostawy.');
+      return;
+    }
     if (!termsAccepted) {
       setFormError('Zaakceptuj regulamin i informację o odstąpieniu.');
       return;
@@ -96,6 +101,7 @@ export default function CheckoutScreen() {
     checkoutMutation.mutate({
       guest_email: auth.user ? undefined : email.trim(),
       shipping_method_id: selectedShipping.id,
+      pickup_point_id: selectedShipping.requires_pickup_point ? pickupPointId.trim() : undefined,
       payment_provider: selectedPayment.id,
       billing_address: address,
       shipping_address: address,
@@ -163,10 +169,25 @@ export default function CheckoutScreen() {
             <SelectableRow
               key={method.id}
               selected={(selectedShipping?.id ?? shippingMethods[0]?.id) === method.id}
-              label={`${method.name} · ${formatMoney(method.base_price)}`}
+              label={`${method.name} · ${formatMoney(method.base_price)}${method.requires_pickup_point ? ' · punkt odbioru' : ''}`}
               onPress={() => setSelectedShippingId(method.id)}
             />
           ))}
+          {selectedShipping?.requires_pickup_point ? (
+            <>
+              <TextInput
+                value={pickupPointId}
+                onChangeText={setPickupPointId}
+                placeholder="ID punktu odbioru / paczkomatu"
+                placeholderTextColor={Storefront.colors.muted}
+                autoCapitalize="characters"
+                style={styles.input}
+              />
+              <ThemedText type="small" themeColor="textSecondary">
+                MVP mobile wysyła `pickup_point_id`; natywny picker/mapa będzie kolejnym krokiem parity.
+              </ThemedText>
+            </>
+          ) : null}
         </GlassSurface>
 
         <GlassSurface style={styles.panel}>

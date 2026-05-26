@@ -33,3 +33,18 @@ export async function getMe(): Promise<User | null> {
   const { data } = await api.get<User | null>('/auth/me');
   return data ?? null;
 }
+
+export async function forgotPassword(email: string): Promise<{ message: string }> {
+  const { data } = await api.post<{ message: string }>('/auth/forgot-password', { email });
+  return data;
+}
+
+export async function resetPassword(payload: {
+  token: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+}): Promise<{ message: string }> {
+  const { data } = await api.post<{ message: string }>('/auth/reset-password', payload);
+  return data;
+}

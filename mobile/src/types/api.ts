@@ -53,6 +53,13 @@ export interface User {
   processing_restricted_at: string | null;
 }
 
+export interface ConsentPreferences {
+  functional: boolean;
+  analytics: boolean;
+  marketing: boolean;
+  consent_version: string | null;
+}
+
 export interface AuthResponse {
   token: string;
   user: User;
@@ -330,6 +337,28 @@ export interface Wishlist {
   id: number;
   items: WishlistItem[];
   items_count: number;
+}
+
+export interface Address {
+  id: number;
+  type: 'billing' | 'shipping';
+  first_name: string;
+  last_name: string;
+  company_name: string | null;
+  street: string;
+  street2: string | null;
+  city: string;
+  postal_code: string;
+  country_code: string;
+  phone: string | null;
+  is_default: boolean;
+  full_address?: string;
+}
+
+export interface UpdatePasswordPayload {
+  current_password: string;
+  password: string;
+  password_confirmation: string;
 }
 
 export interface AddressPayload {

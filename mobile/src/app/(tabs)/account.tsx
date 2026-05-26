@@ -5,7 +5,17 @@ import { FlatList, Pressable, ScrollView, StyleSheet, TextInput } from 'react-na
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getOrders } from '@/api/orders';
-import { updateProfile } from '@/api/profile';
+import {
+  exportProfileData,
+  deleteAccount,
+  getAddresses,
+  getConsent,
+  liftProcessingRestriction,
+  restrictProcessing,
+  updateConsent,
+  updatePassword,
+  updateProfile,
+} from '@/api/profile';
 import { GlassSurface } from '@/components/ui/glass-surface';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { ThemedText } from '@/components/themed-text';
@@ -23,6 +33,11 @@ export default function AccountScreen() {
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [profileName, setProfileName] = useState('');
   const [profileEmail, setProfileEmail] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [nextPassword, setNextPassword] = useState('');
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteArmed, setDeleteArmed] = useState(false);
+  const [exportReady, setExportReady] = useState(false);
   const [error, setError] = useState(false);
   const ordersQuery = useQuery({
     queryKey: ['orders'],
@@ -31,6 +46,38 @@ export default function AccountScreen() {
   });
   const updateProfileMutation = useMutation({
     mutationFn: updateProfile,
+  });
+  const passwordMutation = useMutation({
+    mutationFn: updatePassword,
+    onSuccess: () => {
+      setCurrentPassword('');
+      setNextPassword('');
+    },
+  });
+  const exportMutation = useMutation({
+    mutationFn: exportProfileData,
+    onSuccess: () => setExportReady(true),
+  });
+  const restrictMutation = useMutation({
+    mutationFn: () =>
+      auth.user?.processing_restricted_at ? liftProcessingRestriction() : restrictProcessing(),
+  });
+  const deleteMutation = useMutation({
+    mutationFn: deleteAccount,
+    onSuccess: () => auth.logout(),
+  });
+  const consentQuery = useQuery({
+    queryKey: ['consent'],
+    queryFn: getConsent,
+    enabled: auth.isAuthenticated,
+  });
+  const addressesQuery = useQuery({
+    queryKey: ['addresses'],
+    queryFn: getAddresses,
+    enabled: auth.isAuthenticated,
+  });
+  const consentMutation = useMutation({
+    mutationFn: updateConsent,
   });
 
   if (auth.isLoading) return <LoadingState />;
@@ -68,6 +115,8 @@ export default function AccountScreen() {
             </GlassSurface>
             <ThemedView style={styles.quickActions}>
               <AccountLink href="/account/wishlist" label="Wishlist" />
+              <AccountLink href="/account/orders" label="Zamówienia" />
+              <AccountLink href="/compare" label="Porównaj" />
               <AccountLink href="/checkout" label="Checkout" />
             </ThemedView>
             <GlassSurface style={styles.panel}>
@@ -104,6 +153,50 @@ export default function AccountScreen() {
               </Pressable>
             </GlassSurface>
             <GlassSurface style={styles.panel}>
+              <ThemedText type="smallBold">Hasło</ThemedText>
+              <TextInput
+                value={currentPassword}
+                onChangeText={setCurrentPassword}
+                placeholder="Aktualne hasło"
+                secureTextEntry
+                style={styles.input}
+              />
+              <TextInput
+                value={nextPassword}
+                onChangeText={setNextPassword}
+                placeholder="Nowe hasło"
+                secureTextEntry
+                style={styles.input}
+              />
+              <Pressable
+                disabled={passwordMutation.isPending || !currentPassword || nextPassword.length < 8}
+                onPress={() =>
+                  passwordMutation.mutate({
+                    current_password: currentPassword,
+                    password: nextPassword,
+                    password_confirmation: nextPassword,
+                  })
+                }
+                style={[styles.secondaryButton, (passwordMutation.isPending || !currentPassword || nextPassword.length < 8) && styles.disabled]}>
+                <ThemedText type="smallBold">Zmień hasło</ThemedText>
+              </Pressable>
+              {passwordMutation.isSuccess ? <ThemedText type="small" themeColor="textSecondary">Hasło zostało zmienione.</ThemedText> : null}
+            </GlassSurface>
+            <GlassSurface style={styles.panel}>
+              <ThemedText type="smallBold">Adresy</ThemedText>
+              {addressesQuery.isLoading ? <ThemedText themeColor="textSecondary">Ładowanie adresów</ThemedText> : null}
+              {addressesQuery.data?.length === 0 ? <ThemedText themeColor="textSecondary">Brak zapisanych adresów.</ThemedText> : null}
+              {addressesQuery.data?.map((address) => (
+                <ThemedView key={address.id} style={styles.addressRow}>
+                  <ThemedText type="smallBold">{address.first_name} {address.last_name}</ThemedText>
+                  <ThemedText type="small" themeColor="textSecondary">
+                    {address.street}, {address.postal_code} {address.city}
+                  </ThemedText>
+                  {address.is_default ? <ThemedText type="code" style={styles.kicker}>DOMYŚLNY</ThemedText> : null}
+                </ThemedView>
+              ))}
+            </GlassSurface>
+            <GlassSurface style={styles.panel}>
               <ThemedText type="smallBold">Ostatnie zamówienia</ThemedText>
               {ordersQuery.isLoading ? <ThemedText themeColor="textSecondary">Ładowanie</ThemedText> : null}
               {ordersQuery.isError ? <ThemedText style={styles.errorText}>Nie udało się pobrać zamówień.</ThemedText> : null}
@@ -130,6 +223,70 @@ export default function AccountScreen() {
                   )}
                 />
               ) : null}
+            </GlassSurface>
+            <GlassSurface style={styles.panel}>
+              <ThemedText type="smallBold">Prywatność i zgody</ThemedText>
+              <ToggleRow
+                label="Analityka"
+                enabled={Boolean(consentQuery.data?.analytics)}
+                onPress={() =>
+                  consentMutation.mutate({
+                    functional: true,
+                    analytics: !consentQuery.data?.analytics,
+                    marketing: Boolean(consentQuery.data?.marketing),
+                    consent_version: consentQuery.data?.consent_version ?? '1.0',
+                  })
+                }
+              />
+              <ToggleRow
+                label="Marketing"
+                enabled={Boolean(consentQuery.data?.marketing)}
+                onPress={() =>
+                  consentMutation.mutate({
+                    functional: true,
+                    analytics: Boolean(consentQuery.data?.analytics),
+                    marketing: !consentQuery.data?.marketing,
+                    consent_version: consentQuery.data?.consent_version ?? '1.0',
+                  })
+                }
+              />
+              <Pressable
+                disabled={exportMutation.isPending}
+                onPress={() => exportMutation.mutate()}
+                style={styles.secondaryButton}>
+                <ThemedText type="smallBold">Przygotuj eksport danych</ThemedText>
+              </Pressable>
+              {exportReady ? <ThemedText type="small" themeColor="textSecondary">Eksport danych został pobrany z API i jest gotowy do obsługi w aplikacji.</ThemedText> : null}
+              <Pressable
+                disabled={restrictMutation.isPending}
+                onPress={() => restrictMutation.mutate()}
+                style={styles.secondaryButton}>
+                <ThemedText type="smallBold">
+                  {auth.user.processing_restricted_at ? 'Cofnij ograniczenie przetwarzania' : 'Ogranicz przetwarzanie danych'}
+                </ThemedText>
+              </Pressable>
+            </GlassSurface>
+            <GlassSurface style={styles.dangerPanel}>
+              <ThemedText type="smallBold" style={styles.dangerText}>Usunięcie konta</ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                Konto zostanie zanonimizowane zgodnie z backendowym procesem GDPR.
+              </ThemedText>
+              <TextInput
+                value={deletePassword}
+                onChangeText={setDeletePassword}
+                placeholder="Potwierdź hasłem"
+                secureTextEntry
+                style={styles.input}
+              />
+              <Pressable onPress={() => setDeleteArmed((value) => !value)} style={styles.secondaryButton}>
+                <ThemedText type="smallBold">{deleteArmed ? 'Potwierdzenie aktywne' : 'Aktywuj potwierdzenie'}</ThemedText>
+              </Pressable>
+              <Pressable
+                disabled={!deleteArmed || !deletePassword || deleteMutation.isPending}
+                onPress={() => deleteMutation.mutate(deletePassword)}
+                style={[styles.dangerButton, (!deleteArmed || !deletePassword || deleteMutation.isPending) && styles.disabled]}>
+                <ThemedText type="smallBold" style={styles.primaryButtonText}>Usuń konto</ThemedText>
+              </Pressable>
             </GlassSurface>
             <Pressable onPress={() => auth.logout()} style={styles.secondaryButton}>
               <ThemedText type="smallBold">Wyloguj</ThemedText>
@@ -184,10 +341,28 @@ export default function AccountScreen() {
                 {mode === 'login' ? 'Załóż konto' : 'Mam już konto'}
               </ThemedText>
             </Pressable>
+            {mode === 'login' ? (
+              <Link href={'/auth/forgot-password' as Href} asChild>
+                <Pressable style={styles.secondaryButton}>
+                  <ThemedText type="smallBold">Nie pamiętam hasła</ThemedText>
+                </Pressable>
+              </Link>
+            ) : null}
           </>
         )}
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function ToggleRow({ label, enabled, onPress }: { label: string; enabled: boolean; onPress: () => void }) {
+  return (
+    <Pressable onPress={onPress} style={styles.toggleRow}>
+      <ThemedText type="smallBold">{label}</ThemedText>
+      <ThemedView style={[styles.toggle, enabled && styles.toggleEnabled]}>
+        <ThemedText type="smallBold" style={enabled && styles.toggleText}>{enabled ? 'ON' : 'OFF'}</ThemedText>
+      </ThemedView>
+    </Pressable>
   );
 }
 
@@ -216,11 +391,13 @@ const styles = StyleSheet.create({
   },
   quickActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: Spacing.two,
     backgroundColor: 'transparent',
   },
   accountLink: {
-    flex: 1,
+    flexGrow: 1,
+    minWidth: '30%',
     alignItems: 'center',
     paddingVertical: Spacing.four,
     borderRadius: Storefront.radius.md,
@@ -264,7 +441,54 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
+  addressRow: {
+    gap: Spacing.one,
+    paddingVertical: Spacing.two,
+    borderBottomWidth: 1,
+    borderBottomColor: Storefront.colors.border,
+    backgroundColor: 'transparent',
+  },
+  kicker: {
+    color: Storefront.colors.primary,
+  },
+  toggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.three,
+    paddingVertical: Spacing.two,
+    backgroundColor: 'transparent',
+  },
+  toggle: {
+    minWidth: 52,
+    alignItems: 'center',
+    paddingHorizontal: Spacing.two,
+    paddingVertical: Spacing.one,
+    borderRadius: 999,
+    backgroundColor: Storefront.colors.primarySoft,
+  },
+  toggleEnabled: {
+    backgroundColor: Storefront.colors.primary,
+  },
+  toggleText: {
+    color: '#FFFFFF',
+  },
   errorText: {
     color: '#B91C1C',
+  },
+  dangerPanel: {
+    gap: Spacing.two,
+    padding: Spacing.three,
+    borderRadius: Storefront.radius.lg,
+    borderColor: Storefront.colors.rose,
+  },
+  dangerText: {
+    color: Storefront.colors.rose,
+  },
+  dangerButton: {
+    alignItems: 'center',
+    paddingVertical: Spacing.three,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.rose,
   },
 });

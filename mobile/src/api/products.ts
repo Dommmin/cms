@@ -1,4 +1,4 @@
-import { apiGet, apiGetMany, apiGetPage } from '@/api/client';
+import { api, apiGet, apiGetMany, apiGetPage } from '@/api/client';
 import type { Category, CompareResponse, PaginatedResponse, Product, ProductReview } from '@/types/api';
 
 export interface ProductFilters {
@@ -55,6 +55,17 @@ export function getProductReviews(
   params: { page?: number; per_page?: number } = {},
 ): Promise<PaginatedResponse<ProductReview>> {
   return apiGetPage<ProductReview>(`/products/${slug}/reviews`, { params });
+}
+
+export async function submitProductReview(
+  slug: string,
+  payload: { rating: number; title?: string; body: string },
+): Promise<void> {
+  await api.post(`/products/${slug}/reviews`, payload);
+}
+
+export async function markReviewHelpful(reviewId: number): Promise<void> {
+  await api.post(`/reviews/${reviewId}/helpful`);
 }
 
 export function getCategories(): Promise<Category[]> {

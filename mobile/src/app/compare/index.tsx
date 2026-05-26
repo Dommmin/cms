@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { Link, type Href } from 'expo-router';
 import { FlatList, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -73,6 +74,20 @@ function CompareProduct({ product, onRemove }: { product: Product; onRemove: () 
     <GlassSurface style={styles.productCard}>
       <Link href={`/products/${product.slug}` as Href} asChild>
         <Pressable style={styles.productLink}>
+          {product.thumbnail?.url ? (
+            <Image
+              source={product.thumbnail.url}
+              style={styles.productImage}
+              contentFit="cover"
+              accessibilityLabel={product.thumbnail.alt ?? product.name}
+            />
+          ) : (
+            <ThemedView style={styles.productImagePlaceholder}>
+              <ThemedText type="code" themeColor="textSecondary">
+                Brak zdjęcia
+              </ThemedText>
+            </ThemedView>
+          )}
           <ThemedText type="smallBold" numberOfLines={2}>{product.name}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">{formatMoney(product.price_min)}</ThemedText>
         </Pressable>
@@ -109,6 +124,20 @@ const styles = StyleSheet.create({
     borderRadius: Storefront.radius.lg,
   },
   productLink: { gap: Spacing.one },
+  productImage: {
+    width: '100%',
+    aspectRatio: 1,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.surfaceWarm,
+  },
+  productImagePlaceholder: {
+    width: '100%',
+    aspectRatio: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.glassStrong,
+  },
   removeButton: {
     alignItems: 'center',
     paddingVertical: Spacing.two,

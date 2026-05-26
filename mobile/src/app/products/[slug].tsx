@@ -1,11 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { Link, type Href, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { FlatList, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { FlatList, Pressable, ScrollView, Share, StyleSheet, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getProduct, getProductReviews, getProducts } from '@/api/products';
+import { getProduct, getProductReviews, getProducts, markReviewHelpful, submitProductReview } from '@/api/products';
 import { ProductCard } from '@/components/product/product-card';
 import { GlassSurface } from '@/components/ui/glass-surface';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
@@ -23,7 +23,11 @@ export default function ProductDetailScreen() {
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewTitle, setReviewTitle] = useState('');
+  const [reviewBody, setReviewBody] = useState('');
   const [added, setAdded] = useState(false);
+  const queryClient = useQueryClient();
   const { addItem } = useCart();
   const auth = useAuth();
   const wishlist = useWishlist(auth.isAuthenticated);
@@ -45,6 +49,24 @@ export default function ProductDetailScreen() {
     queryKey: ['products', 'related', product?.category?.slug, product?.id],
     queryFn: () => getProducts({ category: product?.category?.slug, per_page: 5 }),
     enabled: Boolean(product?.category?.slug),
+  });
+  const reviewMutation = useMutation({
+    mutationFn: () =>
+      submitProductReview(slug, {
+        rating: reviewRating,
+        title: reviewTitle.trim() || undefined,
+        body: reviewBody.trim(),
+      }),
+    onSuccess: () => {
+      setReviewRating(0);
+      setReviewTitle('');
+      setReviewBody('');
+      void queryClient.invalidateQueries({ queryKey: ['product-reviews', slug] });
+    },
+  });
+  const helpfulMutation = useMutation({
+    mutationFn: markReviewHelpful,
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['product-reviews', slug] }),
   });
   const selectedVariant = useMemo(() => {
     if (!product) return null;
@@ -80,6 +102,10 @@ export default function ProductDetailScreen() {
   const isWishlisted = selectedVariant
     ? wishlist.wishlist?.items.some((item) => item.variant_id === selectedVariant.id)
     : false;
+  const averageRating =
+    reviewsQuery.data?.data.length
+      ? Math.round((reviewsQuery.data.data.reduce((sum, review) => sum + review.rating, 0) / reviewsQuery.data.data.length) * 10) / 10
+      : null;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -111,6 +137,14 @@ export default function ProductDetailScreen() {
             </ThemedText>
           ) : null}
           <ThemedText type="subtitle">{product.name}</ThemedText>
+          {averageRating ? (
+            <ThemedView style={styles.ratingRow}>
+              <ThemedText type="smallBold">{renderStars(Math.round(averageRating))}</ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                {averageRating}/5 · {reviewsQuery.data?.meta.total ?? reviewsQuery.data?.data.length} opinii
+              </ThemedText>
+            </ThemedView>
+          ) : null}
           <ThemedText type="title">{formatMoney(selectedVariant?.price ?? product.price_min)}</ThemedText>
           {product.omnibus_price_min ? (
             <ThemedText type="small" themeColor="textSecondary">
@@ -129,6 +163,16 @@ export default function ProductDetailScreen() {
               </Pressable>
             </ThemedView>
           </ThemedView>
+          <Pressable
+            onPress={() =>
+              Share.share({
+                title: product.name,
+                message: product.name,
+              })
+            }
+            style={styles.shareButton}>
+            <ThemedText type="smallBold">Udostępnij produkt</ThemedText>
+          </Pressable>
         </GlassSurface>
 
         {variantAttributeGroups.length > 0 ? (
@@ -210,12 +254,51 @@ export default function ProductDetailScreen() {
           {reviewsQuery.data?.data.map((review) => (
             <ThemedView key={review.id} style={styles.review}>
               <ThemedText type="smallBold">
-                {review.author} · {review.rating}/5
+                {review.author} · {renderStars(review.rating)}
               </ThemedText>
               {review.title ? <ThemedText type="smallBold">{review.title}</ThemedText> : null}
               <ThemedText themeColor="textSecondary">{review.body}</ThemedText>
+              <Pressable onPress={() => helpfulMutation.mutate(review.id)} style={styles.helpfulButton}>
+                <ThemedText type="smallBold">Pomocne ({review.helpful_count})</ThemedText>
+              </Pressable>
             </ThemedView>
           ))}
+          {auth.isAuthenticated ? (
+            <ThemedView style={styles.reviewForm}>
+              <ThemedText type="smallBold">Dodaj opinię</ThemedText>
+              <ThemedView style={styles.stars}>
+                {[1, 2, 3, 4, 5].map((rating) => (
+                  <Pressable key={rating} onPress={() => setReviewRating(rating)} style={styles.starButton}>
+                    <ThemedText type="smallBold" style={rating <= reviewRating && styles.starActive}>
+                      ★
+                    </ThemedText>
+                  </Pressable>
+                ))}
+              </ThemedView>
+              <TextInput
+                value={reviewTitle}
+                onChangeText={setReviewTitle}
+                placeholder="Tytuł opinii"
+                placeholderTextColor={Storefront.colors.muted}
+                style={styles.input}
+              />
+              <TextInput
+                value={reviewBody}
+                onChangeText={setReviewBody}
+                placeholder="Treść opinii"
+                placeholderTextColor={Storefront.colors.muted}
+                multiline
+                style={[styles.input, styles.textarea]}
+              />
+              <Pressable
+                disabled={reviewMutation.isPending || reviewRating === 0 || reviewBody.trim().length < 3}
+                onPress={() => reviewMutation.mutate()}
+                style={[styles.secondaryButton, (reviewMutation.isPending || reviewRating === 0 || reviewBody.trim().length < 3) && styles.disabled]}>
+                <ThemedText type="smallBold">Wyślij opinię</ThemedText>
+              </Pressable>
+              {reviewMutation.isSuccess ? <ThemedText type="small" themeColor="textSecondary">Opinia trafi do moderacji.</ThemedText> : null}
+            </ThemedView>
+          ) : null}
         </GlassSurface>
 
         {relatedProducts.length > 0 ? (
@@ -262,6 +345,10 @@ export default function ProductDetailScreen() {
       </GlassSurface>
     </SafeAreaView>
   );
+}
+
+function renderStars(rating: number): string {
+  return `${'★'.repeat(Math.max(0, Math.min(5, rating)))}${'☆'.repeat(Math.max(0, 5 - rating))}`;
 }
 
 const styles = StyleSheet.create({
@@ -322,6 +409,12 @@ const styles = StyleSheet.create({
     marginTop: Spacing.two,
     backgroundColor: 'transparent',
   },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+    backgroundColor: 'transparent',
+  },
   stepper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -338,6 +431,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: Storefront.radius.sm,
+    backgroundColor: Storefront.colors.primarySoft,
+  },
+  shareButton: {
+    alignItems: 'center',
+    marginTop: Spacing.two,
+    paddingVertical: Spacing.three,
+    borderRadius: Storefront.radius.md,
     backgroundColor: Storefront.colors.primarySoft,
   },
   variantGroup: {
@@ -406,6 +506,46 @@ const styles = StyleSheet.create({
     borderColor: Storefront.colors.border,
     borderRadius: Storefront.radius.lg,
     backgroundColor: Storefront.colors.glassStrong,
+  },
+  helpfulButton: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.two,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.primarySoft,
+  },
+  reviewForm: {
+    gap: Spacing.two,
+    paddingTop: Spacing.two,
+    backgroundColor: 'transparent',
+  },
+  stars: {
+    flexDirection: 'row',
+    gap: Spacing.one,
+    backgroundColor: 'transparent',
+  },
+  starButton: {
+    minWidth: 34,
+    minHeight: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  starActive: {
+    color: Storefront.colors.amber,
+  },
+  input: {
+    minHeight: 48,
+    borderWidth: 1,
+    borderColor: Storefront.colors.border,
+    borderRadius: Storefront.radius.md,
+    backgroundColor: Storefront.colors.glassStrong,
+    paddingHorizontal: Spacing.three,
+    fontSize: 16,
+  },
+  textarea: {
+    minHeight: 104,
+    paddingTop: Spacing.three,
+    textAlignVertical: 'top',
   },
   relatedSection: {
     gap: Spacing.three,

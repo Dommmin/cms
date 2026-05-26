@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { FlatList, Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -28,24 +28,39 @@ export default function CategoriesScreen() {
     queryFn: getCategories,
   });
 
-  const productsQuery = useQuery({
+  const productFilters = useMemo(
+    () => ({
+      search: deferredSearch || undefined,
+      category,
+      brand,
+      attributes: selectedAttributes,
+      min_price: minPrice ? Number(minPrice) : undefined,
+      max_price: maxPrice ? Number(maxPrice) : undefined,
+      sort,
+      in_stock: inStock,
+    }),
+    [brand, category, deferredSearch, inStock, maxPrice, minPrice, selectedAttributes, sort],
+  );
+
+  const productsQuery = useInfiniteQuery({
     queryKey: ['products', { search: deferredSearch, category, brand, selectedAttributes, minPrice, maxPrice, sort, inStock }],
-    queryFn: () =>
+    queryFn: ({ pageParam }) =>
       getProducts({
+        page: pageParam,
         per_page: 20,
-        search: deferredSearch || undefined,
-        category,
-        brand,
-        attributes: selectedAttributes,
-        min_price: minPrice ? Number(minPrice) : undefined,
-        max_price: maxPrice ? Number(maxPrice) : undefined,
-        sort,
-        in_stock: inStock,
+        ...productFilters,
       }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.meta.current_page >= lastPage.meta.last_page) return undefined;
+      return lastPage.meta.current_page + 1;
+    },
   });
 
   const categories = useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data]);
-  const availableFilters = productsQuery.data?.meta.available_filters;
+  const firstPage = productsQuery.data?.pages[0];
+  const products = productsQuery.data?.pages.flatMap((page) => page.data) ?? [];
+  const availableFilters = firstPage?.meta.available_filters;
   const activeAttributeCount = Object.values(selectedAttributes).reduce((total, values) => total + values.length, 0);
   const activeFiltersCount = [category, brand, minPrice, maxPrice, inStock ? 'stock' : undefined].filter(Boolean).length + activeAttributeCount;
 
@@ -84,7 +99,7 @@ export default function CategoriesScreen() {
             <ThemedText type="smallBold">Filtry{activeFiltersCount ? ` (${activeFiltersCount})` : ''}</ThemedText>
           </Pressable>
           <ThemedText type="small" themeColor="textSecondary">
-            {productsQuery.data?.meta.total ?? 0} produktów
+            {firstPage?.meta.total ?? 0} produktów
           </ThemedText>
         </ThemedView>
 
@@ -136,18 +151,28 @@ export default function CategoriesScreen() {
 
         {productsQuery.isLoading ? <LoadingState /> : null}
         {productsQuery.isError ? <ErrorState onRetry={() => productsQuery.refetch()} /> : null}
-        {productsQuery.data && productsQuery.data.data.length === 0 ? (
+        {firstPage && products.length === 0 ? (
           <EmptyState title="Brak produktów" body="Zmień wyszukiwanie albo kategorię." />
         ) : null}
-        {productsQuery.data ? (
+        {firstPage ? (
           <FlatList
-            data={productsQuery.data.data}
+            data={products}
             keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) => <ProductCard product={item} />}
             numColumns={2}
             columnWrapperStyle={styles.gridRow}
             contentContainerStyle={styles.grid}
-            ListFooterComponent={<View style={styles.footer} />}
+            onEndReached={() => {
+              if (productsQuery.hasNextPage && !productsQuery.isFetchingNextPage) {
+                void productsQuery.fetchNextPage();
+              }
+            }}
+            onEndReachedThreshold={0.45}
+            ListFooterComponent={
+              <View style={styles.footer}>
+                {productsQuery.isFetchingNextPage ? <ThemedText themeColor="textSecondary">Ładowanie kolejnych produktów</ThemedText> : null}
+              </View>
+            }
           />
         ) : null}
 
@@ -360,7 +385,9 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.three,
   },
   footer: {
-    height: Spacing.five,
+    minHeight: Spacing.five,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sheetBackdrop: {
     flex: 1,
