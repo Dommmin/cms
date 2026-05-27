@@ -15,6 +15,11 @@
 | Client `client/**` | `.cursor/rules/frontend-client.mdc` (globs) |
 | Copy-paste task templates | `.ai/prompts.md` |
 
+## Skills (project)
+
+- Use `.claude/skills/frontend-design` for UI building/polish tasks.
+- Use `.claude/skills/find-skills` when deciding what skill to apply or when promoting global skills into the repo.
+
 ## Verify in Docker (never host `php` / `npm`)
 
 | When | Command (repo root) |
