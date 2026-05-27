@@ -1,4 +1,11 @@
-export type MediaPickerMode = 'image' | 'gallery' | 'file' | 'video' | 'any';
+export type {
+    MediaItem,
+    MediaData,
+    MediaPickerMode,
+    MediaCropVariant,
+    ViewMode,
+    ThumbnailSize,
+} from '@/components/media-browser.types';
 
 export type RteMediaAsset = {
     mediaId: number | null;
@@ -12,38 +19,6 @@ export type RteMediaAsset = {
     focalPoint: { x: number; y: number } | null;
 };
 
-export type MediaCropVariant = {
-    id: number;
-    url: string;
-    label: string;
-    variant: string;
-    width: number | null;
-    height: number | null;
-    focal_point?: { x: number; y: number } | null;
-};
-
-export type MediaItem = {
-    id: number;
-    name: string;
-    file_name: string;
-    mime_type: string;
-    size: number;
-    url: string;
-    alt?: string;
-    caption?: string | null;
-    description?: string | null;
-    credit?: string | null;
-    width?: number | null;
-    height?: number | null;
-    thumb_url?: string | null;
-    thumbnail_url?: string | null;
-    crop_of?: string | number | null;
-    crop_params?: Record<string, unknown> | null;
-    crop_variant?: string | null;
-    crop_variants?: MediaCropVariant[];
-    focal_point?: { x: number; y: number } | null;
-    created_at: string;
-};
 export type SelectedImage = {
     id: number;
     url: string;
@@ -58,19 +33,11 @@ export type SelectedImage = {
     thumb_url?: string | null;
     is_thumbnail: boolean;
 };
-export type MediaData = {
-    data: MediaItem[];
-    prev_page_url: string | null;
-    next_page_url: string | null;
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-};
+
 export type MediaPickerModalProps = {
     open: boolean;
     onClose: () => void;
-    onSelect: (media: MediaItem) => void;
+    onSelect: (media: import('@/components/media-browser.types').MediaItem) => void;
     onConfirm?: (items: SelectedImage[]) => void;
     onReorder?: (images: SelectedImage[]) => void;
     onRemove?: (id: number) => void;
@@ -78,6 +45,6 @@ export type MediaPickerModalProps = {
     selectedImages?: SelectedImage[];
     selectedItems?: SelectedImage[];
     multiple?: boolean;
-    mode?: MediaPickerMode;
+    mode?: import('@/components/media-browser.types').MediaPickerMode;
     acceptedMimeTypes?: string[];
 };

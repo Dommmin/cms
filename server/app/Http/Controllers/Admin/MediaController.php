@@ -20,14 +20,9 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class MediaController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(): Response
     {
-        $media = new MediaIndexQuery($request)->execute();
-
-        return inertia('admin/media/index', [
-            'media' => $media,
-            'filters' => $request->only(['search', 'per_page']),
-        ]);
+        return inertia('admin/media/index');
     }
 
     public function search(Request $request): JsonResponse
@@ -65,7 +60,7 @@ class MediaController extends Controller
         return back()->with('success', 'File(s) uploaded');
     }
 
-    public function update(UpdateMediaRequest $request, Media $media): RedirectResponse
+    public function update(UpdateMediaRequest $request, Media $media): JsonResponse
     {
         $media->setCustomProperty('alt', $request->input('alt', ''));
         $media->setCustomProperty('caption', $request->input('caption', ''));
@@ -73,7 +68,18 @@ class MediaController extends Controller
         $media->setCustomProperty('author', $request->input('author', ''));
         $media->save();
 
-        return back()->with('success', 'Media updated');
+        $media->setAttribute('alt', (string) $media->getCustomProperty('alt', ''));
+        $media->setAttribute('caption', $media->getCustomProperty('caption'));
+        $media->setAttribute('description', $media->getCustomProperty('description'));
+        $media->setAttribute('credit', $media->getCustomProperty('author'));
+
+        return response()->json([
+            'id' => $media->id,
+            'alt' => (string) $media->getCustomProperty('alt', ''),
+            'caption' => $media->getCustomProperty('caption'),
+            'description' => $media->getCustomProperty('description'),
+            'credit' => $media->getCustomProperty('author'),
+        ]);
     }
 
     public function crop(MediaCropRequest $request, Media $media): JsonResponse
@@ -161,11 +167,11 @@ class MediaController extends Controller
         ]);
     }
 
-    public function destroy(Media $media): RedirectResponse
+    public function destroy(Media $media): JsonResponse
     {
         $media->delete();
 
-        return back()->with('success', 'File deleted');
+        return response()->json(['success' => true]);
     }
 
     public function upload(StoreMediaRequest $request): JsonResponse

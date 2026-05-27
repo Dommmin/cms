@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Models\Page;
+use App\Observers\MediaObserver;
 use App\Observers\PageObserver;
 use App\Services\PushNotificationService;
 use Carbon\CarbonImmutable;
@@ -24,6 +25,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
 
 class AppServiceProvider extends ServiceProvider
@@ -71,6 +73,7 @@ class AppServiceProvider extends ServiceProvider
         // Core CMS observers only — ecommerce and newsletter observers
         // are registered by their respective ServiceProviders.
         Page::observe(PageObserver::class);
+        Media::observe(MediaObserver::class);
     }
 
     protected function configureRateLimiting(): void

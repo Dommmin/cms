@@ -54,6 +54,7 @@ trait CachesImages
                 $cmsMedia = CmsMedia::query()->create([]);
                 $media = $cmsMedia->addMedia($file)
                     ->preservingOriginal()
+                    ->withCustomProperties(['alt' => '', 'caption' => '', 'description' => '', 'author' => ''])
                     ->toMediaCollection('default');
 
                 $product->images()->create([

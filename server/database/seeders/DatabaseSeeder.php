@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Config;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,6 +14,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Disable activity logging during seeding — no admin causer, massive noise.
+        Config::set('activitylog.enabled', false);
+
         // ── Core CMS (always seeded) ─────────────────────────────────────────
         $this->call([
             RolePermissionSeeder::class,
