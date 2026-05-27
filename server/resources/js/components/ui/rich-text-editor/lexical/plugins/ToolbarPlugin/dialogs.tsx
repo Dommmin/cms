@@ -31,11 +31,10 @@ export function LinkDialog({ open, url, isInvalid, onOpenChange, onUrlChange, on
     const [urlResults, setUrlResults] = useState<InternalLinkSearchResult[]>([]);
     const [urlLoading, setUrlLoading] = useState(false);
 
-    /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
         if (!open || activeTab !== 'internal' || query.trim().length < 2) {
-            setResults([]);
-            return;
+            const clearResultsId = setTimeout(() => setResults([]), 0);
+            return () => clearTimeout(clearResultsId);
         }
 
         const controller = new AbortController();
@@ -60,14 +59,14 @@ export function LinkDialog({ open, url, isInvalid, onOpenChange, onUrlChange, on
             controller.abort();
             clearTimeout(timeout);
         };
-    }, [activeTab, open, query]);
+    }, [__, activeTab, open, query]);
 
     useEffect(() => {
         const autocompleteQuery = internalLinkQueryFromUrl(url);
 
         if (!open || activeTab !== 'url' || autocompleteQuery.length < 2) {
-            setUrlResults([]);
-            return;
+            const clearUrlResultsId = setTimeout(() => setUrlResults([]), 0);
+            return () => clearTimeout(clearUrlResultsId);
         }
 
         const controller = new AbortController();
@@ -92,17 +91,19 @@ export function LinkDialog({ open, url, isInvalid, onOpenChange, onUrlChange, on
             controller.abort();
             clearTimeout(timeout);
         };
-    }, [activeTab, open, url]);
+    }, [__, activeTab, open, url]);
 
     useEffect(() => {
         if (!open) {
-            setActiveTab('url');
-            setQuery('');
-            setResults([]);
-            setUrlResults([]);
+            const resetId = setTimeout(() => {
+                setActiveTab('url');
+                setQuery('');
+                setResults([]);
+                setUrlResults([]);
+            }, 0);
+            return () => clearTimeout(resetId);
         }
     }, [open]);
-    /* eslint-enable react-hooks/set-state-in-effect */
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>

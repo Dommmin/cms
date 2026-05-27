@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type {
     GooglePayButtonProps,
     GooglePayClient,
@@ -32,7 +32,7 @@ export function GooglePayButton({
         };
     }
 
-    function initClient() {
+    const initClient = useCallback(() => {
         if (!window.google?.payments?.api) return;
 
         const client = new window.google.payments.api.PaymentsClient({
@@ -48,7 +48,7 @@ export function GooglePayButton({
             })
             .then(({ result }) => setIsReady(result))
             .catch(() => setIsReady(false));
-    }
+    }, []);
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -65,7 +65,7 @@ export function GooglePayButton({
         script.src = 'https://pay.google.com/gp/p/js/pay.js';
         script.onload = () => initClient();
         document.head.appendChild(script);
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [initClient]);
 
     async function handleClick() {
         if (!clientRef.current) return;

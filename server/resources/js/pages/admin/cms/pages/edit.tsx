@@ -334,9 +334,13 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                                 </Select>
                                                 <InputError
                                                     message={
-                                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                        (errors as any)
-                                                            .parent_id
+                                                        (
+                                                            errors as Record<
+                                                                string,
+                                                                | string
+                                                                | undefined
+                                                            >
+                                                        ).parent_id
                                                     }
                                                 />
                                             </div>
@@ -532,18 +536,24 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                                             name="module_config[content_id]"
                                                             type="number"
                                                             defaultValue={
-                                                                /* eslint-disable @typescript-eslint/no-explicit-any */
                                                                 (page
                                                                     .module_config
-                                                                    ?.content_id as any) ??
-                                                                /* eslint-enable @typescript-eslint/no-explicit-any */
+                                                                    ?.content_id as
+                                                                    | string
+                                                                    | number
+                                                                    | undefined) ??
                                                                 ''
                                                             }
                                                         />
                                                         <InputError
                                                             message={
-                                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                                (errors as any)[
+                                                                (
+                                                                    errors as Record<
+                                                                        string,
+                                                                        | string
+                                                                        | undefined
+                                                                    >
+                                                                )[
                                                                     'module_config.content_id'
                                                                 ]
                                                             }
@@ -597,17 +607,22 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                                         id="category"
                                                         name="module_config[category]"
                                                         defaultValue={
-                                                            /* eslint-disable @typescript-eslint/no-explicit-any */
                                                             (page.module_config
-                                                                ?.category as any) ??
-                                                            /* eslint-enable @typescript-eslint/no-explicit-any */
+                                                                ?.category as
+                                                                | string
+                                                                | undefined) ??
                                                             ''
                                                         }
                                                     />
                                                     <InputError
                                                         message={
-                                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                            (errors as any)[
+                                                            (
+                                                                errors as Record<
+                                                                    string,
+                                                                    | string
+                                                                    | undefined
+                                                                >
+                                                            )[
                                                                 'module_config.category'
                                                             ]
                                                         }

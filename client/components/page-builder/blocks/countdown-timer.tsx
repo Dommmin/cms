@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import Link from 'next/link';
 
@@ -15,7 +15,10 @@ function pad(n: number) {
 
 export function CountdownTimerBlock({ block }: CountdownTimerProps) {
     const cfg = block.configuration as CountdownTimerConfig;
-    const targetDate = cfg.target_date ? new Date(cfg.target_date) : null;
+    const targetDate = useMemo(
+        () => (cfg.target_date ? new Date(cfg.target_date) : null),
+        [cfg.target_date],
+    );
 
     const [timeLeft, setTimeLeft] = useState<{
         days: number;
@@ -45,7 +48,7 @@ export function CountdownTimerBlock({ block }: CountdownTimerProps) {
         tick();
         const id = setInterval(tick, 1000);
         return () => clearInterval(id);
-    }, [cfg.target_date]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [targetDate]);
 
     const isDark = cfg.style === 'dark' || cfg.style === 'brand';
     const containerClass = {

@@ -106,12 +106,10 @@ export default function SlashCommandPlugin(): JSX.Element | null {
 
     const filtered = filterCommands(query);
 
-    // Clamp selectedIndex when filtered list changes
-     
-     
-    useEffect(() => {
-        setSelectedIndex((i) => Math.min(i, Math.max(filtered.length - 1, 0))); // eslint-disable-line react-hooks/set-state-in-effect
-    }, [filtered.length]);
+    const activeIndex = Math.min(
+        selectedIndex,
+        Math.max(filtered.length - 1, 0),
+    );
 
     // ─── Track keystrokes to detect "/" trigger ──────────────────────────────
 
@@ -273,7 +271,7 @@ export default function SlashCommandPlugin(): JSX.Element | null {
         const unregisterEnter = editor.registerCommand(
             KEY_ENTER_COMMAND,
             () => {
-                const item = filtered[selectedIndex];
+                const item = filtered[activeIndex];
                 if (item) {
                     applyCommand(item);
                     return true;
@@ -298,14 +296,14 @@ export default function SlashCommandPlugin(): JSX.Element | null {
             unregisterEnter();
             unregisterEscape();
         };
-    }, [open, editor, filtered, selectedIndex, applyCommand]);
+    }, [open, editor, filtered, activeIndex, applyCommand]);
 
     // ─── Scroll selected item into view ──────────────────────────────────────
 
     useLayoutEffect(() => {
         const el = menuRef.current?.querySelector<HTMLElement>('[data-selected="true"]');
         el?.scrollIntoView({ block: 'nearest' });
-    }, [selectedIndex]);
+    }, [activeIndex]);
 
     if (!open || !menuPos || filtered.length === 0) return null;
 
@@ -326,7 +324,7 @@ export default function SlashCommandPlugin(): JSX.Element | null {
                 <button
                     key={item.id}
                     type="button"
-                    data-selected={index === selectedIndex}
+                    data-selected={index === activeIndex}
                     onMouseDown={(e) => {
                         e.preventDefault();
                         applyCommand(item);
@@ -334,7 +332,7 @@ export default function SlashCommandPlugin(): JSX.Element | null {
                     onMouseEnter={() => setSelectedIndex(index)}
                     className={cn(
                         'flex w-full items-center gap-3 px-3 py-1.5 text-left transition-colors hover:bg-accent',
-                        index === selectedIndex && 'bg-accent',
+                        index === activeIndex && 'bg-accent',
                     )}
                 >
                     <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded border border-border bg-background text-[11px] font-bold text-muted-foreground">

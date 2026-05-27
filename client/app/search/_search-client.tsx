@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -22,13 +23,15 @@ function ProductSearchCard({
 }) {
     return (
         <article className="border-border bg-card overflow-hidden rounded-xl border">
-            <div className="bg-muted aspect-square">
+            <div className="bg-muted relative aspect-square">
                 {product.thumbnail && (
-                    <img
+                    <Image
                         src={
                             product.thumbnail.thumb_url || product.thumbnail.url
                         }
                         alt={product.thumbnail.alt || product.name}
+                        fill
+                        sizes="(max-width: 768px) 50vw, 25vw"
                         className="h-full w-full object-cover"
                         loading="lazy"
                     />

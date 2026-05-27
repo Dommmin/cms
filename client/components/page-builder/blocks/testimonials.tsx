@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import type {
     TestimonialsConfig,
     TestimonialsProps,
@@ -60,10 +61,11 @@ export function TestimonialsBlock({ block }: TestimonialsProps) {
                         </p>
                         <div className="flex items-center gap-3">
                             {item.avatar_url ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
+                                <Image
                                     src={item.avatar_url}
                                     alt={item.author}
+                                    width={40}
+                                    height={40}
                                     className="h-10 w-10 rounded-full object-cover"
                                 />
                             ) : (

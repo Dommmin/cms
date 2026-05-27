@@ -15,8 +15,10 @@ export function MapPicker({ lat, lng, onChange }: MapPickerProps) {
             if (mapRef.current || !containerRef.current) return;
 
             // Fix default icon paths
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            delete (L.Icon.Default.prototype as any)._getIconUrl;
+            type IconDefaultProto = typeof L.Icon.Default.prototype & {
+                _getIconUrl?: unknown;
+            };
+            delete (L.Icon.Default.prototype as IconDefaultProto)._getIconUrl;
             L.Icon.Default.mergeOptions({
                 iconRetinaUrl:
                     'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
@@ -87,8 +89,7 @@ export function MapPicker({ lat, lng, onChange }: MapPickerProps) {
                 markerRef.current = null;
             }
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [lat, lng, onChange]);
 
     // Update marker position when lat/lng change externally
     useEffect(() => {

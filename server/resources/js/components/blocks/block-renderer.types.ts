@@ -1,5 +1,10 @@
+import type { AccordionItem } from '@/components/blocks/accordion.types';
+
 export type Block = {
     type: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data?: any;
+    data?: {
+        heading?: string;
+        items?: AccordionItem[];
+        [key: string]: unknown;
+    };
 };

@@ -61,8 +61,7 @@ export function SocialLoginButtons() {
         setLoading(provider);
         try {
             const url = await getSocialRedirectUrl(provider);
-            // eslint-disable-next-line react-hooks/immutability
-            window.location.href = url;
+            window.location.assign(url);
         } catch {
             setLoading(null);
         }

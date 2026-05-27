@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
 import { EyeIcon, SaveIcon, TrashIcon, XIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import * as MediaController from '@/actions/App/Http/Controllers/Admin/MediaController';
 import { ConfirmButton } from '@/components/confirm-dialog';
@@ -42,22 +42,14 @@ export default function Index() {
     });
     const [isSavingMeta, setIsSavingMeta] = useState(false);
 
-    useEffect(() => {
-        if (selectedItem) {
-            // This local state update is derived from the currently selected media.
-            // We intentionally refresh it when `selectedItem` changes.
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setMetaForm({
-                alt: selectedItem.alt ?? '',
-                caption: selectedItem.caption ?? '',
-                description: selectedItem.description ?? '',
-                author: selectedItem.credit ?? '',
-            });
-        }
-    }, [selectedItem?.id]); // eslint-disable-line react-hooks/exhaustive-deps
-
     const handleItemClick = (item: MediaItem) => {
         setSelectedItem(item);
+        setMetaForm({
+            alt: item.alt ?? '',
+            caption: item.caption ?? '',
+            description: item.description ?? '',
+            author: item.credit ?? '',
+        });
     };
 
     const handleSaveMeta = () => {

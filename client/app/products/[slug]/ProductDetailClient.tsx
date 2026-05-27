@@ -65,7 +65,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
             });
             addRecentlyViewed(product);
         }
-    }, [product?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [product]);
 
     // Review form state
     const [rating, setRating] = useState(0);

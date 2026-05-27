@@ -11,7 +11,7 @@ import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
-import { useEffect, useRef, type JSX } from 'react';
+import { useEffect, useMemo, useRef, type JSX } from 'react';
 import type { EditorProps } from './Editor.types';
 import { isAllowedEditorLinkUrl } from './link-url';
 import { nodes } from './nodes';
@@ -60,7 +60,7 @@ function EditablePlugin({ editable }: { editable: boolean }): null {
 
 export default function Editor({ value, onChange, onJsonChange, placeholder = 'Start writing...', className, maxHeight, editable = true, mode = 'full', showWordCount = true, instanceKey }: EditorProps): JSX.Element {
     const containerRef = useRef<HTMLDivElement>(null);
-    const config = useRef(buildConfig(editable));
+    const config = useMemo(() => buildConfig(editable), [editable]);
     const isFullMode = mode === 'full';
 
     const contentStyle = maxHeight
@@ -68,9 +68,8 @@ export default function Editor({ value, onChange, onJsonChange, placeholder = 'S
         : undefined;
 
     return (
-        <div ref={containerRef} className={`editor-container ${className ?? ''}`.trim()}>
-            {/* eslint-disable-next-line react-hooks/refs */}
-            <LexicalComposer initialConfig={config.current}>
+            <div ref={containerRef} className={`editor-container ${className ?? ''}`.trim()}>
+            <LexicalComposer initialConfig={config}>
                 {editable && <ToolbarPlugin mode={mode} />}
                 <div className="editor-input group" style={{ position: 'relative', ...contentStyle }}>
                     <RichTextPlugin
@@ -78,10 +77,8 @@ export default function Editor({ value, onChange, onJsonChange, placeholder = 'S
                         placeholder={<div className="editor-placeholder">{placeholder}</div>}
                         ErrorBoundary={LexicalErrorBoundary}
                     />
-                    {/* eslint-disable-next-line react-hooks/refs */}
-                    {editable && <FloatingTextFormatPlugin anchorElem={containerRef.current ?? undefined} />}
-                    {/* eslint-disable-next-line react-hooks/refs */}
-                    {editable && <FloatingLinkEditorPlugin anchorElem={containerRef.current ?? undefined} />}
+                    {editable && <FloatingTextFormatPlugin />}
+                    {editable && <FloatingLinkEditorPlugin />}
                 </div>
                 <HistoryPlugin />
                 <ListPlugin />
@@ -97,8 +94,7 @@ export default function Editor({ value, onChange, onJsonChange, placeholder = 'S
                 {editable && <ClipboardImagePlugin />}
                 {editable && <SlashCommandPlugin />}
                 {editable && <SnippetsPlugin />}
-                {/* eslint-disable-next-line react-hooks/refs */}
-                {editable && <DraggableBlockPlugin anchorElem={containerRef.current ?? undefined} />}
+                {editable && <DraggableBlockPlugin />}
                 <HtmlPlugin value={value} onChange={onChange} onJsonChange={onJsonChange} instanceKey={instanceKey} />
                 <EditablePlugin editable={editable} />
                 <CopyCodePlugin />

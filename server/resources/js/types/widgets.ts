@@ -16,8 +16,6 @@ export interface Widget {
     color?: string;
     is_active: boolean;
     order: number;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data: any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    config?: any;
+    data: Record<string, unknown> | Array<Record<string, unknown>>;
+    config?: Record<string, unknown>;
 }

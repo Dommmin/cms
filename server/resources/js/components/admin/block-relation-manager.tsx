@@ -136,15 +136,10 @@ function ModelPickerModal({
     );
 
     useEffect(() => {
-        if (!open) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setQuery('');
-            setResults([]);
-            return;
-        }
+        if (!open) return;
         // Autofocus + load initial results
         setTimeout(() => inputRef.current?.focus(), 100);
-        doSearch('');
+        setTimeout(() => doSearch(''), 0);
     }, [open, doSearch]);
 
     useEffect(() => {

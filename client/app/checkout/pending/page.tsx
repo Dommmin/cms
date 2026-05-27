@@ -29,7 +29,7 @@ export default function CheckoutPendingPage() {
         return () => {
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
         };
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [lp, router]);
 
     // React to status changes
     useEffect(() => {

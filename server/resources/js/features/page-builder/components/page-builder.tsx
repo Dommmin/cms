@@ -92,7 +92,7 @@ export function PageBuilder({
 
     useEffect(() => {
         onChange?.(sections);
-    }, [sections]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [onChange, sections]);
 
     const firstSectionType = Object.keys(data.available_sections)[0] ?? '';
 

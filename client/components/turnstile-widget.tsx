@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import type { TurnstileWidgetProps } from './turnstile-widget.types';
 
 const SITE_KEY = process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY ?? '';
@@ -13,7 +13,7 @@ export function TurnstileWidget({
     const containerRef = useRef<HTMLDivElement>(null);
     const widgetIdRef = useRef<string | null>(null);
 
-    function renderWidget() {
+    const renderWidget = useCallback(() => {
         if (!containerRef.current || widgetIdRef.current || !window.turnstile) {
             return;
         }
@@ -23,7 +23,7 @@ export function TurnstileWidget({
             'expired-callback': onExpire,
             theme: 'auto',
         });
-    }
+    }, [onExpire, onVerify]);
 
     useEffect(() => {
         if (!SITE_KEY) return;
@@ -43,8 +43,7 @@ export function TurnstileWidget({
             widgetIdRef.current = null;
             document.head.removeChild(script);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [renderWidget]);
 
     if (!SITE_KEY) return null;
 

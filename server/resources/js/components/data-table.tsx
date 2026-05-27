@@ -1,9 +1,7 @@
+'use no memo';
+
 import { Link, router } from '@inertiajs/react';
-import {
-    flexRender,
-    getCoreRowModel,
-    useReactTable,
-} from '@tanstack/react-table';
+import { flexRender } from '@tanstack/react-table';
 import { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -29,6 +27,8 @@ export default function DataTable<T>({
     baseUrl,
     className,
 }: DataTableProps<T>) {
+    'use no memo';
+
     const __ = useTranslation();
     const [search, setSearch] = useState(searchValue);
     const perPageOptions = pagination
@@ -56,14 +56,25 @@ export default function DataTable<T>({
         }
     }, [search, onSearch, baseUrl]);
 
-    // eslint-disable-next-line react-hooks/incompatible-library
-    const table = useReactTable({
-        data,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-        manualPagination: true,
-        manualSorting: true,
-    });
+    const getColumnId = (column: (typeof columns)[number], index: number) =>
+        column.id ??
+        ('accessorKey' in column && typeof column.accessorKey === 'string'
+            ? column.accessorKey
+            : `col-${index}`);
+
+    const getCellValue = (
+        row: T,
+        column: (typeof columns)[number],
+        rowIndex: number,
+    ) => {
+        if ('accessorFn' in column && typeof column.accessorFn === 'function') {
+            return column.accessorFn(row, rowIndex);
+        }
+        if ('accessorKey' in column && typeof column.accessorKey === 'string') {
+            return (row as Record<string, unknown>)[column.accessorKey];
+        }
+        return undefined;
+    };
 
     return (
         <div className={cn('space-y-4', className)}>
@@ -93,27 +104,21 @@ export default function DataTable<T>({
             <div className="overflow-x-auto rounded-md border">
                 <table className="w-full min-w-max text-sm">
                     <thead className="bg-muted/50">
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <tr key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => (
-                                    <th
-                                        key={header.id}
-                                        className="h-10 px-3 text-left align-middle font-medium text-muted-foreground"
-                                    >
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                  header.column.columnDef
-                                                      .header,
-                                                  header.getContext(),
-                                              )}
-                                    </th>
-                                ))}
-                            </tr>
-                        ))}
+                        <tr>
+                            {columns.map((column, index) => (
+                                <th
+                                    key={getColumnId(column, index)}
+                                    className="h-10 px-3 text-left align-middle font-medium text-muted-foreground"
+                                >
+                                    {flexRender(column.header, {
+                                        column,
+                                    } as never)}
+                                </th>
+                            ))}
+                        </tr>
                     </thead>
                     <tbody>
-                        {table.getRowModel().rows.length === 0 ? (
+                        {data.length === 0 ? (
                             <tr>
                                 <td
                                     colSpan={columns.length}
@@ -123,22 +128,38 @@ export default function DataTable<T>({
                                 </td>
                             </tr>
                         ) : (
-                            table.getRowModel().rows.map((row) => (
+                            data.map((row, rowIndex) => (
                                 <tr
-                                    key={row.id}
+                                    key={rowIndex}
                                     className="border-t transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
                                 >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <td
-                                            key={cell.id}
-                                            className="p-3 align-middle"
-                                        >
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext(),
-                                            )}
-                                        </td>
-                                    ))}
+                                    {columns.map((column, colIndex) => {
+                                        const value = getCellValue(
+                                            row,
+                                            column,
+                                            rowIndex,
+                                        );
+                                        const columnId = getColumnId(
+                                            column,
+                                            colIndex,
+                                        );
+                                        return (
+                                            <td
+                                                key={`${rowIndex}-${columnId}`}
+                                                className="p-3 align-middle"
+                                            >
+                                                {flexRender(column.cell, {
+                                                    row: {
+                                                        original: row,
+                                                        index: rowIndex,
+                                                        getValue: () => value,
+                                                    },
+                                                    column,
+                                                    getValue: () => value,
+                                                } as never)}
+                                            </td>
+                                        );
+                                    })}
                                 </tr>
                             ))
                         )}

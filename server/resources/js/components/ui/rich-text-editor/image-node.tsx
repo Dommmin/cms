@@ -186,21 +186,24 @@ function ImageComponent(props: ImageComponentProps): JSX.Element {
     const [draftFilters, setDraftFilters] = useState<ImageFilters | null>(filters);
     const [draftCropVariantId, setDraftCropVariantId] = useState(cropVariantId ? String(cropVariantId) : 'original');
 
-    /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
-        setLocalWidth(width);
-        setDraftAlt(altText);
-        setDraftCaption(caption ?? '');
-        setDraftCredit(credit ?? '');
-        setDraftLinkUrl(linkUrl ?? '');
-        setDraftDecorative(decorative);
-        setDraftFocalX(String(Math.round((focalPoint?.x ?? 0.5) * 100)));
-        setDraftFocalY(String(Math.round((focalPoint?.y ?? 0.5) * 100)));
-        setDraftLoading(loading);
-        setDraftFilters(filters);
-        setDraftCropVariantId(cropVariantId ? String(cropVariantId) : 'original');
+        const syncId = setTimeout(() => {
+            setLocalWidth(width);
+            setDraftAlt(altText);
+            setDraftCaption(caption ?? '');
+            setDraftCredit(credit ?? '');
+            setDraftLinkUrl(linkUrl ?? '');
+            setDraftDecorative(decorative);
+            setDraftFocalX(String(Math.round((focalPoint?.x ?? 0.5) * 100)));
+            setDraftFocalY(String(Math.round((focalPoint?.y ?? 0.5) * 100)));
+            setDraftLoading(loading);
+            setDraftFilters(filters);
+            setDraftCropVariantId(
+                cropVariantId ? String(cropVariantId) : 'original',
+            );
+        }, 0);
+        return () => clearTimeout(syncId);
     }, [altText, caption, credit, decorative, focalPoint, linkUrl, loading, width, filters, cropVariantId]);
-    /* eslint-enable react-hooks/set-state-in-effect */
 
     const applyWidth = (nextWidth: string, nextPreset: ImageSizePreset) => {
         setLocalWidth(nextWidth);

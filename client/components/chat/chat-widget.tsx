@@ -26,17 +26,15 @@ export function ChatWidget({
     userName,
     userEmail,
 }: ChatWidgetProps) {
-    const [isOpen, setIsOpen] = useState(false);
-    const [token, setToken] = useState<string | null>(null);
+    const [isOpen, setIsOpen] = useState(() => {
+        if (typeof window === 'undefined') return false;
+        return localStorage.getItem(OPEN_KEY) === 'true';
+    });
+    const [token, setToken] = useState<string | null>(() => {
+        if (typeof window === 'undefined') return null;
+        return getSupportToken();
+    });
     const prevMessageCount = useRef(0);
-
-    // Restore persisted state on mount
-    useEffect(() => {
-        const savedToken = getSupportToken();
-        setToken(savedToken);
-        const savedOpen = localStorage.getItem(OPEN_KEY);
-        if (savedOpen === 'true') setIsOpen(true);
-    }, []);
 
     // Persist open state
     useEffect(() => {
@@ -49,13 +47,21 @@ export function ChatWidget({
         isError: isConversationError,
     } = useConversation(token);
 
+    function handleReset() {
+        clearSupportToken();
+        setToken(null);
+        prevMessageCount.current = 0;
+    }
+
     // If the conversation no longer exists (404 or any error), reset to start a new one
     useEffect(() => {
         if (isConversationError && token) {
-            handleReset();
+            const resetTimer = setTimeout(() => {
+                handleReset();
+            }, 0);
+            return () => clearTimeout(resetTimer);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isConversationError]);
+    }, [isConversationError, token]);
     const startConversation = useStartConversation();
     const sendMessage = useSendMessage(token ?? '');
 
@@ -96,12 +102,6 @@ export function ChatWidget({
     async function handleSend(body: string) {
         if (!token) return;
         await sendMessage.mutateAsync(body);
-    }
-
-    function handleReset() {
-        clearSupportToken();
-        setToken(null);
-        prevMessageCount.current = 0;
     }
 
     const hasToken = !!token;

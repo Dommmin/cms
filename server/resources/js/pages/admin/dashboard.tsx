@@ -18,6 +18,7 @@ import * as DashboardWidgetController from '@/actions/App/Http/Controllers/Admin
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ChartWidget } from '@/components/widgets/chart-widget';
+import type { DataPoint } from '@/components/widgets/chart-widget.types';
 import { CreateWidgetDialog } from '@/components/widgets/create-widget-dialog';
 import { StatCard } from '@/components/widgets/stat-card';
 import { useTranslation } from '@/hooks/use-translation';
@@ -185,6 +186,28 @@ const STATUS_COLORS: Record<string, string> = {
     cancelled: 'bg-red-100 text-red-800',
 };
 
+type DashboardTableRow = {
+    id?: number;
+    name?: string;
+    customer?: string;
+    created_at?: string;
+    status?: string;
+    total?: number;
+    total_qty?: number;
+    total_revenue?: number;
+    sku?: string;
+    stock?: number;
+    author?: string;
+    rating?: number;
+    [key: string]: unknown;
+};
+
+type DashboardQuickAction = {
+    label: string;
+    url?: string;
+    route?: string;
+};
+
 export default function Dashboard({
     widgetShells,
     onboarding,
@@ -197,8 +220,11 @@ export default function Dashboard({
 
     useEffect(() => {
         if (deferredWidgets) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setWidgets(deferredWidgets);
+            const setWidgetsTimer = setTimeout(
+                () => setWidgets(deferredWidgets),
+                0,
+            );
+            return () => clearTimeout(setWidgetsTimer);
         }
     }, [deferredWidgets]);
     const [resetting, setResetting] = useState(false);
@@ -260,16 +286,48 @@ export default function Dashboard({
     }
 
     function renderWidget(widget: Widget) {
+        const config = (widget.config ?? {}) as Record<string, unknown>;
+        const dataRows = Array.isArray(widget.data)
+            ? (widget.data as DashboardTableRow[])
+            : [];
+        const dataObject = !Array.isArray(widget.data)
+            ? (widget.data as Record<string, unknown>)
+            : {};
+        const chartData: DataPoint[] = dataRows
+            .map((row) => ({
+                date: typeof row.date === 'string' ? row.date : '',
+                value:
+                    typeof row.value === 'number'
+                        ? row.value
+                        : Number(row.value ?? 0),
+                label: typeof row.label === 'string' ? row.label : undefined,
+            }))
+            .filter((row) => row.date !== '');
+
         switch (widget.type) {
             case 'stat':
                 return (
                     <StatCard
                         title={widget.title}
-                        value={widget.data.value}
-                        trend={widget.data.trend}
+                        value={
+                            typeof dataObject.value === 'string' ||
+                            typeof dataObject.value === 'number'
+                                ? dataObject.value
+                                : 0
+                        }
+                        trend={
+                            typeof dataObject.trend === 'number'
+                                ? dataObject.trend
+                                : undefined
+                        }
                         icon={widget.icon}
                         color={widget.color}
-                        format={widget.data.format}
+                        format={
+                            dataObject.format === 'number' ||
+                            dataObject.format === 'currency'
+                                ? dataObject.format
+                                : undefined
+                        }
                     />
                 );
 
@@ -277,67 +335,70 @@ export default function Dashboard({
                 return (
                     <ChartWidget
                         title={widget.title}
-                        data={widget.data}
-                        chartType={widget.config?.chart_type ?? 'line'}
+                        data={chartData}
+                        chartType={
+                            (config.chart_type as
+                                | 'line'
+                                | 'donut'
+                                | undefined) ?? 'line'
+                        }
                         color={widget.color ?? 'blue'}
                     />
                 );
 
             case 'table': {
-                if (widget.config?.data_source === 'top_products') {
+                if (config.data_source === 'top_products') {
                     return (
                         <Card className="p-6">
                             <h3 className="mb-4 font-semibold">
                                 {widget.title}
                             </h3>
-                            {widget.data.length === 0 ? (
+                            {dataRows.length === 0 ? (
                                 <p className="text-sm text-muted-foreground">
                                     {__('empty.no_data', 'No data available.')}
                                 </p>
                             ) : (
                                 <div className="space-y-2">
-                                    {widget.data.map(
-                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                        (row: any, index: number) => (
-                                            <div
-                                                key={index}
-                                                className="flex items-center justify-between rounded-lg border p-3"
-                                            >
-                                                <div className="min-w-0 flex-1">
-                                                    <p className="truncate text-sm font-medium">
-                                                        {row.name}
-                                                    </p>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        {row.total_qty}{' '}
-                                                        {__(
-                                                            'dashboard.units_sold',
-                                                            'units sold',
-                                                        )}
-                                                    </p>
-                                                </div>
-                                                <span className="ml-3 shrink-0 text-sm font-semibold">
-                                                    $
-                                                    {(
-                                                        row.total_revenue / 100
-                                                    ).toFixed(2)}
-                                                </span>
+                                    {dataRows.map((row, index: number) => (
+                                        <div
+                                            key={index}
+                                            className="flex items-center justify-between rounded-lg border p-3"
+                                        >
+                                            <div className="min-w-0 flex-1">
+                                                <p className="truncate text-sm font-medium">
+                                                    {row.name}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {row.total_qty}{' '}
+                                                    {__(
+                                                        'dashboard.units_sold',
+                                                        'units sold',
+                                                    )}
+                                                </p>
                                             </div>
-                                        ),
-                                    )}
+                                            <span className="ml-3 shrink-0 text-sm font-semibold">
+                                                $
+                                                {(
+                                                    (row.total_revenue ?? 0) /
+                                                    100
+                                                ).toFixed(2)}
+                                            </span>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </Card>
                     );
                 }
 
-                if (widget.config?.data_source === 'low_stock') {
+                if (config.data_source === 'low_stock') {
                     return (
                         <Card className="p-6">
                             <h3 className="mb-4 flex items-center gap-2 font-semibold">
                                 <AlertTriangle className="h-4 w-4 text-yellow-500" />
                                 {widget.title}
                             </h3>
-                            {widget.data.length === 0 ? (
+                            {dataRows.length === 0 ? (
                                 <p className="text-sm text-muted-foreground">
                                     {__(
                                         'dashboard.all_stocked',
@@ -346,93 +407,84 @@ export default function Dashboard({
                                 </p>
                             ) : (
                                 <div className="space-y-2">
-                                    {widget.data.map(
-                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                        (row: any) => (
-                                            <div
-                                                key={row.id}
-                                                className="flex items-center justify-between rounded-lg border p-3"
-                                            >
-                                                <div>
-                                                    <p className="text-sm font-medium">
-                                                        {row.name}
+                                    {dataRows.map((row) => (
+                                        <div
+                                            key={row.id}
+                                            className="flex items-center justify-between rounded-lg border p-3"
+                                        >
+                                            <div>
+                                                <p className="text-sm font-medium">
+                                                    {row.name}
+                                                </p>
+                                                {row.sku && (
+                                                    <p className="text-xs text-muted-foreground">
+                                                        SKU: {row.sku}
                                                     </p>
-                                                    {row.sku && (
-                                                        <p className="text-xs text-muted-foreground">
-                                                            SKU: {row.sku}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                                <span
-                                                    className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                                                        row.stock <= 2
-                                                            ? 'bg-red-100 text-red-700'
-                                                            : 'bg-yellow-100 text-yellow-700'
-                                                    }`}
-                                                >
-                                                    {row.stock}{' '}
-                                                    {__(
-                                                        'dashboard.left',
-                                                        'left',
-                                                    )}
-                                                </span>
+                                                )}
                                             </div>
-                                        ),
-                                    )}
+                                            <span
+                                                className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                                                    (row.stock ?? 0) <= 2
+                                                        ? 'bg-red-100 text-red-700'
+                                                        : 'bg-yellow-100 text-yellow-700'
+                                                }`}
+                                            >
+                                                {row.stock}{' '}
+                                                {__('dashboard.left', 'left')}
+                                            </span>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </Card>
                     );
                 }
 
-                if (widget.config?.data_source === 'reviews') {
+                if (config.data_source === 'reviews') {
                     return (
                         <Card className="p-6">
                             <h3 className="mb-4 font-semibold">
                                 {widget.title}
                             </h3>
-                            {widget.data.length === 0 ? (
+                            {dataRows.length === 0 ? (
                                 <p className="text-sm text-muted-foreground">
                                     {__('empty.no_reviews', 'No reviews yet.')}
                                 </p>
                             ) : (
                                 <div className="space-y-3">
-                                    {widget.data.map(
-                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                        (row: any) => (
-                                            <div
-                                                key={row.id}
-                                                className="rounded-lg border p-3"
-                                            >
-                                                <div className="flex items-start justify-between gap-2">
-                                                    <div className="min-w-0">
-                                                        <p className="truncate text-sm font-medium">
-                                                            {row.name}
-                                                        </p>
-                                                        <p className="text-xs text-muted-foreground">
-                                                            {row.author} ·{' '}
-                                                            {row.created_at}
-                                                        </p>
-                                                    </div>
-                                                    <div className="flex shrink-0 items-center gap-0.5">
-                                                        {Array.from({
-                                                            length: 5,
-                                                        }).map((_, i) => (
-                                                            <Star
-                                                                key={i}
-                                                                className={`h-3 w-3 ${i < row.rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`}
-                                                            />
-                                                        ))}
-                                                    </div>
+                                    {dataRows.map((row) => (
+                                        <div
+                                            key={row.id}
+                                            className="rounded-lg border p-3"
+                                        >
+                                            <div className="flex items-start justify-between gap-2">
+                                                <div className="min-w-0">
+                                                    <p className="truncate text-sm font-medium">
+                                                        {row.name}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {row.author} ·{' '}
+                                                        {row.created_at}
+                                                    </p>
                                                 </div>
-                                                {row.status !== 'approved' && (
-                                                    <span className="mt-1 inline-block rounded-full bg-yellow-100 px-2 py-0.5 text-xs text-yellow-700">
-                                                        {row.status}
-                                                    </span>
-                                                )}
+                                                <div className="flex shrink-0 items-center gap-0.5">
+                                                    {Array.from({
+                                                        length: 5,
+                                                    }).map((_, i) => (
+                                                        <Star
+                                                            key={i}
+                                                            className={`h-3 w-3 ${i < (row.rating ?? 0) ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`}
+                                                        />
+                                                    ))}
+                                                </div>
                                             </div>
-                                        ),
-                                    )}
+                                            {row.status !== 'approved' && (
+                                                <span className="mt-1 inline-block rounded-full bg-yellow-100 px-2 py-0.5 text-xs text-yellow-700">
+                                                    {row.status}
+                                                </span>
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </Card>
@@ -443,13 +495,12 @@ export default function Dashboard({
                     <Card className="p-6">
                         <h3 className="mb-4 font-semibold">{widget.title}</h3>
                         <div className="space-y-2">
-                            {widget.data.length === 0 ? (
+                            {dataRows.length === 0 ? (
                                 <p className="text-sm text-muted-foreground">
                                     {__('empty.no_data', 'No data available.')}
                                 </p>
                             ) : (
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                widget.data.map((row: any, index: number) => (
+                                dataRows.map((row, index: number) => (
                                     <div
                                         key={index}
                                         className="flex items-center justify-between rounded-lg border p-3"
@@ -501,9 +552,8 @@ export default function Dashboard({
                     <Card className="p-6">
                         <h3 className="mb-4 font-semibold">{widget.title}</h3>
                         <div className="grid gap-2">
-                            {widget.data.map(
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                (action: any, index: number) => (
+                            {(dataRows as DashboardQuickAction[]).map(
+                                (action, index: number) => (
                                     <Link
                                         key={index}
                                         href={action.url ?? action.route ?? '#'}

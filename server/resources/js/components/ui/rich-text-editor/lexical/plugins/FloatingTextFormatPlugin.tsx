@@ -147,13 +147,8 @@ function FloatingToolbar({ editor, anchorElem }: { editor: ReturnType<typeof use
 
 export default function FloatingTextFormatPlugin({ anchorElem }: { anchorElem?: HTMLElement }): JSX.Element {
     const [editor] = useLexicalComposerContext();
-    const [container, setContainer] = useState<HTMLElement | null>(null);
-
-     
-     
-    useEffect(() => {
-        setContainer(anchorElem ?? editor.getRootElement()?.parentElement ?? document.body); // eslint-disable-line react-hooks/set-state-in-effect
-    }, [editor, anchorElem]);
+    const container =
+        anchorElem ?? editor.getRootElement()?.parentElement ?? document.body;
 
     if (!container) return <></>;
     return createPortal(<FloatingToolbar editor={editor} anchorElem={container} />, container);

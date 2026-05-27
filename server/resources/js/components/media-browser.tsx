@@ -238,7 +238,7 @@ export function MediaBrowser({
 
     useEffect(() => {
         fetchMedia(1);
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [fetchMedia]);
 
     const handleSearchChange = (value: string) => {
         setSearch(value);

@@ -39,7 +39,7 @@ export function PickupPointPicker({
     useEffect(() => {
         if (postalCode && !search)
             void Promise.resolve().then(() => setSearch(postalCode));
-    }, [postalCode]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [postalCode, search]);
 
     const {
         data: points = [],

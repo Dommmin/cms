@@ -151,14 +151,10 @@ export function ChartWidget({
                             ))}
                         </Pie>
                         <Tooltip
-                            formatter={
-                                /* eslint-disable @typescript-eslint/no-explicit-any */
-                                ((value: number, name: string) => [
-                                    value,
-                                    name,
-                                ]) as any
-                                /* eslint-enable @typescript-eslint/no-explicit-any */
-                            }
+                            formatter={(value, name) => [
+                                value ?? 0,
+                                String(name),
+                            ]}
                         />
                     </PieChart>
                 </ResponsiveContainer>
@@ -268,14 +264,10 @@ export function ChartWidget({
                             borderRadius: '8px',
                             fontSize: 12,
                         }}
-                        formatter={
-                            /* eslint-disable @typescript-eslint/no-explicit-any */
-                            ((v: number) => [
-                                formatCurrency(v),
-                                'Revenue',
-                            ]) as any
-                            /* eslint-enable @typescript-eslint/no-explicit-any */
-                        }
+                        formatter={(v) => [
+                            formatCurrency(Number(v ?? 0)),
+                            'Revenue',
+                        ]}
                     />
                     <Area
                         type="monotone"

@@ -187,7 +187,7 @@ export default function BuilderPage({
         setIsAutoSaving(false);
     };
 
-    const runAutoSave = () => {
+    const runAutoSave = useCallback(() => {
         autoSaveAbortRef.current?.abort();
 
         const controller = new AbortController();
@@ -230,7 +230,7 @@ export default function BuilderPage({
                     setIsAutoSaving(false);
                 }
             });
-    };
+    }, [page.id, refreshPreviewUrl]);
 
     // Auto-save: debounce 5s + maxWait 60s
     useEffect(() => {
@@ -264,8 +264,7 @@ export default function BuilderPage({
                 clearTimeout(autoSaveDebounceRef.current);
             }
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [hasUnsavedChanges, localSections, refreshPreviewUrl]);
+    }, [hasUnsavedChanges, runAutoSave]);
 
     useEffect(
         () => () => {
@@ -402,8 +401,7 @@ export default function BuilderPage({
                 description,
                 category,
                 is_global: isGlobal,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                snapshot: JSON.parse(JSON.stringify(localSections)) as any,
+                snapshot: JSON.stringify({ sections: localSections }),
             },
             {
                 preserveScroll: true,

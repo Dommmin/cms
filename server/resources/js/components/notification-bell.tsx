@@ -74,8 +74,10 @@ export function NotificationBell() {
     const panelRef = useRef<HTMLDivElement>(null);
     const seenIdsRef = useRef(seenIds);
     const browserNotifiedIds = useRef<Set<string>>(new Set());
-    // eslint-disable-next-line react-hooks/refs
-    seenIdsRef.current = seenIds;
+
+    useEffect(() => {
+        seenIdsRef.current = seenIds;
+    }, [seenIds]);
 
     const fireBrowserNotifications = useCallback(
         (incoming: AdminNotification[]) => {
@@ -131,9 +133,14 @@ export function NotificationBell() {
     }, [applyUpdate]);
 
     useEffect(() => {
-        fetchNotifications();
+        const initialFetchId = setTimeout(() => {
+            void fetchNotifications();
+        }, 0);
         const id = setInterval(fetchNotifications, 10_000);
-        return () => clearInterval(id);
+        return () => {
+            clearTimeout(initialFetchId);
+            clearInterval(id);
+        };
     }, [fetchNotifications]);
 
     // Close panel on outside click

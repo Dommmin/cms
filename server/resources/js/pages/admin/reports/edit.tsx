@@ -31,7 +31,10 @@ export default function EditReport({
         data_source: report?.data_source ?? '',
         metrics: report?.metrics ?? [],
         dimensions: report?.dimensions ?? [],
-        filters: report?.filters ?? [],
+        filters:
+            (report?.filters as Array<
+                Record<string, string | number | boolean | null>
+            >) ?? [],
         group_by: report?.group_by ?? [],
         chart_type: report?.chart_type ?? 'table',
         is_public: report?.is_public ?? false,

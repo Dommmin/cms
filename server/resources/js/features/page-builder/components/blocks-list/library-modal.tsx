@@ -18,20 +18,15 @@ import type { LibraryModalProps } from '../blocks-list.types';
 export function LibraryModal({ open, onClose, onSelect }: LibraryModalProps) {
     const __ = useTranslation();
     const [blocks, setBlocks] = useState<ReusableBlock[]>([]);
-    const [filtered, setFiltered] = useState<ReusableBlock[]>([]);
     const [query, setQuery] = useState('');
     const [loading, setLoading] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (!open) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setQuery('');
-            return;
-        }
+        if (!open) return;
 
         setTimeout(() => inputRef.current?.focus(), 100);
-        setLoading(true);
+        const loadingStartId = setTimeout(() => setLoading(true), 0);
         axios
             .get<ReusableBlock[]>(ReusableBlockController.library.url())
             .then(({ data }) => {
@@ -40,7 +35,6 @@ export function LibraryModal({ open, onClose, onSelect }: LibraryModalProps) {
                     : ((data as unknown as { data: ReusableBlock[] }).data ??
                       []);
                 setBlocks(items);
-                setFiltered(items);
             })
             .catch(() =>
                 toast.error(
@@ -51,19 +45,16 @@ export function LibraryModal({ open, onClose, onSelect }: LibraryModalProps) {
                 ),
             )
             .finally(() => setLoading(false));
-    }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+        return () => clearTimeout(loadingStartId);
+    }, [__, open]);
 
-    useEffect(() => {
+    const filtered = blocks.filter((block) => {
         const q = query.toLowerCase();
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setFiltered(
-            blocks.filter(
-                (block) =>
-                    block.name.toLowerCase().includes(q) ||
-                    (block.description ?? '').toLowerCase().includes(q),
-            ),
+        return (
+            block.name.toLowerCase().includes(q) ||
+            (block.description ?? '').toLowerCase().includes(q)
         );
-    }, [query, blocks]);
+    });
 
     return (
         <Dialog open={open} onOpenChange={(o) => !o && onClose()}>

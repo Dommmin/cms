@@ -17,9 +17,7 @@ export function BlogViewTracker({ slug, initialCount }: BlogViewTrackerProps) {
                 }
             },
         });
-        // Only fire once on mount
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [slug]);
+    }, [recordView]);
 
     return (
         <div className="text-muted-foreground flex items-center gap-1 text-sm">

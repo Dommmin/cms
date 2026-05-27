@@ -20,8 +20,14 @@ export interface Promotion {
 }
 export interface PaginatedPromotions {
     data: Promotion[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    links: any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    meta: any;
+    links: {
+        url: string | null;
+        label: string;
+        active: boolean;
+    }[];
+    meta: {
+        from: number | null;
+        to: number | null;
+        total: number;
+    };
 }

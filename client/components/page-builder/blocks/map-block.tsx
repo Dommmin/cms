@@ -56,8 +56,7 @@ export function MapBlock({ block }: MapBlockProps) {
         }
 
         load();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [cfg.lat, cfg.lng, cfg.store_id, cfg.title]);
 
     if (loading) {
         return (

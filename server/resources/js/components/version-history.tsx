@@ -87,8 +87,7 @@ export function VersionHistory({ modelType, modelId }: VersionHistoryProps) {
 
     useEffect(() => {
         if (!open) return;
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setLoading(true);
+        const startLoadingId = setTimeout(() => setLoading(true), 0);
         axios
             .get<{ versions?: VersionEntry[] }>(
                 ModelVersionController.index.url({
@@ -98,6 +97,7 @@ export function VersionHistory({ modelType, modelId }: VersionHistoryProps) {
             )
             .then(({ data }) => setVersions(data.versions ?? []))
             .finally(() => setLoading(false));
+        return () => clearTimeout(startLoadingId);
     }, [open, modelType, modelId]);
 
     function handleRestore(versionNumber: number) {

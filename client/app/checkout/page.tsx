@@ -106,7 +106,7 @@ export default function CheckoutPage() {
         if (cart && cart.items.length > 0) {
             trackBeginCheckout(cart.subtotal, cart.currency, cart.items);
         }
-    }, [cart?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [cart]);
 
     // Auto-select first configured shipping method
     useEffect(() => {

@@ -1,5 +1,6 @@
 'use client';
 
+import { isAxiosError } from 'axios';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -27,8 +28,7 @@ export default function LoginPage() {
     }
 
     const errorMessage =
-        // @ts-expect-error axios error shape
-        error?.response?.data?.message ??
+        (isAxiosError(error) ? error.response?.data?.message : null) ??
         (error ? 'Login failed. Please try again.' : null);
 
     return (

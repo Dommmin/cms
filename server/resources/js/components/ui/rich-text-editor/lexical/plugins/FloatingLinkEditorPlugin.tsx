@@ -160,13 +160,8 @@ function FloatingLinkEditor({ editor, anchorElem }: { editor: ReturnType<typeof 
 
 export default function FloatingLinkEditorPlugin({ anchorElem }: { anchorElem?: HTMLElement }): JSX.Element {
     const [editor] = useLexicalComposerContext();
-    const [container, setContainer] = useState<HTMLElement | null>(null);
-
-     
-     
-    useEffect(() => {
-        setContainer(anchorElem ?? editor.getRootElement()?.parentElement ?? document.body); // eslint-disable-line react-hooks/set-state-in-effect
-    }, [editor, anchorElem]);
+    const container =
+        anchorElem ?? editor.getRootElement()?.parentElement ?? document.body;
 
     if (!container) return <></>;
     return createPortal(<FloatingLinkEditor editor={editor} anchorElem={container} />, container);
