@@ -2,8 +2,8 @@
 .idea
 
 # dotenv environment variable files
+docker-compose.override.yml
 .env
-.env.*
 !.env.example
 
 ### Next.js template
@@ -42,3 +42,4 @@ server/.env.*
 /letsencrypt-prod.yaml
 client/.idea
 server/supervisord.pid
+
