@@ -5,13 +5,12 @@ import toast from 'react-hot-toast';
 import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
 
 import InputError from '@/components/input-error';
-import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { MarkdownEditor } from '@/components/ui/markdown-editor';
-import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import { LocalizedField } from '@/components/ui/localized-field';
+import { SlugField } from '@/components/ui/slug-field';
 import {
     Select,
     SelectContent,
@@ -19,11 +18,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { SlugField } from '@/components/ui/slug-field';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
-import { useAdminLocale } from '@/hooks/use-admin-locale';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
@@ -43,7 +40,6 @@ export default function CreateBlogPost({
     const { locales } = usePage<{ locales: SharedLocale[] }>().props;
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
     const __ = useTranslation();
-    const [activeLocale, setActiveLocale] = useAdminLocale(defaultLocale);
 
     const [data, setData] = useState<FormData>({
         title: { [defaultLocale]: '' },
@@ -67,12 +63,15 @@ export default function CreateBlogPost({
     const [autoGenerateSlug, setAutoGenerateSlug] = useState(true);
     const [tagInput, setTagInput] = useState('');
 
-    const handleTitleChange = (locale: string, value: string) => {
+    const handleTitleChange = (value: Record<string, string>) => {
         setData((prev) => ({
             ...prev,
-            title: { ...prev.title, [locale]: value },
+            title: value,
             slug: autoGenerateSlug
-                ? { ...prev.slug, [locale]: slugify(value) }
+                ? Object.keys(value).reduce((acc, locale) => {
+                      acc[locale] = slugify(value[locale] || '');
+                      return acc;
+                  }, {} as Record<string, string>)
                 : prev.slug,
         }));
     };
@@ -105,14 +104,19 @@ export default function CreateBlogPost({
         };
 
         router.post(BlogPostController.store.url(), payload, {
-            onSuccess: () => toast.success('Post created successfully'),
             onError: (errs) => {
                 setErrors(errs);
-                toast.error('Please fix the errors below');
+                toast.error(__('misc.fix_errors', 'Please fix the errors below'));
             },
             onFinish: () => setProcessing(false),
         });
     };
+
+    const buttonText = data.status === 'published'
+        ? __('action.publish', 'Publish')
+        : data.status === 'scheduled'
+            ? __('action.schedule', 'Schedule')
+            : __('action.save_draft', 'Save Draft');
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -154,131 +158,95 @@ export default function CreateBlogPost({
                                     value="general"
                                     className="space-y-6"
                                 >
-                                    {/* Locale switcher */}
-                                    {locales.length > 1 && (
-                                        <div className="flex items-center gap-2 rounded-lg border p-3">
-                                            <span className="text-sm font-medium text-muted-foreground">
-                                                Editing:
-                                            </span>
-                                            <LocaleTabSwitcher
-                                                locales={locales}
-                                                activeLocale={activeLocale}
-                                                onLocaleChange={setActiveLocale}
-                                            />
-                                        </div>
-                                    )}
+                                    <LocalizedField
+                                        label={__('label.title', 'Title')}
+                                        name="title"
+                                        value={data.title}
+                                        onChange={handleTitleChange}
+                                        errors={errors}
+                                        required
+                                        placeholder="Post title"
+                                    />
 
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="title">
-                                            {__('label.title', 'Title')} *
-                                        </Label>
-                                        <Input
-                                            id="title"
-                                            value={
-                                                data.title[activeLocale] ?? ''
-                                            }
-                                            onChange={(e) =>
-                                                handleTitleChange(
-                                                    activeLocale,
-                                                    e.target.value,
-                                                )
-                                            }
-                                            placeholder="Post title"
-                                        />
-                                        <InputError
-                                            message={
-                                                errors['title'] ??
-                                                errors[`title.${activeLocale}`]
-                                            }
-                                        />
-                                    </div>
-
-                                    <div className="grid gap-2">
-                                        {locales.map((locale) => (
-                                            <input
-                                                key={`slug-${locale.code}`}
-                                                type="hidden"
-                                                name={`slug[${locale.code}]`}
-                                                value={
-                                                    data.slug[locale.code] ?? ''
-                                                }
-                                            />
-                                        ))}
-                                        <SlugField
-                                            label={__('label.slug', 'Slug')}
-                                            name="slug"
-                                            value={data.slug}
-                                            onChange={(val) =>
-                                                setData((prev) => ({
-                                                    ...prev,
-                                                    slug: val,
-                                                }))
-                                            }
-                                            autoGenerate={autoGenerateSlug}
-                                            onAutoGenerateChange={(auto) => {
-                                                setAutoGenerateSlug(auto);
-                                                if (auto) {
-                                                    setData((prev) => {
-                                                        const updated = {
-                                                            ...prev.slug,
-                                                        };
-                                                        locales.forEach((l) => {
-                                                            updated[l.code] =
-                                                                slugify(
-                                                                    prev.title[
-                                                                        l.code
-                                                                    ] ?? '',
-                                                                );
-                                                        });
-                                                        return {
-                                                            ...prev,
-                                                            slug: updated,
-                                                        };
+                                    <SlugField
+                                        label={__('label.slug', 'Slug')}
+                                        name="slug"
+                                        value={data.slug}
+                                        onChange={(val) =>
+                                            setData((prev) => ({
+                                                ...prev,
+                                                slug: val,
+                                            }))
+                                        }
+                                        autoGenerate={autoGenerateSlug}
+                                        onAutoGenerateChange={(auto) => {
+                                            setAutoGenerateSlug(auto);
+                                            if (auto) {
+                                                setData((prev) => {
+                                                    const updated = {
+                                                        ...prev.slug,
+                                                    };
+                                                    locales.forEach((l) => {
+                                                        updated[l.code] =
+                                                            slugify(
+                                                                prev.title[
+                                                                    l.code
+                                                                ] ?? '',
+                                                            );
                                                     });
-                                                }
-                                            }}
-                                            locales={locales}
-                                            errors={errors}
-                                        />
-                                    </div>
+                                                    return {
+                                                        ...prev,
+                                                        slug: updated,
+                                                    };
+                                                });
+                                            }
+                                        }}
+                                        locales={locales}
+                                        errors={errors}
+                                    />
 
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="excerpt">
-                                            {__('label.excerpt', 'Excerpt')}
-                                        </Label>
-                                        <Textarea
-                                            id="excerpt"
-                                            value={
-                                                data.excerpt[activeLocale] ?? ''
-                                            }
-                                            onChange={(e) =>
-                                                setData((prev) => ({
-                                                    ...prev,
-                                                    excerpt: {
-                                                        ...prev.excerpt,
-                                                        [activeLocale]:
-                                                            e.target.value,
-                                                    },
-                                                }))
-                                            }
-                                            placeholder="Short description of the post"
-                                            rows={3}
-                                        />
-                                        <InputError
-                                            message={
-                                                errors[
-                                                    `excerpt.${activeLocale}`
-                                                ]
-                                            }
-                                        />
-                                    </div>
+                                    <LocalizedField
+                                        label={__('label.excerpt', 'Excerpt')}
+                                        name="excerpt"
+                                        type="textarea"
+                                        value={data.excerpt}
+                                        onChange={(val) =>
+                                            setData((prev) => ({
+                                                ...prev,
+                                                excerpt: val,
+                                            }))
+                                        }
+                                        placeholder="Short description of the post"
+                                        rows={3}
+                                        errors={errors}
+                                    />
 
-                                    <div className="grid gap-2">
-                                        <div className="flex items-center justify-between">
-                                            <Label>
-                                                {__('label.content', 'Content')}{' '}
-                                                *
-                                            </Label>
+                                    <LocalizedField
+                                        label={__('label.content', 'Content')}
+                                        name="content"
+                                        type={
+                                            data.content_type === 'richtext'
+                                                ? 'richtext'
+                                                : 'markdown'
+                                        }
+                                        value={data.content}
+                                        onChange={(val) =>
+                                            setData((prev) => ({
+                                                ...prev,
+                                                content: val,
+                                            }))
+                                        }
+                                        jsonValue={data.content_json}
+                                        onJsonChange={(val) =>
+                                            setData((prev) => ({
+                                                ...prev,
+                                                content_json: val,
+                                            }))
+                                        }
+                                        errors={errors}
+                                        required
+                                        placeholder="Write your post content..."
+                                        headerEnd={
                                             <Select
                                                 value={data.content_type}
                                                 onValueChange={(val) =>
@@ -301,63 +269,8 @@ export default function CreateBlogPost({
                                                     </SelectItem>
                                                 </SelectContent>
                                             </Select>
-                                        </div>
-                                        {data.content_type === 'richtext' ? (
-                                            <RichTextEditor
-                                                key={`richtext-${activeLocale}`}
-                                                value={
-                                                    data.content[
-                                                        activeLocale
-                                                    ] ?? ''
-                                                }
-                                                onChange={(val) =>
-                                                    setData((prev) => ({
-                                                        ...prev,
-                                                        content: {
-                                                            ...prev.content,
-                                                            [activeLocale]: val,
-                                                        },
-                                                    }))
-                                                }
-                                                onJsonChange={(val) =>
-                                                    setData((prev) => ({
-                                                        ...prev,
-                                                        content_json: {
-                                                            ...prev.content_json,
-                                                            [activeLocale]: val,
-                                                        },
-                                                    }))
-                                                }
-                                                placeholder="Write your post content..."
-                                            />
-                                        ) : (
-                                            <MarkdownEditor
-                                                key={`markdown-${activeLocale}`}
-                                                value={
-                                                    data.content[
-                                                        activeLocale
-                                                    ] ?? ''
-                                                }
-                                                onChange={(val) =>
-                                                    setData((prev) => ({
-                                                        ...prev,
-                                                        content: {
-                                                            ...prev.content,
-                                                            [activeLocale]: val,
-                                                        },
-                                                    }))
-                                                }
-                                            />
-                                        )}
-                                        <InputError
-                                            message={
-                                                errors['content'] ??
-                                                errors[
-                                                    `content.${activeLocale}`
-                                                ]
-                                            }
-                                        />
-                                    </div>
+                                        }
+                                    />
                                 </TabsContent>
 
                                 <TabsContent value="seo" className="space-y-6">
@@ -730,7 +643,9 @@ export default function CreateBlogPost({
                                 className="w-full"
                                 variant="outline"
                             >
-                                {processing ? 'Creating...' : 'Create Post'}
+                                {processing
+                                    ? __('action.saving', 'Saving…')
+                                    : buttonText}
                             </Button>
                         </div>
                     </div>

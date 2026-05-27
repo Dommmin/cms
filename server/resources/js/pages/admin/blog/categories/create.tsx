@@ -55,7 +55,7 @@ export default function CreateBlogCategory({ parentCategories }: CreateProps) {
         setData((prev) => ({ ...prev, slug }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setProcessing(true);
         setErrors({});

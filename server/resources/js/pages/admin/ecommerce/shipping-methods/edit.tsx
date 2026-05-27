@@ -3,12 +3,12 @@ import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import * as ShippingMethodController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ShippingMethodController';
 import InputError from '@/components/input-error';
-import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { LocalizedField } from '@/components/ui/localized-field';
 import {
     Select,
     SelectContent,
@@ -16,9 +16,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
-import { useAdminLocale } from '@/hooks/use-admin-locale';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
@@ -36,14 +34,13 @@ export default function Edit({
 }) {
     const { locales } = usePage().props as { locales: SharedLocale[] };
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
-    const [activeLocale, setActiveLocale] = useAdminLocale(defaultLocale);
 
     const __ = useTranslation();
     const [nameValues, setNameValues] = useState<Record<string, string>>(
-        method.name ?? { [defaultLocale]: '' },
+        method.name ?? {},
     );
     const [descValues, setDescValues] = useState<Record<string, string>>(
-        method.description ?? { [defaultLocale]: '' },
+        method.description ?? {},
     );
 
     const [carrier, setCarrier] = useState(method.carrier);
@@ -180,7 +177,7 @@ export default function Edit({
                 <form id={formId} onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                         <div className="space-y-6 lg:col-span-2">
-                            {/* Basic Info with locale tabs */}
+                            {/* Basic Info */}
                             <div className="space-y-4 rounded-xl border bg-card p-6">
                                 <h2 className="font-semibold">
                                     {__(
@@ -189,92 +186,27 @@ export default function Edit({
                                     )}
                                 </h2>
 
-                                <LocaleTabSwitcher
-                                    locales={locales}
-                                    activeLocale={activeLocale}
-                                    onLocaleChange={setActiveLocale}
+                                <LocalizedField
+                                    label={__('label.name', 'Name')}
+                                    name="name"
+                                    value={nameValues}
+                                    onChange={setNameValues}
+                                    required
+                                    placeholder="e.g. DPD Standard"
                                 />
 
-                                {locales.map((locale) => (
-                                    <div
-                                        key={locale.code}
-                                        className={
-                                            locale.code !== activeLocale
-                                                ? 'hidden'
-                                                : 'space-y-4'
-                                        }
-                                    >
-                                        <div className="grid gap-2">
-                                            <Label
-                                                htmlFor={`name-${locale.code}`}
-                                            >
-                                                {__('label.name', 'Name')}{' '}
-                                                {locale.code ===
-                                                    defaultLocale && '*'}
-                                            </Label>
-                                            <Input
-                                                id={`name-${locale.code}`}
-                                                value={
-                                                    nameValues[locale.code] ??
-                                                    ''
-                                                }
-                                                onChange={(e) =>
-                                                    setNameValues((prev) => ({
-                                                        ...prev,
-                                                        [locale.code]:
-                                                            e.target.value,
-                                                    }))
-                                                }
-                                                placeholder={`e.g. DPD Standard (${locale.code.toUpperCase()})`}
-                                                required={
-                                                    locale.code ===
-                                                    defaultLocale
-                                                }
-                                            />
-                                            <InputError
-                                                message={
-                                                    errors[
-                                                        `name.${locale.code}`
-                                                    ]
-                                                }
-                                            />
-                                        </div>
-
-                                        <div className="grid gap-2">
-                                            <Label
-                                                htmlFor={`description-${locale.code}`}
-                                            >
-                                                {__(
-                                                    'label.description',
-                                                    'Description',
-                                                )}
-                                            </Label>
-                                            <Textarea
-                                                id={`description-${locale.code}`}
-                                                value={
-                                                    descValues[locale.code] ??
-                                                    ''
-                                                }
-                                                onChange={(e) =>
-                                                    setDescValues((prev) => ({
-                                                        ...prev,
-                                                        [locale.code]:
-                                                            e.target.value,
-                                                    }))
-                                                }
-                                                placeholder={`Short description (${locale.code.toUpperCase()})`}
-                                                rows={3}
-                                            />
-                                            <InputError
-                                                message={
-                                                    errors[
-                                                        `description.${locale.code}`
-                                                    ]
-                                                }
-                                            />
-                                        </div>
-                                    </div>
-                                ))}
+                                <LocalizedField
+                                    label={__(
+                                        'label.description',
+                                        'Description',
+                                    )}
+                                    type="textarea"
+                                    name="description"
+                                    value={descValues}
+                                    onChange={setDescValues}
+                                    placeholder="Short description"
+                                    rows={3}
+                                />
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="carrier">

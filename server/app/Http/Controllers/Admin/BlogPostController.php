@@ -49,19 +49,21 @@ class BlogPostController extends Controller
     public function store(StoreBlogPostRequest $request): RedirectResponse
     {
         $data = $request->validated();
+        $tags = $data['tags'] ?? [];
+        unset($data['tags']);
 
         $data['user_id'] = auth()->id();
         $titleForSlug = is_array($data['title'])
             ? ($data['title'][config('app.locale')] ?? array_values($data['title'])[0] ?? '')
-            : (string) $data['title'];
+            : (string) ($data['title'] ?? '');
         if (empty($data['slug']) || (is_array($data['slug']) && array_filter($data['slug']) === [])) {
-            $data['slug'] = [config('app.locale') => Str::slug($titleForSlug)];
+            $data['slug'] = [config('app.locale') => Str::slug($titleForSlug) ?: 'untitled'];
         }
 
         $data['is_featured'] ??= false;
         $contentForEstimate = is_array($data['content'])
             ? ($data['content'][config('app.locale')] ?? array_values($data['content'])[0] ?? '')
-            : (string) $data['content'];
+            : (string) ($data['content'] ?? '');
         $data['reading_time'] = (new BlogPost)->estimateReadingTime($contentForEstimate);
 
         $status = $data['status'] ?? 'draft';
@@ -73,9 +75,11 @@ class BlogPostController extends Controller
         }
 
         $post = BlogPost::query()->create($data);
-        $post->tags()->sync($this->resolveTagIds($request->input('tags', [])));
+        $post->tags()->sync($this->resolveTagIds($tags));
 
-        return to_route('admin.blog.posts.index')->with('success', 'misc.blog_post_created');
+        $message = $status === 'published' ? 'misc.blog_post_published' : 'misc.blog_post_saved';
+
+        return to_route('admin.blog.posts.index')->with('success', $message);
     }
 
     public function edit(BlogPost $post): Response
@@ -101,18 +105,20 @@ class BlogPostController extends Controller
     public function update(UpdateBlogPostRequest $request, BlogPost $post): RedirectResponse
     {
         $data = $request->validated();
+        $tags = $data['tags'] ?? [];
+        unset($data['tags']);
 
         $titleForSlug = is_array($data['title'])
             ? ($data['title'][config('app.locale')] ?? array_values($data['title'])[0] ?? '')
-            : (string) $data['title'];
+            : (string) ($data['title'] ?? '');
         if (empty($data['slug']) || (is_array($data['slug']) && array_filter($data['slug']) === [])) {
-            $data['slug'] = [config('app.locale') => Str::slug($titleForSlug)];
+            $data['slug'] = [config('app.locale') => Str::slug($titleForSlug) ?: 'untitled'];
         }
 
         $data['is_featured'] ??= false;
         $contentForEstimate = is_array($data['content'])
             ? ($data['content'][config('app.locale')] ?? array_values($data['content'])[0] ?? '')
-            : (string) $data['content'];
+            : (string) ($data['content'] ?? '');
         $data['reading_time'] = (new BlogPost)->estimateReadingTime($contentForEstimate);
 
         $status = $data['status'] ?? 'draft';
@@ -124,9 +130,11 @@ class BlogPostController extends Controller
         }
 
         $post->update($data);
-        $post->tags()->sync($this->resolveTagIds($request->input('tags', [])));
+        $post->tags()->sync($this->resolveTagIds($tags));
 
-        return back()->with('success', 'misc.blog_post_updated');
+        $message = $status === 'published' ? 'misc.blog_post_updated' : 'misc.blog_post_saved';
+
+        return back()->with('success', $message);
     }
 
     public function destroy(BlogPost $post): RedirectResponse

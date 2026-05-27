@@ -9,8 +9,8 @@ import {
 import { useState } from 'react';
 import { ImageEditorModal } from '@/components/image-editor-modal';
 import { MediaBrowser } from '@/components/media-browser';
-import type { MediaItem } from '@/components/media-browser.types';
 import { getFileIcon } from '@/components/media-browser';
+import type { MediaItem } from '@/components/media-browser.types';
 import { Button } from '@/components/ui/button';
 import type {
     MediaPickerMode,
@@ -93,7 +93,7 @@ export function MediaPickerModal({
                                   ? 'Select Video'
                                   : 'Select Media'}
                     </h2>
-                    <Button variant="ghost" size="icon" onClick={onClose}>
+                    <Button type="button" variant="ghost" size="icon" onClick={onClose}>
                         <XIcon className="h-5 w-5" />
                     </Button>
                 </div>
@@ -152,6 +152,7 @@ export function MediaPickerModal({
                                             <p className="truncate text-sm">{image.name}</p>
                                             <div className="mt-1 flex gap-1">
                                                 <button
+                                                    type="button"
                                                     onClick={() => onSetThumbnail(image.id)}
                                                     className={`rounded p-1 ${
                                                         image.is_thumbnail
@@ -164,10 +165,11 @@ export function MediaPickerModal({
                                                 </button>
                                                 {image.mime_type?.startsWith('image/') && (
                                                     <button
+                                                        type="button"
                                                         onClick={() =>
-                                                            setEditingImage(
-                                                                image as unknown as MediaItem,
-                                                            )
+                                                                setEditingImage(
+                                                                    image as unknown as MediaItem,
+                                                                )
                                                         }
                                                         className="rounded p-1 text-muted-foreground hover:text-primary"
                                                         title="Edit image"
@@ -176,6 +178,7 @@ export function MediaPickerModal({
                                                     </button>
                                                 )}
                                                 <button
+                                                    type="button"
                                                     onClick={() => onRemove(image.id)}
                                                     className="rounded p-1 text-muted-foreground hover:text-red-500"
                                                     title="Remove"
@@ -192,10 +195,10 @@ export function MediaPickerModal({
                 </div>
 
                 <div className="flex items-center justify-end gap-2 border-t px-6 py-4">
-                    <Button variant="outline" onClick={onClose}>
+                    <Button type="button" variant="outline" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button onClick={handleConfirm}>
+                    <Button type="button" onClick={handleConfirm}>
                         {effectiveMultiple ? 'Done' : 'Close'}
                     </Button>
                 </div>

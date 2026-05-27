@@ -46,6 +46,15 @@ export function SlugField({
 
     return (
         <div className="grid gap-2">
+            {locales.map((locale) => (
+                <input
+                    key={`hidden-${name}-${locale.code}`}
+                    type="hidden"
+                    name={`${name}[${locale.code}]`}
+                    value={value[locale.code] ?? ''}
+                />
+            ))}
+
             <div className="flex items-center justify-between">
                 <Label htmlFor={fieldId}>
                     {label}

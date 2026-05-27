@@ -505,6 +505,7 @@ export function MediaBrowser({
                             const Icon = getFileIcon(item.mime_type);
                             return (
                                 <button
+                                    type="button"
                                     key={item.id}
                                     onClick={() => onItemClick?.(item)}
                                     className={
@@ -594,6 +595,7 @@ export function MediaBrowser({
                     </p>
                     <div className="flex items-center gap-2">
                         <Button
+                            type="button"
                             variant="outline"
                             size="sm"
                             onClick={() => {
@@ -607,6 +609,7 @@ export function MediaBrowser({
                             {__('action.previous', 'Previous')}
                         </Button>
                         <Button
+                            type="button"
                             variant="outline"
                             size="sm"
                             onClick={() => {

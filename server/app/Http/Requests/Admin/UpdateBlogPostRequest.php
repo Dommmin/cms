@@ -20,18 +20,19 @@ class UpdateBlogPostRequest extends FormRequest
     public function rules(): array
     {
         $defaultLocale = config('app.locale');
+        $isDraft = $this->input('status') === 'draft';
 
         return [
             'title' => ['required', 'array'],
             'title.*' => ['nullable', 'string', 'max:255'],
-            'title.'.$defaultLocale => ['required', 'string', 'max:255'],
+            'title.'.$defaultLocale => [$isDraft ? 'nullable' : 'required', 'string', 'max:255'],
             'slug' => ['nullable', 'array'],
             'slug.*' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9-]+$/'],
             'excerpt' => ['nullable', 'array'],
             'excerpt.*' => ['nullable', 'string', 'max:500'],
             'content' => ['required', 'array'],
             'content.*' => ['nullable', 'string'],
-            'content.'.$defaultLocale => ['required', 'string'],
+            'content.'.$defaultLocale => [$isDraft ? 'nullable' : 'required', 'string'],
             'content_json' => ['nullable', 'array'],
             'content_json.*' => ['nullable', 'string'],
             'content_type' => ['required', 'in:richtext,markdown'],
@@ -57,10 +58,15 @@ class UpdateBlogPostRequest extends FormRequest
     public function messages(): array
     {
         $defaultLocale = config('app.locale');
+        $isDraft = $this->input('status') === 'draft';
 
-        return [
-            sprintf('title.%s.required', $defaultLocale) => 'The title is required for the default language.',
-            sprintf('content.%s.required', $defaultLocale) => 'The content is required for the default language.',
-        ];
+        $messages = [];
+
+        if (! $isDraft) {
+            $messages[sprintf('title.%s.required', $defaultLocale)] = 'The title is required for the default language.';
+            $messages[sprintf('content.%s.required', $defaultLocale)] = 'The content is required for the default language.';
+        }
+
+        return $messages;
     }
 }

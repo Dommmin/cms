@@ -5,7 +5,6 @@ import * as PageBuilderController from '@/actions/App/Http/Controllers/Admin/Cms
 import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
 import InputError from '@/components/input-error';
-import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,7 +22,6 @@ import { SlugField } from '@/components/ui/slug-field';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
-import { useAdminLocale } from '@/hooks/use-admin-locale';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
@@ -37,8 +35,6 @@ export default function Edit({ page, modules, pages }: EditProps) {
         frontendUrl: string;
     };
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
-    const [activeLocale, setActiveLocale] = useAdminLocale(defaultLocale);
-
     const moduleOptions = useMemo(
         () => Object.entries(modules ?? {}),
         [modules],
@@ -80,6 +76,19 @@ export default function Edit({ page, modules, pages }: EditProps) {
 
     const displayTitle =
         titleValues[defaultLocale] ?? Object.values(titleValues)[0] ?? '';
+
+    const handleTitleChange = (value: Record<string, string>) => {
+        setTitleValues(value);
+        if (autoGenerateSlug) {
+            setSlugValues((prev) => {
+                const updated = { ...prev };
+                locales.forEach((l) => {
+                    updated[l.code] = slugify(value[l.code] ?? '');
+                });
+                return updated;
+            });
+        }
+    };
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Pages', href: PageController.index.url() },
@@ -242,23 +251,6 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                     name="locale"
                                     value={page.locale ?? ''}
                                 />
-                                {/* Hidden inputs for all locale title/excerpt values */}
-                                {locales.map((locale) => (
-                                    <input
-                                        key={`title-${locale.code}`}
-                                        type="hidden"
-                                        name={`title[${locale.code}]`}
-                                        value={titleValues[locale.code] ?? ''}
-                                    />
-                                ))}
-                                {locales.map((locale) => (
-                                    <input
-                                        key={`excerpt-${locale.code}`}
-                                        type="hidden"
-                                        name={`excerpt[${locale.code}]`}
-                                        value={excerptValues[locale.code] ?? ''}
-                                    />
-                                ))}
                                 {locales.map((locale) => (
                                     <input
                                         key={`content-${locale.code}`}
@@ -349,49 +341,19 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                                 />
                                             </div>
                                         )}
-                                        <div className="grid gap-2">
-                                            <div className="flex items-center justify-between">
-                                                <Label>
-                                                    {__('label.title', 'Title')}
-                                                </Label>
-                                                <LocaleTabSwitcher
-                                                    locales={locales}
-                                                    activeLocale={activeLocale}
-                                                    onLocaleChange={
-                                                        setActiveLocale
-                                                    }
-                                                />
-                                            </div>
-                                            <Input
-                                                required
-                                                value={
-                                                    titleValues[activeLocale] ??
-                                                    ''
-                                                }
-                                                onChange={(e) => {
-                                                    const value =
-                                                        e.target.value;
-                                                    setTitleValues((prev) => ({
-                                                        ...prev,
-                                                        [activeLocale]: value,
-                                                    }));
-                                                    if (autoGenerateSlug) {
-                                                        setSlugValues(
-                                                            (prev) => ({
-                                                                ...prev,
-                                                                [activeLocale]:
-                                                                    slugify(
-                                                                        value,
-                                                                    ),
-                                                            }),
-                                                        );
-                                                    }
-                                                }}
-                                            />
-                                            <InputError
-                                                message={errors.title}
-                                            />
-                                        </div>
+                                        <LocalizedField
+                                            label={__('label.title', 'Title')}
+                                            name="title"
+                                            value={titleValues}
+                                            onChange={handleTitleChange}
+                                            required
+                                            errors={
+                                                errors as Record<
+                                                    string,
+                                                    string
+                                                >
+                                            }
+                                        />
 
                                         <div className="grid gap-2">
                                             {locales.map((locale) => (
@@ -453,43 +415,24 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                             />
                                         </div>
 
-                                        <div className="grid gap-2">
-                                            <div className="flex items-center justify-between">
-                                                <Label>
-                                                    {__(
-                                                        'label.excerpt',
-                                                        'Excerpt',
-                                                    )}
-                                                </Label>
-                                                <LocaleTabSwitcher
-                                                    locales={locales}
-                                                    activeLocale={activeLocale}
-                                                    onLocaleChange={
-                                                        setActiveLocale
-                                                    }
-                                                />
-                                            </div>
-                                            <Textarea
-                                                value={
-                                                    excerptValues[
-                                                        activeLocale
-                                                    ] ?? ''
-                                                }
-                                                onChange={(e) =>
-                                                    setExcerptValues(
-                                                        (prev) => ({
-                                                            ...prev,
-                                                            [activeLocale]:
-                                                                e.target.value,
-                                                        }),
-                                                    )
-                                                }
-                                                placeholder="Short description..."
-                                            />
-                                            <InputError
-                                                message={errors.excerpt}
-                                            />
-                                        </div>
+                                        <LocalizedField
+                                            label={__(
+                                                'label.excerpt',
+                                                'Excerpt',
+                                            )}
+                                            name="excerpt"
+                                            type="textarea"
+                                            value={excerptValues}
+                                            onChange={setExcerptValues}
+                                            placeholder="Short description..."
+                                            rows={3}
+                                            errors={
+                                                errors as Record<
+                                                    string,
+                                                    string
+                                                >
+                                            }
+                                        />
 
                                         <div className="grid gap-2">
                                             <Label>

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
 import InputError from '@/components/input-error';
-import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import {
     MediaPickerModal,
     type MediaItem,
@@ -23,11 +22,11 @@ import {
 } from '@/components/ui/combobox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import { LocalizedField } from '@/components/ui/localized-field';
 import { SlugField } from '@/components/ui/slug-field';
+import { resolveLocalizedText } from '@/lib/localized-text';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Wrapper from '@/components/wrapper';
-import { useAdminLocale } from '@/hooks/use-admin-locale';
 import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
@@ -151,20 +150,22 @@ export default function Create({
     const { locales } = usePage().props as { locales: SharedLocale[] };
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
     const [activeTab, setActiveTab] = useState('general');
-    const [activeLocale, setActiveLocale] = useAdminLocale(defaultLocale);
     const [showMediaPicker, setShowMediaPicker] = useState(false);
     const [selectedImages, setSelectedImages] = useState<SelectedImage[]>([]);
     const [formData, setFormData] = useState<FormData>(
-        defaultFormData(defaultLocale),
+        defaultFormData(locales.find((l) => l.is_default)?.code ?? 'en'),
     );
     const [autoGenerateSlug, setAutoGenerateSlug] = useState(true);
 
-    const handleNameChange = (locale: string, value: string) => {
+    const handleNameChange = (value: Record<string, string>) => {
         setFormData((prev) => ({
             ...prev,
-            name: { ...prev.name, [locale]: value },
+            name: value,
             slug: autoGenerateSlug
-                ? { ...prev.slug, [locale]: slugify(value) }
+                ? Object.keys(value).reduce((acc, locale) => {
+                      acc[locale] = slugify(value[locale] || '');
+                      return acc;
+                  }, {} as Record<string, string>)
                 : prev.slug,
         }));
     };
@@ -229,7 +230,7 @@ export default function Create({
 
     const categoryOptions = categoriesList.map((c) => ({
         value: c.id,
-        label: c.name,
+        label: resolveLocalizedText(c.name, defaultLocale),
     }));
 
     const typeOptions = types.map((t) => ({
@@ -354,124 +355,75 @@ export default function Create({
                                             forceRender
                                             className="mt-6 space-y-6"
                                         >
-                                            <div className="space-y-6 rounded-xl border bg-card p-6">
-                                                <div className="grid gap-2">
-                                                    <div className="flex items-center justify-between">
-                                                        <Label>Name *</Label>
-                                                        <LocaleTabSwitcher
-                                                            locales={locales}
-                                                            activeLocale={
-                                                                activeLocale
-                                                            }
-                                                            onLocaleChange={
-                                                                setActiveLocale
-                                                            }
-                                                        />
-                                                    </div>
-                                                    {locales.map((locale) => (
-                                                        <input
-                                                            key={`name-${locale.code}`}
-                                                            type="hidden"
-                                                            name={`name[${locale.code}]`}
-                                                            value={
-                                                                formData.name[
-                                                                    locale.code
-                                                                ] ?? ''
-                                                            }
-                                                        />
-                                                    ))}
-                                                    <Input
-                                                        id="name"
-                                                        autoFocus
-                                                        placeholder="Product name"
-                                                        value={
-                                                            formData.name[
-                                                                activeLocale
-                                                            ] ?? ''
-                                                        }
-                                                        onChange={(e) =>
-                                                            handleNameChange(
-                                                                activeLocale,
-                                                                e.target.value,
-                                                            )
-                                                        }
-                                                    />
-                                                    <InputError
-                                                        message={errors.name}
-                                                    />
-                                                </div>
+                                             <div className="space-y-6 rounded-xl border bg-card p-6">
+                                                <LocalizedField
+                                                    label="Name"
+                                                    name="name"
+                                                    value={formData.name}
+                                                    onChange={handleNameChange}
+                                                    errors={
+                                                        errors as Record<
+                                                            string,
+                                                            string
+                                                        >
+                                                    }
+                                                    required
+                                                    placeholder="Product name"
+                                                />
 
-                                                <div className="grid gap-2">
-                                                    {locales.map((locale) => (
-                                                        <input
-                                                            key={`slug-${locale.code}`}
-                                                            type="hidden"
-                                                            name={`slug[${locale.code}]`}
-                                                            value={
-                                                                formData.slug[
-                                                                    locale.code
-                                                                ] ?? ''
-                                                            }
-                                                        />
-                                                    ))}
-                                                    <SlugField
-                                                        label="Slug"
-                                                        name="slug"
-                                                        value={formData.slug}
-                                                        onChange={
-                                                            handleSlugChange
-                                                        }
-                                                        autoGenerate={
-                                                            autoGenerateSlug
-                                                        }
-                                                        onAutoGenerateChange={(
+                                                <SlugField
+                                                    label="Slug"
+                                                    name="slug"
+                                                    value={formData.slug}
+                                                    onChange={handleSlugChange}
+                                                    autoGenerate={
+                                                        autoGenerateSlug
+                                                    }
+                                                    onAutoGenerateChange={(
+                                                        auto,
+                                                    ) => {
+                                                        setAutoGenerateSlug(
                                                             auto,
-                                                        ) => {
-                                                            setAutoGenerateSlug(
-                                                                auto,
-                                                            );
-                                                            if (auto) {
-                                                                setFormData(
-                                                                    (prev) => {
-                                                                        const updated =
-                                                                            {
-                                                                                ...prev.slug,
-                                                                            };
-                                                                        locales.forEach(
-                                                                            (
-                                                                                l,
-                                                                            ) => {
-                                                                                updated[
-                                                                                    l.code
-                                                                                ] =
-                                                                                    slugify(
-                                                                                        prev
-                                                                                            .name[
-                                                                                            l
-                                                                                                .code
-                                                                                        ] ??
-                                                                                            '',
-                                                                                    );
-                                                                            },
-                                                                        );
-                                                                        return {
-                                                                            ...prev,
-                                                                            slug: updated,
+                                                        );
+                                                        if (auto) {
+                                                            setFormData(
+                                                                (prev) => {
+                                                                    const updated =
+                                                                        {
+                                                                            ...prev.slug,
                                                                         };
-                                                                    },
-                                                                );
-                                                            }
-                                                        }}
-                                                        locales={locales}
-                                                        errors={
-                                                            errors as Record<
-                                                                string,
-                                                                string
-                                                            >
+                                                                    locales.forEach(
+                                                                        (l) => {
+                                                                            updated[
+                                                                                l.code
+                                                                            ] =
+                                                                                slugify(
+                                                                                    prev
+                                                                                        .name[
+                                                                                        l
+                                                                                            .code
+                                                                                    ] ??
+                                                                                        '',
+                                                                                );
+                                                                        },
+                                                                    );
+                                                                    return {
+                                                                        ...prev,
+                                                                        slug: updated,
+                                                                    };
+                                                                },
+                                                            );
                                                         }
-                                                        required
-                                                    />
-                                                </div>
+                                                    }}
+                                                    locales={locales}
+                                                    errors={
+                                                        errors as Record<
+                                                            string,
+                                                            string
+                                                        >
+                                                    }
+                                                    required
+                                                />
 
                                                 <div className="grid gap-2">
                                                     <Label htmlFor="sku_prefix">
@@ -498,101 +450,49 @@ export default function Create({
                                                     />
                                                 </div>
 
-                                                <div className="grid gap-2">
-                                                    <Label>Description</Label>
-                                                    {locales.map((locale) => (
-                                                        <input
-                                                            key={`desc-${locale.code}`}
-                                                            type="hidden"
-                                                            name={`description[${locale.code}]`}
-                                                            value={
-                                                                formData
-                                                                    .description[
-                                                                    locale.code
-                                                                ] ?? ''
-                                                            }
-                                                        />
-                                                    ))}
-                                                    <RichTextEditor
-                                                        key={`desc-editor-${activeLocale}`}
-                                                        value={
-                                                            formData
-                                                                .description[
-                                                                activeLocale
-                                                            ] ?? ''
-                                                        }
-                                                        onChange={(val) =>
-                                                            setFormData(
-                                                                (prev) => ({
-                                                                    ...prev,
-                                                                    description:
-                                                                        {
-                                                                            ...prev.description,
-                                                                            [activeLocale]:
-                                                                                val,
-                                                                        },
-                                                                }),
-                                                            )
-                                                        }
-                                                        placeholder="Product description..."
-                                                    />
-                                                    <InputError
-                                                        message={
-                                                            errors.description
-                                                        }
-                                                    />
-                                                </div>
+                                                <LocalizedField
+                                                    label="Short Description"
+                                                    name="short_description"
+                                                    type="textarea"
+                                                    value={
+                                                        formData.short_description
+                                                    }
+                                                    onChange={(val) =>
+                                                        setFormData((prev) => ({
+                                                            ...prev,
+                                                            short_description:
+                                                                val,
+                                                        }))
+                                                    }
+                                                    placeholder="Brief product summary"
+                                                    rows={2}
+                                                    errors={
+                                                        errors as Record<
+                                                            string,
+                                                            string
+                                                        >
+                                                    }
+                                                />
 
-                                                <div className="grid gap-2">
-                                                    <Label>
-                                                        Short Description
-                                                    </Label>
-                                                    {locales.map((locale) => (
-                                                        <input
-                                                            key={`short_desc-${locale.code}`}
-                                                            type="hidden"
-                                                            name={`short_description[${locale.code}]`}
-                                                            value={
-                                                                formData
-                                                                    .short_description[
-                                                                    locale.code
-                                                                ] ?? ''
-                                                            }
-                                                        />
-                                                    ))}
-                                                    <textarea
-                                                        id="short_description"
-                                                        rows={2}
-                                                        placeholder="Brief product summary"
-                                                        value={
-                                                            formData
-                                                                .short_description[
-                                                                activeLocale
-                                                            ] ?? ''
-                                                        }
-                                                        onChange={(e) =>
-                                                            setFormData(
-                                                                (prev) => ({
-                                                                    ...prev,
-                                                                    short_description:
-                                                                        {
-                                                                            ...prev.short_description,
-                                                                            [activeLocale]:
-                                                                                e
-                                                                                    .target
-                                                                                    .value,
-                                                                        },
-                                                                }),
-                                                            )
-                                                        }
-                                                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                                                    />
-                                                    <InputError
-                                                        message={
-                                                            errors.short_description
-                                                        }
-                                                    />
-                                                </div>
+                                                <LocalizedField
+                                                    label="Description"
+                                                    name="description"
+                                                    type="richtext"
+                                                    value={formData.description}
+                                                    onChange={(val) =>
+                                                        setFormData((prev) => ({
+                                                            ...prev,
+                                                            description: val,
+                                                        }))
+                                                    }
+                                                    placeholder="Product description..."
+                                                    errors={
+                                                        errors as Record<
+                                                            string,
+                                                            string
+                                                        >
+                                                    }
+                                                />
 
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div className="space-y-2">

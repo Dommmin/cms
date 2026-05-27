@@ -4,7 +4,6 @@ import { useState } from 'react';
 import * as CategoryController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CategoryController';
 import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
 import InputError from '@/components/input-error';
-import { LocaleTabSwitcher } from '@/components/locale-tab-switcher';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { SeoPanel } from '@/components/seo-panel';
 import { SmartCollectionBuilder } from '@/components/smart-collection-builder';
@@ -12,10 +11,10 @@ import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { LocalizedField } from '@/components/ui/localized-field';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VersionHistory } from '@/components/version-history';
 import Wrapper from '@/components/wrapper';
-import { useAdminLocale } from '@/hooks/use-admin-locale';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
@@ -43,12 +42,11 @@ export default function Edit({
         : (Object.values(categories) as Category[]);
 
     const __ = useTranslation();
-    const [activeLocale, setActiveLocale] = useAdminLocale(defaultLocale);
     const [nameValues, setNameValues] = useState<Record<string, string>>(
-        category.name ?? { [defaultLocale]: '' },
+        category.name ?? {},
     );
     const [descValues, setDescValues] = useState<Record<string, string>>(
-        category.description ?? { [defaultLocale]: '' },
+        category.description ?? {},
     );
     const [slug, setSlug] = useState(category.slug);
     const [isSlugManual, setIsSlugManual] = useState(
@@ -75,11 +73,10 @@ export default function Edit({
         (cat) => cat.id !== category.id,
     );
 
-    const handleNameChange = (locale: string, value: string) => {
-        const updated = { ...nameValues, [locale]: value };
-        setNameValues(updated);
-        if (!isSlugManual && locale === defaultLocale) {
-            setSlug(slugify(value));
+    const handleNameChange = (newNames: Record<string, string>) => {
+        setNameValues(newNames);
+        if (!isSlugManual) {
+            setSlug(slugify(newNames[defaultLocale] ?? ''));
         }
     };
 
@@ -189,64 +186,14 @@ export default function Edit({
                         </TabsList>
 
                         <TabsContent value="general" className="space-y-6">
-                            <div className="grid gap-2">
-                                <div className="flex items-center justify-between">
-                                    <Label>{__('label.name', 'Name')}</Label>
-                                    <LocaleTabSwitcher
-                                        locales={locales}
-                                        activeLocale={activeLocale}
-                                        onLocaleChange={setActiveLocale}
-                                    />
-                                </div>
-                                {locales.length > 0 ? (
-                                    locales.map((locale) => (
-                                        <div
-                                            key={locale.code}
-                                            className={
-                                                locale.code !== activeLocale
-                                                    ? 'hidden'
-                                                    : undefined
-                                            }
-                                        >
-                                            <Input
-                                                required={
-                                                    locale.code ===
-                                                    defaultLocale
-                                                }
-                                                autoFocus={
-                                                    locale.code ===
-                                                    defaultLocale
-                                                }
-                                                placeholder="Category name"
-                                                value={
-                                                    nameValues[locale.code] ??
-                                                    ''
-                                                }
-                                                onChange={(e) =>
-                                                    handleNameChange(
-                                                        locale.code,
-                                                        e.target.value,
-                                                    )
-                                                }
-                                            />
-                                        </div>
-                                    ))
-                                ) : (
-                                    <Input
-                                        required
-                                        autoFocus
-                                        placeholder="Category name"
-                                        value={nameValues[defaultLocale] ?? ''}
-                                        onChange={(e) =>
-                                            handleNameChange(
-                                                defaultLocale,
-                                                e.target.value,
-                                            )
-                                        }
-                                    />
-                                )}
-                                <InputError message={errors.name} />
-                            </div>
+                            <LocalizedField
+                                label={__('label.name', 'Name')}
+                                name="name"
+                                value={nameValues}
+                                onChange={handleNameChange}
+                                required
+                                placeholder="Category name"
+                            />
 
                             <div className="grid gap-2">
                                 <Label htmlFor="slug">
@@ -307,61 +254,15 @@ export default function Edit({
                                 <InputError message={errors.parent_id} />
                             </div>
 
-                            <div className="grid gap-2">
-                                <div className="flex items-center justify-between">
-                                    <Label>
-                                        {__('label.description', 'Description')}
-                                    </Label>
-                                    <LocaleTabSwitcher
-                                        locales={locales}
-                                        activeLocale={activeLocale}
-                                        onLocaleChange={setActiveLocale}
-                                    />
-                                </div>
-                                {locales.length > 0 ? (
-                                    locales.map((locale) => (
-                                        <div
-                                            key={locale.code}
-                                            className={
-                                                locale.code !== activeLocale
-                                                    ? 'hidden'
-                                                    : undefined
-                                            }
-                                        >
-                                            <textarea
-                                                rows={3}
-                                                placeholder="Category description (optional)"
-                                                value={
-                                                    descValues[locale.code] ??
-                                                    ''
-                                                }
-                                                onChange={(e) =>
-                                                    setDescValues((prev) => ({
-                                                        ...prev,
-                                                        [locale.code]:
-                                                            e.target.value,
-                                                    }))
-                                                }
-                                                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                                            />
-                                        </div>
-                                    ))
-                                ) : (
-                                    <textarea
-                                        rows={3}
-                                        placeholder="Category description (optional)"
-                                        value={descValues[defaultLocale] ?? ''}
-                                        onChange={(e) =>
-                                            setDescValues((prev) => ({
-                                                ...prev,
-                                                [defaultLocale]: e.target.value,
-                                            }))
-                                        }
-                                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                                    />
-                                )}
-                                <InputError message={errors.description} />
-                            </div>
+                            <LocalizedField
+                                label={__('label.description', 'Description')}
+                                type="textarea"
+                                name="description"
+                                value={descValues}
+                                onChange={setDescValues}
+                                placeholder="Category description (optional)"
+                                rows={3}
+                            />
 
                             <div className="flex items-center gap-2">
                                 <input

@@ -39,6 +39,11 @@ export function LocalizedField({
     errors,
     rows = 3,
     id,
+    headerEnd,
+    hideLabel = false,
+    jsonValue,
+    onJsonChange,
+    autoFocus,
 }: LocalizedFieldProps) {
     const { locales = [] } = usePage<{ locales: SharedLocale[] }>().props;
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
@@ -60,18 +65,33 @@ export function LocalizedField({
 
     return (
         <div className="grid gap-2">
-            <div className="flex items-center justify-between">
-                <Label htmlFor={fieldId}>
-                    {label}
-                    {required && ' *'}
-                </Label>
-                {locales.length > 1 && (
-                    <LocaleTabSwitcher
-                        locales={locales}
-                        activeLocale={activeLocale}
-                        onLocaleChange={setActiveLocale}
+            {name &&
+                locales.map((locale) => (
+                    <input
+                        key={`hidden-${name}-${locale.code}`}
+                        type="hidden"
+                        name={`${name}[${locale.code}]`}
+                        value={value[locale.code] ?? ''}
                     />
+                ))}
+
+            <div className="flex items-center justify-between gap-2">
+                {!hideLabel && (
+                    <Label htmlFor={fieldId}>
+                        {label}
+                        {required && ' *'}
+                    </Label>
                 )}
+                <div className="ml-auto flex items-center gap-2">
+                    {headerEnd}
+                    {locales.length > 1 && (
+                        <LocaleTabSwitcher
+                            locales={locales}
+                            activeLocale={activeLocale}
+                            onLocaleChange={setActiveLocale}
+                        />
+                    )}
+                </div>
             </div>
 
             {type === 'input' && (
@@ -81,6 +101,7 @@ export function LocalizedField({
                     onChange={(e) => update(e.target.value)}
                     placeholder={placeholder ?? label}
                     className={activeLocaleError ? 'border-destructive' : ''}
+                    autoFocus={autoFocus}
                 />
             )}
 
@@ -100,6 +121,16 @@ export function LocalizedField({
                     key={`richtext-${activeLocale}`}
                     value={value[activeLocale] ?? ''}
                     onChange={update}
+                    jsonValue={jsonValue?.[activeLocale]}
+                    onJsonChange={
+                        onJsonChange
+                            ? (json) =>
+                                  onJsonChange({
+                                      ...(jsonValue ?? {}),
+                                      [activeLocale]: json,
+                                  })
+                            : undefined
+                    }
                     placeholder={placeholder ?? label}
                     instanceKey={`${activeLocale}`}
                 />
