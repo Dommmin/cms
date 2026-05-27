@@ -35,11 +35,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LocalizedField } from '@/components/ui/localized-field';
 import { SlugField } from '@/components/ui/slug-field';
-import { resolveLocalizedText } from '@/lib/localized-text';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VersionHistory } from '@/components/version-history';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { resolveLocalizedText } from '@/lib/localized-text';
 import { slugify } from '@/lib/slug';
 import { formatDateTime } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
@@ -250,10 +250,13 @@ export default function Edit({
             ...prev,
             name: value,
             slug: autoGenerateSlug
-                ? Object.keys(value).reduce((acc, locale) => ({
-                      ...acc,
-                      [locale]: slugify(value[locale] || '')
-                  }), {})
+                ? Object.keys(value).reduce(
+                      (acc, locale) => ({
+                          ...acc,
+                          [locale]: slugify(value[locale] || ''),
+                      }),
+                      {},
+                  )
                 : prev.slug,
         }));
     };
@@ -499,7 +502,9 @@ export default function Edit({
                                                         <LocalizedField
                                                             label="Name"
                                                             name="name"
-                                                            value={formData.name}
+                                                            value={
+                                                                formData.name
+                                                            }
                                                             onChange={
                                                                 handleNameChange
                                                             }
@@ -516,7 +521,9 @@ export default function Edit({
                                                         <SlugField
                                                             label="Slug"
                                                             name="slug"
-                                                            value={formData.slug}
+                                                            value={
+                                                                formData.slug
+                                                            }
                                                             onChange={
                                                                 handleSlugChange
                                                             }

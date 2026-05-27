@@ -348,10 +348,7 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                             onChange={handleTitleChange}
                                             required
                                             errors={
-                                                errors as Record<
-                                                    string,
-                                                    string
-                                                >
+                                                errors as Record<string, string>
                                             }
                                         />
 
@@ -427,10 +424,7 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                             placeholder="Short description..."
                                             rows={3}
                                             errors={
-                                                errors as Record<
-                                                    string,
-                                                    string
-                                                >
+                                                errors as Record<string, string>
                                             }
                                         />
 

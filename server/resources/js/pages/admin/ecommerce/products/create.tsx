@@ -24,10 +24,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LocalizedField } from '@/components/ui/localized-field';
 import { SlugField } from '@/components/ui/slug-field';
-import { resolveLocalizedText } from '@/lib/localized-text';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
+import { resolveLocalizedText } from '@/lib/localized-text';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
@@ -162,10 +162,13 @@ export default function Create({
             ...prev,
             name: value,
             slug: autoGenerateSlug
-                ? Object.keys(value).reduce((acc, locale) => {
-                      acc[locale] = slugify(value[locale] || '');
-                      return acc;
-                  }, {} as Record<string, string>)
+                ? Object.keys(value).reduce(
+                      (acc, locale) => {
+                          acc[locale] = slugify(value[locale] || '');
+                          return acc;
+                      },
+                      {} as Record<string, string>,
+                  )
                 : prev.slug,
         }));
     };
@@ -355,7 +358,7 @@ export default function Create({
                                             forceRender
                                             className="mt-6 space-y-6"
                                         >
-                                             <div className="space-y-6 rounded-xl border bg-card p-6">
+                                            <div className="space-y-6 rounded-xl border bg-card p-6">
                                                 <LocalizedField
                                                     label="Name"
                                                     name="name"

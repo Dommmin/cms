@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LocalizedField } from '@/components/ui/localized-field';
-import { SlugField } from '@/components/ui/slug-field';
 import {
     Select,
     SelectContent,
@@ -19,6 +18,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { SlugField } from '@/components/ui/slug-field';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VersionHistory } from '@/components/version-history';
 import Wrapper from '@/components/wrapper';
@@ -43,7 +43,9 @@ export default function EditBlogPost({
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Blog Posts', href: BlogPostController.index.url() },
         {
-            title: post.title?.[locales.find((l) => l.is_default)?.code ?? 'en'] ?? 'Edit Post',
+            title:
+                post.title?.[locales.find((l) => l.is_default)?.code ?? 'en'] ??
+                'Edit Post',
             href: BlogPostController.edit.url(post.id),
         },
     ];
@@ -83,21 +85,25 @@ export default function EditBlogPost({
     );
     const [tagInput, setTagInput] = useState('');
 
-    const buttonText = data.status === 'published'
-        ? __('action.save_changes', 'Save Changes')
-        : data.status === 'scheduled'
-            ? __('action.schedule', 'Schedule')
-            : __('action.save_draft', 'Save Draft');
+    const buttonText =
+        data.status === 'published'
+            ? __('action.save_changes', 'Save Changes')
+            : data.status === 'scheduled'
+              ? __('action.schedule', 'Schedule')
+              : __('action.save_draft', 'Save Draft');
 
     const handleTitleChange = (value: Record<string, string>) => {
         setData((prev) => ({
             ...prev,
             title: value,
             slug: autoGenerateSlug
-                ? Object.keys(value).reduce((acc, locale) => {
-                      acc[locale] = slugify(value[locale] || '');
-                      return acc;
-                  }, {} as Record<string, string>)
+                ? Object.keys(value).reduce(
+                      (acc, locale) => {
+                          acc[locale] = slugify(value[locale] || '');
+                          return acc;
+                      },
+                      {} as Record<string, string>,
+                  )
                 : prev.slug,
         }));
     };

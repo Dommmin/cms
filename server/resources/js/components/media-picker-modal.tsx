@@ -1,5 +1,4 @@
 import {
-    CheckIcon,
     GripVerticalIcon,
     PencilIcon,
     StarIcon,
@@ -55,7 +54,9 @@ export function MediaPickerModal({
     const selectedIds = selectedMediaItems.map((img) => img.id);
 
     const handleItemClick = (item: MediaItem) => {
-        const isAlreadySelected = selectedMediaItems.some((img) => img.id === item.id);
+        const isAlreadySelected = selectedMediaItems.some(
+            (img) => img.id === item.id,
+        );
         if (isAlreadySelected) {
             onRemove(item.id);
         } else {
@@ -93,7 +94,12 @@ export function MediaPickerModal({
                                   ? 'Select Video'
                                   : 'Select Media'}
                     </h2>
-                    <Button type="button" variant="ghost" size="icon" onClick={onClose}>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={onClose}
+                    >
                         <XIcon className="h-5 w-5" />
                     </Button>
                 </div>
@@ -119,18 +125,24 @@ export function MediaPickerModal({
                                     <div
                                         key={image.id}
                                         draggable
-                                        onDragStart={() => handleDragStart(index)}
+                                        onDragStart={() =>
+                                            handleDragStart(index)
+                                        }
                                         onDragOver={(e) => {
                                             e.preventDefault();
                                             onReorder(
-                                                [...selectedMediaItems].map((img) => img),
+                                                [...selectedMediaItems].map(
+                                                    (img) => img,
+                                                ),
                                             );
                                         }}
                                         onDragEnd={() => {}}
                                         className="flex items-center gap-2 rounded-lg border bg-background p-2"
                                     >
                                         <GripVerticalIcon className="h-4 w-4 cursor-grab text-muted-foreground" />
-                                        {(image.mime_type?.startsWith('image/') ?? true) ? (
+                                        {(image.mime_type?.startsWith(
+                                            'image/',
+                                        ) ?? true) ? (
                                             <img
                                                 src={image.url}
                                                 alt={image.name}
@@ -149,11 +161,15 @@ export function MediaPickerModal({
                                             </div>
                                         )}
                                         <div className="min-w-0 flex-1">
-                                            <p className="truncate text-sm">{image.name}</p>
+                                            <p className="truncate text-sm">
+                                                {image.name}
+                                            </p>
                                             <div className="mt-1 flex gap-1">
                                                 <button
                                                     type="button"
-                                                    onClick={() => onSetThumbnail(image.id)}
+                                                    onClick={() =>
+                                                        onSetThumbnail(image.id)
+                                                    }
                                                     className={`rounded p-1 ${
                                                         image.is_thumbnail
                                                             ? 'text-yellow-500'
@@ -163,13 +179,15 @@ export function MediaPickerModal({
                                                 >
                                                     <StarIcon className="h-4 w-4" />
                                                 </button>
-                                                {image.mime_type?.startsWith('image/') && (
+                                                {image.mime_type?.startsWith(
+                                                    'image/',
+                                                ) && (
                                                     <button
                                                         type="button"
                                                         onClick={() =>
-                                                                setEditingImage(
-                                                                    image as unknown as MediaItem,
-                                                                )
+                                                            setEditingImage(
+                                                                image as unknown as MediaItem,
+                                                            )
                                                         }
                                                         className="rounded p-1 text-muted-foreground hover:text-primary"
                                                         title="Edit image"
@@ -179,7 +197,9 @@ export function MediaPickerModal({
                                                 )}
                                                 <button
                                                     type="button"
-                                                    onClick={() => onRemove(image.id)}
+                                                    onClick={() =>
+                                                        onRemove(image.id)
+                                                    }
                                                     className="rounded p-1 text-muted-foreground hover:text-red-500"
                                                     title="Remove"
                                                 >

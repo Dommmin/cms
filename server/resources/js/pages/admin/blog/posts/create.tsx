@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LocalizedField } from '@/components/ui/localized-field';
-import { SlugField } from '@/components/ui/slug-field';
 import {
     Select,
     SelectContent,
@@ -18,6 +17,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { SlugField } from '@/components/ui/slug-field';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
@@ -68,10 +68,13 @@ export default function CreateBlogPost({
             ...prev,
             title: value,
             slug: autoGenerateSlug
-                ? Object.keys(value).reduce((acc, locale) => {
-                      acc[locale] = slugify(value[locale] || '');
-                      return acc;
-                  }, {} as Record<string, string>)
+                ? Object.keys(value).reduce(
+                      (acc, locale) => {
+                          acc[locale] = slugify(value[locale] || '');
+                          return acc;
+                      },
+                      {} as Record<string, string>,
+                  )
                 : prev.slug,
         }));
     };
@@ -106,17 +109,20 @@ export default function CreateBlogPost({
         router.post(BlogPostController.store.url(), payload, {
             onError: (errs) => {
                 setErrors(errs);
-                toast.error(__('misc.fix_errors', 'Please fix the errors below'));
+                toast.error(
+                    __('misc.fix_errors', 'Please fix the errors below'),
+                );
             },
             onFinish: () => setProcessing(false),
         });
     };
 
-    const buttonText = data.status === 'published'
-        ? __('action.publish', 'Publish')
-        : data.status === 'scheduled'
-            ? __('action.schedule', 'Schedule')
-            : __('action.save_draft', 'Save Draft');
+    const buttonText =
+        data.status === 'published'
+            ? __('action.publish', 'Publish')
+            : data.status === 'scheduled'
+              ? __('action.schedule', 'Schedule')
+              : __('action.save_draft', 'Save Draft');
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

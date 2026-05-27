@@ -191,7 +191,7 @@ class MediaController extends Controller
                 ->toMediaCollection($request->input('collection', 'default'));
 
             $uploaded[] = [
-                'id' => $media->id,
+                'id' => (int) $media->getKey(),
                 'name' => $media->name,
                 'file_name' => $media->file_name,
                 'mime_type' => $media->mime_type,

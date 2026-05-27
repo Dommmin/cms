@@ -7,6 +7,11 @@ export type {
     ThumbnailSize,
 } from '@/components/media-browser.types';
 
+import type {
+    MediaItem,
+    MediaPickerMode,
+} from '@/components/media-browser.types';
+
 export type RteMediaAsset = {
     mediaId: number | null;
     src: string;
@@ -37,7 +42,7 @@ export type SelectedImage = {
 export type MediaPickerModalProps = {
     open: boolean;
     onClose: () => void;
-    onSelect: (media: import('@/components/media-browser.types').MediaItem) => void;
+    onSelect: (media: MediaItem) => void;
     onConfirm?: (items: SelectedImage[]) => void;
     onReorder?: (images: SelectedImage[]) => void;
     onRemove?: (id: number) => void;
@@ -45,6 +50,6 @@ export type MediaPickerModalProps = {
     selectedImages?: SelectedImage[];
     selectedItems?: SelectedImage[];
     multiple?: boolean;
-    mode?: import('@/components/media-browser.types').MediaPickerMode;
+    mode?: MediaPickerMode;
     acceptedMimeTypes?: string[];
 };
