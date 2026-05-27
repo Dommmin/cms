@@ -80,6 +80,7 @@ REST API: `/api/v1/*` · Admin: `/admin/*` (Inertia SPA)
 - Types in `.ts` files: `Name.types.ts` (component), `types.ts` (shared), `client/types/api.ts` (API)
 - Admin SPA routes → Wayfinder (`@/actions/`, `@/routes/`) — never hardcode strings
 - All client links → `useLocalePath()` / `lp()` (locale-prefixed URLs)
+- **Static analysis & linters — no silencing by default**: do not add `eslint-disable` (any form), `@ts-ignore`, `@ts-expect-error`, `@phpstan-ignore-*`, or update/create `server/phpstan-baseline.neon` unless there is a documented reason and no safe code-level fix exists. If unavoidable, suppress the narrowest possible rule/line and add a short inline explanation. Never regenerate/expand PHPStan baseline without explicit approval.
 
 **Always:**
 - Pest tests for every feature — `docker compose exec php php artisan make:test --pest Name`

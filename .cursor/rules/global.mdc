@@ -37,6 +37,12 @@ docker compose exec php npm run types          # admin TS (runs in php container
 - `env()` only inside `config/` files — use `config('key')` everywhere else
 - Business logic in `app/Services/` — controllers stay thin
 - New top-level directories require approval
+- **Static analysis & linters — no silencing by default**
+  - Do not silence static analysis or linter errors by default.
+  - Never add `eslint-disable` (any form), `@ts-ignore`, `@ts-expect-error`, `@phpstan-ignore-*`, or update/create `server/phpstan-baseline.neon` unless there is a documented reason and no safe code-level fix exists.
+  - Prefer fixing the root cause: correct types, correct PHPDoc/generics, proper null handling, typed DTOs/resources, correct Eloquent relation annotations, explicit return types.
+  - If suppression is unavoidable: suppress the narrowest possible rule/line and add a short inline explanation.
+  - Never regenerate, expand, or rebaseline PHPStan baseline without explicit approval.
 
 ## Git — Requires Explicit Consent
 

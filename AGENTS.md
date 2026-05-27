@@ -86,5 +86,6 @@ This repo’s routing/verification matrix lives in `.ai/routing.md`.
 - Use `.ai/rules.md` for canonical MUST/FORBIDDEN and quality gates.
 - Admin SPA routes: Wayfinder (`@/actions/`, `@/routes/`) — no hardcoded strings.
 - `.tsx` files: no inline `type/interface` — keep types in `.ts`.
+- Static analysis & linters: do not silence by default. Never add `eslint-disable` (any form), `@ts-ignore`, `@ts-expect-error`, `@phpstan-ignore-*`, or update/create `server/phpstan-baseline.neon` unless there is a documented reason and no safe code-level fix exists. If unavoidable, suppress the narrowest possible rule/line and add a short inline explanation. Never regenerate/expand PHPStan baseline without explicit approval.
 - No branch/commit/push without explicit user approval.
 - Keep diffs minimal; no drive-by refactors.
