@@ -16,8 +16,8 @@ client/node_modules
 
 
 ### Laravel template
-server/vendor
-server/node_modules
+server/vendor/
+server/node_modules/
 server/npm-debug.log
 server/yarn-error.log
 server/storage/media-library/temp
@@ -25,6 +25,7 @@ server/public/storage
 server/public/hot
 storage/*.key
 server/.idea
+server/.env
 server/.env.*
 !server/.env.example
 !server/.env.deploy

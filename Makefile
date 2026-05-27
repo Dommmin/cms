@@ -1,4 +1,4 @@
-.PHONY: up stop down build install shell migrate fresh test setup-test-db logs pail seed fresh-seed scout-import clear sync-translations npm-build pint fix check mobile-install mobile-start mobile-start-lan mobile-start-tunnel mobile-ios mobile-android mobile-web mobile-types mobile-lint mobile-check e2e e2e-report glitchtip-up glitchtip-down glitchtip-logs nuke-volumes help
+.PHONY: up stop down build install install-local shell migrate fresh test setup-test-db logs pail seed fresh-seed scout-import clear sync-translations npm-build pint fix check mobile-install mobile-start mobile-start-lan mobile-start-tunnel mobile-ios mobile-android mobile-web mobile-types mobile-lint mobile-check e2e e2e-report glitchtip-up glitchtip-down glitchtip-logs nuke-volumes help
 
 # Set environment variables
 export UID = $(shell id -u)
@@ -14,6 +14,7 @@ help:
 	@echo "  stop               - Stop the application"
 	@echo "  build              - Build containers"
 	@echo "  install            - Install dependencies"
+	@echo "  install-local      - Install dependencies locally"
 	@echo "  migrate            - Run migrations"
 	@echo "  fresh              - Fresh migrations"
 	@echo "  seed               - Seed database"
@@ -80,6 +81,11 @@ install:
 	docker compose exec php composer install
 	docker compose exec -e NODE_OPTIONS="--max-old-space-size=512" php npm install
 	docker compose run --rm node npm install
+
+# Install dependencies locally (need for phpstorm index)
+install-local:
+	cd server && npm install
+	cd client && npm install
 
 # Run migrations
 migrate:
@@ -201,6 +207,9 @@ setup: build up
 	docker compose run --rm node npm install
 	docker compose exec php php artisan key:generate
 	docker compose exec php php artisan migrate
+	cd server && composer install --no-scripts
+	cd server && npm install
+	cd client && npm install
 	@echo "Project setup completed!"
 
 # Show logs
