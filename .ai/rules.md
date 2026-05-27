@@ -105,7 +105,7 @@ Project skills live in `.claude/skills/` — committed to the repo, shared with 
 | `seo-review` | Technical + content SEO analysis of the storefront |
 
 > Only **Claude Code** executes these as skills. Other tools (Codex, Gemini, Copilot…) should treat this table as a reference to available workflows and run the equivalent commands directly.
-> **Global / personal skills** (`~/.claude/skills/`, installed plugins) are NOT part of this project — never rely on them in shared work, and never list them in committed files.
+> **Global / personal skills** (`~/.claude/skills/`, installed plugins) are not shared — do not rely on them for team workflows. If a skill is valuable and stable, install/commit it under `.claude/skills/` (and mirror where required, e.g. `server/.cursor/skills/`), then reference it from this file.
 
 ---
 
@@ -155,9 +155,11 @@ make check  # read-only CI mirror: fails if anything is wrong (same checks as Gi
 ```
 
 **Workflow for AI:**
-1. After writing code, run `make fix` — this auto-corrects style/refactor issues without human review
-2. Then run `make check` — if it passes, the code is safe to commit and push
-3. If `make check` fails with issues that `make fix` cannot resolve (e.g. Larastan type errors, failing tests), fix them manually and repeat
+1. After writing code, run targeted checks from `.ai/routing.md` (at minimum: `types` for TS, `pint --dirty` for PHP)
+2. **Before telling the user the task is done**, run `make check` in Docker (full CI mirror) — not only before commit
+3. Before commit: `make fix && make check`
+4. If `make check` fails with issues `make fix` cannot resolve, fix manually and repeat
+5. Never ask the user to run `make check` on your behalf unless Docker is unavailable on the agent side
 
 **Details:**
 - `make fix` runs: `pint` → `rector process` → `pint` (again, to re-format rector output) → `npm run lint` (eslint --fix, server) → `npm run format` (prettier, server) → `eslint --fix` (client) → `npm run format` (prettier, client)

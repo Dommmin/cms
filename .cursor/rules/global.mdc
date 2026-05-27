@@ -7,21 +7,18 @@ alwaysApply: true
 
 **Project**: Headless CMS + e-commerce. `server/` = Laravel 12 backend + Inertia/React admin SPA. `client/` = Next.js 16 public storefront.
 
-Compact non-negotiable core. For depth read the shared knowledge base: `.ai/guide.md` (feature map — read first), `.ai/rules.md` (canonical rules: MUST/FORBIDDEN, task routing, quality gates), `.ai/context.md` (deep technical context). Backend/frontend specifics: `.cursor/rules/backend.mdc`, `.cursor/rules/frontend-client.mdc`.
+Compact non-negotiable core. **Routing (what to read / when to verify):** `.ai/routing.md`. Depth: `.ai/rules.md`, `.ai/guide.md` (feature sections only), `.ai/context.md`. Globs: `backend.mdc`, `frontend-client.mdc`.
 
-## Docker — All Commands in Containers
+## Docker — commands only in containers
 
 ```bash
-docker compose exec php php artisan <cmd>
+make check   # after code changes, before saying "done" (CI mirror)
+make fix     # before commit (auto-fix)
 docker compose exec php php artisan test --compact
-docker compose exec php vendor/bin/pint --dirty
-docker compose exec node npm run build
-make up / make down / make shell / make migrate / make test
-make fix    # auto-fix before committing
-make check  # CI mirror — must pass before commit
+docker compose exec php npm run types          # admin TS (runs in php container)
 ```
 
-**Never run `php artisan`, `pint`, or `npm` directly** — host has no DB/Redis. If a container is down, report it and stop.
+**Never run `php artisan`, `pint`, or `npm` on the host.** Container down → `docker compose ps`, report, stop. Do **not** ask the user to run checks you can run in Docker.
 
 ## Task Routing
 

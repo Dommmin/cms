@@ -1,0 +1,10 @@
+---
+description: Verification rules for admin TypeScript changes
+globs: ["server/resources/js/**/*.ts", "server/resources/js/**/*.tsx"]
+alwaysApply: false
+---
+
+# Verify After Admin TS Changes
+
+- After editing files matching these globs, run `docker compose exec php npm run types`.
+- Before saying task is done, run `make check` (Docker).

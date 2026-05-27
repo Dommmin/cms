@@ -1,7 +1,7 @@
 # CMS Project — AI Guide
 
-> This is the primary operational memory for AI. Read this first on every session.
-> When a new feature is implemented, update this file under the relevant section.
+> Primary feature map for AI. **Do not read this whole file up front** — open the section you need, or search (see `.ai/routing.md`).
+> When a new feature is implemented, update the relevant section below.
 
 ---
 

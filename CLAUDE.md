@@ -2,8 +2,8 @@
 
 Monorepo: **Laravel backend + admin SPA** (`server/`) · **Next.js public frontend** (`client/`)
 
-> **Read `.ai/guide.md` first** — feature map, key paths, conventions.
-> Deep context: `.ai/context.md` · Canonical rules (MUST/FORBIDDEN, task routing, quality gates): `.ai/rules.md` · MCP: `.ai/mcp.md`
+> **`.ai/routing.md`** — when to read which file, when to run Docker checks (start here if unsure).
+> **`.ai/guide.md`** — feature map (relevant section only) · **`.ai/rules.md`** — MUST/FORBIDDEN, quality gates · **`.ai/context.md`** — deep context · **`.ai/mcp.md`**
 >
 > All AI tools (Claude, Codex, Gemini, Copilot, Cursor, Junie) share the same core — this file, `AGENTS.md`,
 > `GEMINI.md`, `.junie/guidelines.md`, `.github/copilot-instructions.md`, `.cursor/rules/global.mdc` are kept in sync.
@@ -29,6 +29,11 @@ docker compose exec node npm run build
 
 > **Never run `php artisan` or `pint` directly** — host has no DB/Redis access. If a container is down, report it and stop.
 > **Before every commit:** `make fix && make check` — if `check` passes, the code is safe to push.
+
+## Per-project rules (links)
+
+- `server/` (Laravel + Inertia admin): `server/CLAUDE.md` (auto-managed by Boost; version-specific)
+- `client/` (Next.js storefront): `client/CLAUDE.md`
 
 ---
 
@@ -95,7 +100,8 @@ REST API: `/api/v1/*` · Admin: `/admin/*` (Inertia SPA)
 ## AI Context Files
 
 ```
-.ai/guide.md        ← feature map, key paths (PRIMARY — read every session)
+.ai/routing.md      ← when to read / verify (start if unsure)
+.ai/guide.md        ← feature map (sections on demand)
 .ai/context.md      ← auth, cart, i18n, payments, page builder (deep tasks)
 .ai/rules.md        ← canonical rules: MUST/FORBIDDEN, task routing, quality gates, GDPR, Docker-first
 .ai/prompts.md      ← copy-paste task templates
@@ -134,6 +140,7 @@ See `.ai/mcp.md` for full documentation.
 ## Golden Rule
 
 **Always prefix commands with `rtk`**. If RTK has a dedicated filter, it uses it. If not, it passes through unchanged. This means RTK is always safe to use.
+**RTK is output filtering only — it never replaces required project verification (`make check`, `make fix`, Docker-first workflow).**
 
 **Important**: Even in command chains with `&&`, use `rtk`:
 ```bash

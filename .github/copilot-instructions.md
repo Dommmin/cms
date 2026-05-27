@@ -1,135 +1,18 @@
 # GitHub Copilot Instructions — CMS Monorepo
 
-**Project**: Headless CMS + e-commerce. `server/` = Laravel 12 backend + Inertia/React admin SPA. `client/` = Next.js 16 public storefront.
+Headless CMS + e-commerce. Monorepo: `server/` (Laravel + Inertia/React admin) and `client/` (Next.js storefront).
 
-> Carries the compact non-negotiable core. For depth, read the shared knowledge base in `.ai/`:
-> `.ai/guide.md` (feature map — read first) · `.ai/rules.md` (canonical rules) · `.ai/context.md` (deep technical context) · `.ai/commit-rules.md` (commit convention).
+Use `.ai/routing.md` first for the minimal routing matrix (what to read / what to run).
 
----
+## Must Follow
 
-## All Commands Run in Docker
-
-```bash
-docker compose exec php php artisan <cmd>
-docker compose exec php php artisan test --compact
-docker compose exec php vendor/bin/pint --dirty
-docker compose exec node npm run build
-make up / make down / make shell / make migrate / make fresh / make test
-make fix    # auto-fix before committing
-make check  # CI mirror — must pass before commit
-```
-
-**Never run `php artisan`, `pint`, or `npm` directly** — host has no DB/Redis. If a container is down, report it and stop.
-
----
-
-## Task Routing
-
-- **Bug fix** — locate the root cause first; fix only what is broken; no drive-by refactors.
-- **New endpoint / feature** — copy the nearest existing example: migration → model → FormRequest → Controller → Resource → route → test.
-- **Refactoring** — only when explicitly requested, never as a side effect.
-- **Cross-project change** — one side at a time, verify each independently.
-- Read 2-3 similar files first; plan before coding when a task has 3+ steps.
-
----
-
-## PHP Rules (server/)
-
-- `declare(strict_types=1)` on every file
-- Explicit return types on all methods
-- Constructor property promotion: `public function __construct(private readonly CartService $cs) {}`
-- `Model::query()` — never `DB::` for standard queries
-- Eager-load relations (no N+1)
-- Form Request classes for all validation — never inline
-- `env()` only inside `config/` files
-- `casts()` method on models (not `$casts` property) — Laravel 12
-
-### Architecture
-- Models → `app/Models/`
-- Business logic → `app/Services/` (fat services, thin controllers)
-- One-off ops → `app/Actions/`
-- Prices are **integer cents/grosze** — never floats
-- Order state machine: `spatie/laravel-model-states`
-
-### Routes
-- API: `api.v1.` prefix, `/api/v1/`, rate limiter required (`api.strict` 10/min | `api.public` 60/min | `api.auth` 300/min)
-- Admin: `admin.` prefix, `/admin/`
-
----
-
-## TypeScript Rules (client/ and server/resources/js/)
-
-- **`.tsx` files are clean** — no `interface` or `type` definitions inside `.tsx` files
-- Types live in separate `.ts` files:
-  - Component props → `ComponentName.types.ts` (colocated)
-  - Directory-shared → `types.ts` in that directory
-  - API response types → `client/types/api.ts` (check before writing any API call)
-- Server components → `serverFetch()` from `lib/server-fetch.ts`
-- Client components (`"use client"`) → `api` from `lib/axios.ts`
-- All links use `useLocalePath()` — URLs are locale-prefixed (`/en/`, `/pl/`)
-- Wayfinder for admin SPA routes: import from `@/actions/` or `@/routes/`
-
-### API Type Gotchas
-| Type | Correct field | Wrong assumption |
-|------|--------------|--------------------|
-| `CartItem` | `product` (direct) | ~~`variant.product`~~ |
-| `ProductVariant` | `attributes: Record<string,string>` | ~~`attribute_values`~~ |
-| `ProductReview` | `author`, `body` | ~~`reviewer_name`~~ |
-| `Order` | `items?.length` | ~~`items_count`~~ |
-| `BlogPost` | `featured_image: string\|null` | ~~`cover_image_url`~~ |
-
----
-
-## Testing (Pest)
-
-```php
-declare(strict_types=1);
-
-beforeEach(function () {
-    Role::firstOrCreate(['name' => 'admin']);
-});
-
-it('creates a product', function () {
-    $user = User::factory()->create()->assignRole('admin');
-    $this->actingAs($user, 'sanctum')
-        ->postJson('/api/v1/products', [...])
-        ->assertCreated();
-});
-```
-
-- Use factories, never `Model::create()` in tests
-- `assertSoftDeleted()` for soft-delete models
-- `assertOk()` / `assertCreated()` / `assertUnprocessable()` — not `assertStatus(200)`
-- API auth: `$this->actingAs($user, 'sanctum')`
-
----
-
-## WCAG 2.1 AA (client/)
-
-- Icon-only buttons: `aria-label` + `aria-hidden="true"` on icon
-- Form inputs: `<label htmlFor="id">` or `aria-label`
-- Active nav links: `aria-current="page"`
-- Quantity steppers: `aria-live="polite" aria-atomic` on the number
-- Modal/dialog: `role="dialog" aria-modal="true"` + focus trap
-- Skip link in root layout: `<a href="#main-content">Skip to main content</a>`
-- Pagination: `<nav aria-label="Pagination">` + `aria-current="page"` on active
-
----
-
-## Git — Requires Explicit Consent
-
-- **NEVER** create a branch, commit, or push without the user's explicit approval. Read-only git is always fine.
-- Commit **only files you explicitly modified** — never stage unrelated or auto-generated files. Review `git diff --staged` first.
-- Atomic commits — one concern per commit (`.ai/commit-rules.md`).
-- `make fix && make check` must both pass before any commit.
-
----
-
-## After Implementing a Feature
-
-1. Update `.ai/guide.md` → Implemented Features section
-2. Update `docs/backend.md` or `docs/frontend.md` if architecture changed
-3. Update `server/docs/USER_GUIDE.md` — editor instructions
-4. Update `server/docs/DEVELOPER_GUIDE.md` — developer extension patterns
-5. Run: `docker compose exec php vendor/bin/pint --dirty`
-6. Run: `docker compose exec php php artisan test --compact`
+- Run all commands in Docker only.
+- After code changes, run `make check` before claiming task is done.
+- Before commit, run `make fix && make check`.
+- Never ask the user to run checks if the agent can run them.
+- Never run host `php artisan`, `pint`, or `npm`.
+- Read `.ai/guide.md` by section only (do not load whole file by default).
+- Use `.ai/rules.md` for canonical MUST/FORBIDDEN and quality gates.
+- Use `.cursor/rules/backend.mdc` for `server/resources/js/**` and `server/**/*.php`.
+- No branch/commit/push without explicit user approval.
+- Keep diffs minimal; no drive-by refactors.
