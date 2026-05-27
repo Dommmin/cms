@@ -43,3 +43,7 @@ server/.env.*
 client/.idea
 server/supervisord.pid
 
+# Skills installer caches (do not commit)
+.agents/
+mobile/.agents/
+
