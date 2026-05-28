@@ -25,6 +25,22 @@ use Illuminate\Support\Str;
  * @property-read OrderItem|null $orderItem
  * @property-read ProductVariant $variant
  * @property-read Collection<int, ProductDownloadEvent> $events
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read int|null $events_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereDownloadCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereExpiresAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereMaxDownloads($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereOrderItemId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereProductVariantId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'order_item_id',

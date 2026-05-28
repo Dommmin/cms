@@ -10,6 +10,13 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property HomepageSectionTypeEnum $type
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|HomepageSection newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|HomepageSection newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|HomepageSection query()
+ * @mixin \Eloquent
+ */
 #[Fillable([
     'type', 'configuration', 'is_active', 'position',
 ])]

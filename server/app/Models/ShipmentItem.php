@@ -15,6 +15,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $shipment_id
  * @property int $order_item_id
  * @property int $quantity
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \App\Models\OrderItem $orderItem
+ * @property-read \App\Models\Shipment $shipment
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShipmentItem newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShipmentItem newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShipmentItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShipmentItem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShipmentItem whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShipmentItem whereOrderItemId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShipmentItem whereQuantity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShipmentItem whereShipmentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShipmentItem whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[Fillable(['shipment_id', 'order_item_id', 'quantity'])]
 #[Table(name: 'shipment_items')]

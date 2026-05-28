@@ -14,6 +14,39 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property string|null $description
+ * @property string|null $logo_path
+ * @property bool $is_active
+ * @property int $position
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property \Carbon\CarbonImmutable|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Product> $products
+ * @property-read int|null $products_count
+ * @method static Builder<static>|Brand newModelQuery()
+ * @method static Builder<static>|Brand newQuery()
+ * @method static Builder<static>|Brand onlyTrashed()
+ * @method static Builder<static>|Brand query()
+ * @method static Builder<static>|Brand whereCreatedAt($value)
+ * @method static Builder<static>|Brand whereDeletedAt($value)
+ * @method static Builder<static>|Brand whereDescription($value)
+ * @method static Builder<static>|Brand whereId($value)
+ * @method static Builder<static>|Brand whereIsActive($value)
+ * @method static Builder<static>|Brand whereLogoPath($value)
+ * @method static Builder<static>|Brand whereName($value)
+ * @method static Builder<static>|Brand wherePosition($value)
+ * @method static Builder<static>|Brand whereSlug($value)
+ * @method static Builder<static>|Brand whereUpdatedAt($value)
+ * @method static Builder<static>|Brand withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|Brand withoutTrashed()
+ * @mixin \Eloquent
+ */
 #[Fillable([
     'name', 'slug', 'description', 'logo_path', 'is_active', 'position',
 ])]

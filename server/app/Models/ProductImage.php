@@ -21,6 +21,23 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property ?string $alt_text
  * @property-read ?Media $media
  * @property-read string $path
+ * @property int|null $product_variant_id
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \App\Models\Product $product
+ * @property-read \App\Models\ProductVariant|null $variant
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage whereIsThumbnail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage whereMediaId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage wherePosition($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage whereProductVariantId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'product_id', 'variant_id', 'media_id', 'is_thumbnail', 'position',

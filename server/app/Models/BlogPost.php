@@ -42,6 +42,69 @@ use Spatie\Translatable\HasTranslations;
  * @property string|null $featured_image
  * @property Carbon|null $created_at
  * @property User|null $author
+ * @property int|null $blog_id
+ * @property int|null $user_id
+ * @property int|null $blog_category_id
+ * @property string $content_type
+ * @property int $views_count
+ * @property string $meta_robots
+ * @property string|null $og_image
+ * @property bool $sitemap_exclude
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read \App\Models\Blog|null $blog
+ * @property-read \App\Models\BlogCategory|null $category
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BlogComment> $comments
+ * @property-read int|null $comments_count
+ * @property-read array $translatable_columns_from
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Metafield> $metafields
+ * @property-read int|null $metafields_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Tag> $tags
+ * @property-read int|null $tags_count
+ * @property-read mixed $translations
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ModelVersion> $versions
+ * @property-read int|null $versions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BlogPostVote> $votes
+ * @property-read int|null $votes_count
+ * @method static Builder<static>|BlogPost draft()
+ * @method static \Database\Factories\BlogPostFactory factory($count = null, $state = [])
+ * @method static Builder<static>|BlogPost featured()
+ * @method static Builder<static>|BlogPost newModelQuery()
+ * @method static Builder<static>|BlogPost newQuery()
+ * @method static Builder<static>|BlogPost published()
+ * @method static Builder<static>|BlogPost query()
+ * @method static Builder<static>|BlogPost whereAvailableLocales($value)
+ * @method static Builder<static>|BlogPost whereBlogCategoryId($value)
+ * @method static Builder<static>|BlogPost whereBlogId($value)
+ * @method static Builder<static>|BlogPost whereCanonicalUrl($value)
+ * @method static Builder<static>|BlogPost whereContent($value)
+ * @method static Builder<static>|BlogPost whereContentJson($value)
+ * @method static Builder<static>|BlogPost whereContentType($value)
+ * @method static Builder<static>|BlogPost whereCreatedAt($value)
+ * @method static Builder<static>|BlogPost whereExcerpt($value)
+ * @method static Builder<static>|BlogPost whereFeaturedImage($value)
+ * @method static Builder<static>|BlogPost whereId($value)
+ * @method static Builder<static>|BlogPost whereIsFeatured($value)
+ * @method static Builder<static>|BlogPost whereJsonContainsLocale(string $column, string $locale, ?mixed $value, string $operand = '=')
+ * @method static Builder<static>|BlogPost whereJsonContainsLocales(string $column, array $locales, ?mixed $value, string $operand = '=')
+ * @method static Builder<static>|BlogPost whereLocale(string $column, string $locale)
+ * @method static Builder<static>|BlogPost whereLocales(string $column, array $locales)
+ * @method static Builder<static>|BlogPost whereMetaRobots($value)
+ * @method static Builder<static>|BlogPost whereOgImage($value)
+ * @method static Builder<static>|BlogPost wherePublishedAt($value)
+ * @method static Builder<static>|BlogPost whereReadingTime($value)
+ * @method static Builder<static>|BlogPost whereSeoDescription($value)
+ * @method static Builder<static>|BlogPost whereSeoTitle($value)
+ * @method static Builder<static>|BlogPost whereSitemapExclude($value)
+ * @method static Builder<static>|BlogPost whereSlug($value)
+ * @method static Builder<static>|BlogPost whereStatus($value)
+ * @method static Builder<static>|BlogPost whereTitle($value)
+ * @method static Builder<static>|BlogPost whereTranslationGroupId($value)
+ * @method static Builder<static>|BlogPost whereUpdatedAt($value)
+ * @method static Builder<static>|BlogPost whereUserId($value)
+ * @method static Builder<static>|BlogPost whereViewsCount($value)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'user_id',
@@ -191,20 +254,17 @@ class BlogPost extends Model
             && (bool) Setting::get('search', 'index_blog_posts', true);
     }
 
-    #[Scope]
-    protected function published(Builder $query): Builder
+    public function scopePublished(Builder $query): Builder
     {
         return $query->where('status', BlogPostStatusEnum::Published);
     }
 
-    #[Scope]
-    protected function draft(Builder $query): Builder
+    public function scopeDraft(Builder $query): Builder
     {
         return $query->where('status', BlogPostStatusEnum::Draft);
     }
 
-    #[Scope]
-    protected function featured(Builder $query): Builder
+    public function scopeFeatured(Builder $query): Builder
     {
         return $query->where('is_featured', true);
     }

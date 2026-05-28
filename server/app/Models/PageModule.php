@@ -23,6 +23,37 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $route_key_name
  * @property bool $is_active
  * @property bool $is_system
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ModuleLayout> $activeLayouts
+ * @property-read int|null $active_layouts_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ModuleLayout> $detailLayouts
+ * @property-read int|null $detail_layouts_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ModuleLayout> $layouts
+ * @property-read int|null $layouts_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ModuleLayout> $listLayouts
+ * @property-read int|null $list_layouts_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Page> $pages
+ * @property-read int|null $pages_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereDetailRoutePattern($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereHasDetailPage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereHasListPage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereIcon($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereIsSystem($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereListRoutePattern($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereModelClass($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereRouteKeyName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'key',

@@ -16,6 +16,23 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $id
  * @property string $session_token
  * @property Collection $items
+ * @property int|null $customer_id
+ * @property string|null $discount_code
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \App\Models\Customer|null $customer
+ * @property-read int|null $items_count
+ * @method static \Database\Factories\CartFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart whereCustomerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart whereDiscountCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart whereSessionToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[Guarded(['id'])]
 #[Table(name: 'carts')]

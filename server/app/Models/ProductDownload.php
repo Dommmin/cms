@@ -22,6 +22,22 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int $position
  * @property-read ProductVariant $variant
  * @property-read Media|null $media
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownload newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownload newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownload query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownload whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownload whereFileName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownload whereFilePath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownload whereFileSize($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownload whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownload whereMimeType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownload whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownload wherePosition($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownload whereProductVariantId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownload whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'product_variant_id',

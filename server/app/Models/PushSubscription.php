@@ -16,6 +16,27 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $public_key
  * @property string|null $auth_token
  * @property string|null $content_encoding
+ * @property int|null $user_id
+ * @property string|null $user_agent
+ * @property bool $is_active
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \App\Models\User|null $user
+ * @method static Builder<static>|PushSubscription active()
+ * @method static Builder<static>|PushSubscription newModelQuery()
+ * @method static Builder<static>|PushSubscription newQuery()
+ * @method static Builder<static>|PushSubscription query()
+ * @method static Builder<static>|PushSubscription whereAuthToken($value)
+ * @method static Builder<static>|PushSubscription whereContentEncoding($value)
+ * @method static Builder<static>|PushSubscription whereCreatedAt($value)
+ * @method static Builder<static>|PushSubscription whereEndpoint($value)
+ * @method static Builder<static>|PushSubscription whereId($value)
+ * @method static Builder<static>|PushSubscription whereIsActive($value)
+ * @method static Builder<static>|PushSubscription wherePublicKey($value)
+ * @method static Builder<static>|PushSubscription whereUpdatedAt($value)
+ * @method static Builder<static>|PushSubscription whereUserAgent($value)
+ * @method static Builder<static>|PushSubscription whereUserId($value)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'user_id',

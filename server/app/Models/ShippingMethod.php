@@ -26,6 +26,56 @@ use Spatie\Translatable\HasTranslations;
  * @property float|null $max_depth_cm
  * @property Collection $restrictedProducts
  * @property Collection $restrictedCategories
+ * @property ShippingCarrierEnum $carrier
+ * @property array<array-key, mixed>|null $description
+ * @property numeric|null $min_weight
+ * @property numeric $max_weight
+ * @property bool $requires_signature
+ * @property bool $insurance_available
+ * @property int|null $min_order_value
+ * @property int|null $free_shipping_threshold
+ * @property int $price_per_kg
+ * @property int|null $estimated_days_min
+ * @property int|null $estimated_days_max
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read array $translatable_columns_from
+ * @property-read int|null $restricted_categories_count
+ * @property-read int|null $restricted_products_count
+ * @property-read Collection<int, \App\Models\Shipment> $shipments
+ * @property-read int|null $shipments_count
+ * @property-read mixed $translations
+ * @method static \Database\Factories\ShippingMethodFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereBasePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereCarrier($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereEstimatedDaysMax($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereEstimatedDaysMin($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereFreeShippingThreshold($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereInsuranceAvailable($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereJsonContainsLocale(string $column, string $locale, ?mixed $value, string $operand = '=')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereJsonContainsLocales(string $column, array $locales, ?mixed $value, string $operand = '=')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereLocale(string $column, string $locale)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereLocales(string $column, array $locales)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereMaxDepthCm($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereMaxLengthCm($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereMaxWeight($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereMaxWidthCm($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereMinOrderValue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereMinWeight($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod wherePricePerKg($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereRequiresSignature($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'carrier', 'name', 'description', 'is_active', 'min_weight', 'max_weight',

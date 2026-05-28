@@ -12,6 +12,20 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
+/**
+ * @property int $id
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
+ * @property-read int|null $media_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CmsMedia newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CmsMedia newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CmsMedia query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CmsMedia whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CmsMedia whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CmsMedia whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 #[Table(name: 'cms_media')]
 class CmsMedia extends Model implements HasMedia
 {

@@ -23,6 +23,26 @@ use Illuminate\Support\Facades\Date;
  * @property Carbon|null $read_at
  * @property string|null $action_url
  * @property Carbon|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \App\Models\Customer|null $customer
+ * @property-read \App\Models\User|null $user
+ * @method static \Database\Factories\CustomerNotificationFactory factory($count = null, $state = [])
+ * @method static Builder<static>|CustomerNotification newModelQuery()
+ * @method static Builder<static>|CustomerNotification newQuery()
+ * @method static Builder<static>|CustomerNotification query()
+ * @method static Builder<static>|CustomerNotification unread()
+ * @method static Builder<static>|CustomerNotification whereActionUrl($value)
+ * @method static Builder<static>|CustomerNotification whereBody($value)
+ * @method static Builder<static>|CustomerNotification whereCreatedAt($value)
+ * @method static Builder<static>|CustomerNotification whereCustomerId($value)
+ * @method static Builder<static>|CustomerNotification whereData($value)
+ * @method static Builder<static>|CustomerNotification whereId($value)
+ * @method static Builder<static>|CustomerNotification whereReadAt($value)
+ * @method static Builder<static>|CustomerNotification whereTitle($value)
+ * @method static Builder<static>|CustomerNotification whereType($value)
+ * @method static Builder<static>|CustomerNotification whereUpdatedAt($value)
+ * @method static Builder<static>|CustomerNotification whereUserId($value)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'customer_id',

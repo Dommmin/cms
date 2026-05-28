@@ -12,6 +12,42 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property int $menu_id
+ * @property int|null $parent_id
+ * @property array<array-key, mixed>|null $label
+ * @property string|null $url
+ * @property string $target
+ * @property MenuLinkTypeEnum $link_type
+ * @property int|null $linked_entity_id
+ * @property string|null $icon
+ * @property bool $is_active
+ * @property int $position
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, MenuItem> $children
+ * @property-read int|null $children_count
+ * @property-read \App\Models\Menu $menu
+ * @property-read MenuItem|null $parent
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MenuItem newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MenuItem newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MenuItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MenuItem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MenuItem whereIcon($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MenuItem whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MenuItem whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MenuItem whereLabel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MenuItem whereLinkType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MenuItem whereLinkedEntityId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MenuItem whereMenuId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MenuItem whereParentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MenuItem wherePosition($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MenuItem whereTarget($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MenuItem whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MenuItem whereUrl($value)
+ * @mixin \Eloquent
+ */
 #[Fillable([
     'menu_id', 'parent_id', 'label', 'url', 'target',
     'link_type', 'linked_entity_id', 'icon', 'is_active', 'position',

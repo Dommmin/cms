@@ -13,6 +13,55 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property string|null $description
+ * @property string $type
+ * @property numeric|null $value
+ * @property numeric|null $min_value
+ * @property numeric|null $max_discount
+ * @property string $apply_to
+ * @property bool $is_active
+ * @property bool $is_stackable
+ * @property int $priority
+ * @property \Carbon\CarbonImmutable|null $starts_at
+ * @property \Carbon\CarbonImmutable|null $ends_at
+ * @property array<array-key, mixed>|null $metadata
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Category> $categories
+ * @property-read int|null $categories_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Product> $products
+ * @property-read int|null $products_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion active()
+ * @method static \Database\Factories\PromotionFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereApplyTo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereEndsAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereIsStackable($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereMaxDiscount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereMetadata($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereMinValue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion wherePriority($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereStartsAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereValue($value)
+ * @mixin \Eloquent
+ */
 #[Fillable([
     'name', 'slug', 'description', 'type', 'value', 'min_value', 'max_discount',
     'apply_to', 'is_active', 'is_stackable', 'priority', 'starts_at', 'ends_at', 'metadata',

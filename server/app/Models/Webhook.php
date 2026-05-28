@@ -25,6 +25,32 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property int $failure_count
  * @property Carbon|null $last_triggered_at
  * @property Collection $deliveries
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property \Carbon\CarbonImmutable|null $deleted_at
+ * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read int|null $deliveries_count
+ * @method static \Database\Factories\WebhookFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereEvents($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereFailureCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereLastTriggeredAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereSecret($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook withoutTrashed()
+ * @mixin \Eloquent
  */
 #[Fillable([
     'name',

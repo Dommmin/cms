@@ -13,6 +13,28 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 /**
  * @property int $id
  * @property string $type
+ * @property string $name
+ * @property string|null $description
+ * @property array<array-key, mixed>|null $rules
+ * @property-read int|null $customers_count
+ * @property bool $is_active
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Customer> $customers
+ * @method static \Database\Factories\CustomerSegmentFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereCustomersCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereRules($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'name',

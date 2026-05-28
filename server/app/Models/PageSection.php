@@ -24,6 +24,24 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read Page $page
  * @property-read Collection<int, PageBlock> $blocks
  * @property-read Collection<int, PageBlock> $allBlocks
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read int|null $all_blocks_count
+ * @property-read int|null $blocks_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageSection newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageSection newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageSection query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageSection whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageSection whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageSection whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageSection whereLayout($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageSection wherePageId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageSection wherePosition($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageSection whereSectionType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageSection whereSettings($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageSection whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageSection whereVariant($value)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'page_id', 'section_type', 'layout', 'variant', 'settings', 'position', 'is_active',

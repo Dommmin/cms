@@ -11,6 +11,29 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property string $locale_code
+ * @property string $group
+ * @property string $key
+ * @property string $value
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \App\Models\Locale $locale
+ * @method static Builder<static>|Translation forLocale(string $localeCode)
+ * @method static Builder<static>|Translation inGroup(string $group)
+ * @method static Builder<static>|Translation newModelQuery()
+ * @method static Builder<static>|Translation newQuery()
+ * @method static Builder<static>|Translation query()
+ * @method static Builder<static>|Translation whereCreatedAt($value)
+ * @method static Builder<static>|Translation whereGroup($value)
+ * @method static Builder<static>|Translation whereId($value)
+ * @method static Builder<static>|Translation whereKey($value)
+ * @method static Builder<static>|Translation whereLocaleCode($value)
+ * @method static Builder<static>|Translation whereUpdatedAt($value)
+ * @method static Builder<static>|Translation whereValue($value)
+ * @mixin \Eloquent
+ */
 #[Fillable([
     'locale_code',
     'group',

@@ -14,6 +14,38 @@ use Illuminate\Support\Collection;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+/**
+ * @property int $id
+ * @property string $code
+ * @property string $name
+ * @property string $native_name
+ * @property string|null $flag_emoji
+ * @property string|null $currency_code
+ * @property bool $is_default
+ * @property bool $is_active
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Translation> $translations
+ * @property-read int|null $translations_count
+ * @method static Builder<static>|Locale active()
+ * @method static Builder<static>|Locale default()
+ * @method static Builder<static>|Locale newModelQuery()
+ * @method static Builder<static>|Locale newQuery()
+ * @method static Builder<static>|Locale query()
+ * @method static Builder<static>|Locale whereCode($value)
+ * @method static Builder<static>|Locale whereCreatedAt($value)
+ * @method static Builder<static>|Locale whereCurrencyCode($value)
+ * @method static Builder<static>|Locale whereFlagEmoji($value)
+ * @method static Builder<static>|Locale whereId($value)
+ * @method static Builder<static>|Locale whereIsActive($value)
+ * @method static Builder<static>|Locale whereIsDefault($value)
+ * @method static Builder<static>|Locale whereName($value)
+ * @method static Builder<static>|Locale whereNativeName($value)
+ * @method static Builder<static>|Locale whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 #[Fillable([
     'code',
     'name',

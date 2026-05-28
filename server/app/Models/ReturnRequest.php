@@ -28,6 +28,29 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property Carbon $created_at
  * @property Collection $items
  * @property-read Order $order
+ * @property int $order_id
+ * @property string|null $return_label_url
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read int|null $items_count
+ * @property-read Collection<int, \App\Models\ReturnStatusHistory> $statusHistory
+ * @property-read int|null $status_history_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnRequest newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnRequest newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnRequest query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnRequest whereAdminNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnRequest whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnRequest whereCustomerNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnRequest whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnRequest whereOrderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnRequest whereReason($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnRequest whereReferenceNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnRequest whereRefundAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnRequest whereReturnLabelUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnRequest whereReturnTrackingNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnRequest whereReturnType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnRequest whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnRequest whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'order_id', 'reference_number', 'return_type', 'status',

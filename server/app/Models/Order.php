@@ -56,6 +56,51 @@ use Spatie\ModelStates\HasStates;
  * @property Shipment|null $shipment
  * @property Payment|null $payment
  * @property Collection $returns
+ * @property int|null $customer_id
+ * @property int $billing_address_id
+ * @property int $shipping_address_id
+ * @property numeric $exchange_rate
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read \App\Models\Address $billingAddress
+ * @property-read int|null $items_count
+ * @property-read int|null $returns_count
+ * @property-read Collection<int, \App\Models\Shipment> $shipments
+ * @property-read int|null $shipments_count
+ * @property-read \App\Models\Address $shippingAddress
+ * @property-read Collection<int, \App\Models\OrderStatusHistory> $statusHistory
+ * @property-read int|null $status_history_count
+ * @method static \Database\Factories\OrderFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order orWhereNotState(string $column, $states)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order orWhereState(string $column, $states)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereBillingAddressId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereBuyerCompanyName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereBuyerVatId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereCurrencyCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereCustomerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereDiscountAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereExchangeRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereGuestEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereInvoiceIssuedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereInvoiceNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereNotState(string $column, $states)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereReferenceNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereShippingAddressId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereShippingCost($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereState(string $column, $states)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereSubtotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereTaxAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'reference_number', 'invoice_number', 'invoice_issued_at', 'buyer_vat_id', 'buyer_company_name',

@@ -22,6 +22,36 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property array<string, mixed>|null $containers
  * @property array<string, mixed>|null $settings
  * @property bool $is_active
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property string|null $description
+ * @property string|null $preview_image
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Page> $pages
+ * @property-read int|null $pages_count
+ * @method static \Database\Factories\ThemeFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Theme newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Theme newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Theme query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Theme whereButtons($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Theme whereContainers($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Theme whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Theme whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Theme whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Theme whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Theme whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Theme wherePreviewImage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Theme whereSettings($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Theme whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Theme whereSpacing($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Theme whereTokens($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Theme whereTypography($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Theme whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'name',

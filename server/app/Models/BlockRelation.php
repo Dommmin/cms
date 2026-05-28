@@ -23,6 +23,24 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property array|null $metadata
  * @property-read PageBlock $block
  * @property-read Model $related
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @method static Builder<static>|BlockRelation newModelQuery()
+ * @method static Builder<static>|BlockRelation newQuery()
+ * @method static Builder<static>|BlockRelation ofType(string $type)
+ * @method static Builder<static>|BlockRelation ordered()
+ * @method static Builder<static>|BlockRelation query()
+ * @method static Builder<static>|BlockRelation whereCreatedAt($value)
+ * @method static Builder<static>|BlockRelation whereId($value)
+ * @method static Builder<static>|BlockRelation whereMetadata($value)
+ * @method static Builder<static>|BlockRelation wherePageBlockId($value)
+ * @method static Builder<static>|BlockRelation wherePosition($value)
+ * @method static Builder<static>|BlockRelation whereRelationId($value)
+ * @method static Builder<static>|BlockRelation whereRelationKey($value)
+ * @method static Builder<static>|BlockRelation whereRelationType($value)
+ * @method static Builder<static>|BlockRelation whereUpdatedAt($value)
+ * @method static Builder<static>|BlockRelation withKey(string $key)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'page_block_id',

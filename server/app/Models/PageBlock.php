@@ -25,6 +25,25 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read Page $page
  * @property-read PageSection|null $section
  * @property-read Collection<BlockRelation> $relations
+ * @property int|null $reusable_block_id
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read int|null $relations_count
+ * @property-read \App\Models\ReusableBlock|null $reusableBlock
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock whereConfiguration($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock wherePageId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock wherePosition($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock whereReusableBlockId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock whereSectionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'page_id', 'section_id', 'type', 'configuration', 'position', 'is_active', 'reusable_block_id',

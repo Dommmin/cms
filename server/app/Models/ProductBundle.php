@@ -14,6 +14,27 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 /**
  * @property Collection $items
  * @property int $discount_percentage
+ * @property int $id
+ * @property int $product_id
+ * @property string $name
+ * @property string|null $description
+ * @property bool $is_active
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read int|null $items_count
+ * @property-read \App\Models\Product $product
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle whereDiscountPercentage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'product_id',

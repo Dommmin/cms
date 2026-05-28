@@ -35,6 +35,55 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property Carbon|null $created_at
  * @property int $total_sent
  * @property int $sends_count
+ * @property int|null $newsletter_segment_id
+ * @property array<array-key, mixed>|null $target_tags
+ * @property \Carbon\CarbonImmutable|null $started_sending_at
+ * @property \Carbon\CarbonImmutable|null $finished_sending_at
+ * @property int $total_recipients
+ * @property int $total_delivered
+ * @property int $total_opened
+ * @property int $total_clicked
+ * @property int $total_bounced
+ * @property int $total_unsubscribed
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NewsletterClick> $clicks
+ * @property-read int|null $clicks_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NewsletterOpen> $opens
+ * @property-read int|null $opens_count
+ * @property-read \App\Models\NewsletterSegment|null $segment
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NewsletterSend> $sends
+ * @method static \Database\Factories\NewsletterCampaignFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereAudienceType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereFinishedSendingAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereHtmlContent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereNewsletterSegmentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign wherePlainTextContent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign wherePreviewText($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereScheduledAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereSenderEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereSenderName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereStartedSendingAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereSubject($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereTargetTags($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereTotalBounced($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereTotalClicked($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereTotalDelivered($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereTotalOpened($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereTotalRecipients($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereTotalSent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereTotalUnsubscribed($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereTrigger($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereTriggerDelayHours($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterCampaign whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[Appends(['sends_count'])]
 #[Fillable([

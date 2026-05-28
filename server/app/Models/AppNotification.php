@@ -27,6 +27,25 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $sent_at
  * @property Carbon|null $failed_at
  * @property-read Customer|null $customer
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AppNotification newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AppNotification newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AppNotification query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AppNotification whereChannel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AppNotification whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AppNotification whereCustomerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AppNotification whereErrorMessage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AppNotification whereFailedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AppNotification whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AppNotification whereMetadata($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AppNotification whereRelatedModel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AppNotification whereRelatedModelId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AppNotification whereSentAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AppNotification whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AppNotification whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AppNotification whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'customer_id', 'type', 'channel', 'status',

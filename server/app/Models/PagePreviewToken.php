@@ -17,6 +17,24 @@ use Illuminate\Support\Carbon;
  * @property string $token_hash
  * @property Carbon $expires_at
  * @property int|null $created_by
+ * @property int $id
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \App\Models\User|null $creator
+ * @property-read \App\Models\Page $page
+ * @property-read \App\Models\PageVersion|null $version
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PagePreviewToken newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PagePreviewToken newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PagePreviewToken query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PagePreviewToken whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PagePreviewToken whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PagePreviewToken whereExpiresAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PagePreviewToken whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PagePreviewToken wherePageId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PagePreviewToken wherePageVersionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PagePreviewToken whereTokenHash($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PagePreviewToken whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[Fillable([
     'page_id', 'page_version_id', 'token_hash', 'expires_at', 'created_by',

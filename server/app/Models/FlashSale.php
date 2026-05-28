@@ -28,6 +28,29 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property int $stock_sold
  * @property Product|null $product
  * @property ProductVariant|null $variant
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read string $status
+ * @method static Builder<static>|FlashSale active()
+ * @method static \Database\Factories\FlashSaleFactory factory($count = null, $state = [])
+ * @method static Builder<static>|FlashSale newModelQuery()
+ * @method static Builder<static>|FlashSale newQuery()
+ * @method static Builder<static>|FlashSale query()
+ * @method static Builder<static>|FlashSale whereCreatedAt($value)
+ * @method static Builder<static>|FlashSale whereEndsAt($value)
+ * @method static Builder<static>|FlashSale whereId($value)
+ * @method static Builder<static>|FlashSale whereIsActive($value)
+ * @method static Builder<static>|FlashSale whereName($value)
+ * @method static Builder<static>|FlashSale whereProductId($value)
+ * @method static Builder<static>|FlashSale whereSalePrice($value)
+ * @method static Builder<static>|FlashSale whereStartsAt($value)
+ * @method static Builder<static>|FlashSale whereStockLimit($value)
+ * @method static Builder<static>|FlashSale whereStockSold($value)
+ * @method static Builder<static>|FlashSale whereUpdatedAt($value)
+ * @method static Builder<static>|FlashSale whereVariantId($value)
+ * @mixin \Eloquent
  */
 #[Guarded(['id'])]
 #[Table(name: 'flash_sales')]

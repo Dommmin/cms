@@ -10,6 +10,41 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property string $code
+ * @property string $discount_type
+ * @property int $discount_value Percentage (0-100) or fixed amount in cents
+ * @property numeric $commission_rate Commission percentage paid to affiliate
+ * @property int|null $max_uses null = unlimited
+ * @property int $uses_count
+ * @property bool $is_active
+ * @property \Carbon\CarbonImmutable|null $expires_at
+ * @property string|null $notes
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Referral> $referrals
+ * @property-read int|null $referrals_count
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AffiliateCode newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AffiliateCode newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AffiliateCode query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AffiliateCode whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AffiliateCode whereCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AffiliateCode whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AffiliateCode whereDiscountType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AffiliateCode whereDiscountValue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AffiliateCode whereExpiresAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AffiliateCode whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AffiliateCode whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AffiliateCode whereMaxUses($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AffiliateCode whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AffiliateCode whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AffiliateCode whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AffiliateCode whereUsesCount($value)
+ * @mixin \Eloquent
+ */
 #[Fillable([
     'user_id',
     'code',

@@ -11,6 +11,34 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+/**
+ * @property int $id
+ * @property string $versionable_type
+ * @property int $versionable_id
+ * @property int $version_number
+ * @property array<array-key, mixed> $snapshot
+ * @property array<array-key, mixed>|null $changes
+ * @property string $event
+ * @property int|null $created_by
+ * @property string|null $change_note
+ * @property \Carbon\CarbonImmutable $created_at
+ * @property-read \App\Models\User|null $creator
+ * @property-read Model|\Eloquent $versionable
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereChangeNote($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereChanges($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereEvent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereSnapshot($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereVersionNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereVersionableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereVersionableType($value)
+ * @mixin \Eloquent
+ */
 #[Fillable([
     'versionable_type',
     'versionable_id',

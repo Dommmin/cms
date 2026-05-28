@@ -34,6 +34,86 @@ use Spatie\Translatable\HasTranslations;
  * @property bool $is_featured
  * @property bool $is_active
  * @property-read ProductImage|null $thumbnail
+ * @property int $product_type_id
+ * @property int $category_id
+ * @property int|null $brand_id
+ * @property array<array-key, mixed>|null $description
+ * @property array<array-key, mixed>|null $short_description
+ * @property string|null $sku_prefix
+ * @property bool $is_saleable
+ * @property \Carbon\CarbonImmutable|null $available_from
+ * @property \Carbon\CarbonImmutable|null $available_until
+ * @property string|null $seo_title
+ * @property string|null $seo_description
+ * @property string $meta_robots
+ * @property string|null $og_image
+ * @property bool $sitemap_exclude
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductVariant> $activeVariants
+ * @property-read int|null $active_variants_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read \App\Models\Brand|null $brand
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Category> $categories
+ * @property-read int|null $categories_count
+ * @property-read \App\Models\Category $category
+ * @property-read \App\Models\ProductVariant|null $defaultVariant
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductFlag> $flags
+ * @property-read int|null $flags_count
+ * @property-read array $translatable_columns_from
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductImage> $images
+ * @property-read int|null $images_count
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read int|null $media_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Metafield> $metafields
+ * @property-read int|null $metafields_count
+ * @property-read \App\Models\ProductType $productType
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Promotion> $promotions
+ * @property-read int|null $promotions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductReview> $reviews
+ * @property-read int|null $reviews_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Tag> $tags
+ * @property-read int|null $tags_count
+ * @property-read mixed $translations
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductVariant> $variants
+ * @property-read int|null $variants_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ModelVersion> $versions
+ * @property-read int|null $versions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\WishlistItem> $wishlistItems
+ * @property-read int|null $wishlist_items_count
+ * @method static Builder<static>|Product available()
+ * @method static \Database\Factories\ProductFactory factory($count = null, $state = [])
+ * @method static Builder<static>|Product newModelQuery()
+ * @method static Builder<static>|Product newQuery()
+ * @method static Builder<static>|Product query()
+ * @method static Builder<static>|Product whereAvailableFrom($value)
+ * @method static Builder<static>|Product whereAvailableUntil($value)
+ * @method static Builder<static>|Product whereBrandId($value)
+ * @method static Builder<static>|Product whereCategoryId($value)
+ * @method static Builder<static>|Product whereCreatedAt($value)
+ * @method static Builder<static>|Product whereDescription($value)
+ * @method static Builder<static>|Product whereId($value)
+ * @method static Builder<static>|Product whereIsActive($value)
+ * @method static Builder<static>|Product whereIsFeatured($value)
+ * @method static Builder<static>|Product whereIsSaleable($value)
+ * @method static Builder<static>|Product whereIsSearchPromoted($value)
+ * @method static Builder<static>|Product whereJsonContainsLocale(string $column, string $locale, ?mixed $value, string $operand = '=')
+ * @method static Builder<static>|Product whereJsonContainsLocales(string $column, array $locales, ?mixed $value, string $operand = '=')
+ * @method static Builder<static>|Product whereLocale(string $column, string $locale)
+ * @method static Builder<static>|Product whereLocales(string $column, array $locales)
+ * @method static Builder<static>|Product whereMetaRobots($value)
+ * @method static Builder<static>|Product whereName($value)
+ * @method static Builder<static>|Product whereOgImage($value)
+ * @method static Builder<static>|Product whereProductTypeId($value)
+ * @method static Builder<static>|Product whereSeoDescription($value)
+ * @method static Builder<static>|Product whereSeoTitle($value)
+ * @method static Builder<static>|Product whereShortDescription($value)
+ * @method static Builder<static>|Product whereSitemapExclude($value)
+ * @method static Builder<static>|Product whereSkuPrefix($value)
+ * @method static Builder<static>|Product whereSlug($value)
+ * @method static Builder<static>|Product whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[Guarded(['id'])]
 #[Table(name: 'products')]
