@@ -44,13 +44,14 @@ export default function AccountLayout({
 
     // Strip locale prefix before comparing against href
     const pathWithoutLocale = stripLocaleFromPath(pathname);
+    const isWishlistRedirect = pathWithoutLocale === '/account/wishlist';
 
     useEffect(() => {
         void Promise.resolve().then(() => setMounted(true));
-        if (!getToken()) {
+        if (!isWishlistRedirect && !getToken()) {
             router.push(lp('/login'));
         }
-    }, [lp, router]);
+    }, [lp, router, isWishlistRedirect]);
 
     // Show skeleton until mounted (avoids hydration mismatch from typeof window checks)
     if (!mounted || isLoading) {
@@ -59,6 +60,10 @@ export default function AccountLayout({
                 <div className="bg-muted h-8 w-48 animate-pulse rounded" />
             </div>
         );
+    }
+
+    if (isWishlistRedirect) {
+        return children;
     }
 
     if (!user) {

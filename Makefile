@@ -1,4 +1,4 @@
-.PHONY: up stop down build install install-local shell migrate fresh test setup-test-db logs pail seed fresh-seed scout-import clear sync-translations npm-build pint fix check mobile-install mobile-start mobile-start-lan mobile-start-tunnel mobile-ios mobile-android mobile-web mobile-types mobile-lint mobile-check e2e e2e-report glitchtip-up glitchtip-down glitchtip-logs nuke-volumes help
+.PHONY: up stop down build install install-local audit shell migrate fresh test setup-test-db logs pail seed fresh-seed scout-import clear sync-translations npm-build pint fix check mobile-install mobile-start mobile-start-lan mobile-start-tunnel mobile-ios mobile-android mobile-web mobile-types mobile-lint mobile-check e2e e2e-report glitchtip-up glitchtip-down glitchtip-logs nuke-volumes help
 
 # Set environment variables
 export UID = $(shell id -u)
@@ -15,6 +15,7 @@ help:
 	@echo "  build              - Build containers"
 	@echo "  install            - Install dependencies"
 	@echo "  install-local      - Install dependencies locally"
+	@echo "  audit      		- Security audit"
 	@echo "  migrate            - Run migrations"
 	@echo "  fresh              - Fresh migrations"
 	@echo "  seed               - Seed database"
@@ -86,6 +87,11 @@ install:
 install-local:
 	cd server && npm install
 	cd client && npm install
+
+audit:
+	docker compose exec php composer outdated
+	docker compose exec php npm audit
+	docker compose exec node npm audit
 
 # Run migrations
 migrate:

@@ -411,6 +411,17 @@ class Page extends Model
 
         $found = $baseQuery()->where('locale', $locale)->first();
 
-        return $found ?? $baseQuery()->whereNull('locale')->first();
+        $resolved = $found ?? $baseQuery()->whereNull('locale')->first();
+
+        if (! $resolved && $segment === 'home' && $parentId === null) {
+            return self::query()
+                ->where('is_published', true)
+                ->where('locale', $locale)
+                ->whereNull('parent_id')
+                ->where('position', 1)
+                ->first();
+        }
+
+        return $resolved;
     }
 }

@@ -6,7 +6,7 @@ const FALLBACK_DEFAULT_LOCALE = 'pl';
 const API_URL =
     process.env.API_URL ??
     process.env.NEXT_PUBLIC_API_URL ??
-    'http://localhost/api/v1';
+    'http://nginx/api/v1';
 
 interface I18nConfig {
     locales: string[];
@@ -33,6 +33,7 @@ const SESSION_PATHS = [
     '/register',
     '/forgot-password',
     '/newsletter',
+    '/wishlist',
 ];
 
 function isSessionPath(path: string): boolean {

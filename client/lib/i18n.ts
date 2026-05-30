@@ -1,5 +1,5 @@
 export const FALLBACK_LOCALES = ['pl', 'en'] as const;
-export const FALLBACK_DEFAULT_LOCALE = 'pl';
+export const FALLBACK_DEFAULT_LOCALE = 'en';
 
 export type Locale = string;
 

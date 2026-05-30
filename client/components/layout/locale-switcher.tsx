@@ -107,7 +107,7 @@ export function LocaleSwitcher() {
             <button
                 type="button"
                 onClick={() => setOpen((o) => !o)}
-                className="border-border bg-background text-foreground focus:ring-ring flex cursor-pointer items-center rounded-md border px-2 py-1 text-sm focus:ring-2 focus:outline-none"
+                className="border-border bg-background text-foreground focus:ring-ring flex cursor-pointer items-center gap-1.5 rounded-md border px-2.5 py-1 text-sm focus:ring-2 focus:outline-none"
                 aria-haspopup="listbox"
                 aria-expanded={open}
                 aria-label={`${current.native_name} (${current.code.toUpperCase()})`}
@@ -117,6 +117,7 @@ export function LocaleSwitcher() {
                         {current.flag_emoji}
                     </span>
                 )}
+                <span>{current.native_name}</span>
             </button>
 
             {open && mounted && typeof document !== 'undefined'
@@ -129,12 +130,11 @@ export function LocaleSwitcher() {
                               ...(direction === 'up'
                                   ? { bottom: position.bottom }
                                   : { top: position.top }),
-                              left: alignRight
-                                  ? Math.max(
-                                        8,
-                                        position.left + position.width - 1,
-                                    )
-                                  : position.left,
+                              left: alignRight ? 'auto' : position.left,
+                              right: alignRight
+                                  ? window.innerWidth -
+                                    (position.left + position.width)
+                                  : 'auto',
                               zIndex: 210,
                           }}
                       >

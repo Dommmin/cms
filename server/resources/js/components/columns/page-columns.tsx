@@ -53,9 +53,9 @@ export function usePageColumns(): ColumnDef<PageRow>[] {
             cell: ({ row }) => (
                 <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
                     {row.original.parent
-                        ? `/${row.original.parent.slug}/`
+                        ? `/${resolveLocalizedText(row.original.parent.slug)}/`
                         : '/'}
-                    {row.original.slug}
+                    {resolveLocalizedText(row.original.slug)}
                 </code>
             ),
         },
