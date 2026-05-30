@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\PageBlockTypeEnum;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,24 +28,26 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read PageSection|null $section
  * @property-read Collection<BlockRelation> $relations
  * @property int|null $reusable_block_id
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
  * @property-read int|null $relations_count
- * @property-read \App\Models\ReusableBlock|null $reusableBlock
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock whereConfiguration($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock wherePageId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock wherePosition($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock whereReusableBlockId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock whereSectionId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageBlock whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @property-read ReusableBlock|null $reusableBlock
+ *
+ * @method static Builder<static>|PageBlock newModelQuery()
+ * @method static Builder<static>|PageBlock newQuery()
+ * @method static Builder<static>|PageBlock query()
+ * @method static Builder<static>|PageBlock whereConfiguration($value)
+ * @method static Builder<static>|PageBlock whereCreatedAt($value)
+ * @method static Builder<static>|PageBlock whereId($value)
+ * @method static Builder<static>|PageBlock whereIsActive($value)
+ * @method static Builder<static>|PageBlock wherePageId($value)
+ * @method static Builder<static>|PageBlock wherePosition($value)
+ * @method static Builder<static>|PageBlock whereReusableBlockId($value)
+ * @method static Builder<static>|PageBlock whereSectionId($value)
+ * @method static Builder<static>|PageBlock whereType($value)
+ * @method static Builder<static>|PageBlock whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'page_id', 'section_id', 'type', 'configuration', 'position', 'is_active', 'reusable_block_id',
@@ -92,7 +96,7 @@ class PageBlock extends Model
         return $query->get();
     }
 
-    public function getRelatedModels(string $type, ?string $key = null): Collection
+    public function getRelatedModels(string $type, ?string $key = null): \Illuminate\Support\Collection
     {
         $relations = $this->getRelationsByType($type, $key);
 
@@ -101,6 +105,7 @@ class PageBlock extends Model
             return collect();
         }
 
+        /** @var class-string<Model> $modelClass */
         $modelClass = $config['model'];
         $ids = $relations->pluck('relation_id')->toArray();
 
@@ -108,12 +113,12 @@ class PageBlock extends Model
             return collect();
         }
 
-        $models = $modelClass::whereIn('id', $ids)->get();
+        $models = $modelClass::query()->whereIn('id', $ids)->get();
 
         return collect($ids)->map(fn ($id) => $models->firstWhere('id', $id))->filter();
     }
 
-    public function getMediaByKey(string $key): Collection
+    public function getMediaByKey(string $key): \Illuminate\Support\Collection
     {
         return $this->getRelatedModels('media.image', $key)
             ->merge($this->getRelatedModels('media.icon', $key))
@@ -148,9 +153,10 @@ class PageBlock extends Model
                 continue;
             }
 
+            /** @var class-string<Model> $modelClass */
             $modelClass = $config['model'];
             $ids = $relations->pluck('relation_id')->toArray();
-            $models = $modelClass::whereIn('id', $ids)->get();
+            $models = $modelClass::query()->whereIn('id', $ids)->get();
 
             $byKey = $relations->groupBy('relation_key');
 

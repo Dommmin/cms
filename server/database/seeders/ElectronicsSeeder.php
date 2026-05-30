@@ -906,7 +906,7 @@ class ElectronicsSeeder extends Seeder
         ];
 
         foreach ($tvs as [$brand, $size, $tech, $priceMin, $priceMax]) {
-            $category = $categoryMap[$size] ?? 'Telewizory 55 cali';
+            $category = $categoryMap[$size];
             $brandKey = 'TV Audio::'.$brand;
 
             for ($i = 0; $i < 4; $i++) {

@@ -6,8 +6,10 @@ namespace App\Models;
 
 use App\Enums\WidgetSize;
 use App\Enums\WidgetType;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,26 +24,28 @@ use Illuminate\Database\Eloquent\Model;
  * @property array<array-key, mixed>|null $permissions
  * @property string|null $icon
  * @property string|null $color
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget active()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget ordered()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget whereColor($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget whereConfig($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget whereIcon($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget whereOrder($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget wherePermissions($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget whereSize($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget whereTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ *
+ * @method static Builder<static>|DashboardWidget active()
+ * @method static Builder<static>|DashboardWidget newModelQuery()
+ * @method static Builder<static>|DashboardWidget newQuery()
+ * @method static Builder<static>|DashboardWidget ordered()
+ * @method static Builder<static>|DashboardWidget query()
+ * @method static Builder<static>|DashboardWidget whereColor($value)
+ * @method static Builder<static>|DashboardWidget whereConfig($value)
+ * @method static Builder<static>|DashboardWidget whereCreatedAt($value)
+ * @method static Builder<static>|DashboardWidget whereIcon($value)
+ * @method static Builder<static>|DashboardWidget whereId($value)
+ * @method static Builder<static>|DashboardWidget whereIsActive($value)
+ * @method static Builder<static>|DashboardWidget whereOrder($value)
+ * @method static Builder<static>|DashboardWidget wherePermissions($value)
+ * @method static Builder<static>|DashboardWidget whereSize($value)
+ * @method static Builder<static>|DashboardWidget whereTitle($value)
+ * @method static Builder<static>|DashboardWidget whereType($value)
+ * @method static Builder<static>|DashboardWidget whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'title',

@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
+use Database\Factories\CookieConsentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,23 +21,25 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $category
  * @property string|null $ip
  * @property string|null $user_agent
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @method static \Database\Factories\CookieConsentFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CookieConsent newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CookieConsent newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CookieConsent query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CookieConsent whereCategory($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CookieConsent whereConsentVersion($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CookieConsent whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CookieConsent whereGranted($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CookieConsent whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CookieConsent whereIp($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CookieConsent whereSessionId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CookieConsent whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CookieConsent whereUserAgent($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CookieConsent whereUserId($value)
- * @mixin \Eloquent
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ *
+ * @method static CookieConsentFactory factory($count = null, $state = [])
+ * @method static Builder<static>|CookieConsent newModelQuery()
+ * @method static Builder<static>|CookieConsent newQuery()
+ * @method static Builder<static>|CookieConsent query()
+ * @method static Builder<static>|CookieConsent whereCategory($value)
+ * @method static Builder<static>|CookieConsent whereConsentVersion($value)
+ * @method static Builder<static>|CookieConsent whereCreatedAt($value)
+ * @method static Builder<static>|CookieConsent whereGranted($value)
+ * @method static Builder<static>|CookieConsent whereId($value)
+ * @method static Builder<static>|CookieConsent whereIp($value)
+ * @method static Builder<static>|CookieConsent whereSessionId($value)
+ * @method static Builder<static>|CookieConsent whereUpdatedAt($value)
+ * @method static Builder<static>|CookieConsent whereUserAgent($value)
+ * @method static Builder<static>|CookieConsent whereUserId($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'session_id',

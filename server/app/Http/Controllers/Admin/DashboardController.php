@@ -226,7 +226,7 @@ class DashboardController extends Controller
             ->get()
             ->map(fn ($variant): array => [
                 'id' => $variant->id,
-                'name' => $variant->product?->name ?? 'Variant #'.$variant->id,
+                'name' => $variant->product->name ?? 'Variant #'.$variant->id,
                 'sku' => $variant->sku,
                 'stock' => $variant->stock_quantity,
             ])
@@ -241,7 +241,7 @@ class DashboardController extends Controller
             ->orderByDesc('total_revenue')
             ->limit($limit)
             ->get()
-            ->map(fn ($row): array => [
+            ->map(fn (mixed $row): array => [
                 'name' => $row->product_name,
                 'total_qty' => (int) $row->total_qty,
                 'total_revenue' => (int) $row->total_revenue,
@@ -267,7 +267,7 @@ class DashboardController extends Controller
                 ->get()
                 ->map(fn ($review): array => [
                     'id' => $review->id,
-                    'name' => $review->product?->name ?? '—',
+                    'name' => $review->product->name ?? '—',
                     'author' => $review->author ?? 'Anonymous',
                     'rating' => $review->rating,
                     'status' => $review->status,
@@ -301,8 +301,8 @@ class DashboardController extends Controller
 
                 foreach ($config['columns'] ?? [] as $column) {
                     $data[$column] = match ($column) {
-                        'customer' => $item->customer?->name ?? 'Guest',
-                        'created_at' => $item->created_at?->diffForHumans(),
+                        'customer' => $item->customer->name ?? 'Guest',
+                        'created_at' => $item->created_at->diffForHumans(),
                         default => $item->{$column} ?? null,
                     };
                 }

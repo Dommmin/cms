@@ -59,7 +59,7 @@ class OrdersExport implements FromQuery, ShouldAutoSize, ShouldQueue, WithHeadin
             $row->payment?->status,
             $row->shipment?->shippingMethod?->name,
             $row->shipment?->tracking_number,
-            $row->created_at?->toDateTimeString(),
+            $row->created_at->toDateTimeString(),
         ];
     }
 }

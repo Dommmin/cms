@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Modules\Core\Domain\Models\Currency;
+use Carbon\CarbonImmutable;
+use Database\Factories\ProductVariantFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
@@ -50,52 +54,54 @@ use Spatie\Translatable\HasTranslations;
  * @property-read Collection<int, ProductImage> $images
  * @property-read Collection<int, ProductDownload> $downloads
  * @property-read Collection<int, PriceHistory> $priceHistory
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read int|null $attribute_values_count
  * @property-read int|null $downloads_count
  * @property-read array $translatable_columns_from
  * @property-read int|null $images_count
  * @property-read int|null $price_history_count
- * @property-read Collection<int, \App\Models\ProductVariantPriceTier> $priceTiers
+ * @property-read Collection<int, ProductVariantPriceTier> $priceTiers
  * @property-read int|null $price_tiers_count
  * @property-read mixed $translations
- * @method static \Database\Factories\ProductVariantFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereAvailableAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereBackorderAllowed($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereBarcode($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereCompareAtPrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereCostPrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereDownloadExpiryDays($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereDownloadLimit($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereEan($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereIsDefault($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereIsDigital($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereJsonContainsLocale(string $column, string $locale, ?mixed $value, string $operand = '=')
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereJsonContainsLocales(string $column, array $locales, ?mixed $value, string $operand = '=')
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereLocale(string $column, string $locale)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereLocales(string $column, array $locales)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant wherePosition($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant wherePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereProductId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereSku($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereStockQuantity($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereStockStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereStockThreshold($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereTaxRateId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereUpc($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariant whereWeight($value)
- * @mixin \Eloquent
+ *
+ * @method static ProductVariantFactory factory($count = null, $state = [])
+ * @method static Builder<static>|ProductVariant newModelQuery()
+ * @method static Builder<static>|ProductVariant newQuery()
+ * @method static Builder<static>|ProductVariant query()
+ * @method static Builder<static>|ProductVariant whereAvailableAt($value)
+ * @method static Builder<static>|ProductVariant whereBackorderAllowed($value)
+ * @method static Builder<static>|ProductVariant whereBarcode($value)
+ * @method static Builder<static>|ProductVariant whereCompareAtPrice($value)
+ * @method static Builder<static>|ProductVariant whereCostPrice($value)
+ * @method static Builder<static>|ProductVariant whereCreatedAt($value)
+ * @method static Builder<static>|ProductVariant whereDownloadExpiryDays($value)
+ * @method static Builder<static>|ProductVariant whereDownloadLimit($value)
+ * @method static Builder<static>|ProductVariant whereEan($value)
+ * @method static Builder<static>|ProductVariant whereId($value)
+ * @method static Builder<static>|ProductVariant whereIsActive($value)
+ * @method static Builder<static>|ProductVariant whereIsDefault($value)
+ * @method static Builder<static>|ProductVariant whereIsDigital($value)
+ * @method static Builder<static>|ProductVariant whereJsonContainsLocale(string $column, string $locale, ?mixed $value, string $operand = '=')
+ * @method static Builder<static>|ProductVariant whereJsonContainsLocales(string $column, array $locales, ?mixed $value, string $operand = '=')
+ * @method static Builder<static>|ProductVariant whereLocale(string $column, string $locale)
+ * @method static Builder<static>|ProductVariant whereLocales(string $column, array $locales)
+ * @method static Builder<static>|ProductVariant whereName($value)
+ * @method static Builder<static>|ProductVariant wherePosition($value)
+ * @method static Builder<static>|ProductVariant wherePrice($value)
+ * @method static Builder<static>|ProductVariant whereProductId($value)
+ * @method static Builder<static>|ProductVariant whereSku($value)
+ * @method static Builder<static>|ProductVariant whereStockQuantity($value)
+ * @method static Builder<static>|ProductVariant whereStockStatus($value)
+ * @method static Builder<static>|ProductVariant whereStockThreshold($value)
+ * @method static Builder<static>|ProductVariant whereTaxRateId($value)
+ * @method static Builder<static>|ProductVariant whereUpc($value)
+ * @method static Builder<static>|ProductVariant whereUpdatedAt($value)
+ * @method static Builder<static>|ProductVariant whereWeight($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'product_id', 'tax_rate_id', 'sku', 'barcode', 'ean', 'upc', 'name', 'price', 'cost_price',

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
+use Database\Factories\BlogCategoryFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,15 +23,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $parent_id
  * @property bool $is_active
  * @property int $position
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, BlogCategory> $children
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, BlogCategory> $children
  * @property-read int|null $children_count
  * @property-read BlogCategory|null $parent
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BlogPost> $posts
+ * @property-read Collection<int, BlogPost> $posts
  * @property-read int|null $posts_count
+ *
  * @method static Builder<static>|BlogCategory active()
- * @method static \Database\Factories\BlogCategoryFactory factory($count = null, $state = [])
+ * @method static BlogCategoryFactory factory($count = null, $state = [])
  * @method static Builder<static>|BlogCategory newModelQuery()
  * @method static Builder<static>|BlogCategory newQuery()
  * @method static Builder<static>|BlogCategory query()
@@ -42,7 +46,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static Builder<static>|BlogCategory wherePosition($value)
  * @method static Builder<static>|BlogCategory whereSlug($value)
  * @method static Builder<static>|BlogCategory whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @mixin Model
  */
 #[Fillable([
     'name',

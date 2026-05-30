@@ -7,6 +7,7 @@ namespace App\Concerns;
 use App\Models\ModelVersion;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Auth;
+use RuntimeException;
 
 /**
  * Polymorphic versioning trait.
@@ -44,7 +45,9 @@ trait HasVersions
 
     public function latestVersion(): ?ModelVersion
     {
-        return $this->versions()->first();
+        $version = $this->versions()->first();
+
+        return $version instanceof ModelVersion ? $version : null;
     }
 
     public function createVersion(string $event = 'updated', ?string $changeNote = null): ModelVersion
@@ -68,6 +71,8 @@ trait HasVersions
         ]);
 
         $this->pruneOldVersions();
+
+        throw_unless($version instanceof ModelVersion, RuntimeException::class, 'Failed to create ModelVersion instance');
 
         return $version;
     }
@@ -103,15 +108,19 @@ trait HasVersions
      */
     protected function getVersionedAttributes(): array
     {
-        return property_exists($this, 'versionedAttributes')
-            ? $this->versionedAttributes  // @phpstan-ignore-line
+        $prop = 'versionedAttributes';
+
+        return property_exists($this, $prop)
+            ? $this->$prop
             : [];
     }
 
     protected function getMaxVersions(): int
     {
-        return property_exists($this, 'maxVersions')
-            ? $this->maxVersions  // @phpstan-ignore-line
+        $prop = 'maxVersions';
+
+        return property_exists($this, $prop)
+            ? $this->$prop
             : 50;
     }
 

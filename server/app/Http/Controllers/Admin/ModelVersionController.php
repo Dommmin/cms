@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Concerns\HasVersions;
 use App\Http\Controllers\Controller;
 use App\Models\BlogPost;
 use App\Models\Category;
@@ -71,7 +70,7 @@ class ModelVersionController extends Controller
     {
         $modelClass = $this->resolveModelClass($type);
 
-        /** @var Model&HasVersions $model */
+        /** @var BlogPost|Category|Product $model */
         $model = $modelClass::query()->findOrFail($id);
 
         $version = ModelVersion::query()

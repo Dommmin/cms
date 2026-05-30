@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,22 +24,24 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read ?Media $media
  * @property-read string $path
  * @property int|null $product_variant_id
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\Product $product
- * @property-read \App\Models\ProductVariant|null $variant
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage whereIsThumbnail($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage whereMediaId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage wherePosition($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage whereProductId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage whereProductVariantId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductImage whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Product $product
+ * @property-read ProductVariant|null $variant
+ *
+ * @method static Builder<static>|ProductImage newModelQuery()
+ * @method static Builder<static>|ProductImage newQuery()
+ * @method static Builder<static>|ProductImage query()
+ * @method static Builder<static>|ProductImage whereCreatedAt($value)
+ * @method static Builder<static>|ProductImage whereId($value)
+ * @method static Builder<static>|ProductImage whereIsThumbnail($value)
+ * @method static Builder<static>|ProductImage whereMediaId($value)
+ * @method static Builder<static>|ProductImage wherePosition($value)
+ * @method static Builder<static>|ProductImage whereProductId($value)
+ * @method static Builder<static>|ProductImage whereProductVariantId($value)
+ * @method static Builder<static>|ProductImage whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'product_id', 'variant_id', 'media_id', 'is_thumbnail', 'position',

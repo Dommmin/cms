@@ -22,9 +22,7 @@ class ProcessPaymentWebhook implements ShouldQueue
      */
     public function __construct(
         private readonly string $provider,
-        private readonly array $payload,
-        private readonly string $rawBody,
-        private readonly string $signature
+        private readonly array $payload
     ) {}
 
     public function handle(PaymentGatewayManager $gatewayManager): void

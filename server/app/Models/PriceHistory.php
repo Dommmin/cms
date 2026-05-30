@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,20 +16,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $product_variant_id
  * @property int $price
- * @property \Carbon\CarbonImmutable $recorded_at
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\ProductVariant $productVariant
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PriceHistory newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PriceHistory newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PriceHistory query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PriceHistory whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PriceHistory whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PriceHistory wherePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PriceHistory whereProductVariantId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PriceHistory whereRecordedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PriceHistory whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @property CarbonImmutable $recorded_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read ProductVariant $productVariant
+ *
+ * @method static Builder<static>|PriceHistory newModelQuery()
+ * @method static Builder<static>|PriceHistory newQuery()
+ * @method static Builder<static>|PriceHistory query()
+ * @method static Builder<static>|PriceHistory whereCreatedAt($value)
+ * @method static Builder<static>|PriceHistory whereId($value)
+ * @method static Builder<static>|PriceHistory wherePrice($value)
+ * @method static Builder<static>|PriceHistory whereProductVariantId($value)
+ * @method static Builder<static>|PriceHistory whereRecordedAt($value)
+ * @method static Builder<static>|PriceHistory whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'product_variant_id',

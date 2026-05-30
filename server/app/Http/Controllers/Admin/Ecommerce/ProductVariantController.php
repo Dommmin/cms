@@ -23,7 +23,7 @@ class ProductVariantController extends Controller
 {
     public function index(Product $product): Response
     {
-        $variants = new ProductVariantIndexQuery(request())->execute($product);
+        $variants = new ProductVariantIndexQuery()->execute($product);
 
         return inertia('admin/ecommerce/products/variants/index', [
             'product' => $product,
@@ -33,7 +33,7 @@ class ProductVariantController extends Controller
 
     public function create(Product $product): Response
     {
-        $taxRates = new ProductVariantIndexQuery(request())->getTaxRates();
+        $taxRates = new ProductVariantIndexQuery()->getTaxRates();
 
         return inertia('admin/ecommerce/products/variants/create', [
             'product' => $product,
@@ -75,7 +75,7 @@ class ProductVariantController extends Controller
     {
         $variant->load(['taxRate', 'attributeValues.attribute', 'images.media', 'priceTiers']);
 
-        $taxRates = new ProductVariantIndexQuery(request())->getTaxRates();
+        $taxRates = new ProductVariantIndexQuery()->getTaxRates();
 
         return inertia('admin/ecommerce/products/variants/edit', [
             'product' => $product,
@@ -151,7 +151,7 @@ class ProductVariantController extends Controller
     {
         $product->loadMissing('productType.productTypeAttributes.attribute.values');
 
-        return $product->productType?->productTypeAttributes
+        return $product->productType->productTypeAttributes
             ->sortBy('position')
             ->map(function ($productTypeAttribute): array {
                 $attribute = $productTypeAttribute->attribute;
@@ -168,7 +168,7 @@ class ProductVariantController extends Controller
                     ])->values()->all(),
                 ];
             })
-            ->values() ?? collect();
+            ->values();
     }
 
     private function syncVariantAttributeValues(ProductVariant $variant, array $attributeValueIds): void

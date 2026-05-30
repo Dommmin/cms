@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
+use Database\Factories\DiscountFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
@@ -23,43 +29,47 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property int|null $max_uses
  * @property int $uses_count
  * @property int|null $max_uses_per_customer
- * @property \Carbon\CarbonImmutable $starts_at
- * @property \Carbon\CarbonImmutable|null $ends_at
+ * @property CarbonImmutable $starts_at
+ * @property CarbonImmutable|null $ends_at
  * @property bool $is_active
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
  * @property int $is_stackable
  * @property int $apply_to_discounted_products
  * @property int $is_auto_apply
  * @property int $priority
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DiscountCondition> $conditions
+ * @property-read Collection<int, DiscountCondition> $conditions
  * @property-read int|null $conditions_count
- * @method static \Database\Factories\DiscountFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereApplyTo($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereApplyToDiscountedProducts($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereCode($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereEndsAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereIsAutoApply($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereIsStackable($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereMaxUses($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereMaxUsesPerCustomer($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereMinOrderValue($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount wherePriority($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereStartsAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereUsesCount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Discount whereValue($value)
- * @mixin \Eloquent
+ * @property-read Collection<int, Product> $products
+ * @property-read Collection<int, Category> $categories
+ *
+ * @method static DiscountFactory factory($count = null, $state = [])
+ * @method static Builder<static>|Discount newModelQuery()
+ * @method static Builder<static>|Discount newQuery()
+ * @method static Builder<static>|Discount query()
+ * @method static Builder<static>|Discount whereApplyTo($value)
+ * @method static Builder<static>|Discount whereApplyToDiscountedProducts($value)
+ * @method static Builder<static>|Discount whereCode($value)
+ * @method static Builder<static>|Discount whereCreatedAt($value)
+ * @method static Builder<static>|Discount whereEndsAt($value)
+ * @method static Builder<static>|Discount whereId($value)
+ * @method static Builder<static>|Discount whereIsActive($value)
+ * @method static Builder<static>|Discount whereIsAutoApply($value)
+ * @method static Builder<static>|Discount whereIsStackable($value)
+ * @method static Builder<static>|Discount whereMaxUses($value)
+ * @method static Builder<static>|Discount whereMaxUsesPerCustomer($value)
+ * @method static Builder<static>|Discount whereMinOrderValue($value)
+ * @method static Builder<static>|Discount whereName($value)
+ * @method static Builder<static>|Discount wherePriority($value)
+ * @method static Builder<static>|Discount whereStartsAt($value)
+ * @method static Builder<static>|Discount whereType($value)
+ * @method static Builder<static>|Discount whereUpdatedAt($value)
+ * @method static Builder<static>|Discount whereUsesCount($value)
+ * @method static Builder<static>|Discount whereValue($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'code', 'name', 'type', 'value', 'apply_to',
@@ -87,9 +97,22 @@ class Discount extends Model
             ->useLogName('discount');
     }
 
+    /**
+     * @return HasMany<DiscountCondition, $this>
+     */
     public function conditions(): HasMany
     {
         return $this->hasMany(DiscountCondition::class);
+    }
+
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'discount_products');
+    }
+
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'discount_categories');
     }
 
     public function isValid(): bool

@@ -8,6 +8,7 @@ use App\Enums\OrderStatusEnum;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreReturnRequestRequest;
 use App\Http\Resources\Api\V1\OrderResource;
+use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\ReturnRequest;
 use App\Services\CartService;
@@ -107,7 +108,7 @@ class OrderController extends ApiController
 
             $existingCartItem = $cart->items()->where('variant_id', $item->variant_id)->first();
 
-            if ($existingCartItem) {
+            if ($existingCartItem instanceof CartItem) {
                 $existingCartItem->getQuery()->where('id', $existingCartItem->id)->increment('quantity', $item->quantity);
             } else {
                 $cart->items()->create([

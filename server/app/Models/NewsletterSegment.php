@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,21 +19,23 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $description
  * @property array<array-key, mixed>|null $rules
  * @property bool $is_active
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NewsletterCampaign> $campaigns
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, NewsletterCampaign> $campaigns
  * @property-read int|null $campaigns_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSegment newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSegment newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSegment query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSegment whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSegment whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSegment whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSegment whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSegment whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSegment whereRules($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSegment whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @method static Builder<static>|NewsletterSegment newModelQuery()
+ * @method static Builder<static>|NewsletterSegment newQuery()
+ * @method static Builder<static>|NewsletterSegment query()
+ * @method static Builder<static>|NewsletterSegment whereCreatedAt($value)
+ * @method static Builder<static>|NewsletterSegment whereDescription($value)
+ * @method static Builder<static>|NewsletterSegment whereId($value)
+ * @method static Builder<static>|NewsletterSegment whereIsActive($value)
+ * @method static Builder<static>|NewsletterSegment whereName($value)
+ * @method static Builder<static>|NewsletterSegment whereRules($value)
+ * @method static Builder<static>|NewsletterSegment whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'name', 'description', 'rules', 'is_active',

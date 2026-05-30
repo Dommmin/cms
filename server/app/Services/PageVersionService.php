@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Page;
+use App\Models\PageBlock;
+use App\Models\PageSection;
 use App\Models\PageVersion;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -24,14 +26,14 @@ class PageVersionService
     ): PageVersion {
         $versionNumber = $this->getNextVersionNumber($page);
 
-        /** @var Collection<int, \App\Modules\Core\Domain\Models\PageSection> $sections */
+        /** @var Collection<int, PageSection> $sections */
         $sections = $page->allSections()
             ->with('allBlocks')
             ->get();
 
-        $sections = $sections->map(fn ($section): array => [
+        $sections = $sections->map(fn (PageSection $section): array => [
             'section' => $section->toArray(),
-            'blocks' => $section->allBlocks()->get()->map(fn ($block) => $block->toArray())->toArray(),
+            'blocks' => $section->allBlocks()->get()->map(fn ($block) => /** @var PageBlock $block */ $block->toArray())->all(),
         ])
             ->all();
 
@@ -101,7 +103,7 @@ class PageVersionService
                 // Restore from section snapshot if available
                 if (isset($snapshot['sections']) && is_array($snapshot['sections']) && $snapshot['sections'] !== []) {
                     foreach ($snapshot['sections'] as $sectionData) {
-                        /** @var \App\Modules\Core\Domain\Models\PageSection $section */
+                        /** @var PageSection $section */
                         $section = $page->allSections()->create([
                             'section_type' => $sectionData['section']['section_type'] ?? null,
                             'layout' => $sectionData['section']['layout'] ?? 'default',
@@ -123,7 +125,7 @@ class PageVersionService
                     }
                 } elseif (isset($snapshot['legacy_blocks'])) {
                     // Fallback: create a single default section for legacy blocks
-                    /** @var \App\Modules\Core\Domain\Models\PageSection $section */
+                    /** @var PageSection $section */
                     $section = $page->allSections()->create([
                         'section_type' => null,
                         'layout' => 'default',

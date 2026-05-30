@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ShippingCarrierEnum;
+use Carbon\CarbonImmutable;
+use Database\Factories\ShippingMethodFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
@@ -37,45 +41,47 @@ use Spatie\Translatable\HasTranslations;
  * @property int $price_per_kg
  * @property int|null $estimated_days_min
  * @property int|null $estimated_days_max
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read array $translatable_columns_from
  * @property-read int|null $restricted_categories_count
  * @property-read int|null $restricted_products_count
- * @property-read Collection<int, \App\Models\Shipment> $shipments
+ * @property-read Collection<int, Shipment> $shipments
  * @property-read int|null $shipments_count
  * @property-read mixed $translations
- * @method static \Database\Factories\ShippingMethodFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereBasePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereCarrier($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereEstimatedDaysMax($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereEstimatedDaysMin($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereFreeShippingThreshold($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereInsuranceAvailable($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereJsonContainsLocale(string $column, string $locale, ?mixed $value, string $operand = '=')
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereJsonContainsLocales(string $column, array $locales, ?mixed $value, string $operand = '=')
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereLocale(string $column, string $locale)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereLocales(string $column, array $locales)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereMaxDepthCm($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereMaxLengthCm($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereMaxWeight($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereMaxWidthCm($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereMinOrderValue($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereMinWeight($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod wherePricePerKg($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereRequiresSignature($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippingMethod whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @method static ShippingMethodFactory factory($count = null, $state = [])
+ * @method static Builder<static>|ShippingMethod newModelQuery()
+ * @method static Builder<static>|ShippingMethod newQuery()
+ * @method static Builder<static>|ShippingMethod query()
+ * @method static Builder<static>|ShippingMethod whereBasePrice($value)
+ * @method static Builder<static>|ShippingMethod whereCarrier($value)
+ * @method static Builder<static>|ShippingMethod whereCreatedAt($value)
+ * @method static Builder<static>|ShippingMethod whereDescription($value)
+ * @method static Builder<static>|ShippingMethod whereEstimatedDaysMax($value)
+ * @method static Builder<static>|ShippingMethod whereEstimatedDaysMin($value)
+ * @method static Builder<static>|ShippingMethod whereFreeShippingThreshold($value)
+ * @method static Builder<static>|ShippingMethod whereId($value)
+ * @method static Builder<static>|ShippingMethod whereInsuranceAvailable($value)
+ * @method static Builder<static>|ShippingMethod whereIsActive($value)
+ * @method static Builder<static>|ShippingMethod whereJsonContainsLocale(string $column, string $locale, ?mixed $value, string $operand = '=')
+ * @method static Builder<static>|ShippingMethod whereJsonContainsLocales(string $column, array $locales, ?mixed $value, string $operand = '=')
+ * @method static Builder<static>|ShippingMethod whereLocale(string $column, string $locale)
+ * @method static Builder<static>|ShippingMethod whereLocales(string $column, array $locales)
+ * @method static Builder<static>|ShippingMethod whereMaxDepthCm($value)
+ * @method static Builder<static>|ShippingMethod whereMaxLengthCm($value)
+ * @method static Builder<static>|ShippingMethod whereMaxWeight($value)
+ * @method static Builder<static>|ShippingMethod whereMaxWidthCm($value)
+ * @method static Builder<static>|ShippingMethod whereMinOrderValue($value)
+ * @method static Builder<static>|ShippingMethod whereMinWeight($value)
+ * @method static Builder<static>|ShippingMethod whereName($value)
+ * @method static Builder<static>|ShippingMethod wherePricePerKg($value)
+ * @method static Builder<static>|ShippingMethod whereRequiresSignature($value)
+ * @method static Builder<static>|ShippingMethod whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'carrier', 'name', 'description', 'is_active', 'min_weight', 'max_weight',
@@ -171,7 +177,7 @@ class ShippingMethod extends Model
     /** Czy metoda wymaga wyboru punktu odbioru (paczkomat)? */
     public function requiresPickupPoint(): bool
     {
-        return $this->carrier instanceof ShippingCarrierEnum && $this->carrier->requiresPickupPoint();
+        return $this->carrier->requiresPickupPoint();
     }
 
     public function hasMaxDimensions(): bool

@@ -22,7 +22,7 @@ class PaymentController extends ApiController
 
         return $this->ok([
             'status' => $payment->status->value,
-            'order_reference' => $payment->order?->reference_number,
+            'order_reference' => $payment->order->reference_number,
         ]);
     }
 

@@ -26,7 +26,7 @@ class ReturnPolicy
             $customer = $user->customer ?? null;
             $order = $returnRequest->order;
 
-            return $customer && $order && $order->customer_id === $customer->id;
+            return $customer && $order->customer_id === $customer->id;
         }
 
         return $user->can('orders.view');

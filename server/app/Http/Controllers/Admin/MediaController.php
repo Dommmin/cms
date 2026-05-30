@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Response;
+use Spatie\Image\Enums\Orientation;
 use Spatie\Image\Image as SpatieImage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -99,7 +100,13 @@ class MediaController extends Controller
         $image = SpatieImage::load($mediaPath);
 
         if ($rotate !== 0) {
-            $image = $image->rotate($rotate);
+            $orientation = match ($rotate) {
+                90 => Orientation::Rotate90,
+                180 => Orientation::Rotate180,
+                270 => Orientation::Rotate270,
+                default => Orientation::Rotate0,
+            };
+            $image = $image->orientation($orientation);
         }
 
         $sourceWidth = $image->getWidth();

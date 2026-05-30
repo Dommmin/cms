@@ -8,6 +8,7 @@ use App\Enums\ReturnItemConditionEnum;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,18 +20,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $quantity
  * @property ReturnItemConditionEnum|null $condition
  * @property string|null $notes
- * @property-read \App\Models\OrderItem $orderItem
- * @property-read \App\Models\ReturnRequest $return
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnItem newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnItem newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnItem query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnItem whereCondition($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnItem whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnItem whereNotes($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnItem whereOrderItemId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnItem whereQuantity($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReturnItem whereReturnId($value)
- * @mixin \Eloquent
+ * @property-read OrderItem $orderItem
+ * @property-read ReturnRequest $return
+ *
+ * @method static Builder<static>|ReturnItem newModelQuery()
+ * @method static Builder<static>|ReturnItem newQuery()
+ * @method static Builder<static>|ReturnItem query()
+ * @method static Builder<static>|ReturnItem whereCondition($value)
+ * @method static Builder<static>|ReturnItem whereId($value)
+ * @method static Builder<static>|ReturnItem whereNotes($value)
+ * @method static Builder<static>|ReturnItem whereOrderItemId($value)
+ * @method static Builder<static>|ReturnItem whereQuantity($value)
+ * @method static Builder<static>|ReturnItem whereReturnId($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'return_id', 'order_item_id', 'quantity', 'condition', 'notes',

@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
+use Database\Factories\BlogFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -26,17 +29,18 @@ use Spatie\Translatable\HasTranslations;
  * @property bool $is_active
  * @property array<array-key, mixed>|null $available_locales
  * @property int $position
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\User|null $defaultAuthor
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read User|null $defaultAuthor
  * @property-read array $translatable_columns_from
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BlogPost> $posts
+ * @property-read Collection<int, BlogPost> $posts
  * @property-read int|null $posts_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BlogPost> $publishedPosts
+ * @property-read Collection<int, BlogPost> $publishedPosts
  * @property-read int|null $published_posts_count
  * @property-read mixed $translations
+ *
  * @method static Builder<static>|Blog active()
- * @method static \Database\Factories\BlogFactory factory($count = null, $state = [])
+ * @method static BlogFactory factory($count = null, $state = [])
  * @method static Builder<static>|Blog newModelQuery()
  * @method static Builder<static>|Blog newQuery()
  * @method static Builder<static>|Blog query()
@@ -59,7 +63,8 @@ use Spatie\Translatable\HasTranslations;
  * @method static Builder<static>|Blog whereSeoTitle($value)
  * @method static Builder<static>|Blog whereSlug($value)
  * @method static Builder<static>|Blog whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @mixin Model
  */
 #[Fillable([
     'name',

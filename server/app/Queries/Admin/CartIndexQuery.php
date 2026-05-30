@@ -16,7 +16,7 @@ class CartIndexQuery
     public function execute()
     {
         return Cart::query()
-            ->with(['customer', 'items.product'])
+            ->with(['customer', 'items.variant.product'])
             ->when($this->request->search, function ($query, $search): void {
                 $query->whereHas('customer', function ($q) use ($search): void {
                     $q->where('email', 'like', sprintf('%%%s%%', $search))

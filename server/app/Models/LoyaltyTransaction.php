@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,24 +21,26 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string $source_type
  * @property int $source_id
  * @property int $balance_after
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\Customer|null $customer
- * @property-read Model|\Eloquent $source
- * @method static \Illuminate\Database\Eloquent\Builder<static>|LoyaltyTransaction newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|LoyaltyTransaction newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|LoyaltyTransaction query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|LoyaltyTransaction whereBalanceAfter($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|LoyaltyTransaction whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|LoyaltyTransaction whereCustomerId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|LoyaltyTransaction whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|LoyaltyTransaction whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|LoyaltyTransaction wherePoints($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|LoyaltyTransaction whereSourceId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|LoyaltyTransaction whereSourceType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|LoyaltyTransaction whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|LoyaltyTransaction whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Customer|null $customer
+ * @property-read Model $source
+ *
+ * @method static Builder<static>|LoyaltyTransaction newModelQuery()
+ * @method static Builder<static>|LoyaltyTransaction newQuery()
+ * @method static Builder<static>|LoyaltyTransaction query()
+ * @method static Builder<static>|LoyaltyTransaction whereBalanceAfter($value)
+ * @method static Builder<static>|LoyaltyTransaction whereCreatedAt($value)
+ * @method static Builder<static>|LoyaltyTransaction whereCustomerId($value)
+ * @method static Builder<static>|LoyaltyTransaction whereDescription($value)
+ * @method static Builder<static>|LoyaltyTransaction whereId($value)
+ * @method static Builder<static>|LoyaltyTransaction wherePoints($value)
+ * @method static Builder<static>|LoyaltyTransaction whereSourceId($value)
+ * @method static Builder<static>|LoyaltyTransaction whereSourceType($value)
+ * @method static Builder<static>|LoyaltyTransaction whereType($value)
+ * @method static Builder<static>|LoyaltyTransaction whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'customer_id',

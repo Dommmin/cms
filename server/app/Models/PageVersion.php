@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,26 +23,28 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $source
  * @property int $is_published
  * @property string|null $published_at
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\User|null $creator
- * @property-read \App\Models\Page $page
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageVersion newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageVersion newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageVersion query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageVersion whereChangeNote($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageVersion whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageVersion whereCreatedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageVersion whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageVersion whereIsAutosave($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageVersion whereIsPublished($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageVersion wherePageId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageVersion wherePublishedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageVersion whereSnapshot($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageVersion whereSource($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageVersion whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageVersion whereVersionNumber($value)
- * @mixin \Eloquent
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read User|null $creator
+ * @property-read Page $page
+ *
+ * @method static Builder<static>|PageVersion newModelQuery()
+ * @method static Builder<static>|PageVersion newQuery()
+ * @method static Builder<static>|PageVersion query()
+ * @method static Builder<static>|PageVersion whereChangeNote($value)
+ * @method static Builder<static>|PageVersion whereCreatedAt($value)
+ * @method static Builder<static>|PageVersion whereCreatedBy($value)
+ * @method static Builder<static>|PageVersion whereId($value)
+ * @method static Builder<static>|PageVersion whereIsAutosave($value)
+ * @method static Builder<static>|PageVersion whereIsPublished($value)
+ * @method static Builder<static>|PageVersion wherePageId($value)
+ * @method static Builder<static>|PageVersion wherePublishedAt($value)
+ * @method static Builder<static>|PageVersion whereSnapshot($value)
+ * @method static Builder<static>|PageVersion whereSource($value)
+ * @method static Builder<static>|PageVersion whereUpdatedAt($value)
+ * @method static Builder<static>|PageVersion whereVersionNumber($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'page_id', 'version_number', 'snapshot', 'created_by', 'change_note', 'is_autosave', 'source',

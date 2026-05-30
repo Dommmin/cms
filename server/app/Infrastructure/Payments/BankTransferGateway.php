@@ -29,6 +29,7 @@ class BankTransferGateway implements PaymentGatewayInterface
     {
         return [
             'action' => 'none',
+            'redirect_url' => null,
             'bank_details' => [
                 'account_name' => config('services.bank_transfer.account_name', ''),
                 'iban' => config('services.bank_transfer.iban', ''),

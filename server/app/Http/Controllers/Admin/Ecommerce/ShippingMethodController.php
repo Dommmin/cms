@@ -163,7 +163,7 @@ class ShippingMethodController extends Controller
                 ->get(['id', 'name'])
                 ->map(/** @phpstan-ignore argument.type */ fn (Category $c): array => [
                     'id' => $c->id,
-                    'name' => $c->getTranslation('name', app()->getLocale(), false) ?: (is_array($c->getRawOriginal('name')) ? reset($c->getRawOriginal('name')) : $c->getRawOriginal('name')),
+                    'name' => $c->getTranslation('name', app()->getLocale(), false) ?: (is_array($raw = $c->getRawOriginal('name')) ? (array_values($raw)[0] ?? '') : (string) $raw),
                 ]);
         } else {
             $results = Product::query()
@@ -173,7 +173,7 @@ class ShippingMethodController extends Controller
                 ->get(['id', 'name'])
                 ->map(/** @phpstan-ignore argument.type */ fn (Product $p): array => [
                     'id' => $p->id,
-                    'name' => $p->getTranslation('name', app()->getLocale(), false) ?: (is_array($p->getRawOriginal('name')) ? reset($p->getRawOriginal('name')) : $p->getRawOriginal('name')),
+                    'name' => $p->getTranslation('name', app()->getLocale(), false) ?: (is_array($raw = $p->getRawOriginal('name')) ? (array_values($raw)[0] ?? '') : (string) $raw),
                 ]);
         }
 

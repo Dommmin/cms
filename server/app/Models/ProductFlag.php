@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -19,25 +22,27 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string|null $description
  * @property bool $is_active
  * @property int $position
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Product> $products
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, Product> $products
  * @property-read int|null $products_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductFlag active()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductFlag newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductFlag newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductFlag ordered()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductFlag query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductFlag whereColor($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductFlag whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductFlag whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductFlag whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductFlag whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductFlag whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductFlag wherePosition($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductFlag whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductFlag whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @method static Builder<static>|ProductFlag active()
+ * @method static Builder<static>|ProductFlag newModelQuery()
+ * @method static Builder<static>|ProductFlag newQuery()
+ * @method static Builder<static>|ProductFlag ordered()
+ * @method static Builder<static>|ProductFlag query()
+ * @method static Builder<static>|ProductFlag whereColor($value)
+ * @method static Builder<static>|ProductFlag whereCreatedAt($value)
+ * @method static Builder<static>|ProductFlag whereDescription($value)
+ * @method static Builder<static>|ProductFlag whereId($value)
+ * @method static Builder<static>|ProductFlag whereIsActive($value)
+ * @method static Builder<static>|ProductFlag whereName($value)
+ * @method static Builder<static>|ProductFlag wherePosition($value)
+ * @method static Builder<static>|ProductFlag whereSlug($value)
+ * @method static Builder<static>|ProductFlag whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'name',

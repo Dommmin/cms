@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Concerns\HasMetafields;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Api\V1\MetafieldResource;
 use App\Models\BlogPost;
@@ -33,7 +32,7 @@ class MetafieldController extends ApiController
         /** @var class-string<Model> $modelClass */
         $modelClass = $this->allowedTypes[$type];
 
-        /** @var (Model&HasMetafields) $model */
+        /** @var Product|BlogPost|Page|Category $model */
         $model = $modelClass::query()->findOrFail($id);
 
         return $this->ok(

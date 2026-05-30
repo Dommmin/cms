@@ -17,7 +17,7 @@ class ImpersonateCustomer
 
         $user = $customer->user;
 
-        abort_unless($user, 404, 'Customer has no associated user account');
+        abort_unless($user instanceof User, 404, 'Customer has no associated user account');
 
         Session::put('impersonator_id', $admin->id);
         Session::put('impersonating_customer', true);

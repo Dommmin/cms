@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -21,27 +24,29 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property array<array-key, mixed>|null $features
  * @property bool $is_active
  * @property int $sort_order
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Subscription> $subscriptions
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, Subscription> $subscriptions
  * @property-read int|null $subscriptions_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereBillingCycle($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereBillingPeriod($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereCurrency($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereFeatures($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan wherePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereSortOrder($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereTrialDays($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @method static Builder<static>|SubscriptionPlan newModelQuery()
+ * @method static Builder<static>|SubscriptionPlan newQuery()
+ * @method static Builder<static>|SubscriptionPlan query()
+ * @method static Builder<static>|SubscriptionPlan whereBillingCycle($value)
+ * @method static Builder<static>|SubscriptionPlan whereBillingPeriod($value)
+ * @method static Builder<static>|SubscriptionPlan whereCreatedAt($value)
+ * @method static Builder<static>|SubscriptionPlan whereCurrency($value)
+ * @method static Builder<static>|SubscriptionPlan whereDescription($value)
+ * @method static Builder<static>|SubscriptionPlan whereFeatures($value)
+ * @method static Builder<static>|SubscriptionPlan whereId($value)
+ * @method static Builder<static>|SubscriptionPlan whereIsActive($value)
+ * @method static Builder<static>|SubscriptionPlan whereName($value)
+ * @method static Builder<static>|SubscriptionPlan wherePrice($value)
+ * @method static Builder<static>|SubscriptionPlan whereSortOrder($value)
+ * @method static Builder<static>|SubscriptionPlan whereTrialDays($value)
+ * @method static Builder<static>|SubscriptionPlan whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'name',

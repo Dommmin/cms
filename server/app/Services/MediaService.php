@@ -51,9 +51,9 @@ class MediaService
             'path' => $path,
             'url' => Storage::disk('cloudinary')->url($path),
             'variants' => [
-                'thumbnail' => Storage::disk('cloudinary')->url($path, ['width' => 300, 'height' => 300]),
-                'medium' => Storage::disk('cloudinary')->url($path, ['width' => 800, 'height' => 800]),
-                'large' => Storage::disk('cloudinary')->url($path, ['width' => 1200, 'height' => 1200]),
+                'thumbnail' => Storage::disk('cloudinary')->url($path, ['width' => 300, 'height' => 300]), // @phpstan-ignore arguments.count
+                'medium' => Storage::disk('cloudinary')->url($path, ['width' => 800, 'height' => 800]), // @phpstan-ignore arguments.count
+                'large' => Storage::disk('cloudinary')->url($path, ['width' => 1200, 'height' => 1200]), // @phpstan-ignore arguments.count
             ],
         ];
     }

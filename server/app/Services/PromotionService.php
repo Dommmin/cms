@@ -25,12 +25,12 @@ class PromotionService
 
         foreach ($cartItems as $cartItem) {
             $product = Product::query()->find($cartItem['product_id']);
-            if (! $product) {
+            if (! $product instanceof Product) {
                 continue;
             }
 
             $quantity = $cartItem['quantity'];
-            $originalPrice = $cartItem['price'] ?? $product->price;
+            $originalPrice = $cartItem['price'] ?? ($product->getDefaultVariant()->price ?? 0);
 
             $itemResult = $this->calculateItemDiscounts($product, $quantity, $originalPrice);
 

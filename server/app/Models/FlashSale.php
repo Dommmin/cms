@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Database\Factories\FlashSaleFactory;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Date;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
@@ -28,13 +32,14 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property int $stock_sold
  * @property Product|null $product
  * @property ProductVariant|null $variant
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read string $status
+ *
  * @method static Builder<static>|FlashSale active()
- * @method static \Database\Factories\FlashSaleFactory factory($count = null, $state = [])
+ * @method static FlashSaleFactory factory($count = null, $state = [])
  * @method static Builder<static>|FlashSale newModelQuery()
  * @method static Builder<static>|FlashSale newQuery()
  * @method static Builder<static>|FlashSale query()
@@ -50,7 +55,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static Builder<static>|FlashSale whereStockSold($value)
  * @method static Builder<static>|FlashSale whereUpdatedAt($value)
  * @method static Builder<static>|FlashSale whereVariantId($value)
- * @mixin \Eloquent
+ *
+ * @mixin Model
  */
 #[Guarded(['id'])]
 #[Table(name: 'flash_sales')]

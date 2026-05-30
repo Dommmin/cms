@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\SettingTypeEnum;
+use Carbon\CarbonImmutable;
 use Exception;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
@@ -19,28 +23,30 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string $group
  * @property string $key
  * @property string|null $label
- * @property array<array-key, mixed>|null $value
+ * @property mixed $value
  * @property SettingTypeEnum $type
  * @property string|null $description
  * @property bool $is_public
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereGroup($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereIsPublic($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereKey($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereLabel($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereValue($value)
- * @mixin \Eloquent
+ *
+ * @method static Builder<static>|Setting newModelQuery()
+ * @method static Builder<static>|Setting newQuery()
+ * @method static Builder<static>|Setting query()
+ * @method static Builder<static>|Setting whereCreatedAt($value)
+ * @method static Builder<static>|Setting whereDescription($value)
+ * @method static Builder<static>|Setting whereGroup($value)
+ * @method static Builder<static>|Setting whereId($value)
+ * @method static Builder<static>|Setting whereIsPublic($value)
+ * @method static Builder<static>|Setting whereKey($value)
+ * @method static Builder<static>|Setting whereLabel($value)
+ * @method static Builder<static>|Setting whereType($value)
+ * @method static Builder<static>|Setting whereUpdatedAt($value)
+ * @method static Builder<static>|Setting whereValue($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'group', 'key', 'label', 'value', 'type', 'description', 'is_public',
@@ -71,7 +77,7 @@ class Setting extends Model
         // Decrypt jeśli encrypted
         if ($setting->type === SettingTypeEnum::Encrypted && $value) {
             try {
-                return Crypt::decryptString($value);
+                return Crypt::decryptString((string) $value);
             } catch (Exception) {
                 return null;
             }
@@ -102,7 +108,7 @@ class Setting extends Model
     {
         return self::query()->where('is_public', true)
             ->get()
-            ->mapWith(fn (self $setting): array => [
+            ->map(fn (self $setting): array => [
                 'group' => $setting->group,
                 'key' => $setting->key,
                 'value' => $setting->value,

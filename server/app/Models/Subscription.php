@@ -6,7 +6,10 @@ namespace App\Models;
 
 use App\Enums\SubscriptionStatusEnum;
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
- * @property string $status
+ * @property SubscriptionStatusEnum $status
  * @property Carbon|null $trial_ends_at
  * @property Carbon|null $expires_at
  * @property bool $auto_renew
@@ -22,42 +25,44 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property SubscriptionPlan $plan
  * @property int $customer_id
  * @property int $subscription_plan_id
- * @property \Carbon\CarbonImmutable $starts_at
- * @property \Carbon\CarbonImmutable|null $cancelled_at
- * @property \Carbon\CarbonImmutable|null $paused_at
- * @property \Carbon\CarbonImmutable|null $next_billing_at
+ * @property CarbonImmutable $starts_at
+ * @property CarbonImmutable|null $cancelled_at
+ * @property CarbonImmutable|null $paused_at
+ * @property CarbonImmutable|null $next_billing_at
  * @property int $billing_price
  * @property string|null $payment_method_id
  * @property int $Billing_cycle_count
  * @property array<array-key, mixed>|null $metadata
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\Customer|null $customer
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Customer|null $customer
+ * @property-read Collection<int, Order> $orders
  * @property-read int|null $orders_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription active()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription expired()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereAutoRenew($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereBillingCycleCount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereBillingPrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereCancelledAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereCustomerId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereExpiresAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereMetadata($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereNextBillingAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription wherePausedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription wherePaymentMethodId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereStartsAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereSubscriptionPlanId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereTrialEndsAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @method static Builder<static>|Subscription active()
+ * @method static Builder<static>|Subscription expired()
+ * @method static Builder<static>|Subscription newModelQuery()
+ * @method static Builder<static>|Subscription newQuery()
+ * @method static Builder<static>|Subscription query()
+ * @method static Builder<static>|Subscription whereAutoRenew($value)
+ * @method static Builder<static>|Subscription whereBillingCycleCount($value)
+ * @method static Builder<static>|Subscription whereBillingPrice($value)
+ * @method static Builder<static>|Subscription whereCancelledAt($value)
+ * @method static Builder<static>|Subscription whereCreatedAt($value)
+ * @method static Builder<static>|Subscription whereCustomerId($value)
+ * @method static Builder<static>|Subscription whereExpiresAt($value)
+ * @method static Builder<static>|Subscription whereId($value)
+ * @method static Builder<static>|Subscription whereMetadata($value)
+ * @method static Builder<static>|Subscription whereNextBillingAt($value)
+ * @method static Builder<static>|Subscription wherePausedAt($value)
+ * @method static Builder<static>|Subscription wherePaymentMethodId($value)
+ * @method static Builder<static>|Subscription whereStartsAt($value)
+ * @method static Builder<static>|Subscription whereStatus($value)
+ * @method static Builder<static>|Subscription whereSubscriptionPlanId($value)
+ * @method static Builder<static>|Subscription whereTrialEndsAt($value)
+ * @method static Builder<static>|Subscription whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'customer_id',

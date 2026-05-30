@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
@@ -22,13 +25,14 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string|null $logo_path
  * @property bool $is_active
  * @property int $position
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property \Carbon\CarbonImmutable|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property CarbonImmutable|null $deleted_at
+ * @property-read Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Product> $products
+ * @property-read Collection<int, Product> $products
  * @property-read int|null $products_count
+ *
  * @method static Builder<static>|Brand newModelQuery()
  * @method static Builder<static>|Brand newQuery()
  * @method static Builder<static>|Brand onlyTrashed()
@@ -45,7 +49,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static Builder<static>|Brand whereUpdatedAt($value)
  * @method static Builder<static>|Brand withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|Brand withoutTrashed()
- * @mixin \Eloquent
+ *
+ * @mixin Model
  */
 #[Fillable([
     'name', 'slug', 'description', 'logo_path', 'is_active', 'position',

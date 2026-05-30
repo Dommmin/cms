@@ -41,7 +41,7 @@ class LocaleController extends Controller
     {
         $data = $request->validated();
 
-        if (! empty($data['is_default']) && $data['is_default']) {
+        if (! empty($data['is_default'])) {
             Locale::query()->update(['is_default' => false]);
         }
 
@@ -54,7 +54,7 @@ class LocaleController extends Controller
     {
         $data = $request->validated();
 
-        if (! empty($data['is_default']) && $data['is_default']) {
+        if (! empty($data['is_default'])) {
             Locale::query()->where('id', '!=', $locale->id)->update(['is_default' => false]);
         }
 

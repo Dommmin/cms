@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -25,22 +27,24 @@ use Illuminate\Support\Str;
  * @property-read OrderItem|null $orderItem
  * @property-read ProductVariant $variant
  * @property-read Collection<int, ProductDownloadEvent> $events
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
  * @property-read int|null $events_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereDownloadCount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereExpiresAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereMaxDownloads($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereOrderItemId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereProductVariantId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDownloadLink whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @method static Builder<static>|ProductDownloadLink newModelQuery()
+ * @method static Builder<static>|ProductDownloadLink newQuery()
+ * @method static Builder<static>|ProductDownloadLink query()
+ * @method static Builder<static>|ProductDownloadLink whereCreatedAt($value)
+ * @method static Builder<static>|ProductDownloadLink whereDownloadCount($value)
+ * @method static Builder<static>|ProductDownloadLink whereExpiresAt($value)
+ * @method static Builder<static>|ProductDownloadLink whereId($value)
+ * @method static Builder<static>|ProductDownloadLink whereMaxDownloads($value)
+ * @method static Builder<static>|ProductDownloadLink whereOrderItemId($value)
+ * @method static Builder<static>|ProductDownloadLink whereProductVariantId($value)
+ * @method static Builder<static>|ProductDownloadLink whereToken($value)
+ * @method static Builder<static>|ProductDownloadLink whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'order_item_id',

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Concerns\HasMetafields;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SyncMetafieldsRequest;
 use App\Models\BlogPost;
@@ -21,7 +20,7 @@ class MetafieldController extends Controller
     {
         $model = $this->resolveModel($type, $id);
 
-        /** @var HasMetafields $model */
+        /** @var Product|BlogPost|Page|Category $model */
         $model->syncMetafields($request->input('metafields', []));
 
         return back()->with('success', 'Metafields saved successfully');

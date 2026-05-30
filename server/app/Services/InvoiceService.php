@@ -44,7 +44,7 @@ class InvoiceService
         }
 
         $order->invoice_number = $this->generateInvoiceNumber();
-        $order->invoice_issued_at = Date::now();
+        $order->invoice_issued_at = Date::now()->toMutable();
         $order->saveQuietly();
     }
 

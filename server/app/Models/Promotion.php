@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
+use Database\Factories\PromotionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
@@ -26,41 +31,43 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property bool $is_active
  * @property bool $is_stackable
  * @property int $priority
- * @property \Carbon\CarbonImmutable|null $starts_at
- * @property \Carbon\CarbonImmutable|null $ends_at
+ * @property CarbonImmutable|null $starts_at
+ * @property CarbonImmutable|null $ends_at
  * @property array<array-key, mixed>|null $metadata
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Category> $categories
+ * @property-read Collection<int, Category> $categories
  * @property-read int|null $categories_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Product> $products
+ * @property-read Collection<int, Product> $products
  * @property-read int|null $products_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion active()
- * @method static \Database\Factories\PromotionFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion ordered()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereApplyTo($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereEndsAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereIsStackable($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereMaxDiscount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereMetadata($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereMinValue($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion wherePriority($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereStartsAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereValue($value)
- * @mixin \Eloquent
+ *
+ * @method static Builder<static>|Promotion active()
+ * @method static PromotionFactory factory($count = null, $state = [])
+ * @method static Builder<static>|Promotion newModelQuery()
+ * @method static Builder<static>|Promotion newQuery()
+ * @method static Builder<static>|Promotion ordered()
+ * @method static Builder<static>|Promotion query()
+ * @method static Builder<static>|Promotion whereApplyTo($value)
+ * @method static Builder<static>|Promotion whereCreatedAt($value)
+ * @method static Builder<static>|Promotion whereDescription($value)
+ * @method static Builder<static>|Promotion whereEndsAt($value)
+ * @method static Builder<static>|Promotion whereId($value)
+ * @method static Builder<static>|Promotion whereIsActive($value)
+ * @method static Builder<static>|Promotion whereIsStackable($value)
+ * @method static Builder<static>|Promotion whereMaxDiscount($value)
+ * @method static Builder<static>|Promotion whereMetadata($value)
+ * @method static Builder<static>|Promotion whereMinValue($value)
+ * @method static Builder<static>|Promotion whereName($value)
+ * @method static Builder<static>|Promotion wherePriority($value)
+ * @method static Builder<static>|Promotion whereSlug($value)
+ * @method static Builder<static>|Promotion whereStartsAt($value)
+ * @method static Builder<static>|Promotion whereType($value)
+ * @method static Builder<static>|Promotion whereUpdatedAt($value)
+ * @method static Builder<static>|Promotion whereValue($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'name', 'slug', 'description', 'type', 'value', 'min_value', 'max_discount',

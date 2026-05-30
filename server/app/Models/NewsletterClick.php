@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,21 +20,23 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $tracking_token
  * @property string|null $ip_address
  * @property string|null $user_agent
- * @property \Carbon\CarbonImmutable $clicked_at
- * @property-read \App\Models\NewsletterCampaign|null $campaign
- * @property-read \App\Models\NewsletterSubscriber|null $subscriber
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterClick newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterClick newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterClick query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterClick whereClickedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterClick whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterClick whereIpAddress($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterClick whereNewsletterCampaignId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterClick whereNewsletterSubscriberId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterClick whereTrackingToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterClick whereUrl($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterClick whereUserAgent($value)
- * @mixin \Eloquent
+ * @property CarbonImmutable $clicked_at
+ * @property-read NewsletterCampaign|null $campaign
+ * @property-read NewsletterSubscriber|null $subscriber
+ *
+ * @method static Builder<static>|NewsletterClick newModelQuery()
+ * @method static Builder<static>|NewsletterClick newQuery()
+ * @method static Builder<static>|NewsletterClick query()
+ * @method static Builder<static>|NewsletterClick whereClickedAt($value)
+ * @method static Builder<static>|NewsletterClick whereId($value)
+ * @method static Builder<static>|NewsletterClick whereIpAddress($value)
+ * @method static Builder<static>|NewsletterClick whereNewsletterCampaignId($value)
+ * @method static Builder<static>|NewsletterClick whereNewsletterSubscriberId($value)
+ * @method static Builder<static>|NewsletterClick whereTrackingToken($value)
+ * @method static Builder<static>|NewsletterClick whereUrl($value)
+ * @method static Builder<static>|NewsletterClick whereUserAgent($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'newsletter_campaign_id', 'newsletter_subscriber_id', 'url',

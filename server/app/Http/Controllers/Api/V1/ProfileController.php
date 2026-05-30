@@ -12,11 +12,13 @@ use App\Http\Requests\Api\V1\UpdatePasswordRequest;
 use App\Http\Requests\Api\V1\UpdateProfileRequest;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Models\Order;
+use App\Models\ProductReview;
 use App\Models\Setting;
 use App\Models\Theme;
 use App\Notifications\AccountDeletedNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -97,36 +99,45 @@ class ProfileController extends ApiController
         $user = $request->user()->load(['customer.addresses']);
         $customer = $user->customer;
 
-        $orders = $customer
-            ? Order::query()
+        $orders = [];
+        if ($customer) {
+            $orders = Order::query()
                 ->where('customer_id', $customer->id)
                 ->with(['items.variant', 'shipment'])
                 ->get()
-                ->map(fn ($o): array => [
-                    'reference_number' => $o->reference_number,
-                    'status' => $o->status,
-                    'total' => $o->total,
-                    'created_at' => $o->created_at,
-                    'items' => $o->items->map(fn ($i): array => [
+                ->map(function (Order $o): array {
+                    /** @var Collection<int, array{product_name: mixed, quantity: mixed, unit_price: mixed}> $items */
+                    $items = $o->items->map(fn ($i): array => [
                         'product_name' => $i->product_name,
                         'quantity' => $i->quantity,
                         'unit_price' => $i->unit_price,
-                    ]),
-                ])
-            : [];
+                    ]);
 
-        $reviews = $customer
-            ? $customer->reviews()->with('product:id,name')->get()->map(fn ($r): array => [
-                'product_name' => $r->product?->name,
+                    return [
+                        'reference_number' => $o->reference_number,
+                        'status' => $o->status,
+                        'total' => $o->total,
+                        'created_at' => $o->created_at,
+                        'items' => $items,
+                    ];
+                });
+        }
+
+        $reviews = [];
+        if ($customer) {
+            /** @var \Illuminate\Database\Eloquent\Collection<int, ProductReview> $reviewsCollection */
+            $reviewsCollection = $customer->reviews()->with('product:id,name')->get();
+            $reviews = $reviewsCollection->map(fn (ProductReview $r): array => [
+                'product_name' => $r->product->name,
                 'rating' => $r->rating,
                 'body' => $r->body,
                 'created_at' => $r->created_at,
-            ])
-            : [];
+            ]);
+        }
 
         $newsletter = $customer?->newsletterSubscriber ? [
-            'subscribed' => $customer->newsletterSubscriber->subscribed,
-            'subscribed_at' => $customer->newsletterSubscriber->subscribed_at,
+            'subscribed' => $customer->newsletterSubscriber->is_active,
+            'subscribed_at' => $customer->newsletterSubscriber->created_at,
         ] : null;
 
         return $this->ok([

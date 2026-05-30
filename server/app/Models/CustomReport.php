@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
+use Database\Factories\CustomReportFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,27 +24,29 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $description
  * @property array<array-key, mixed>|null $group_by
  * @property bool $is_public
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\User|null $user
- * @method static \Database\Factories\CustomReportFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomReport newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomReport newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomReport query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomReport whereChartType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomReport whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomReport whereDataSource($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomReport whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomReport whereDimensions($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomReport whereFilters($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomReport whereGroupBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomReport whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomReport whereIsPublic($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomReport whereMetrics($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomReport whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomReport whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomReport whereUserId($value)
- * @mixin \Eloquent
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read User|null $user
+ *
+ * @method static CustomReportFactory factory($count = null, $state = [])
+ * @method static Builder<static>|CustomReport newModelQuery()
+ * @method static Builder<static>|CustomReport newQuery()
+ * @method static Builder<static>|CustomReport query()
+ * @method static Builder<static>|CustomReport whereChartType($value)
+ * @method static Builder<static>|CustomReport whereCreatedAt($value)
+ * @method static Builder<static>|CustomReport whereDataSource($value)
+ * @method static Builder<static>|CustomReport whereDescription($value)
+ * @method static Builder<static>|CustomReport whereDimensions($value)
+ * @method static Builder<static>|CustomReport whereFilters($value)
+ * @method static Builder<static>|CustomReport whereGroupBy($value)
+ * @method static Builder<static>|CustomReport whereId($value)
+ * @method static Builder<static>|CustomReport whereIsPublic($value)
+ * @method static Builder<static>|CustomReport whereMetrics($value)
+ * @method static Builder<static>|CustomReport whereName($value)
+ * @method static Builder<static>|CustomReport whereUpdatedAt($value)
+ * @method static Builder<static>|CustomReport whereUserId($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'user_id',

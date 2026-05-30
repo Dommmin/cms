@@ -71,7 +71,9 @@ class ImportSearchIndex extends Command
      */
     private function importIndex(string $indexName, string $modelClass, int $chunk, bool $fresh, EngineManager $engineManager): void
     {
-        $collectionName = (new $modelClass)->searchableAs();
+        /** @var Product|Category|BlogPost $instance */
+        $instance = new $modelClass;
+        $collectionName = $instance->searchableAs();
 
         if ($fresh) {
             $this->info(sprintf('[%s] Dropping existing collection…', $indexName));
@@ -96,6 +98,7 @@ class ImportSearchIndex extends Command
             ->with($this->getEagerRelations($modelClass))
             ->chunkById($chunk, function ($models) use (&$imported, &$removed): void {
                 foreach ($models as $model) {
+                    /** @var Product|Category|BlogPost $model */
                     if ($model->shouldBeSearchable()) {
                         $model->searchable();
                         $imported++;

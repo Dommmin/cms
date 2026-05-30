@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,24 +21,26 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $created_by
  * @property bool $is_global
  * @property int $usage_count
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\User|null $creator
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SectionTemplate newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SectionTemplate newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SectionTemplate query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SectionTemplate whereCategory($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SectionTemplate whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SectionTemplate whereCreatedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SectionTemplate whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SectionTemplate whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SectionTemplate whereIsGlobal($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SectionTemplate whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SectionTemplate whereSnapshot($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SectionTemplate whereThumbnail($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SectionTemplate whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SectionTemplate whereUsageCount($value)
- * @mixin \Eloquent
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read User|null $creator
+ *
+ * @method static Builder<static>|SectionTemplate newModelQuery()
+ * @method static Builder<static>|SectionTemplate newQuery()
+ * @method static Builder<static>|SectionTemplate query()
+ * @method static Builder<static>|SectionTemplate whereCategory($value)
+ * @method static Builder<static>|SectionTemplate whereCreatedAt($value)
+ * @method static Builder<static>|SectionTemplate whereCreatedBy($value)
+ * @method static Builder<static>|SectionTemplate whereDescription($value)
+ * @method static Builder<static>|SectionTemplate whereId($value)
+ * @method static Builder<static>|SectionTemplate whereIsGlobal($value)
+ * @method static Builder<static>|SectionTemplate whereName($value)
+ * @method static Builder<static>|SectionTemplate whereSnapshot($value)
+ * @method static Builder<static>|SectionTemplate whereThumbnail($value)
+ * @method static Builder<static>|SectionTemplate whereUpdatedAt($value)
+ * @method static Builder<static>|SectionTemplate whereUsageCount($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'name',

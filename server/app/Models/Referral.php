@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,26 +19,28 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $order_total Order total in cents at time of referral
  * @property int $commission_amount Commission in cents
  * @property string $status
- * @property \Carbon\CarbonImmutable|null $paid_at
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\AffiliateCode $affiliateCode
- * @property-read \App\Models\Order|null $order
- * @property-read \App\Models\User|null $referredUser
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Referral newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Referral newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Referral query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Referral whereAffiliateCodeId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Referral whereCommissionAmount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Referral whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Referral whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Referral whereOrderId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Referral whereOrderTotal($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Referral wherePaidAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Referral whereReferredUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Referral whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Referral whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @property CarbonImmutable|null $paid_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read AffiliateCode $affiliateCode
+ * @property-read Order|null $order
+ * @property-read User|null $referredUser
+ *
+ * @method static Builder<static>|Referral newModelQuery()
+ * @method static Builder<static>|Referral newQuery()
+ * @method static Builder<static>|Referral query()
+ * @method static Builder<static>|Referral whereAffiliateCodeId($value)
+ * @method static Builder<static>|Referral whereCommissionAmount($value)
+ * @method static Builder<static>|Referral whereCreatedAt($value)
+ * @method static Builder<static>|Referral whereId($value)
+ * @method static Builder<static>|Referral whereOrderId($value)
+ * @method static Builder<static>|Referral whereOrderTotal($value)
+ * @method static Builder<static>|Referral wherePaidAt($value)
+ * @method static Builder<static>|Referral whereReferredUserId($value)
+ * @method static Builder<static>|Referral whereStatus($value)
+ * @method static Builder<static>|Referral whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'affiliate_code_id',

@@ -7,6 +7,7 @@ namespace App\Traits;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
+/** @phpstan-ignore trait.unused */
 trait ApiResponse
 {
     protected function success(

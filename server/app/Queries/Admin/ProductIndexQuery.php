@@ -48,19 +48,19 @@ class ProductIndexQuery
                 'id' => $product->id,
                 'name' => $product->name,
                 'slug' => $product->slug,
-                'price' => $product->defaultVariant?->price ?? 0,
+                'price' => $product->defaultVariant->price ?? 0,
                 'is_active' => $product->is_active,
                 'is_saleable' => $product->is_saleable,
-                'category' => $product->category ? [
+                'category' => [
                     'id' => $product->category->id,
                     'name' => $product->category->name,
-                ] : null,
-                'product_type' => $product->productType ? [
+                ],
+                'product_type' => [
                     'id' => $product->productType->id,
                     'name' => $product->productType->name,
-                ] : null,
-                'images' => $product->thumbnail?->media ? [
-                    ['url' => $product->thumbnail->media->getUrl()],
+                ],
+                'images' => ($thumbnail = $product->thumbnail) && ($media = $thumbnail->media) ? [
+                    ['url' => $media->getUrl()],
                 ] : [],
             ])
             ->withQueryString();

@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Services\SegmentEvaluationService;
+use Carbon\CarbonImmutable;
+use Database\Factories\CustomerSegmentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -18,23 +22,25 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property array<array-key, mixed>|null $rules
  * @property-read int|null $customers_count
  * @property bool $is_active
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Customer> $customers
- * @method static \Database\Factories\CustomerSegmentFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereCustomersCount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereRules($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSegment whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, Customer> $customers
+ *
+ * @method static CustomerSegmentFactory factory($count = null, $state = [])
+ * @method static Builder<static>|CustomerSegment newModelQuery()
+ * @method static Builder<static>|CustomerSegment newQuery()
+ * @method static Builder<static>|CustomerSegment query()
+ * @method static Builder<static>|CustomerSegment whereCreatedAt($value)
+ * @method static Builder<static>|CustomerSegment whereCustomersCount($value)
+ * @method static Builder<static>|CustomerSegment whereDescription($value)
+ * @method static Builder<static>|CustomerSegment whereId($value)
+ * @method static Builder<static>|CustomerSegment whereIsActive($value)
+ * @method static Builder<static>|CustomerSegment whereName($value)
+ * @method static Builder<static>|CustomerSegment whereRules($value)
+ * @method static Builder<static>|CustomerSegment whereType($value)
+ * @method static Builder<static>|CustomerSegment whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'name',

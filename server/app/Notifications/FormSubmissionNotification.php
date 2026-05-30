@@ -42,7 +42,7 @@ class FormSubmissionNotification extends Notification
 
         foreach ($this->submission->payload as $fieldName => $value) {
             $field = $this->form->fields->firstWhere('name', $fieldName);
-            $label = $field?->label ?? $fieldName;
+            $label = $field ? $field->label : $fieldName;
             $displayValue = is_array($value) ? implode(', ', $value) : (string) $value;
             $message->line(sprintf('**%s:** %s', $label, $displayValue));
         }

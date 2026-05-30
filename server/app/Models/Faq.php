@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
+use Database\Factories\FaqFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\Table;
@@ -20,11 +22,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $is_active
  * @property int $views_count
  * @property int $helpful_count
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ *
  * @method static Builder<static>|Faq active()
  * @method static Builder<static>|Faq byCategory(?string $category)
- * @method static \Database\Factories\FaqFactory factory($count = null, $state = [])
+ * @method static FaqFactory factory($count = null, $state = [])
  * @method static Builder<static>|Faq newModelQuery()
  * @method static Builder<static>|Faq newQuery()
  * @method static Builder<static>|Faq query()
@@ -38,7 +41,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static Builder<static>|Faq whereQuestion($value)
  * @method static Builder<static>|Faq whereUpdatedAt($value)
  * @method static Builder<static>|Faq whereViewsCount($value)
- * @mixin \Eloquent
+ *
+ * @mixin Model
  */
 #[Fillable([
     'question',

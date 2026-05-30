@@ -16,15 +16,15 @@ class ProductReviewIndexQuery
     public function execute()
     {
         return ProductReview::query()
-            ->with(['product', 'user'])
-            ->when($this->request->search, function ($query, string $search): void {
-                $query->where('comment', 'like', sprintf('%%%s%%', $search))
+            ->with(['product', 'customer.user'])
+            ->when($this->request->search, function ($query, $search): void {
+                $query->where('comment', 'like', sprintf('%%%s%%', (string) $search))
                     ->orWhereHas('product', function ($q) use ($search): void {
-                        $q->where('name', 'like', sprintf('%%%s%%', $search));
+                        $q->where('name', 'like', sprintf('%%%s%%', (string) $search));
                     })
-                    ->orWhereHas('user', function ($q) use ($search): void {
-                        $q->where('name', 'like', sprintf('%%%s%%', $search))
-                            ->orWhere('email', 'like', sprintf('%%%s%%', $search));
+                    ->orWhereHas('customer.user', function ($q) use ($search): void {
+                        $q->where('name', 'like', sprintf('%%%s%%', (string) $search))
+                            ->orWhere('email', 'like', sprintf('%%%s%%', (string) $search));
                     });
             })
             ->when($this->request->rating, function ($query, $rating): void {

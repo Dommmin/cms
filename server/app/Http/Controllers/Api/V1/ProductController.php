@@ -15,10 +15,12 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\FlashSale;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Services\SmartCollectionService;
 use App\Sorts\RatingSort;
 use App\Sorts\VariantPriceSort;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -117,26 +119,26 @@ class ProductController extends ApiController
                 'id' => $product->thumbnail->id,
                 'url' => $product->thumbnail->media?->getUrl() ?? '',
                 'thumb_url' => $product->thumbnail->media?->getUrl() ?? '',
-                'alt' => $product->thumbnail->media?->name ?? $product->name,
+                'alt' => $product->thumbnail->media->name ?? $product->name,
                 'position' => $product->thumbnail->position,
             ] : null,
             'images' => $product->images->map(fn ($img): array => [
                 'id' => $img->id,
                 'url' => $img->media?->getUrl() ?? '',
                 'thumb_url' => $img->media?->getUrl() ?? '',
-                'alt' => $img->media?->name ?? $product->name,
+                'alt' => $img->media->name ?? $product->name,
                 'position' => $img->position,
             ])->values()->all(),
             'average_rating' => $product->averageRating(),
             'reviews_count' => $product->reviews->count(),
-            'category' => $product->category ? [
+            'category' => [
                 'id' => $product->category->id,
                 'name' => $product->category->name,
                 'slug' => $product->category->slug,
                 'description' => null,
                 'image_url' => null,
                 'parent_id' => $product->category->parent_id,
-            ] : null,
+            ],
             'brand' => $product->brand ? [
                 'id' => $product->brand->id,
                 'name' => $product->brand->name,
@@ -231,13 +233,13 @@ class ProductController extends ApiController
             'price_max' => $product->priceRange()['max'],
             'thumbnail' => $product->thumbnail ? [
                 'url' => $product->thumbnail->media?->getUrl() ?? '',
-                'alt' => $product->thumbnail->media?->name ?? $product->name,
+                'alt' => $product->thumbnail->media->name ?? $product->name,
             ] : null,
-            'category' => $product->category ? [
+            'category' => [
                 'id' => $product->category->id,
                 'name' => $product->category->name,
                 'slug' => $product->category->slug,
-            ] : null,
+            ],
             'brand' => $product->brand ? [
                 'id' => $product->brand->id,
                 'name' => $product->brand->name,
@@ -245,17 +247,22 @@ class ProductController extends ApiController
             // Aggregated attribute map for this product
             'attribute_map' => $productAttributeMaps[$index],
             // Keep variants for add-to-cart
-            'variants' => $product->activeVariants->map(fn ($variant): array => [
-                'id' => $variant->id,
-                'sku' => $variant->sku,
-                'price' => $variant->price,
-                'stock_quantity' => $variant->stock_quantity,
-                'is_available' => $variant->isInStock(),
-                'is_default' => $variant->is_default,
-                'attributes' => $variant->attributeValues->mapWithKeys(
-                    fn ($av): array => [$av->attribute->name => $av->attributeValue->value]
-                )->all(),
-            ]),
+            'variants' => $product->activeVariants->map(function (ProductVariant $variant): array {
+                /** @var mixed $id */
+                $id = $variant->id;
+
+                return [
+                    'id' => $id,
+                    'sku' => $variant->sku,
+                    'price' => $variant->price,
+                    'stock_quantity' => $variant->stock_quantity,
+                    'is_available' => $variant->isInStock(),
+                    'is_default' => $variant->is_default,
+                    'attributes' => $variant->attributeValues->mapWithKeys(
+                        fn ($av): array => [$av->attribute->name => $av->attributeValue->value]
+                    )->all(),
+                ];
+            }),
         ]])->values();
 
         return $this->ok([
@@ -274,9 +281,7 @@ class ProductController extends ApiController
             ->available()
             ->where('id', '!=', $product->id)
             ->where(function ($q) use ($product): void {
-                if ($product->category_id !== null) {
-                    $q->orWhere('category_id', $product->category_id);
-                }
+                $q->orWhere('category_id', $product->category_id);
 
                 if ($product->brand_id !== null) {
                     $q->orWhere('brand_id', $product->brand_id);
@@ -382,6 +387,7 @@ class ProductController extends ApiController
 
     private function buildAvailableFilters(QueryBuilder $query): array
     {
+        /** @var Collection<int, Product> $products */
         $products = $query
             ->with([
                 'brand:id,name,slug',
@@ -390,7 +396,9 @@ class ProductController extends ApiController
             ])
             ->get(['products.id', 'products.brand_id']);
 
+        /** @var array<int, array{id: int, slug: string, label: string, count: int, product_ids: list<int>}> $brandBuckets */
         $brandBuckets = [];
+        /** @var array<string, array{slug: string, label: string, position: int, values: array<string, array{slug: string, label: string, position: int, count: int, product_ids: list<int>}>}> $attributeBuckets */
         $attributeBuckets = [];
 
         foreach ($products as $product) {
@@ -417,14 +425,6 @@ class ProductController extends ApiController
                 foreach ($variant->attributeValues as $attributeValuePivot) {
                     $attribute = $attributeValuePivot->attribute;
                     $attributeValue = $attributeValuePivot->attributeValue;
-                    if (! $attribute) {
-                        continue;
-                    }
-
-                    if (! $attributeValue) {
-                        continue;
-                    }
-
                     if (! $attribute->is_filterable) {
                         continue;
                     }

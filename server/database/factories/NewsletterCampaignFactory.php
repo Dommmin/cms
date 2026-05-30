@@ -43,7 +43,7 @@ final class NewsletterCampaignFactory extends Factory
     public function active(): static
     {
         return $this->state(fn (array $attributes): array => [
-            'status' => CampaignStatusEnum::Active,
+            'status' => CampaignStatusEnum::Ready,
         ]);
     }
 }

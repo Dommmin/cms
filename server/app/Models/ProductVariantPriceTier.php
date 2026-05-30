@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,20 +18,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $min_quantity
  * @property int|null $max_quantity
  * @property int $price
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\ProductVariant $variant
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariantPriceTier newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariantPriceTier newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariantPriceTier query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariantPriceTier whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariantPriceTier whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariantPriceTier whereMaxQuantity($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariantPriceTier whereMinQuantity($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariantPriceTier wherePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariantPriceTier whereProductVariantId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductVariantPriceTier whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read ProductVariant $variant
+ *
+ * @method static Builder<static>|ProductVariantPriceTier newModelQuery()
+ * @method static Builder<static>|ProductVariantPriceTier newQuery()
+ * @method static Builder<static>|ProductVariantPriceTier query()
+ * @method static Builder<static>|ProductVariantPriceTier whereCreatedAt($value)
+ * @method static Builder<static>|ProductVariantPriceTier whereId($value)
+ * @method static Builder<static>|ProductVariantPriceTier whereMaxQuantity($value)
+ * @method static Builder<static>|ProductVariantPriceTier whereMinQuantity($value)
+ * @method static Builder<static>|ProductVariantPriceTier wherePrice($value)
+ * @method static Builder<static>|ProductVariantPriceTier whereProductVariantId($value)
+ * @method static Builder<static>|ProductVariantPriceTier whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable(['product_variant_id', 'min_quantity', 'max_quantity', 'price'])]
 #[Table(name: 'product_variant_price_tiers')]

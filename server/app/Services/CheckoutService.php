@@ -12,12 +12,12 @@ use App\Enums\ShipmentStatusEnum;
 use App\Models\Address;
 use App\Models\AffiliateCode;
 use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Customer;
 use App\Models\Discount;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
-use App\Models\ProductVariant;
 use App\Models\Referral;
 use App\Models\Shipment;
 use App\Models\ShippingMethod;
@@ -115,11 +115,9 @@ class CheckoutService
             'notes' => $notes,
         ]);
 
+        /** @var CartItem $cartItem */
         foreach ($cart->items as $cartItem) {
             $variant = $cartItem->variant;
-            if (! $variant instanceof ProductVariant) {
-                continue;
-            }
 
             OrderItem::query()->create(array_merge(
                 ['order_id' => $order->id],
@@ -172,10 +170,8 @@ class CheckoutService
     private function calculateTotalWeightKg(Cart $cart): float
     {
         return (float) $cart->items->sum(function ($item): float {
+            /** @var CartItem $item */
             $variant = $item->variant;
-            if (! $variant instanceof ProductVariant) {
-                return 0;
-            }
 
             $weight = (float) ($variant->weight ?? 0);
 
@@ -186,10 +182,8 @@ class CheckoutService
     private function calculateTaxAmount(Cart $cart): int
     {
         return (int) $cart->items->sum(function ($item): int {
+            /** @var CartItem $item */
             $variant = $item->variant;
-            if (! $variant instanceof ProductVariant) {
-                return 0;
-            }
 
             $gross = $variant->price * (int) $item->quantity;
             $taxRate = $variant->effectiveTaxRate();
@@ -198,9 +192,6 @@ class CheckoutService
         });
     }
 
-    /**
-     * @return array{0: int, 1: bool}
-     */
     private function resolveAffiliateCode(?string $code): ?AffiliateCode
     {
         if (! is_string($code) || $code === '') {

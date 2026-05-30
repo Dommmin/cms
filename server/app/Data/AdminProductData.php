@@ -47,7 +47,7 @@ class AdminProductData extends Data
             id: $img->id,
             media_id: $img->media_id,
             url: $img->media?->getUrl() ?? $img->media?->getTemporaryUrl() ?? '',
-            name: $img->media?->name ?? '',
+            name: $img->media->name ?? '',
             is_thumbnail: $img->is_thumbnail,
             position: $img->position,
         ))->all();

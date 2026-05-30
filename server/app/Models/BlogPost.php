@@ -9,9 +9,11 @@ use App\Concerns\HasTags;
 use App\Concerns\HasVersions;
 use App\Concerns\SanitizesTranslatableHtml;
 use App\Enums\BlogPostStatusEnum;
+use Carbon\CarbonImmutable;
+use Database\Factories\BlogPostFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
@@ -50,25 +53,28 @@ use Spatie\Translatable\HasTranslations;
  * @property string $meta_robots
  * @property string|null $og_image
  * @property bool $sitemap_exclude
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \App\Models\Blog|null $blog
- * @property-read \App\Models\BlogCategory|null $category
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BlogComment> $comments
+ * @property-read Blog|null $blog
+ * @property-read BlogCategory|null $category
+ * @property int|null $votes_up_count
+ * @property int|null $votes_down_count
+ * @property-read Collection<int, BlogComment> $comments
  * @property-read int|null $comments_count
  * @property-read array $translatable_columns_from
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Metafield> $metafields
+ * @property-read Collection<int, Metafield> $metafields
  * @property-read int|null $metafields_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Tag> $tags
+ * @property-read Collection<int, Tag> $tags
  * @property-read int|null $tags_count
  * @property-read mixed $translations
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ModelVersion> $versions
+ * @property-read Collection<int, ModelVersion> $versions
  * @property-read int|null $versions_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BlogPostVote> $votes
+ * @property-read Collection<int, BlogPostVote> $votes
  * @property-read int|null $votes_count
+ *
  * @method static Builder<static>|BlogPost draft()
- * @method static \Database\Factories\BlogPostFactory factory($count = null, $state = [])
+ * @method static BlogPostFactory factory($count = null, $state = [])
  * @method static Builder<static>|BlogPost featured()
  * @method static Builder<static>|BlogPost newModelQuery()
  * @method static Builder<static>|BlogPost newQuery()
@@ -104,7 +110,8 @@ use Spatie\Translatable\HasTranslations;
  * @method static Builder<static>|BlogPost whereUpdatedAt($value)
  * @method static Builder<static>|BlogPost whereUserId($value)
  * @method static Builder<static>|BlogPost whereViewsCount($value)
- * @mixin \Eloquent
+ *
+ * @mixin Model
  */
 #[Fillable([
     'user_id',
@@ -254,17 +261,17 @@ class BlogPost extends Model
             && (bool) Setting::get('search', 'index_blog_posts', true);
     }
 
-    public function scopePublished(Builder $query): Builder
+    protected function scopePublished(Builder $query): Builder
     {
         return $query->where('status', BlogPostStatusEnum::Published);
     }
 
-    public function scopeDraft(Builder $query): Builder
+    protected function scopeDraft(Builder $query): Builder
     {
         return $query->where('status', BlogPostStatusEnum::Draft);
     }
 
-    public function scopeFeatured(Builder $query): Builder
+    protected function scopeFeatured(Builder $query): Builder
     {
         return $query->where('is_featured', true);
     }

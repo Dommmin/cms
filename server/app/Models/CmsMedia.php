@@ -4,27 +4,32 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * @property int $id
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read MediaCollection<int, Media> $media
  * @property-read int|null $media_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CmsMedia newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CmsMedia newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CmsMedia query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CmsMedia whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CmsMedia whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CmsMedia whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @method static Builder<static>|CmsMedia newModelQuery()
+ * @method static Builder<static>|CmsMedia newQuery()
+ * @method static Builder<static>|CmsMedia query()
+ * @method static Builder<static>|CmsMedia whereCreatedAt($value)
+ * @method static Builder<static>|CmsMedia whereId($value)
+ * @method static Builder<static>|CmsMedia whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Table(name: 'cms_media')]
 class CmsMedia extends Model implements HasMedia
@@ -52,15 +57,17 @@ class CmsMedia extends Model implements HasMedia
         }
 
         // Fast WebP thumbnail for the admin grid — generated synchronously
-        $this->addMediaConversion('thumbnail')
-            ->fit(Fit::Crop, 400, 400)
+        /** @var \Spatie\MediaLibrary\MediaCollections\Models\Conversion $thumbnailConversion */
+        $thumbnailConversion = $this->addMediaConversion('thumbnail');
+        $thumbnailConversion->fit(Fit::Crop, 400, 400)
             ->format('webp')
             ->quality(80)
             ->nonQueued();
 
         // Optimised WebP for the frontend with automatic srcset
-        $this->addMediaConversion('optimized')
-            ->fit(Fit::Max, 1920, 1920)
+        /** @var \Spatie\MediaLibrary\MediaCollections\Models\Conversion $optimizedConversion */
+        $optimizedConversion = $this->addMediaConversion('optimized');
+        $optimizedConversion->fit(Fit::Max, 1920, 1920)
             ->format('webp')
             ->quality(85)
             ->withResponsiveImages();

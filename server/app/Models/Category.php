@@ -7,8 +7,12 @@ namespace App\Models;
 use App\Concerns\HasMetafields;
 use App\Concerns\HasTags;
 use App\Concerns\HasVersions;
+use Carbon\CarbonImmutable;
+use Database\Factories\CategoryFactory;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
@@ -42,55 +47,57 @@ use Spatie\Translatable\HasTranslations;
  * @property string $meta_robots
  * @property string|null $og_image
  * @property bool $sitemap_exclude
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Category> $allChildren
+ * @property-read Collection<int, Category> $allChildren
  * @property-read int|null $all_children_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Category> $children
+ * @property-read Collection<int, Category> $children
  * @property-read int|null $children_count
  * @property-read array $translatable_columns_from
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Metafield> $metafields
+ * @property-read Collection<int, Metafield> $metafields
  * @property-read int|null $metafields_count
  * @property-read Category|null $parent
- * @property-read \App\Models\ProductType|null $productType
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Product> $products
+ * @property-read ProductType|null $productType
+ * @property-read Collection<int, Product> $products
  * @property-read int|null $products_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Tag> $tags
+ * @property-read Collection<int, Tag> $tags
  * @property-read int|null $tags_count
- * @property-read \App\Models\TaxRate|null $taxRate
+ * @property-read TaxRate|null $taxRate
  * @property-read mixed $translations
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ModelVersion> $versions
+ * @property-read Collection<int, ModelVersion> $versions
  * @property-read int|null $versions_count
- * @method static \Database\Factories\CategoryFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereCanonicalUrl($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereCollectionType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereImagePath($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereJsonContainsLocale(string $column, string $locale, ?mixed $value, string $operand = '=')
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereJsonContainsLocales(string $column, array $locales, ?mixed $value, string $operand = '=')
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereLocale(string $column, string $locale)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereLocales(string $column, array $locales)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereMetaRobots($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereOgImage($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereParentId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category wherePosition($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereProductTypeId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereRules($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereRulesMatch($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereSeoDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereSeoTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereSitemapExclude($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @method static CategoryFactory factory($count = null, $state = [])
+ * @method static Builder<static>|Category newModelQuery()
+ * @method static Builder<static>|Category newQuery()
+ * @method static Builder<static>|Category query()
+ * @method static Builder<static>|Category whereCanonicalUrl($value)
+ * @method static Builder<static>|Category whereCollectionType($value)
+ * @method static Builder<static>|Category whereCreatedAt($value)
+ * @method static Builder<static>|Category whereDescription($value)
+ * @method static Builder<static>|Category whereId($value)
+ * @method static Builder<static>|Category whereImagePath($value)
+ * @method static Builder<static>|Category whereIsActive($value)
+ * @method static Builder<static>|Category whereJsonContainsLocale(string $column, string $locale, ?mixed $value, string $operand = '=')
+ * @method static Builder<static>|Category whereJsonContainsLocales(string $column, array $locales, ?mixed $value, string $operand = '=')
+ * @method static Builder<static>|Category whereLocale(string $column, string $locale)
+ * @method static Builder<static>|Category whereLocales(string $column, array $locales)
+ * @method static Builder<static>|Category whereMetaRobots($value)
+ * @method static Builder<static>|Category whereName($value)
+ * @method static Builder<static>|Category whereOgImage($value)
+ * @method static Builder<static>|Category whereParentId($value)
+ * @method static Builder<static>|Category wherePosition($value)
+ * @method static Builder<static>|Category whereProductTypeId($value)
+ * @method static Builder<static>|Category whereRules($value)
+ * @method static Builder<static>|Category whereRulesMatch($value)
+ * @method static Builder<static>|Category whereSeoDescription($value)
+ * @method static Builder<static>|Category whereSeoTitle($value)
+ * @method static Builder<static>|Category whereSitemapExclude($value)
+ * @method static Builder<static>|Category whereSlug($value)
+ * @method static Builder<static>|Category whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Guarded(['id'])]
 #[Table(name: 'categories')]

@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
@@ -19,26 +23,28 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string $country_code
  * @property bool $is_active
  * @property bool $is_default
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Category> $categories
+ * @property-read Collection<int, Category> $categories
  * @property-read int|null $categories_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductVariant> $variants
+ * @property-read Collection<int, ProductVariant> $variants
  * @property-read int|null $variants_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|TaxRate newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|TaxRate newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|TaxRate query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|TaxRate whereCountryCode($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|TaxRate whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|TaxRate whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|TaxRate whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|TaxRate whereIsDefault($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|TaxRate whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|TaxRate whereRate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|TaxRate whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @method static Builder<static>|TaxRate newModelQuery()
+ * @method static Builder<static>|TaxRate newQuery()
+ * @method static Builder<static>|TaxRate query()
+ * @method static Builder<static>|TaxRate whereCountryCode($value)
+ * @method static Builder<static>|TaxRate whereCreatedAt($value)
+ * @method static Builder<static>|TaxRate whereId($value)
+ * @method static Builder<static>|TaxRate whereIsActive($value)
+ * @method static Builder<static>|TaxRate whereIsDefault($value)
+ * @method static Builder<static>|TaxRate whereName($value)
+ * @method static Builder<static>|TaxRate whereRate($value)
+ * @method static Builder<static>|TaxRate whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'name', 'rate', 'country_code', 'is_active', 'is_default',

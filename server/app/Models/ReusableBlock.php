@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,23 +20,25 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $description
  * @property array<array-key, mixed>|null $relations_config
  * @property bool $is_active
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PageBlock> $pageBlocks
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, PageBlock> $pageBlocks
  * @property-read int|null $page_blocks_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReusableBlock newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReusableBlock newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReusableBlock query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReusableBlock whereConfiguration($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReusableBlock whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReusableBlock whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReusableBlock whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReusableBlock whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReusableBlock whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReusableBlock whereRelationsConfig($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReusableBlock whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReusableBlock whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @method static Builder<static>|ReusableBlock newModelQuery()
+ * @method static Builder<static>|ReusableBlock newQuery()
+ * @method static Builder<static>|ReusableBlock query()
+ * @method static Builder<static>|ReusableBlock whereConfiguration($value)
+ * @method static Builder<static>|ReusableBlock whereCreatedAt($value)
+ * @method static Builder<static>|ReusableBlock whereDescription($value)
+ * @method static Builder<static>|ReusableBlock whereId($value)
+ * @method static Builder<static>|ReusableBlock whereIsActive($value)
+ * @method static Builder<static>|ReusableBlock whereName($value)
+ * @method static Builder<static>|ReusableBlock whereRelationsConfig($value)
+ * @method static Builder<static>|ReusableBlock whereType($value)
+ * @method static Builder<static>|ReusableBlock whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'name',

@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\MenuLocationEnum;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,22 +19,24 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $name
  * @property MenuLocationEnum|null $location
  * @property bool $is_active
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MenuItem> $allItems
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, MenuItem> $allItems
  * @property-read int|null $all_items_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MenuItem> $items
+ * @property-read Collection<int, MenuItem> $items
  * @property-read int|null $items_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Menu newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Menu newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Menu query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Menu whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Menu whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Menu whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Menu whereLocation($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Menu whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Menu whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @method static Builder<static>|Menu newModelQuery()
+ * @method static Builder<static>|Menu newQuery()
+ * @method static Builder<static>|Menu query()
+ * @method static Builder<static>|Menu whereCreatedAt($value)
+ * @method static Builder<static>|Menu whereId($value)
+ * @method static Builder<static>|Menu whereIsActive($value)
+ * @method static Builder<static>|Menu whereLocation($value)
+ * @method static Builder<static>|Menu whereName($value)
+ * @method static Builder<static>|Menu whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'name', 'location', 'is_active',

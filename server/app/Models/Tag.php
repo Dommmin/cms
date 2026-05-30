@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -14,25 +17,27 @@ use Illuminate\Support\Str;
  * @property int $id
  * @property string $name
  * @property string $slug
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BlogPost> $blogPosts
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, BlogPost> $blogPosts
  * @property-read int|null $blog_posts_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Category> $categories
+ * @property-read Collection<int, Category> $categories
  * @property-read int|null $categories_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Page> $pages
+ * @property-read Collection<int, Page> $pages
  * @property-read int|null $pages_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Product> $products
+ * @property-read Collection<int, Product> $products
  * @property-read int|null $products_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Tag newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Tag newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Tag query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Tag whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Tag whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Tag whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Tag whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Tag whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @method static Builder<static>|Tag newModelQuery()
+ * @method static Builder<static>|Tag newQuery()
+ * @method static Builder<static>|Tag query()
+ * @method static Builder<static>|Tag whereCreatedAt($value)
+ * @method static Builder<static>|Tag whereId($value)
+ * @method static Builder<static>|Tag whereName($value)
+ * @method static Builder<static>|Tag whereSlug($value)
+ * @method static Builder<static>|Tag whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable(['name', 'slug'])]
 class Tag extends Model

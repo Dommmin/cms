@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,17 +18,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $attribute_id
  * @property bool $is_required
  * @property int $position
- * @property-read \App\Models\Attribute $attribute
- * @property-read \App\Models\ProductType $productType
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductTypeAttribute newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductTypeAttribute newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductTypeAttribute query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductTypeAttribute whereAttributeId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductTypeAttribute whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductTypeAttribute whereIsRequired($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductTypeAttribute wherePosition($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductTypeAttribute whereProductTypeId($value)
- * @mixin \Eloquent
+ * @property-read Attribute $attribute
+ * @property-read ProductType $productType
+ *
+ * @method static Builder<static>|ProductTypeAttribute newModelQuery()
+ * @method static Builder<static>|ProductTypeAttribute newQuery()
+ * @method static Builder<static>|ProductTypeAttribute query()
+ * @method static Builder<static>|ProductTypeAttribute whereAttributeId($value)
+ * @method static Builder<static>|ProductTypeAttribute whereId($value)
+ * @method static Builder<static>|ProductTypeAttribute whereIsRequired($value)
+ * @method static Builder<static>|ProductTypeAttribute wherePosition($value)
+ * @method static Builder<static>|ProductTypeAttribute whereProductTypeId($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'product_type_id', 'attribute_id', 'is_required', 'position',

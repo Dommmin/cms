@@ -9,7 +9,9 @@ use App\Concerns\HasTags;
 use App\Concerns\SanitizesTranslatableHtml;
 use App\Enums\PageLayoutEnum;
 use App\Enums\PageTypeEnum;
+use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
+use Database\Factories\PageFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\Table;
@@ -21,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
@@ -77,24 +80,25 @@ use Spatie\Translatable\HasTranslations;
  * @property string $meta_robots
  * @property string|null $og_image
  * @property bool $sitemap_exclude
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read int|null $all_blocks_count
  * @property-read int|null $all_sections_count
  * @property-read int|null $blocks_count
  * @property-read int|null $children_count
  * @property-read array $translatable_columns_from
- * @property-read Collection<int, \App\Models\Metafield> $metafields
+ * @property-read Collection<int, Metafield> $metafields
  * @property-read int|null $metafields_count
  * @property-read int|null $section_blocks_count
  * @property-read int|null $sections_count
- * @property-read Collection<int, \App\Models\Tag> $tags
+ * @property-read Collection<int, Tag> $tags
  * @property-read int|null $tags_count
  * @property-read mixed $translations
  * @property-read int|null $versions_count
- * @method static \Database\Factories\PageFactory factory($count = null, $state = [])
+ *
+ * @method static PageFactory factory($count = null, $state = [])
  * @method static Builder<static>|Page forLocale(?string $locale)
  * @method static Builder<static>|Page newModelQuery()
  * @method static Builder<static>|Page newQuery()
@@ -146,7 +150,8 @@ use Spatie\Translatable\HasTranslations;
  * @method static Builder<static>|Page whereUpdatedAt($value)
  * @method static Builder<static>|Page whereVersion($value)
  * @method static Builder<static>|Page withFullContent()
- * @mixin \Eloquent
+ *
+ * @mixin Model
  */
 #[Fillable([
     'parent_id', 'locale', 'title', 'slug', 'content', 'rich_content', 'excerpt', 'layout',

@@ -23,7 +23,7 @@ class PaymentPolicy
      */
     public function view(User $user, Payment $payment): bool
     {
-        return $payment->order?->customer?->user_id === $user->id;
+        return $payment->order->customer?->user_id === $user->id;
     }
 
     /**

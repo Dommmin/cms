@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,9 +18,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $group
  * @property string $key
  * @property string $value
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\Locale $locale
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Locale $locale
+ *
  * @method static Builder<static>|Translation forLocale(string $localeCode)
  * @method static Builder<static>|Translation inGroup(string $group)
  * @method static Builder<static>|Translation newModelQuery()
@@ -32,7 +34,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static Builder<static>|Translation whereLocaleCode($value)
  * @method static Builder<static>|Translation whereUpdatedAt($value)
  * @method static Builder<static>|Translation whereValue($value)
- * @mixin \Eloquent
+ *
+ * @mixin Model
  */
 #[Fillable([
     'locale_code',

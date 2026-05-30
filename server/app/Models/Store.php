@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
+use Database\Factories\StoreFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,10 +25,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property numeric $lat
  * @property numeric $lng
  * @property bool $is_active
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ *
  * @method static Builder<static>|Store active()
- * @method static \Database\Factories\StoreFactory factory($count = null, $state = [])
+ * @method static StoreFactory factory($count = null, $state = [])
  * @method static Builder<static>|Store newModelQuery()
  * @method static Builder<static>|Store newQuery()
  * @method static Builder<static>|Store query()
@@ -44,7 +47,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static Builder<static>|Store wherePhone($value)
  * @method static Builder<static>|Store whereSlug($value)
  * @method static Builder<static>|Store whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @mixin Model
  */
 #[Fillable([
     'name',

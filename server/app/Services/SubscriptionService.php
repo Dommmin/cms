@@ -8,7 +8,7 @@ use App\Enums\SubscriptionStatusEnum;
 use App\Models\Customer;
 use App\Models\Subscription;
 use App\Models\SubscriptionPlan;
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 
 final class SubscriptionService
 {
@@ -117,7 +117,7 @@ final class SubscriptionService
         return $expiredCount;
     }
 
-    private function calculateExpirationDate(Carbon $startDate, SubscriptionPlan $plan): Carbon
+    private function calculateExpirationDate(CarbonInterface $startDate, SubscriptionPlan $plan): CarbonInterface
     {
         return match ($plan->billing_period) {
             'daily' => $startDate->copy()->addDays($plan->billing_cycle),

@@ -9,10 +9,13 @@ use App\Concerns\HasTags;
 use App\Concerns\HasVersions;
 use App\Concerns\SanitizesTranslatableHtml;
 use App\Enums\ReviewStatusEnum;
+use Carbon\CarbonImmutable;
+use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,9 +24,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -41,49 +47,50 @@ use Spatie\Translatable\HasTranslations;
  * @property array<array-key, mixed>|null $short_description
  * @property string|null $sku_prefix
  * @property bool $is_saleable
- * @property \Carbon\CarbonImmutable|null $available_from
- * @property \Carbon\CarbonImmutable|null $available_until
+ * @property CarbonImmutable|null $available_from
+ * @property CarbonImmutable|null $available_until
  * @property string|null $seo_title
  * @property string|null $seo_description
  * @property string $meta_robots
  * @property string|null $og_image
  * @property bool $sitemap_exclude
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductVariant> $activeVariants
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, ProductVariant> $activeVariants
  * @property-read int|null $active_variants_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \App\Models\Brand|null $brand
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Category> $categories
+ * @property-read Brand|null $brand
+ * @property-read Collection<int, Category> $categories
  * @property-read int|null $categories_count
- * @property-read \App\Models\Category $category
- * @property-read \App\Models\ProductVariant|null $defaultVariant
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductFlag> $flags
+ * @property-read Category $category
+ * @property-read ProductVariant|null $defaultVariant
+ * @property-read Collection<int, ProductFlag> $flags
  * @property-read int|null $flags_count
  * @property-read array $translatable_columns_from
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductImage> $images
+ * @property-read Collection<int, ProductImage> $images
  * @property-read int|null $images_count
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read MediaCollection<int, Media> $media
  * @property-read int|null $media_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Metafield> $metafields
+ * @property-read Collection<int, Metafield> $metafields
  * @property-read int|null $metafields_count
- * @property-read \App\Models\ProductType $productType
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Promotion> $promotions
+ * @property-read ProductType $productType
+ * @property-read Collection<int, Promotion> $promotions
  * @property-read int|null $promotions_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductReview> $reviews
+ * @property-read Collection<int, ProductReview> $reviews
  * @property-read int|null $reviews_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Tag> $tags
+ * @property-read Collection<int, Tag> $tags
  * @property-read int|null $tags_count
  * @property-read mixed $translations
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductVariant> $variants
+ * @property-read Collection<int, ProductVariant> $variants
  * @property-read int|null $variants_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ModelVersion> $versions
+ * @property-read Collection<int, ModelVersion> $versions
  * @property-read int|null $versions_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\WishlistItem> $wishlistItems
+ * @property-read Collection<int, WishlistItem> $wishlistItems
  * @property-read int|null $wishlist_items_count
+ *
  * @method static Builder<static>|Product available()
- * @method static \Database\Factories\ProductFactory factory($count = null, $state = [])
+ * @method static ProductFactory factory($count = null, $state = [])
  * @method static Builder<static>|Product newModelQuery()
  * @method static Builder<static>|Product newQuery()
  * @method static Builder<static>|Product query()
@@ -113,7 +120,8 @@ use Spatie\Translatable\HasTranslations;
  * @method static Builder<static>|Product whereSkuPrefix($value)
  * @method static Builder<static>|Product whereSlug($value)
  * @method static Builder<static>|Product whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @mixin Model
  */
 #[Guarded(['id'])]
 #[Table(name: 'products')]
@@ -241,9 +249,9 @@ class Product extends Model implements HasMedia
      */
     public function averageRating(): float
     {
-        return (float) $this->reviews()
+        return (float) ($this->reviews()
             ->where('status', ReviewStatusEnum::Approved->value)
-            ->avg('rating') ?? 0;
+            ->avg('rating') ?? 0);
     }
 
     /**

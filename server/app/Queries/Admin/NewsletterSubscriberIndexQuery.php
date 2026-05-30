@@ -16,8 +16,8 @@ class NewsletterSubscriberIndexQuery
     public function execute()
     {
         return NewsletterSubscriber::query()
-            ->when($this->request->search, function ($query, string $search): void {
-                $query->where('email', 'like', sprintf('%%%s%%', $search));
+            ->when($this->request->search, function ($query, $search): void {
+                $query->where('email', 'like', sprintf('%%%s%%', (string) $search));
             })
             ->when($this->request->status, function ($query, $status): void {
                 $query->where('status', $status);

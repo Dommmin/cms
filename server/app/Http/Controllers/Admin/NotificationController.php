@@ -123,7 +123,7 @@ class NotificationController extends Controller
                 'id' => 'stock-'.$variant->id,
                 'type' => 'low_stock',
                 'title' => 'Low stock alert',
-                'message' => ($variant->product?->name ?? 'Variant #'.$variant->id).sprintf(' — %s left', $variant->stock_quantity),
+                'message' => ($variant->product->name ?? 'Variant #'.$variant->id).sprintf(' — %s left', $variant->stock_quantity),
                 'created_at' => now()->toISOString(),
                 'url' => '/panel/ecommerce/products',
             ]);

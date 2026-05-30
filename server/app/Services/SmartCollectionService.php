@@ -11,6 +11,9 @@ use Illuminate\Database\Eloquent\Collection;
 
 class SmartCollectionService
 {
+    /**
+     * @return Builder<Product>
+     */
     public function buildQuery(Category $category): Builder
     {
         $rules = $category->rules ?? [];

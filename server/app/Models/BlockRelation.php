@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\Table;
@@ -23,8 +24,9 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property array|null $metadata
  * @property-read PageBlock $block
  * @property-read Model $related
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ *
  * @method static Builder<static>|BlockRelation newModelQuery()
  * @method static Builder<static>|BlockRelation newQuery()
  * @method static Builder<static>|BlockRelation ofType(string $type)
@@ -40,7 +42,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @method static Builder<static>|BlockRelation whereRelationType($value)
  * @method static Builder<static>|BlockRelation whereUpdatedAt($value)
  * @method static Builder<static>|BlockRelation withKey(string $key)
- * @mixin \Eloquent
+ *
+ * @mixin Model
  */
 #[Fillable([
     'page_block_id',

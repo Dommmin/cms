@@ -22,9 +22,10 @@ class SendShippingNotification implements ShouldQueue
     public function handle(OrderShipped $event): void
     {
         $order = $event->order->load(['customer.user', 'shipment']);
+        $customer = $order->customer;
 
-        $email = $order->customer?->user?->email ?? $order->guest_email;
-        $phone = $order->customer?->phone ?? null;
+        $email = ($customer && $customer->user) ? $customer->user->email : $order->guest_email;
+        $phone = $customer ? $customer->phone : null;
         $reference = $order->reference_number;
         $tracking = $order->shipment?->tracking_number;
 

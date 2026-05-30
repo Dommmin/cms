@@ -12,6 +12,7 @@ use App\Models\NewsletterCampaign;
 use App\Models\NewsletterSubscriber;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\WishlistItem;
 use App\Notifications\NewsletterCampaignNotification;
 use Illuminate\Support\Facades\Notification;
 
@@ -58,19 +59,23 @@ final class MarketingAutomationService
 
     private function processCampaign(NewsletterCampaign $campaign, object $context): void
     {
-        match ($campaign->trigger) {
-            CampaignTriggerEnum::OnSubscribe => $this->handleSubscribe($campaign, $context),
-            CampaignTriggerEnum::OnFirstOrder => $this->handleFirstOrder($campaign, $context),
-            CampaignTriggerEnum::OnBirthday => $this->handleBirthday($campaign, $context),
-            CampaignTriggerEnum::AfterPurchase => $this->handleAfterPurchase($campaign, $context),
+        $trigger = $campaign->trigger;
+        if (! $trigger instanceof CampaignTriggerEnum) {
+            return;
+        }
+
+        match ($trigger) {
+            CampaignTriggerEnum::OnSubscribe => $context instanceof NewsletterSubscriber ? $this->handleSubscribe($campaign, $context) : null,
+            CampaignTriggerEnum::OnFirstOrder => $context instanceof Order ? $this->handleFirstOrder($campaign, $context) : null,
+            CampaignTriggerEnum::OnBirthday => $context instanceof Customer ? $this->handleBirthday($campaign, $context) : null,
+            CampaignTriggerEnum::AfterPurchase => $context instanceof Order ? $this->handleAfterPurchase($campaign, $context) : null,
             CampaignTriggerEnum::CartAbandonment => null,
-            CampaignTriggerEnum::ProductReviewRequest => $this->handleProductReview($campaign, $context),
-            CampaignTriggerEnum::WishlistBackInStock => $this->handleWishlistBackInStock($campaign, $context),
-            CampaignTriggerEnum::LoyaltyPointsEarned => $this->handleLoyaltyPoints($campaign, $context),
-            CampaignTriggerEnum::CategoryPurchased => $this->handleCategoryPurchased($campaign, $context),
-            CampaignTriggerEnum::CustomerInactive => $this->handleCustomerInactive($campaign, $context),
-            CampaignTriggerEnum::ProductPurchased => $this->handleProductPurchased($campaign, $context),
-            default => null,
+            CampaignTriggerEnum::ProductReviewRequest => $context instanceof Order ? $this->handleProductReview($campaign, $context) : null,
+            CampaignTriggerEnum::WishlistBackInStock => $context instanceof Product ? $this->handleWishlistBackInStock($campaign, $context) : null,
+            CampaignTriggerEnum::LoyaltyPointsEarned => $context instanceof Customer ? $this->handleLoyaltyPoints($campaign, $context) : null,
+            CampaignTriggerEnum::CategoryPurchased => $context instanceof Order ? $this->handleCategoryPurchased($campaign, $context) : null,
+            CampaignTriggerEnum::CustomerInactive => $context instanceof Customer ? $this->handleCustomerInactive($campaign, $context) : null,
+            CampaignTriggerEnum::ProductPurchased => $context instanceof Order ? $this->handleProductPurchased($campaign, $context) : null,
         };
     }
 
@@ -129,10 +134,14 @@ final class MarketingAutomationService
 
     private function handleWishlistBackInStock(NewsletterCampaign $campaign, Product $product): void
     {
-        $wishlistItems = $product->wishlistItems()->with('customer.user')->get();
+        $wishlistItems = $product->wishlistItems()->with('wishlist.customer.user')->get();
 
+        /** @var WishlistItem $item */
         foreach ($wishlistItems as $item) {
-            $this->sendToCustomer($campaign, $item->customer);
+            $customer = $item->wishlist->customer;
+            if ($customer instanceof Customer) {
+                $this->sendToCustomer($campaign, $customer);
+            }
         }
     }
 

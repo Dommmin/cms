@@ -26,19 +26,20 @@ class FurgonetkaCarrier implements ShippingCarrierInterface
         $shipment = $order->shipment ?? throw new RuntimeException('Order has no shipment record.');
 
         $address = $order->shippingAddress ?? $order->billingAddress;
+        $customer = $order->customer;
 
         $payload = [
             'service' => $this->serviceCode,
             'sender' => $this->buildSender(),
             'receiver' => [
-                'name' => mb_trim(($address?->first_name ?? '').' '.($address?->last_name ?? '')),
-                'company' => $address?->company_name,
-                'email' => $order->customer?->email ?? '',
-                'phone' => $address?->phone ?? '',
-                'street' => $address?->street ?? '',
-                'city' => $address?->city ?? '',
-                'postal_code' => $address?->postal_code ?? '',
-                'country_code' => $address?->country_code ?? 'PL',
+                'name' => mb_trim($address->first_name.' '.$address->last_name),
+                'company' => $address->company_name,
+                'email' => $customer ? $customer->email : '',
+                'phone' => $address->phone,
+                'street' => $address->street,
+                'city' => $address->city,
+                'postal_code' => $address->postal_code,
+                'country_code' => $address->country_code,
             ],
             'parcels' => [
                 [
@@ -99,7 +100,7 @@ class FurgonetkaCarrier implements ShippingCarrierInterface
 
         $response = $this->client->getTracking($shipmentId);
 
-        $status = $this->mapStatus($response['status'] ?? '');
+        $status = $this->mapStatus((string) ($response['status'] ?? ''));
         if ($status && $shipment->status !== $status) {
             $shipment->update(['status' => $status->value]);
         }
@@ -122,7 +123,7 @@ class FurgonetkaCarrier implements ShippingCarrierInterface
             return;
         }
 
-        $status = $this->mapStatus($payload['status'] ?? '');
+        $status = $this->mapStatus((string) ($payload['status'] ?? ''));
         if ($status instanceof ShipmentStatusEnum) {
             $shipment->update(['status' => $status->value]);
         }

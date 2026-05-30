@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\AbstractProvider;
 use Throwable;
 
 class SocialLoginController extends ApiController
@@ -26,7 +27,9 @@ class SocialLoginController extends ApiController
             ]);
         }
 
-        $url = Socialite::driver($provider)->stateless()->redirect()->getTargetUrl();
+        /** @var AbstractProvider $driver */
+        $driver = Socialite::driver($provider);
+        $url = $driver->stateless()->redirect()->getTargetUrl();
 
         return $this->ok(['url' => $url]);
     }
@@ -40,7 +43,9 @@ class SocialLoginController extends ApiController
         }
 
         try {
-            $socialUser = Socialite::driver($provider)->stateless()->user();
+            /** @var AbstractProvider $driver */
+            $driver = Socialite::driver($provider);
+            $socialUser = $driver->stateless()->user();
         } catch (Throwable) {
             throw ValidationException::withMessages([
                 'provider' => ['Social authentication failed.'],

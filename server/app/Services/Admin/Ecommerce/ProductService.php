@@ -100,7 +100,7 @@ class ProductService
 
     private function createVariant(Product $product, array $variantData): ProductVariant
     {
-        return $product->variants()->create([
+        $variant = $product->variants()->create([
             'sku' => $variantData['sku'],
             'name' => $variantData['name'] ?? $product->name,
             'price' => $variantData['price'] ?? 0,
@@ -113,6 +113,8 @@ class ProductService
             'is_default' => true,
             'position' => 0,
         ]);
+
+        return $variant instanceof ProductVariant ? $variant : new ProductVariant();
     }
 
     private function updateOrCreateVariant(Product $product, array $variantData): ProductVariant

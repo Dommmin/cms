@@ -172,6 +172,7 @@ class PageBuilderController extends Controller
 
         $sectionConfig = config('cms.sections.'.$request->input('section_type'));
 
+        /** @var PageSection $section */
         $section = $page->allSections()->create([
             'section_type' => $request->input('section_type'),
             'layout' => $sectionConfig['layouts'][0] ?? 'default',
@@ -224,6 +225,7 @@ class PageBuilderController extends Controller
 
         $section = PageSection::query()->where('page_id', $page)->findOrFail($section);
 
+        /** @var PageBlock $block */
         $block = $section->allBlocks()->create([
             'page_id' => $page,
             'type' => $request->input('type'),

@@ -27,7 +27,7 @@ class GenerateMerchantFeed extends Command
         $this->info(sprintf('Generating %s feed for locale %s...', $type, $locale));
 
         $products = Product::query()
-            ->with(['variants', 'category', 'brand', 'translations'])
+            ->with(['variants', 'category', 'brand'])
             ->where('is_active', true)
             ->whereHas('variants', fn ($q) => $q->where('is_active', true)->where('stock', '>', 0))
             ->get();

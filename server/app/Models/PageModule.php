@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,37 +26,39 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $route_key_name
  * @property bool $is_active
  * @property bool $is_system
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ModuleLayout> $activeLayouts
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, ModuleLayout> $activeLayouts
  * @property-read int|null $active_layouts_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ModuleLayout> $detailLayouts
+ * @property-read Collection<int, ModuleLayout> $detailLayouts
  * @property-read int|null $detail_layouts_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ModuleLayout> $layouts
+ * @property-read Collection<int, ModuleLayout> $layouts
  * @property-read int|null $layouts_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ModuleLayout> $listLayouts
+ * @property-read Collection<int, ModuleLayout> $listLayouts
  * @property-read int|null $list_layouts_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Page> $pages
+ * @property-read Collection<int, Page> $pages
  * @property-read int|null $pages_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereDetailRoutePattern($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereHasDetailPage($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereHasListPage($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereIcon($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereIsSystem($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereKey($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereListRoutePattern($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereModelClass($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereRouteKeyName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PageModule whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @method static Builder<static>|PageModule newModelQuery()
+ * @method static Builder<static>|PageModule newQuery()
+ * @method static Builder<static>|PageModule query()
+ * @method static Builder<static>|PageModule whereCreatedAt($value)
+ * @method static Builder<static>|PageModule whereDescription($value)
+ * @method static Builder<static>|PageModule whereDetailRoutePattern($value)
+ * @method static Builder<static>|PageModule whereHasDetailPage($value)
+ * @method static Builder<static>|PageModule whereHasListPage($value)
+ * @method static Builder<static>|PageModule whereIcon($value)
+ * @method static Builder<static>|PageModule whereId($value)
+ * @method static Builder<static>|PageModule whereIsActive($value)
+ * @method static Builder<static>|PageModule whereIsSystem($value)
+ * @method static Builder<static>|PageModule whereKey($value)
+ * @method static Builder<static>|PageModule whereListRoutePattern($value)
+ * @method static Builder<static>|PageModule whereModelClass($value)
+ * @method static Builder<static>|PageModule whereName($value)
+ * @method static Builder<static>|PageModule whereRouteKeyName($value)
+ * @method static Builder<static>|PageModule whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'key',

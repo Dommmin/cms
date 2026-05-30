@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Database\Factories\CustomerNotificationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,10 +25,11 @@ use Illuminate\Support\Facades\Date;
  * @property Carbon|null $read_at
  * @property string|null $action_url
  * @property Carbon|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\Customer|null $customer
- * @property-read \App\Models\User|null $user
- * @method static \Database\Factories\CustomerNotificationFactory factory($count = null, $state = [])
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Customer|null $customer
+ * @property-read User|null $user
+ *
+ * @method static CustomerNotificationFactory factory($count = null, $state = [])
  * @method static Builder<static>|CustomerNotification newModelQuery()
  * @method static Builder<static>|CustomerNotification newQuery()
  * @method static Builder<static>|CustomerNotification query()
@@ -42,7 +45,8 @@ use Illuminate\Support\Facades\Date;
  * @method static Builder<static>|CustomerNotification whereType($value)
  * @method static Builder<static>|CustomerNotification whereUpdatedAt($value)
  * @method static Builder<static>|CustomerNotification whereUserId($value)
- * @mixin \Eloquent
+ *
+ * @mixin Model
  */
 #[Fillable([
     'customer_id',

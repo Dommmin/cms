@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,23 +23,25 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string $event
  * @property int|null $created_by
  * @property string|null $change_note
- * @property \Carbon\CarbonImmutable $created_at
- * @property-read \App\Models\User|null $creator
- * @property-read Model|\Eloquent $versionable
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereChangeNote($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereChanges($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereCreatedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereEvent($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereSnapshot($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereVersionNumber($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereVersionableId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModelVersion whereVersionableType($value)
- * @mixin \Eloquent
+ * @property CarbonImmutable $created_at
+ * @property-read User|null $creator
+ * @property-read Model $versionable
+ *
+ * @method static Builder<static>|ModelVersion newModelQuery()
+ * @method static Builder<static>|ModelVersion newQuery()
+ * @method static Builder<static>|ModelVersion query()
+ * @method static Builder<static>|ModelVersion whereChangeNote($value)
+ * @method static Builder<static>|ModelVersion whereChanges($value)
+ * @method static Builder<static>|ModelVersion whereCreatedAt($value)
+ * @method static Builder<static>|ModelVersion whereCreatedBy($value)
+ * @method static Builder<static>|ModelVersion whereEvent($value)
+ * @method static Builder<static>|ModelVersion whereId($value)
+ * @method static Builder<static>|ModelVersion whereSnapshot($value)
+ * @method static Builder<static>|ModelVersion whereVersionNumber($value)
+ * @method static Builder<static>|ModelVersion whereVersionableId($value)
+ * @method static Builder<static>|ModelVersion whereVersionableType($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'versionable_type',

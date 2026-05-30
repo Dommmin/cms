@@ -9,6 +9,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Minishlink\WebPush\Subscription;
+use Minishlink\WebPush\VAPID;
 use Minishlink\WebPush\WebPush;
 
 final class PushNotificationService
@@ -22,7 +23,7 @@ final class PushNotificationService
 
     public static function generateVapidKeys(): array
     {
-        $vapid = WebPush::createVapidKeys();
+        $vapid = VAPID::createVapidKeys();
 
         return [
             'public_key' => $vapid['publicKey'],

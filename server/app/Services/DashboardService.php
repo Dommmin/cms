@@ -185,7 +185,7 @@ class DashboardService
      */
     private function getOrdersByStatus(CarbonInterface $start, CarbonInterface $end): array
     {
-        $results = Order::query()
+        $results = DB::table('orders')
             ->whereBetween('created_at', [$start, $end])
             ->select('status', DB::raw('COUNT(*) as count'))
             ->groupBy('status')
@@ -197,7 +197,7 @@ class DashboardService
         }
 
         foreach ($results as $result) {
-            $statusCounts[$result->status] = (int) $result->count;
+            $statusCounts[(string) $result->status] = (int) $result->count;
         }
 
         return $statusCounts;
@@ -210,7 +210,7 @@ class DashboardService
      */
     private function getRevenueByDay(CarbonInterface $start, CarbonInterface $end): array
     {
-        $results = Order::query()
+        $results = DB::table('orders')
             ->whereBetween('created_at', [$start, $end])
             ->whereIn('status', [
                 OrderStatusEnum::PENDING->value,
@@ -236,7 +236,7 @@ class DashboardService
         }
 
         foreach ($results as $result) {
-            $revenueByDay[$result->date] = (int) $result->revenue;
+            $revenueByDay[(string) $result->date] = (int) $result->revenue;
         }
 
         return $revenueByDay;

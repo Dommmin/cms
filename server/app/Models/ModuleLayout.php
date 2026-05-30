@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,27 +24,29 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property array|null $configuration_schema
  * @property array|null $default_configuration
  * @property bool $is_active
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\PageModule $module
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Page> $pages
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read PageModule $module
+ * @property-read Collection<int, Page> $pages
  * @property-read int|null $pages_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleLayout newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleLayout newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleLayout query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleLayout whereComponentName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleLayout whereConfigurationSchema($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleLayout whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleLayout whereDefaultConfiguration($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleLayout whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleLayout whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleLayout whereKey($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleLayout whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleLayout wherePageModuleId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleLayout wherePreviewImage($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleLayout whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleLayout whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @method static Builder<static>|ModuleLayout newModelQuery()
+ * @method static Builder<static>|ModuleLayout newQuery()
+ * @method static Builder<static>|ModuleLayout query()
+ * @method static Builder<static>|ModuleLayout whereComponentName($value)
+ * @method static Builder<static>|ModuleLayout whereConfigurationSchema($value)
+ * @method static Builder<static>|ModuleLayout whereCreatedAt($value)
+ * @method static Builder<static>|ModuleLayout whereDefaultConfiguration($value)
+ * @method static Builder<static>|ModuleLayout whereId($value)
+ * @method static Builder<static>|ModuleLayout whereIsActive($value)
+ * @method static Builder<static>|ModuleLayout whereKey($value)
+ * @method static Builder<static>|ModuleLayout whereName($value)
+ * @method static Builder<static>|ModuleLayout wherePageModuleId($value)
+ * @method static Builder<static>|ModuleLayout wherePreviewImage($value)
+ * @method static Builder<static>|ModuleLayout whereType($value)
+ * @method static Builder<static>|ModuleLayout whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'page_module_id',

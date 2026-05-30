@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Modules\Core\Domain\Models\Customer;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,19 +17,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $product_review_id
  * @property int $customer_id
  * @property bool $is_helpful
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\ProductReview|null $review
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewHelpfulVote newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewHelpfulVote newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewHelpfulVote query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewHelpfulVote whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewHelpfulVote whereCustomerId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewHelpfulVote whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewHelpfulVote whereIsHelpful($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewHelpfulVote whereProductReviewId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewHelpfulVote whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read ProductReview|null $review
+ *
+ * @method static Builder<static>|ReviewHelpfulVote newModelQuery()
+ * @method static Builder<static>|ReviewHelpfulVote newQuery()
+ * @method static Builder<static>|ReviewHelpfulVote query()
+ * @method static Builder<static>|ReviewHelpfulVote whereCreatedAt($value)
+ * @method static Builder<static>|ReviewHelpfulVote whereCustomerId($value)
+ * @method static Builder<static>|ReviewHelpfulVote whereId($value)
+ * @method static Builder<static>|ReviewHelpfulVote whereIsHelpful($value)
+ * @method static Builder<static>|ReviewHelpfulVote whereProductReviewId($value)
+ * @method static Builder<static>|ReviewHelpfulVote whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'product_review_id', 'customer_id', 'is_helpful',

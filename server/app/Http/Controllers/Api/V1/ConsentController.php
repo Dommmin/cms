@@ -37,10 +37,13 @@ class ConsentController extends ApiController
 
         $consents = $query->latest()->get()->keyBy('category');
 
+        $analyticsConsent = $consents->get('analytics');
+        $marketingConsent = $consents->get('marketing');
+
         return $this->ok([
             'functional' => true,
-            'analytics' => (bool) ($consents->get('analytics')?->granted ?? false),
-            'marketing' => (bool) ($consents->get('marketing')?->granted ?? false),
+            'analytics' => $analyticsConsent instanceof CookieConsent && (bool) $analyticsConsent->granted,
+            'marketing' => $marketingConsent instanceof CookieConsent && (bool) $marketingConsent->granted,
             'consent_version' => $consents->first()?->consent_version,
         ]);
     }

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,22 +21,24 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string $name
  * @property string|null $description
  * @property bool $is_active
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
  * @property-read int|null $items_count
- * @property-read \App\Models\Product $product
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle whereDiscountPercentage($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle whereProductId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductBundle whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @property-read Product $product
+ *
+ * @method static Builder<static>|ProductBundle newModelQuery()
+ * @method static Builder<static>|ProductBundle newQuery()
+ * @method static Builder<static>|ProductBundle query()
+ * @method static Builder<static>|ProductBundle whereCreatedAt($value)
+ * @method static Builder<static>|ProductBundle whereDescription($value)
+ * @method static Builder<static>|ProductBundle whereDiscountPercentage($value)
+ * @method static Builder<static>|ProductBundle whereId($value)
+ * @method static Builder<static>|ProductBundle whereIsActive($value)
+ * @method static Builder<static>|ProductBundle whereName($value)
+ * @method static Builder<static>|ProductBundle whereProductId($value)
+ * @method static Builder<static>|ProductBundle whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'product_id',
@@ -52,11 +56,17 @@ class ProductBundle extends Model
         'is_active' => 'boolean',
     ];
 
+    /**
+     * @return BelongsTo<Product, $this>
+     */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
+    /**
+     * @return BelongsToMany<ProductVariant, $this>
+     */
     public function items(): BelongsToMany
     {
         return $this->belongsToMany(ProductVariant::class, 'product_bundle_items')
@@ -66,7 +76,7 @@ class ProductBundle extends Model
 
     public function calculateBundlePrice(): int
     {
-        $total = $this->items->sum(fn ($variant): int|float => $variant->price * $variant->pivot->quantity);
+        $total = $this->items->sum(fn (ProductVariant $variant): int => (int) ($variant->price * $variant->pivot->quantity));
 
         if ($this->discount_percentage > 0) {
             return (int) ($total * (100 - $this->discount_percentage) / 100);

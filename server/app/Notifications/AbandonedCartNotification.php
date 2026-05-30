@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Notifications;
 
 use App\Models\Cart;
+use App\Models\CartItem;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -31,8 +32,9 @@ class AbandonedCartNotification extends Notification implements ShouldQueue
             ->greeting(sprintf('Hello %s!', $notifiable->name))
             ->line("It looks like you left some items in your cart. Don't forget to complete your purchase!");
 
+        /** @var CartItem $item */
         foreach ($this->cart->items as $item) {
-            $mail->line(sprintf('- %s x%s', $item->variant?->product?->name, $item->quantity));
+            $mail->line(sprintf('- %s x%s', $item->variant->product->name, $item->quantity));
         }
 
         if ($this->discountCode) {

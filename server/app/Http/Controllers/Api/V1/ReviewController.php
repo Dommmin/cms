@@ -79,7 +79,7 @@ class ReviewController extends ApiController
         $user = $request->user();
         $customer = $user?->customer;
 
-        abort_unless($customer, 401, 'Login required');
+        abort_unless($customer !== null, 401, 'Login required');
 
         $alreadyVoted = $review->helpfulVotes()->where('customer_id', $customer->id)->exists();
 

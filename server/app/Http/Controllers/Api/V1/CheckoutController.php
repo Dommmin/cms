@@ -120,6 +120,7 @@ class CheckoutController extends ApiController
 
     public function shippingMethods(Request $request): AnonymousResourceCollection
     {
+        /** @var User|null $user */
         $user = auth('sanctum')->user();
         $cartToken = $request->header('X-Cart-Token');
 
@@ -143,6 +144,7 @@ class CheckoutController extends ApiController
     public function checkout(CheckoutRequest $request): JsonResponse
     {
         $data = $request->validated();
+        /** @var User|null $user */
         $user = auth('sanctum')->user();
         $cartToken = $request->header('X-Cart-Token');
 
@@ -162,7 +164,7 @@ class CheckoutController extends ApiController
         // Order confirmation email is sent via OrderCreated event listener
 
         $payment = $order->payment;
-        $result = ['action' => 'none', 'redirect_url' => null, 'message' => 'Order created'];
+        $result = ['action' => 'none', 'redirect_url' => null, 'message' => 'Order created', 'bank_details' => null];
 
         if ($payment) {
             $gateway = $this->gatewayManager->driver($payment->provider);

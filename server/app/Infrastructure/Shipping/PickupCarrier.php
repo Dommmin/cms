@@ -17,7 +17,10 @@ class PickupCarrier implements ShippingCarrierInterface
 {
     public function createShipment(Order $order, array $data = []): Shipment
     {
-        return $order->shipment ?? $order->shipment()->firstOrFail();
+        /** @var Shipment $shipment */
+        $shipment = $order->shipment ?? $order->shipment()->firstOrFail();
+
+        return $shipment;
     }
 
     public function generateLabel(Shipment $shipment): string

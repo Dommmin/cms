@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,9 +20,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $user_id
  * @property string|null $user_agent
  * @property bool $is_active
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\User|null $user
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read User|null $user
+ *
  * @method static Builder<static>|PushSubscription active()
  * @method static Builder<static>|PushSubscription newModelQuery()
  * @method static Builder<static>|PushSubscription newQuery()
@@ -36,7 +38,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static Builder<static>|PushSubscription whereUpdatedAt($value)
  * @method static Builder<static>|PushSubscription whereUserAgent($value)
  * @method static Builder<static>|PushSubscription whereUserId($value)
- * @mixin \Eloquent
+ *
+ * @mixin Model
  */
 #[Fillable([
     'user_id',

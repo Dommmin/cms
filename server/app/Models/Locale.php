@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
@@ -23,12 +25,13 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string|null $currency_code
  * @property bool $is_default
  * @property bool $is_active
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Translation> $translations
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Translation> $translations
  * @property-read int|null $translations_count
+ *
  * @method static Builder<static>|Locale active()
  * @method static Builder<static>|Locale default()
  * @method static Builder<static>|Locale newModelQuery()
@@ -44,7 +47,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static Builder<static>|Locale whereName($value)
  * @method static Builder<static>|Locale whereNativeName($value)
  * @method static Builder<static>|Locale whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @mixin Model
  */
 #[Fillable([
     'code',

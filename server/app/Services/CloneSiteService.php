@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Page;
+use App\Models\PageBlock;
 use App\Models\PageSection;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -92,7 +93,9 @@ class CloneSiteService
                 'is_active' => $section->is_active,
             ]);
 
-            $this->cloneBlocks($section, $newSection, $newPage->id);
+            if ($newSection instanceof PageSection) {
+                $this->cloneBlocks($section, $newSection, $newPage->id);
+            }
         }
     }
 
@@ -108,14 +111,16 @@ class CloneSiteService
                 'reusable_block_id' => $block->reusable_block_id,
             ]);
 
-            foreach ($block->relations as $relation) {
-                $newBlock->relations()->create([
-                    'relation_type' => $relation->relation_type,
-                    'relation_id' => $relation->relation_id,
-                    'relation_key' => $relation->relation_key,
-                    'position' => $relation->position,
-                    'metadata' => $relation->metadata,
-                ]);
+            if ($newBlock instanceof PageBlock) {
+                foreach ($block->relations as $relation) {
+                    $newBlock->relations()->create([
+                        'relation_type' => $relation->relation_type,
+                        'relation_id' => $relation->relation_id,
+                        'relation_key' => $relation->relation_key,
+                        'position' => $relation->position,
+                        'metadata' => $relation->metadata,
+                    ]);
+                }
             }
         }
     }

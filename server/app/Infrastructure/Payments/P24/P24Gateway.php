@@ -176,7 +176,7 @@ class P24Gateway implements PaymentGatewayInterface
             $payment->update(['status' => PaymentStatusEnum::COMPLETED->value]);
 
             $order = $payment->order;
-            if ($order && $order->status !== OrderStatusEnum::PAID) {
+            if ($order && ! $order->status->equals(PaidState::class)) {
                 $order->update(['status' => OrderStatusEnum::PAID->value]);
             }
         } else {

@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
+use Database\Factories\CurrencyFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,24 +22,26 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $decimal_places
  * @property bool $is_active
  * @property bool $is_base
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ExchangeRate> $exchangeRates
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, ExchangeRate> $exchangeRates
  * @property-read int|null $exchange_rates_count
- * @method static \Database\Factories\CurrencyFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereCode($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereDecimalPlaces($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereIsBase($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereSymbol($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @method static CurrencyFactory factory($count = null, $state = [])
+ * @method static Builder<static>|Currency newModelQuery()
+ * @method static Builder<static>|Currency newQuery()
+ * @method static Builder<static>|Currency query()
+ * @method static Builder<static>|Currency whereCode($value)
+ * @method static Builder<static>|Currency whereCreatedAt($value)
+ * @method static Builder<static>|Currency whereDecimalPlaces($value)
+ * @method static Builder<static>|Currency whereId($value)
+ * @method static Builder<static>|Currency whereIsActive($value)
+ * @method static Builder<static>|Currency whereIsBase($value)
+ * @method static Builder<static>|Currency whereName($value)
+ * @method static Builder<static>|Currency whereSymbol($value)
+ * @method static Builder<static>|Currency whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'code', 'name', 'symbol', 'decimal_places', 'is_active', 'is_base',
@@ -64,6 +70,9 @@ class Currency extends Model
             ]);
     }
 
+    /**
+     * @return HasMany<ExchangeRate, $this>
+     */
     public function exchangeRates(): HasMany
     {
         return $this->hasMany(ExchangeRate::class);

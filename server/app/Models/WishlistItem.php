@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,20 +17,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $wishlist_id
  * @property int $product_variant_id
  * @property string|null $notes
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\ProductVariant $variant
- * @property-read \App\Models\Wishlist $wishlist
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WishlistItem newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WishlistItem newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WishlistItem query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WishlistItem whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WishlistItem whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WishlistItem whereNotes($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WishlistItem whereProductVariantId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WishlistItem whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WishlistItem whereWishlistId($value)
- * @mixin \Eloquent
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read ProductVariant $variant
+ * @property-read Wishlist $wishlist
+ *
+ * @method static Builder<static>|WishlistItem newModelQuery()
+ * @method static Builder<static>|WishlistItem newQuery()
+ * @method static Builder<static>|WishlistItem query()
+ * @method static Builder<static>|WishlistItem whereCreatedAt($value)
+ * @method static Builder<static>|WishlistItem whereId($value)
+ * @method static Builder<static>|WishlistItem whereNotes($value)
+ * @method static Builder<static>|WishlistItem whereProductVariantId($value)
+ * @method static Builder<static>|WishlistItem whereUpdatedAt($value)
+ * @method static Builder<static>|WishlistItem whereWishlistId($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'wishlist_id', 'product_variant_id', 'notes',

@@ -32,12 +32,16 @@ class WishlistService
             $wishlist = $user->customer->wishlists()->first();
 
             if (! $wishlist) {
-                return $user->customer->wishlists()->create([
+                /** @var Wishlist $newWishlist */
+                $newWishlist = $user->customer->wishlists()->create([
                     'name' => 'Wishlist',
                     'is_public' => false,
                 ]);
+
+                return $newWishlist;
             }
 
+            /** @var Wishlist $wishlist */
             return $wishlist;
         }
 
@@ -117,10 +121,12 @@ class WishlistService
         $customerWishlist = $customer->wishlists()->first();
 
         if (! $customerWishlist) {
-            $customerWishlist = $customer->wishlists()->create([
+            /** @var Wishlist $newWishlist */
+            $newWishlist = $customer->wishlists()->create([
                 'name' => 'Wishlist',
                 'is_public' => false,
             ]);
+            $customerWishlist = $newWishlist;
         }
 
         $customerWishlist->load('items');

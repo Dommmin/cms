@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,21 +17,23 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $currency_id
  * @property float $rate
  * @property string $source
- * @property \Carbon\CarbonImmutable $fetched_at
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\Currency $currency
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExchangeRate newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExchangeRate newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExchangeRate query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExchangeRate whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExchangeRate whereCurrencyId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExchangeRate whereFetchedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExchangeRate whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExchangeRate whereRate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExchangeRate whereSource($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExchangeRate whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @property CarbonImmutable $fetched_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Currency $currency
+ *
+ * @method static Builder<static>|ExchangeRate newModelQuery()
+ * @method static Builder<static>|ExchangeRate newQuery()
+ * @method static Builder<static>|ExchangeRate query()
+ * @method static Builder<static>|ExchangeRate whereCreatedAt($value)
+ * @method static Builder<static>|ExchangeRate whereCurrencyId($value)
+ * @method static Builder<static>|ExchangeRate whereFetchedAt($value)
+ * @method static Builder<static>|ExchangeRate whereId($value)
+ * @method static Builder<static>|ExchangeRate whereRate($value)
+ * @method static Builder<static>|ExchangeRate whereSource($value)
+ * @method static Builder<static>|ExchangeRate whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'currency_id', 'rate', 'source', 'fetched_at',

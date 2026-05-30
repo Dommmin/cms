@@ -43,6 +43,7 @@ class CartController extends ApiController
         }
 
         $cart = $this->cartService->getOrCreateCart($request->user(), $request->header('X-Cart-Token'));
+        /** @var CartItem|null $existing */
         $existing = $cart->items()->where('variant_id', $variant->id)->first();
 
         if ($existing) {
@@ -75,7 +76,7 @@ class CartController extends ApiController
         $data = $request->validated();
         $variant = $cartItem->variant;
 
-        if ($variant && $data['quantity'] > $variant->stock_quantity) {
+        if ($data['quantity'] > $variant->stock_quantity) {
             throw ValidationException::withMessages([
                 'quantity' => [sprintf('Not enough stock available. Available: %d', $variant->stock_quantity)],
             ]);

@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,25 +20,27 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $parent_id
  * @property string $body
  * @property bool $is_approved
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
  * @property-read BlogComment|null $parent
- * @property-read \App\Models\BlogPost $post
- * @property-read \Illuminate\Database\Eloquent\Collection<int, BlogComment> $replies
+ * @property-read BlogPost $post
+ * @property-read Collection<int, BlogComment> $replies
  * @property-read int|null $replies_count
- * @property-read \App\Models\User|null $user
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BlogComment newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BlogComment newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BlogComment query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BlogComment whereBlogPostId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BlogComment whereBody($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BlogComment whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BlogComment whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BlogComment whereIsApproved($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BlogComment whereParentId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BlogComment whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BlogComment whereUserId($value)
- * @mixin \Eloquent
+ * @property-read User|null $user
+ *
+ * @method static Builder<static>|BlogComment newModelQuery()
+ * @method static Builder<static>|BlogComment newQuery()
+ * @method static Builder<static>|BlogComment query()
+ * @method static Builder<static>|BlogComment whereBlogPostId($value)
+ * @method static Builder<static>|BlogComment whereBody($value)
+ * @method static Builder<static>|BlogComment whereCreatedAt($value)
+ * @method static Builder<static>|BlogComment whereId($value)
+ * @method static Builder<static>|BlogComment whereIsApproved($value)
+ * @method static Builder<static>|BlogComment whereParentId($value)
+ * @method static Builder<static>|BlogComment whereUpdatedAt($value)
+ * @method static Builder<static>|BlogComment whereUserId($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'blog_post_id',

@@ -6,8 +6,12 @@ namespace App\Models;
 
 use App\Enums\OrderStatusEnum;
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Database\Factories\CustomerFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
@@ -32,43 +37,45 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string|null $notes
  * @property array<array-key, mixed>|null $tags
  * @property bool $is_active
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property \Carbon\CarbonImmutable|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property CarbonImmutable|null $deleted_at
+ * @property-read Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Address> $addresses
+ * @property-read Collection<int, Address> $addresses
  * @property-read int|null $addresses_count
- * @property-read \App\Models\Cart|null $cart
- * @property-read \App\Models\NewsletterSubscriber|null $newsletterSubscriber
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders
+ * @property-read Cart|null $cart
+ * @property-read NewsletterSubscriber|null $newsletterSubscriber
+ * @property-read Collection<int, Order> $orders
  * @property-read int|null $orders_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductReview> $reviews
+ * @property-read Collection<int, ProductReview> $reviews
  * @property-read int|null $reviews_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Wishlist> $wishlists
+ * @property-read Collection<int, Wishlist> $wishlists
  * @property-read int|null $wishlists_count
- * @method static \Database\Factories\CustomerFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereCompanyName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereFirstName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereLastName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereNotes($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer wherePhone($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereTags($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereTaxId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer withTrashed(bool $withTrashed = true)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer withoutTrashed()
- * @mixin \Eloquent
+ *
+ * @method static CustomerFactory factory($count = null, $state = [])
+ * @method static Builder<static>|Customer newModelQuery()
+ * @method static Builder<static>|Customer newQuery()
+ * @method static Builder<static>|Customer onlyTrashed()
+ * @method static Builder<static>|Customer query()
+ * @method static Builder<static>|Customer whereCompanyName($value)
+ * @method static Builder<static>|Customer whereCreatedAt($value)
+ * @method static Builder<static>|Customer whereDeletedAt($value)
+ * @method static Builder<static>|Customer whereEmail($value)
+ * @method static Builder<static>|Customer whereFirstName($value)
+ * @method static Builder<static>|Customer whereId($value)
+ * @method static Builder<static>|Customer whereIsActive($value)
+ * @method static Builder<static>|Customer whereLastName($value)
+ * @method static Builder<static>|Customer whereNotes($value)
+ * @method static Builder<static>|Customer wherePhone($value)
+ * @method static Builder<static>|Customer whereTags($value)
+ * @method static Builder<static>|Customer whereTaxId($value)
+ * @method static Builder<static>|Customer whereUpdatedAt($value)
+ * @method static Builder<static>|Customer whereUserId($value)
+ * @method static Builder<static>|Customer withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|Customer withoutTrashed()
+ *
+ * @mixin Model
  */
 #[Fillable([
     'user_id', 'first_name', 'last_name', 'email',
@@ -90,11 +97,17 @@ class Customer extends Model
             ->useLogName('customer');
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return HasMany<Address, $this>
+     */
     public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
@@ -105,26 +118,41 @@ class Customer extends Model
         return $this->addresses()->where('is_default', true)->first();
     }
 
+    /**
+     * @return HasMany<Order, $this>
+     */
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
     }
 
+    /**
+     * @return HasOne<Cart, $this>
+     */
     public function cart(): HasOne
     {
         return $this->hasOne(Cart::class);
     }
 
+    /**
+     * @return HasMany<Wishlist, $this>
+     */
     public function wishlists(): HasMany
     {
         return $this->hasMany(Wishlist::class);
     }
 
+    /**
+     * @return HasMany<ProductReview, $this>
+     */
     public function reviews(): HasMany
     {
         return $this->hasMany(ProductReview::class);
     }
 
+    /**
+     * @return HasOne<NewsletterSubscriber, $this>
+     */
     public function newsletterSubscriber(): HasOne
     {
         return $this->hasOne(NewsletterSubscriber::class);

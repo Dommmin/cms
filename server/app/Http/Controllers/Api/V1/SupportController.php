@@ -22,7 +22,7 @@ class SupportController extends ApiController
         $user = $request->user();
         $customer = $user?->customer;
 
-        $email = $customer?->email ?? $data['email'] ?? null;
+        $email = ($customer ? $customer->email : null) ?? $data['email'] ?? null;
         $name = $customer ? ($customer->first_name.' '.$customer->last_name) : ($data['name'] ?? null);
 
         $conversation = SupportConversation::query()->create([

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Modules\Core\Domain\Models\Customer;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -21,44 +24,46 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $token
  * @property array<array-key, mixed>|null $tags
  * @property bool $consent_given
- * @property \Carbon\CarbonImmutable|null $consent_given_at
+ * @property CarbonImmutable|null $consent_given_at
  * @property string|null $consent_ip
  * @property string|null $consent_source
  * @property bool $is_active
- * @property \Carbon\CarbonImmutable|null $unsubscribed_at
+ * @property CarbonImmutable|null $unsubscribed_at
  * @property string|null $unsubscribe_reason
  * @property bool $is_bounced
- * @property \Carbon\CarbonImmutable|null $bounced_at
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NewsletterClick> $clicks
+ * @property CarbonImmutable|null $bounced_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, NewsletterClick> $clicks
  * @property-read int|null $clicks_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NewsletterOpen> $opens
+ * @property-read Collection<int, NewsletterOpen> $opens
  * @property-read int|null $opens_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NewsletterSend> $sends
+ * @property-read Collection<int, NewsletterSend> $sends
  * @property-read int|null $sends_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereBouncedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereConsentGiven($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereConsentGivenAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereConsentIp($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereConsentSource($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereCustomerId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereFirstName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereIsBounced($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereLocale($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereTags($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereUnsubscribeReason($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereUnsubscribedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NewsletterSubscriber whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @method static Builder<static>|NewsletterSubscriber newModelQuery()
+ * @method static Builder<static>|NewsletterSubscriber newQuery()
+ * @method static Builder<static>|NewsletterSubscriber query()
+ * @method static Builder<static>|NewsletterSubscriber whereBouncedAt($value)
+ * @method static Builder<static>|NewsletterSubscriber whereConsentGiven($value)
+ * @method static Builder<static>|NewsletterSubscriber whereConsentGivenAt($value)
+ * @method static Builder<static>|NewsletterSubscriber whereConsentIp($value)
+ * @method static Builder<static>|NewsletterSubscriber whereConsentSource($value)
+ * @method static Builder<static>|NewsletterSubscriber whereCreatedAt($value)
+ * @method static Builder<static>|NewsletterSubscriber whereCustomerId($value)
+ * @method static Builder<static>|NewsletterSubscriber whereEmail($value)
+ * @method static Builder<static>|NewsletterSubscriber whereFirstName($value)
+ * @method static Builder<static>|NewsletterSubscriber whereId($value)
+ * @method static Builder<static>|NewsletterSubscriber whereIsActive($value)
+ * @method static Builder<static>|NewsletterSubscriber whereIsBounced($value)
+ * @method static Builder<static>|NewsletterSubscriber whereLocale($value)
+ * @method static Builder<static>|NewsletterSubscriber whereTags($value)
+ * @method static Builder<static>|NewsletterSubscriber whereToken($value)
+ * @method static Builder<static>|NewsletterSubscriber whereUnsubscribeReason($value)
+ * @method static Builder<static>|NewsletterSubscriber whereUnsubscribedAt($value)
+ * @method static Builder<static>|NewsletterSubscriber whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'customer_id', 'email', 'first_name', 'locale', 'token', 'tags',
@@ -81,21 +86,33 @@ class NewsletterSubscriber extends Model
         'bounced_at' => 'datetime',
     ];
 
+    /**
+     * @return BelongsTo<Customer, $this>
+     */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
 
+    /**
+     * @return HasMany<NewsletterSend, $this>
+     */
     public function sends(): HasMany
     {
         return $this->hasMany(NewsletterSend::class);
     }
 
+    /**
+     * @return HasMany<NewsletterOpen, $this>
+     */
     public function opens(): HasMany
     {
         return $this->hasMany(NewsletterOpen::class);
     }
 
+    /**
+     * @return HasMany<NewsletterClick, $this>
+     */
     public function clicks(): HasMany
     {
         return $this->hasMany(NewsletterClick::class);
@@ -113,5 +130,13 @@ class NewsletterSubscriber extends Model
     public function hasTag(string $tag): bool
     {
         return $this->tags && in_array($tag, $this->tags);
+    }
+
+    /**
+     * @return BelongsToMany<NewsletterSegment, $this>
+     */
+    public function segments(): BelongsToMany
+    {
+        return $this->belongsToMany(NewsletterSegment::class, 'newsletter_segment_subscriber');
     }
 }

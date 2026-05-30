@@ -6,8 +6,12 @@ namespace App\Models;
 
 use App\Enums\SupportChannelEnum;
 use App\Enums\SupportConversationStatusEnum;
+use Carbon\CarbonImmutable;
+use Database\Factories\SupportConversationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,32 +28,34 @@ use Illuminate\Support\Str;
  * @property string $subject
  * @property SupportConversationStatusEnum $status
  * @property SupportChannelEnum $channel
- * @property \Carbon\CarbonImmutable|null $last_reply_at
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\User|null $assignedTo
- * @property-read \App\Models\Customer|null $customer
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupportMessage> $messages
+ * @property CarbonImmutable|null $last_reply_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read User|null $assignedTo
+ * @property-read Customer|null $customer
+ * @property-read Collection<int, SupportMessage> $messages
  * @property-read int|null $messages_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupportMessage> $unreadMessages
+ * @property-read Collection<int, SupportMessage> $unreadMessages
  * @property-read int|null $unread_messages_count
- * @method static \Database\Factories\SupportConversationFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportConversation newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportConversation newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportConversation query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportConversation whereAssignedTo($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportConversation whereChannel($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportConversation whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportConversation whereCustomerId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportConversation whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportConversation whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportConversation whereLastReplyAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportConversation whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportConversation whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportConversation whereSubject($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportConversation whereToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportConversation whereUpdatedAt($value)
- * @mixin \Eloquent
+ *
+ * @method static SupportConversationFactory factory($count = null, $state = [])
+ * @method static Builder<static>|SupportConversation newModelQuery()
+ * @method static Builder<static>|SupportConversation newQuery()
+ * @method static Builder<static>|SupportConversation query()
+ * @method static Builder<static>|SupportConversation whereAssignedTo($value)
+ * @method static Builder<static>|SupportConversation whereChannel($value)
+ * @method static Builder<static>|SupportConversation whereCreatedAt($value)
+ * @method static Builder<static>|SupportConversation whereCustomerId($value)
+ * @method static Builder<static>|SupportConversation whereEmail($value)
+ * @method static Builder<static>|SupportConversation whereId($value)
+ * @method static Builder<static>|SupportConversation whereLastReplyAt($value)
+ * @method static Builder<static>|SupportConversation whereName($value)
+ * @method static Builder<static>|SupportConversation whereStatus($value)
+ * @method static Builder<static>|SupportConversation whereSubject($value)
+ * @method static Builder<static>|SupportConversation whereToken($value)
+ * @method static Builder<static>|SupportConversation whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'token', 'customer_id', 'assigned_to', 'email', 'name',

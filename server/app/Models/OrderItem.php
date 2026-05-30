@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
+use Database\Factories\OrderItemFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,28 +32,30 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $product_id
  * @property-read ProductVariant|null $variant
  * @property-read int $remaining_to_ship
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\Order $order
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ShipmentItem> $shipmentItems
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Order $order
+ * @property-read Collection<int, ShipmentItem> $shipmentItems
  * @property-read int|null $shipment_items_count
- * @method static \Database\Factories\OrderItemFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereOrderId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereProductName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereQuantity($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereShippedQuantity($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereSku($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereTotalPrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereUnitPrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereVariantId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereVariantName($value)
- * @mixin \Eloquent
+ *
+ * @method static OrderItemFactory factory($count = null, $state = [])
+ * @method static Builder<static>|OrderItem newModelQuery()
+ * @method static Builder<static>|OrderItem newQuery()
+ * @method static Builder<static>|OrderItem query()
+ * @method static Builder<static>|OrderItem whereCreatedAt($value)
+ * @method static Builder<static>|OrderItem whereId($value)
+ * @method static Builder<static>|OrderItem whereOrderId($value)
+ * @method static Builder<static>|OrderItem whereProductName($value)
+ * @method static Builder<static>|OrderItem whereQuantity($value)
+ * @method static Builder<static>|OrderItem whereShippedQuantity($value)
+ * @method static Builder<static>|OrderItem whereSku($value)
+ * @method static Builder<static>|OrderItem whereTotalPrice($value)
+ * @method static Builder<static>|OrderItem whereUnitPrice($value)
+ * @method static Builder<static>|OrderItem whereUpdatedAt($value)
+ * @method static Builder<static>|OrderItem whereVariantId($value)
+ * @method static Builder<static>|OrderItem whereVariantName($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'order_id', 'variant_id', 'product_name', 'variant_name',

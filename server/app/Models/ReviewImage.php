@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,20 +18,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $path
  * @property string|null $alt_text
  * @property int $position
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\ProductReview|null $review
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewImage newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewImage newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewImage query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewImage whereAltText($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewImage whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewImage whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewImage wherePath($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewImage wherePosition($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewImage whereProductReviewId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewImage whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read ProductReview|null $review
+ *
+ * @method static Builder<static>|ReviewImage newModelQuery()
+ * @method static Builder<static>|ReviewImage newQuery()
+ * @method static Builder<static>|ReviewImage query()
+ * @method static Builder<static>|ReviewImage whereAltText($value)
+ * @method static Builder<static>|ReviewImage whereCreatedAt($value)
+ * @method static Builder<static>|ReviewImage whereId($value)
+ * @method static Builder<static>|ReviewImage wherePath($value)
+ * @method static Builder<static>|ReviewImage wherePosition($value)
+ * @method static Builder<static>|ReviewImage whereProductReviewId($value)
+ * @method static Builder<static>|ReviewImage whereUpdatedAt($value)
+ *
+ * @mixin Model
  */
 #[Fillable([
     'product_review_id', 'path', 'alt_text', 'position',

@@ -32,16 +32,16 @@ class InPostLockerCarrier implements ShippingCarrierInterface
 
         $payload = [
             'receiver' => [
-                'name' => mb_trim(($address?->first_name ?? '').' '.($address?->last_name ?? '')),
-                'company_name' => $address?->company_name,
-                'email' => $customer?->email ?? '',
-                'phone' => $address?->phone ?? '',
+                'name' => mb_trim($address->first_name.' '.$address->last_name),
+                'company_name' => $address->company_name,
+                'email' => $customer ? $customer->email : '',
+                'phone' => $address->phone,
                 'address' => [
-                    'street' => $address?->street ?? '',
+                    'street' => $address->street,
                     'building_number' => '',
-                    'city' => $address?->city ?? '',
-                    'post_code' => $address?->postal_code ?? '',
-                    'country_code' => $address?->country_code ?? 'PL',
+                    'city' => $address->city,
+                    'post_code' => $address->postal_code,
+                    'country_code' => $address->country_code,
                 ],
             ],
             'sender' => [
@@ -114,7 +114,7 @@ class InPostLockerCarrier implements ShippingCarrierInterface
 
         $response = $this->client->getShipment($shipmentId);
 
-        $status = $this->mapStatus($response['status'] ?? '');
+        $status = $this->mapStatus((string) ($response['status'] ?? ''));
         if ($status && $shipment->status !== $status) {
             $shipment->update(['status' => $status->value]);
         }
@@ -137,7 +137,7 @@ class InPostLockerCarrier implements ShippingCarrierInterface
             return;
         }
 
-        $status = $this->mapStatus($payload['shipment']['status'] ?? $payload['status'] ?? '');
+        $status = $this->mapStatus((string) ($payload['shipment']['status'] ?? $payload['status'] ?? ''));
         if ($status instanceof ShipmentStatusEnum) {
             $shipment->update(['status' => $status->value]);
         }
