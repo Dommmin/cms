@@ -16,7 +16,7 @@ class PromotionController extends ApiController
             ->ordered()
             ->whereNotNull('metadata')
             ->get()
-            ->filter(fn ($p): bool => ! empty($p->metadata['banner_text']))
+            ->reject(fn ($p): bool => empty($p->metadata['banner_text']))
             ->values()
             ->map(fn ($p): array => [
                 'id' => $p->id,
@@ -27,6 +27,6 @@ class PromotionController extends ApiController
                 'ends_at' => $p->ends_at?->toISOString(),
             ]);
 
-        return $this->ok($promotions->values()->toArray());
+        return $this->ok($promotions->values()->all());
     }
 }

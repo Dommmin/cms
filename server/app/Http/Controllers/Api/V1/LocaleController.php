@@ -27,7 +27,7 @@ class LocaleController extends ApiController
             ->get()
             ->keyBy('code');
 
-        $result = array_map(function ($locale) use ($currencies): array {
+        $result = array_map(function (Locale $locale) use ($currencies): array {
             $data = [
                 'code' => $locale->code,
                 'name' => $locale->name,

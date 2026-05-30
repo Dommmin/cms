@@ -24,9 +24,7 @@ class ProductResource extends JsonResource
                 $product->setAttribute('price_max', $range['max']);
             }
 
-            $isOnSale = $product->relationLoaded('activeVariants')
-                ? $product->activeVariants->some(fn ($v): bool => $v->compare_at_price && $v->compare_at_price > $v->price)
-                : false;
+            $isOnSale = $product->relationLoaded('activeVariants') && $product->activeVariants->contains(fn ($v): bool => $v->compare_at_price && $v->compare_at_price > $v->price);
             $product->setAttribute('is_on_sale', $isOnSale);
 
             $maxDiscount = $product->relationLoaded('activeVariants')

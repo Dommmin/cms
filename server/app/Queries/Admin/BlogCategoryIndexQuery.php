@@ -44,6 +44,6 @@ class BlogCategoryIndexQuery
                 'id' => $category->id,
                 'name' => $category->name,
             ])
-            ->toArray();
+            ->all();
     }
 }
