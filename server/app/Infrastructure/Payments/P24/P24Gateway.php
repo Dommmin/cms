@@ -10,6 +10,7 @@ use App\Enums\PaymentStatusEnum;
 use App\Interfaces\PaymentGatewayInterface;
 use App\Models\Order;
 use App\Models\Payment;
+use App\States\Order\PaidState;
 
 class P24Gateway implements PaymentGatewayInterface
 {
@@ -55,6 +56,9 @@ class P24Gateway implements PaymentGatewayInterface
             'currency' => $currency,
         ]);
 
+        $customer = $order->customer;
+        $email = $customer ? $customer->email : ($order->guest_email ?? '');
+
         $data = [
             'merchantId' => $merchantId,
             'posId' => $posId,
@@ -62,10 +66,10 @@ class P24Gateway implements PaymentGatewayInterface
             'amount' => $payment->amount,
             'currency' => $currency,
             'description' => 'Zamówienie #'.($order->reference_number ?? $order->id),
-            'email' => $order->customer?->email ?? '',
-            'client' => mb_trim(($address?->first_name ?? '').' '.($address?->last_name ?? '')),
-            'phone' => $address?->phone ?? '',
-            'country' => $address?->country_code ?? 'PL',
+            'email' => $email,
+            'client' => mb_trim($address->first_name.' '.$address->last_name),
+            'phone' => $address->phone,
+            'country' => $address->country_code ?: 'PL',
             'urlReturn' => $returnUrl,
             'urlStatus' => $notifyUrl,
             'sign' => $sign,
@@ -176,7 +180,7 @@ class P24Gateway implements PaymentGatewayInterface
             $payment->update(['status' => PaymentStatusEnum::COMPLETED->value]);
 
             $order = $payment->order;
-            if ($order && ! $order->status->equals(PaidState::class)) {
+            if (! $order->status->equals(PaidState::class)) {
                 $order->update(['status' => OrderStatusEnum::PAID->value]);
             }
         } else {

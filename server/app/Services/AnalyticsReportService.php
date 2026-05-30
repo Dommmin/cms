@@ -114,7 +114,7 @@ class AnalyticsReportService
             ->groupBy('date')
             ->orderBy('date')
             ->get()
-            ->mapWithKeys(fn ($item): array => [$item->date => (int) $item->count]);
+            ->mapWithKeys(fn (Customer $item): array => [(string) $item->getAttribute('date') => (int) $item->getAttribute('count')]);
 
         $chart = [];
         $current = $start->copy()->startOfDay();
@@ -154,13 +154,13 @@ class AnalyticsReportService
         $lowStock = $variants->filter(fn ($v): bool => $v->stock_quantity > 0 && $v->stock_quantity <= $v->stock_threshold)->count();
         $inStock = $variants->where('stock_quantity', '>', 0)->count();
 
-        $totalStockValue = $variants->sum(fn ($v): int|float => $v->stock_quantity * $v->price);
+        $totalStockValue = $variants->sum(fn (ProductVariant $v): int => $v->stock_quantity * $v->price);
 
         $topByValue = $variants
-            ->sortByDesc(fn ($v): int|float => $v->stock_quantity * $v->price)
+            ->sortByDesc(fn (ProductVariant $v): int => $v->stock_quantity * $v->price)
             ->take(20)
             ->values()
-            ->map(fn ($v): array => [
+            ->map(fn (ProductVariant $v): array => [
                 'id' => $v->id,
                 'sku' => $v->sku,
                 'name' => $v->product?->getTranslation('name', 'en', false).($v->name ? ' — '.$v->name : ''),
@@ -237,21 +237,21 @@ class AnalyticsReportService
             ->groupBy('month')
             ->orderBy('month')
             ->get()
-            ->map(fn ($row): array => [
-                'month' => $row->month,
-                'vat' => (int) $row->vat,
-                'net' => (int) $row->net,
-                'gross' => (int) $row->gross,
-                'count' => (int) $row->count,
+            ->map(fn (Order $row): array => [
+                'month' => (string) $row->getAttribute('month'),
+                'vat' => (int) $row->getAttribute('vat'),
+                'net' => (int) $row->getAttribute('net'),
+                'gross' => (int) $row->getAttribute('gross'),
+                'count' => (int) $row->getAttribute('count'),
             ]);
 
         return [
-            'orders_count' => (int) ($totals->orders_count ?? 0),
-            'net_total' => (int) ($totals->net_total ?? 0),
-            'vat_total' => (int) ($totals->vat_total ?? 0),
-            'gross_total' => (int) ($totals->gross_total ?? 0),
-            'effective_vat_rate' => ($totals->net_total ?? 0) > 0
-                ? round($totals->vat_total / $totals->net_total * 100, 2)
+            'orders_count' => (int) ($totals ? $totals->getAttribute('orders_count') : 0),
+            'net_total' => (int) ($totals ? $totals->getAttribute('net_total') : 0),
+            'vat_total' => (int) ($totals ? $totals->getAttribute('vat_total') : 0),
+            'gross_total' => (int) ($totals ? $totals->getAttribute('gross_total') : 0),
+            'effective_vat_rate' => ($totals && (int) $totals->getAttribute('net_total') > 0)
+                ? round((int) $totals->getAttribute('vat_total') / (int) $totals->getAttribute('net_total') * 100, 2)
                 : 0,
             'by_month' => $byMonth,
         ];

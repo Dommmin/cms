@@ -24,7 +24,7 @@ class WebhookController extends ApiController
 
         $payload = json_decode($body, true) ?? [];
 
-        dispatch(new ProcessPaymentWebhook('payu', $payload, $body, (string) $signatureHeader));
+        dispatch(new ProcessPaymentWebhook('payu', $payload));
 
         return $this->ok(['message' => 'OK']);
     }
@@ -32,13 +32,11 @@ class WebhookController extends ApiController
     public function p24(Request $request, P24SignatureService $verifier): JsonResponse
     {
         $payload = $request->all();
-        $body = $request->getContent();
+        $request->getContent();
 
         abort_unless($verifier->verifyWebhook($payload), 400, 'Invalid signature');
 
-        $signature = (string) ($payload['sign'] ?? '');
-
-        dispatch(new ProcessPaymentWebhook('p24', $payload, $body, $signature));
+        dispatch(new ProcessPaymentWebhook('p24', $payload));
 
         return $this->ok(['message' => 'OK']);
     }
@@ -52,7 +50,7 @@ class WebhookController extends ApiController
 
         $payload = json_decode($body, true) ?? [];
 
-        dispatch(new ProcessPaymentWebhook('paynow', $payload, $body, $signature));
+        dispatch(new ProcessPaymentWebhook('paynow', $payload));
 
         return $this->ok(['message' => 'OK']);
     }

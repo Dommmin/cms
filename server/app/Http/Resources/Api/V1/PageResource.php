@@ -35,7 +35,7 @@ class PageResource extends JsonResource
             'title' => $page->title,
             'slug' => $page->getTranslation('slug', $locale, false),
             'is_published' => $page->is_published,
-            'page_type' => $page->page_type instanceof BackedEnum ? $page->page_type->value : $page->page_type,
+            'page_type' => $page->page_type->value,
             'module_name' => $page->module_name,
             'module_config' => $page->module_config,
             'content' => $page->content,
@@ -55,7 +55,7 @@ class PageResource extends JsonResource
                 'is_active' => (bool) $section->is_active,
                 'blocks' => $section->relationLoaded('blocks') ? $section->blocks->map(fn ($block): array => [
                     'id' => $block->id,
-                    'type' => $block->type instanceof BackedEnum ? $block->type->value : $block->type,
+                    'type' => $block->type->value,
                     'configuration' => $this->resolveBlockConfiguration($block, $resolvedForms),
                     'position' => $block->position,
                     'is_active' => (bool) $block->is_active,
@@ -81,7 +81,7 @@ class PageResource extends JsonResource
         if ($type === 'featured_posts' && ($config['source'] ?? null) === 'latest') {
             $posts = $autoPostsLookup[$block->id] ?? [];
 
-            return array_values(array_map(fn ($post, $pos): array => [
+            return array_map(fn ($post, $pos): array => [
                 'id' => 0,
                 'relation_type' => 'blog_post',
                 'relation_id' => $post['id'],
@@ -89,7 +89,7 @@ class PageResource extends JsonResource
                 'position' => $pos,
                 'metadata' => null,
                 'data' => $post,
-            ], $posts, array_keys($posts)));
+            ], $posts, array_keys($posts));
         }
 
         if (! $block->relationLoaded('relations')) {
@@ -233,17 +233,17 @@ class PageResource extends JsonResource
                             'price' => $v->price,
                             'compare_at_price' => $v->compare_at_price,
                         ])->values()->toArray(),
-                        'thumbnail' => $product->thumbnail ? [
-                            'url' => $product->thumbnail->media?->getUrl() ?? '',
-                            'alt' => $product->thumbnail->media?->name ?? $product->name,
+                        'thumbnail' => ($thumbnail = $product->thumbnail) && ($media = $thumbnail->media) ? [
+                            'url' => $media->getUrl(),
+                            'alt' => $media->name ?: $product->name,
                         ] : null,
                         'brand' => $product->brand ? ['id' => $product->brand->id, 'name' => $product->brand->name] : null,
-                        'category' => $product->category ? [
+                        'category' => [
                             'id' => $product->category->id,
                             'name' => $product->category->name,
                             'slug' => $product->category->slug,
                             'image_url' => $product->category->image_path,
-                        ] : null,
+                        ],
                         'images' => [],
                         'attributes' => [],
                         'created_at' => $product->created_at->toIso8601String(),
@@ -358,7 +358,7 @@ class PageResource extends JsonResource
                     'id' => $f->id,
                     'name' => $f->name,
                     'label' => $f->label,
-                    'type' => $f->type instanceof BackedEnum ? $f->type->value : $f->type,
+                    'type' => $f->type,
                     'is_required' => (bool) $f->is_required,
                     'placeholder' => ($f->settings['placeholder'] ?? null),
                     'options' => $f->options,

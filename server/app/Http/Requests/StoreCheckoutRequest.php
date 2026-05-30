@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use App\Enums\PaymentProviderEnum;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 
 /**
  * @property int $shipping_method_id
@@ -24,7 +26,7 @@ class StoreCheckoutRequest extends FormRequest
     }
 
     /**
-     * @return array<string, array<int, string|Rule>>
+     * @return array<string, array<int, Enum|\Illuminate\Contracts\Validation\Rule|ValidationRule|string>>
      */
     public function rules(): array
     {

@@ -83,11 +83,17 @@ class ReturnRequest extends Model
     /**
      * @return BelongsTo<Order, $this>
      */
+    /**
+     * @return BelongsTo<Order, $this>
+     */
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
+    /**
+     * @return HasMany<ReturnItem, $this>
+     */
     /**
      * @return HasMany<ReturnItem, $this>
      */

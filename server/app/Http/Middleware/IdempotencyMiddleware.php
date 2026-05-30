@@ -37,7 +37,7 @@ class IdempotencyMiddleware
             'sha256',
             implode('|', [
                 $idempotencyKey,
-                $request->user()?->id ?? 'guest',
+                $request->user() ? $request->user()->id : 'guest',
                 $request->path(),
             ])
         );

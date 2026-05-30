@@ -28,7 +28,6 @@ class CashOnDeliveryGateway implements PaymentGatewayInterface
     public function processPayment(Payment $payment, array $options = []): array
     {
         return [
-            'provider' => PaymentProviderEnum::CASH_ON_DELIVERY->value,
             'action' => 'none',
             'redirect_url' => null,
             'message' => 'Płatność przy odbiorze – zapłać kurierowi lub w sklepie.',

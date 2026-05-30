@@ -96,11 +96,11 @@ class NewsletterCampaignController extends Controller
 
     public function send(NewsletterCampaign $campaign): RedirectResponse
     {
-        if ($campaign->status !== CampaignStatusEnum::Draft->value) {
+        if ($campaign->status !== CampaignStatusEnum::Draft) {
             return back()->with('error', 'Kampania została już wysłana');
         }
 
-        $campaign->update(['status' => CampaignStatusEnum::Sending->value]);
+        $campaign->update(['status' => CampaignStatusEnum::Sending]);
 
         // Tutaj dispatch job do wysyłki
 
@@ -112,7 +112,7 @@ class NewsletterCampaignController extends Controller
         $data = $request->validated();
 
         $campaign->update([
-            'status' => CampaignStatusEnum::Scheduled->value,
+            'status' => CampaignStatusEnum::Scheduled,
             'scheduled_at' => $data['scheduled_at'],
         ]);
 
@@ -123,7 +123,7 @@ class NewsletterCampaignController extends Controller
     {
         $newCampaign = $campaign->replicate();
         $newCampaign->name = $campaign->name.' (Kopia)';
-        $newCampaign->status = CampaignStatusEnum::Draft->value;
+        $newCampaign->status = CampaignStatusEnum::Draft;
         $newCampaign->scheduled_at = null;
         $newCampaign->started_sending_at = null;
         $newCampaign->finished_sending_at = null;

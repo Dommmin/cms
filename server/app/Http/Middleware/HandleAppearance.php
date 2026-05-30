@@ -127,7 +127,7 @@ class HandleAppearance
     private function sanitizeTokenVariables(array $tokens, array $allowedKeys): array
     {
         return collect($tokens)
-            ->filter(fn (mixed $value, mixed $key): bool => is_string($key) && (is_string($value) || is_null($value)))
+            ->filter(fn (mixed $value): bool => is_string($value) || is_null($value))
             ->mapWithKeys(fn (mixed $value, string $key): array => [mb_ltrim(mb_trim($key), '-') => is_string($value) ? mb_trim($value) : ''])
             ->filter(
                 fn (string $value, string $key): bool => in_array($key, $allowedKeys, true)

@@ -110,6 +110,7 @@ trait HasVersions
     {
         $prop = 'versionedAttributes';
 
+        // @phpstan-ignore-next-line property_exists always evaluates to true in current models using this trait
         return property_exists($this, $prop)
             ? $this->$prop
             : [];
@@ -119,6 +120,7 @@ trait HasVersions
     {
         $prop = 'maxVersions';
 
+        // @phpstan-ignore-next-line property_exists always evaluates to true in current models using this trait
         return property_exists($this, $prop)
             ? $this->$prop
             : 50;

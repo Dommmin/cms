@@ -127,6 +127,7 @@ class PageBlock extends Model
 
     public function getSingleMedia(string $key): ?Media
     {
+        /** @var BlockRelation|null $relation */
         $relation = $this->relations()
             ->where('relation_key', $key)
             ->whereIn('relation_type', ['media.image', 'media.icon', 'media.file'])
@@ -162,6 +163,7 @@ class PageBlock extends Model
 
             foreach ($byKey as $key => $keyRelations) {
                 $resolvedModels = $keyRelations->map(function ($rel) use ($models): ?array {
+                    /** @var BlockRelation $rel */
                     $model = $models->firstWhere('id', $rel->relation_id);
 
                     return $model ? [

@@ -89,11 +89,17 @@ class NewsletterSubscriber extends Model
     /**
      * @return BelongsTo<Customer, $this>
      */
+    /**
+     * @return BelongsTo<Customer, $this>
+     */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
 
+    /**
+     * @return HasMany<NewsletterSend, $this>
+     */
     /**
      * @return HasMany<NewsletterSend, $this>
      */
@@ -105,11 +111,17 @@ class NewsletterSubscriber extends Model
     /**
      * @return HasMany<NewsletterOpen, $this>
      */
+    /**
+     * @return HasMany<NewsletterOpen, $this>
+     */
     public function opens(): HasMany
     {
         return $this->hasMany(NewsletterOpen::class);
     }
 
+    /**
+     * @return HasMany<NewsletterClick, $this>
+     */
     /**
      * @return HasMany<NewsletterClick, $this>
      */

@@ -42,6 +42,7 @@ class PageBuilderController extends Controller
     {
         $pageModel = Page::with(['sections.blocks', 'sections.allBlocks', 'sections.blocks.relations', 'sections.blocks.reusableBlock'])->findOrFail($page);
 
+        // @phpstan-ignore-next-line map callback returns a collection of blocks with type string instead of literal enum values union
         $sections = $pageModel->sections->map(fn (PageSection $section): array => [
             'id' => $section->id,
             'section_type' => $section->section_type,

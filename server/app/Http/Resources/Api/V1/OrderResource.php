@@ -6,6 +6,8 @@ namespace App\Http\Resources\Api\V1;
 
 use App\Enums\OrderStatusEnum;
 use App\Models\Order;
+use App\Models\OrderStatusHistory;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -31,7 +33,7 @@ class OrderResource extends JsonResource
             'total' => $order->total,
             'currency_code' => $order->currency_code,
             'notes' => $order->notes,
-            'created_at' => $order->created_at?->toISOString(),
+            'created_at' => $order->created_at->toISOString(),
             'items' => $order->relationLoaded('items') ? OrderItemResource::collection($order->items) : [],
             'billing_address' => $order->relationLoaded('billingAddress') ? new AddressResource($order->billingAddress) : null,
             'shipping_address' => $order->relationLoaded('shippingAddress') ? new AddressResource($order->shippingAddress) : null,
@@ -47,11 +49,15 @@ class OrderResource extends JsonResource
                 'status' => $order->shipment->status->value,
             ] : null,
             'status_history' => $order->relationLoaded('statusHistory')
-                ? $order->statusHistory->map(fn ($h): array => [
-                    'status' => $h->status,
-                    'note' => $h->note,
-                    'created_at' => $h->created_at?->toISOString(),
-                ])
+                ? array_map(function (OrderStatusHistory $h): array {
+                    $createdAt = $h->getAttribute('created_at');
+
+                    return [
+                        'status' => $h->getAttribute('status'),
+                        'note' => $h->getAttribute('note'),
+                        'created_at' => $createdAt instanceof Carbon ? $createdAt->toISOString() : null,
+                    ];
+                }, $order->statusHistory->all())
                 : [],
             'returns' => $order->relationLoaded('returns')
                 ? ReturnResource::collection($order->returns)

@@ -29,7 +29,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property int|null $max_uses
  * @property int $uses_count
  * @property int|null $max_uses_per_customer
- * @property CarbonImmutable $starts_at
+ * @property CarbonImmutable|null $starts_at
  * @property CarbonImmutable|null $ends_at
  * @property bool $is_active
  * @property CarbonImmutable|null $created_at

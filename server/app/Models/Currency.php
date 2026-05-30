@@ -73,6 +73,9 @@ class Currency extends Model
     /**
      * @return HasMany<ExchangeRate, $this>
      */
+    /**
+     * @return HasMany<ExchangeRate, $this>
+     */
     public function exchangeRates(): HasMany
     {
         return $this->hasMany(ExchangeRate::class);

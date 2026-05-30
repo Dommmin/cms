@@ -16,7 +16,7 @@ class StoreUserRequest extends FormRequest
     }
 
     /**
-     * @return array<string, array<int, string>|string>
+     * @return array<string, array<int, Password|string|null>|string>
      */
     public function rules(): array
     {

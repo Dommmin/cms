@@ -98,6 +98,7 @@ class BlockMediaResolver
      */
     private function getMediaFieldNames(array $sectionConfig): array
     {
+        /** @var array<int, string> $names */
         $names = [];
         $this->collectMediaFields($sectionConfig['fields'] ?? [], $names, '');
 
@@ -106,7 +107,7 @@ class BlockMediaResolver
 
     /**
      * @param  array<int, mixed>  $fields
-     * @param  array<int, string>  $names
+     * @param  array<int, string|mixed>  $names
      */
     private function collectMediaFields(array $fields, array &$names, string $prefix): void
     {

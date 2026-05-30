@@ -125,10 +125,7 @@ final class MarketingAutomationService
         $delay = $campaign->trigger_delay_hours ?? 7;
 
         foreach ($order->items as $item) {
-            $this->scheduleDelayed($campaign, $customer, $delay, [
-                'product_id' => $item->product_id,
-                'order_id' => $order->id,
-            ]);
+            $this->scheduleDelayed($campaign, $customer, $delay);
         }
     }
 
@@ -180,9 +177,9 @@ final class MarketingAutomationService
         $customer->user->notify(new NewsletterCampaignNotification($campaign));
     }
 
-    private function scheduleDelayed(NewsletterCampaign $campaign, Customer $customer, int $delayHours, array $context = []): void
+    private function scheduleDelayed(NewsletterCampaign $campaign, Customer $customer, int $delayHours): void
     {
-        dispatch(new SendAutomatedCampaignJob($campaign->id, $customer->id, $context))
+        dispatch(new SendAutomatedCampaignJob($campaign->id, $customer->id))
             ->delay(now()->addHours($delayHours));
     }
 }

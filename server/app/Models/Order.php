@@ -148,11 +148,17 @@ class Order extends Model
     /**
      * @return BelongsTo<Customer, $this>
      */
+    /**
+     * @return BelongsTo<Customer, $this>
+     */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
 
+    /**
+     * @return BelongsTo<Address, $this>
+     */
     /**
      * @return BelongsTo<Address, $this>
      */
@@ -164,11 +170,17 @@ class Order extends Model
     /**
      * @return BelongsTo<Address, $this>
      */
+    /**
+     * @return BelongsTo<Address, $this>
+     */
     public function shippingAddress(): BelongsTo
     {
         return $this->belongsTo(Address::class, 'shipping_address_id');
     }
 
+    /**
+     * @return HasMany<OrderItem, $this>
+     */
     /**
      * @return HasMany<OrderItem, $this>
      */
@@ -180,11 +192,17 @@ class Order extends Model
     /**
      * @return HasMany<OrderStatusHistory, $this>
      */
+    /**
+     * @return HasMany<OrderStatusHistory, $this>
+     */
     public function statusHistory(): HasMany
     {
         return $this->hasMany(OrderStatusHistory::class)->latest('changed_at');
     }
 
+    /**
+     * @return HasOne<Payment, $this>
+     */
     /**
      * @return HasOne<Payment, $this>
      */
@@ -196,6 +214,9 @@ class Order extends Model
     /**
      * @return HasOne<Shipment, $this>
      */
+    /**
+     * @return HasOne<Shipment, $this>
+     */
     public function shipment(): HasOne
     {
         return $this->hasOne(Shipment::class)->latestOfMany();
@@ -204,11 +225,17 @@ class Order extends Model
     /**
      * @return HasMany<Shipment, $this>
      */
+    /**
+     * @return HasMany<Shipment, $this>
+     */
     public function shipments(): HasMany
     {
         return $this->hasMany(Shipment::class);
     }
 
+    /**
+     * @return HasMany<ReturnRequest, $this>
+     */
     /**
      * @return HasMany<ReturnRequest, $this>
      */

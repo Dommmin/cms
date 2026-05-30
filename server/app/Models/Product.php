@@ -221,7 +221,9 @@ class Product extends Model implements HasMedia
 
     public function getDefaultVariant(): ?ProductVariant
     {
-        return $this->defaultVariant()->first();
+        $variant = $this->defaultVariant()->first();
+
+        return $variant instanceof ProductVariant ? $variant : null;
     }
 
     public function images(): HasMany
@@ -314,7 +316,7 @@ class Product extends Model implements HasMedia
             'sku' => $this->variants->first()?->sku,
             'price' => (int) ($priceRange['min'] ?? 0),
             'category_id' => (string) $this->category_id,
-            'category_name' => $this->category?->name,
+            'category_name' => $this->category->name,
             'brand_id' => $this->brand_id ? (string) $this->brand_id : null,
             'brand_name' => $this->brand?->name,
             'is_active' => $this->is_active,

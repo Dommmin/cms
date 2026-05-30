@@ -11,6 +11,7 @@ use App\Interfaces\PaymentGatewayInterface;
 use App\Models\Address;
 use App\Models\Order;
 use App\Models\Payment;
+use App\States\Order\PaidState;
 
 class PaynowGateway implements PaymentGatewayInterface
 {
@@ -137,7 +138,7 @@ class PaynowGateway implements PaymentGatewayInterface
         }
 
         $order = $payment->order;
-        if ($order && ! $order->status->equals(PaidState::class)) {
+        if (! $order->status->equals(PaidState::class)) {
             $order->update(['status' => OrderStatusEnum::PAID->value]);
         }
     }
@@ -151,23 +152,22 @@ class PaynowGateway implements PaymentGatewayInterface
         $payment->update(['status' => PaymentStatusEnum::FAILED->value]);
     }
 
-    /**
-     * @return array<string, mixed>
-     */
     private function buildBuyer(Order $order): array
     {
         $billing = $order->billingAddress;
         $shipping = $order->shippingAddress;
-        $address = $billing ?? $shipping;
+        $address = $billing;
+        $customer = $order->customer;
+        $email = $customer ? $customer->email : ($order->guest_email ?? '');
 
         return array_filter([
-            'email' => mb_substr($order->customer?->email ?? $order->guest_email ?? '', 0, 50),
-            'firstName' => $address?->first_name ? mb_substr((string) $address->first_name, 0, 50) : null,
-            'lastName' => $address?->last_name ? mb_substr((string) $address->last_name, 0, 50) : null,
-            'phone' => $this->phone($address?->phone),
+            'email' => mb_substr($email, 0, 50),
+            'firstName' => mb_substr($address->first_name, 0, 50),
+            'lastName' => mb_substr($address->last_name, 0, 50),
+            'phone' => $this->phone($address->phone),
             'address' => [
-                'billing' => $this->address($billing ?? $shipping),
-                'shipping' => $this->address($shipping ?? $billing),
+                'billing' => $this->address($billing),
+                'shipping' => $this->address($shipping),
             ],
             'locale' => 'pl-PL',
         ], fn (string|array|null $value): bool => $value !== null && $value !== []);

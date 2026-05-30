@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
-use App\Modules\Forms\Domain\Events\FormSubmitted;
-use App\Modules\Forms\Domain\Notifications\FormSubmissionNotification;
+use App\Events\FormSubmitted;
+use App\Notifications\FormSubmissionNotification;
 use Illuminate\Support\Facades\Notification;
 
 class SendFormSubmissionNotification
@@ -17,7 +17,7 @@ class SendFormSubmissionNotification
     {
         $emails = $event->form->notify_emails ?? [];
 
-        if (empty($emails) || ! is_array($emails)) {
+        if (empty($emails)) {
             return;
         }
 

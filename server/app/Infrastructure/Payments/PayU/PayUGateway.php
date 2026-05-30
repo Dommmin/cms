@@ -10,6 +10,7 @@ use App\Enums\PaymentStatusEnum;
 use App\Interfaces\PaymentGatewayInterface;
 use App\Models\Order;
 use App\Models\Payment;
+use App\States\Order\PaidState;
 use RuntimeException;
 
 class PayUGateway implements PaymentGatewayInterface
@@ -220,18 +221,17 @@ class PayUGateway implements PaymentGatewayInterface
         return [$body, 'redirect'];
     }
 
-    /**
-     * @return array<string, mixed>
-     */
     private function buildBuyer(Order $order): array
     {
         $address = $order->billingAddress ?? $order->shippingAddress;
+        $customer = $order->customer;
+        $email = $customer ? $customer->email : ($order->guest_email ?? '');
 
         return [
-            'firstName' => $address?->first_name ?? '',
-            'lastName' => $address?->last_name ?? '',
-            'email' => $order->customer?->email ?? '',
-            'phone' => $address?->phone ?? '',
+            'firstName' => $address->first_name,
+            'lastName' => $address->last_name,
+            'email' => $email,
+            'phone' => $address->phone,
             'language' => 'pl',
         ];
     }
@@ -263,7 +263,7 @@ class PayUGateway implements PaymentGatewayInterface
         $payment->update(['status' => PaymentStatusEnum::COMPLETED->value]);
 
         $order = $payment->order;
-        if ($order && ! $order->status->equals(PaidState::class)) {
+        if (! $order->status->equals(PaidState::class)) {
             $order->update(['status' => OrderStatusEnum::PAID->value]);
         }
     }

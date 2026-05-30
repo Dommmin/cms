@@ -28,14 +28,13 @@ class WishlistResource extends JsonResource
                 'id' => $item->id,
                 'variant_id' => $item->product_variant_id,
                 'notes' => $item->notes,
-                'product' => $item->relationLoaded('variant') && $item->variant?->relationLoaded('product') && $item->variant->product ? [
-                    'id' => $item->variant->product->id,
-                    'name' => $item->variant->product->name,
-                    'slug' => $item->variant->product->slug,
+                'product' => ($variant = $item->variant)->relationLoaded('product') && $variant->product ? [
+                    'id' => $variant->product->id,
+                    'name' => $variant->product->name,
+                    'slug' => $variant->product->slug,
                     'thumbnail' => null,
                 ] : null,
-                'variant' => $item->relationLoaded('variant') && $item->variant ? (function () use ($item): array {
-                    $variant = $item->variant;
+                'variant' => (function () use ($variant): array {
                     $isOnSale = $variant->compare_at_price && $variant->compare_at_price > $variant->price;
 
                     return [
@@ -46,9 +45,9 @@ class WishlistResource extends JsonResource
                         'omnibus_price' => $isOnSale ? $variant->lowestPriceInLast30Days() : null,
                         'is_on_sale' => $isOnSale,
                         'in_stock' => $variant->isInStock(),
-                        'attributes' => $variant->attributes ?? [],
+                        'attributes' => $variant->getAttribute('attributes') ?? [],
                     ];
-                })() : null,
+                })(),
             ]),
         ];
     }

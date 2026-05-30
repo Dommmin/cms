@@ -241,10 +241,10 @@ class DashboardController extends Controller
             ->orderByDesc('total_revenue')
             ->limit($limit)
             ->get()
-            ->map(fn (mixed $row): array => [
+            ->map(fn (OrderItem $row): array => [
                 'name' => $row->product_name,
-                'total_qty' => (int) $row->total_qty,
-                'total_revenue' => (int) $row->total_revenue,
+                'total_qty' => (int) $row->getAttribute('total_qty'),
+                'total_revenue' => (int) $row->getAttribute('total_revenue'),
             ])
             ->all();
     }

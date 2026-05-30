@@ -66,7 +66,7 @@ class Cart extends Model
      */
     public function subtotal(): int
     {
-        return (int) $this->items->sum(fn (CartItem $item): int => $item->variant ? $item->unitPrice() * $item->quantity : 0);
+        return (int) $this->items->sum(fn (CartItem $item): int => $item->unitPrice() * $item->quantity);
     }
 
     /**

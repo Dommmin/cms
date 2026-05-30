@@ -100,11 +100,17 @@ class Customer extends Model
     /**
      * @return BelongsTo<User, $this>
      */
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return HasMany<Address, $this>
+     */
     /**
      * @return HasMany<Address, $this>
      */
@@ -121,11 +127,17 @@ class Customer extends Model
     /**
      * @return HasMany<Order, $this>
      */
+    /**
+     * @return HasMany<Order, $this>
+     */
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
     }
 
+    /**
+     * @return HasOne<Cart, $this>
+     */
     /**
      * @return HasOne<Cart, $this>
      */
@@ -137,6 +149,9 @@ class Customer extends Model
     /**
      * @return HasMany<Wishlist, $this>
      */
+    /**
+     * @return HasMany<Wishlist, $this>
+     */
     public function wishlists(): HasMany
     {
         return $this->hasMany(Wishlist::class);
@@ -145,11 +160,17 @@ class Customer extends Model
     /**
      * @return HasMany<ProductReview, $this>
      */
+    /**
+     * @return HasMany<ProductReview, $this>
+     */
     public function reviews(): HasMany
     {
         return $this->hasMany(ProductReview::class);
     }
 
+    /**
+     * @return HasOne<NewsletterSubscriber, $this>
+     */
     /**
      * @return HasOne<NewsletterSubscriber, $this>
      */

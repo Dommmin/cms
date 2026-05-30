@@ -57,19 +57,17 @@ class CmsMedia extends Model implements HasMedia
         }
 
         // Fast WebP thumbnail for the admin grid — generated synchronously
-        /** @var \Spatie\MediaLibrary\MediaCollections\Models\Conversion $thumbnailConversion */
-        $thumbnailConversion = $this->addMediaConversion('thumbnail');
-        $thumbnailConversion->fit(Fit::Crop, 400, 400)
+        $this->addMediaConversion('thumbnail')
+            ->nonQueued()
+            ->fit(Fit::Crop, 400, 400)
             ->format('webp')
-            ->quality(80)
-            ->nonQueued();
+            ->quality(80);
 
         // Optimised WebP for the frontend with automatic srcset
-        /** @var \Spatie\MediaLibrary\MediaCollections\Models\Conversion $optimizedConversion */
-        $optimizedConversion = $this->addMediaConversion('optimized');
-        $optimizedConversion->fit(Fit::Max, 1920, 1920)
+        $this->addMediaConversion('optimized')
+            ->withResponsiveImages()
+            ->fit(Fit::Max, 1920, 1920)
             ->format('webp')
-            ->quality(85)
-            ->withResponsiveImages();
+            ->quality(85);
     }
 }

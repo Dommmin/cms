@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use App\Enums\ReturnTypeEnum;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 
 /**
  * @property int $order_id
@@ -23,7 +25,7 @@ class StoreReturnRequest extends FormRequest
     }
 
     /**
-     * @return array<string, array<int, string|Rule>>
+     * @return array<string, array<int, Enum|\Illuminate\Contracts\Validation\Rule|ValidationRule|string>>
      */
     public function rules(): array
     {

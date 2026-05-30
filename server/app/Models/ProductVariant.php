@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Modules\Core\Domain\Models\Currency;
 use Carbon\CarbonImmutable;
 use Database\Factories\ProductVariantFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -157,7 +156,7 @@ class ProductVariant extends Model
 
         if (! $rate) {
             $product = $this->product;
-            if ($product && $product->category) {
+            if ($product) {
                 $rate = $product->category->taxRate;
             }
         }

@@ -50,7 +50,12 @@ class BlogFeedController extends Controller
             $prefix = $locale === 'en' ? '/en' : '';
             $link = e(sprintf('%s%s/blog/%s', $siteUrl, $prefix, $post->slugForLocale($locale)));
             $pubDate = $post->published_at?->toRfc2822String() ?? now()->toRfc2822String();
-            $author = e($post->author?->name ?? '');
+            $authorName = '';
+            if ($post->author) {
+                $authorName = $post->author->name;
+            }
+
+            $author = e($authorName);
 
             return <<<XML
         <item>

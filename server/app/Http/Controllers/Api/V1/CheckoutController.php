@@ -11,6 +11,7 @@ use App\Http\Resources\Api\V1\OrderResource;
 use App\Http\Resources\Api\V1\ShippingMethodResource;
 use App\Models\Product;
 use App\Models\ShippingMethod;
+use App\Models\User;
 use App\Services\CartService;
 use App\Services\CheckoutService;
 use App\Services\PaymentGatewayManager;

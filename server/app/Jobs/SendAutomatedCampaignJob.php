@@ -16,8 +16,7 @@ final class SendAutomatedCampaignJob implements ShouldQueue
 
     public function __construct(
         private readonly int $campaignId,
-        private readonly int $customerId,
-        private readonly array $context = []
+        private readonly int $customerId
     ) {}
 
     public function handle(): void

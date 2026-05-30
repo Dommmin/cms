@@ -76,7 +76,7 @@ class ProductBundle extends Model
 
     public function calculateBundlePrice(): int
     {
-        $total = $this->items->sum(fn (ProductVariant $variant): int => (int) ($variant->price * $variant->pivot->quantity));
+        $total = $this->items->sum(fn ($variant): int => (int) ($variant->getAttribute('price') * ($variant->getAttribute('pivot') ? (int) $variant->getAttribute('pivot')->getAttribute('quantity') : 1)));
 
         if ($this->discount_percentage > 0) {
             return (int) ($total * (100 - $this->discount_percentage) / 100);

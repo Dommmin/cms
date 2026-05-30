@@ -6,7 +6,6 @@ namespace App\Models;
 
 use App\Enums\PaymentProviderEnum;
 use App\Enums\PaymentStatusEnum;
-use App\Modules\Core\Domain\Models\Currency;
 use Carbon\CarbonImmutable;
 use Database\Factories\PaymentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;

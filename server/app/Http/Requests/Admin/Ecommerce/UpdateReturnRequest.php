@@ -7,6 +7,7 @@ namespace App\Http\Requests\Admin\Ecommerce;
 use App\Enums\ReturnStatusEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 
 class UpdateReturnRequest extends FormRequest
 {
@@ -16,7 +17,7 @@ class UpdateReturnRequest extends FormRequest
     }
 
     /**
-     * @return array<string, array<int, string>>
+     * @return array<string, array<int, Enum|string>>
      */
     public function rules(): array
     {
