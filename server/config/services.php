@@ -56,6 +56,7 @@ return [
         'md5_key' => env('PAYU_MD5_KEY'),
         'base_url' => env('PAYU_BASE_URL', 'https://sandbox.snd.payu.com'),
         'oauth_url' => env('PAYU_OAUTH_URL', 'https://secure.snd.payu.com'),
+        'webhook_url' => env('PAYU_WEBHOOK_URL'),
     ],
 
     'p24' => [
@@ -64,6 +65,7 @@ return [
         'crc' => env('P24_CRC'),
         'api_key' => env('P24_API_KEY'),
         'base_url' => env('P24_BASE_URL', 'https://sandbox.przelewy24.pl'),
+        'webhook_url' => env('P24_WEBHOOK_URL'),
     ],
 
     'paynow' => [

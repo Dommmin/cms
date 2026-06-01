@@ -40,13 +40,13 @@ Rules every AI tool (Claude Code, Codex, Gemini, Copilot, Cursor, Junie, Cline, 
 
 ## Task Routing
 
-| Task type | Approach |
-|-----------|----------|
-| **Bug fix** | Reproduce / locate the root cause first. Fix only what is broken. No drive-by refactors. |
-| **New endpoint / feature** | Find the nearest existing example, copy its structure: migration → model → FormRequest → Controller → Resource → route → test. |
-| **Refactoring** | Only when explicitly requested — never as a side effect of another change. |
-| **Cross-project change (server + client)** | One side at a time, verify each independently before moving on. |
-| **3+ step task** | Plan before coding. State the steps, then execute. |
+| Task type                                  | Approach                                                                                                                       |
+|--------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| **Bug fix**                                | Reproduce / locate the root cause first. Fix only what is broken. No drive-by refactors.                                       |
+| **New endpoint / feature**                 | Find the nearest existing example, copy its structure: migration → model → FormRequest → Controller → Resource → route → test. |
+| **Refactoring**                            | Only when explicitly requested — never as a side effect of another change.                                                     |
+| **Cross-project change (server + client)** | One side at a time, verify each independently before moving on.                                                                |
+| **3+ step task**                           | Plan before coding. State the steps, then execute.                                                                             |
 
 ---
 
@@ -92,17 +92,17 @@ To see why a container is failing: `docker compose logs <service> --tail=30`
 
 Project skills live in `.claude/skills/` — committed to the repo, shared with the team.
 
-| Skill | Purpose |
-|-------|---------|
-| `commit` | Conventional commit; runs `make fix` + `make check` first |
-| `fix` | Run `make fix` (pint + rector + eslint + prettier) |
-| `review` | Code review of current-branch changes or a given file |
-| `test` | Write or run Pest tests |
-| `deploy-check` | Pre-deployment checklist (tests, build, debug calls, vulnerabilities) |
+| Skill          | Purpose                                                                |
+|----------------|------------------------------------------------------------------------|
+| `commit`       | Conventional commit; runs `make fix` + `make check` first              |
+| `fix`          | Run `make fix` (pint + rector + eslint + prettier)                     |
+| `review`       | Code review of current-branch changes or a given file                  |
+| `test`         | Write or run Pest tests                                                |
+| `deploy-check` | Pre-deployment checklist (tests, build, debug calls, vulnerabilities)  |
 | `audit-update` | Refresh `.ai/audit-plan.md` — verify gap/feature status, recalc scores |
-| `a11y-check` | WCAG 2.2 AA check + fixes for a view/component |
-| `ux-review` | UI/UX analysis of a screen or flow |
-| `seo-review` | Technical + content SEO analysis of the storefront |
+| `a11y-check`   | WCAG 2.2 AA check + fixes for a view/component                         |
+| `ux-review`    | UI/UX analysis of a screen or flow                                     |
+| `seo-review`   | Technical + content SEO analysis of the storefront                     |
 
 > Only **Claude Code** executes these as skills. Other tools (Codex, Gemini, Copilot…) should treat this table as a reference to available workflows and run the equivalent commands directly.
 > **Global / personal skills** (`~/.claude/skills/`, installed plugins) are not shared — do not rely on them for team workflows. If a skill is valuable and stable, install/commit it under `.claude/skills/` (and mirror where required, e.g. `server/.cursor/skills/`), then reference it from this file.
@@ -155,11 +155,10 @@ make check  # read-only CI mirror: fails if anything is wrong (same checks as Gi
 ```
 
 **Workflow for AI:**
-1. After writing code, run targeted checks from `.ai/routing.md` (at minimum: `types` for TS, `pint --dirty` for PHP)
-2. **Before telling the user the task is done**, run `make check` in Docker (full CI mirror) — not only before commit
-3. Before commit: `make fix && make check`
-4. If `make check` fails with issues `make fix` cannot resolve, fix manually and repeat
-5. Never ask the user to run `make check` on your behalf unless Docker is unavailable on the agent side
+1. **DO NOT** run `make test`, `make fix`, or `make check` after every single individual file edit or minor change. Only run them before proposing a commit.
+2. Before commit: `make fix && make check`.
+3. If `make check` fails with issues `make fix` cannot resolve, fix manually and repeat.
+4. Never ask the user to run `make check` on your behalf unless Docker is unavailable on the agent side.
 
 **Details:**
 - `make fix` runs: `pint` → `rector process` → `pint` (again, to re-format rector output) → `npm run lint` (eslint --fix, server) → `npm run format` (prettier, server) → `eslint --fix` (client) → `npm run format` (prettier, client)

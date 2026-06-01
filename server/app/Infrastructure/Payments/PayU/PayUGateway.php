@@ -45,7 +45,7 @@ class PayUGateway implements PaymentGatewayInterface
         $options['return_url'] ?? config('app.frontend_url').'/checkout/success';
 
         $body = [
-            'notifyUrl' => config('app.url').'/api/v1/webhooks/payu',
+            'notifyUrl' => config('services.payu.webhook_url') ?: config('app.url').'/api/v1/webhooks/payu',
             'customerIp' => $customerIp,
             'merchantPosId' => (string) config('services.payu.pos_id'),
             'description' => 'Zamówienie #'.($order->reference_number ?? $order->id),

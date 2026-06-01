@@ -32,19 +32,17 @@ class DatabaseSeeder extends Seeder
             DashboardWidgetSeeder::class,
         ]);
 
-        // ── E-commerce (seeded only when module is active) ───────────────────
-        if (config('modules.ecommerce')) {
-            $this->call([
-                ProductTypeSeeder::class,
-                // EcommerceDemoSeeder::class,
-                ElectronicsSeeder::class,
-                DiscountSeeder::class,
-                PromotionSeeder::class,
-                ShippingMethodSeeder::class,
-                CurrencySeeder::class,
-                EmailTemplateSeeder::class,
-            ]);
-        }
+        // ── E-commerce ───────────────────────────────────────────────────────
+        $this->call([
+            ProductTypeSeeder::class,
+            // EcommerceDemoSeeder::class,
+            ElectronicsSeeder::class,
+            DiscountSeeder::class,
+            PromotionSeeder::class,
+            ShippingMethodSeeder::class,
+            CurrencySeeder::class,
+            EmailTemplateSeeder::class,
+        ]);
 
         // ── Newsletter (seeded only when module is active) ───────────────────
         // (no dedicated newsletter seeder at this time)

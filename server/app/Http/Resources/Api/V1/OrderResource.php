@@ -41,6 +41,7 @@ class OrderResource extends JsonResource
                 'provider' => $order->payment->provider->value,
                 'status' => $order->payment->status->value,
                 'amount' => $order->payment->amount,
+                'redirect_url' => $order->payment->getRedirectUrl(),
             ] : null,
             'shipment' => $order->relationLoaded('shipment') && $order->shipment ? [
                 'carrier' => $order->shipment->carrier,

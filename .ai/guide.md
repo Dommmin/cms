@@ -78,7 +78,7 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 
 ### Payments
 - **PayU** — BLIK native, Apple Pay, Google Pay, redirect; OAuth2 token caching; MD5 webhook verification; `POST /api/v1/webhooks/payu`
-- **P24** — Basic Auth, SHA256 signature; Apple/Google Pay on P24 page; `POST /api/v1/webhooks/p24`
+- **P24** — Basic Auth, SHA256 signature; Apple/Google Pay on P24 page; failed/cancelled returns are resolved from polled transaction status because P24 sends `urlStatus` only for successful payments; `POST /api/v1/webhooks/p24`
 - **Paynow** — API v3 hosted/redirect payments for fast online payments and PayPo/deferred payment option; HMAC-SHA256/Base64 request + webhook signatures; `POST /api/v1/webhooks/paynow`
 - **Manual methods** — cash on delivery and bank transfer gateways are registered for checkout without redirect/webhook flow
 - **Not implemented yet** — Autopay is a candidate for a future payment gateway

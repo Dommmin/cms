@@ -14,7 +14,6 @@ use App\Models\ProductVariant;
 use App\Models\SearchLog;
 use App\Models\SearchSynonym;
 use App\Models\Setting;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Laravel\Scout\Builder;
@@ -550,15 +549,7 @@ class SearchController extends ApiController
 
     private function buildPriceRanges(): array
     {
-        $query = ProductVariant::query()
-            ->whereHas('product', fn (EloquentBuilder $q) => $q->where('is_active', true))
-            ->selectRaw('MIN(price) AS min_price, MAX(price) AS max_price')
-            ->first();
-
-        return [
-            'min' => (int) ($query->min_price ?? 0),
-            'max' => (int) ($query->max_price ?? 0),
-        ];
+        return ProductVariant::getActivePriceBounds();
     }
 
     /**
@@ -685,14 +676,6 @@ class SearchController extends ApiController
 
     private function getPriceRangesFallback(): array
     {
-        $query = ProductVariant::query()
-            ->whereHas('product', fn (EloquentBuilder $q) => $q->where('is_active', true))
-            ->selectRaw('MIN(price) AS min_price, MAX(price) AS max_price')
-            ->first();
-
-        return [
-            'min' => (int) ($query->min_price ?? 0),
-            'max' => (int) ($query->max_price ?? 0),
-        ];
+        return ProductVariant::getActivePriceBounds();
     }
 }

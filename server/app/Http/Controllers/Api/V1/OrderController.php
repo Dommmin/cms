@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\OrderStatusEnum;
+use App\Enums\PaymentStatusEnum;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreReturnRequestRequest;
 use App\Http\Resources\Api\V1\OrderResource;
 use App\Models\CartItem;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\ReturnRequest;
 use App\Services\CartService;
 use App\Services\InvoiceService;
+use App\Services\PaymentGatewayManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -70,6 +73,46 @@ class OrderController extends ApiController
         $order->changeStatus(OrderStatusEnum::CANCELLED, 'customer', 'Cancelled by customer');
 
         return $this->ok(new OrderResource($order->fresh()));
+    }
+
+    public function pay(Request $request, string $reference, PaymentGatewayManager $gatewayManager): JsonResponse
+    {
+        $customer = $request->user()->customer;
+
+        $order = Order::query()
+            ->where('reference_number', $reference)
+            ->where('customer_id', $customer?->id)
+            ->with('payment')
+            ->firstOrFail();
+
+        $currentStatus = OrderStatusEnum::from((string) $order->status);
+        if ($currentStatus !== OrderStatusEnum::AWAITING) {
+            throw ValidationException::withMessages([
+                'status' => ['Order is not awaiting payment'],
+            ]);
+        }
+
+        $payment = $order->payment;
+        abort_unless($payment instanceof Payment, 404, 'Payment record not found');
+
+        // Reset payment status, transaction ID, and payload to pending/null to allow a clean retry attempt
+        $payment->update([
+            'status' => PaymentStatusEnum::PENDING->value,
+            'provider_transaction_id' => null,
+            'payload' => null,
+        ]);
+
+        $gateway = $gatewayManager->driver($payment->provider);
+        $result = $gateway->processPayment($payment, [
+            'customer_ip' => $request->ip(),
+            'return_url' => config('app.frontend_url').'/checkout/pending?payment='.$payment->id.'&ref='.$order->reference_number,
+            'continue_url' => config('app.frontend_url').'/checkout/pending?payment='.$payment->id.'&ref='.$order->reference_number,
+        ]);
+
+        return $this->ok([
+            'action' => $result['action'],
+            'redirect_url' => $result['redirect_url'] ?? null,
+        ]);
     }
 
     public function invoice(Request $request, string $reference, InvoiceService $invoiceService): Response

@@ -32,10 +32,22 @@ protected function casts(): array
 
 ## Eloquent
 
-- `Model::query()` always — never `DB::` for standard queries
+- `Model::query()` always — never `DB::` for standard queries.
+- **No raw/complex queries in controllers:** Never build database queries with multiple constraints or complex filter logic directly in a Controller or Service. Always encapsulate them into a **Custom Query Builder** or dedicated Model method.
+- **Clean static calls:** Prefer clean static calls on the model (e.g., `Address::findMatchingAddress(...)`) instead of chaining query (e.g., `Address::query()->findMatchingAddress(...)`).
 - Eager-load relations (no N+1): `->with(['variants', 'category'])`
-- `->sole()` for must-exist single result, `->firstOrFail()` when appropriate
-- Translatable columns: `where('title->en', 'value')` or `whereJsonContainsLocale()`
+- `->sole()` for must-exist single result, `->firstOrFail()` when appropriate.
+- Translatable columns: `where('title->en', 'value')` or `whereJsonContainsLocale()`.
+
+## Security & SQL Injection Protection (OWASP Top 10)
+
+- **Strictly parameterized queries:** Always use parameterized binds for variables inside raw queries (`selectRaw`, `whereRaw`, `havingRaw`, `orderByRaw`, etc.). Never interpolate user input directly into SQL strings.
+  - **Forbidden:** `->whereRaw("name = '$input'")`
+  - **Mandatory:** `->whereRaw("name = ?", [$input])` or standard `->where('name', $input)`
+- **OWASP Top 10 Pre-Audit:** Before implementing or modifying controller/service logic, perform a mental check against key OWASP Top 10 vulnerabilities:
+  - **Injection (SQL, Command):** Ensure proper escaping and variable parameterization.
+  - **Broken Object Level Authorization (BOLA):** Ensure user-scoped checks are applied (e.g. `$user->orders()->findOrFail($id)` instead of `Order::findOrFail($id)`).
+  - **Sensitive Data Exposure:** Validate that API Resources do not leak sensitive attributes.
 
 ## Controllers
 
