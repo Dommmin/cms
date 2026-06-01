@@ -107,7 +107,7 @@ it('creates paynow payment and stores redirect payload', function (): void {
         ->and($payment->fresh()->provider_transaction_id)->toBe('NOLV-8F9-08K-WGD');
 
     Http::assertSent(fn ($request): bool => $request->hasHeader('Api-Key', 'paynow-api-key')
-        && $request->hasHeader('Idempotency-Key', 'paynow-create-'.$payment->id)
+        && str_starts_with((string) $request->header('Idempotency-Key')[0], 'paynow-create-'.$payment->id)
         && $request->hasHeader('Signature')
         && $request['amount'] === 12345
         && $request['externalId'] === (string) $payment->id);

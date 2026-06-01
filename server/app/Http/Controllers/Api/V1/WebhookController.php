@@ -11,6 +11,7 @@ use App\Infrastructure\Payments\PayU\PayUWebhookVerifier;
 use App\Jobs\ProcessPaymentWebhook;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class WebhookController extends ApiController
 {
@@ -32,6 +33,7 @@ class WebhookController extends ApiController
     public function p24(Request $request, P24SignatureService $verifier): JsonResponse
     {
         $payload = $request->all();
+        Log::info('P24 Webhook Raw Payload:', $payload);
         $request->getContent();
 
         abort_unless($verifier->verifyWebhook($payload), 400, 'Invalid signature');

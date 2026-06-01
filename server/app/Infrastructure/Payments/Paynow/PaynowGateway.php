@@ -240,6 +240,9 @@ class PaynowGateway implements PaymentGatewayInterface
 
     private function idempotencyKey(Payment $payment, string $operation): string
     {
-        return mb_substr(sprintf('paynow-%s-%s', $operation, $payment->id), 0, 45);
+        // Add a random 8-character string to make the idempotency key unique for retries of the same payment record
+        $random = mb_substr(md5(uniqid((string) mt_rand(), true)), 0, 8);
+
+        return mb_substr(sprintf('paynow-%s-%s-%s', $operation, $payment->id, $random), 0, 45);
     }
 }
