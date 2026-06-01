@@ -3,8 +3,11 @@
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 
+import { ShareCartDialog } from '@/app/cart/components/share-cart-dialog';
 import { PriceDisplay } from '@/components/price-display';
+import { Button } from '@/components/ui/button';
 import {
     useCart,
     useRemoveCartItem,
@@ -19,6 +22,7 @@ export default function CartPage() {
     const { data: cart, isLoading } = useCart();
     const { mutate: updateItem } = useUpdateCartItem();
     const { mutate: removeItem } = useRemoveCartItem();
+    const [shareOpen, setShareOpen] = useState(false);
     const { t } = useTranslation();
     const lp = useLocalePath();
     const { formatPrice } = useCurrency();
@@ -66,9 +70,14 @@ export default function CartPage() {
 
     return (
         <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-            <h1 className="mb-8 text-3xl font-bold">
-                {t('cart.your_cart', 'Your Cart')}
-            </h1>
+            <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <h1 className="text-3xl font-bold">
+                    {t('cart.your_cart', 'Your Cart')}
+                </h1>
+                <Button variant="outline" onClick={() => setShareOpen(true)}>
+                    {t('cart.share_action', 'Share cart')}
+                </Button>
+            </div>
 
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                 {/* Items list */}
@@ -239,6 +248,11 @@ export default function CartPage() {
                     </Link>
                 </div>
             </div>
+
+            <ShareCartDialog
+                open={shareOpen}
+                onClose={() => setShareOpen(false)}
+            />
         </div>
     );
 }
