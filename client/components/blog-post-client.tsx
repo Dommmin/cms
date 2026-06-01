@@ -185,7 +185,7 @@ export function BlogPostClient({
             )}
 
             <div className="mt-8 flex items-center justify-between">
-                <BlogVotes post={post} />
+                <BlogVotes post={post} locale={locale} />
                 <BlogViewTracker
                     slug={post.slug}
                     initialCount={post.views_count ?? 0}

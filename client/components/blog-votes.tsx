@@ -5,6 +5,7 @@ import { startTransition, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { useMe } from '@/hooks/use-auth';
+import { useBlogPost } from '@/hooks/use-blog';
 import { useBlogVote } from '@/hooks/use-blog-comments';
 import { useTranslation } from '@/hooks/use-translation';
 import type { BlogVotesProps } from './blog-votes.types';
@@ -29,10 +30,12 @@ const downActiveStyle = {
     color: 'rgb(185 28 28)',
 };
 
-export function BlogVotes({ post }: BlogVotesProps) {
+export function BlogVotes({ post, locale }: BlogVotesProps) {
     const { t } = useTranslation();
     const { data: user } = useMe();
     const { mutate: vote, isPending } = useBlogVote(post.slug);
+
+    const { data: latestPost } = useBlogPost(post.slug, locale);
 
     const [votesUp, setVotesUp] = useState(post.votes_up ?? 0);
     const [votesDown, setVotesDown] = useState(post.votes_down ?? 0);
@@ -42,19 +45,20 @@ export function BlogVotes({ post }: BlogVotesProps) {
     const isUpActive = userVote === 'up';
     const isDownActive = userVote === 'down';
 
-    // Sync if post prop changes (e.g. navigation)
+    // Sync if post prop or latestPost changes
     useEffect(() => {
         startTransition(() => {
-            setVotesUp(post.votes_up ?? 0);
-            setVotesDown(post.votes_down ?? 0);
-            // Server never returns user_vote (no auth in serverFetch); use localStorage
+            const currentPost = latestPost ?? post;
+            setVotesUp(currentPost.votes_up ?? 0);
+            setVotesDown(currentPost.votes_down ?? 0);
+            // Server never returns user_vote (no auth in serverFetch); use localStorage or latestPost
             const stored = localStorage.getItem(`vote_${post.slug}`);
             setUserVote(
-                post.user_vote ??
+                currentPost.user_vote ??
                     (stored === 'up' || stored === 'down' ? stored : null),
             );
         });
-    }, [post.votes_up, post.votes_down, post.user_vote, post.slug]);
+    }, [post, latestPost]);
 
     function handleVote(direction: 'up' | 'down') {
         if (!user) {
