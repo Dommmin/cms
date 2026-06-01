@@ -1,4 +1,4 @@
-import { api } from '@/lib/axios';
+import { api, getToken } from '@/lib/axios';
 import type { Wishlist } from '@/types/api';
 
 const WISHLIST_TOKEN_KEY = 'wishlist_token';
@@ -16,6 +16,17 @@ export function clearWishlistToken(): void {
     localStorage.removeItem(WISHLIST_TOKEN_KEY);
 }
 
+function syncWishlistToken(token: string | null | undefined): void {
+    if (token) {
+        setWishlistToken(token);
+        return;
+    }
+
+    if (getToken()) {
+        clearWishlistToken();
+    }
+}
+
 function withWishlistToken() {
     const token = getWishlistToken();
     return token ? { headers: { 'X-Wishlist-Token': token } } : {};
@@ -23,7 +34,7 @@ function withWishlistToken() {
 
 export async function getWishlist(): Promise<Wishlist | null> {
     const { data } = await api.get<Wishlist>('/wishlist', withWishlistToken());
-    if (data.token) setWishlistToken(data.token);
+    syncWishlistToken(data.token);
     return data;
 }
 
@@ -35,7 +46,7 @@ export async function addToWishlist(
         { variant_id: variantId },
         withWishlistToken(),
     );
-    if (data.token) setWishlistToken(data.token);
+    syncWishlistToken(data.token);
     return data;
 }
 
@@ -46,6 +57,6 @@ export async function removeFromWishlist(
         `/wishlist/items/${variantId}`,
         withWishlistToken(),
     );
-    if (data.token) setWishlistToken(data.token);
+    syncWishlistToken(data.token);
     return data;
 }

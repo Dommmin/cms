@@ -71,6 +71,7 @@ export interface LoginPayload {
     email: string;
     password: string;
     cart_token?: string | null;
+    wishlist_token?: string | null;
     cf_turnstile_response?: string;
 }
 
@@ -80,6 +81,7 @@ export interface RegisterPayload {
     password: string;
     password_confirmation: string;
     cart_token?: string | null;
+    wishlist_token?: string | null;
     cf_turnstile_response?: string;
 }
 
@@ -240,7 +242,10 @@ export interface Address {
 // ── Orders ────────────────────────────────────────────────────────────────────
 
 export type OrderStatus =
+    | 'draft'
     | 'pending'
+    | 'awaiting_payment'
+    | 'paid'
     | 'confirmed'
     | 'processing'
     | 'shipped'
@@ -269,12 +274,14 @@ export interface Shipment {
 }
 
 export interface Payment {
-    id: number;
-    method: string;
-    payment_method: string | null;
+    /** Payment provider (p24, payu, paynow, cash_on_delivery, …) */
+    provider?: string;
+    /** Kept for backward compatibility */
+    method?: string;
+    payment_method?: string | null;
     status: string;
     amount: number;
-    paid_at: string | null;
+    redirect_url?: string | null;
 }
 
 export interface OrderStatusHistory {

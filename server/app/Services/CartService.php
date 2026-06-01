@@ -124,6 +124,7 @@ class CartService
         if (! $customerCart instanceof Cart) {
             $customerCart = new Cart(['customer_id' => $customer->id]);
             $customerCart->save();
+            $customer->setRelation('cart', $customerCart);
         }
 
         $customerCart->load('items');
@@ -147,6 +148,8 @@ class CartService
         if (! $cartToken) {
             session()->forget(self::SESSION_CART_KEY);
         }
+
+        $customer->setRelation('cart', $customerCart->fresh('items.variant.product'));
     }
 
     public function currentCartBelongsToUser(Cart $cart, User $user): bool

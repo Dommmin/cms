@@ -1,4 +1,5 @@
 import { getCartToken } from '@/api/cart';
+import { getWishlistToken } from '@/api/wishlist';
 import { apiGet } from '@/lib/api';
 import { api } from '@/lib/axios';
 import type {
@@ -13,7 +14,8 @@ export type SocialProvider = 'google' | 'github';
 export async function login(payload: LoginPayload): Promise<AuthResponse> {
     const { data } = await api.post<AuthResponse>('/auth/login', {
         ...payload,
-        cart_token: getCartToken(),
+        cart_token: payload.cart_token ?? getCartToken(),
+        wishlist_token: payload.wishlist_token ?? getWishlistToken(),
     });
     return data;
 }
@@ -23,7 +25,8 @@ export async function register(
 ): Promise<AuthResponse> {
     const { data } = await api.post<AuthResponse>('/auth/register', {
         ...payload,
-        cart_token: getCartToken(),
+        cart_token: payload.cart_token ?? getCartToken(),
+        wishlist_token: payload.wishlist_token ?? getWishlistToken(),
     });
     return data;
 }
@@ -74,7 +77,12 @@ export async function handleSocialCallback(
 ): Promise<AuthResponse> {
     const { data } = await api.post<AuthResponse>(
         `/auth/social/${provider}/callback`,
-        { code },
+        {
+            code,
+            // Social login always merges silently — send both guest tokens
+            cart_token: getCartToken(),
+            wishlist_token: getWishlistToken(),
+        },
     );
     return data;
 }

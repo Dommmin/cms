@@ -81,6 +81,14 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
         }
     }
 
+    // Attach cart token if present
+    if (typeof window !== 'undefined') {
+        const cartToken = localStorage.getItem('cart_token');
+        if (cartToken) {
+            config.headers['X-Cart-Token'] = cartToken;
+        }
+    }
+
     // URL locale is the source of truth; cookie is only a fallback for legacy unprefixed paths.
     const locale = getRequestLocale();
     if (locale) {

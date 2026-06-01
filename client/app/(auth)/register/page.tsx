@@ -4,6 +4,7 @@ import { isAxiosError } from 'axios';
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { MergeDialog } from '@/components/merge-dialog';
 import { SocialLoginButtons } from '@/components/social-login-buttons';
 import { TurnstileWidget } from '@/components/turnstile-widget';
 import { useRegister } from '@/hooks/use-auth';
@@ -11,7 +12,13 @@ import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
 
 export default function RegisterPage() {
-    const { mutate: register, isPending, error } = useRegister();
+    const {
+        mutate: register,
+        isPending,
+        error,
+        mergeDialogState,
+        confirmMerge,
+    } = useRegister();
     const { t } = useTranslation();
     const lp = useLocalePath();
     const [form, setForm] = useState({
@@ -40,6 +47,11 @@ export default function RegisterPage() {
 
     return (
         <div className="mx-auto max-w-sm px-4 py-24 sm:px-6">
+            <MergeDialog
+                open={mergeDialogState !== null}
+                state={mergeDialogState}
+                onConfirm={confirmMerge}
+            />
             <h1 className="mb-2 text-center text-3xl font-bold">
                 {t('auth.register_title', 'Create Account')}
             </h1>

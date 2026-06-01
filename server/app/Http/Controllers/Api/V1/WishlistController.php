@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreWishlistItemRequest;
 use App\Http\Resources\Api\V1\WishlistResource;
+use App\Models\User;
 use App\Services\WishlistService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,15 +16,17 @@ class WishlistController extends ApiController
 {
     public function show(Request $request): JsonResponse
     {
+        /** @var User|null $user */
+        $user = auth('sanctum')->user();
         $wishlist = resolve(WishlistService::class)->getOrCreateWishlist(
-            $request->user(),
+            $user,
             $request->header('X-Wishlist-Token'),
         );
         $wishlist->load('items.variant.product');
 
         $response = $this->ok(new WishlistResource($wishlist));
 
-        if (! $request->user() && $wishlist->session_token) {
+        if (! $user && $wishlist->session_token) {
             $response->header('X-Wishlist-Token', $wishlist->session_token);
         }
 
@@ -32,8 +35,10 @@ class WishlistController extends ApiController
 
     public function addItem(StoreWishlistItemRequest $request): JsonResponse
     {
+        /** @var User|null $user */
+        $user = auth('sanctum')->user();
         $wishlist = resolve(WishlistService::class)->getOrCreateWishlist(
-            $request->user(),
+            $user,
             $request->header('X-Wishlist-Token'),
         );
 
@@ -49,7 +54,7 @@ class WishlistController extends ApiController
 
         $response = $this->ok(new WishlistResource($wishlist));
 
-        if (! $request->user() && $wishlist->session_token) {
+        if (! $user && $wishlist->session_token) {
             $response->header('X-Wishlist-Token', $wishlist->session_token);
         }
 
@@ -58,8 +63,10 @@ class WishlistController extends ApiController
 
     public function removeItem(Request $request, int $variantId): JsonResponse
     {
+        /** @var User|null $user */
+        $user = auth('sanctum')->user();
         $wishlist = resolve(WishlistService::class)->getOrCreateWishlist(
-            $request->user(),
+            $user,
             $request->header('X-Wishlist-Token'),
         );
 
@@ -68,7 +75,7 @@ class WishlistController extends ApiController
 
         $response = $this->ok(new WishlistResource($wishlist));
 
-        if (! $request->user() && $wishlist->session_token) {
+        if (! $user && $wishlist->session_token) {
             $response->header('X-Wishlist-Token', $wishlist->session_token);
         }
 

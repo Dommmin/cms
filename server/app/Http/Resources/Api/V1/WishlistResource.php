@@ -45,7 +45,7 @@ class WishlistResource extends JsonResource
                         'omnibus_price' => $isOnSale ? $variant->lowestPriceInLast30Days() : null,
                         'is_on_sale' => $isOnSale,
                         'in_stock' => $variant->isInStock(),
-                        'attributes' => $variant->getAttribute('attributes') ?? [],
+                        'attributes' => $variant->relationLoaded('attributeValues') ? $variant->attributeValues->mapWithKeys(fn ($av): array => [($av->attribute->name ?? '') => ($av->attributeValue->value ?? '')])->all() : [],
                     ];
                 })(),
             ]),

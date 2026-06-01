@@ -11,8 +11,6 @@ use App\Http\Requests\Api\V1\RegisterRequest;
 use App\Http\Requests\Api\V1\ResetPasswordRequest;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Models\User;
-use App\Services\CartService;
-use App\Services\WishlistService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,11 +20,6 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends ApiController
 {
-    public function __construct(
-        private readonly CartService $cartService,
-        private readonly WishlistService $wishlistService,
-    ) {}
-
     public function register(RegisterRequest $request): JsonResponse
     {
         $user = User::query()->create([
@@ -36,9 +29,6 @@ class AuthController extends ApiController
         ]);
 
         event(new Registered($user));
-
-        $this->cartService->mergeGuestCartIntoCustomer($user, $request->cart_token);
-        $this->wishlistService->mergeGuestWishlistIntoCustomer($user, $request->wishlist_token);
 
         $token = $user->createToken('api')->plainTextToken;
 
@@ -57,9 +47,6 @@ class AuthController extends ApiController
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
-
-        $this->cartService->mergeGuestCartIntoCustomer($user, $request->cart_token);
-        $this->wishlistService->mergeGuestWishlistIntoCustomer($user, $request->wishlist_token);
 
         $token = $user->createToken('api')->plainTextToken;
 

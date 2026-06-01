@@ -12,6 +12,7 @@ use App\Http\Resources\Api\V1\CartResource;
 use App\Models\CartItem;
 use App\Models\Discount;
 use App\Models\ProductVariant;
+use App\Models\User;
 use App\Services\CartService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,7 +26,9 @@ class CartController extends ApiController
 
     public function show(Request $request): JsonResponse
     {
-        $cart = $this->cartService->getOrCreateCart($request->user(), $request->header('X-Cart-Token'));
+        /** @var User|null $user */
+        $user = auth('sanctum')->user();
+        $cart = $this->cartService->getOrCreateCart($user, $request->header('X-Cart-Token'));
         $cart->load('items.variant.product');
 
         return $this->ok(new CartResource($cart));
@@ -42,7 +45,9 @@ class CartController extends ApiController
             ]);
         }
 
-        $cart = $this->cartService->getOrCreateCart($request->user(), $request->header('X-Cart-Token'));
+        /** @var User|null $user */
+        $user = auth('sanctum')->user();
+        $cart = $this->cartService->getOrCreateCart($user, $request->header('X-Cart-Token'));
         /** @var CartItem|null $existing */
         $existing = $cart->items()->where('variant_id', $variant->id)->first();
 
@@ -69,7 +74,9 @@ class CartController extends ApiController
 
     public function updateItem(UpdateCartItemRequest $request, CartItem $cartItem): JsonResponse
     {
-        $cart = $this->cartService->getOrCreateCart($request->user(), $request->header('X-Cart-Token'));
+        /** @var User|null $user */
+        $user = auth('sanctum')->user();
+        $cart = $this->cartService->getOrCreateCart($user, $request->header('X-Cart-Token'));
 
         abort_unless($this->cartService->cartItemBelongsToCurrentCart($cartItem, $cart), 403, 'Cart item does not belong to your cart');
 
@@ -90,7 +97,9 @@ class CartController extends ApiController
 
     public function removeItem(Request $request, CartItem $cartItem): JsonResponse
     {
-        $cart = $this->cartService->getOrCreateCart($request->user(), $request->header('X-Cart-Token'));
+        /** @var User|null $user */
+        $user = auth('sanctum')->user();
+        $cart = $this->cartService->getOrCreateCart($user, $request->header('X-Cart-Token'));
 
         abort_unless($this->cartService->cartItemBelongsToCurrentCart($cartItem, $cart), 403, 'Cart item does not belong to your cart');
 
@@ -102,7 +111,9 @@ class CartController extends ApiController
 
     public function clear(Request $request): JsonResponse
     {
-        $cart = $this->cartService->getOrCreateCart($request->user(), $request->header('X-Cart-Token'));
+        /** @var User|null $user */
+        $user = auth('sanctum')->user();
+        $cart = $this->cartService->getOrCreateCart($user, $request->header('X-Cart-Token'));
         $cart->items()->delete();
         $cart->update(['discount_code' => null]);
         $cart->load('items.variant.product');
@@ -113,7 +124,9 @@ class CartController extends ApiController
     public function applyDiscount(ApplyDiscountRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $cart = $this->cartService->getOrCreateCart($request->user(), $request->header('X-Cart-Token'));
+        /** @var User|null $user */
+        $user = auth('sanctum')->user();
+        $cart = $this->cartService->getOrCreateCart($user, $request->header('X-Cart-Token'));
 
         $discount = Discount::query()
             ->where('code', mb_strtoupper((string) $data['code']))
@@ -154,7 +167,9 @@ class CartController extends ApiController
 
     public function removeDiscount(Request $request): JsonResponse
     {
-        $cart = $this->cartService->getOrCreateCart($request->user(), $request->header('X-Cart-Token'));
+        /** @var User|null $user */
+        $user = auth('sanctum')->user();
+        $cart = $this->cartService->getOrCreateCart($user, $request->header('X-Cart-Token'));
 
         $cart->getConnection()
             ->table('carts')
