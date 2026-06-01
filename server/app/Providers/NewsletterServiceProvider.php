@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Infrastructure\Newsletter\MailerLiteProvider;
+use App\Infrastructure\Newsletter\NewsletterProvider;
 use App\Models\NewsletterClick;
 use App\Models\NewsletterSubscriber;
 use App\Observers\NewsletterClickObserver;
@@ -13,6 +15,14 @@ use Illuminate\Support\ServiceProvider;
 
 class NewsletterServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        $this->app->singleton(NewsletterProvider::class, fn (): MailerLiteProvider => new MailerLiteProvider(
+            apiKey: (string) config('services.mailerlite.api_key', ''),
+            groupId: (string) config('services.mailerlite.group_id', '')
+        ));
+    }
+
     /**
      * Bootstrap newsletter observers and routes.
      */
