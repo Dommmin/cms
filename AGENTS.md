@@ -23,8 +23,8 @@ Headless CMS + e-commerce platform. Monorepo: `server/` (Laravel 12 backend + In
 make up / make down / make shell / make migrate / make fresh / make test / make quality
 
 # Verification (Docker only — see .ai/routing.md)
-make check  # run before saying a coding task is "done"; CI mirror
-make fix    # before commit: auto-fix then make check
+make check  # run only before deploy / final release validation; CI mirror
+make fix    # run only before deploy, immediately before make check
 
 # Direct — when you need specific args
 docker compose exec php php artisan <cmd>
@@ -79,13 +79,15 @@ client/          Next.js public storefront
 This repo’s routing/verification matrix lives in `.ai/routing.md`.
 
 - **Docker-only** commands. Never run host `php artisan`, `pint`, `npm`.
-- **Done criteria** (after any code change): run `make check` (Docker) before saying task is complete.
-- **Commit criteria**: run `make fix && make check`.
+- **Done criteria during implementation**: write code that should already satisfy the existing toolchain; do not rely on `make fix` to clean up avoidable issues.
+- **Full verification**: run `make fix && make check` only before deploy / final release validation, not after every coding task.
 - If containers are down: `docker compose ps`, report blocker, stop (no host fallback).
 - Read `.ai/guide.md` by **relevant section only** (no full-file preload).
 - Use `.ai/rules.md` for canonical MUST/FORBIDDEN and quality gates.
 - Admin SPA routes: Wayfinder (`@/actions/`, `@/routes/`) — no hardcoded strings.
 - `.tsx` files: no inline `type/interface` — keep types in `.ts`.
 - Static analysis & linters: do not silence by default. Never add `eslint-disable` (any form), `@ts-ignore`, `@ts-expect-error`, `@phpstan-ignore-*`, or update/create `server/phpstan-baseline.neon` unless there is a documented reason and no safe code-level fix exists. If unavoidable, suppress the narrowest possible rule/line and add a short inline explanation. Never regenerate/expand PHPStan baseline without explicit approval.
+- Write code to pass the current stack on first pass: match 2-3 nearby files, keep imports/usages clean, preserve strict types, avoid unused code, keep TS/PHP types explicit, and follow existing Laravel/Inertia/Next patterns instead of inventing new ones.
+- Prefer narrow, targeted verification while iterating when needed (for example a touched feature test or a file-scoped lint/type check) instead of the full pipeline.
 - No branch/commit/push without explicit user approval.
 - Keep diffs minimal; no drive-by refactors.

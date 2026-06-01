@@ -24,8 +24,8 @@
 
 | When | Command (repo root) |
 |------|---------------------|
-| **Claiming task done** (any code change) | `make check` — or targeted rows below + say if Docker down |
-| Before commit / PR | `make fix && make check` |
+| During implementation | Prefer targeted checks below; reserve full pipeline for release validation |
+| Before deploy / final release validation | `make fix && make check` |
 | After `server/**/*.php` | `docker compose exec php vendor/bin/pint --dirty` |
 | After `server/resources/js/**` | `docker compose exec php npm run types` |
 | After admin UI change (optional) | `docker compose exec php npx eslint . --max-warnings=0` on touched paths |
@@ -37,5 +37,6 @@
 ## Common mistakes
 
 - Running `npx tsc` / `npm run typecheck` on the **host** → use `docker compose exec php npm run types`
-- Skipping verification because user did not ask to **commit** → done = `make check` (or explained partial check)
+- Using `make fix` / `make check` after every small edit instead of writing code that already matches local patterns
+- Treating targeted checks as optional when a touched area has a fast, relevant verifier
 - Delegating verification to the user ("uruchom u siebie make check")

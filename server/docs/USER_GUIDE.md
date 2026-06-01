@@ -612,6 +612,7 @@ Pending → Approved → Return Label Sent → Awaiting Return → Received → 
 Navigate to **Shop > Carts** and **Shop > Wishlists** for read-only views of:
 
 - **Carts** — active shopping carts (both guest carts using a token and logged-in customer carts)
+- **Shared cart links** — storefront users can generate snapshot links that others may preview and import into their own carts
 - **Wishlists** — products customers have saved for later
 
 These views are for monitoring and customer support purposes.

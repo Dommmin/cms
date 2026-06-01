@@ -696,6 +696,8 @@ All API responses are forced to JSON via `ForceJsonResponse` middleware. All end
 
 Guest carts use the `X-Cart-Token` header. Authenticated carts use Sanctum bearer tokens. The `CartService` handles both cases transparently.
 
+Shared cart links are implemented as snapshot records in `shared_carts`, not by exposing the live guest cart token. `POST /api/v1/cart/share` captures the current cart state, `GET /api/v1/cart/shared/{token}` returns a read-only preview with fresh availability/pricing checks, and `POST /api/v1/cart/shared/{token}/import` imports that snapshot into the recipient cart in `merge` or `replace` mode.
+
 ### Idempotency
 
 Mutating cart endpoints use the `idempotent` middleware (`grazulex/laravel-api-idempotency`). Clients should send an `Idempotency-Key` header to prevent duplicate operations on retry.
@@ -715,6 +717,9 @@ Auto-generated OpenAPI docs via `dedoc/scramble` at `/docs/api`. The Scramble co
 | `GET`  | `/api/v1/products`              | Product listing (filterable)    |
 | `GET`  | `/api/v1/products/{slug}`       | Product detail                  |
 | `GET`  | `/api/v1/categories`            | Category tree                   |
+| `POST` | `/api/v1/cart/share`            | Create a shared-cart snapshot   |
+| `GET`  | `/api/v1/cart/shared/{token}`   | Preview a shared cart snapshot  |
+| `POST` | `/api/v1/cart/shared/{token}/import` | Import shared cart into current cart |
 | `GET`  | `/api/v1/blog/posts`            | Blog post listing               |
 | `GET`  | `/api/v1/blog/posts/{slug}`     | Blog post detail                |
 | `GET`  | `/api/v1/pages/{slug}`          | CMS page content                |

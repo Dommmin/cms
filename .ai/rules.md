@@ -14,8 +14,8 @@ Rules every AI tool (Claude Code, Codex, Gemini, Copilot, Cursor, Junie, Cline, 
 4. **MUST** plan before coding when a task has 3+ steps
 5. **MUST** use Form Request classes for all validation — never inline in controllers
 6. **MUST** put business logic in the API (Controllers/Services/Resources) — the view receives ready-to-display data
-7. **MUST** write Pest tests for every feature and keep the whole suite green
-8. **MUST** run `make fix && make check` before proposing a commit — `make check` mirrors CI
+7. **MUST** write Pest tests for every feature and keep the relevant suite green while iterating
+8. **MUST** write code that should pass the current lint/static-analysis stack on first pass; reserve `make fix && make check` for pre-deploy / final release validation
 9. **MUST** update `.ai/guide.md` (+ `server/docs/*`) when a feature is added or changed
 10. **MUST** ask before any git branch / commit / push (see Git section)
 11. **MUST** verify: "would a staff engineer approve this diff?"
@@ -84,7 +84,7 @@ To see why a container is failing: `docker compose logs <service> --tail=30`
 - Commit **only files you explicitly modified** — never stage unrelated changes, auto-generated files (Wayfinder, migrations you did not write), or other developers' work
 - Always review `git diff --staged` before committing
 - Atomic commits — one concern per commit. See `.ai/commit-rules.md` for the full convention (feature/tests/types/docs split, conventional-commit types)
-- `make fix && make check` must both pass before any commit; tests must pass before committing PHP changes
+- `make fix && make check` must both pass before any deploy / release candidate; tests must pass before releasing PHP changes
 
 ---
 
@@ -94,7 +94,7 @@ Project skills live in `.claude/skills/` — committed to the repo, shared with 
 
 | Skill          | Purpose                                                                |
 |----------------|------------------------------------------------------------------------|
-| `commit`       | Conventional commit; runs `make fix` + `make check` first              |
+| `commit`       | Conventional commit workflow reference; full validation belongs to pre-deploy / release checks |
 | `fix`          | Run `make fix` (pint + rector + eslint + prettier)                     |
 | `review`       | Code review of current-branch changes or a given file                  |
 | `test`         | Write or run Pest tests                                                |
@@ -137,7 +137,7 @@ Project skills live in `.claude/skills/` — committed to the repo, shared with 
 - Workflows belong **only** in `.github/workflows/` at the repo root — never in `server/.github/` or `client/.github/`
 - The pipeline order is always: lint → test → build → deploy (enforced via `needs:`)
 - Lint runs in check-only mode: `pint --test`, `rector --dry-run`, `phpstan analyse`, `eslint --max-warnings=0`, `prettier --check`
-- Locally use **write** mode before committing: `pint` → `rector process` → `pint` (again) → `phpstan analyse` → `npm run lint` + `prettier --write`
+- Locally use **write** mode before deploy / release validation: `pint` → `rector process` → `pint` (again) → `phpstan analyse` → `npm run lint` + `prettier --write`
 - rector.php must have `->withoutParallel()` — Docker containers OOM-kill rector child processes otherwise
 - phpstan level: 5 with baseline; regenerate baseline with `--generate-baseline` when stale entries appear after refactors
 
@@ -145,9 +145,9 @@ Project skills live in `.claude/skills/` — committed to the repo, shared with 
 
 ## Code Quality Rules
 
-### Before every commit (local)
+### Before deploy / final release validation
 
-Use the two Makefile commands — they are the canonical pre-commit workflow:
+Use the two Makefile commands — they are the canonical full validation workflow:
 
 ```bash
 make fix    # auto-fixes everything: pint → rector → pint → eslint --fix → prettier
@@ -155,8 +155,8 @@ make check  # read-only CI mirror: fails if anything is wrong (same checks as Gi
 ```
 
 **Workflow for AI:**
-1. **DO NOT** run `make test`, `make fix`, or `make check` after every single individual file edit or minor change. Only run them before proposing a commit.
-2. Before commit: `make fix && make check`.
+1. **DO NOT** run `make test`, `make fix`, or `make check` after every single individual file edit or minor change. Write code to local conventions first, and use targeted checks while iterating.
+2. Before deploy / final release validation: `make fix && make check`.
 3. If `make check` fails with issues `make fix` cannot resolve, fix manually and repeat.
 4. Never ask the user to run `make check` on your behalf unless Docker is unavailable on the agent side.
 
@@ -169,11 +169,13 @@ make check  # read-only CI mirror: fails if anything is wrong (same checks as Gi
 - **PHP**: follow Pint/PSR-12 style — no unused imports, correct spacing, trailing commas in arrays/params, `declare(strict_types=1)` at top
 - **TypeScript**: no unused variables, no `any` types, no `console.log` left in, imports organized (prettier-plugin-organize-imports runs on format)
 - **Tailwind**: class order enforced by prettier-plugin-tailwindcss — always run prettier after adding Tailwind classes
-- Never leave code that will fail linting — fix it before committing, not after CI fails
+- Read 2-3 nearby files before editing and mimic their structure, naming, imports, null-handling, and test style
+- Prefer explicit PHP/TS types, existing helper abstractions, and boring patterns that already exist in the repo over clever one-off code
+- Never leave code that will fail linting — fix it in the implementation, not only after CI fails
 
 ### Always
-- Run `docker compose exec php vendor/bin/pint` after any PHP changes
-- Run `docker compose exec php php artisan test --compact` — all tests must pass
+- Run the fastest relevant targeted verifier when a touched area has one available
+- Run `docker compose exec php php artisan test --compact` for the affected feature area when behavior changes
 - Write tests for every feature — no exceptions
 - Use factories in tests (create them if missing)
 

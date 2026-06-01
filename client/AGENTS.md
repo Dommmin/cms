@@ -10,8 +10,9 @@ Part of the monorepo. Entry point for Codex and `AGENTS.md`-aware tools working 
 ## MUST (client, compact)
 
 - Docker-only `npm` commands. Never run host `npm`.
-- After code changes, run `make check` before claiming the task is done.
-- Before commit, run `make fix && make check`.
+- During implementation, write code that should already satisfy the repo toolchain; do not rely on `make fix` for avoidable cleanup.
+- Run `make fix && make check` only before deploy / final release validation.
 - Next.js conventions live in `client/CLAUDE.md` (Server vs Client components, i18n, metadata/SEO, types rules).
 - For API response fields, always check `client/types/api.ts`.
+- Prefer targeted client verification while iterating when needed (`docker compose exec node npm run types`, `docker compose exec node npm run lint`, touched tests) instead of the full pipeline.
 - No branch/commit/push without explicit user approval.
