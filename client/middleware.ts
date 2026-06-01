@@ -111,7 +111,7 @@ function getCspHeader(nonce: string): string {
         `img-src 'self' data: blob: https: ${isDev ? 'http:' : ''}`,
         `font-src 'self' https://fonts.gstatic.com`,
         `connect-src 'self' https: ${isDev ? 'http://localhost:*' : ''}`,
-        `frame-src 'self' https://www.google.com`,
+        `frame-src 'self' https://www.google.com https://geowidget-app.inpost.pl https://geowidget.inpost.pl`,
         `object-src 'none'`,
         `base-uri 'self'`,
         `form-action 'self'`,
