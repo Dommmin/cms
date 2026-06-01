@@ -208,7 +208,7 @@ export interface CartItem {
 
 export interface Cart {
     id: number;
-    token: string;
+    token: string | null;
     items: CartItem[];
     /** in cents */
     subtotal: number;
@@ -219,6 +219,66 @@ export interface Cart {
     discount_code: string | null;
     currency: string;
     items_count: number;
+}
+
+export type SharedCartPreviewItemStatus =
+    | 'available'
+    | 'partial'
+    | 'unavailable';
+
+export interface SharedCartPreviewItem {
+    variant_id: number;
+    requested_quantity: number;
+    import_quantity: number;
+    available_quantity: number;
+    status: SharedCartPreviewItemStatus;
+    status_message: string;
+    shared_unit_price: number;
+    current_unit_price: number;
+    product: {
+        name: string;
+        slug: string | null;
+        thumbnail: Product['thumbnail'] | null;
+    };
+    variant: {
+        name: string | null;
+        sku: string | null;
+    };
+}
+
+export interface SharedCartPreview {
+    token: string;
+    currency: string;
+    locale: string | null;
+    discount_code: string | null;
+    expires_at: string | null;
+    is_active: boolean;
+    items_count: number;
+    shared_subtotal: number;
+    estimated_subtotal: number;
+    available_items: number;
+    partial_items: number;
+    unavailable_items: number;
+    items: SharedCartPreviewItem[];
+}
+
+export interface SharedCartShareLink {
+    token: string;
+    expires_at: string | null;
+}
+
+export type SharedCartImportMode = 'merge' | 'replace';
+
+export interface SharedCartImportResult {
+    mode: SharedCartImportMode;
+    added_items: number;
+    merged_items: number;
+    skipped_items: number;
+    partial_items: number;
+    imported_quantity: number;
+    discount_cleared: boolean;
+    message: string;
+    cart: Cart;
 }
 
 // ── Addresses ─────────────────────────────────────────────────────────────────

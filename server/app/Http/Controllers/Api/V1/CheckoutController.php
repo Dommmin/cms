@@ -160,6 +160,7 @@ class CheckoutController extends ApiController
             pickupPointId: $data['pickup_point_id'] ?? null,
             notes: $data['notes'] ?? null,
             referralCode: $data['referral_code'] ?? null,
+            gaClientId: $data['ga_client_id'] ?? null,
         );
 
         // Order confirmation email is sent via OrderCreated event listener

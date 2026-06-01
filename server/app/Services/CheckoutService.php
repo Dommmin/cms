@@ -45,7 +45,8 @@ class CheckoutService
         ?string $cartToken = null,
         ?string $pickupPointId = null,
         ?string $notes = null,
-        ?string $referralCode = null
+        ?string $referralCode = null,
+        ?string $gaClientId = null
     ): Order {
         if ($user instanceof User) {
             if (! $user->customer) {
@@ -116,6 +117,7 @@ class CheckoutService
             'currency_code' => 'PLN',
             'exchange_rate' => 1.0,
             'notes' => $notes,
+            'ga_client_id' => $gaClientId,
         ]);
 
         /** @var CartItem $cartItem */

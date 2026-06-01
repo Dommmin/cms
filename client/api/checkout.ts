@@ -68,6 +68,8 @@ export interface CheckoutPayload {
     notes?: string;
     terms_accepted?: boolean;
     referral_code?: string;
+    /** GA4 client_id from the _ga cookie — used for server-side Measurement Protocol */
+    ga_client_id?: string;
 }
 
 export interface PaymentResult {

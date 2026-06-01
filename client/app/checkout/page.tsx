@@ -22,7 +22,11 @@ import { useLocalePath } from '@/hooks/use-locale';
 import { useAddresses, useCreateAddress } from '@/hooks/use-profile';
 import { useTranslation } from '@/hooks/use-translation';
 import { getToken } from '@/lib/axios';
-import { trackBeginCheckout, trackPurchase } from '@/lib/datalayer';
+import {
+    getGaClientId,
+    trackBeginCheckout,
+    trackPurchase,
+} from '@/lib/datalayer';
 import type { Address } from '@/types/api';
 import type { StepState } from './checkout.types';
 import { CheckoutAddressSection } from './components/checkout-address-section';
@@ -107,7 +111,8 @@ export default function CheckoutPage() {
         if (cart && cart.items.length > 0) {
             trackBeginCheckout(cart.subtotal, cart.currency, cart.items);
         }
-    }, [cart]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [cart?.id]);
 
     // Auto-select first configured shipping method
     useEffect(() => {
@@ -260,6 +265,7 @@ export default function CheckoutPage() {
                 shipping_address: shippingAddr,
                 notes: notes || undefined,
                 terms_accepted: termsAccepted,
+                ga_client_id: getGaClientId() ?? undefined,
             },
             {
                 onSuccess: (response) => {
@@ -271,7 +277,13 @@ export default function CheckoutPage() {
                         transactionId: order.reference_number,
                         revenue: order.total,
                         currency: order.currency_code,
-                        items: [],
+                        shippingCost: order.shipping_cost,
+                        items: (cart?.items ?? []).map((item) => ({
+                            item_id: item.variant_id,
+                            item_name: item.product.name,
+                            price: item.unit_price,
+                            quantity: item.quantity,
+                        })),
                     });
                     if (token && saveBilling) {
                         createAddress(payloadToAddress(billing, 'billing'));

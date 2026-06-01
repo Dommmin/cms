@@ -80,6 +80,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 #[Fillable([
     'user_id', 'first_name', 'last_name', 'email',
     'phone', 'company_name', 'tax_id', 'notes', 'is_active', 'tags',
+    'sms_notifications',
 ])]
 #[Table(name: 'customers')]
 class Customer extends Model
@@ -192,11 +193,21 @@ class Customer extends Model
             ->sum('total');
     }
 
+    public function routeNotificationForSms(object $notification): ?string
+    {
+        if (! $this->sms_notifications || empty($this->phone)) {
+            return null;
+        }
+
+        return $this->phone;
+    }
+
     protected function casts(): array
     {
         return [
             'is_active' => 'boolean',
             'tags' => 'array',
+            'sms_notifications' => 'boolean',
         ];
     }
 }

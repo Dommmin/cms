@@ -98,8 +98,8 @@ export function useCheckout() {
                 items: order.items.map((i) => ({
                     item_id: i.id,
                     item_name: i.product_name,
+                    price: i.unit_price, // cents — datalayer divides by 100
                     quantity: i.quantity,
-                    price: (i.unit_price / 100).toFixed(2),
                 })),
             });
         },

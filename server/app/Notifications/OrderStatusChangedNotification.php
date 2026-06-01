@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications;
 
+use App\Broadcasting\SmsChannel;
 use App\Enums\OrderStatusEnum;
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
@@ -22,7 +23,7 @@ class OrderStatusChangedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', SmsChannel::class];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -44,6 +45,21 @@ class OrderStatusChangedNotification extends Notification implements ShouldQueue
         return $message
             ->action('View Order', url('/orders/'.$this->order->reference_number))
             ->line('Thank you for shopping with us!');
+    }
+
+    public function toSms(object $notifiable): string
+    {
+        $statusLabel = OrderStatusEnum::from((string) $this->order->status)->getLabel();
+        $message = sprintf('Your order %s status changed to: %s.', $this->order->reference_number, $statusLabel);
+
+        if (OrderStatusEnum::from((string) $this->order->status) === OrderStatusEnum::SHIPPED) {
+            $shipment = $this->order->shipment;
+            if ($shipment?->tracking_number) {
+                $message .= sprintf(' Tracking: %s', $shipment->tracking_number);
+            }
+        }
+
+        return $message;
     }
 
     public function toArray(object $notifiable): array
