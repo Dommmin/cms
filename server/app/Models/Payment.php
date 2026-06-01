@@ -76,4 +76,23 @@ class Payment extends Model
 
         return $currency->format($this->amount);
     }
+
+    public function getRedirectUrl(): ?string
+    {
+        if ($this->provider === PaymentProviderEnum::PAYU) {
+            return $this->payload['redirectUri'] ?? null;
+        }
+
+        if ($this->provider === PaymentProviderEnum::P24) {
+            $token = $this->payload['data']['token'] ?? null;
+
+            return $token ? config('services.p24.base_url').'/trnRequest/'.$token : null;
+        }
+
+        if ($this->provider === PaymentProviderEnum::PAYNOW) {
+            return $this->payload['redirectUrl'] ?? null;
+        }
+
+        return null;
+    }
 }

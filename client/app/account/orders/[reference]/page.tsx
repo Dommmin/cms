@@ -4,27 +4,56 @@ import {
     ArrowLeft,
     CheckCircle2,
     Circle,
+    CreditCard,
     Loader2,
     Package,
     RefreshCw,
     Truck,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 import { useCurrency } from '@/hooks/use-currency';
 import { useLocalePath } from '@/hooks/use-locale';
-import { useCancelOrder, useOrder, useReorder } from '@/hooks/use-orders';
+import {
+    useCancelOrder,
+    useOrder,
+    usePayOrder,
+    useReorder,
+} from '@/hooks/use-orders';
 import { useTranslation } from '@/hooks/use-translation';
 import { api } from '@/lib/axios';
 import type { OrderReturn, OrderStatus } from '@/types/api';
 
-const STATUS_COLORS: Record<string, string> = {
+const PAYMENT_STATUS_LABELS: Record<string, string> = {
+    awaiting_payment: 'Awaiting Payment',
+    paid: 'Paid',
+    failed: 'Failed',
+    refunded: 'Refunded',
+    partially_refunded: 'Partially Refunded',
+    cancelled: 'Cancelled',
+    pending: 'Pending',
+};
+
+const PAYMENT_STATUS_COLORS: Record<string, string> = {
+    awaiting_payment: 'bg-amber-100 text-amber-800',
+    paid: 'bg-green-100 text-green-800',
+    failed: 'bg-red-100 text-red-800',
+    refunded: 'bg-gray-100 text-gray-700',
+    partially_refunded: 'bg-orange-100 text-orange-800',
+    cancelled: 'bg-red-50 text-red-600',
     pending: 'bg-yellow-100 text-yellow-800',
+};
+
+const STATUS_COLORS: Record<string, string> = {
+    draft: 'bg-slate-100 text-slate-600',
+    pending: 'bg-yellow-100 text-yellow-800',
+    awaiting_payment: 'bg-amber-100 text-amber-800',
+    paid: 'bg-green-50 text-green-700',
     confirmed: 'bg-blue-50 text-blue-700',
     processing: 'bg-blue-100 text-blue-800',
-    shipped: 'bg-purple-100 text-purple-800',
+    shipped: 'bg-indigo-100 text-indigo-800',
     delivered: 'bg-green-100 text-green-800',
     cancelled: 'bg-red-100 text-red-800',
     refunded: 'bg-gray-100 text-gray-800',
@@ -241,9 +270,13 @@ export default function OrderDetailPage() {
     const { reference } = useParams<{ reference: string }>();
     const lp = useLocalePath();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const paymentError = searchParams.get('error') === 'payment_failed';
+    const paymentSuccess = searchParams.get('payment') === 'success';
     const { data: order, isLoading } = useOrder(reference);
     const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder();
     const { mutate: reorderItems, isPending: isReordering } = useReorder();
+    const { mutate: payOrderAgain, isPending: isPayingAgain } = usePayOrder();
     const { formatPrice } = useCurrency();
     const { t } = useTranslation();
 
@@ -361,12 +394,15 @@ export default function OrderDetailPage() {
                     </p>
                 </div>
                 <span
-                    className={`self-start rounded-full px-3 py-1 text-sm font-medium capitalize ${
+                    className={`self-start rounded-full px-3 py-1 text-sm font-medium ${
                         STATUS_COLORS[order.status] ??
                         'bg-muted text-muted-foreground'
                     }`}
                 >
-                    {order.status_label ?? order.status}
+                    {order.status_label ??
+                        order.status
+                            .replace(/_/g, ' ')
+                            .replace(/\b\w/g, (c) => c.toUpperCase())}
                 </span>
             </div>
 
@@ -377,6 +413,36 @@ export default function OrderDetailPage() {
                         'order.return_submitted',
                         "Your return request has been submitted. We'll get back to you within 1-2 business days.",
                     )}
+                </div>
+            )}
+
+            {/* Payment failure banner */}
+            {paymentError && (
+                <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+                    <p className="font-semibold">
+                        {t('order.payment_failed', 'Payment failed')}
+                    </p>
+                    <p className="mt-0.5 text-red-700">
+                        {t(
+                            'order.payment_failed_desc',
+                            'Your payment could not be processed. You can try again using the button in the Payment section below.',
+                        )}
+                    </p>
+                </div>
+            )}
+
+            {/* Payment success banner */}
+            {paymentSuccess && (
+                <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800">
+                    <p className="font-semibold">
+                        {t('order.payment_success', 'Payment successful!')}
+                    </p>
+                    <p className="mt-0.5 text-green-700">
+                        {t(
+                            'order.payment_success_desc',
+                            'Your payment has been confirmed. We will process your order shortly.',
+                        )}
+                    </p>
                 </div>
             )}
 
@@ -579,19 +645,83 @@ export default function OrderDetailPage() {
             {/* Payment */}
             {order.payment && (
                 <div className="border-border bg-card rounded-xl border p-4">
-                    <h3 className="mb-2 text-sm font-semibold">
+                    <h3 className="mb-3 text-sm font-semibold">
                         {t('order.payment', 'Payment')}
                     </h3>
-                    <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                    <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                         <dt className="text-muted-foreground">
-                            {t('order.payment_method', 'Method')}
+                            {t('order.payment_provider', 'Provider')}
                         </dt>
-                        <dd className="capitalize">{order.payment.method}</dd>
+                        <dd className="capitalize">
+                            {order.payment.provider ?? order.payment.method}
+                        </dd>
                         <dt className="text-muted-foreground">
                             {t('order.payment_status', 'Status')}
                         </dt>
-                        <dd className="capitalize">{order.payment.status}</dd>
+                        <dd>
+                            <span
+                                className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                                    PAYMENT_STATUS_COLORS[
+                                        order.payment.status
+                                    ] ?? 'bg-muted text-muted-foreground'
+                                }`}
+                            >
+                                {PAYMENT_STATUS_LABELS[order.payment.status] ??
+                                    order.payment.status
+                                        .replace(/_/g, ' ')
+                                        .replace(/\b\w/g, (c) =>
+                                            c.toUpperCase(),
+                                        )}
+                            </span>
+                        </dd>
                     </dl>
+
+                    {order.status === 'awaiting_payment' &&
+                        order.payment.redirect_url && (
+                            <div className="border-border mt-4 border-t pt-4">
+                                <button
+                                    type="button"
+                                    disabled={isPayingAgain}
+                                    onClick={() =>
+                                        payOrderAgain(order.reference_number, {
+                                            onSuccess: (result) => {
+                                                if (result?.redirect_url) {
+                                                    window.location.href =
+                                                        result.redirect_url;
+                                                } else if (
+                                                    result?.action ===
+                                                    'redirect'
+                                                ) {
+                                                    window.location.reload();
+                                                }
+                                            },
+                                        })
+                                    }
+                                    className="bg-primary text-primary-foreground inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90 active:scale-[.98] disabled:opacity-60"
+                                >
+                                    {isPayingAgain ? (
+                                        <Loader2
+                                            className="h-4 w-4 animate-spin"
+                                            aria-hidden="true"
+                                        />
+                                    ) : (
+                                        <CreditCard
+                                            className="h-4 w-4"
+                                            aria-hidden="true"
+                                        />
+                                    )}
+                                    {isPayingAgain
+                                        ? t('order.redirecting', 'Redirecting…')
+                                        : t('order.pay_again', 'Pay Again')}
+                                </button>
+                                <p className="text-muted-foreground mt-2 text-xs">
+                                    {t(
+                                        'order.pay_again_desc',
+                                        'Your previous payment attempt was unsuccessful. Click above to try again.',
+                                    )}
+                                </p>
+                            </div>
+                        )}
                 </div>
             )}
 

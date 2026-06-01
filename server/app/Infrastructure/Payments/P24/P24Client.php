@@ -26,6 +26,20 @@ class P24Client
     }
 
     /**
+     * @return array<string, mixed>
+     */
+    public function getTransactionBySessionId(string $sessionId): array
+    {
+        $response = $this->client()->get($this->baseUrl().'/api/v1/transaction/by/sessionId/'.$sessionId);
+
+        if (! $response->successful()) {
+            throw new RuntimeException('P24 get transaction by sessionId failed: '.$response->body());
+        }
+
+        return $response->json() ?? [];
+    }
+
+    /**
      * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */

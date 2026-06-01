@@ -17,6 +17,17 @@ export async function cancelOrder(reference: string): Promise<Order | null> {
     return apiPost<Order>(`/orders/${reference}/cancel`);
 }
 
+export interface PayOrderResult {
+    action: string;
+    redirect_url: string | null;
+}
+
+export async function payOrder(
+    reference: string,
+): Promise<PayOrderResult | null> {
+    return apiPost<PayOrderResult>(`/orders/${reference}/pay`);
+}
+
 export interface ReorderResult {
     cart_token: string | null;
     added: number;

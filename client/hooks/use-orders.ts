@@ -10,6 +10,7 @@ import {
     getOrder,
     getOrders,
     getShippingMethods,
+    payOrder,
     reorder,
 } from '@/api/orders';
 import { trackPurchase } from '@/lib/datalayer';
@@ -49,6 +50,12 @@ export function useCancelOrder() {
             );
             queryClient.invalidateQueries({ queryKey: orderKeys.all });
         },
+    });
+}
+
+export function usePayOrder() {
+    return useMutation({
+        mutationFn: (reference: string) => payOrder(reference),
     });
 }
 

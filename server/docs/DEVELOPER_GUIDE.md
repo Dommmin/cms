@@ -316,7 +316,7 @@ Autopay is not implemented yet. If added, it should follow the same gateway/clie
 
 **Webhooks:** `POST /api/v1/webhooks/payu`, `POST /api/v1/webhooks/p24` and `POST /api/v1/webhooks/paynow` → dispatches `ProcessPaymentWebhook` job (3 tries, 10s backoff). Webhook signatures are verified synchronously before queuing.
 
-**Payment status polling:** `GET /api/v1/payments/{payment}/status` — authenticated, returns `{status, order_reference}`. Frontend polls every 3s while `status === 'pending'` (BLIK flow).
+**Payment status polling:** `GET /api/v1/payments/{payment}/status` — authenticated, returns `{status, order_reference}`. Frontend polls every 3s while `status === 'pending'` (BLIK flow). For P24 this polling also resolves failed/cancelled returns, because P24 sends `urlStatus` notifications only for successful payments.
 
 ### ShippingCarrierManager
 

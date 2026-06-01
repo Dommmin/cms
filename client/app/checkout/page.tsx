@@ -98,6 +98,7 @@ export default function CheckoutPage() {
     const [notes, setNotes] = useState('');
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [submitAttempted, setSubmitAttempted] = useState(false);
+    const [isRedirecting, setIsRedirecting] = useState(false);
 
     // token and mounted are initialized via lazy useState — no effect needed
 
@@ -262,6 +263,7 @@ export default function CheckoutPage() {
             },
             {
                 onSuccess: (response) => {
+                    setIsRedirecting(true);
                     const order = response.order;
                     const payment = response.payment;
 
@@ -308,6 +310,30 @@ export default function CheckoutPage() {
 
     // Render nothing until mounted — consistent with SSR (no token available server-side)
     if (!mounted) return null;
+
+    if (isRedirecting) {
+        return (
+            <div
+                className="mx-auto max-w-4xl px-4 py-16 text-center"
+                role="status"
+                aria-label={t(
+                    'checkout.redirecting',
+                    'Redirecting to payment...',
+                )}
+            >
+                <div
+                    className="border-primary mx-auto h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"
+                    aria-hidden="true"
+                />
+                <p className="text-muted-foreground mt-4 animate-pulse text-sm">
+                    {t(
+                        'checkout.redirecting_to_payment',
+                        'Redirecting to payment...',
+                    )}
+                </p>
+            </div>
+        );
+    }
 
     if (cartLoading) {
         return (

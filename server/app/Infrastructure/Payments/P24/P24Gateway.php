@@ -11,6 +11,8 @@ use App\Interfaces\PaymentGatewayInterface;
 use App\Models\Order;
 use App\Models\Payment;
 use App\States\Order\PaidState;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class P24Gateway implements PaymentGatewayInterface
 {
@@ -39,12 +41,12 @@ class P24Gateway implements PaymentGatewayInterface
     public function processPayment(Payment $payment, array $options = []): array
     {
         $order = $payment->order;
-        $sessionId = 'p24-'.$payment->id;
+        $sessionId = 'p24-'.$payment->id.'-'.mb_substr(uniqid('', true), -8);
         $merchantId = (int) config('services.p24.merchant_id');
         $posId = (int) config('services.p24.pos_id');
         $currency = mb_strtoupper($payment->currency_code);
         $returnUrl = $options['return_url'] ?? config('app.frontend_url').'/checkout/success';
-        $notifyUrl = config('app.url').'/api/v1/webhooks/p24';
+        $notifyUrl = config('services.p24.webhook_url') ?: config('app.url').'/api/v1/webhooks/p24';
 
         $address = $order->billingAddress ?? $order->shippingAddress;
 
@@ -76,6 +78,11 @@ class P24Gateway implements PaymentGatewayInterface
             'encoding' => 'UTF-8',
         ];
 
+        // Save the session ID in the database before sending the transaction request
+        $payment->update([
+            'provider_transaction_id' => $sessionId,
+        ]);
+
         $response = $this->client->registerTransaction($data);
 
         $token = $response['data']['token'] ?? null;
@@ -83,7 +90,6 @@ class P24Gateway implements PaymentGatewayInterface
         if ($token) {
             $redirectUrl = config('services.p24.base_url').'/trnRequest/'.$token;
             $payment->update([
-                'provider_transaction_id' => $sessionId,
                 'payload' => $response,
             ]);
 
@@ -95,7 +101,46 @@ class P24Gateway implements PaymentGatewayInterface
 
     public function verifyPayment(Payment $payment): bool
     {
-        return $payment->status === PaymentStatusEnum::COMPLETED;
+        if (! $payment->provider_transaction_id) {
+            return $payment->status === PaymentStatusEnum::COMPLETED;
+        }
+
+        try {
+            $response = $this->client->getTransactionBySessionId($payment->provider_transaction_id);
+            $data = $response['data'] ?? null;
+
+            if ($data) {
+                $status = $data['status'] ?? null;
+                $orderId = $data['orderId'] ?? null;
+                $amount = $data['amount'] ?? null;
+                $currency = $data['currency'] ?? null;
+
+                if ($status === 2) {
+                    if ($payment->status !== PaymentStatusEnum::COMPLETED) {
+                        $payment->update(['status' => PaymentStatusEnum::COMPLETED->value]);
+                        $order = $payment->order;
+                        if (! $order->status->equals(PaidState::class)) {
+                            $order->update(['status' => OrderStatusEnum::PAID->value]);
+                        }
+                    }
+                } elseif (in_array($status, [0, 3], true)) {
+                    $payment->update(['status' => PaymentStatusEnum::FAILED->value]);
+                } elseif ($payment->created_at->addMinutes(3)->isPast()) {
+                    $payment->update(['status' => PaymentStatusEnum::FAILED->value]);
+                }
+            }
+        } catch (Throwable $throwable) {
+            Log::error('P24 verifyPayment failed: '.$throwable->getMessage(), [
+                'payment_id' => $payment->id,
+                'provider_transaction_id' => $payment->provider_transaction_id,
+            ]);
+
+            if ($payment->created_at->addMinutes(3)->isPast()) {
+                $payment->update(['status' => PaymentStatusEnum::FAILED->value]);
+            }
+        }
+
+        return $payment->fresh()->status === PaymentStatusEnum::COMPLETED;
     }
 
     public function refundPayment(Payment $payment, int $amount): bool
@@ -142,16 +187,7 @@ class P24Gateway implements PaymentGatewayInterface
         $merchantId = (int) config('services.p24.merchant_id');
         $posId = (int) config('services.p24.pos_id');
 
-        $expected = $this->signatureService->signVerify([
-            'merchantId' => $merchantId,
-            'posId' => $posId,
-            'sessionId' => $sessionId,
-            'orderId' => $orderId,
-            'amount' => $amount,
-            'currency' => mb_strtoupper($currency),
-        ]);
-
-        if (! $this->signatureService->verify($expected, $sign)) {
+        if (! $this->signatureService->verifyWebhook($payload)) {
             return;
         }
 
@@ -176,7 +212,7 @@ class P24Gateway implements PaymentGatewayInterface
 
         $status = $verifyResponse['data']['status'] ?? -1;
 
-        if ($status === 0) {
+        if (in_array($status, [0, 'success'], true)) {
             $payment->update(['status' => PaymentStatusEnum::COMPLETED->value]);
 
             $order = $payment->order;

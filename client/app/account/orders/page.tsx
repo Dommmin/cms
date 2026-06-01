@@ -9,9 +9,12 @@ import { useOrders } from '@/hooks/use-orders';
 import { useTranslation } from '@/hooks/use-translation';
 
 const STATUS_COLORS: Record<string, string> = {
+    draft: 'bg-slate-100 text-slate-600',
     pending: 'bg-yellow-100 text-yellow-800',
+    awaiting_payment: 'bg-amber-100 text-amber-800',
+    paid: 'bg-green-50 text-green-700',
     processing: 'bg-blue-100 text-blue-800',
-    shipped: 'bg-purple-100 text-purple-800',
+    shipped: 'bg-indigo-100 text-indigo-800',
     delivered: 'bg-green-100 text-green-800',
     cancelled: 'bg-red-100 text-red-800',
     refunded: 'bg-gray-100 text-gray-800',
@@ -94,12 +97,17 @@ export default function OrdersPage() {
                             </div>
                             <div className="flex items-center gap-3">
                                 <span
-                                    className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${
+                                    className={`rounded-full px-2.5 py-1 text-xs font-medium ${
                                         STATUS_COLORS[order.status] ??
                                         'bg-muted text-muted-foreground'
                                     }`}
                                 >
-                                    {order.status}
+                                    {order.status_label ??
+                                        order.status
+                                            .replace(/_/g, ' ')
+                                            .replace(/\b\w/g, (c) =>
+                                                c.toUpperCase(),
+                                            )}
                                 </span>
                                 <span className="font-semibold">
                                     {formatPrice(order.total)}
