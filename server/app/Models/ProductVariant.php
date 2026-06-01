@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Builders\ProductVariantBuilder;
 use Carbon\CarbonImmutable;
 use Database\Factories\ProductVariantFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
@@ -67,38 +68,39 @@ use Spatie\Translatable\HasTranslations;
  * @property-read mixed $translations
  *
  * @method static ProductVariantFactory factory($count = null, $state = [])
- * @method static Builder<static>|ProductVariant newModelQuery()
- * @method static Builder<static>|ProductVariant newQuery()
- * @method static Builder<static>|ProductVariant query()
- * @method static Builder<static>|ProductVariant whereAvailableAt($value)
- * @method static Builder<static>|ProductVariant whereBackorderAllowed($value)
- * @method static Builder<static>|ProductVariant whereBarcode($value)
- * @method static Builder<static>|ProductVariant whereCompareAtPrice($value)
- * @method static Builder<static>|ProductVariant whereCostPrice($value)
- * @method static Builder<static>|ProductVariant whereCreatedAt($value)
- * @method static Builder<static>|ProductVariant whereDownloadExpiryDays($value)
- * @method static Builder<static>|ProductVariant whereDownloadLimit($value)
- * @method static Builder<static>|ProductVariant whereEan($value)
- * @method static Builder<static>|ProductVariant whereId($value)
- * @method static Builder<static>|ProductVariant whereIsActive($value)
- * @method static Builder<static>|ProductVariant whereIsDefault($value)
- * @method static Builder<static>|ProductVariant whereIsDigital($value)
- * @method static Builder<static>|ProductVariant whereJsonContainsLocale(string $column, string $locale, ?mixed $value, string $operand = '=')
- * @method static Builder<static>|ProductVariant whereJsonContainsLocales(string $column, array $locales, ?mixed $value, string $operand = '=')
- * @method static Builder<static>|ProductVariant whereLocale(string $column, string $locale)
- * @method static Builder<static>|ProductVariant whereLocales(string $column, array $locales)
- * @method static Builder<static>|ProductVariant whereName($value)
- * @method static Builder<static>|ProductVariant wherePosition($value)
- * @method static Builder<static>|ProductVariant wherePrice($value)
- * @method static Builder<static>|ProductVariant whereProductId($value)
- * @method static Builder<static>|ProductVariant whereSku($value)
- * @method static Builder<static>|ProductVariant whereStockQuantity($value)
- * @method static Builder<static>|ProductVariant whereStockStatus($value)
- * @method static Builder<static>|ProductVariant whereStockThreshold($value)
- * @method static Builder<static>|ProductVariant whereTaxRateId($value)
- * @method static Builder<static>|ProductVariant whereUpc($value)
- * @method static Builder<static>|ProductVariant whereUpdatedAt($value)
- * @method static Builder<static>|ProductVariant whereWeight($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant newModelQuery()
+ * @method static ProductVariantBuilder<static>|ProductVariant newQuery()
+ * @method static ProductVariantBuilder<static>|ProductVariant query()
+ * @method static array getActivePriceBounds()
+ * @method static ProductVariantBuilder<static>|ProductVariant whereAvailableAt($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereBackorderAllowed($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereBarcode($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereCompareAtPrice($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereCostPrice($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereCreatedAt($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereDownloadExpiryDays($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereDownloadLimit($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereEan($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereId($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereIsActive($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereIsDefault($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereIsDigital($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereJsonContainsLocale(string $column, string $locale, ?mixed $value, string $operand = '=')
+ * @method static ProductVariantBuilder<static>|ProductVariant whereJsonContainsLocales(string $column, array $locales, ?mixed $value, string $operand = '=')
+ * @method static ProductVariantBuilder<static>|ProductVariant whereLocale(string $column, string $locale)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereLocales(string $column, array $locales)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereName($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant wherePosition($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant wherePrice($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereProductId($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereSku($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereStockQuantity($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereStockStatus($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereStockThreshold($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereTaxRateId($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereUpc($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereUpdatedAt($value)
+ * @method static ProductVariantBuilder<static>|ProductVariant whereWeight($value)
  *
  * @mixin Model
  */
@@ -127,6 +129,20 @@ class ProductVariant extends Model
         'download_limit' => 'integer',
         'download_expiry_days' => 'integer',
     ];
+
+    /**
+     * Create a new Eloquent query builder for the model.
+     *
+     * @param  Builder  $query
+     * @return ProductVariantBuilder<static>
+     */
+    public function newEloquentBuilder($query): ProductVariantBuilder
+    {
+        /** @var ProductVariantBuilder<static> */
+        $builder = new ProductVariantBuilder($query);
+
+        return $builder;
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

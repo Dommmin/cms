@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\SettingTypeEnum;
+use App\Models\Builders\SettingBuilder;
 use Carbon\CarbonImmutable;
 use Exception;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Crypt;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
@@ -32,19 +33,21 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property-read Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  *
- * @method static Builder<static>|Setting newModelQuery()
- * @method static Builder<static>|Setting newQuery()
- * @method static Builder<static>|Setting query()
- * @method static Builder<static>|Setting whereCreatedAt($value)
- * @method static Builder<static>|Setting whereDescription($value)
- * @method static Builder<static>|Setting whereGroup($value)
- * @method static Builder<static>|Setting whereId($value)
- * @method static Builder<static>|Setting whereIsPublic($value)
- * @method static Builder<static>|Setting whereKey($value)
- * @method static Builder<static>|Setting whereLabel($value)
- * @method static Builder<static>|Setting whereType($value)
- * @method static Builder<static>|Setting whereUpdatedAt($value)
- * @method static Builder<static>|Setting whereValue($value)
+ * @method static SettingBuilder<static>|Setting newModelQuery()
+ * @method static SettingBuilder<static>|Setting newQuery()
+ * @method static SettingBuilder<static>|Setting query()
+ * @method static Setting|null findByGroupAndKey(string $group, string $key)
+ * @method static Collection getPublicSettings()
+ * @method static SettingBuilder<static>|Setting whereCreatedAt($value)
+ * @method static SettingBuilder<static>|Setting whereDescription($value)
+ * @method static SettingBuilder<static>|Setting whereGroup($value)
+ * @method static SettingBuilder<static>|Setting whereId($value)
+ * @method static SettingBuilder<static>|Setting whereIsPublic($value)
+ * @method static SettingBuilder<static>|Setting whereKey($value)
+ * @method static SettingBuilder<static>|Setting whereLabel($value)
+ * @method static SettingBuilder<static>|Setting whereType($value)
+ * @method static SettingBuilder<static>|Setting whereUpdatedAt($value)
+ * @method static SettingBuilder<static>|Setting whereValue($value)
  *
  * @mixin Model
  */
@@ -66,7 +69,7 @@ class Setting extends Model
     /** Pobierz wartość ustawienia */
     public static function get(string $group, string $key, mixed $default = null): mixed
     {
-        $setting = self::query()->where('group', $group)->where('key', $key)->first();
+        $setting = self::findByGroupAndKey($group, $key);
 
         if (! $setting) {
             return $default;
@@ -89,7 +92,7 @@ class Setting extends Model
     /** Ustawia wartość */
     public static function set(string $group, string $key, mixed $value): void
     {
-        $setting = self::query()->where('group', $group)->where('key', $key)->first();
+        $setting = self::findByGroupAndKey($group, $key);
 
         if (! $setting) {
             return;
@@ -106,14 +109,27 @@ class Setting extends Model
     /** Pobierz wszystkie public settings (dla frontend) */
     public static function allPublic(): array
     {
-        return self::query()->where('is_public', true)
-            ->get()
+        return self::getPublicSettings()
             ->map(fn (self $setting): array => [
                 'group' => $setting->group,
                 'key' => $setting->key,
                 'value' => $setting->value,
             ])
             ->all();
+    }
+
+    /**
+     * Create a new Eloquent query builder for the model.
+     *
+     * @param  Builder  $query
+     * @return SettingBuilder<static>
+     */
+    public function newEloquentBuilder($query): SettingBuilder
+    {
+        /** @var SettingBuilder<static> */
+        $builder = new SettingBuilder($query);
+
+        return $builder;
     }
 
     public function getActivitylogOptions(): LogOptions
