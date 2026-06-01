@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\BaseLinkerWebhookController;
 use App\Http\Controllers\Api\V1\BrandController;
 use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\CategoryController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\PromotionController;
 use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\SearchController;
+use App\Http\Controllers\Api\V1\SharedCartController;
 use App\Http\Controllers\Api\V1\WebhookController;
 use App\Http\Controllers\Api\V1\WishlistController;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +26,7 @@ Route::prefix('v1/webhooks')->name('api.v1.webhooks.')->group(function (): void 
     Route::post('payu', [WebhookController::class, 'payu'])->name('payu');
     Route::post('p24', [WebhookController::class, 'p24'])->name('p24');
     Route::post('paynow', [WebhookController::class, 'paynow'])->name('paynow');
+    Route::post('baselinker', [BaseLinkerWebhookController::class, 'handle'])->name('baselinker');
 });
 
 Route::prefix('v1')->name('api.v1.')->group(function (): void {
@@ -72,6 +75,9 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::delete('/', [CartController::class, 'clear'])->name('clear');
         Route::post('discount', [CartController::class, 'applyDiscount'])->name('discount.apply');
         Route::delete('discount', [CartController::class, 'removeDiscount'])->name('discount.remove');
+        Route::post('share', [SharedCartController::class, 'store'])->middleware('idempotent')->name('share.store');
+        Route::get('shared/{token}', [SharedCartController::class, 'show'])->name('share.show');
+        Route::post('shared/{token}/import', [SharedCartController::class, 'import'])->middleware('idempotent')->name('share.import');
     });
 
     // ── Wishlist (guest + auth) ─────────────────────────────────────────────

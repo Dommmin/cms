@@ -247,6 +247,24 @@ class AppServiceProvider extends ServiceProvider
             if ($v = $decode($rows['mailerlite_group_id'] ?? null)) {
                 config(['services.mailerlite.group_id' => $v]);
             }
+
+            // GA4 Measurement Protocol
+            if ($v = $decode($rows['ga4_measurement_id'] ?? null)) {
+                config(['services.ga4.measurement_id' => $v]);
+            }
+
+            if ($v = $decrypt($decode($rows['ga4_api_secret'] ?? null))) {
+                config(['services.ga4.api_secret' => $v]);
+            }
+
+            // BaseLinker
+            if ($v = $decrypt($decode($rows['baselinker_api_token'] ?? null))) {
+                config(['services.baselinker.api_token' => $v]);
+            }
+
+            if ($v = $decode($rows['baselinker_webhook_token'] ?? null)) {
+                config(['services.baselinker.webhook_token' => $v]);
+            }
         } catch (Throwable) {
             // Graceful degradation — DB unavailable during artisan migrate etc.
         }

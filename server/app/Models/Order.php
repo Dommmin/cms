@@ -111,7 +111,7 @@ use Spatie\ModelStates\HasStates;
     'reference_number', 'invoice_number', 'invoice_issued_at', 'buyer_vat_id', 'buyer_company_name',
     'customer_id', 'guest_email', 'billing_address_id', 'shipping_address_id',
     'status', 'subtotal', 'discount_amount', 'shipping_cost', 'tax_amount', 'total',
-    'currency_code', 'exchange_rate', 'notes',
+    'currency_code', 'exchange_rate', 'notes', 'ga_client_id', 'baselinker_order_id',
 ])]
 #[Table(name: 'orders')]
 class Order extends Model

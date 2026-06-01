@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Enums\PaymentProviderEnum;
 use App\Enums\ShippingCarrierEnum;
+use App\Events\OrderPaid;
 use App\Events\OrderShipped;
 use App\Infrastructure\Payments\BankTransferGateway;
 use App\Infrastructure\Payments\CashOnDeliveryGateway;
@@ -26,6 +27,8 @@ use App\Infrastructure\Shipping\InPost\InPostClient;
 use App\Infrastructure\Shipping\InPost\InPostLockerCarrier;
 use App\Infrastructure\Shipping\PickupCarrier;
 use App\Listeners\SendShippingNotification;
+use App\Listeners\SyncOrderToBaseLinkerListener;
+use App\Listeners\TrackPurchaseInGA4;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -34,6 +37,8 @@ use App\Observers\CategoryObserver;
 use App\Observers\ProductObserver;
 use App\Observers\ProductVariantPriceObserver;
 use App\Observers\WishlistObserver;
+use App\Services\BaseLinkerService;
+use App\Services\GA4MeasurementProtocolService;
 use App\Services\PaymentGatewayManager;
 use App\Services\ShippingCarrierManager;
 use Illuminate\Support\Facades\Crypt;
@@ -84,6 +89,15 @@ class EcommerceServiceProvider extends ServiceProvider
             PaymentProviderEnum::CASH_ON_DELIVERY->value => new CashOnDeliveryGateway(),
             PaymentProviderEnum::BANK_TRANSFER->value => new BankTransferGateway(),
         ]));
+
+        $this->app->singleton(GA4MeasurementProtocolService::class, fn (): GA4MeasurementProtocolService => new GA4MeasurementProtocolService(
+            measurementId: (string) config('services.ga4.measurement_id', ''),
+            apiSecret: (string) config('services.ga4.api_secret', ''),
+        ));
+
+        $this->app->singleton(BaseLinkerService::class, fn (): BaseLinkerService => new BaseLinkerService(
+            apiToken: (string) config('services.baselinker.api_token', ''),
+        ));
     }
 
     /**
@@ -109,6 +123,8 @@ class EcommerceServiceProvider extends ServiceProvider
     protected function registerEventListeners(): void
     {
         Event::listen(OrderShipped::class, SendShippingNotification::class);
+        Event::listen(OrderPaid::class, TrackPurchaseInGA4::class);
+        Event::listen(OrderPaid::class, SyncOrderToBaseLinkerListener::class);
     }
 
     protected function loadRoutes(): void
