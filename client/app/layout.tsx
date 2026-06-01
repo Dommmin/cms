@@ -19,6 +19,7 @@ import { Header } from '@/components/layout/header';
 import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import { PageTransition } from '@/components/layout/page-transition';
 import { ThemeInit } from '@/components/layout/theme-init';
+import { Maintenance } from '@/components/maintenance';
 import { BlockAnimationObserver } from '@/components/page-builder/block-animation-observer';
 import { PwaServiceWorker } from '@/components/pwa-service-worker';
 import { ThemeStyles } from '@/components/theme-styles';
@@ -143,6 +144,12 @@ export default async function RootLayout({
         : [];
     const cookieSettings = publicSettings?.settings.cookie ?? {};
 
+    const maintenanceMode =
+        publicSettings?.settings.general?.maintenance_mode === 'true' ||
+        publicSettings?.settings.general?.maintenance_mode === true;
+    const maintenanceUntil =
+        publicSettings?.settings.general?.maintenance_until ?? null;
+
     return (
         <html
             lang={locale}
@@ -184,41 +191,61 @@ export default async function RootLayout({
                 className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased${isAdminPreview ? 'pt-10' : ''}`}
             >
                 <ThemeInit />
-                <a
-                    href="#main-content"
-                    className="focus:bg-primary focus:text-primary-foreground sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:rounded-md focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:outline-none"
-                >
-                    Skip to main content
-                </a>
-                <QueryProvider>
-                    <ModulesProvider modules={modules}>
-                        <TranslationProvider initialLocale={locale}>
-                            <AdminBar entity={adminPreviewEntity} />
-                            <div className="flex min-h-screen flex-col">
-                                <AnnouncementBar />
-                                <Header modules={modules} siteName={siteName} />
-                                <main
-                                    id="main-content"
-                                    className="flex-1 [padding-bottom:calc(5rem+env(safe-area-inset-bottom))] md:pb-0"
-                                >
-                                    <PageTransition>{children}</PageTransition>
-                                </main>
-                                <Footer />
-                                <MobileBottomNav modules={modules} />
-                            </div>
-                            <CookieConsent settings={cookieSettings} />
-                            <ChatWidgetLoader />
-                            <ComparisonBarLoader />
-                            <BlockAnimationObserver />
-                            <PwaServiceWorker />
-                            <ToastContainer
-                                position="bottom-right"
-                                autoClose={2000}
-                            />
-                            {gtmId && <GoogleTagManager gtmId={gtmId} />}
-                        </TranslationProvider>
-                    </ModulesProvider>
-                </QueryProvider>
+                {maintenanceMode && !isAdminPreview ? (
+                    <Maintenance
+                        siteName={siteName}
+                        contactEmail={contactEmail}
+                        contactPhone={contactPhone}
+                        maintenanceUntil={maintenanceUntil}
+                        locale={locale}
+                    />
+                ) : (
+                    <>
+                        <a
+                            href="#main-content"
+                            className="focus:bg-primary focus:text-primary-foreground sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:rounded-md focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:outline-none"
+                        >
+                            Skip to main content
+                        </a>
+
+                        <QueryProvider>
+                            <ModulesProvider modules={modules}>
+                                <TranslationProvider initialLocale={locale}>
+                                    <AdminBar entity={adminPreviewEntity} />
+                                    <div className="flex min-h-screen flex-col">
+                                        <AnnouncementBar />
+                                        <Header
+                                            modules={modules}
+                                            siteName={siteName}
+                                        />
+                                        <main
+                                            id="main-content"
+                                            className="flex-1 [padding-bottom:calc(5rem+env(safe-area-inset-bottom))] md:pb-0"
+                                        >
+                                            <PageTransition>
+                                                {children}
+                                            </PageTransition>
+                                        </main>
+                                        <Footer />
+                                        <MobileBottomNav modules={modules} />
+                                    </div>
+                                    <CookieConsent settings={cookieSettings} />
+                                    <ChatWidgetLoader />
+                                    <ComparisonBarLoader />
+                                    <BlockAnimationObserver />
+                                    <PwaServiceWorker />
+                                    <ToastContainer
+                                        position="bottom-right"
+                                        autoClose={2000}
+                                    />
+                                    {gtmId && (
+                                        <GoogleTagManager gtmId={gtmId} />
+                                    )}
+                                </TranslationProvider>
+                            </ModulesProvider>
+                        </QueryProvider>
+                    </>
+                )}
             </body>
         </html>
     );

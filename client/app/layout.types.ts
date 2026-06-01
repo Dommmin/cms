@@ -48,6 +48,8 @@ export type PublicSettingsResponse = {
             site_description?: string;
             contact_email?: string;
             contact_phone?: string;
+            maintenance_mode?: string | boolean;
+            maintenance_until?: string;
         };
         seo?: {
             google_tag_manager?: string;
