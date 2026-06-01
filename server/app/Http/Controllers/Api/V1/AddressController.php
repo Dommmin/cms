@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enums\AddressTypeEnum;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreAddressRequest;
 use App\Http\Resources\Api\V1\AddressResource;
 use App\Models\Address;
 use App\Models\Customer;
+use App\Models\Order;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -26,6 +28,18 @@ class AddressController extends ApiController
     {
         $customer = $this->ensureCustomer($request);
         $data = $request->validated();
+
+        $type = AddressTypeEnum::from($data['type']);
+        $existing = Address::findMatchingAddress($customer->id, $type, $data);
+
+        if ($existing instanceof Address) {
+            if (($data['is_default'] ?? false) && $data['is_default']) {
+                $customer->addresses()->where('id', '!=', $existing->id)->update(['is_default' => false]);
+                $existing->update(['is_default' => true]);
+            }
+
+            return $this->created(new AddressResource($existing));
+        }
 
         if (($data['is_default'] ?? false) && $data['is_default']) {
             $customer->addresses()->update(['is_default' => false]);
@@ -60,7 +74,20 @@ class AddressController extends ApiController
     public function destroy(Request $request, Address $address): JsonResponse
     {
         $this->authorizeAddress($request, $address);
-        $address->delete();
+
+        $isReferenced = Order::query()
+            ->where('billing_address_id', $address->id)
+            ->orWhere('shipping_address_id', $address->id)
+            ->exists();
+
+        if ($isReferenced) {
+            $address->update([
+                'customer_id' => null,
+                'is_default' => false,
+            ]);
+        } else {
+            $address->delete();
+        }
 
         return $this->noContent();
     }

@@ -65,7 +65,10 @@ class CheckoutService
             $cart = $this->cartService->getOrCreateCart(null, $cartToken);
         }
 
-        $cart->load('items.variant.product.category');
+        $cart->load([
+            'items.variant.product.category.taxRate',
+            'items.variant.taxRate',
+        ]);
 
         abort_if($cart->isEmpty(), 422, 'Cart is empty');
 
@@ -91,8 +94,8 @@ class CheckoutService
 
         $total = max(0, $subtotalAfterDiscount + $shippingCost);
 
-        $billing = Address::query()->create($this->mapAddressPayload($billingAddress, $customer, AddressTypeEnum::BILLING));
-        $shipping = Address::query()->create($this->mapAddressPayload($shippingAddress, $customer, AddressTypeEnum::SHIPPING));
+        $billing = $this->firstOrCreateAddress($billingAddress, $customer, AddressTypeEnum::BILLING);
+        $shipping = $this->firstOrCreateAddress($shippingAddress, $customer, AddressTypeEnum::SHIPPING);
 
         $initialStatus = $paymentProvider === PaymentProviderEnum::CASH_ON_DELIVERY
             ? OrderStatusEnum::PENDING
@@ -241,5 +244,25 @@ class CheckoutService
             'phone' => (string) Arr::get($payload, 'phone'),
             'is_default' => false,
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    private function firstOrCreateAddress(array $payload, ?Customer $customer, AddressTypeEnum $type): Address
+    {
+        $mapped = $this->mapAddressPayload($payload, $customer, $type);
+
+        if (! $customer instanceof Customer) {
+            return Address::query()->create($mapped);
+        }
+
+        $existing = Address::findMatchingAddress($customer->id, $type, $mapped);
+
+        if ($existing instanceof Address) {
+            return $existing;
+        }
+
+        return Address::query()->create($mapped);
     }
 }

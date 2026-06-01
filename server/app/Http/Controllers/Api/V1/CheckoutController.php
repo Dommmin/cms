@@ -174,8 +174,8 @@ class CheckoutController extends ApiController
                 'payment_method' => $data['payment_method'] ?? null,
                 'blik_code' => $data['blik_code'] ?? null,
                 'payment_token' => $data['payment_token'] ?? null,
-                'return_url' => config('app.frontend_url').'/checkout/success?ref='.$order->reference_number,
-                'continue_url' => config('app.frontend_url').'/checkout/pending?payment='.$payment->id,
+                'return_url' => config('app.frontend_url').'/checkout/pending?payment='.$payment->id.'&ref='.$order->reference_number,
+                'continue_url' => config('app.frontend_url').'/checkout/pending?payment='.$payment->id.'&ref='.$order->reference_number,
             ]);
         }
 
