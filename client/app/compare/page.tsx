@@ -7,6 +7,7 @@ import { startTransition, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { PriceDisplay } from '@/components/price-display';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAddToCart } from '@/hooks/use-cart';
 import {
     clearComparison,
@@ -38,7 +39,7 @@ export default function ComparePage() {
     if (!mounted) {
         return (
             <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-                <div className="bg-muted h-8 w-48 animate-pulse rounded" />
+                <Skeleton className="h-8 w-48" />
             </div>
         );
     }
@@ -91,8 +92,8 @@ export default function ComparePage() {
         return (
             <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
                 <div className="mb-6 flex items-center justify-between">
-                    <div className="bg-muted h-7 w-48 animate-pulse rounded" />
-                    <div className="bg-muted h-5 w-16 animate-pulse rounded" />
+                    <Skeleton className="h-7 w-48" />
+                    <Skeleton className="h-5 w-16" />
                 </div>
                 <div
                     className="grid gap-4"
@@ -104,8 +105,15 @@ export default function ComparePage() {
                     {ids.map((id) => (
                         <div
                             key={id}
-                            className="bg-muted h-72 animate-pulse rounded-xl"
-                        />
+                            className="border-border bg-card flex h-72 flex-col gap-2 overflow-hidden rounded-xl border p-1"
+                        >
+                            <Skeleton className="flex-1 rounded-lg" />
+                            <div className="space-y-2 p-3">
+                                <Skeleton className="h-4 w-5/6" />
+                                <Skeleton className="h-3 w-1/3" />
+                                <Skeleton className="mt-2 h-8 w-full" />
+                            </div>
+                        </div>
                     ))}
                 </div>
             </div>

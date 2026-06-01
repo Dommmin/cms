@@ -25,6 +25,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from '@/components/ui/pagination';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useProducts } from '@/hooks/use-products';
 import { useTranslation } from '@/hooks/use-translation';
@@ -682,13 +683,13 @@ export default function ProductsClient() {
                                         key={i}
                                         className="border-border bg-card overflow-hidden rounded-[var(--store-card-radius)] border shadow-[var(--store-shadow-soft)]"
                                     >
-                                        <div className="bg-muted/70 aspect-square animate-pulse sm:aspect-[var(--store-product-image-ratio)]" />
+                                        <Skeleton className="aspect-square rounded-t-[var(--store-card-radius)] rounded-b-none sm:aspect-[var(--store-product-image-ratio)]" />
                                         <div className="space-y-2 p-4">
-                                            <div className="bg-muted h-3 w-1/3 animate-pulse rounded-full" />
-                                            <div className="bg-muted h-4 w-[88%] animate-pulse rounded" />
-                                            <div className="bg-muted h-4 w-3/4 animate-pulse rounded" />
-                                            <div className="bg-muted h-5 w-1/2 animate-pulse rounded" />
-                                            <div className="bg-muted mt-4 h-11 animate-pulse rounded-[var(--store-control-radius)]" />
+                                            <Skeleton className="h-3 w-1/3" />
+                                            <Skeleton className="h-4 w-[88%]" />
+                                            <Skeleton className="h-4 w-3/4" />
+                                            <Skeleton className="h-5 w-1/2" />
+                                            <Skeleton className="mt-4 h-11 rounded-[var(--store-control-radius)]" />
                                         </div>
                                     </div>
                                 ))}
@@ -700,18 +701,18 @@ export default function ProductsClient() {
                                         key={i}
                                         className="border-border bg-card flex flex-col gap-4 rounded-[var(--store-card-radius)] border p-4 shadow-[var(--store-shadow-soft)] sm:flex-row sm:gap-6"
                                     >
-                                        <div className="bg-muted aspect-[4/3] w-full shrink-0 animate-pulse rounded-md sm:h-40 sm:w-44" />
+                                        <Skeleton className="aspect-[4/3] w-full shrink-0 rounded-md sm:h-40 sm:w-44" />
                                         <div className="flex flex-1 flex-col gap-3 py-1">
-                                            <div className="bg-muted h-3 w-24 animate-pulse rounded-full" />
-                                            <div className="bg-muted h-5 w-2/3 animate-pulse rounded" />
-                                            <div className="bg-muted h-5 w-1/4 animate-pulse rounded" />
+                                            <Skeleton className="h-3 w-24" />
+                                            <Skeleton className="h-5 w-2/3" />
+                                            <Skeleton className="h-5 w-1/4" />
                                             <div className="flex flex-wrap gap-2">
-                                                <div className="bg-muted h-7 w-24 animate-pulse rounded-md" />
-                                                <div className="bg-muted h-7 w-32 animate-pulse rounded-md" />
+                                                <Skeleton className="h-7 w-24" />
+                                                <Skeleton className="h-7 w-32" />
                                             </div>
-                                            <div className="mt-auto flex gap-2">
-                                                <div className="bg-muted h-10 w-32 animate-pulse rounded-[var(--store-control-radius)]" />
-                                                <div className="bg-muted h-10 w-10 animate-pulse rounded-[var(--store-control-radius)]" />
+                                            <div className="mt-auto flex gap-2 pt-2">
+                                                <Skeleton className="h-10 w-32 rounded-[var(--store-control-radius)]" />
+                                                <Skeleton className="h-10 w-10 rounded-[var(--store-control-radius)]" />
                                             </div>
                                         </div>
                                     </div>

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { toast } from 'react-toastify';
 
 import { PriceDisplay } from '@/components/price-display';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAddToCart } from '@/hooks/use-cart';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
@@ -27,11 +28,21 @@ export default function WishlistPage() {
         return (
             <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                    {Array.from({ length: 6 }).map((_, i) => (
+                    {Array.from({ length: 4 }).map((_, i) => (
                         <div
                             key={i}
-                            className="bg-muted aspect-square animate-pulse rounded-xl"
-                        />
+                            className="border-border bg-card flex flex-col gap-2 overflow-hidden rounded-xl border p-1"
+                        >
+                            <Skeleton className="aspect-square rounded-lg" />
+                            <div className="space-y-2 p-3">
+                                <Skeleton className="h-4 w-5/6" />
+                                <Skeleton className="h-3 w-1/3" />
+                                <div className="mt-2 flex items-center justify-between gap-2">
+                                    <Skeleton className="h-5 w-1/2" />
+                                    <Skeleton className="h-8 w-8 rounded-lg" />
+                                </div>
+                            </div>
+                        </div>
                     ))}
                 </div>
             </div>

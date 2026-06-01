@@ -14,6 +14,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import type { SearchSuggestion } from '@/api/search.types';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useIsMounted } from '@/hooks/use-is-mounted';
 import { useLocalePath } from '@/hooks/use-locale';
 import {
@@ -343,11 +344,11 @@ export function SearchBar() {
                                                 {[1, 2, 3].map((i) => (
                                                     <div
                                                         key={i}
-                                                        className="flex animate-pulse items-center gap-3"
+                                                        className="flex items-center gap-3"
                                                     >
-                                                        <div className="bg-muted h-10 w-10 rounded-lg" />
-                                                        <div className="bg-muted h-4 flex-1 rounded" />
-                                                        <div className="bg-muted h-4 w-16 rounded" />
+                                                        <Skeleton className="h-10 w-10 shrink-0 rounded-lg" />
+                                                        <Skeleton className="h-4 flex-1" />
+                                                        <Skeleton className="h-4 w-16" />
                                                     </div>
                                                 ))}
                                             </div>

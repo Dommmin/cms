@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom';
 
 import { searchProducts } from '@/api/search';
 import type { SearchFilters, SearchResult } from '@/api/search.types';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useCategories } from '@/hooks/use-cms';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
@@ -588,16 +589,16 @@ export function SearchClient() {
                     {/* Skeleton – first load only (no data at all yet) */}
                     {isLoading && (
                         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                            {Array.from({ length: 6 }).map((_, i) => (
+                            {Array.from({ length: 8 }).map((_, i) => (
                                 <div
                                     key={i}
-                                    className="border-border bg-card overflow-hidden rounded-xl border"
+                                    className="border-border bg-card overflow-hidden rounded-xl border shadow-[var(--store-shadow-soft)]"
                                 >
-                                    <div className="bg-muted aspect-square animate-pulse" />
-                                    <div className="space-y-1.5 p-3">
-                                        <div className="bg-muted h-3 w-2/5 animate-pulse rounded" />
-                                        <div className="bg-muted h-4 w-4/5 animate-pulse rounded" />
-                                        <div className="bg-muted mt-1 h-5 w-1/3 animate-pulse rounded" />
+                                    <Skeleton className="aspect-square rounded-t-xl rounded-b-none" />
+                                    <div className="space-y-2 p-3">
+                                        <Skeleton className="h-3 w-2/5" />
+                                        <Skeleton className="h-4 w-4/5" />
+                                        <Skeleton className="mt-1 h-5 w-1/3" />
                                     </div>
                                 </div>
                             ))}
