@@ -9,6 +9,7 @@
 **/.env
 **/.env.*
 !server/.env.deploy
+!client/.env.production
 
 server/tests
 server/storage
