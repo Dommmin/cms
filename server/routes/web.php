@@ -7,7 +7,7 @@ use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\SeoController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/debug-glitchtip', function () {
+Route::get('/debug-glitchtip', function (): void {
     throw new Exception('Test GlitchTip error!');
 });
 
