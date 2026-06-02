@@ -5,6 +5,8 @@ declare(strict_types=1);
 return [
     'dsn' => env('GLITCHTIP_DSN', env('SENTRY_LARAVEL_DSN')),
 
+    'http_ssl_verify' => (bool) env('GLITCHTIP_HTTP_SSL_VERIFY', env('SENTRY_HTTP_SSL_VERIFY', true)),
+
     'release' => env('APP_VERSION', env('SENTRY_RELEASE')),
 
     'environment' => env('APP_ENV', 'production'),
