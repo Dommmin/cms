@@ -79,6 +79,10 @@ export default function ProductsClient() {
     ];
 
     const [showFilters, setShowFilters] = useState(false);
+    const [showDesktopFilters, setShowDesktopFilters] = useState(true);
+    const [collapsedAttributes, setCollapsedAttributes] = useState<
+        Record<string, boolean>
+    >({});
     const [viewMode, setViewMode] = useState<ViewMode>('grid');
     const [pending, setPending] = useState<PendingFilters>(() =>
         pendingFromSearchParams(searchParams),
@@ -417,42 +421,76 @@ export default function ProductsClient() {
             )}
 
             {availableFilters && availableFilters.attributes.length > 0 && (
-                <div className="space-y-5 border-t pt-5">
-                    {availableFilters.attributes.map((attribute) => (
-                        <div key={attribute.slug}>
-                            <p className="text-muted-foreground mb-2 text-xs font-medium">
-                                {attribute.label}
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                                {attribute.values.map((value) => {
-                                    const isSelected =
-                                        pending.attributes[
-                                            attribute.slug
-                                        ]?.includes(value.slug) ?? false;
+                <div className="space-y-4 border-t pt-5">
+                    {availableFilters.attributes.map((attribute) => {
+                        const isCollapsed =
+                            collapsedAttributes[attribute.slug] ?? false;
+                        return (
+                            <div
+                                key={attribute.slug}
+                                className="border-b pb-4 last:border-0 last:pb-0"
+                            >
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setCollapsedAttributes((prev) => ({
+                                            ...prev,
+                                            [attribute.slug]: !isCollapsed,
+                                        }))
+                                    }
+                                    className="hover:text-primary flex w-full items-center justify-between text-left text-sm font-medium transition-colors focus:outline-none"
+                                >
+                                    <span>{attribute.label}</span>
+                                    <svg
+                                        className={`h-4 w-4 transform transition-transform duration-200 ${isCollapsed ? '-rotate-90' : ''}`}
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M19 9l-7 7-7-7"
+                                        />
+                                    </svg>
+                                </button>
 
-                                    return (
-                                        <button
-                                            key={`${attribute.slug}-${value.slug}`}
-                                            type="button"
-                                            onClick={() =>
-                                                togglePendingAttribute(
-                                                    attribute.slug,
-                                                    value.slug,
-                                                )
-                                            }
-                                            className={`min-h-9 rounded-full border px-3 text-sm transition-colors ${
-                                                isSelected
-                                                    ? 'border-primary bg-primary text-primary-foreground'
-                                                    : 'border-input bg-background hover:bg-accent'
-                                            }`}
-                                        >
-                                            {value.label} ({value.count})
-                                        </button>
-                                    );
-                                })}
+                                {!isCollapsed && (
+                                    <div className="mt-3 flex flex-wrap gap-2 transition-all">
+                                        {attribute.values.map((value) => {
+                                            const isSelected =
+                                                pending.attributes[
+                                                    attribute.slug
+                                                ]?.includes(value.slug) ??
+                                                false;
+
+                                            return (
+                                                <button
+                                                    key={`${attribute.slug}-${value.slug}`}
+                                                    type="button"
+                                                    onClick={() =>
+                                                        togglePendingAttribute(
+                                                            attribute.slug,
+                                                            value.slug,
+                                                        )
+                                                    }
+                                                    className={`min-h-9 rounded-full border px-3 text-sm transition-colors ${
+                                                        isSelected
+                                                            ? 'border-primary bg-primary text-primary-foreground'
+                                                            : 'border-input bg-background hover:bg-accent'
+                                                    }`}
+                                                >
+                                                    {value.label} ({value.count}
+                                                    )
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
 
@@ -497,6 +535,10 @@ export default function ProductsClient() {
             </div>
         </div>
     );
+
+    const gridColsClass = showDesktopFilters
+        ? 'grid-cols-1 min-[520px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'
+        : 'grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5';
 
     return (
         <div className="store-shell mx-auto px-4 py-8 sm:px-6 lg:px-8">
@@ -606,6 +648,22 @@ export default function ProductsClient() {
                             </span>
                         )}
                     </button>
+
+                    <button
+                        onClick={() => setShowDesktopFilters((prev) => !prev)}
+                        aria-pressed={showDesktopFilters}
+                        className="border-input bg-background hover:bg-accent hidden min-h-11 items-center justify-center gap-2 rounded-[var(--store-control-radius)] border px-3 text-sm lg:inline-flex"
+                    >
+                        <SlidersHorizontal className="h-4 w-4" />
+                        {showDesktopFilters
+                            ? t('shop.hide_filters', 'Hide Filters')
+                            : t('shop.show_filters', 'Show Filters')}
+                        {activeFilterCount > 0 && (
+                            <span className="bg-primary text-primary-foreground rounded-full px-1.5 text-xs">
+                                {activeFilterCount}
+                            </span>
+                        )}
+                    </button>
                 </div>
             </div>
 
@@ -667,17 +725,23 @@ export default function ProductsClient() {
                 </div>
             )}
 
-            <div className="grid gap-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
-                <aside className="hidden lg:block">
-                    <div className="border-border bg-card sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-[var(--store-card-radius)] border p-4 shadow-[var(--store-shadow-soft)]">
-                        {renderFiltersPanel('products-desktop-filters')}
-                    </div>
-                </aside>
+            <div
+                className={`grid gap-6 ${showDesktopFilters ? 'lg:grid-cols-[18rem_minmax(0,1fr)]' : 'grid-cols-1'}`}
+            >
+                {showDesktopFilters && (
+                    <aside className="hidden lg:block">
+                        <div className="border-border bg-card sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-[var(--store-card-radius)] border p-4 shadow-[var(--store-shadow-soft)]">
+                            {renderFiltersPanel('products-desktop-filters')}
+                        </div>
+                    </aside>
+                )}
 
                 <div className="min-w-0">
                     {isLoading ? (
                         viewMode === 'grid' ? (
-                            <div className="grid grid-cols-1 gap-[var(--store-grid-gap)] min-[520px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                            <div
+                                className={`grid gap-[var(--store-grid-gap)] ${gridColsClass}`}
+                            >
                                 {Array.from({ length: 8 }).map((_, i) => (
                                     <div
                                         key={i}
@@ -745,7 +809,9 @@ export default function ProductsClient() {
                                 style={{ opacity: isFetching ? 0.4 : 1 }}
                             >
                                 {viewMode === 'grid' ? (
-                                    <div className="grid grid-cols-1 gap-[var(--store-grid-gap)] min-[520px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                                    <div
+                                        className={`grid gap-[var(--store-grid-gap)] ${gridColsClass}`}
+                                    >
                                         {data?.data?.map((product, index) => (
                                             <ProductCard
                                                 key={product.id}

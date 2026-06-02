@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { AnimatedSection } from './animated-section';
 import { BlockRenderer } from './block-renderer';
+import { BlockErrorBoundary } from './error-boundary';
 import type { SectionRendererProps } from './section-renderer.types';
 
 function sanitizeCss(css: string): string {
@@ -85,7 +86,9 @@ function SectionContent({
                             undefined
                         }
                     >
-                        <BlockRenderer block={block} />
+                        <BlockErrorBoundary blockName={block.type}>
+                            <BlockRenderer block={block} />
+                        </BlockErrorBoundary>
                     </div>
                 ) : (
                     <div
@@ -152,7 +155,9 @@ function SectionContent({
                                 }}
                             />
                         )}
-                        <BlockRenderer block={block} />
+                        <BlockErrorBoundary blockName={block.type}>
+                            <BlockRenderer block={block} />
+                        </BlockErrorBoundary>
                     </div>
                 ),
             )}
