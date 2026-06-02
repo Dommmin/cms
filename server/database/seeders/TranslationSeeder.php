@@ -152,7 +152,7 @@ class TranslationSeeder extends Seeder
             ['group' => 'checkout', 'key' => 'bank_transfer_swift',            'en' => 'SWIFT / BIC',                                   'pl' => 'SWIFT / BIC'],
             ['group' => 'checkout', 'key' => 'bank_transfer_amount',           'en' => 'Amount',                                        'pl' => 'Kwota'],
             ['group' => 'checkout', 'key' => 'bank_transfer_reference',        'en' => 'Transfer title',                                'pl' => 'Tytuł przelewu'],
-            ['group' => 'checkout', 'key' => 'bank_transfer_note',             'en' => 'Your order will be processed after we receive the payment.', 'pl' => 'Zamówienie zostanie zrealizowane po zaksięgowaniu wpłaty.'],
+            ['group' => 'checkout', 'key' => 'bank_transfer_note',             'en' => 'Your order will be processed after we receive the payment. Please complete the transfer within 5 days, otherwise the order will be automatically cancelled.', 'pl' => 'Zamówienie zostanie zrealizowane po zaksięgowaniu wpłaty. Prosimy o dokonanie przelewu w ciągu 5 dni, w przeciwnym razie zamówienie zostanie automatycznie anulowane.'],
             ['group' => 'checkout', 'key' => 'bank_transfer_after_order',    'en' => 'Bank account details will be shown after you place your order.', 'pl' => 'Dane do przelewu zostaną wyświetlone po złożeniu zamówienia.'],
             ['group' => 'checkout', 'key' => 'next_step_2_bank',               'en' => 'Complete your bank transfer using the details above.',     'pl' => 'Wykonaj przelew bankowy korzystając z powyższych danych.'],
 

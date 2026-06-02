@@ -16,6 +16,7 @@ Schedule::command('blog:publish-scheduled')->everyMinute();
 Schedule::command('cms:process-scheduled-pages')->everyMinute();
 Schedule::command('activitylog:clean')->weekly();
 Schedule::command('cart:clean')->daily();
+Schedule::command('orders:cancel-unpaid-offline')->daily();
 Schedule::job(new SendAbandonedCartEmails)->hourly();
 Schedule::job(new SendLowStockAlerts)->daily();
 Schedule::command('user:prune')->monthly();
