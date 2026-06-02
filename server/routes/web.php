@@ -7,6 +7,10 @@ use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\SeoController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/debug-glitchtip', function () {
+    throw new Exception('Test GlitchTip error!');
+});
+
 Route::get('/feed', BlogFeedController::class)->name('blog.feed');
 Route::get('/robots.txt', [SeoController::class, 'robots'])->name('robots.txt');
 Route::get('/health', HealthCheckController::class)->name('health');
