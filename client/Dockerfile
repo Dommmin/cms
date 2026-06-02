@@ -20,6 +20,8 @@ COPY client/ .
 # NEXT_PUBLIC_* vars are baked at build time — pass via --build-arg in CI
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_APP_NAME
+ARG NEXT_PUBLIC_GLITCHTIP_DSN
+ARG NEXT_PUBLIC_SENTRY_DSN
 
 ENV NEXT_TELEMETRY_DISABLED=1
 # Skip TS + ESLint during docker build — already checked in lint-client CI job
