@@ -105,16 +105,24 @@ export default function DataTable<T>({
                 <table className="w-full min-w-max text-sm">
                     <thead className="bg-muted/50">
                         <tr>
-                            {columns.map((column, index) => (
-                                <th
-                                    key={getColumnId(column, index)}
-                                    className="h-10 px-3 text-left align-middle font-medium text-muted-foreground"
-                                >
-                                    {flexRender(column.header, {
-                                        column,
-                                    } as never)}
-                                </th>
-                            ))}
+                            {columns.map((column, index) => {
+                                const customClassName = (
+                                    column as { meta?: { className?: string } }
+                                ).meta?.className;
+                                return (
+                                    <th
+                                        key={getColumnId(column, index)}
+                                        className={cn(
+                                            'h-10 px-3 text-left align-middle font-medium text-muted-foreground',
+                                            customClassName,
+                                        )}
+                                    >
+                                        {flexRender(column.header, {
+                                            column,
+                                        } as never)}
+                                    </th>
+                                );
+                            })}
                         </tr>
                     </thead>
                     <tbody>
@@ -143,10 +151,18 @@ export default function DataTable<T>({
                                             column,
                                             colIndex,
                                         );
+                                        const customClassName = (
+                                            column as {
+                                                meta?: { className?: string };
+                                            }
+                                        ).meta?.className;
                                         return (
                                             <td
                                                 key={`${rowIndex}-${columnId}`}
-                                                className="p-3 align-middle"
+                                                className={cn(
+                                                    'p-3 align-middle',
+                                                    customClassName,
+                                                )}
                                             >
                                                 {flexRender(column.cell, {
                                                     row: {

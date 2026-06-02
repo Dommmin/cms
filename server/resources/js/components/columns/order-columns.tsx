@@ -37,6 +37,7 @@ export function useOrderColumns(
 
     const checkboxColumn: ColumnDef<OrderRow> = {
         id: 'select',
+        meta: { className: 'w-[40px]' } as ColumnDef<OrderRow>['meta'],
         header: () => (
             <input
                 type="checkbox"
@@ -62,6 +63,7 @@ export function useOrderColumns(
     const dataColumns: ColumnDef<OrderRow>[] = [
         {
             accessorKey: 'order_number',
+            meta: { className: 'w-[120px]' },
             header: 'Order',
             cell: ({ row }) => (
                 <span className="font-mono font-medium">
@@ -71,6 +73,7 @@ export function useOrderColumns(
         },
         {
             accessorKey: 'customer',
+            // Customer column left auto-sized to span remaining table width
             header: __('column.customer', 'Customer'),
             cell: ({ row }) =>
                 row.original.customer ? (
@@ -91,6 +94,7 @@ export function useOrderColumns(
         },
         {
             accessorKey: 'status',
+            meta: { className: 'w-[130px]' },
             header: __('column.status', 'Status'),
             cell: ({ row }) => (
                 <Badge
@@ -105,6 +109,7 @@ export function useOrderColumns(
         },
         {
             accessorKey: 'payment_status',
+            meta: { className: 'w-[140px]' },
             header: 'Payment',
             cell: ({ row }) => (
                 <Badge
@@ -120,6 +125,7 @@ export function useOrderColumns(
         },
         {
             accessorKey: 'total',
+            meta: { className: 'w-[120px]' },
             header: __('column.total_spent', 'Total'),
             cell: ({ row }) => (
                 <span className="font-mono font-medium">
@@ -132,6 +138,7 @@ export function useOrderColumns(
         },
         {
             accessorKey: 'created_at',
+            meta: { className: 'w-[140px]' },
             header: __('column.created_at', 'Date'),
             cell: ({ row }) => (
                 <span className="text-sm">
@@ -148,6 +155,7 @@ export function useOrderColumns(
         },
         {
             id: 'actions',
+            meta: { className: 'w-[100px]' },
             header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
