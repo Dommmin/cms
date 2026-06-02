@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Concerns\AddressValidationRules;
 use App\Enums\PaymentProviderEnum;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\Validator;
@@ -13,6 +14,8 @@ use Illuminate\Validation\Rules\Enum;
 
 class CheckoutRequest extends FormRequest
 {
+    use AddressValidationRules;
+
     public function authorize(): bool
     {
         return true;
@@ -23,17 +26,7 @@ class CheckoutRequest extends FormRequest
      */
     public function rules(): array
     {
-        $addressRules = [
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'company_name' => ['nullable', 'string', 'max:255'],
-            'street' => ['required', 'string', 'max:255'],
-            'street2' => ['nullable', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:255'],
-            'postal_code' => ['required', 'string', 'max:20'],
-            'country_code' => ['required', 'string', 'size:2'],
-            'phone' => ['required', 'string', 'max:30'],
-        ];
+        $addressRules = $this->addressRules(phoneRequired: true, countryCodeRequired: true);
 
         return [
             'guest_email' => ['nullable', 'email', 'max:255'],

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Concerns\AddressValidationRules;
 use App\Enums\PaymentProviderEnum;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -20,6 +21,8 @@ use Illuminate\Validation\Rules\Enum;
  */
 class StoreCheckoutRequest extends FormRequest
 {
+    use AddressValidationRules;
+
     public function authorize(): bool
     {
         return true;
@@ -30,6 +33,8 @@ class StoreCheckoutRequest extends FormRequest
      */
     public function rules(): array
     {
+        $addressRules = $this->addressRules(phoneRequired: true, countryCodeRequired: false);
+
         return [
             'shipping_method_id' => ['required', 'integer', 'exists:shipping_methods,id'],
             'payment_provider' => ['required', 'string', Rule::enum(PaymentProviderEnum::class)],
@@ -37,26 +42,9 @@ class StoreCheckoutRequest extends FormRequest
             'notes' => ['nullable', 'string', 'max:2000'],
 
             'billing_address' => ['required', 'array'],
-            'billing_address.first_name' => ['required', 'string', 'max:255'],
-            'billing_address.last_name' => ['required', 'string', 'max:255'],
-            'billing_address.company_name' => ['nullable', 'string', 'max:255'],
-            'billing_address.street' => ['required', 'string', 'max:255'],
-            'billing_address.street2' => ['nullable', 'string', 'max:255'],
-            'billing_address.city' => ['required', 'string', 'max:255'],
-            'billing_address.postal_code' => ['required', 'string', 'max:20'],
-            'billing_address.country_code' => ['nullable', 'string', 'size:2'],
-            'billing_address.phone' => ['required', 'string', 'max:30'],
-
+            ...collect($addressRules)->mapWithKeys(fn ($rules, $key): array => ['billing_address.'.$key => $rules])->all(),
             'shipping_address' => ['required', 'array'],
-            'shipping_address.first_name' => ['required', 'string', 'max:255'],
-            'shipping_address.last_name' => ['required', 'string', 'max:255'],
-            'shipping_address.company_name' => ['nullable', 'string', 'max:255'],
-            'shipping_address.street' => ['required', 'string', 'max:255'],
-            'shipping_address.street2' => ['nullable', 'string', 'max:255'],
-            'shipping_address.city' => ['required', 'string', 'max:255'],
-            'shipping_address.postal_code' => ['required', 'string', 'max:20'],
-            'shipping_address.country_code' => ['nullable', 'string', 'size:2'],
-            'shipping_address.phone' => ['required', 'string', 'max:30'],
+            ...collect($addressRules)->mapWithKeys(fn ($rules, $key): array => ['shipping_address.'.$key => $rules])->all(),
         ];
     }
 }

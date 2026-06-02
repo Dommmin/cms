@@ -6,11 +6,11 @@ namespace App\Http\Controllers\Admin\Ecommerce;
 
 use App\Enums\AddressTypeEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Ecommerce\StoreAddressRequest;
 use App\Http\Requests\Admin\Ecommerce\UpdateAddressRequest;
 use App\Models\Address;
 use App\Models\Customer;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Response;
 
 class AddressController extends Controller
@@ -35,21 +35,9 @@ class AddressController extends Controller
         ]);
     }
 
-    public function store(Request $request, Customer $customer): RedirectResponse
+    public function store(StoreAddressRequest $request, Customer $customer): RedirectResponse
     {
-        $data = $request->validate([
-            'type' => ['required', 'string'],
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'company_name' => ['nullable', 'string', 'max:255'],
-            'street' => ['required', 'string', 'max:255'],
-            'street2' => ['nullable', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:255'],
-            'postal_code' => ['required', 'string', 'max:20'],
-            'country_code' => ['required', 'string', 'size:2'],
-            'phone' => ['nullable', 'string', 'max:50'],
-            'is_default' => ['boolean'],
-        ]);
+        $data = $request->validated();
 
         $data['customer_id'] = $customer->id;
 
