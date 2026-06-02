@@ -437,6 +437,15 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
+      - name: Create client env file
+        run: |
+          if [ -z "${{ vars.ENV_CLIENT_PROD }}" ]; then
+            echo "::warning::ENV_CLIENT_PROD variable is empty or not set."
+          else
+            printf '%s' "${{ vars.ENV_CLIENT_PROD }}" > client/.env.production
+            echo "✓ client/.env.production file created from ENV_CLIENT_PROD"
+          fi
+
       - name: Build and push
         uses: docker/build-push-action@v7
         with:
@@ -446,7 +455,6 @@ jobs:
           tags: |
             ${{ steps.images.outputs.client }}:${{ steps.sha.outputs.short }}
             ${{ steps.images.outputs.client }}:latest
-          build-args: ${{ vars.ENV_CLIENT_PROD }}
           cache-from: type=gha,scope=client
           cache-to: type=gha,mode=max,scope=client
 
