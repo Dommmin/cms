@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ApiController;
 use App\Infrastructure\Shipping\Furgonetka\FurgonetkaClient;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class PickupPointsController extends ApiController
@@ -61,7 +62,13 @@ class PickupPointsController extends ApiController
                 lat: $lat,
                 lng: $lng,
             );
-        } catch (Throwable) {
+        } catch (Throwable $throwable) {
+            Log::error('Furgonetka pickup points fetch failed: '.$throwable->getMessage(), [
+                'exception' => $throwable,
+                'carrier' => $carrier->value,
+                'postal_code' => $postalCode,
+            ]);
+
             return $this->ok(['data' => []]);
         }
 
