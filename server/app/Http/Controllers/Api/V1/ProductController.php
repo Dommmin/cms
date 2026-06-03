@@ -63,6 +63,10 @@ class ProductController extends ApiController
 
         $availableFilters = $this->buildAvailableFilters(clone $query);
 
+        $perPage = (int) ($request->validate([
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+        ])['per_page'] ?? 24);
+
         $products = $query
             ->with([
                 'thumbnail.media',
@@ -74,7 +78,7 @@ class ProductController extends ApiController
                 'activeVariants.attributeValues.attributeValue',
                 'promotions' => fn ($q) => $q->active()->select('promotions.id', 'promotions.name', 'promotions.type'),
             ])
-            ->paginate(24)
+            ->paginate($perPage)
             ->withQueryString();
 
         return new ProductCollection($products)
@@ -295,7 +299,7 @@ class ProductController extends ApiController
         return $this->ok(ProductResource::collection($related));
     }
 
-    public function byCategory(string $slug, SmartCollectionService $smartCollectionService): AnonymousResourceCollection
+    public function byCategory(string $slug, Request $request, SmartCollectionService $smartCollectionService): AnonymousResourceCollection
     {
         $locale = app()->getLocale();
 
@@ -322,11 +326,15 @@ class ProductController extends ApiController
             ])
             ->defaultSort('name');
 
-        $this->applyAttributeFilters($products, request()->input('filter.attributes', []));
+        $this->applyAttributeFilters($products, $request->input('filter.attributes', []));
+
+        $perPage = (int) ($request->validate([
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+        ])['per_page'] ?? 24);
 
         $products = $products
             ->with(['thumbnail.media', 'brand'])
-            ->paginate(24)
+            ->paginate($perPage)
             ->withQueryString();
 
         return $this->collection(ProductResource::collection($products));

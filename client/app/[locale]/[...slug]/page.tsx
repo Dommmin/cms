@@ -16,8 +16,14 @@ export async function generateMetadata({
     return generateDynamicPageMetadata({ locale, slug });
 }
 
-export default async function DynamicPage({ params }: PageProps) {
+export default async function DynamicPage({ params, searchParams }: PageProps) {
     const { locale, slug } = await params;
 
-    return <CmsDynamicPage locale={locale} slug={slug} />;
+    return (
+        <CmsDynamicPage
+            locale={locale}
+            slug={slug}
+            searchParams={await searchParams}
+        />
+    );
 }

@@ -154,7 +154,15 @@ When a page is published, unpublished, or processed by the scheduled publishing 
 
 **Translatable fields:** Page title, excerpt, content, and rich content can be entered in multiple languages. Use the language selector on the edit form to switch between locales.
 
+**Configuring Module Pages:**
+When creating or editing a page of type **Module**, you bind a dynamic module (e.g. Blog, E-commerce Shop, Job Offers) to the page. Each module has its own configuration settings directly on the page form under the **Module Configuration** section. For example:
+- **Pagination (`per_page`)**: You can set how many items to display per page (e.g., 9 posts per page on the blog, 12 products per page on the shop).
+- **Layout Options**: Select list layouts (e.g., Grid, Magazine, Masonry) and customize options like columns, items per row, or displaying filters.
+
+This configuration is page-scoped rather than global. For instance, you could have a Polish blog page (`/blog`) and an English blog page (`/en/blog`) with different pagination limits or visual layouts customized for each.
+
 ---
+
 
 ### 4.2 Page Builder
 

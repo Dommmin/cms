@@ -21,7 +21,6 @@ use Spatie\Translatable\HasTranslations;
  * @property array<array-key, mixed>|null $slug
  * @property array<array-key, mixed>|null $description
  * @property string $layout
- * @property int $posts_per_page
  * @property bool $commentable
  * @property int|null $default_author_id
  * @property string|null $seo_title
@@ -71,7 +70,6 @@ use Spatie\Translatable\HasTranslations;
     'slug',
     'description',
     'layout',
-    'posts_per_page',
     'commentable',
     'default_author_id',
     'seo_title',
@@ -123,7 +121,6 @@ class Blog extends Model
             'commentable' => 'boolean',
             'is_active' => 'boolean',
             'available_locales' => 'array',
-            'posts_per_page' => 'integer',
             'position' => 'integer',
         ];
     }

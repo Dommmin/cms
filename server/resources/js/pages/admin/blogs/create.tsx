@@ -37,7 +37,6 @@ export default function CreateBlog({ users }: CreateProps) {
         description_en: '',
         description_pl: '',
         layout: 'grid',
-        posts_per_page: 12,
         commentable: true,
         default_author_id: '',
         seo_title: '',
@@ -77,7 +76,6 @@ export default function CreateBlog({ users }: CreateProps) {
                     pl: data.description_pl,
                 },
                 layout: data.layout,
-                posts_per_page: data.posts_per_page,
                 commentable: data.commentable,
                 default_author_id: data.default_author_id || null,
                 seo_title: data.seo_title || null,
@@ -231,27 +229,6 @@ export default function CreateBlog({ users }: CreateProps) {
                             </SelectContent>
                         </Select>
                         <InputError message={errors.layout} />
-                    </div>
-
-                    <div className="grid gap-2">
-                        <Label htmlFor="posts_per_page">
-                            {__('label.posts_per_page', 'Posts Per Page')}
-                        </Label>
-                        <Input
-                            id="posts_per_page"
-                            type="number"
-                            min="1"
-                            max="100"
-                            value={data.posts_per_page}
-                            onChange={(e) =>
-                                setData((prev) => ({
-                                    ...prev,
-                                    posts_per_page:
-                                        parseInt(e.target.value) || 12,
-                                }))
-                            }
-                        />
-                        <InputError message={errors.posts_per_page} />
                     </div>
 
                     {users.length > 0 && (

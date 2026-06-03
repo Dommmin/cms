@@ -34,10 +34,14 @@ class BlogController extends ApiController
             ->active()
             ->firstOrFail();
 
+        $perPage = (int) ($request->validate([
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+        ])['per_page'] ?? 9);
+
         $posts = $blog->publishedPosts()
             ->with(['author', 'category', 'tags'])
             ->orderByDesc('published_at')
-            ->paginate($blog->posts_per_page, ['*'], 'page', (int) $request->input('page', 1));
+            ->paginate($perPage, ['*'], 'page', (int) $request->input('page', 1));
 
         return $this->ok([
             'blog' => new BlogResource($blog),
@@ -54,10 +58,14 @@ class BlogController extends ApiController
             ->active()
             ->firstOrFail();
 
+        $perPage = (int) ($request->validate([
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+        ])['per_page'] ?? 9);
+
         $posts = $blog->publishedPosts()
             ->with(['author', 'category', 'tags'])
             ->orderByDesc('published_at')
-            ->paginate($blog->posts_per_page, ['*'], 'page', (int) $request->input('page', 1));
+            ->paginate($perPage, ['*'], 'page', (int) $request->input('page', 1));
 
         return $this->ok(BlogPostResource::collection($posts)->response()->getData(true));
     }

@@ -16,6 +16,7 @@ export function BlogListClient({
     posts,
     categories,
     params,
+    basePath,
 }: BlogListClientProps) {
     const lp = useLocalePath();
     const { page = 1, category, sort = '-created_at' } = params;
@@ -31,7 +32,7 @@ export function BlogListClient({
         if (merged.sort && merged.sort !== '-created_at')
             urlParams.set('sort', String(merged.sort));
         const qs = urlParams.toString();
-        return lp(`/blog${qs ? `?${qs}` : ''}`);
+        return lp(`${basePath}${qs ? `?${qs}` : ''}`);
     };
 
     return (
@@ -105,7 +106,7 @@ export function BlogListClient({
                         {posts.data.map((post) => (
                             <Link
                                 key={post.id}
-                                href={lp(`/blog/${post.slug}`)}
+                                href={lp(`${basePath}/${post.slug}`)}
                                 className="group border-border bg-card flex flex-col overflow-hidden rounded-xl border transition-shadow hover:shadow-lg"
                             >
                                 {post.featured_image ? (

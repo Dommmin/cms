@@ -16,15 +16,15 @@ it('lists active blogs via api', function (): void {
 });
 
 it('shows a blog with paginated published posts', function (): void {
-    $blog = Blog::factory()->create(['posts_per_page' => 5]);
+    $blog = Blog::factory()->create();
     BlogPost::factory()->published()->count(3)->create(['blog_id' => $blog->id]);
     BlogPost::factory()->count(2)->create(['blog_id' => $blog->id]); // draft
 
-    $response = $this->getJson('/api/v1/blogs/'.$blog->slug)
+    $response = $this->getJson('/api/v1/blogs/'.$blog->slug.'?per_page=2')
         ->assertSuccessful();
 
     expect($response->json('blog.slug'))->toBe($blog->slug);
-    expect($response->json('posts.data'))->toHaveCount(3);
+    expect($response->json('posts.data'))->toHaveCount(2);
 });
 
 it('returns 404 for inactive blog', function (): void {

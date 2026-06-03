@@ -21,6 +21,10 @@ class BlogPostController extends ApiController
         $locale = $request->query('locale', app()->getLocale());
         $sort = $request->query('sort', '-created_at');
 
+        $perPage = (int) ($request->validate([
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+        ])['per_page'] ?? 9);
+
         $posts = BlogPost::query()->published()
             ->with(['author:id,name', 'category:id,name,slug', 'tags'])
             ->where(function ($q) use ($locale): void {
@@ -41,7 +45,7 @@ class BlogPostController extends ApiController
                 - (SELECT COUNT(*) FROM blog_post_votes WHERE blog_post_votes.blog_post_id = blog_posts.id AND vote = "down") DESC'
             ))
             ->when(! in_array($sort, ['popular', 'top_rated'], true), fn ($q) => $q->latest('published_at'))
-            ->paginate($request->integer('per_page', 15))
+            ->paginate($perPage)
             ->withQueryString();
 
         return $this->ok(BlogPostResource::collection($posts)->response()->getData(true));
@@ -139,6 +143,10 @@ class BlogPostController extends ApiController
 
         $category = BlogCategory::query()->active()->where('slug', $slug)->firstOrFail();
 
+        $perPage = (int) ($request->validate([
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+        ])['per_page'] ?? 9);
+
         $posts = BlogPost::query()->published()
             ->where('blog_category_id', $category->id)
             ->where(function ($q) use ($locale): void {
@@ -147,7 +155,7 @@ class BlogPostController extends ApiController
             })
             ->with(['author:id,name', 'category:id,name,slug', 'tags'])
             ->latest('published_at')
-            ->paginate(15)
+            ->paginate($perPage)
             ->withQueryString();
 
         return $this->ok(BlogPostResource::collection($posts)->response()->getData(true));

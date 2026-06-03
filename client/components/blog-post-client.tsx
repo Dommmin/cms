@@ -17,12 +17,14 @@ export function BlogPostClient({
     post,
     relatedPosts = [],
     locale,
+    basePath,
 }: BlogPostClientProps) {
     const lp = (path: string) => localePath(locale, path);
     const articlePath = localizedBlogPath(
         locale,
         post.slug_translations,
         post.canonical_slug,
+        basePath,
     );
     const articleUrl = post.canonical_url ?? absoluteUrl(locale, articlePath);
     const { html, toc } = enrichArticleHtml(sanitizeHtml(post.content));
@@ -32,7 +34,7 @@ export function BlogPostClient({
             <JsonLd data={buildBlogPosting(post, locale)} />
             <JsonLd
                 data={buildBreadcrumbList([
-                    { name: 'Blog', url: absoluteUrl(locale, '/blog') },
+                    { name: 'Blog', url: absoluteUrl(locale, basePath) },
                     {
                         name: post.title,
                         url: articleUrl,
@@ -43,13 +45,13 @@ export function BlogPostClient({
             <Breadcrumb
                 homeHref={lp('/')}
                 items={[
-                    { label: 'Blog', href: lp('/blog') },
+                    { label: 'Blog', href: lp(basePath) },
                     ...(post.category
                         ? [
                               {
                                   label: post.category.name,
                                   href: lp(
-                                      `/blog?category=${post.category.slug}`,
+                                      `${basePath}?category=${post.category.slug}`,
                                   ),
                               },
                           ]
@@ -61,7 +63,7 @@ export function BlogPostClient({
             {post.category && (
                 <div className="mb-3">
                     <Link
-                        href={lp(`/blog?category=${post.category.slug}`)}
+                        href={lp(`${basePath}?category=${post.category.slug}`)}
                         className="border-input text-muted-foreground hover:bg-accent rounded-full border px-3 py-0.5 text-xs font-medium"
                     >
                         {post.category.name}
@@ -167,6 +169,7 @@ export function BlogPostClient({
                                             locale,
                                             relatedPost.slug_translations,
                                             relatedPost.canonical_slug,
+                                            basePath,
                                         ),
                                     )}
                                     className="font-medium hover:underline"

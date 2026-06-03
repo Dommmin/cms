@@ -29,7 +29,6 @@ class StoreBlogRequest extends FormRequest
             'slug.*' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9-]+$/'],
             'description' => ['nullable', 'array'],
             'layout' => ['required', 'string', 'in:grid,list,magazine'],
-            'posts_per_page' => ['required', 'integer', 'min:1', 'max:100'],
             'commentable' => ['boolean'],
             'default_author_id' => ['nullable', 'exists:users,id'],
             'seo_title' => ['nullable', 'string', 'max:255'],

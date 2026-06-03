@@ -4,7 +4,6 @@ export interface BlogDetail {
     slug: string;
     description: Record<string, string> | null;
     layout: string;
-    posts_per_page: number;
     commentable: boolean;
     is_active: boolean;
     available_locales: string[] | null;

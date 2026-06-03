@@ -1145,6 +1145,18 @@ $registry->registerModule('my-module', [
         'grid' => [
             'name'      => 'Grid',
             'component' => 'MyModuleGrid',
+            'schema'    => [
+                'per_page' => [
+                    'type' => 'integer',
+                    'label' => 'Items per Page',
+                    'default' => 12,
+                    'min' => 1,
+                    'max' => 100,
+                ],
+            ],
+            'default_config' => [
+                'per_page' => 12,
+            ],
         ],
     ],
     'detail_layouts' => [
@@ -1157,6 +1169,20 @@ $registry->registerModule('my-module', [
 
 $registry->sync(); // call once to persist to database
 ```
+
+#### Dynamic Module Pagination & API Guardrails
+
+1. **Standardized Parameter (`per_page`)**:
+   Always define dynamic pagination limits under the `per_page` setting key within your layout schemas or module configurations. Do not hardcode static layout pagination limits or add database column properties on the models (e.g. `posts_per_page`).
+
+2. **Controller Query Validation**:
+   When implementing search/list endpoints in public controllers, retrieve the `per_page` query parameter from the frontend and validate it strictly to prevent denial-of-service/performance exploitation:
+   ```php
+   $perPage = (int) ($request->validate([
+       'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+   ])['per_page'] ?? $defaultPerPage);
+   ```
+   Fallback to page-level layout config values where possible, or use a sensible system fallback (e.g., 9 for blogs, 24 for catalog products).
 
 ---
 

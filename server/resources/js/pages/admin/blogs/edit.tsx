@@ -41,7 +41,6 @@ export default function EditBlog({ blog, users }: EditProps) {
         description_en: blog.description?.en ?? '',
         description_pl: blog.description?.pl ?? '',
         layout: blog.layout,
-        posts_per_page: blog.posts_per_page,
         commentable: blog.commentable,
         default_author_id: blog.default_author_id
             ? String(blog.default_author_id)
@@ -83,7 +82,6 @@ export default function EditBlog({ blog, users }: EditProps) {
                     pl: data.description_pl,
                 },
                 layout: data.layout,
-                posts_per_page: data.posts_per_page,
                 commentable: data.commentable,
                 default_author_id: data.default_author_id || null,
                 seo_title: data.seo_title || null,
@@ -239,27 +237,6 @@ export default function EditBlog({ blog, users }: EditProps) {
                             </SelectContent>
                         </Select>
                         <InputError message={errors.layout} />
-                    </div>
-
-                    <div className="grid gap-2">
-                        <Label htmlFor="posts_per_page">
-                            {__('label.posts_per_page', 'Posts Per Page')}
-                        </Label>
-                        <Input
-                            id="posts_per_page"
-                            type="number"
-                            min="1"
-                            max="100"
-                            value={data.posts_per_page}
-                            onChange={(e) =>
-                                setData((prev) => ({
-                                    ...prev,
-                                    posts_per_page:
-                                        parseInt(e.target.value) || 12,
-                                }))
-                            }
-                        />
-                        <InputError message={errors.posts_per_page} />
                     </div>
 
                     {users.length > 0 && (

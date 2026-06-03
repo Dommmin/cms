@@ -22,7 +22,6 @@ class BlogFactory extends Factory
             'slug' => ['en' => Str::slug($name)],
             'description' => null,
             'layout' => fake()->randomElement(['grid', 'list', 'magazine']),
-            'posts_per_page' => 12,
             'commentable' => true,
             'default_author_id' => null,
             'seo_title' => null,

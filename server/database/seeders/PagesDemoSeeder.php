@@ -38,6 +38,7 @@ class PagesDemoSeeder extends Seeder
         $this->seedPolishReturnPolicyPage();
         $this->seedPolishCookiePolicyPage();
         $this->seedPolishContactPage();
+        $this->seedModulePages();
     }
 
     /**
@@ -1432,5 +1433,120 @@ HTML;
 <h2>Managing Cookies</h2>
 <p>Use the cookie banner in the footer to update your preferences at any time.</p>
 HTML;
+    }
+
+    private function seedModulePages(): void
+    {
+        // Blog Page (EN)
+        $this->updatePage('blog', [
+            'parent_id' => null,
+            'title' => ['en' => 'Blog', 'pl' => 'Blog'],
+            'page_type' => 'module',
+            'module_name' => 'blog',
+            'module_config' => ['per_page' => 9],
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 40,
+            'seo_title' => 'Our Blog — Latest Articles',
+            'seo_description' => 'Read our latest blog posts and articles about fashion, lifestyle, and sustainability.',
+        ], 'en');
+
+        // Blog Page (PL)
+        $this->updatePage('blog', [
+            'parent_id' => null,
+            'title' => ['pl' => 'Blog', 'en' => 'Blog'],
+            'page_type' => 'module',
+            'module_name' => 'blog',
+            'module_config' => ['per_page' => 9],
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 40,
+            'seo_title' => 'Nasz Blog — Najnowsze Artykuły',
+            'seo_description' => 'Przeczytaj nasze najnowsze wpisy i artykuły na temat mody, stylu życia i ekologii.',
+        ], 'pl');
+
+        // Shop Page (EN)
+        $this->updatePage('shop', [
+            'parent_id' => null,
+            'title' => ['en' => 'Shop', 'pl' => 'Sklep'],
+            'page_type' => 'module',
+            'module_name' => 'ecommerce',
+            'module_config' => ['per_page' => 12],
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 50,
+            'seo_title' => 'Shop Our Products',
+            'seo_description' => 'Browse our catalog of premium products.',
+        ], 'en');
+
+        // Shop Page (PL)
+        $this->updatePage('sklep', [
+            'parent_id' => null,
+            'title' => ['pl' => 'Sklep', 'en' => 'Shop'],
+            'page_type' => 'module',
+            'module_name' => 'ecommerce',
+            'module_config' => ['per_page' => 12],
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 50,
+            'seo_title' => 'Kupuj Nasze Produkty',
+            'seo_description' => 'Przeglądaj nasz katalog produktów premium.',
+        ], 'pl');
+
+        // Categories Page (EN)
+        $this->updatePage('categories', [
+            'parent_id' => null,
+            'title' => ['en' => 'Categories', 'pl' => 'Kategorie'],
+            'page_type' => 'module',
+            'module_name' => 'ecommerce',
+            'module_config' => ['per_page' => 12],
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 60,
+            'seo_title' => 'Product Categories',
+            'seo_description' => 'Browse products by category.',
+        ], 'en');
+
+        // Categories Page (PL)
+        $this->updatePage('kategorie', [
+            'parent_id' => null,
+            'title' => ['pl' => 'Kategorie', 'en' => 'Categories'],
+            'page_type' => 'module',
+            'module_name' => 'ecommerce',
+            'module_config' => ['per_page' => 12],
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 60,
+            'seo_title' => 'Kategorie Produktów',
+            'seo_description' => 'Przeglądaj produkty według kategorii.',
+        ], 'pl');
+
+        // Brands Page (EN)
+        $this->updatePage('brands', [
+            'parent_id' => null,
+            'title' => ['en' => 'Brands', 'pl' => 'Marki'],
+            'page_type' => 'module',
+            'module_name' => 'ecommerce',
+            'module_config' => ['per_page' => 15],
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 70,
+            'seo_title' => 'Featured Brands',
+            'seo_description' => 'Browse products by brand.',
+        ], 'en');
+
+        // Brands Page (PL)
+        $this->updatePage('marki', [
+            'parent_id' => null,
+            'title' => ['pl' => 'Marki', 'en' => 'Brands'],
+            'page_type' => 'module',
+            'module_name' => 'ecommerce',
+            'module_config' => ['per_page' => 15],
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 70,
+            'seo_title' => 'Nasze Marki',
+            'seo_description' => 'Przeglądaj produkty według marek.',
+        ], 'pl');
     }
 }

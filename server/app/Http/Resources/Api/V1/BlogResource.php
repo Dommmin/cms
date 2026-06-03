@@ -21,7 +21,6 @@ class BlogResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'layout' => $this->layout,
-            'posts_per_page' => $this->posts_per_page,
             'commentable' => $this->commentable,
             'is_active' => $this->is_active,
             'available_locales' => $this->available_locales,

@@ -37,7 +37,7 @@ export async function generateBlogPostMetadata(
     }
 }
 
-export async function BlogPostPage({ slug, locale }: BlogPostParams) {
+export async function BlogPostPage({ slug, locale, basePath }: BlogPostParams) {
     let post;
     try {
         post = await getBlogPost(slug, locale);
@@ -60,6 +60,7 @@ export async function BlogPostPage({ slug, locale }: BlogPostParams) {
             post={post}
             relatedPosts={relatedPosts}
             locale={locale}
+            basePath={basePath ?? '/blog'}
         />
     );
 }

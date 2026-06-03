@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 
-import { getPage } from '@/api/cms';
+import { getBlogPost, getPage } from '@/api/cms';
 import { JsonLd } from '@/components/json-ld';
 import { PageRenderer } from '@/components/page-builder/page-renderer';
-import type { I18nConfig } from '@/lib/i18n';
+import type { I18nConfig, Locale } from '@/lib/i18n';
 import { getI18nConfig } from '@/lib/i18n-server';
 import { buildFaqPage, buildWebPage } from '@/lib/schema';
 import { absoluteUrl } from '@/lib/seo';
@@ -70,9 +70,11 @@ export async function generateDynamicPageMetadata({
 export async function CmsDynamicPage({
     locale,
     slug,
+    searchParams,
 }: {
     locale?: string;
     slug: string[];
+    searchParams?: { [key: string]: string | string[] | undefined };
 }) {
     const resolved = await resolveDynamicPageParams({ locale, slug });
     const i18nConfig = await getI18nConfig();
@@ -84,6 +86,30 @@ export async function CmsDynamicPage({
         previewToken,
     ).catch(() => null);
 
+    if (!page && resolved.slug.length > 0) {
+        // Try falling back to blog post if it's a sub-page
+        const postSlug = resolved.slug[resolved.slug.length - 1];
+        try {
+            const post = await getBlogPost(postSlug, resolved.locale);
+            if (post) {
+                // If it's a blog post, render the blog post page.
+                const basePath = `/${resolved.slug.slice(0, -1).join('/')}`;
+                // We'll pass basePath down to BlogPostPage later.
+                const { BlogPostPage } =
+                    await import('@/app/_routes/blog-post-page');
+                return (
+                    <BlogPostPage
+                        slug={postSlug}
+                        locale={resolved.locale as Locale}
+                        basePath={basePath}
+                    />
+                );
+            }
+        } catch {
+            // Not a blog post either, continue to 404 in PageContent
+        }
+    }
+
     return (
         <PageContent
             page={page}
@@ -91,6 +117,7 @@ export async function CmsDynamicPage({
             locale={resolved.locale}
             isPreview={!!previewToken}
             i18nConfig={i18nConfig}
+            searchParams={searchParams}
         />
     );
 }
@@ -101,12 +128,14 @@ function PageContent({
     locale,
     isPreview,
     i18nConfig,
+    searchParams,
 }: {
     page: PageData | null;
     slug: string[];
     locale: string;
     isPreview: boolean;
     i18nConfig: I18nConfig;
+    searchParams?: { [key: string]: string | string[] | undefined };
 }) {
     if (!page || (!page.is_published && !isPreview)) {
         notFound();
@@ -135,7 +164,11 @@ function PageContent({
     return (
         <>
             <JsonLd data={schemaData} />
-            <PageRenderer page={page} />
+            <PageRenderer
+                page={page}
+                searchParams={searchParams}
+                locale={locale}
+            />
         </>
     );
 }

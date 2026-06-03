@@ -14,13 +14,23 @@ import { SectionRenderer } from './section-renderer';
  * This component is a Server Component — it has no interactivity of its own.
  * Interactive child blocks (newsletter, forms, accordion, tabs) are 'use client'.
  */
-export async function PageRenderer({ page }: PageRendererProps) {
+export async function PageRenderer({
+    page,
+    searchParams,
+    locale,
+}: PageRendererProps) {
     if (!page.is_published) {
         return null;
     }
 
     if (page.page_type === 'module') {
-        return <ModuleRenderer page={page} />;
+        return (
+            <ModuleRenderer
+                page={page}
+                searchParams={searchParams}
+                locale={locale}
+            />
+        );
     }
 
     const cookieStore = await cookies();

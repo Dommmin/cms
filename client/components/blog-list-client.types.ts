@@ -11,4 +11,5 @@ export interface BlogListClientProps {
     posts: PaginatedResponse<BlogPost>;
     categories: BlogCategory[];
     params: BlogListParams;
+    basePath: string;
 }

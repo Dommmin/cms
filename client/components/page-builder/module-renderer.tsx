@@ -1,6 +1,7 @@
 import { sanitizeHtml } from '@/lib/sanitize';
 import type { Faq, Page } from '@/types/api';
 import type { ModuleRendererProps } from './module-renderer.types';
+import { BlogModule } from './modules/blog-module';
 
 /**
  * Renders the content for module-type pages.
@@ -62,12 +63,24 @@ function FaqModule({ page }: { page: Page }) {
     );
 }
 
-export function ModuleRenderer({ page }: ModuleRendererProps) {
+export function ModuleRenderer({
+    page,
+    searchParams,
+    locale,
+}: ModuleRendererProps) {
     switch (page.module_name) {
         case 'content':
             return <ContentModule page={page} />;
         case 'faq':
             return <FaqModule page={page} />;
+        case 'blog':
+            return (
+                <BlogModule
+                    page={page}
+                    searchParams={searchParams}
+                    locale={locale}
+                />
+            );
         default:
             if (process.env.NODE_ENV === 'development') {
                 return (

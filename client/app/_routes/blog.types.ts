@@ -9,6 +9,7 @@ export interface BlogIndexSearchParams {
 export interface BlogPostParams {
     slug: string;
     locale: Locale;
+    basePath?: string;
 }
 
 export interface BlogIndexPageProps {

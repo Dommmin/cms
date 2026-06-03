@@ -3,7 +3,6 @@ export interface Blog {
     name: string | Record<string, string>;
     slug: string | Record<string, string>;
     layout: string;
-    posts_per_page: number;
     commentable: boolean;
     is_active: boolean;
     position: number;

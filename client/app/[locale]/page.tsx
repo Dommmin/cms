@@ -40,7 +40,7 @@ export default async function HomePage({ params }: PageProps) {
             () => null,
         );
         if (!page || !page.is_published) notFound();
-        return <PageRenderer page={page} />;
+        return <PageRenderer page={page} locale={i18nConfig.defaultLocale} />;
     }
 
     const page = await getPage('home', locale).catch(() => null);
@@ -48,7 +48,7 @@ export default async function HomePage({ params }: PageProps) {
 
     return (
         <>
-            <PageRenderer page={page} />
+            <PageRenderer page={page} locale={locale} />
             <div className="store-shell mx-auto w-full px-4 pb-12 sm:px-6 lg:px-8">
                 <RecentlyViewed />
             </div>

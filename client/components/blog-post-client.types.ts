@@ -4,4 +4,5 @@ export interface BlogPostClientProps {
     post: BlogPost;
     relatedPosts?: BlogPost[];
     locale: string;
+    basePath: string;
 }

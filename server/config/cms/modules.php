@@ -24,4 +24,12 @@ return [
             'category' => ['nullable', 'string', 'max:255'],
         ],
     ],
+    'blog' => [
+        'label' => 'Blog (Lista postów)',
+        'description' => 'Wyświetla listę wpisów z bloga.',
+        'frontend_renderer' => 'blog',
+        'module_config_schema' => [
+            'blog_id' => ['nullable', 'integer', 'exists:blogs,id'],
+        ],
+    ],
 ];

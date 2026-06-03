@@ -29,20 +29,25 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-    const page = await getPage('home', await getDefaultLocale()).catch(
-        () => null,
-    );
-    return <HomeContent page={page} />;
+    const locale = await getDefaultLocale();
+    const page = await getPage('home', locale).catch(() => null);
+    return <HomeContent page={page} locale={locale} />;
 }
 
-function HomeContent({ page }: { page: PageData | null }) {
+function HomeContent({
+    page,
+    locale,
+}: {
+    page: PageData | null;
+    locale: string;
+}) {
     if (!page || !page.is_published) {
         notFound();
     }
 
     return (
         <>
-            <PageRenderer page={page} />
+            <PageRenderer page={page} locale={locale} />
             <div className="store-shell mx-auto w-full px-4 pb-12 sm:px-6 lg:px-8">
                 <RecentlyViewed />
             </div>
