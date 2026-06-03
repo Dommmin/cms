@@ -34,6 +34,7 @@ docker compose exec node npm run build
 ```
 
 > **Never run `php artisan`, `pint`, or `npm` directly** — the host has no DB/Redis access.
+> **NEVER run `npm run build`** during development while the dev server is running (it corrupts `.next` cache and breaks Turbopack/HMR).
 > If a container is down, report it and stop — do not fall back to the host.
 
 ---
@@ -78,7 +79,7 @@ client/          Next.js public storefront
 
 This repo’s routing/verification matrix lives in `.ai/routing.md`.
 
-- **Docker-only** commands. Never run host `php artisan`, `pint`, `npm`.
+- **Docker-only** commands. Never run host `php artisan`, `pint`, `npm`. Never run `npm run build` during local dev.
 - **Done criteria during implementation**: write code that should already satisfy the existing toolchain; do not rely on `make fix` to clean up avoidable issues.
 - **Full verification**: run `make fix && make check` only before deploy / final release validation, not after every coding task.
 - If containers are down: `docker compose ps`, report blocker, stop (no host fallback).

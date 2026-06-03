@@ -16,7 +16,7 @@ Headless CMS + e-commerce platform. Monorepo: `server/` (Laravel 12 backend + In
 
 ## MUST (short)
 
-- Docker-only commands: no host `php artisan`, `pint`, `npm`.
+- Docker-only commands: no host `php artisan`, `pint`, `npm`. Never run `npm run build` during local dev.
 - Done criteria: run `make check` before saying task is complete.
 - Commit criteria: run `make fix && make check`.
 - If containers are down: run `docker compose ps`, report blocker, stop.
