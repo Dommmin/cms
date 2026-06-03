@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { useLocalePath } from '@/hooks/use-locale';
+import { resolveBlogPostPath } from '@/lib/public-paths';
 import type { BlogListClientProps } from './blog-list-client.types';
 
 const SORT_OPTIONS = [
@@ -106,7 +107,10 @@ export function BlogListClient({
                         {posts.data.map((post) => (
                             <Link
                                 key={post.id}
-                                href={lp(`${basePath}/${post.slug}`)}
+                                href={lp(
+                                    post.public_url ??
+                                        resolveBlogPostPath(post),
+                                )}
                                 className="group border-border bg-card flex flex-col overflow-hidden rounded-xl border transition-shadow hover:shadow-lg"
                             >
                                 {post.featured_image ? (

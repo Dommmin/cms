@@ -15,6 +15,7 @@ import {
     useIsInWishlist,
     useRemoveFromWishlist,
 } from '@/hooks/use-wishlist';
+import { resolveProductPath } from '@/lib/public-paths';
 import type { ProductListItemProps } from './product-list-item.types';
 
 export function ProductListItem({
@@ -48,7 +49,7 @@ export function ProductListItem({
         <div className="border-border bg-card flex flex-col gap-4 rounded-xl border p-4 transition-shadow hover:shadow-md sm:flex-row sm:gap-6">
             {/* Thumbnail */}
             <Link
-                href={lp(`/products/${product.slug}`)}
+                href={lp(resolveProductPath(product))}
                 className="bg-muted/70 relative aspect-[4/3] w-full shrink-0 overflow-hidden rounded-lg sm:h-40 sm:w-40"
                 tabIndex={-1}
                 aria-hidden="true"
@@ -88,7 +89,7 @@ export function ProductListItem({
                         </p>
                     )}
                     <Link
-                        href={lp(`/products/${product.slug}`)}
+                        href={lp(resolveProductPath(product))}
                         className="hover:text-primary text-base leading-snug font-semibold hover:underline"
                     >
                         {product.name}

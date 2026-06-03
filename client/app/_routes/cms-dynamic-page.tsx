@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
+import type { ReactNode } from 'react';
 
-import { getBlogPost, getPage } from '@/api/cms';
+import { getPage } from '@/api/cms';
 import { JsonLd } from '@/components/json-ld';
 import { PageRenderer } from '@/components/page-builder/page-renderer';
 import type { I18nConfig, Locale } from '@/lib/i18n';
@@ -11,6 +12,65 @@ import { buildFaqPage, buildWebPage } from '@/lib/schema';
 import { absoluteUrl } from '@/lib/seo';
 
 import type { PageData } from './cms-dynamic-page.types';
+
+async function resolveModuleDetail(
+    locale: string,
+    slug: string[],
+): Promise<ReactNode> {
+    if (slug.length === 0) {
+        return null;
+    }
+
+    const parentPath = slug.slice(0, -1).join('/');
+    if (parentPath === '') {
+        return null;
+    }
+
+    const parentPage = await getPage(parentPath, locale).catch(() => null);
+    if (!parentPage) {
+        return null;
+    }
+
+    const entitySlug = slug[slug.length - 1];
+
+    switch (parentPage.module_name) {
+        case 'blog': {
+            const { BlogPostPage } =
+                await import('@/app/_routes/blog-post-page');
+            return (
+                <BlogPostPage
+                    slug={entitySlug}
+                    locale={locale as Locale}
+                    basePath={parentPage.path}
+                />
+            );
+        }
+        case 'product_listing': {
+            const { ProductPage } =
+                await import('@/app/_routes/product-detail-page');
+            return <ProductPage slug={entitySlug} basePath={parentPage.path} />;
+        }
+        case 'category_listing': {
+            const { CategoryDetailPage } =
+                await import('@/app/_routes/category-detail-page');
+            return (
+                <CategoryDetailPage
+                    slug={entitySlug}
+                    basePath={parentPage.path}
+                />
+            );
+        }
+        case 'brand_listing': {
+            const { BrandDetailPage } =
+                await import('@/app/_routes/brand-detail-page');
+            return (
+                <BrandDetailPage slug={entitySlug} basePath={parentPage.path} />
+            );
+        }
+        default:
+            return null;
+    }
+}
 
 export async function resolveDynamicPageParams({
     locale,
@@ -46,7 +106,54 @@ export async function generateDynamicPageMetadata({
             resolved.slug.join('/'),
             resolved.locale,
             previewToken,
-        );
+        ).catch(() => null);
+
+        if (!page) {
+            const parentPath = resolved.slug.slice(0, -1).join('/');
+            const parentPage =
+                parentPath !== ''
+                    ? await getPage(parentPath, resolved.locale).catch(
+                          () => null,
+                      )
+                    : null;
+
+            const entitySlug = resolved.slug[resolved.slug.length - 1];
+
+            switch (parentPage?.module_name) {
+                case 'blog': {
+                    const { getBlogPostMetadata } =
+                        await import('@/app/blog/_blog-metadata');
+                    return getBlogPostMetadata(entitySlug, resolved.locale);
+                }
+                case 'product_listing': {
+                    const { generateProductMetadata } =
+                        await import('@/app/_routes/product-detail-page');
+                    return generateProductMetadata({
+                        slug: entitySlug,
+                        locale: resolved.locale,
+                        basePath: parentPage.path,
+                    });
+                }
+                case 'category_listing': {
+                    const { generateCategoryMetadata } =
+                        await import('@/app/_routes/category-detail-page');
+                    return generateCategoryMetadata({
+                        slug: entitySlug,
+                        locale: resolved.locale,
+                    });
+                }
+                case 'brand_listing': {
+                    const { generateBrandMetadata } =
+                        await import('@/app/_routes/brand-detail-page');
+                    return generateBrandMetadata({
+                        slug: entitySlug,
+                        locale: resolved.locale,
+                    });
+                }
+                default:
+                    return {};
+            }
+        }
 
         return {
             title: page.seo_title ?? page.title,
@@ -87,26 +194,12 @@ export async function CmsDynamicPage({
     ).catch(() => null);
 
     if (!page && resolved.slug.length > 0) {
-        // Try falling back to blog post if it's a sub-page
-        const postSlug = resolved.slug[resolved.slug.length - 1];
-        try {
-            const post = await getBlogPost(postSlug, resolved.locale);
-            if (post) {
-                // If it's a blog post, render the blog post page.
-                const basePath = `/${resolved.slug.slice(0, -1).join('/')}`;
-                // We'll pass basePath down to BlogPostPage later.
-                const { BlogPostPage } =
-                    await import('@/app/_routes/blog-post-page');
-                return (
-                    <BlogPostPage
-                        slug={postSlug}
-                        locale={resolved.locale as Locale}
-                        basePath={basePath}
-                    />
-                );
-            }
-        } catch {
-            // Not a blog post either, continue to 404 in PageContent
+        const detail = await resolveModuleDetail(
+            resolved.locale,
+            resolved.slug,
+        );
+        if (detail) {
+            return detail;
         }
     }
 
@@ -141,7 +234,7 @@ function PageContent({
         notFound();
     }
 
-    const path = `/${slug.join('/')}`;
+    const path = page.path;
 
     const schemaData =
         page.module_name === 'faq' &&

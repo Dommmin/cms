@@ -13,9 +13,11 @@ import type { Product } from '@/types/api';
 export async function generateProductMetadata({
     slug,
     locale,
+    basePath = '/products',
 }: {
     slug: string;
     locale?: string;
+    basePath?: string;
 }): Promise<Metadata> {
     try {
         const resolvedLocale = locale
@@ -34,7 +36,7 @@ export async function generateProductMetadata({
                 undefined,
             robots: product.meta_robots ?? 'index, follow',
             alternates: generateAlternates(
-                `/products/${slug}`,
+                product.public_url ?? `${basePath}/${slug}`,
                 resolvedLocale,
                 i18nConfig,
             ),
@@ -58,6 +60,12 @@ export async function generateProductMetadata({
     }
 }
 
-export function ProductPage({ slug }: { slug: string }) {
-    return <ProductDetailClient slug={slug} />;
+export function ProductPage({
+    slug,
+    basePath,
+}: {
+    slug: string;
+    basePath?: string;
+}) {
+    return <ProductDetailClient slug={slug} basePath={basePath} />;
 }

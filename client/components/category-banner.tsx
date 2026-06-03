@@ -6,7 +6,8 @@ import { useCategory } from '@/hooks/use-cms';
 import type { CategoryBannerProps } from './category-banner.types';
 
 export function CategoryBanner({ slug }: CategoryBannerProps) {
-    const { data: category } = useCategory(slug);
+    const { data } = useCategory(slug);
+    const category = data?.category;
 
     if (!category) return null;
 

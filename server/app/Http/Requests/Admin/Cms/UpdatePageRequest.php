@@ -25,6 +25,7 @@ class UpdatePageRequest extends FormRequest
     {
         $this->route('page');
         $modules = array_keys((array) config('cms.modules', []));
+        $systemPages = array_keys((array) config('cms.system_pages', []));
         $defaultLocale = config('app.locale');
 
         return [
@@ -39,6 +40,7 @@ class UpdatePageRequest extends FormRequest
             'excerpt.*' => ['nullable', 'string', 'max:1000'],
             'layout' => ['required', Rule::enum(PageLayoutEnum::class)],
             'page_type' => ['required', Rule::enum(PageTypeEnum::class)],
+            'system_page_key' => ['nullable', 'string', Rule::in($systemPages)],
             'module_name' => [
                 Rule::requiredIf(fn (): bool => $this->input('page_type') === PageTypeEnum::Module->value),
                 'nullable',
@@ -65,6 +67,7 @@ class UpdatePageRequest extends FormRequest
             $parentId = $this->input('parent_id') ?: null;
             $locale = $this->input('locale') ?: null;
             $slugInput = $this->input('slug', []);
+            $systemPageKey = $this->input('system_page_key');
 
             if (! is_array($slugInput)) {
                 return;
@@ -85,6 +88,20 @@ class UpdatePageRequest extends FormRequest
                 if ($exists) {
                     $validator->errors()->add('slug.'.$localeCode, 'The slug must be unique for this parent and locale.');
                 }
+            }
+
+            if (! is_string($systemPageKey) || $systemPageKey === '') {
+                return;
+            }
+
+            $exists = Page::query()
+                ->where('system_page_key', $systemPageKey)
+                ->where('locale', $locale)
+                ->when($page, fn ($q) => $q->where('id', '!=', $page->id))
+                ->exists();
+
+            if ($exists) {
+                $validator->errors()->add('system_page_key', 'This system page role is already assigned for the selected locale.');
             }
         });
     }

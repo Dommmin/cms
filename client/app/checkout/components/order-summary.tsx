@@ -4,6 +4,7 @@ import { ChevronDown, RotateCcw, ShieldCheck, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { useStorefrontRoutes } from '@/hooks/use-cms';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
 
@@ -24,7 +25,14 @@ export function OrderSummary({
 }: OrderSummaryProps) {
     const { t } = useTranslation();
     const lp = useLocalePath();
+    const { data: storefrontRoutes } = useStorefrontRoutes();
     const [isMobileExpanded, setIsMobileExpanded] = useState(false);
+    const termsUrl = lp(
+        storefrontRoutes?.terms_of_service ?? '/terms-of-service',
+    );
+    const privacyUrl = lp(
+        storefrontRoutes?.privacy_policy ?? '/privacy-policy',
+    );
 
     const trustBadges = [
         {
@@ -173,7 +181,7 @@ export function OrderSummary({
                             'I have read and accept the',
                         )}{' '}
                         <Link
-                            href={lp('/terms-of-service')}
+                            href={termsUrl}
                             target="_blank"
                             className="hover:text-foreground underline"
                         >
@@ -181,7 +189,7 @@ export function OrderSummary({
                         </Link>{' '}
                         {t('checkout.and', 'and')}{' '}
                         <Link
-                            href={lp('/privacy-policy')}
+                            href={privacyUrl}
                             target="_blank"
                             className="hover:text-foreground underline"
                         >

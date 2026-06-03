@@ -2,6 +2,12 @@ import { sanitizeHtml } from '@/lib/sanitize';
 import type { Faq, Page } from '@/types/api';
 import type { ModuleRendererProps } from './module-renderer.types';
 import { BlogModule } from './modules/blog-module';
+import { ReturnsPortalModule } from './modules/returns-portal-module';
+import {
+    BrandListingModule,
+    CategoryListingModule,
+    ProductListingModule,
+} from './modules/storefront-listing-modules';
 
 /**
  * Renders the content for module-type pages.
@@ -81,6 +87,14 @@ export function ModuleRenderer({
                     locale={locale}
                 />
             );
+        case 'returns_portal':
+            return <ReturnsPortalModule page={page} />;
+        case 'product_listing':
+            return <ProductListingModule page={page} locale={locale} />;
+        case 'category_listing':
+            return <CategoryListingModule page={page} locale={locale} />;
+        case 'brand_listing':
+            return <BrandListingModule page={page} locale={locale} />;
         default:
             if (process.env.NODE_ENV === 'development') {
                 return (

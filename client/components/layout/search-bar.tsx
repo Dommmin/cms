@@ -44,14 +44,7 @@ function suggestionUrl(
     s: SearchSuggestion,
     lp: (path: string) => string,
 ): string {
-    switch (s.type) {
-        case 'category':
-            return lp(`/products?category=${s.slug}`);
-        case 'blog_post':
-            return lp(`/blog/${s.slug}`);
-        default:
-            return lp(`/products/${s.slug}`);
-    }
+    return lp(s.public_url ?? `/search?q=${encodeURIComponent(s.name)}`);
 }
 
 export function SearchBar() {

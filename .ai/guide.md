@@ -46,6 +46,7 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
   - **Stable Builder Sync** — `PageBuilderSyncService` uses diff/upsert by DB `id` for sections, blocks and relations; normal saves preserve stable IDs, support block moves between sections, and delete only items omitted from the snapshot
 - **Themes** — multiple themes with full design system (colors, typography, spacing, buttons, containers); activate/deactivate; per-page override via `theme_id`; CSS variables injected via `HandleAppearance` middleware (admin) and `ThemeStyles` component (storefront); theme editor with Typography/Spacing/Buttons/Containers sections
 - **Menus** — CRUD, menu items with link types
+- **System page roles foundation** — `pages.system_page_key` plus `config/cms/system_pages.php` define semantic storefront roles such as `privacy_policy`, `returns_portal`, `product_listing` and `blog_listing`; admin page create/edit now exposes a system-role assignment dropdown; public API supports `GET /api/v1/pages/system/{systemPageKey}` for locale-aware resolution with global fallback
 - **Forms** — form builder, submissions, email notifications
 - **FAQ** — CRUD with reorder and toggle
 - **Media** — upload, search, spatie/medialibrary
@@ -62,7 +63,7 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - **Checkout** — multi-step, shipping, payment providers, idempotency
 - **Discounts + Promotions** — conditions, stackable, product/category targeting
 - **Shipping Methods** — carrier strategy with Furgonetka aggregation for InPost Courier, DPD Courier, DPD Pickup, DHL Parcel, DHL ServicePoint and GLS; direct InPost ShipX integration for Paczkomat/locker shipments with GeoWidget token support; pickup-point methods expose checkout env requirements to the storefront; local pickup uses a no-op carrier
-- **Returns** — return requests, status history
+- **Returns** — return requests, status history, public guest lookup foundation (`POST /api/v1/returns/lookup`, `POST /api/v1/returns/guest-request`) and dedicated authenticated returns endpoints (`GET /api/v1/returns`, `GET /api/v1/returns/{reference}`)
 - **Wishlists** — per customer
 - **Reviews** — with images, helpful votes, moderation
 - **Affiliates + Referrals** — codes, commission tracking (pending/approved/paid)

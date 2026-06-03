@@ -62,6 +62,13 @@ export type PublicSettingsResponse = {
         social?: Record<string, string>;
         cookie?: CookieSettings;
     };
+    legal?: {
+        consent_version: string;
+        consent_version_snapshot: {
+            privacy_policy?: string | null;
+            cookie_policy?: string | null;
+        };
+    };
     modules?: Modules;
     theme?: ActiveTheme | null;
 };

@@ -20,8 +20,10 @@ import { createPortal } from 'react-dom';
 import { LocaleSwitcher } from '@/components/layout/locale-switcher';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { useLogout, useMe } from '@/hooks/use-auth';
+import { useStorefrontRoutes } from '@/hooks/use-cms';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
+import { resolveCategoryPath } from '@/lib/public-paths';
 import type { MobileMenuProps } from './mobile-menu.types';
 
 function localiseUrl(
@@ -50,6 +52,7 @@ export function MobileMenu({ items, categories, siteName }: MobileMenuProps) {
     const { mutate: logout } = useLogout();
     const { t } = useTranslation();
     const lp = useLocalePath();
+    const { data: storefrontRoutes } = useStorefrontRoutes();
 
     function closeMenu() {
         setMenuOpen(false);
@@ -205,7 +208,10 @@ export function MobileMenu({ items, categories, siteName }: MobileMenuProps) {
                         {categories.length > 0 && (
                             <div className="border-border border-b">
                                 <Link
-                                    href={lp('/products')}
+                                    href={lp(
+                                        storefrontRoutes?.product_listing ??
+                                            '/products',
+                                    )}
                                     onClick={closeMenu}
                                     className="border-border flex items-center gap-3 border-b px-4 py-3.5"
                                 >
@@ -268,7 +274,9 @@ export function MobileMenu({ items, categories, siteName }: MobileMenuProps) {
                                             ) : (
                                                 <Link
                                                     href={lp(
-                                                        `/products?category=${cat.slug}`,
+                                                        resolveCategoryPath(
+                                                            cat,
+                                                        ),
                                                     )}
                                                     onClick={closeMenu}
                                                     className="flex items-center gap-3 px-4 py-3.5"
@@ -300,7 +308,9 @@ export function MobileMenu({ items, categories, siteName }: MobileMenuProps) {
                                                 <div className="bg-muted/30 px-4 pb-3">
                                                     <Link
                                                         href={lp(
-                                                            `/products?category=${cat.slug}`,
+                                                            resolveCategoryPath(
+                                                                cat,
+                                                            ),
                                                         )}
                                                         onClick={closeMenu}
                                                         className="text-primary mb-2 block py-1.5 text-xs font-medium"
@@ -318,7 +328,9 @@ export function MobileMenu({ items, categories, siteName }: MobileMenuProps) {
                                                                         child.id
                                                                     }
                                                                     href={lp(
-                                                                        `/products?category=${child.slug}`,
+                                                                        resolveCategoryPath(
+                                                                            child,
+                                                                        ),
                                                                     )}
                                                                     onClick={
                                                                         closeMenu

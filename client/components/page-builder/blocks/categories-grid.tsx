@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { getRelationsByKey } from '@/lib/format';
+import { resolveCategoryPath } from '@/lib/public-paths';
 import type { Category } from '@/types/api';
 import type {
     CategoriesGridConfig,
@@ -45,7 +46,7 @@ export function CategoriesGridBlock({ block }: CategoriesGridProps) {
                 {categories.map((cat) => (
                     <Link
                         key={cat.id}
-                        href={`/categories/${cat.slug}`}
+                        href={resolveCategoryPath(cat)}
                         className="group bg-muted relative flex aspect-square flex-col items-center justify-end overflow-hidden rounded-2xl"
                     >
                         {cat.image_url && (

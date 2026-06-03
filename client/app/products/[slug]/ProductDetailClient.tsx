@@ -22,8 +22,10 @@ import {
 import { addRecentlyViewed } from '@/hooks/use-recently-viewed';
 import { useTranslation } from '@/hooks/use-translation';
 import { trackViewItem } from '@/lib/datalayer';
+import { resolveCategoryPath } from '@/lib/public-paths';
 import { buildBreadcrumbList, buildProduct } from '@/lib/schema';
 import { generateCanonical } from '@/lib/seo';
+import type { ProductDetailClientProps } from './product-detail-client.types';
 import {
     ProductBuyBox,
     ProductGallery,
@@ -31,7 +33,10 @@ import {
     RelatedProducts,
 } from './product-detail-components';
 
-export default function ProductDetailClient({ slug }: { slug: string }) {
+export default function ProductDetailClient({
+    slug,
+    basePath = '/products',
+}: ProductDetailClientProps) {
     const { data: product, isLoading } = useProduct(slug);
     const { data: reviewsData } = useProductReviews(slug);
     const { data: relatedProducts } = useRelatedProducts(slug);
@@ -122,7 +127,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                     {t('product.not_found', 'Product not found.')}
                 </p>
                 <Link
-                    href={lp('/products')}
+                    href={lp(basePath)}
                     className="mt-4 inline-block underline"
                 >
                     {t('product.back_to_shop', 'Back to shop')}
@@ -217,7 +222,9 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
               ) / 10
             : null;
 
-    const productUrl = generateCanonical(`/products/${product.slug}`);
+    const productUrl = generateCanonical(
+        product.public_url ?? `${basePath}/${product.slug}`,
+    );
     const compareAtPrice =
         selectedVariant?.compare_at_price &&
         selectedVariant.compare_at_price > selectedVariant.price
@@ -229,12 +236,15 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
             : null;
 
     const breadcrumbs = [
-        { label: t('nav.products', 'Products'), href: lp('/products') },
+        { label: t('nav.products', 'Products'), href: lp(basePath) },
         ...(product.category
             ? [
                   {
                       label: product.category.name,
-                      href: lp(`/products?category=${product.category.slug}`),
+                      href: lp(
+                          product.category.public_url ??
+                              resolveCategoryPath(product.category),
+                      ),
                   },
               ]
             : []),
@@ -301,13 +311,14 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
             />
             <JsonLd
                 data={buildBreadcrumbList([
-                    { name: 'Products', url: generateCanonical('/products') },
+                    { name: 'Products', url: generateCanonical(basePath) },
                     ...(product.category
                         ? [
                               {
                                   name: product.category.name,
                                   url: generateCanonical(
-                                      `/products?category=${product.category.slug}`,
+                                      product.category.public_url ??
+                                          resolveCategoryPath(product.category),
                                   ),
                               },
                           ]

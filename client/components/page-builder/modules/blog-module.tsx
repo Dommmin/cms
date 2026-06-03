@@ -33,7 +33,7 @@ export async function BlogModule({
     ]);
 
     // Calculate the base path for this blog module from the CMS page slug
-    const basePath = `/${page.slug}`;
+    const basePath = page.path;
 
     return (
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">

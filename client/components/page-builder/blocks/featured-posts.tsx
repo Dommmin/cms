@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { getRelationsByKey } from '@/lib/format';
+import { resolveBlogPostPath } from '@/lib/public-paths';
 import type { BlogPost } from '@/types/api';
 import type {
     FeaturedPostsConfig,
@@ -57,7 +58,7 @@ export function FeaturedPostsBlock({ block }: FeaturedPostsProps) {
                     {posts.map((post) => (
                         <article key={post.id} className="flex flex-col gap-3">
                             {post.featured_image && (
-                                <Link href={`/blog/${post.slug}`}>
+                                <Link href={resolveBlogPostPath(post)}>
                                     <div className="relative aspect-video overflow-hidden rounded-xl">
                                         <Image
                                             src={post.featured_image}
@@ -78,7 +79,7 @@ export function FeaturedPostsBlock({ block }: FeaturedPostsProps) {
                                         </span>
                                     )}
 
-                                <Link href={`/blog/${post.slug}`}>
+                                <Link href={resolveBlogPostPath(post)}>
                                     <h3 className="hover:text-primary text-lg leading-snug font-semibold transition-colors">
                                         {post.title}
                                     </h3>

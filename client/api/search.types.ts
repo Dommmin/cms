@@ -35,6 +35,7 @@ export interface SearchResult {
         id: number;
         name: string;
         slug: string;
+        public_url?: string | null;
         short_description: string | null;
         description: string | null;
         price_min: number;
@@ -56,10 +57,13 @@ export interface SearchResult {
             id: number;
             name: string;
             slug: string;
+            public_url?: string | null;
         } | null;
         brand: {
             id: number;
             name: string;
+            slug?: string;
+            public_url?: string | null;
         } | null;
     }[];
     meta: SearchMeta;
@@ -70,6 +74,7 @@ export interface SearchSuggestion {
     id: number;
     name: string;
     slug: string;
+    public_url?: string;
     thumbnail: string;
     price?: number;
     products_count?: number;

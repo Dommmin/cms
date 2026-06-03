@@ -13,10 +13,12 @@ import {
     useRemoveCartItem,
     useUpdateCartItem,
 } from '@/hooks/use-cart';
+import { useStorefrontRoutes } from '@/hooks/use-cms';
 import { useCurrency } from '@/hooks/use-currency';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
 import { getToken } from '@/lib/axios';
+import { resolveProductPath } from '@/lib/public-paths';
 
 export default function CartPage() {
     const { data: cart, isLoading } = useCart();
@@ -25,6 +27,7 @@ export default function CartPage() {
     const [shareOpen, setShareOpen] = useState(false);
     const { t } = useTranslation();
     const lp = useLocalePath();
+    const { data: storefrontRoutes } = useStorefrontRoutes();
     const { formatPrice } = useCurrency();
     const token = getToken();
     const checkoutHref = lp(token ? '/checkout' : '/checkout/options');
@@ -59,7 +62,7 @@ export default function CartPage() {
                     {t('cart.empty_desc', 'Your cart is empty.')}
                 </p>
                 <Link
-                    href={lp('/products')}
+                    href={lp(storefrontRoutes?.product_listing ?? '/products')}
                     className="bg-primary text-primary-foreground inline-flex items-center rounded-xl px-6 py-3 font-semibold hover:opacity-90"
                 >
                     {t('cart.start_shopping', 'Start Shopping')}
@@ -106,7 +109,11 @@ export default function CartPage() {
                                 <div className="flex flex-1 flex-col gap-1">
                                     <Link
                                         href={lp(
-                                            `/products/${item.product?.slug ?? ''}`,
+                                            item.product
+                                                ? resolveProductPath(
+                                                      item.product,
+                                                  )
+                                                : '/products',
                                         )}
                                         className="leading-tight font-medium hover:underline"
                                     >
@@ -241,7 +248,9 @@ export default function CartPage() {
                         {t('cart.proceed', 'Proceed to Checkout')}
                     </Link>
                     <Link
-                        href={lp('/products')}
+                        href={lp(
+                            storefrontRoutes?.product_listing ?? '/products',
+                        )}
                         className="text-muted-foreground hover:text-foreground mt-3 block text-center text-sm"
                     >
                         {t('cart.continue_shopping', 'Continue Shopping')}

@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\V1\NotificationPreferenceController;
 use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\StoreController as ApiStoreController;
+use App\Http\Controllers\Api\V1\StorefrontRouteController;
 use App\Http\Controllers\Api\V1\SupportController;
 use App\Http\Controllers\Api\V1\TagController;
 use App\Http\Controllers\Api\V1\TranslationController;
@@ -67,9 +68,11 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
     Route::middleware('throttle:api.public')->group(function (): void {
         Route::get('locales', new ApiLocaleController()->index(...))->name('locales.index');
         Route::get('translations/{locale}', [TranslationController::class, 'show'])->name('translations.show');
+        Route::get('pages/system/{systemPageKey}', [PageController::class, 'showBySystemPageKey'])->name('pages.system.show');
         Route::get('pages/{slug}', [PageController::class, 'show'])->where('slug', '.*')->name('pages.show');
         Route::get('menus/{location}', [MenuController::class, 'show'])->name('menus.show');
         Route::get('settings/public', [ProfileController::class, 'publicSettings'])->name('settings.public');
+        Route::get('storefront/routes', [StorefrontRouteController::class, 'index'])->name('storefront.routes');
         Route::get('faqs', [FaqController::class, 'index'])->name('faqs.index');
         Route::get('stores', new ApiStoreController()->index(...))->name('stores.index');
         Route::get('stores/{store}', new ApiStoreController()->show(...))->name('stores.show');
@@ -108,6 +111,7 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
             Route::put('password', [ProfileController::class, 'updatePassword'])->name('password');
             Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
             Route::get('export', [ProfileController::class, 'exportData'])->name('export');
+            Route::get('privacy-requests', [ProfileController::class, 'privacyRequests'])->name('privacy-requests.index');
             Route::post('restrict-processing', [ProfileController::class, 'restrictProcessing'])->name('restrict-processing');
             Route::delete('restrict-processing', [ProfileController::class, 'liftProcessingRestriction'])->name('lift-processing-restriction');
         });

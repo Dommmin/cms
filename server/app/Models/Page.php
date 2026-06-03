@@ -40,6 +40,7 @@ use Spatie\Translatable\HasTranslations;
  * @property array<string, mixed>|null $builder_snapshot
  * @property PageTypeEnum $page_type
  * @property string|null $module_name
+ * @property string|null $system_page_key
  * @property array<string, mixed>|null $module_config
  * @property int|null $theme_id
  * @property bool $is_published
@@ -145,6 +146,7 @@ use Spatie\Translatable\HasTranslations;
  * @method static Builder<static>|Page whereSitemapExclude($value)
  * @method static Builder<static>|Page whereSlug($value)
  * @method static Builder<static>|Page whereSubmittedForReviewAt($value)
+ * @method static Builder<static>|Page whereSystemPageKey($value)
  * @method static Builder<static>|Page whereThemeId($value)
  * @method static Builder<static>|Page whereTitle($value)
  * @method static Builder<static>|Page whereUpdatedAt($value)
@@ -155,7 +157,7 @@ use Spatie\Translatable\HasTranslations;
  */
 #[Fillable([
     'parent_id', 'locale', 'title', 'slug', 'content', 'rich_content', 'excerpt', 'layout',
-    'builder_snapshot', 'page_type', 'module_name', 'module_config',
+    'builder_snapshot', 'page_type', 'module_name', 'system_page_key', 'module_config',
     'theme_id', 'is_published', 'published_at', 'scheduled_publish_at', 'scheduled_unpublish_at',
     'published_version_id', 'draft_version_id', 'position',
     'seo_title', 'seo_description', 'seo_canonical', 'meta_robots', 'og_image', 'sitemap_exclude', 'available_locales',
@@ -230,6 +232,54 @@ class Page extends Model
         }
 
         return $page;
+    }
+
+    public static function findPublishedBySystemPageKey(
+        string $systemPageKey,
+        ?string $locale = null,
+    ): ?self {
+        $resolvedLocale = $locale ?? app()->getLocale();
+
+        $baseQuery = self::query()
+            ->where('is_published', true)
+            ->where('system_page_key', $systemPageKey);
+
+        $localized = (clone $baseQuery)
+            ->where('locale', $resolvedLocale)
+            ->first();
+
+        return $localized ?? (clone $baseQuery)->whereNull('locale')->first();
+    }
+
+    public function localizedSlug(string $locale): ?string
+    {
+        $slug = $this->getTranslation('slug', $locale, false);
+
+        if (is_string($slug) && $slug !== '') {
+            return $slug;
+        }
+
+        $fallback = $this->getTranslation('slug', config('app.locale'), false);
+
+        return is_string($fallback) && $fallback !== '' ? $fallback : null;
+    }
+
+    public function localizedPath(string $locale): string
+    {
+        $segments = [];
+        $current = $this;
+
+        while ($current instanceof self) {
+            $slug = $current->localizedSlug($locale);
+
+            if (is_string($slug) && $slug !== '') {
+                array_unshift($segments, $slug);
+            }
+
+            $current = $current->parent;
+        }
+
+        return '/'.implode('/', $segments);
     }
 
     public function getActivitylogOptions(): LogOptions

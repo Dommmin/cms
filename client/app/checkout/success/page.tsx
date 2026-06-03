@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
 import type { BankDetails } from '@/api/checkout';
+import { useStorefrontRoutes } from '@/hooks/use-cms';
 import { useCurrency } from '@/hooks/use-currency';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
@@ -16,6 +17,7 @@ function SuccessContent() {
     const isGuest = searchParams.get('guest') === '1';
     const { t } = useTranslation();
     const lp = useLocalePath();
+    const { data: storefrontRoutes } = useStorefrontRoutes();
     const { formatPrice } = useCurrency();
 
     const [bankDetails, setBankDetails] = useState<BankDetails | null>(null);
@@ -192,7 +194,9 @@ function SuccessContent() {
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
                 {isGuest ? (
                     <Link
-                        href={lp('/products')}
+                        href={lp(
+                            storefrontRoutes?.product_listing ?? '/products',
+                        )}
                         className="bg-primary text-primary-foreground inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-medium hover:opacity-90"
                     >
                         <ShoppingBag className="h-4 w-4" />
@@ -208,7 +212,10 @@ function SuccessContent() {
                             {t('account.my_orders', 'My Orders')}
                         </Link>
                         <Link
-                            href={lp('/products')}
+                            href={lp(
+                                storefrontRoutes?.product_listing ??
+                                    '/products',
+                            )}
                             className="border-border hover:bg-accent inline-flex items-center justify-center gap-2 rounded-xl border px-6 py-3 text-sm font-medium"
                         >
                             <ShoppingBag className="h-4 w-4" />

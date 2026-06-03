@@ -13,3 +13,11 @@ export interface ActiveFilterChip {
     label: string;
     onRemove: () => void;
 }
+
+export interface ProductsClientProps {
+    basePath?: string;
+    initialCategory?: string;
+    initialBrand?: string;
+    title?: string | null;
+    excerpt?: string | null;
+}

@@ -1,14 +1,17 @@
 'use client';
 
 import { FlashSaleCountdown } from '@/components/flash-sale-countdown';
+import { useStorefrontRoutes } from '@/hooks/use-cms';
 import { useLocalePath } from '@/hooks/use-locale';
 import { api } from '@/lib/axios';
+import { resolveProductPath } from '@/lib/public-paths';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type { FlashSalesResponse } from './page.types';
 
 export default function FlashSalesClient() {
     const lp = useLocalePath();
+    const { data: storefrontRoutes } = useStorefrontRoutes();
     const [data, setData] = useState<FlashSalesResponse | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -51,7 +54,9 @@ export default function FlashSalesClient() {
                         No active flash sales right now. Check back soon!
                     </p>
                     <Link
-                        href={lp('/products')}
+                        href={lp(
+                            storefrontRoutes?.product_listing ?? '/products',
+                        )}
                         className="mt-4 inline-block text-sm underline"
                     >
                         Browse all products
@@ -72,7 +77,9 @@ export default function FlashSalesClient() {
                                     {sale.product && (
                                         <Link
                                             href={lp(
-                                                `/products/${sale.product.slug}`,
+                                                resolveProductPath(
+                                                    sale.product,
+                                                ),
                                             )}
                                             className="text-muted-foreground mt-1 text-sm hover:underline"
                                         >
@@ -86,7 +93,7 @@ export default function FlashSalesClient() {
                                 {sale.product && (
                                     <Link
                                         href={lp(
-                                            `/products/${sale.product.slug}`,
+                                            resolveProductPath(sale.product),
                                         )}
                                         className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center rounded-md px-4 py-2 text-sm font-medium"
                                     >

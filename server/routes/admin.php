@@ -30,6 +30,7 @@ use App\Http\Controllers\Admin\NewsletterSegmentController;
 use App\Http\Controllers\Admin\NewsletterSubscriberController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PreviewController;
+use App\Http\Controllers\Admin\PrivacyRequestController;
 use App\Http\Controllers\Admin\ReferralController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\RteLinkController;
@@ -166,6 +167,7 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('panel')->name(
 
     // Cookie Consents (read-only, admin only)
     Route::resource('cookie-consents', CookieConsentController::class)->only(['index', 'show'])->middleware('role:admin|super-admin');
+    Route::resource('privacy-requests', PrivacyRequestController::class)->only(['index', 'show'])->middleware('role:admin|super-admin');
 
     // Users (admin only)
     Route::middleware('role:admin|super-admin')->group(function (): void {

@@ -1,3 +1,4 @@
+import { getSystemPage } from '@/api/cms';
 import type { I18nConfig } from '@/lib/i18n';
 import { getI18nConfig } from '@/lib/i18n-server';
 import { absoluteUrl, localizedBlogPath } from '@/lib/seo';
@@ -38,6 +39,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const i18nConfig = await getI18nConfig();
     const defaultLocale = i18nConfig.defaultLocale;
     const entries: MetadataRoute.Sitemap = [];
+    const [productListingPage, faqPage, blogListingPages] = await Promise.all([
+        getSystemPage('product_listing', defaultLocale).catch(() => null),
+        getSystemPage('faq_page', defaultLocale).catch(() => null),
+        Promise.all(
+            i18nConfig.locales.map(async (locale) => [
+                locale,
+                (await getSystemPage('blog_listing', locale).catch(() => null))
+                    ?.path ?? '/blog',
+            ]),
+        ),
+    ]);
+    const productListingPath = productListingPage?.path ?? '/products';
+    const faqPath = faqPage?.path ?? '/faq';
+    const blogListingPathByLocale = Object.fromEntries(blogListingPages);
+    const blogListingPath = blogListingPathByLocale[defaultLocale] ?? '/blog';
 
     // Static pages
     entries.push(
@@ -46,7 +62,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entries.push(
         sitemapEntry(
             i18nConfig,
-            '/products',
+            productListingPath,
             defaultLocale,
             undefined,
             'daily',
@@ -56,7 +72,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entries.push(
         sitemapEntry(
             i18nConfig,
-            '/blog',
+            blogListingPath,
             defaultLocale,
             undefined,
             'daily',
@@ -66,7 +82,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entries.push(
         sitemapEntry(
             i18nConfig,
-            '/faq',
+            faqPath,
             defaultLocale,
             undefined,
             'monthly',
@@ -84,7 +100,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             entries.push(
                 sitemapEntry(
                     i18nConfig,
-                    `/products/${product.slug}`,
+                    product.public_url ??
+                        `${productListingPath}/${product.slug}`,
                     defaultLocale,
                     d && !isNaN(d.getTime()) ? d : new Date(),
                     'weekly',
@@ -124,11 +141,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 entries.push(
                     sitemapEntry(
                         i18nConfig,
-                        localizedBlogPath(
-                            locale,
-                            post.slug_translations,
-                            post.canonical_slug,
-                        ),
+                        post.public_url ??
+                            localizedBlogPath(
+                                locale,
+                                post.slug_translations,
+                                post.canonical_slug,
+                                blogListingPathByLocale[locale] ??
+                                    blogListingPath,
+                            ),
                         locale,
                         post.updated_at
                             ? new Date(post.updated_at)
@@ -138,11 +158,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                         Object.fromEntries(
                             i18nConfig.locales.map((availableLocale) => [
                                 availableLocale,
-                                localizedBlogPath(
-                                    availableLocale,
-                                    post.slug_translations,
-                                    post.canonical_slug,
-                                ),
+                                post.public_url ??
+                                    localizedBlogPath(
+                                        availableLocale,
+                                        post.slug_translations,
+                                        post.canonical_slug,
+                                        blogListingPathByLocale[
+                                            availableLocale
+                                        ] ?? blogListingPath,
+                                    ),
                             ]),
                         ),
                     ),

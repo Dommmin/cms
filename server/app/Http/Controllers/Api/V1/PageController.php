@@ -14,6 +14,21 @@ use Illuminate\Http\Request;
 
 class PageController extends ApiController
 {
+    public function showBySystemPageKey(Request $request, string $systemPageKey): JsonResponse
+    {
+        $page = Page::findPublishedBySystemPageKey($systemPageKey, app()->getLocale());
+
+        abort_unless($page instanceof Page, 404);
+
+        $page->load([
+            'sections' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
+            'sections.blocks' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
+            'sections.blocks.relations',
+        ]);
+
+        return $this->ok(new PageResource($page));
+    }
+
     public function show(Request $request, string $slug): JsonResponse
     {
         $locale = app()->getLocale();

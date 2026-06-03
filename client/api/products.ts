@@ -62,6 +62,15 @@ export async function getProductsByCategory(
     });
 }
 
+export async function getProductsByBrand(
+    brandSlug: string,
+    filters: Omit<ProductFilters, 'brand'> = {},
+): Promise<PaginatedResponse<Product>> {
+    return apiGetPage<Product>(`/brands/${brandSlug}/products`, {
+        params: buildProductParams(filters),
+    });
+}
+
 export async function getProductReviews(
     slug: string,
     params: { page?: number; per_page?: number } = {},

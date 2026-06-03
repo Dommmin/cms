@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { PriceDisplay } from '@/components/price-display';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAddToCart } from '@/hooks/use-cart';
+import { useStorefrontRoutes } from '@/hooks/use-cms';
 import {
     clearComparison,
     removeFromCompare,
@@ -17,6 +18,7 @@ import {
 } from '@/hooks/use-comparison';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
+import { resolveProductPath } from '@/lib/public-paths';
 import type { Product } from '@/types/api';
 
 import type { CompareRow } from './page.types';
@@ -24,6 +26,7 @@ import type { CompareRow } from './page.types';
 export default function ComparePage() {
     const { t } = useTranslation();
     const lp = useLocalePath();
+    const { data: storefrontRoutes } = useStorefrontRoutes();
     const [mounted, setMounted] = useState(false);
     useEffect(() => {
         startTransition(() => setMounted(true));
@@ -57,7 +60,7 @@ export default function ComparePage() {
                     )}
                 </p>
                 <Link
-                    href={lp('/products')}
+                    href={lp(storefrontRoutes?.product_listing ?? '/products')}
                     className="bg-primary text-primary-foreground inline-flex items-center rounded-xl px-6 py-3 text-sm font-medium hover:opacity-90"
                 >
                     {t('compare.browse', 'Browse products')}
@@ -79,7 +82,7 @@ export default function ComparePage() {
                     )}
                 </p>
                 <Link
-                    href={lp('/products')}
+                    href={lp(storefrontRoutes?.product_listing ?? '/products')}
                     className="bg-primary text-primary-foreground inline-flex items-center rounded-xl px-6 py-3 text-sm font-medium hover:opacity-90"
                 >
                     {t('compare.browse', 'Browse products')}
@@ -303,7 +306,7 @@ export default function ComparePage() {
 
                                 {/* Name */}
                                 <Link
-                                    href={lp(`/products/${product.slug}`)}
+                                    href={lp(resolveProductPath(product))}
                                     className="hover:text-primary block text-center text-sm leading-snug font-semibold hover:underline"
                                 >
                                     {product.name}
@@ -413,7 +416,9 @@ export default function ComparePage() {
             {ids.length < 4 && (
                 <div className="mt-8 text-center">
                     <Link
-                        href={lp('/products')}
+                        href={lp(
+                            storefrontRoutes?.product_listing ?? '/products',
+                        )}
                         className="border-input hover:bg-accent inline-flex items-center rounded-xl border px-5 py-2.5 text-sm font-medium"
                     >
                         {t(

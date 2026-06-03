@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Form;
 use App\Models\Page;
 use App\Models\Product;
+use App\Services\StorefrontPathService;
 use BackedEnum;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -34,9 +35,11 @@ class PageResource extends JsonResource
             'id' => $page->id,
             'title' => $page->title,
             'slug' => $page->getTranslation('slug', $locale, false),
+            'path' => resolve(StorefrontPathService::class)->pagePath($page, $locale),
             'is_published' => $page->is_published,
             'page_type' => $page->page_type->value,
             'module_name' => $page->module_name,
+            'system_page_key' => $page->system_page_key,
             'module_config' => $page->module_config,
             'content' => $page->content,
             'seo_title' => $page->seo_title,
@@ -193,6 +196,7 @@ class PageResource extends JsonResource
         }
 
         $lookup = [];
+        $pathService = resolve(StorefrontPathService::class);
 
         foreach ($allRelations->groupBy('relation_type') as $type => $relations) {
             $ids = $relations->pluck('relation_id')->unique()->values()->toArray();
@@ -220,6 +224,7 @@ class PageResource extends JsonResource
                         'id' => $product->id,
                         'name' => $product->name,
                         'slug' => $product->slug,
+                        'public_url' => $pathService->productPath($product),
                         'short_description' => $product->short_description,
                         'price_min' => $priceMin,
                         'price_max' => $priceMax,
@@ -237,12 +242,18 @@ class PageResource extends JsonResource
                             'url' => $media->getUrl(),
                             'alt' => $media->name ?: $product->name,
                         ] : null,
-                        'brand' => $product->brand ? ['id' => $product->brand->id, 'name' => $product->brand->name] : null,
+                        'brand' => $product->brand ? [
+                            'id' => $product->brand->id,
+                            'name' => $product->brand->name,
+                            'slug' => $product->brand->slug,
+                            'public_url' => $pathService->brandPath($product->brand),
+                        ] : null,
                         'category' => [
                             'id' => $product->category->id,
                             'name' => $product->category->name,
                             'slug' => $product->category->slug,
                             'image_url' => $product->category->image_path,
+                            'public_url' => $pathService->categoryPath($product->category),
                         ],
                         'images' => [],
                         'attributes' => [],
@@ -257,6 +268,7 @@ class PageResource extends JsonResource
                         'id' => $post->id,
                         'title' => $post->title,
                         'slug' => $post->slug,
+                        'public_url' => $pathService->blogPostPath($post),
                         'excerpt' => $post->excerpt,
                         'featured_image' => $post->featured_image,
                         'published_at' => $post->published_at?->toIso8601String(),
@@ -280,6 +292,7 @@ class PageResource extends JsonResource
                         'description' => $cat->description,
                         'image_url' => $cat->image_path,
                         'parent_id' => $cat->parent_id,
+                        'public_url' => $pathService->categoryPath($cat),
                     ];
                 }
             } elseif ($type === 'brand') {
@@ -290,7 +303,8 @@ class PageResource extends JsonResource
                         'id' => $brand->id,
                         'name' => $brand->name,
                         'slug' => $brand->slug,
-                        'logo_url' => $brand->logo_url ?? null,
+                        'logo_url' => $brand->logo_path,
+                        'public_url' => $pathService->brandPath($brand),
                     ];
                 }
             }

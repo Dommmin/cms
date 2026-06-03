@@ -10,6 +10,12 @@ async function articleAlternates(
 ): Promise<Metadata['alternates']> {
     const i18nConfig = await getI18nConfig();
     const languages: Record<string, string> = {};
+    const basePath = post.public_url
+        ? post.public_url.slice(
+              0,
+              Math.max(post.public_url.lastIndexOf('/'), 0),
+          )
+        : '/blog';
 
     for (const availableLocale of i18nConfig.locales) {
         if (!post.available_locales.includes(availableLocale)) {
@@ -22,6 +28,7 @@ async function articleAlternates(
                 availableLocale,
                 post.slug_translations,
                 post.canonical_slug,
+                basePath,
             ),
             i18nConfig,
         );
@@ -31,6 +38,7 @@ async function articleAlternates(
         locale,
         post.slug_translations,
         post.canonical_slug,
+        basePath,
     );
 
     return {
@@ -47,6 +55,7 @@ async function articleAlternates(
                         i18nConfig.defaultLocale,
                         post.slug_translations,
                         post.canonical_slug,
+                        basePath,
                     ),
                     i18nConfig,
                 ),
@@ -64,6 +73,12 @@ export async function getBlogPostMetadata(
         locale,
         post.slug_translations,
         post.canonical_slug,
+        post.public_url
+            ? post.public_url.slice(
+                  0,
+                  Math.max(post.public_url.lastIndexOf('/'), 0),
+              )
+            : '/blog',
     );
     const dynamicOgImage = absoluteUrl(
         locale,

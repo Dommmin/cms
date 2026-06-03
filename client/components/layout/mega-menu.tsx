@@ -5,8 +5,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 
+import { useStorefrontRoutes } from '@/hooks/use-cms';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
+import { resolveCategoryPath } from '@/lib/public-paths';
 import type { Category } from '@/types/api';
 import type { MegaMenuProps, OpenKey } from './mega-menu.types';
 
@@ -53,6 +55,7 @@ export function MegaMenu({ items, categories }: MegaMenuProps) {
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const lp = useLocalePath();
     const { t } = useTranslation();
+    const { data: storefrontRoutes } = useStorefrontRoutes();
 
     const activeCategory =
         activeCatId != null
@@ -126,7 +129,9 @@ export function MegaMenu({ items, categories }: MegaMenuProps) {
                                             <li key={cat.id}>
                                                 <Link
                                                     href={lp(
-                                                        `/products?category=${cat.slug}`,
+                                                        resolveCategoryPath(
+                                                            cat,
+                                                        ),
                                                     )}
                                                     onMouseEnter={() =>
                                                         setActiveCatId(cat.id)
@@ -158,7 +163,10 @@ export function MegaMenu({ items, categories }: MegaMenuProps) {
 
                                     <div className="border-border mt-3 border-t pt-3">
                                         <Link
-                                            href={lp('/products')}
+                                            href={lp(
+                                                storefrontRoutes?.product_listing ??
+                                                    '/products',
+                                            )}
                                             onClick={() => setOpenKey(null)}
                                             className="text-primary px-3 text-xs font-medium hover:underline"
                                         >
@@ -177,7 +185,9 @@ export function MegaMenu({ items, categories }: MegaMenuProps) {
                                             <div className="mb-3 flex items-center justify-between">
                                                 <Link
                                                     href={lp(
-                                                        `/products?category=${activeCategory.slug}`,
+                                                        resolveCategoryPath(
+                                                            activeCategory,
+                                                        ),
                                                     )}
                                                     onClick={() =>
                                                         setOpenKey(null)
@@ -188,7 +198,9 @@ export function MegaMenu({ items, categories }: MegaMenuProps) {
                                                 </Link>
                                                 <Link
                                                     href={lp(
-                                                        `/products?category=${activeCategory.slug}`,
+                                                        resolveCategoryPath(
+                                                            activeCategory,
+                                                        ),
                                                     )}
                                                     onClick={() =>
                                                         setOpenKey(null)
@@ -213,7 +225,9 @@ export function MegaMenu({ items, categories }: MegaMenuProps) {
                                                             <li key={child.id}>
                                                                 <Link
                                                                     href={lp(
-                                                                        `/products?category=${child.slug}`,
+                                                                        resolveCategoryPath(
+                                                                            child,
+                                                                        ),
                                                                     )}
                                                                     onClick={() =>
                                                                         setOpenKey(

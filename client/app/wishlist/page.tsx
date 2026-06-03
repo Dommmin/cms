@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { PriceDisplay } from '@/components/price-display';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAddToCart } from '@/hooks/use-cart';
+import { useStorefrontRoutes } from '@/hooks/use-cms';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
 import {
@@ -15,12 +16,14 @@ import {
     useRemoveFromWishlist,
     useWishlist,
 } from '@/hooks/use-wishlist';
+import { resolveProductPath } from '@/lib/public-paths';
 
 export default function WishlistPage() {
     const { data: wishlist, isLoading } = useWishlist();
     const { mutate: removeFromWishlist } = useRemoveFromWishlist();
     const { mutate: addToWishlist } = useAddToWishlist();
     const { mutate: addToCart } = useAddToCart();
+    const { data: storefrontRoutes } = useStorefrontRoutes();
     const lp = useLocalePath();
     const { t } = useTranslation();
 
@@ -77,7 +80,9 @@ export default function WishlistPage() {
                         )}
                     </p>
                     <Link
-                        href={lp('/products')}
+                        href={lp(
+                            storefrontRoutes?.product_listing ?? '/products',
+                        )}
                         className="bg-primary text-primary-foreground mt-6 inline-block rounded-xl px-6 py-2.5 text-sm font-semibold hover:opacity-90"
                     >
                         {t('wishlist.browse_products', 'Browse products')}
@@ -90,7 +95,7 @@ export default function WishlistPage() {
                             key={item.id}
                             className="group border-border bg-card relative flex flex-col overflow-hidden rounded-xl border"
                         >
-                            <Link href={lp(`/products/${item.product.slug}`)}>
+                            <Link href={lp(resolveProductPath(item.product))}>
                                 <div className="bg-muted relative aspect-square overflow-hidden">
                                     {item.product.thumbnail?.url ? (
                                         <Image
@@ -152,7 +157,7 @@ export default function WishlistPage() {
 
                             <div className="flex flex-col gap-2 p-3">
                                 <Link
-                                    href={lp(`/products/${item.product.slug}`)}
+                                    href={lp(resolveProductPath(item.product))}
                                     className="line-clamp-2 text-sm leading-snug font-medium hover:underline"
                                 >
                                     {item.product.name}

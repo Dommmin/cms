@@ -29,6 +29,23 @@ class MenuSeeder extends Seeder
         return Page::query()->where('slug->en', $slug)->value('id');
     }
 
+    private function pageIdBySystemKey(string $systemPageKey): ?int
+    {
+        return Page::query()->where('system_page_key', $systemPageKey)->value('id');
+    }
+
+    private function pageReference(string $slug, ?string $systemPageKey = null): ?int
+    {
+        if ($systemPageKey !== null) {
+            $pageId = $this->pageIdBySystemKey($systemPageKey);
+            if ($pageId !== null) {
+                return $pageId;
+            }
+        }
+
+        return $this->pageId($slug);
+    }
+
     private function seedHeaderMenu(): void
     {
         $menu = Menu::query()->updateOrCreate(['location' => MenuLocationEnum::Header->value], ['name' => 'Header Navigation', 'is_active' => true]);
@@ -53,6 +70,7 @@ class MenuSeeder extends Seeder
             [
                 'label' => ['en' => 'FAQ', 'pl' => 'FAQ'],
                 'page_slug' => 'faq',
+                'system_page_key' => 'faq_page',
                 'link_type' => MenuLinkTypeEnum::Page,
                 'position' => 3,
             ],
@@ -65,6 +83,7 @@ class MenuSeeder extends Seeder
             [
                 'label' => ['en' => 'Contact', 'pl' => 'Kontakt'],
                 'page_slug' => 'contact',
+                'system_page_key' => 'contact_page',
                 'link_type' => MenuLinkTypeEnum::Page,
                 'position' => 5,
             ],
@@ -78,7 +97,9 @@ class MenuSeeder extends Seeder
                 'url' => $item['url'] ?? null,
                 'target' => '_self',
                 'link_type' => $item['link_type'],
-                'linked_entity_id' => isset($item['page_slug']) ? $this->pageId($item['page_slug']) : null,
+                'linked_entity_id' => isset($item['page_slug'])
+                    ? $this->pageReference($item['page_slug'], $item['system_page_key'] ?? null)
+                    : null,
                 'is_active' => true,
                 'position' => $item['position'],
             ]);
@@ -107,12 +128,14 @@ class MenuSeeder extends Seeder
             [
                 'label' => ['en' => 'FAQ', 'pl' => 'FAQ'],
                 'page_slug' => 'faq',
+                'system_page_key' => 'faq_page',
                 'link_type' => MenuLinkTypeEnum::Page,
                 'position' => 3,
             ],
             [
                 'label' => ['en' => 'Contact', 'pl' => 'Kontakt'],
                 'page_slug' => 'contact',
+                'system_page_key' => 'contact_page',
                 'link_type' => MenuLinkTypeEnum::Page,
                 'position' => 4,
             ],
@@ -126,7 +149,9 @@ class MenuSeeder extends Seeder
                 'url' => $item['url'] ?? null,
                 'target' => '_self',
                 'link_type' => $item['link_type'],
-                'linked_entity_id' => isset($item['page_slug']) ? $this->pageId($item['page_slug']) : null,
+                'linked_entity_id' => isset($item['page_slug'])
+                    ? $this->pageReference($item['page_slug'], $item['system_page_key'] ?? null)
+                    : null,
                 'is_active' => true,
                 'position' => $item['position'],
             ]);
@@ -143,30 +168,35 @@ class MenuSeeder extends Seeder
             [
                 'label' => ['en' => 'Privacy Policy', 'pl' => 'Polityka prywatności'],
                 'page_slug' => 'privacy-policy',
+                'system_page_key' => 'privacy_policy',
                 'link_type' => MenuLinkTypeEnum::Page,
                 'position' => 1,
             ],
             [
                 'label' => ['en' => 'Terms of Service', 'pl' => 'Regulamin'],
                 'page_slug' => 'terms-of-service',
+                'system_page_key' => 'terms_of_service',
                 'link_type' => MenuLinkTypeEnum::Page,
                 'position' => 2,
             ],
             [
                 'label' => ['en' => 'Shipping Policy', 'pl' => 'Polityka wysyłki'],
                 'page_slug' => 'shipping-policy',
+                'system_page_key' => 'shipping_policy',
                 'link_type' => MenuLinkTypeEnum::Page,
                 'position' => 3,
             ],
             [
                 'label' => ['en' => 'Return Policy', 'pl' => 'Polityka zwrotów'],
                 'page_slug' => 'return-policy',
+                'system_page_key' => 'return_policy',
                 'link_type' => MenuLinkTypeEnum::Page,
                 'position' => 4,
             ],
             [
                 'label' => ['en' => 'Cookie Policy', 'pl' => 'Polityka cookies'],
                 'page_slug' => 'cookie-policy',
+                'system_page_key' => 'cookie_policy',
                 'link_type' => MenuLinkTypeEnum::Page,
                 'position' => 5,
             ],
@@ -187,7 +217,9 @@ class MenuSeeder extends Seeder
                 'url' => $item['url'] ?? null,
                 'target' => $item['target'] ?? '_self',
                 'link_type' => $item['link_type'],
-                'linked_entity_id' => isset($item['page_slug']) ? $this->pageId($item['page_slug']) : null,
+                'linked_entity_id' => isset($item['page_slug'])
+                    ? $this->pageReference($item['page_slug'], $item['system_page_key'])
+                    : null,
                 'is_active' => true,
                 'position' => $item['position'],
             ]);

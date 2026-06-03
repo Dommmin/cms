@@ -4,10 +4,12 @@ import type {
     BlogPost,
     Brand,
     Category,
+    CategoryShowResponse,
     Faq,
     Menu,
     Page,
     PaginatedResponse,
+    StorefrontRoutes,
 } from '@/types/api';
 
 // ── Pages ─────────────────────────────────────────────────────────────────────
@@ -27,6 +29,17 @@ export async function getPage(
     });
 }
 
+export async function getSystemPage(
+    systemPageKey: string,
+    locale?: string,
+): Promise<Page> {
+    return serverFetch<Page>(`/pages/system/${systemPageKey}`, {
+        locale,
+        revalidate: 60,
+        tags: [`system-page:${systemPageKey}`],
+    });
+}
+
 // ── Menus ─────────────────────────────────────────────────────────────────────
 
 export async function getMenu(
@@ -43,14 +56,16 @@ export async function getMenu(
 // ── Categories ────────────────────────────────────────────────────────────────
 
 export async function getCategories(): Promise<Category[]> {
-    return serverFetch<Category[]>('/categories', {
+    const response = await serverFetch<{ data: Category[] }>('/categories', {
         revalidate: 120,
         tags: ['categories'],
     });
+
+    return response.data;
 }
 
-export async function getCategory(slug: string): Promise<Category> {
-    return serverFetch<Category>(`/categories/${slug}`, {
+export async function getCategory(slug: string): Promise<CategoryShowResponse> {
+    return serverFetch<CategoryShowResponse>(`/categories/${slug}`, {
         revalidate: 120,
         tags: [`category:${slug}`],
     });
@@ -112,8 +127,25 @@ export async function getBrands(): Promise<Brand[]> {
     });
 }
 
+export async function getBrand(slug: string): Promise<Brand> {
+    return serverFetch<Brand>(`/brands/${slug}`, {
+        revalidate: 120,
+        tags: [`brand:${slug}`],
+    });
+}
+
 // ── FAQs ──────────────────────────────────────────────────────────────────────
 
 export async function getFaqs(): Promise<Faq[]> {
     return serverFetch<Faq[]>('/faqs', { revalidate: 300, tags: ['faqs'] });
+}
+
+export async function getStorefrontRoutes(
+    locale?: string,
+): Promise<StorefrontRoutes> {
+    return serverFetch<StorefrontRoutes>('/storefront/routes', {
+        locale,
+        revalidate: 300,
+        tags: ['storefront-routes'],
+    });
 }

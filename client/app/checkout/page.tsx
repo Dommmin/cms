@@ -17,6 +17,7 @@ import {
     usePaymentMethods,
     useShippingMethods,
 } from '@/hooks/use-checkout';
+import { useStorefrontRoutes } from '@/hooks/use-cms';
 import { useCurrency } from '@/hooks/use-currency';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useAddresses, useCreateAddress } from '@/hooks/use-profile';
@@ -74,6 +75,7 @@ export default function CheckoutPage() {
     const router = useRouter();
     const { t } = useTranslation();
     const lp = useLocalePath();
+    const { data: storefrontRoutes } = useStorefrontRoutes();
     const [mounted] = useState(() => typeof window !== 'undefined');
     const [token] = useState<string | null>(() =>
         typeof window !== 'undefined' ? getToken() : null,
@@ -376,7 +378,7 @@ export default function CheckoutPage() {
                     )}
                 </p>
                 <Link
-                    href={lp('/products')}
+                    href={lp(storefrontRoutes?.product_listing ?? '/products')}
                     className="bg-primary text-primary-foreground inline-flex items-center rounded-xl px-6 py-3 text-sm font-medium hover:opacity-90"
                 >
                     {t('checkout.browse_products', 'Browse products')}

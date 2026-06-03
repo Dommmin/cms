@@ -14,6 +14,7 @@ import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
 import { trackSearch } from '@/lib/datalayer';
 import { formatPrice } from '@/lib/format';
+import { resolveProductPath } from '@/lib/public-paths';
 import type { Category } from '@/types/api';
 import { useQuery } from '@tanstack/react-query';
 
@@ -669,7 +670,7 @@ export function SearchClient() {
                                 {products.map((product) => (
                                     <a
                                         key={product.id}
-                                        href={lp(`/products/${product.slug}`)}
+                                        href={lp(resolveProductPath(product))}
                                         className="hover:bg-accent/5 rounded-xl transition-colors"
                                     >
                                         <ProductSearchCard product={product} />

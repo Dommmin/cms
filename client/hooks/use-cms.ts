@@ -8,10 +8,12 @@ import type {
     BlogPost,
     Brand,
     Category,
+    CategoryShowResponse,
     Faq,
     Menu,
     Page,
     PaginatedResponse,
+    StorefrontRoutes,
 } from '@/types/api';
 
 export function usePage(slug: string) {
@@ -42,7 +44,7 @@ export function useCategories() {
 export function useCategory(slug: string) {
     return useQuery({
         queryKey: ['categories', slug],
-        queryFn: () => apiGet<Category>(`/categories/${slug}`),
+        queryFn: () => apiGet<CategoryShowResponse>(`/categories/${slug}`),
         enabled: !!slug,
         staleTime: 5 * 60 * 1000,
     });
@@ -87,6 +89,14 @@ export function useFaqs() {
     return useQuery({
         queryKey: ['faqs'],
         queryFn: () => apiGetMany<Faq>('/faqs'),
+        staleTime: 10 * 60 * 1000,
+    });
+}
+
+export function useStorefrontRoutes() {
+    return useQuery({
+        queryKey: ['storefront-routes'],
+        queryFn: () => apiGet<StorefrontRoutes>('/storefront/routes'),
         staleTime: 10 * 60 * 1000,
     });
 }

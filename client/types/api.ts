@@ -60,6 +60,10 @@ export interface ConsentPreferences {
     analytics: boolean;
     marketing: boolean;
     consent_version: string | null;
+    policy_version_snapshot?: {
+        privacy_policy?: string | null;
+        cookie_policy?: string | null;
+    } | null;
 }
 
 export interface AuthResponse {
@@ -139,13 +143,16 @@ export interface Brand {
     id: number;
     name: string;
     slug: string;
+    description?: string | null;
     logo_url: string | null;
+    public_url?: string | null;
 }
 
 export interface Product {
     id: number;
     name: string;
     slug: string;
+    public_url?: string | null;
     short_description: string | null;
     description: string | null;
     /** min price across variants, in cents */
@@ -189,7 +196,13 @@ export interface Category {
     description: string | null;
     image_url: string | null;
     parent_id: number | null;
+    public_url?: string | null;
     children?: Category[];
+}
+
+export interface CategoryShowResponse {
+    category: Category;
+    breadcrumb: Category[];
 }
 
 // ── Cart ──────────────────────────────────────────────────────────────────────
@@ -322,6 +335,14 @@ export interface OrderItem {
     unit_price: number;
     /** in cents */
     subtotal: number;
+    return_eligibility?: {
+        order_item_id: number;
+        ordered_quantity: number;
+        already_requested_quantity: number;
+        eligible_quantity: number;
+        is_eligible: boolean;
+        reasons: string[];
+    };
 }
 
 export interface Shipment {
@@ -351,9 +372,19 @@ export interface OrderStatusHistory {
 }
 
 export interface OrderReturnItem {
+    order_item_id?: number;
     quantity: number;
     condition: string | null;
     product_name: string | null;
+    notes?: string | null;
+}
+
+export interface ReturnStatusHistory {
+    previous_status: string | null;
+    new_status: string;
+    changed_by: string | null;
+    notes: string | null;
+    changed_at: string | null;
 }
 
 export interface OrderReturn {
@@ -361,6 +392,7 @@ export interface OrderReturn {
     reference_number: string;
     return_type: string;
     status: string;
+    order_reference_number?: string | null;
     reason: string | null;
     customer_notes: string | null;
     admin_notes: string | null;
@@ -368,6 +400,7 @@ export interface OrderReturn {
     refund_amount: number | null;
     return_tracking_number: string | null;
     created_at: string;
+    status_history?: ReturnStatusHistory[];
     items: OrderReturnItem[];
 }
 
@@ -395,6 +428,17 @@ export interface Order {
     billing_address?: Address;
     status_history?: OrderStatusHistory[];
     returns?: OrderReturn[];
+    return_eligibility?: {
+        delivered_at: string | null;
+        eligible_types: Array<'return' | 'exchange' | 'complaint'>;
+        blocked_reasons: string[];
+        policy: {
+            return_window_days: number;
+            exchange_window_days: number;
+            complaint_window_days: number;
+        };
+        items: Array<NonNullable<OrderItem['return_eligibility']>>;
+    };
     created_at: string;
 }
 
@@ -553,6 +597,7 @@ export interface BlogPost {
     seo_title: string | null;
     seo_description: string | null;
     canonical_url: string | null;
+    public_url?: string | null;
     meta_robots: string;
     og_image: string | null;
     sitemap_exclude: boolean;
@@ -672,10 +717,12 @@ export type BlockType =
 export interface Page {
     id: number;
     title: string;
-    slug: Record<string, string>;
+    slug: string;
+    path: string;
     page_type: PageType;
     layout: PageLayout;
     module_name: string | null;
+    system_page_key: string | null;
     module_config: Record<string, unknown> | null;
     content: string | null;
     excerpt: string | null;
@@ -727,6 +774,33 @@ export interface PublicSettings {
     contact_email: string | null;
     contact_phone: string | null;
     social_links: Record<string, string> | null;
+}
+
+export interface PrivacyRequest {
+    id: number;
+    type: string;
+    status: string;
+    email: string | null;
+    payload: Record<string, unknown> | null;
+    resolution_note: string | null;
+    requested_at: string | null;
+    resolved_at: string | null;
+}
+
+export interface StorefrontRoutes {
+    product_listing: string;
+    category_listing: string;
+    brand_listing: string;
+    blog_listing: string;
+    search_results: string;
+    faq_page: string | null;
+    returns_portal: string | null;
+    contact_page: string | null;
+    privacy_policy: string | null;
+    cookie_policy: string | null;
+    terms_of_service: string | null;
+    shipping_policy: string | null;
+    return_policy: string | null;
 }
 
 // ── Error ─────────────────────────────────────────────────────────────────────

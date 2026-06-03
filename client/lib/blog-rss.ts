@@ -1,4 +1,4 @@
-import { getBlogPosts } from '@/api/cms';
+import { getBlogPosts, getSystemPage } from '@/api/cms';
 import { getI18nConfig } from '@/lib/i18n-server';
 import { absoluteUrl, localizedBlogPath } from '@/lib/seo';
 import type { BlogPost } from '@/types/api';
@@ -22,7 +22,12 @@ function itemXml(
 ): string {
     const url = absoluteUrl(
         locale,
-        localizedBlogPath(locale, post.slug_translations, post.canonical_slug),
+        post.public_url ??
+            localizedBlogPath(
+                locale,
+                post.slug_translations,
+                post.canonical_slug,
+            ),
         i18nConfig,
     );
 
@@ -48,8 +53,12 @@ export async function blogRss(locale: string): Promise<Response> {
         posts = [];
     }
 
-    const feedUrl = absoluteUrl(locale, '/blog/rss.xml', i18nConfig);
-    const blogUrl = absoluteUrl(locale, '/blog', i18nConfig);
+    const blogPage = await getSystemPage('blog_listing', locale).catch(
+        () => null,
+    );
+    const blogPath = blogPage?.path ?? '/blog';
+    const feedUrl = absoluteUrl(locale, `${blogPath}/rss.xml`, i18nConfig);
+    const blogUrl = absoluteUrl(locale, blogPath, i18nConfig);
     const language = locale === 'pl' ? 'pl-PL' : 'en';
     const description =
         locale === 'pl'

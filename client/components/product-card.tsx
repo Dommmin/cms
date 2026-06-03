@@ -20,6 +20,7 @@ import {
     useIsInWishlist,
     useRemoveFromWishlist,
 } from '@/hooks/use-wishlist';
+import { resolveProductPath } from '@/lib/public-paths';
 import type { ProductCardProps } from './product-card.types';
 
 export function ProductCard({ product, priority = false }: ProductCardProps) {
@@ -48,7 +49,7 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
     return (
         <div className="group border-border bg-card flex flex-col overflow-hidden rounded-[var(--store-card-radius)] border transition-all duration-300 ease-out hover:shadow-[var(--store-shadow-lifted)]">
             <Link
-                href={lp(`/products/${product.slug}`)}
+                href={lp(resolveProductPath(product))}
                 className="flex flex-1 flex-col"
             >
                 <div className="bg-muted/70 relative aspect-[4/3] overflow-hidden">

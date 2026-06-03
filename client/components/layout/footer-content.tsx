@@ -3,11 +3,26 @@
 import { Mail } from 'lucide-react';
 import Link from 'next/link';
 
+import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
 import { openCookiePreferences } from '@/providers/cookie-consent-provider';
 import type { FooterContentProps } from './footer-content.types';
 import { LocaleSwitcher } from './locale-switcher';
 import { NewsletterForm } from './newsletter-form';
+
+function localiseUrl(
+    url: string | null | undefined,
+    lp: (path: string) => string,
+): string {
+    if (!url || url === '#') return '#';
+    if (
+        url.startsWith('http://') ||
+        url.startsWith('https://') ||
+        url.startsWith('//')
+    )
+        return url;
+    return lp(url);
+}
 
 export function FooterContent({
     mainItems,
@@ -15,6 +30,7 @@ export function FooterContent({
     currentYear,
 }: FooterContentProps) {
     const { t } = useTranslation();
+    const lp = useLocalePath();
 
     return (
         <footer className="border-border relative [margin-bottom:calc(5rem+env(safe-area-inset-bottom))] overflow-hidden border-t md:mb-0">
@@ -72,7 +88,7 @@ export function FooterContent({
                                 {mainItems.map((item) => (
                                     <li key={item.id}>
                                         <Link
-                                            href={item.url ?? '#'}
+                                            href={localiseUrl(item.url, lp)}
                                             className="text-muted-foreground hover:text-foreground text-sm transition-colors"
                                         >
                                             {item.label}
@@ -110,7 +126,7 @@ export function FooterContent({
                             {legalItems.map((item) => (
                                 <Link
                                     key={item.id}
-                                    href={item.url ?? '#'}
+                                    href={localiseUrl(item.url, lp)}
                                     className="text-muted-foreground hover:text-foreground text-xs transition-colors"
                                 >
                                     {item.label}

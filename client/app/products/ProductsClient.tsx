@@ -32,11 +32,13 @@ import { useTranslation } from '@/hooks/use-translation';
 import type {
     ActiveFilterChip,
     PendingFilters,
+    ProductsClientProps,
     ViewMode,
 } from './ProductsClient.types';
 
 function pendingFromSearchParams(
     searchParams: URLSearchParams,
+    defaults?: { brand?: string },
 ): PendingFilters {
     const attributes = Array.from(searchParams.entries()).reduce<
         Record<string, string[]>
@@ -50,7 +52,7 @@ function pendingFromSearchParams(
     }, {});
 
     return {
-        brand: searchParams.get('brand') ?? '',
+        brand: searchParams.get('brand') ?? defaults?.brand ?? '',
         min_price: searchParams.get('min_price') ?? '',
         max_price: searchParams.get('max_price') ?? '',
         in_stock: searchParams.get('in_stock') === '1',
@@ -58,7 +60,13 @@ function pendingFromSearchParams(
     };
 }
 
-export default function ProductsClient() {
+export default function ProductsClient({
+    basePath = '/products',
+    initialCategory,
+    initialBrand,
+    title,
+    excerpt,
+}: ProductsClientProps) {
     const searchParams = useSearchParams();
     const router = useRouter();
     const lp = useLocalePath();
@@ -84,19 +92,23 @@ export default function ProductsClient() {
         Record<string, boolean>
     >({});
     const [viewMode, setViewMode] = useState<ViewMode>('grid');
+    const [prevSearchParams, setPrevSearchParams] = useState(searchParams);
     const [pending, setPending] = useState<PendingFilters>(() =>
-        pendingFromSearchParams(searchParams),
+        pendingFromSearchParams(searchParams, { brand: initialBrand }),
     );
+
+    if (searchParams !== prevSearchParams) {
+        setPrevSearchParams(searchParams);
+        setPending(
+            pendingFromSearchParams(searchParams, { brand: initialBrand }),
+        );
+    }
 
     useEffect(() => {
         const stored = localStorage.getItem('products_view_mode');
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- Loaded on mount from localStorage to prevent server-client hydration mismatch
         if (stored === 'list' || stored === 'grid') setViewMode(stored);
     }, []);
-
-    // Sync pending state when URL changes (browser back/forward, external navigation)
-    useEffect(() => {
-        setPending(pendingFromSearchParams(searchParams));
-    }, [searchParams]);
 
     function changeViewMode(mode: ViewMode) {
         setViewMode(mode);
@@ -107,8 +119,8 @@ export default function ProductsClient() {
     const appliedFilters: ProductFilters = {
         page: Number(searchParams.get('page') ?? 1),
         search: searchParams.get('search') ?? undefined,
-        category: searchParams.get('category') ?? undefined,
-        brand: searchParams.get('brand') ?? undefined,
+        category: initialCategory ?? searchParams.get('category') ?? undefined,
+        brand: initialBrand ?? searchParams.get('brand') ?? undefined,
         sort: searchParams.get('sort') ?? undefined,
         min_price: searchParams.get('min_price')
             ? Number(searchParams.get('min_price'))
@@ -134,7 +146,7 @@ export default function ProductsClient() {
 
     // Whether pending state differs from what's currently applied in the URL
     const hasChanges =
-        pending.brand !== (searchParams.get('brand') ?? '') ||
+        pending.brand !== (searchParams.get('brand') ?? initialBrand ?? '') ||
         pending.min_price !== (searchParams.get('min_price') ?? '') ||
         pending.max_price !== (searchParams.get('max_price') ?? '') ||
         pending.in_stock !== (searchParams.get('in_stock') === '1') ||
@@ -179,7 +191,7 @@ export default function ProductsClient() {
         });
 
         params.delete('page');
-        router.push(lp(`/products?${params.toString()}`));
+        router.push(lp(`${basePath}?${params.toString()}`));
     }
 
     function clearFilters() {
@@ -188,16 +200,18 @@ export default function ProductsClient() {
             params.set('search', searchParams.get('search')!);
         if (searchParams.get('sort'))
             params.set('sort', searchParams.get('sort')!);
-        if (searchParams.get('category'))
-            params.set('category', searchParams.get('category')!);
-        router.push(lp(`/products?${params.toString()}`));
+        const category = searchParams.get('category') ?? initialCategory;
+        const brand = searchParams.get('brand') ?? initialBrand;
+        if (category) params.set('category', category);
+        if (brand) params.set('brand', brand);
+        router.push(lp(`${basePath}?${params.toString()}`));
     }
 
     function removeFilterParam(key: string) {
         const params = new URLSearchParams(searchParams.toString());
         params.delete(key);
         params.delete('page');
-        router.push(lp(`/products?${params.toString()}`));
+        router.push(lp(`${basePath}?${params.toString()}`));
     }
 
     function togglePendingAttribute(attributeSlug: string, valueSlug: string) {
@@ -221,7 +235,7 @@ export default function ProductsClient() {
         if (value) params.set(key, value);
         else params.delete(key);
         if (key !== 'page') params.delete('page');
-        router.push(lp(`/products?${params.toString()}`));
+        router.push(lp(`${basePath}?${params.toString()}`));
     }
 
     function buildPaginationItems(
@@ -313,7 +327,7 @@ export default function ProductsClient() {
                             params.delete(`attr_${attributeSlug}`);
                         }
                         params.delete('page');
-                        router.push(lp(`/products?${params.toString()}`));
+                        router.push(lp(`${basePath}?${params.toString()}`));
                     },
                 });
             });
@@ -553,8 +567,13 @@ export default function ProductsClient() {
                         {t('shop.collection_label', 'Collection')}
                     </p>
                     <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">
-                        {t('shop.title', 'Shop')}
+                        {title ?? t('shop.title', 'Shop')}
                     </h1>
+                    {excerpt && (
+                        <p className="text-muted-foreground mt-2 max-w-3xl text-sm">
+                            {excerpt}
+                        </p>
+                    )}
                     {data && (
                         <p className="text-muted-foreground mt-2 text-sm">
                             {data.meta?.total ?? data.data?.length ?? 0}{' '}

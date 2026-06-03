@@ -11,6 +11,7 @@ use App\Http\Requests\Admin\Cms\UpdatePageRequest;
 use App\Models\Page;
 use App\Queries\Admin\PageIndexQuery;
 use App\Services\CloneSiteService;
+use App\Services\LegalDocumentVersionService;
 use App\Services\PagePublicationWebhookService;
 use App\Services\PageSlugService;
 use App\Services\PageVersionService;
@@ -26,6 +27,7 @@ class PageController extends Controller
         private readonly PageSlugService $slugService,
         private readonly PageVersionService $versionService,
         private readonly PagePublicationWebhookService $publicationWebhookService,
+        private readonly LegalDocumentVersionService $legalDocumentVersionService,
     ) {}
 
     public function index(Request $request): Response
@@ -49,6 +51,7 @@ class PageController extends Controller
 
         return inertia('admin/cms/pages/create', [
             'modules' => config('cms.modules'),
+            'systemPages' => config('cms.system_pages'),
             'pages' => $pages,
         ]);
     }
@@ -84,6 +87,7 @@ class PageController extends Controller
                 'excerpt' => $page->getTranslations('excerpt'),
             ]),
             'modules' => config('cms.modules'),
+            'systemPages' => config('cms.system_pages'),
             'pages' => $pages,
         ]);
     }
@@ -147,6 +151,7 @@ class PageController extends Controller
     {
         $version = $this->versionService->saveDraft($page, Auth::id(), 'Publish');
         $this->versionService->publishVersion($page, $version);
+        $this->legalDocumentVersionService->syncPublishedPage($page->refresh());
         $this->publicationWebhookService->dispatchPublished($page->refresh(), 'manual');
 
         return back()->with('success', 'Page published');
