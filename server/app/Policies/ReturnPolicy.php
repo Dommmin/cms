@@ -11,41 +11,85 @@ class ReturnPolicy
 {
     public function viewAny(User $user): bool
     {
-        // Users can view their own returns, admins can view all
         if ($user->hasRole('customer')) {
             return true;
         }
 
-        return $user->can('orders.view');
+        return $this->canViewReturns($user);
     }
 
     public function view(User $user, ReturnRequest $returnRequest): bool
     {
-        // Users can view their own returns, admins can view all
-        if ($user->hasRole('customer')) {
-            $customer = $user->customer ?? null;
-            $order = $returnRequest->order;
-
-            return $customer && $order->customer_id === $customer->id;
+        if ($this->ownsReturn($user, $returnRequest)) {
+            return true;
         }
 
-        return $user->can('orders.view');
+        return $this->canViewReturns($user);
     }
 
     public function create(User $user): bool
     {
-        // Any authenticated customer can create returns
         return $user->hasRole('customer');
     }
 
-    public function update(User $user): bool
+    public function update(User $user, ReturnRequest $returnRequest): bool
     {
-        // Only admins can update returns
-        return $user->can('orders.update');
+        return $this->canManageReturns($user);
     }
 
-    public function delete(User $user): bool
+    public function delete(User $user, ReturnRequest $returnRequest): bool
     {
-        return $user->can('orders.delete');
+        return $this->canManageReturns($user);
+    }
+
+    public function refund(User $user, ReturnRequest $returnRequest): bool
+    {
+        return $this->canRefundReturns($user);
+    }
+
+    private function ownsReturn(User $user, ReturnRequest $returnRequest): bool
+    {
+        if (! $user->hasRole('customer')) {
+            return false;
+        }
+
+        $customer = $user->customer ?? null;
+
+        return $customer !== null && $returnRequest->order->customer_id === $customer->id;
+    }
+
+    private function canViewReturns(User $user): bool
+    {
+        if ($user->can('returns.view')) {
+            return true;
+        }
+
+        if ($user->can('orders.view')) {
+            return true;
+        }
+
+        if ($this->canManageReturns($user)) {
+            return true;
+        }
+
+        return $this->canRefundReturns($user);
+    }
+
+    private function canManageReturns(User $user): bool
+    {
+        if ($user->can('returns.manage')) {
+            return true;
+        }
+
+        return $user->can('orders.manage');
+    }
+
+    private function canRefundReturns(User $user): bool
+    {
+        if ($user->can('returns.refund')) {
+            return true;
+        }
+
+        return $user->can('orders.refund');
     }
 }

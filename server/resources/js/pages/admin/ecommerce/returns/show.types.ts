@@ -1,3 +1,7 @@
+export type { EnumOption } from './index.types';
+
+import type { EnumOption } from './index.types';
+
 export interface Customer {
     id: number;
     first_name: string;
@@ -6,7 +10,7 @@ export interface Customer {
 }
 export interface Order {
     id: number;
-    order_number: string;
+    reference_number: string;
     customer: Customer | null;
 }
 export interface ProductVariant {
@@ -45,4 +49,10 @@ export interface ReturnRequest {
     order: Order;
     items: ReturnItem[];
     status_history: StatusHistoryEntry[];
+}
+
+export interface ShowProps {
+    return: ReturnRequest;
+    statuses: EnumOption[];
+    returnTypes: EnumOption[];
 }

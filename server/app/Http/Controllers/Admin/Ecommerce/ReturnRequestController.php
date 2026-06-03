@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin\Ecommerce;
 
 use App\Enums\ReturnStatusEnum;
+use App\Enums\ReturnTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Ecommerce\UpdateReturnRequest;
 use App\Models\ReturnRequest;
@@ -16,6 +17,11 @@ use Inertia\Response;
 
 class ReturnRequestController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(ReturnRequest::class, 'return');
+    }
+
     public function index(Request $request): Response
     {
         $returnQuery = new ReturnRequestIndexQuery($request);
@@ -25,6 +31,7 @@ class ReturnRequestController extends Controller
             'returns' => $returns,
             'filters' => $request->only(['search', 'status', 'return_type']),
             'statuses' => array_map(fn (ReturnStatusEnum $s): array => ['value' => $s->value, 'label' => $s->label()], ReturnStatusEnum::cases()),
+            'returnTypes' => array_map(fn (ReturnTypeEnum $type): array => ['value' => $type->value, 'label' => $type->label()], ReturnTypeEnum::cases()),
         ]);
     }
 
@@ -34,6 +41,8 @@ class ReturnRequestController extends Controller
 
         return inertia('admin/ecommerce/returns/show', [
             'return' => $return,
+            'statuses' => array_map(fn (ReturnStatusEnum $s): array => ['value' => $s->value, 'label' => $s->label()], ReturnStatusEnum::cases()),
+            'returnTypes' => array_map(fn (ReturnTypeEnum $type): array => ['value' => $type->value, 'label' => $type->label()], ReturnTypeEnum::cases()),
         ]);
     }
 
@@ -76,6 +85,7 @@ class ReturnRequestController extends Controller
 
     public function approve(ReturnRequest $return): RedirectResponse
     {
+        $this->authorize('update', $return);
         $return->changeStatus(ReturnStatusEnum::Approved, 'admin');
 
         return back()->with('success', 'Zwrot został zatwierdzony');
@@ -83,6 +93,7 @@ class ReturnRequestController extends Controller
 
     public function reject(ReturnRequest $return): RedirectResponse
     {
+        $this->authorize('update', $return);
         $return->changeStatus(ReturnStatusEnum::Rejected, 'admin');
 
         return back()->with('success', 'Zwrot został odrzucony');
@@ -90,6 +101,7 @@ class ReturnRequestController extends Controller
 
     public function processRefund(Request $request, ReturnRequest $return): RedirectResponse
     {
+        $this->authorize('refund', $return);
         $request->validate([
             'refund_amount' => ['required', 'integer', 'min:1'],
         ]);

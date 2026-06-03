@@ -12,10 +12,10 @@ use App\Http\Resources\Api\V1\OrderResource;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\Payment;
-use App\Models\ReturnRequest;
 use App\Services\CartService;
 use App\Services\InvoiceService;
 use App\Services\PaymentGatewayManager;
+use App\Services\ReturnRequestService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -173,8 +173,11 @@ class OrderController extends ApiController
         ]);
     }
 
-    public function requestReturn(StoreReturnRequestRequest $request, string $reference): JsonResponse
-    {
+    public function requestReturn(
+        StoreReturnRequestRequest $request,
+        string $reference,
+        ReturnRequestService $returnRequestService,
+    ): JsonResponse {
         $customer = $request->user()->customer;
 
         $order = Order::query()
@@ -183,33 +186,10 @@ class OrderController extends ApiController
             ->with('items')
             ->firstOrFail();
 
-        if (OrderStatusEnum::from((string) $order->status) !== OrderStatusEnum::DELIVERED) {
-            throw ValidationException::withMessages([
-                'status' => ['Returns can only be requested for delivered orders'],
-            ]);
-        }
-
-        $data = $request->validated();
-
-        $returnRequest = ReturnRequest::query()->create([
-            'order_id' => $order->id,
-            'reference_number' => ReturnRequest::generateReferenceNumber(),
-            'return_type' => $data['type'],
-            'status' => 'pending',
-            'reason' => $data['reason'],
-            'customer_notes' => $data['notes'] ?? null,
-        ]);
-
-        foreach ($data['items'] as $itemData) {
-            $orderItem = $order->items->where('id', $itemData['order_item_id'])->first();
-            if ($orderItem) {
-                $returnRequest->items()->create([
-                    'order_item_id' => $orderItem->id,
-                    'quantity' => min($itemData['quantity'], $orderItem->quantity),
-                    'notes' => $itemData['notes'] ?? null,
-                ]);
-            }
-        }
+        $returnRequest = $returnRequestService->createForOrder(
+            $order,
+            $request->validated(),
+        );
 
         return $this->created([
             'message' => 'Return request submitted successfully',

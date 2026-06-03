@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\ReturnRequest;
 use App\Models\User;
+use Illuminate\Support\Facades\Notification;
 
 function makeOrderWithReturn(Customer $customer): array
 {
@@ -48,6 +49,10 @@ function makeOrderWithReturn(Customer $customer): array
 }
 
 describe('Return status in order detail', function (): void {
+    beforeEach(function (): void {
+        Notification::fake();
+    });
+
     it('includes returns in the order show response', function (): void {
         $user = User::factory()->create();
         $customer = Customer::query()->firstOrCreate(

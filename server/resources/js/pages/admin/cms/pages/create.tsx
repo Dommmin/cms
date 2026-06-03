@@ -30,7 +30,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Create', href: PageController.create.url() },
 ];
 
-export default function Create({ modules, pages }: CreateProps) {
+export default function Create({ modules, systemPages, pages }: CreateProps) {
     const __ = useTranslation();
     const { locales } = usePage().props as { locales: SharedLocale[] };
 
@@ -38,10 +38,15 @@ export default function Create({ modules, pages }: CreateProps) {
         () => Object.entries(modules ?? {}),
         [modules],
     );
+    const systemPageOptions = useMemo(
+        () => Object.entries(systemPages ?? {}),
+        [systemPages],
+    );
 
     const [layout] = useState<string>('default');
     const [pageType, setPageType] = useState<string>('blocks');
     const [moduleName, setModuleName] = useState<string | null>(null);
+    const [systemPageKey, setSystemPageKey] = useState<string | null>(null);
     const [locale, setLocale] = useState<string>('global');
     const [parentId, setParentId] = useState<string>('none');
     const [title, setTitle] = useState('');
@@ -120,6 +125,11 @@ export default function Create({ modules, pages }: CreateProps) {
                                             type="hidden"
                                             name="module_name"
                                             value={moduleName ?? ''}
+                                        />
+                                        <input
+                                            type="hidden"
+                                            name="system_page_key"
+                                            value={systemPageKey ?? ''}
                                         />
                                         {locale !== 'global' && (
                                             <input
@@ -458,6 +468,63 @@ export default function Create({ modules, pages }: CreateProps) {
                                                         />
                                                     </div>
                                                 )}
+
+                                                <div className="grid gap-2">
+                                                    <Label>
+                                                        {__(
+                                                            'label.system_page_role',
+                                                            'System page role',
+                                                        )}
+                                                    </Label>
+                                                    <Select
+                                                        value={
+                                                            systemPageKey ??
+                                                            'none'
+                                                        }
+                                                        onValueChange={(
+                                                            value,
+                                                        ) =>
+                                                            setSystemPageKey(
+                                                                value === 'none'
+                                                                    ? null
+                                                                    : value,
+                                                            )
+                                                        }
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select system page role" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="none">
+                                                                — None —
+                                                            </SelectItem>
+                                                            {systemPageOptions.map(
+                                                                ([
+                                                                    key,
+                                                                    config,
+                                                                ]) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            key
+                                                                        }
+                                                                        value={
+                                                                            key
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            config.label
+                                                                        }
+                                                                    </SelectItem>
+                                                                ),
+                                                            )}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <InputError
+                                                        message={
+                                                            errors.system_page_key
+                                                        }
+                                                    />
+                                                </div>
 
                                                 {pageType === 'module' &&
                                                     moduleName ===

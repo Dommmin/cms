@@ -10,21 +10,36 @@ import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { IndexProps, ReturnRequest } from './index.types';
+import type { EnumOption, IndexProps, ReturnRequest } from './index.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Returns', href: ReturnRequestController.index.url() },
+    {
+        title: 'Returns & Complaints',
+        href: ReturnRequestController.index.url(),
+    },
 ];
 
 const statusColors: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-800',
     approved: 'bg-blue-100 text-blue-800',
     rejected: 'bg-red-100 text-red-800',
-    processing: 'bg-purple-100 text-purple-800',
-    completed: 'bg-green-100 text-green-800',
+    return_label_sent: 'bg-purple-100 text-purple-800',
+    awaiting_return: 'bg-orange-100 text-orange-800',
+    received: 'bg-indigo-100 text-indigo-800',
+    inspected: 'bg-cyan-100 text-cyan-800',
+    refunded: 'bg-green-100 text-green-800',
+    closed: 'bg-gray-100 text-gray-700',
 };
 
-export default function ReturnsIndex({ returns, filters }: IndexProps) {
+const resolveLabel = (value: string, options: EnumOption[]): string =>
+    options.find((option) => option.value === value)?.label ?? value;
+
+export default function ReturnsIndex({
+    returns,
+    filters,
+    statuses,
+    returnTypes,
+}: IndexProps) {
     const __ = useTranslation();
     const columns: ColumnDef<ReturnRequest>[] = [
         {
@@ -41,7 +56,7 @@ export default function ReturnsIndex({ returns, filters }: IndexProps) {
             header: __('column.orders', 'Order'),
             cell: ({ row }) => (
                 <span className="font-mono">
-                    {row.original.order.order_number}
+                    {row.original.order.reference_number}
                 </span>
             ),
         },
@@ -73,7 +88,7 @@ export default function ReturnsIndex({ returns, filters }: IndexProps) {
             header: __('column.type', 'Type'),
             cell: ({ row }) => (
                 <Badge variant="outline" className="text-xs">
-                    {row.original.return_type}
+                    {resolveLabel(row.original.return_type, returnTypes)}
                 </Badge>
             ),
         },
@@ -87,7 +102,7 @@ export default function ReturnsIndex({ returns, filters }: IndexProps) {
                         'bg-gray-100 text-gray-800'
                     }
                 >
-                    {row.original.status}
+                    {resolveLabel(row.original.status, statuses)}
                 </Badge>
             ),
         },
@@ -124,13 +139,16 @@ export default function ReturnsIndex({ returns, filters }: IndexProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Returns" />
+            <Head title="Returns & Complaints" />
             <Wrapper>
                 <PageHeader
-                    title={__('page.returns', 'Returns')}
+                    title={__(
+                        'page.returns_complaints',
+                        'Returns & Complaints',
+                    )}
                     description={__(
                         'page.returns_desc',
-                        'Manage return requests',
+                        'Manage return and complaint requests',
                     )}
                 />
 
@@ -148,7 +166,7 @@ export default function ReturnsIndex({ returns, filters }: IndexProps) {
                     searchable
                     searchPlaceholder={__(
                         'placeholder.search',
-                        'Search returns...',
+                        'Search returns & complaints...',
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={ReturnRequestController.index.url()}

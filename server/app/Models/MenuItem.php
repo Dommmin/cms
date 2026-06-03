@@ -90,7 +90,7 @@ class MenuItem extends Model
         return match ($this->link_type) {
             MenuLinkTypeEnum::Category => '/products?category='.Category::query()->find($this->linked_entity_id)?->slug,
             MenuLinkTypeEnum::Product => '/products/'.Product::query()->find($this->linked_entity_id)?->slug,
-            MenuLinkTypeEnum::Page => '/'.Page::query()->find($this->linked_entity_id)?->getSlugForLocale($locale),
+            MenuLinkTypeEnum::Page => $this->resolvePageUrl($locale),
             default => $this->url ?? '#',
         };
     }
@@ -102,5 +102,27 @@ class MenuItem extends Model
             'link_type' => MenuLinkTypeEnum::class,
             'is_active' => 'boolean',
         ];
+    }
+
+    private function resolveLinkedPage(string $locale): ?Page
+    {
+        $page = Page::query()->find($this->linked_entity_id);
+
+        if (! $page instanceof Page) {
+            return null;
+        }
+
+        if ($page->system_page_key !== null) {
+            return Page::findPublishedBySystemPageKey($page->system_page_key, $locale) ?? $page;
+        }
+
+        return $page;
+    }
+
+    private function resolvePageUrl(string $locale): string
+    {
+        $page = $this->resolveLinkedPage($locale);
+
+        return $page instanceof Page ? '/'.$page->getSlugForLocale($locale) : ($this->url ?? '#');
     }
 }

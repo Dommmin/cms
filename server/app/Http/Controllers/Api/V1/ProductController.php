@@ -17,6 +17,7 @@ use App\Models\FlashSale;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\SmartCollectionService;
+use App\Services\StorefrontPathService;
 use App\Sorts\RatingSort;
 use App\Sorts\VariantPriceSort;
 use Illuminate\Database\Eloquent\Builder;
@@ -89,6 +90,7 @@ class ProductController extends ApiController
     public function show(string $slug): JsonResponse
     {
         $locale = app()->getLocale();
+        $pathService = resolve(StorefrontPathService::class);
 
         $product = Product::query()
             ->available()
@@ -114,6 +116,7 @@ class ProductController extends ApiController
             'id' => $product->id,
             'name' => $product->name,
             'slug' => $product->slug,
+            'public_url' => $pathService->productPath($product, $locale),
             'is_active' => (bool) $product->is_active,
             'description' => $product->description,
             'short_description' => $product->short_description,
@@ -142,12 +145,14 @@ class ProductController extends ApiController
                 'description' => null,
                 'image_url' => null,
                 'parent_id' => $product->category->parent_id,
+                'public_url' => $pathService->categoryPath($product->category, $locale),
             ],
             'brand' => $product->brand ? [
                 'id' => $product->brand->id,
                 'name' => $product->brand->name,
                 'slug' => $product->brand->slug,
                 'logo_url' => null,
+                'public_url' => $pathService->brandPath($product->brand, $locale),
             ] : null,
             'attributes' => [],
             'created_at' => $product->created_at?->toIso8601String(),

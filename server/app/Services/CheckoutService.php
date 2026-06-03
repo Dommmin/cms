@@ -28,7 +28,8 @@ use Illuminate\Support\Arr;
 class CheckoutService
 {
     public function __construct(
-        private readonly CartService $cartService
+        private readonly CartService $cartService,
+        private readonly LegalDocumentVersionService $legalDocumentVersionService,
     ) {}
 
     /**
@@ -97,6 +98,7 @@ class CheckoutService
 
         $billing = $this->firstOrCreateAddress($billingAddress, $customer, AddressTypeEnum::BILLING);
         $shipping = $this->firstOrCreateAddress($shippingAddress, $customer, AddressTypeEnum::SHIPPING);
+        $legalSnapshot = $this->legalDocumentVersionService->checkoutLegalSnapshot();
 
         $initialStatus = $paymentProvider === PaymentProviderEnum::CASH_ON_DELIVERY
             ? OrderStatusEnum::PENDING
@@ -118,6 +120,10 @@ class CheckoutService
             'exchange_rate' => 1.0,
             'notes' => $notes,
             'ga_client_id' => $gaClientId,
+            'terms_consent_version' => $legalSnapshot['terms_of_service'],
+            'privacy_consent_version' => $legalSnapshot['privacy_policy'],
+            'legal_version_snapshot' => $legalSnapshot,
+            'terms_accepted_at' => now(),
         ]);
 
         /** @var CartItem $cartItem */

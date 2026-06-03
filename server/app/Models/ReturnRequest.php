@@ -104,7 +104,7 @@ class ReturnRequest extends Model
 
     public function statusHistory(): HasMany
     {
-        return $this->hasMany(ReturnStatusHistory::class)->latest('changed_at');
+        return $this->hasMany(ReturnStatusHistory::class, 'return_id')->latest('changed_at');
     }
 
     public function changeStatus(ReturnStatusEnum $newStatus, string $changedBy = 'system', ?string $notes = null): void

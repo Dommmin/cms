@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\PickupPointsController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\PromotionController;
+use App\Http\Controllers\Api\V1\ReturnController;
 use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\SharedCartController;
@@ -48,8 +49,14 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
             Route::get('{slug}/products', [ProductController::class, 'byCategory'])->name('products');
         });
 
-        Route::get('brands', [BrandController::class, 'index'])->name('brands.index');
+        Route::prefix('brands')->name('brands.')->group(function (): void {
+            Route::get('/', [BrandController::class, 'index'])->name('index');
+            Route::get('{slug}', [BrandController::class, 'show'])->name('show');
+            Route::get('{slug}/products', [BrandController::class, 'products'])->name('products');
+        });
         Route::get('promotions', [PromotionController::class, 'index'])->name('promotions.index');
+        Route::post('returns/lookup', [ReturnController::class, 'lookup'])->name('returns.lookup');
+        Route::post('returns/guest-request', [ReturnController::class, 'storeGuest'])->middleware('idempotent')->name('returns.guest-request');
 
         // Flash Sales
         Route::get('flash-sales', [FlashSaleController::class, 'index'])->name('flash-sales.index');
@@ -103,6 +110,11 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
             Route::post('{reference}/pay', [OrderController::class, 'pay'])->name('pay');
             Route::post('{reference}/return', [OrderController::class, 'requestReturn'])->name('return');
             Route::post('{reference}/reorder', [OrderController::class, 'reorder'])->name('reorder');
+        });
+
+        Route::prefix('returns')->name('returns.')->group(function (): void {
+            Route::get('/', [ReturnController::class, 'index'])->name('index');
+            Route::get('{referenceNumber}', [ReturnController::class, 'show'])->name('show');
         });
 
         // Reviews

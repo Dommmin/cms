@@ -3,6 +3,7 @@
 import { Package } from 'lucide-react';
 import Link from 'next/link';
 
+import { useStorefrontRoutes } from '@/hooks/use-cms';
 import { useCurrency } from '@/hooks/use-currency';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useOrders } from '@/hooks/use-orders';
@@ -22,6 +23,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default function OrdersPage() {
     const { data, isLoading } = useOrders();
+    const { data: storefrontRoutes } = useStorefrontRoutes();
     const { t } = useTranslation();
     const lp = useLocalePath();
     const { formatPrice } = useCurrency();
@@ -60,7 +62,9 @@ export default function OrdersPage() {
                         )}
                     </p>
                     <Link
-                        href={lp('/products')}
+                        href={lp(
+                            storefrontRoutes?.product_listing ?? '/products',
+                        )}
                         className="bg-primary text-primary-foreground mt-4 inline-flex items-center rounded-xl px-6 py-2.5 text-sm font-semibold hover:opacity-90"
                     >
                         {t('account.start_shopping', 'Start Shopping')}

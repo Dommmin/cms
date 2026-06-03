@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources\Api\V1;
 
 use App\Models\BlogPost;
+use App\Services\StorefrontPathService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -47,6 +48,7 @@ class BlogPostResource extends JsonResource
             'seo_description' => $this->seo_description,
             'meta_description' => $this->seo_description,
             'canonical_url' => $this->canonical_url,
+            'public_url' => resolve(StorefrontPathService::class)->blogPostPath($this->resource, $locale),
             'meta_robots' => $this->meta_robots ?? 'index, follow',
             'og_image' => $this->og_image,
             'sitemap_exclude' => (bool) $this->sitemap_exclude,

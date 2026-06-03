@@ -29,7 +29,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
 import type { EditProps } from './edit.types';
 
-export default function Edit({ page, modules, pages }: EditProps) {
+export default function Edit({ page, modules, systemPages, pages }: EditProps) {
     const { locales, frontendUrl } = usePage().props as {
         locales: SharedLocale[];
         frontendUrl: string;
@@ -39,6 +39,10 @@ export default function Edit({ page, modules, pages }: EditProps) {
         () => Object.entries(modules ?? {}),
         [modules],
     );
+    const systemPageOptions = useMemo(
+        () => Object.entries(systemPages ?? {}),
+        [systemPages],
+    );
 
     const __ = useTranslation();
     const [layout] = useState<string>(page.layout ?? 'default');
@@ -47,6 +51,9 @@ export default function Edit({ page, modules, pages }: EditProps) {
     );
     const [moduleName, setModuleName] = useState<string | null>(
         page.module_name ?? null,
+    );
+    const [systemPageKey, setSystemPageKey] = useState<string | null>(
+        page.system_page_key ?? null,
     );
     const [titleValues, setTitleValues] = useState<Record<string, string>>(
         page.title ?? { [defaultLocale]: '' },
@@ -240,6 +247,11 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                     type="hidden"
                                     name="module_name"
                                     value={moduleName ?? ''}
+                                />
+                                <input
+                                    type="hidden"
+                                    name="system_page_key"
+                                    value={systemPageKey ?? ''}
                                 />
                                 <input
                                     type="hidden"
@@ -520,6 +532,55 @@ export default function Edit({ page, modules, pages }: EditProps) {
                                                 />
                                             </div>
                                         )}
+
+                                        <div className="grid gap-2">
+                                            <Label>
+                                                {__(
+                                                    'label.system_page_role',
+                                                    'System page role',
+                                                )}
+                                            </Label>
+                                            <Select
+                                                value={systemPageKey ?? 'none'}
+                                                onValueChange={(value) =>
+                                                    setSystemPageKey(
+                                                        value === 'none'
+                                                            ? null
+                                                            : value,
+                                                    )
+                                                }
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue
+                                                        placeholder={__(
+                                                            'placeholder.select_system_page_role',
+                                                            'Select system page role',
+                                                        )}
+                                                    />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="none">
+                                                        {__(
+                                                            'misc.none',
+                                                            '— None —',
+                                                        )}
+                                                    </SelectItem>
+                                                    {systemPageOptions.map(
+                                                        ([key, config]) => (
+                                                            <SelectItem
+                                                                key={key}
+                                                                value={key}
+                                                            >
+                                                                {config.label}
+                                                            </SelectItem>
+                                                        ),
+                                                    )}
+                                                </SelectContent>
+                                            </Select>
+                                            <InputError
+                                                message={errors.system_page_key}
+                                            />
+                                        </div>
 
                                         {pageType === 'module' &&
                                             moduleName === 'content' && (

@@ -6,6 +6,7 @@ namespace App\Http\Resources\Api\V1;
 
 use App\Data\ProductData;
 use App\Models\Product;
+use App\Services\StorefrontPathService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -36,6 +37,17 @@ class ProductResource extends JsonResource
             $product->setAttribute('discount_percentage', $maxDiscount ?: null);
 
             $data = ProductData::from($product)->toArray();
+            $data['public_url'] = resolve(StorefrontPathService::class)->productPath($product);
+
+            /** @var int|null $categoryId */
+            $categoryId = $product->category_id;
+            if ($product->relationLoaded('category') && $categoryId !== null) {
+                $data['category']['public_url'] = resolve(StorefrontPathService::class)->categoryPath($product->category);
+            }
+
+            if ($product->relationLoaded('brand') && $product->brand !== null) {
+                $data['brand']['public_url'] = resolve(StorefrontPathService::class)->brandPath($product->brand);
+            }
 
             // Override thumbnail to match the ProductImage TS interface (url/alt/thumb_url)
             // ProductData maps to ProductImageData which uses path/alt_text — wrong shape for the frontend.

@@ -89,6 +89,7 @@ import * as MetafieldDefinitionController from '@/actions/App/Http/Controllers/A
 import * as NewsletterCampaignController from '@/actions/App/Http/Controllers/Admin/NewsletterCampaignController';
 import * as NewsletterSegmentController from '@/actions/App/Http/Controllers/Admin/NewsletterSegmentController';
 import * as NewsletterSubscriberController from '@/actions/App/Http/Controllers/Admin/NewsletterSubscriberController';
+import * as PrivacyRequestController from '@/actions/App/Http/Controllers/Admin/PrivacyRequestController';
 import * as ReferralController from '@/actions/App/Http/Controllers/Admin/ReferralController';
 import * as RoleController from '@/actions/App/Http/Controllers/Admin/RoleController';
 import * as SearchAnalyticsController from '@/actions/App/Http/Controllers/Admin/SearchAnalyticsController';
@@ -254,7 +255,7 @@ export function AppSidebar() {
                   icon: Truck,
               },
               {
-                  title: __('nav.returns', 'Returns'),
+                  title: __('nav.returns_complaints', 'Returns & Complaints'),
                   href: ReturnRequestController.index.url(),
                   icon: RotateCcw,
               },
@@ -461,6 +462,11 @@ export function AppSidebar() {
             title: __('nav.cookie_consents', 'Cookie Consents'),
             href: CookieConsentController.index.url(),
             icon: Cookie,
+        },
+        {
+            title: __('nav.privacy_requests', 'Privacy Requests'),
+            href: PrivacyRequestController.index.url(),
+            icon: Shield,
         },
         {
             title: __('nav.settings', 'Settings'),

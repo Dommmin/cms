@@ -2,6 +2,10 @@ export type ModuleConfig = {
     label: string;
     description?: string;
 };
+export type SystemPageConfig = {
+    label: string;
+    description?: string;
+};
 export type PageData = {
     id: number;
     parent_id: number | null;
@@ -14,6 +18,7 @@ export type PageData = {
     layout: string;
     page_type: string;
     module_name: string | null;
+    system_page_key: string | null;
     module_config: Record<string, unknown> | null;
     seo_title: string | null;
     seo_description: string | null;
@@ -31,5 +36,6 @@ export type ParentPage = {
 export type EditProps = {
     page: PageData;
     modules: Record<string, ModuleConfig>;
+    systemPages: Record<string, SystemPageConfig>;
     pages: ParentPage[];
 };

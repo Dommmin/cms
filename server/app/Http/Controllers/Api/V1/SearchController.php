@@ -14,6 +14,7 @@ use App\Models\ProductVariant;
 use App\Models\SearchLog;
 use App\Models\SearchSynonym;
 use App\Models\Setting;
+use App\Services\StorefrontPathService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Laravel\Scout\Builder;
@@ -141,6 +142,7 @@ class SearchController extends ApiController
     {
         $query = $request->input('q', '');
         $limit = (int) $request->input('limit', 10);
+        $pathService = resolve(StorefrontPathService::class);
 
         if (mb_strlen((string) $query) < 2) {
             return $this->ok(['suggestions' => []]);
@@ -171,6 +173,7 @@ class SearchController extends ApiController
                     'id' => $fresh->id,
                     'name' => $fresh->name,
                     'slug' => $fresh->slug,
+                    'public_url' => $pathService->productPath($fresh),
                     'thumbnail' => $fresh->getFirstMediaUrl('images', 'thumb') ?: null,
                     'price' => $fresh->priceRange()['min'],
                 ]);
@@ -196,6 +199,7 @@ class SearchController extends ApiController
                     'id' => $fresh->id,
                     'name' => $fresh->name,
                     'slug' => $fresh->slug,
+                    'public_url' => $pathService->categoryPath($fresh),
                     'thumbnail' => $fresh->image_path ?: null,
                     'products_count' => $fresh->products()->count(),
                 ]);
@@ -222,6 +226,7 @@ class SearchController extends ApiController
                     'id' => $fresh->id,
                     'name' => $fresh->title,
                     'slug' => $fresh->slug,
+                    'public_url' => $pathService->blogPostPath($fresh),
                     'thumbnail' => $fresh->featured_image,
                     'excerpt' => is_array($fresh->excerpt) ? ($fresh->excerpt[app()->getLocale()] ?? reset($fresh->excerpt)) : $fresh->excerpt,
                 ]);

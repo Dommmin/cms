@@ -7,6 +7,7 @@ namespace App\Http\Resources\Api\V1;
 use App\Enums\OrderStatusEnum;
 use App\Models\Order;
 use App\Models\OrderStatusHistory;
+use App\Services\ReturnEligibilityService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -20,6 +21,22 @@ class OrderResource extends JsonResource
     {
         /** @var Order $order */
         $order = $this->resource;
+        $returnEligibility = null;
+        $items = [];
+
+        if ($order->relationLoaded('items')) {
+            $returnEligibility = resolve(ReturnEligibilityService::class)->buildForOrder($order);
+            $itemEligibility = collect($returnEligibility['items'])->keyBy('order_item_id');
+            $items = OrderItemResource::collection($order->items)
+                ->resolve($request);
+            $items = array_map(
+                fn (array $item): array => [
+                    ...$item,
+                    'return_eligibility' => $itemEligibility->get($item['id']),
+                ],
+                $items,
+            );
+        }
 
         return [
             'id' => $order->id,
@@ -34,7 +51,7 @@ class OrderResource extends JsonResource
             'currency_code' => $order->currency_code,
             'notes' => $order->notes,
             'created_at' => $order->created_at->toISOString(),
-            'items' => $order->relationLoaded('items') ? OrderItemResource::collection($order->items) : [],
+            'items' => $items,
             'billing_address' => $order->relationLoaded('billingAddress') ? new AddressResource($order->billingAddress) : null,
             'shipping_address' => $order->relationLoaded('shippingAddress') ? new AddressResource($order->shippingAddress) : null,
             'payment' => $order->relationLoaded('payment') && $order->payment ? [
@@ -63,6 +80,7 @@ class OrderResource extends JsonResource
             'returns' => $order->relationLoaded('returns')
                 ? ReturnResource::collection($order->returns)
                 : [],
+            'return_eligibility' => $returnEligibility,
         ];
     }
 }

@@ -32,4 +32,30 @@ return [
             'blog_id' => ['nullable', 'integer', 'exists:blogs,id'],
         ],
     ],
+    'product_listing' => [
+        'label' => 'Produkty (listing)',
+        'description' => 'Dynamiczny listing produktów storefrontu.',
+        'frontend_renderer' => 'product_listing',
+        'module_config_schema' => [
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+        ],
+    ],
+    'category_listing' => [
+        'label' => 'Kategorie (listing)',
+        'description' => 'Dynamiczna lista kategorii z własnymi URL-ami detail.',
+        'frontend_renderer' => 'category_listing',
+        'module_config_schema' => [],
+    ],
+    'brand_listing' => [
+        'label' => 'Marki (listing)',
+        'description' => 'Dynamiczna lista marek z własnymi URL-ami detail.',
+        'frontend_renderer' => 'brand_listing',
+        'module_config_schema' => [],
+    ],
+    'returns_portal' => [
+        'label' => 'Zwroty i reklamacje',
+        'description' => 'Portal self-service do wyszukania zamówienia i złożenia zwrotu lub reklamacji.',
+        'frontend_renderer' => 'returns_portal',
+        'module_config_schema' => [],
+    ],
 ];

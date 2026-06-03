@@ -12,7 +12,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { formatDateTime } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
-import type { ReturnRequest } from './show.types';
+import type { EnumOption, ShowProps } from './show.types';
 
 const statusColors: Record<string, string> = {
     pending:
@@ -33,23 +33,29 @@ const statusColors: Record<string, string> = {
     closed: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400',
 };
 
+const resolveLabel = (value: string, options: EnumOption[]): string =>
+    options.find((option) => option.value === value)?.label ?? value;
+
 export default function Show({
     return: returnRequest,
-}: {
-    return: ReturnRequest;
-}) {
+    statuses,
+    returnTypes,
+}: ShowProps) {
     const __ = useTranslation();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Returns', href: ReturnRequestController.index.url() },
+        {
+            title: 'Returns & Complaints',
+            href: ReturnRequestController.index.url(),
+        },
         { title: returnRequest.reference_number, href: '' },
     ];
 
     const canApprove = returnRequest.status === 'pending';
     const canReject = ['pending', 'approved'].includes(returnRequest.status);
-    const canProcessRefund = ['received', 'inspected'].includes(
-        returnRequest.status,
-    );
+    const canProcessRefund =
+        returnRequest.refund_amount !== null &&
+        ['received', 'inspected'].includes(returnRequest.status);
 
     const handleApprove = () => {
         router.post(
@@ -70,14 +76,16 @@ export default function Show({
     const handleProcessRefund = () => {
         router.post(
             ReturnRequestController.processRefund.url(returnRequest.id),
-            {},
+            { refund_amount: returnRequest.refund_amount },
             { onSuccess: () => toast.success('Refund processed') },
         );
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Return ${returnRequest.reference_number}`} />
+            <Head
+                title={`Returns & Complaints ${returnRequest.reference_number}`}
+            />
 
             <Wrapper>
                 <PageHeader
@@ -291,7 +299,10 @@ export default function Show({
                                                             'bg-gray-100 text-gray-800'
                                                         }
                                                     >
-                                                        {entry.new_status}
+                                                        {resolveLabel(
+                                                            entry.new_status,
+                                                            statuses,
+                                                        )}
                                                     </Badge>
                                                     <span className="text-xs text-muted-foreground">
                                                         {formatDateTime(
@@ -327,7 +338,7 @@ export default function Show({
                                     'bg-gray-100 text-gray-800'
                                 }
                             >
-                                {returnRequest.status}
+                                {resolveLabel(returnRequest.status, statuses)}
                             </Badge>
                         </div>
 
@@ -353,7 +364,10 @@ export default function Show({
                                             variant="outline"
                                             className="text-xs"
                                         >
-                                            {returnRequest.return_type}
+                                            {resolveLabel(
+                                                returnRequest.return_type,
+                                                returnTypes,
+                                            )}
                                         </Badge>
                                     </dd>
                                 </div>
@@ -370,7 +384,10 @@ export default function Show({
                                             cacheFor={60}
                                             className="font-mono text-primary hover:underline"
                                         >
-                                            {returnRequest.order.order_number}
+                                            {
+                                                returnRequest.order
+                                                    .reference_number
+                                            }
                                         </Link>
                                     </dd>
                                 </div>

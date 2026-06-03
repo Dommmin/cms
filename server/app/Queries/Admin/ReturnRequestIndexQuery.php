@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Queries\Admin;
 
 use App\Models\ReturnRequest;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class ReturnRequestIndexQuery
@@ -17,20 +18,29 @@ class ReturnRequestIndexQuery
     {
         return ReturnRequest::query()
             ->with(['order.customer'])
-            ->when($this->request->search, function ($query, string $search): void {
-                $query->where('reason', 'like', sprintf('%%%s%%', $search))
-                    ->orWhereHas('order', function ($q) use ($search): void {
-                        $q->where('order_number', 'like', sprintf('%%%s%%', $search));
-                    })
-                    ->orWhereHas('order.customer', function ($q) use ($search): void {
-                        $q->where('first_name', 'like', sprintf('%%%s%%', $search))
-                            ->orWhere('last_name', 'like', sprintf('%%%s%%', $search))
-                            ->orWhere('email', 'like', sprintf('%%%s%%', $search));
-                    });
+            ->when($this->request->filled('search'), function ($query): void {
+                $search = (string) $this->request->string('search');
+
+                $query->where(function (Builder $query) use ($search): void {
+                    $query->where('reference_number', 'like', sprintf('%%%s%%', $search))
+                        ->orWhere('reason', 'like', sprintf('%%%s%%', $search))
+                        ->orWhereHas('order', function (Builder $query) use ($search): void {
+                            $query->where('reference_number', 'like', sprintf('%%%s%%', $search));
+                        })
+                        ->orWhereHas('order.customer', function (Builder $query) use ($search): void {
+                            $query->where('first_name', 'like', sprintf('%%%s%%', $search))
+                                ->orWhere('last_name', 'like', sprintf('%%%s%%', $search))
+                                ->orWhere('email', 'like', sprintf('%%%s%%', $search));
+                        });
+                });
             })
-            ->when($this->request->status, function ($query, $status): void {
-                $query->where('status', $status);
-            })->latest()
+            ->when($this->request->filled('status'), function ($query): void {
+                $query->where('status', (string) $this->request->input('status'));
+            })
+            ->when($this->request->filled('return_type'), function ($query): void {
+                $query->where('return_type', (string) $this->request->input('return_type'));
+            })
+            ->latest()
             ->paginate(20)
             ->withQueryString();
     }

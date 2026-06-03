@@ -82,84 +82,104 @@ const RETURN_STATUS_COLORS: Record<string, string> = {
 function ReturnsList({ returns }: { returns: OrderReturn[] }) {
     const { t } = useTranslation();
     const { formatPrice } = useCurrency();
+    const lp = useLocalePath();
 
     return (
         <div className="border-border bg-card rounded-xl border">
-            <div className="border-border border-b px-4 py-3">
+            <div className="border-border flex items-center justify-between gap-3 border-b px-4 py-3">
                 <h2 className="font-semibold">
                     {t('order.returns', 'Your Returns & Complaints')}
                 </h2>
+                <Link
+                    href={lp('/account/returns')}
+                    className="text-primary text-sm font-medium hover:underline"
+                >
+                    {t('order.view_all_returns', 'View all returns')}
+                </Link>
             </div>
             <ul className="divide-border divide-y">
                 {returns.map((ret) => (
-                    <li key={ret.id} className="px-4 py-3">
-                        <div className="mb-2 flex flex-wrap items-center gap-2">
-                            <span className="font-mono text-sm font-medium">
-                                {ret.reference_number}
-                            </span>
-                            <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs capitalize">
-                                {ret.return_type}
-                            </span>
-                            <span
-                                className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${
-                                    RETURN_STATUS_COLORS[ret.status] ??
-                                    'bg-muted text-muted-foreground'
-                                }`}
-                            >
-                                {ret.status.replace(/_/g, ' ')}
-                            </span>
-                            <span className="text-muted-foreground ml-auto text-xs">
-                                {new Date(ret.created_at).toLocaleDateString(
-                                    'en-US',
-                                    {
+                    <li key={ret.id}>
+                        <Link
+                            href={lp(
+                                `/account/returns/${ret.reference_number}`,
+                            )}
+                            className="hover:bg-accent/40 block px-4 py-3 transition-colors"
+                        >
+                            <div className="mb-2 flex flex-wrap items-center gap-2">
+                                <span className="font-mono text-sm font-medium">
+                                    {ret.reference_number}
+                                </span>
+                                <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs capitalize">
+                                    {ret.return_type}
+                                </span>
+                                <span
+                                    className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${
+                                        RETURN_STATUS_COLORS[ret.status] ??
+                                        'bg-muted text-muted-foreground'
+                                    }`}
+                                >
+                                    {ret.status.replace(/_/g, ' ')}
+                                </span>
+                                <span className="text-muted-foreground ml-auto text-xs">
+                                    {new Date(
+                                        ret.created_at,
+                                    ).toLocaleDateString('en-US', {
                                         year: 'numeric',
                                         month: 'short',
                                         day: 'numeric',
-                                    },
-                                )}
-                            </span>
-                        </div>
-                        {ret.items.length > 0 && (
-                            <ul className="text-muted-foreground mb-2 space-y-0.5 text-xs">
-                                {ret.items.map((item, idx) => (
-                                    <li key={idx}>
-                                        {item.product_name
-                                            ? `${item.product_name} × ${item.quantity}`
-                                            : `${t('order.qty', 'Qty')}: ${item.quantity}`}
-                                        {item.condition
-                                            ? ` — ${item.condition}`
-                                            : ''}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                        {ret.refund_amount !== null && (
-                            <p className="text-sm">
-                                <span className="text-muted-foreground">
-                                    {t('order.refund_amount', 'Refund amount')}
+                                    })}
+                                </span>
+                            </div>
+                            {ret.items.length > 0 && (
+                                <ul className="text-muted-foreground mb-2 space-y-0.5 text-xs">
+                                    {ret.items.map((item, idx) => (
+                                        <li key={idx}>
+                                            {item.product_name
+                                                ? `${item.product_name} × ${item.quantity}`
+                                                : `${t('order.qty', 'Qty')}: ${item.quantity}`}
+                                            {item.condition
+                                                ? ` — ${item.condition}`
+                                                : ''}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                            {ret.refund_amount !== null && (
+                                <p className="text-sm">
+                                    <span className="text-muted-foreground">
+                                        {t(
+                                            'order.refund_amount',
+                                            'Refund amount',
+                                        )}
+                                        :{' '}
+                                    </span>
+                                    <span className="font-medium text-green-600">
+                                        {formatPrice(ret.refund_amount)}
+                                    </span>
+                                </p>
+                            )}
+                            {ret.return_tracking_number && (
+                                <p className="text-muted-foreground text-xs">
+                                    {t(
+                                        'order.return_tracking',
+                                        'Return tracking',
+                                    )}
                                     :{' '}
-                                </span>
-                                <span className="font-medium text-green-600">
-                                    {formatPrice(ret.refund_amount)}
-                                </span>
-                            </p>
-                        )}
-                        {ret.return_tracking_number && (
-                            <p className="text-muted-foreground text-xs">
-                                {t('order.return_tracking', 'Return tracking')}:{' '}
-                                <span className="font-mono">
-                                    {ret.return_tracking_number}
-                                </span>
-                            </p>
-                        )}
-                        {ret.admin_notes && (
-                            <p className="mt-1 text-sm">
-                                <span className="text-muted-foreground">
-                                    {t('order.admin_notes', 'Note')}:{' '}
-                                </span>
-                                {ret.admin_notes}
-                            </p>
-                        )}
+                                    <span className="font-mono">
+                                        {ret.return_tracking_number}
+                                    </span>
+                                </p>
+                            )}
+                            {ret.admin_notes && (
+                                <p className="mt-1 text-sm">
+                                    <span className="text-muted-foreground">
+                                        {t('order.admin_notes', 'Note')}:
+                                    </span>
+                                    {ret.admin_notes}
+                                </p>
+                            )}
+                        </Link>
                     </li>
                 ))}
             </ul>
@@ -167,11 +187,35 @@ function ReturnsList({ returns }: { returns: OrderReturn[] }) {
     );
 }
 
-const RETURN_TYPES = [
+const RETURN_TYPES: Array<{
+    value: 'return' | 'exchange' | 'complaint';
+    labelKey:
+        | 'order.return_type_return'
+        | 'order.return_type_exchange'
+        | 'order.return_type_complaint';
+}> = [
     { value: 'return', labelKey: 'order.return_type_return' as const },
     { value: 'exchange', labelKey: 'order.return_type_exchange' as const },
     { value: 'complaint', labelKey: 'order.return_type_complaint' as const },
 ];
+
+function getEligibleQuantity(
+    order: {
+        return_eligibility?: {
+            items: Array<{
+                order_item_id: number;
+                eligible_quantity: number;
+            }>;
+        };
+    },
+    itemId: number,
+): number {
+    return (
+        order.return_eligibility?.items.find(
+            (item) => item.order_item_id === itemId,
+        )?.eligible_quantity ?? 0
+    );
+}
 
 function StatusTimeline({
     status,
@@ -364,6 +408,9 @@ export default function OrderDetailPage() {
             </div>
         );
     }
+
+    const hasEligibleReturnType =
+        (order.return_eligibility?.eligible_types.length ?? 0) > 0;
 
     return (
         <div className="space-y-4">
@@ -763,7 +810,7 @@ export default function OrderDetailPage() {
 
             {['delivered', 'shipped'].includes(order.status) &&
                 !returnSuccess &&
-                !(order.returns && order.returns.length > 0) && (
+                hasEligibleReturnType && (
                     <div>
                         <button
                             onClick={() => setShowReturnForm(!showReturnForm)}
@@ -810,6 +857,11 @@ export default function OrderDetailPage() {
                                         name="type"
                                         value={value}
                                         checked={returnType === value}
+                                        disabled={
+                                            !order.return_eligibility?.eligible_types.includes(
+                                                value,
+                                            )
+                                        }
                                         onChange={() => setReturnType(value)}
                                     />
                                     {t(labelKey, value)}
@@ -826,10 +878,20 @@ export default function OrderDetailPage() {
                             {order.items?.map((item) => (
                                 <label
                                     key={item.id}
-                                    className="flex items-center gap-2 text-sm"
+                                    className={`flex items-center gap-2 text-sm ${
+                                        getEligibleQuantity(order, item.id) < 1
+                                            ? 'text-muted-foreground'
+                                            : ''
+                                    }`}
                                 >
                                     <input
                                         type="checkbox"
+                                        disabled={
+                                            getEligibleQuantity(
+                                                order,
+                                                item.id,
+                                            ) < 1
+                                        }
                                         checked={selectedItems.includes(
                                             item.id,
                                         )}
@@ -839,6 +901,9 @@ export default function OrderDetailPage() {
                                     {item.variant_sku
                                         ? ` (${item.variant_sku})`
                                         : ''}
+                                    {getEligibleQuantity(order, item.id) > 0
+                                        ? ` - ${t('returns.eligible_quantity', 'Eligible')}: ${getEligibleQuantity(order, item.id)}`
+                                        : ` - ${t('returns.item_not_eligible', 'This item is no longer eligible for a new return request.')}`}
                                 </label>
                             ))}
                         </div>
