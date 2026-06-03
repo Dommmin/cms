@@ -24,8 +24,7 @@ export async function serverFetch<T>(
     },
 ): Promise<T> {
     const locale = options?.locale;
-    const separator = path.includes('?') ? '&' : '?';
-    const url = `${BASE_URL}${path}${locale ? `${separator}locale=${locale}` : ''}`;
+    const url = `${BASE_URL}${path}`;
 
     const nextOpts: { revalidate?: number; tags?: string[] } = {};
     let cacheDirective: RequestInit['cache'] | undefined;
@@ -41,6 +40,7 @@ export async function serverFetch<T>(
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
+            ...(locale ? { 'Accept-Language': locale } : {}),
         },
         signal: AbortSignal.timeout(5000),
         ...(cacheDirective ? { cache: cacheDirective } : { next: nextOpts }),

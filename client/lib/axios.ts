@@ -92,7 +92,7 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     // URL locale is the source of truth; cookie is only a fallback for legacy unprefixed paths.
     const locale = getRequestLocale();
     if (locale) {
-        config.params = { locale, ...config.params };
+        config.headers['Accept-Language'] = locale;
     }
 
     return config;
