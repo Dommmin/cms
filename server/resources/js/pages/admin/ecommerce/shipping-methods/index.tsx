@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
+import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
 import type { IndexProps, ShippingMethod } from './index.types';
 
@@ -25,7 +26,9 @@ export default function ShippingMethodsIndex({ methods, filters }: IndexProps) {
             accessorKey: 'name',
             header: __('column.name', 'Name'),
             cell: ({ row }) => (
-                <div className="font-medium">{row.original.name}</div>
+                <div className="font-medium">
+                    {resolveLocalizedText(row.original.name)}
+                </div>
             ),
         },
         {
@@ -99,7 +102,7 @@ export default function ShippingMethodsIndex({ methods, filters }: IndexProps) {
                             'dialog.delete_title',
                             'Delete Shipping Method',
                         )}
-                        description={`Are you sure you want to delete "${row.original.name}"?`}
+                        description={`Are you sure you want to delete "${resolveLocalizedText(row.original.name)}"?`}
                         onConfirm={() => {
                             router.delete(
                                 ShippingMethodController.destroy.url(

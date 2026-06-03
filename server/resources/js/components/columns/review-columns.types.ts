@@ -3,7 +3,7 @@ export type ReviewRow = {
     product: {
         id: number;
         name: string | Record<string, string>;
-        slug: string;
+        slug: string | Record<string, string>;
     };
     customer?: { id: number; name: string; email: string };
     rating: number;

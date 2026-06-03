@@ -2,7 +2,7 @@ export type Category = { id: number; name: string | Record<string, string> };
 export type BlogPost = {
     id: number;
     title: string | Record<string, string>;
-    slug: string;
+    slug: string | Record<string, string>;
     status: string;
     content_type: string;
     is_featured: boolean;

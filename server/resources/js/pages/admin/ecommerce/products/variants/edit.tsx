@@ -130,10 +130,12 @@ export default function EditVariant({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Edit Variant: ${variant.name}`} />
+            <Head
+                title={`Edit Variant: ${resolveLocalizedText(variant.name)}`}
+            />
             <Wrapper>
                 <PageHeader
-                    title={`Edit Variant: ${variant.name}`}
+                    title={`Edit Variant: ${resolveLocalizedText(variant.name)}`}
                     description={__(
                         'page.edit_variant_desc',
                         'Update variant details',
@@ -178,7 +180,9 @@ export default function EditVariant({
                                         id="name"
                                         name="name"
                                         required
-                                        defaultValue={variant.name}
+                                        defaultValue={resolveLocalizedText(
+                                            variant.name,
+                                        )}
                                     />
                                     <InputError message={errors.name} />
                                 </div>

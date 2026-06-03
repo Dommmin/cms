@@ -18,6 +18,7 @@ import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce
 
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import Wrapper from '@/components/wrapper';
+import { useAdminLocale } from '@/hooks/use-admin-locale';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
@@ -206,6 +207,21 @@ export default function OrderShow({
 }) {
     const [modalStatus, setModalStatus] = useState<string | null>(null);
     const __ = useTranslation();
+    const [locale] = useAdminLocale();
+
+    const getLocalized = (
+        val: string | Record<string, string> | null | undefined,
+        fallback: string = '',
+    ): string => {
+        if (!val) return fallback;
+        if (typeof val === 'string') return val;
+        if (typeof val === 'object') {
+            return (
+                val[locale] ?? val['en'] ?? Object.values(val)[0] ?? fallback
+            );
+        }
+        return String(val);
+    };
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -376,8 +392,10 @@ export default function OrderShow({
                                 <tbody className="divide-y divide-border">
                                     {(order.items ?? []).map((item) => {
                                         const name =
-                                            item.variant?.product?.name ??
-                                            item.product_name ??
+                                            getLocalized(
+                                                item.variant?.product?.name,
+                                            ) ||
+                                            item.product_name ||
                                             __('misc.product', 'Product');
                                         const attrs = item.variant?.attributes
                                             ? Object.entries(
@@ -614,9 +632,10 @@ export default function OrderShow({
                                             {__('label.method', 'Method')}
                                         </span>
                                         <span className="font-medium">
-                                            {order.shipment.shipping_method
-                                                ?.name ??
-                                                order.shipment.carrier}
+                                            {getLocalized(
+                                                order.shipment.shipping_method
+                                                    ?.name,
+                                            ) || order.shipment.carrier}
                                         </span>
                                     </div>
                                     <div className="flex justify-between">

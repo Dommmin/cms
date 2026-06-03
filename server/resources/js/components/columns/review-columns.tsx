@@ -47,7 +47,7 @@ export function useReviewColumns(): ColumnDef<ReviewRow>[] {
                         {resolveLocalizedText(row.original.product.name)}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                        /{row.original.product.slug}
+                        /{resolveLocalizedText(row.original.product.slug)}
                     </div>
                 </div>
             ),

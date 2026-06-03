@@ -1,6 +1,6 @@
 export type ShippingMethod = {
     id: number;
-    name: string;
+    name: string | Record<string, string>;
     carrier: string;
     base_price: number;
     price_per_kg: number;

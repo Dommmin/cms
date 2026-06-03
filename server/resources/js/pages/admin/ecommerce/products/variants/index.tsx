@@ -121,7 +121,9 @@ export default function ProductVariantsIndex({
                                     <tr key={variant.id} className="border-t">
                                         <td className="px-4 py-3">
                                             <div className="font-medium">
-                                                {variant.name}
+                                                {resolveLocalizedText(
+                                                    variant.name,
+                                                )}
                                             </div>
                                             {variant.is_default && (
                                                 <div className="text-xs text-muted-foreground">
@@ -205,7 +207,7 @@ export default function ProductVariantsIndex({
                                                         'dialog.delete_title',
                                                         'Delete Variant',
                                                     )}
-                                                    description={`${__('dialog.delete_variant_desc', 'Delete variant')} "${variant.name}"?`}
+                                                    description={`${__('dialog.delete_variant_desc', 'Delete variant')} "${resolveLocalizedText(variant.name)}"?`}
                                                     onConfirm={() => {
                                                         router.delete(
                                                             ProductVariantController.destroy.url(

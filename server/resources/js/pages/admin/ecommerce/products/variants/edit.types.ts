@@ -23,7 +23,7 @@ export type PriceTier = {
 export type Variant = {
     id: number;
     sku: string;
-    name: string;
+    name: string | Record<string, string>;
     price: number;
     cost_price: number;
     compare_at_price?: number | null;
