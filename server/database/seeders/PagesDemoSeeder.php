@@ -459,6 +459,7 @@ class PagesDemoSeeder extends Seeder
                 'seo_title' => 'Privacy Policy',
                 'seo_description' => 'Learn how we collect, use, and protect your personal data.',
                 'content' => $this->privacyPolicyHtml(),
+                'system_page_key' => 'privacy_policy',
             ],
             [
                 'slug' => 'terms-of-service',
@@ -467,6 +468,7 @@ class PagesDemoSeeder extends Seeder
                 'seo_title' => 'Terms of Service',
                 'seo_description' => 'Our terms and conditions governing the use of our website and services.',
                 'content' => $this->termsOfServiceHtml(),
+                'system_page_key' => 'terms_of_service',
             ],
         ];
 
@@ -483,6 +485,7 @@ class PagesDemoSeeder extends Seeder
                 'position' => $def['position'],
                 'seo_title' => $def['seo_title'],
                 'seo_description' => $def['seo_description'],
+                'system_page_key' => $def['system_page_key'],
             ]);
             $p->allSections()->delete();
         }
@@ -501,6 +504,7 @@ class PagesDemoSeeder extends Seeder
             'title' => ['en' => 'Frequently Asked Questions', 'pl' => 'Najczęstsze pytania'],
             'page_type' => 'module',
             'module_name' => 'faq',
+            'system_page_key' => 'faq_page',
             'module_config' => [
                 'items' => $faqs->map(fn ($f): array => [
                     'id' => $f->id,
@@ -529,6 +533,7 @@ class PagesDemoSeeder extends Seeder
             'title' => ['en' => 'Shipping Policy', 'pl' => 'Polityka wysyłki'],
             'page_type' => 'module',
             'module_name' => 'content',
+            'system_page_key' => 'shipping_policy',
             'module_config' => ['html' => $this->shippingPolicyHtml()],
             'content' => $this->shippingPolicyHtml(),
             'is_published' => true,
@@ -547,6 +552,7 @@ class PagesDemoSeeder extends Seeder
             'title' => ['en' => 'Return & Refund Policy', 'pl' => 'Polityka zwrotów'],
             'page_type' => 'module',
             'module_name' => 'content',
+            'system_page_key' => 'return_policy',
             'module_config' => ['html' => $this->returnPolicyHtml()],
             'content' => $this->returnPolicyHtml(),
             'is_published' => true,
@@ -565,6 +571,7 @@ class PagesDemoSeeder extends Seeder
             'title' => ['en' => 'Cookie Policy', 'pl' => 'Polityka cookies'],
             'page_type' => 'module',
             'module_name' => 'content',
+            'system_page_key' => 'cookie_policy',
             'module_config' => ['html' => $this->cookiePolicyHtml()],
             'content' => $this->cookiePolicyHtml(),
             'is_published' => true,
@@ -588,6 +595,7 @@ class PagesDemoSeeder extends Seeder
             'parent_id' => null,
             'title' => ['en' => 'Contact Us', 'pl' => 'Kontakt'],
             'page_type' => 'blocks',
+            'system_page_key' => 'contact_page',
             'is_published' => true,
             'published_at' => now(),
             'position' => 20,
@@ -993,6 +1001,7 @@ class PagesDemoSeeder extends Seeder
                 'seo_title' => 'Polityka prywatności',
                 'seo_description' => 'Dowiedz się, jak zbieramy, wykorzystujemy i chronimy Twoje dane osobowe.',
                 'content' => $this->privacyPolicyHtmlPl(),
+                'system_page_key' => 'privacy_policy',
             ],
             [
                 'slug' => 'regulamin',
@@ -1001,6 +1010,7 @@ class PagesDemoSeeder extends Seeder
                 'seo_title' => 'Regulamin sklepu',
                 'seo_description' => 'Regulamin i warunki korzystania z naszej strony internetowej i usług.',
                 'content' => $this->termsOfServiceHtmlPl(),
+                'system_page_key' => 'terms_of_service',
             ],
         ];
 
@@ -1017,6 +1027,7 @@ class PagesDemoSeeder extends Seeder
                 'position' => $def['position'],
                 'seo_title' => $def['seo_title'],
                 'seo_description' => $def['seo_description'],
+                'system_page_key' => $def['system_page_key'],
             ], 'pl');
             $p->allSections()->delete();
         }
@@ -1031,6 +1042,7 @@ class PagesDemoSeeder extends Seeder
             'title' => ['pl' => 'Najczęstsze pytania', 'en' => 'FAQ'],
             'page_type' => 'module',
             'module_name' => 'faq',
+            'system_page_key' => 'faq_page',
             'module_config' => [
                 'items' => $faqs->map(fn ($f): array => [
                     'id' => $f->id,
@@ -1055,6 +1067,7 @@ class PagesDemoSeeder extends Seeder
             'title' => ['pl' => 'Polityka wysyłki', 'en' => 'Shipping Policy'],
             'page_type' => 'module',
             'module_name' => 'content',
+            'system_page_key' => 'shipping_policy',
             'module_config' => ['html' => $this->shippingPolicyHtmlPl()],
             'content' => $this->shippingPolicyHtmlPl(),
             'is_published' => true,
@@ -1073,6 +1086,7 @@ class PagesDemoSeeder extends Seeder
             'title' => ['pl' => 'Polityka zwrotów', 'en' => 'Return Policy'],
             'page_type' => 'module',
             'module_name' => 'content',
+            'system_page_key' => 'return_policy',
             'module_config' => ['html' => $this->returnPolicyHtmlPl()],
             'content' => $this->returnPolicyHtmlPl(),
             'is_published' => true,
@@ -1091,6 +1105,7 @@ class PagesDemoSeeder extends Seeder
             'title' => ['pl' => 'Polityka cookies', 'en' => 'Cookie Policy'],
             'page_type' => 'module',
             'module_name' => 'content',
+            'system_page_key' => 'cookie_policy',
             'module_config' => ['html' => $this->cookiePolicyHtmlPl()],
             'content' => $this->cookiePolicyHtmlPl(),
             'is_published' => true,
@@ -1110,6 +1125,7 @@ class PagesDemoSeeder extends Seeder
             'parent_id' => null,
             'title' => ['pl' => 'Kontakt', 'en' => 'Contact Us'],
             'page_type' => 'blocks',
+            'system_page_key' => 'contact_page',
             'is_published' => true,
             'published_at' => now(),
             'position' => 20,
@@ -1555,6 +1571,36 @@ HTML;
             'position' => 70,
             'seo_title' => 'Nasze Marki',
             'seo_description' => 'Przeglądaj produkty według marek.',
+        ], 'pl');
+
+        // Returns Portal Page (EN)
+        $this->updatePage('returns', [
+            'parent_id' => null,
+            'title' => ['en' => 'Returns Portal', 'pl' => 'Portal zwrotów'],
+            'page_type' => 'module',
+            'module_name' => 'returns_portal',
+            'system_page_key' => 'returns_portal',
+            'module_config' => [],
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 80,
+            'seo_title' => 'Returns Portal — Register your Return',
+            'seo_description' => 'Easily register your returns online using our portal.',
+        ], 'en');
+
+        // Returns Portal Page (PL)
+        $this->updatePage('zwroty', [
+            'parent_id' => null,
+            'title' => ['pl' => 'Portal zwrotów', 'en' => 'Returns Portal'],
+            'page_type' => 'module',
+            'module_name' => 'returns_portal',
+            'system_page_key' => 'returns_portal',
+            'module_config' => [],
+            'is_published' => true,
+            'published_at' => now(),
+            'position' => 80,
+            'seo_title' => 'Portal Zwrotów — Zarejestruj Zwrot',
+            'seo_description' => 'Wygodnie zarejestruj swój zwrot online za pomocą naszego portalu.',
         ], 'pl');
     }
 }

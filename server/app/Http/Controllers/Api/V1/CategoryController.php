@@ -15,17 +15,55 @@ class CategoryController extends ApiController
 {
     public function index(Request $request): JsonResponse
     {
-        $categories = Category::query()
+        // Load all active categories to build/check paths recursively in-memory
+        $allCategories = Category::query()
+            ->where('is_active', true)
+            ->withCount('products')
+            ->get();
+
+        // Get category IDs that have products directly
+        $directProductCategoryIds = $allCategories->filter(fn ($cat): bool => $cat->products_count > 0)->pluck('id')->toArray();
+
+        // Build parent -> children map in memory
+        $childrenMap = [];
+        foreach ($allCategories as $cat) {
+            if ($cat->parent_id !== null) {
+                $childrenMap[$cat->parent_id][] = $cat->id;
+            }
+        }
+
+        // Recursive helper to check if category or any of its descendants has products
+        $hasProducts = function (int $catId) use (&$hasProducts, $directProductCategoryIds, $childrenMap): bool {
+            if (in_array($catId, $directProductCategoryIds, true)) {
+                return true;
+            }
+
+            if (isset($childrenMap[$catId])) {
+                foreach ($childrenMap[$catId] as $childId) {
+                    if ($hasProducts($childId)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        };
+
+        $categoriesQuery = Category::query()
             ->where('is_active', true)
             ->when($request->parent_id, fn ($q, $id) => $q->where('parent_id', $id))
             ->when(! $request->has('parent_id') && ! $request->boolean('all'), fn ($q) => $q->whereNull('parent_id'))
             ->withCount('products')
-            ->with(['children' => fn ($q) => $q->withCount('products')])
-            ->orderBy('position')
-            ->get()
-            // Exclude categories with no products (directly or through one level of children)
-            ->filter(fn (Category $cat): bool => $cat->products_count > 0
-                || $cat->children->sum('products_count') > 0)
+            ->with(['children' => fn ($q) => $q->where('is_active', true)->withCount('products')])
+            ->orderBy('position');
+
+        $categories = $categoriesQuery->get()
+            ->filter(fn (Category $cat): bool => $hasProducts($cat->id))
+            ->map(function (Category $cat) use ($hasProducts): Category {
+                $cat->setRelation('children', $cat->children->filter(fn (Category $child): bool => $hasProducts($child->id))->values());
+
+                return $cat;
+            })
             ->values();
 
         return $this->ok(new CategoryCollection($categories));
