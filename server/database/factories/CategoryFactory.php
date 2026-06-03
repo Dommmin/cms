@@ -25,7 +25,7 @@ class CategoryFactory extends Factory
             'description' => $this->faker->text(),
             'image_path' => $this->faker->word(),
             'is_active' => $this->faker->boolean(),
-            'position' => $this->faker->randomNumber(),
+            'position' => $this->faker->numberBetween(0, 255),
             'seo_title' => $this->faker->word(),
             'seo_description' => $this->faker->text(),
             'created_at' => Date::now(),
