@@ -40,7 +40,7 @@ export async function Header({ modules, siteName = 'Store' }: HeaderProps) {
 
     return (
         <HeaderClient>
-            <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
+            <div className="store-shell mx-auto flex w-full items-center gap-6 px-4 sm:px-6 lg:px-8">
                 <Link
                     href={`/${locale}`}
                     className="text-primary shrink-0 text-xl font-bold tracking-tight"

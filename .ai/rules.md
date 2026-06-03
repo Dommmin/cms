@@ -23,6 +23,7 @@ Rules every AI tool (Claude Code, Codex, Gemini, Copilot, Cursor, Junie, Cline, 
 ## Core Rules — FORBIDDEN
 
 - **NEVER** run `php artisan`, `pint`, `npm`, etc. directly on the host — no DB/Redis there
+- **NEVER** run `npm run build` during local development while the dev server is running, as it corrupts the `.next` cache and breaks Turbopack / HMR. Use targeted tools like `npm run lint` or `make check` instead.
 - **NEVER** use `env()` outside `config/` files — use `config('key')`
 - **NEVER** use `DB::` raw queries when Eloquent suffices
 - **NEVER** skip `declare(strict_types=1)` on a PHP file
@@ -63,7 +64,6 @@ docker compose exec php vendor/bin/phpstan analyse
 
 # Frontend (npm/eslint/prettier/playwright)
 docker compose exec node npm run lint
-docker compose exec node npm run build
 docker compose exec node npx prettier --write .
 docker compose exec node npx playwright test
 ```

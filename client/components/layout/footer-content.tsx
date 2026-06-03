@@ -26,7 +26,7 @@ export function FooterContent({
             />
 
             <div className="border-border/50 border-b py-12">
-                <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+                <div className="store-shell mx-auto w-full px-4 text-center sm:px-6 lg:px-8">
                     <Mail
                         className="text-primary mx-auto mb-3 h-6 w-6"
                         aria-hidden="true"
@@ -46,7 +46,7 @@ export function FooterContent({
                 </div>
             </div>
 
-            <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+            <div className="store-shell mx-auto w-full px-4 py-12 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
                     <div>
                         <Link

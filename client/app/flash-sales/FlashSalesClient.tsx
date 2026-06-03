@@ -21,7 +21,7 @@ export default function FlashSalesClient() {
 
     if (loading) {
         return (
-            <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+            <div className="store-shell mx-auto w-full px-4 py-12 sm:px-6 lg:px-8">
                 <div className="space-y-4">
                     {[1, 2, 3].map((i) => (
                         <div
@@ -37,7 +37,7 @@ export default function FlashSalesClient() {
     const sales = data?.data ?? [];
 
     return (
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="store-shell mx-auto w-full px-4 py-12 sm:px-6 lg:px-8">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold">Flash Sales</h1>
                 <p className="text-muted-foreground mt-1">

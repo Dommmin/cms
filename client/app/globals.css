@@ -129,12 +129,13 @@
 
     /* Storefront design tokens */
     --store-shell-width: 80rem;
+    --store-wide-shell-width: 96rem;
     --store-content-width: 72rem;
     --store-section-y: clamp(2.5rem, 6vw, 5rem);
     --store-grid-gap: clamp(1rem, 2vw, 1.5rem);
     --store-card-radius: 0.5rem;
     --store-control-radius: 0.375rem;
-    --store-product-image-ratio: 4 / 5;
+    --store-product-image-ratio: 1 / 1;
     --store-focus-ring: 0 0 0 3px oklch(0.72 0.16 184.7 / 35%);
     --store-shadow-soft: 0 18px 55px -36px oklch(0.16 0.03 264.7 / 45%);
     --store-shadow-lifted: 0 24px 70px -42px oklch(0.16 0.03 264.7 / 55%);
@@ -257,19 +258,21 @@
     }
 }
 
-@layer utilities {
-    .store-shell {
-        max-width: var(--store-shell-width);
-    }
+@utility store-shell {
+    max-width: var(--store-shell-width);
+}
 
-    .store-section {
-        padding-block: var(--store-section-y);
-    }
+@utility store-wide-shell {
+    max-width: var(--store-wide-shell-width);
+}
 
-    .store-focus {
-        outline: none;
-        box-shadow: var(--store-focus-ring);
-    }
+@utility store-section {
+    padding-block: var(--store-section-y);
+}
+
+@utility store-focus {
+    outline: none;
+    box-shadow: var(--store-focus-ring);
 }
 
 /* ── Prose (rich text) styles — used in page builder content blocks ───────── */
@@ -513,7 +516,7 @@
     background: linear-gradient(
         90deg,
         var(--muted) 25%,
-        oklch(from var(--muted) l c h / 0.5) 50%,
+        oklch(from var(--muted) calc(l + 0.03) c h) 50%,
         var(--muted) 75%
     );
     background-size: 200% 100%;

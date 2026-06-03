@@ -35,7 +35,7 @@ export function BlogListClient({
     };
 
     return (
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="store-wide-shell mx-auto w-full px-4 py-12 sm:px-6 lg:px-8">
             <div className="mb-10 text-center">
                 <h1 className="text-4xl font-bold">Blog</h1>
                 <p className="text-muted-foreground mt-2">
@@ -101,7 +101,7 @@ export function BlogListClient({
                 </div>
             ) : (
                 <>
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {posts.data.map((post) => (
                             <Link
                                 key={post.id}

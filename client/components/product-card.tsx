@@ -46,19 +46,19 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
     }
 
     return (
-        <div className="group border-border bg-card flex flex-col overflow-hidden rounded-[var(--store-card-radius)] border transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[var(--store-shadow-lifted)]">
+        <div className="group border-border bg-card flex flex-col overflow-hidden rounded-[var(--store-card-radius)] border transition-all duration-300 ease-out hover:shadow-[var(--store-shadow-lifted)]">
             <Link
                 href={lp(`/products/${product.slug}`)}
                 className="flex flex-1 flex-col"
             >
-                <div className="bg-muted/70 relative aspect-square overflow-hidden sm:aspect-[var(--store-product-image-ratio)]">
+                <div className="bg-muted/70 relative aspect-[4/3] overflow-hidden">
                     {product.thumbnail?.url ? (
                         <Image
                             src={product.thumbnail.url}
                             alt={product.thumbnail.alt ?? product.name}
                             fill
                             loading={priority ? 'eager' : 'lazy'}
-                            className="object-contain p-3 transition-transform duration-300 group-hover:scale-105 sm:p-4"
+                            className="object-cover transition-opacity duration-300 group-hover:opacity-90"
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         />
                     ) : (
@@ -138,7 +138,7 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
                     </button>
                 </div>
 
-                <div className="flex min-h-[8.75rem] flex-col gap-1 p-4">
+                <div className="flex min-h-[7.5rem] flex-col gap-1 p-4">
                     {product.brand && (
                         <span className="text-muted-foreground text-xs tracking-wide uppercase">
                             {product.brand.name}

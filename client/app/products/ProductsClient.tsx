@@ -537,11 +537,13 @@ export default function ProductsClient() {
     );
 
     const gridColsClass = showDesktopFilters
-        ? 'grid-cols-1 min-[520px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'
+        ? 'grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'
         : 'grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5';
 
     return (
-        <div className="store-shell mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <div
+            className={`${viewMode === 'list' ? 'store-shell' : 'store-wide-shell'} mx-auto w-full px-4 py-8 sm:px-6 lg:px-8`}
+        >
             {appliedFilters.category && (
                 <CategoryBanner slug={appliedFilters.category} />
             )}

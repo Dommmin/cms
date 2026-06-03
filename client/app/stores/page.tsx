@@ -44,7 +44,7 @@ export default async function StoresPage() {
 
     if (stores.length === 0) {
         return (
-            <div className="mx-auto max-w-7xl px-4 py-24 text-center">
+            <div className="store-shell mx-auto w-full px-4 py-24 text-center">
                 <MapPin className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
                 <h1 className="text-3xl font-bold">Our Stores</h1>
                 <p className="text-muted-foreground mt-2">
@@ -55,7 +55,7 @@ export default async function StoresPage() {
     }
 
     return (
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="store-shell mx-auto w-full px-4 py-12 sm:px-6 lg:px-8">
             {stores.map((store) => (
                 <JsonLd key={store.id} data={buildLocalBusiness(store)} />
             ))}

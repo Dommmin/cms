@@ -111,7 +111,7 @@ export function MegaMenu({ items, categories }: MegaMenuProps) {
                             onMouseEnter={cancelClose}
                             onMouseLeave={scheduleClose}
                         >
-                            <div className="mx-auto flex max-w-7xl px-4 sm:px-6 lg:px-8">
+                            <div className="store-shell mx-auto flex w-full px-4 sm:px-6 lg:px-8">
                                 {/* Left panel — parent categories */}
                                 <div className="border-border w-52 shrink-0 border-r py-5 pr-2">
                                     <p className="text-muted-foreground mb-2 px-3 text-[11px] font-semibold tracking-wider uppercase">
