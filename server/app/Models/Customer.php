@@ -80,7 +80,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 #[Fillable([
     'user_id', 'first_name', 'last_name', 'email',
     'phone', 'company_name', 'tax_id', 'notes', 'is_active', 'tags',
-    'sms_notifications',
+    'sms_notifications', 'birth_date',
 ])]
 #[Table(name: 'customers')]
 class Customer extends Model
@@ -208,6 +208,7 @@ class Customer extends Model
             'is_active' => 'boolean',
             'tags' => 'array',
             'sms_notifications' => 'boolean',
+            'birth_date' => 'date',
         ];
     }
 }

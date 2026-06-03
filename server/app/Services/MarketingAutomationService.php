@@ -14,6 +14,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\WishlistItem;
 use App\Notifications\NewsletterCampaignNotification;
+use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\Notification;
 
 final class MarketingAutomationService
@@ -34,9 +35,16 @@ final class MarketingAutomationService
     public function processBirthdays(): void
     {
         $today = now()->format('m-d');
+        $connection = Customer::query()->getConnection();
+        $driver = $connection instanceof Connection
+            ? $connection->getDriverName()
+            : 'mysql';
+        $dateExpression = $driver === 'sqlite'
+            ? "strftime('%m-%d', birth_date)"
+            : "DATE_FORMAT(birth_date, '%m-%d')";
 
         Customer::query()
-            ->whereRaw("DATE_FORMAT(birth_date, '%m-%d') = ?", [$today])
+            ->whereRaw($dateExpression.' = ?', [$today])
             ->whereNotNull('birth_date')
             ->each(fn (Customer $customer) => $this->trigger(CampaignTriggerEnum::OnBirthday, $customer));
     }

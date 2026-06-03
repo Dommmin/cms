@@ -23,6 +23,7 @@ class CustomerFactory extends Factory
             'phone' => fake()->phoneNumber(),
             'company_name' => null,
             'tax_id' => null,
+            'birth_date' => fake()->date(),
         ];
     }
 }

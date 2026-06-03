@@ -75,3 +75,31 @@ it('does not send campaigns for inactive campaigns', function (): void {
 
     Notification::assertNotSentTo($user, NewsletterCampaignNotification::class);
 });
+
+it('triggers automated campaign on birthday', function (): void {
+    $user = User::factory()->create();
+    $customer = Customer::factory()->create([
+        'user_id' => $user->id,
+        'birth_date' => now()->format('Y-m-d'),
+    ]);
+
+    // Create a customer with a birthday that is not today to verify they don't get triggered
+    $otherUser = User::factory()->create();
+    $otherCustomer = Customer::factory()->create([
+        'user_id' => $otherUser->id,
+        'birth_date' => now()->addDays(5)->format('Y-m-d'),
+    ]);
+
+    $campaign = NewsletterCampaign::factory()->create([
+        'type' => CampaignTypeEnum::Automated,
+        'status' => CampaignStatusEnum::Ready,
+        'trigger' => CampaignTriggerEnum::OnBirthday,
+        'subject' => 'Happy Birthday!',
+    ]);
+
+    $service = resolve(MarketingAutomationService::class);
+    $service->processBirthdays();
+
+    Notification::assertSentTo($user, NewsletterCampaignNotification::class);
+    Notification::assertNotSentTo($otherUser, NewsletterCampaignNotification::class);
+});
