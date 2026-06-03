@@ -28,7 +28,7 @@ class BlogPostController extends ApiController
                     ->orWhereJsonContains('available_locales', $locale);
             })
             ->when($request->category, fn ($q, $slug) => $q->whereHas(
-                'category', fn ($c) => $c->where('slug->'.$locale, $slug)
+                'category', fn ($c) => $c->where('slug', $slug)
             ))
             ->when($request->featured, fn ($q) => $q->featured())
             ->when($request->search, fn ($q, $search) => $q->where(function ($q) use ($search, $locale): void {
