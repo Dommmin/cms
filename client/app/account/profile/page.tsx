@@ -8,6 +8,7 @@ import {
     useCreateAddress,
     useDeleteAccount,
     useDeleteAddress,
+    usePrivacyRequests,
     useProfile,
     useSetDefaultAddress,
     useUpdatePassword,
@@ -19,6 +20,7 @@ import type {
     AddressForm,
     ConsentState,
     DeleteAccountModalState,
+    PrivacyRequestMetadata,
     ProcessingRestrictionState,
 } from './page.types';
 
@@ -46,6 +48,7 @@ export default function ProfilePage() {
     const { t } = useTranslation();
 
     const { data: addresses = [] } = useAddresses();
+    const { data: privacyRequests = [] } = usePrivacyRequests();
     const { mutate: createAddress, isPending: addingAddress } =
         useCreateAddress();
     const { mutate: deleteAddress } = useDeleteAddress();
@@ -225,6 +228,44 @@ export default function ProfilePage() {
             },
         });
     }
+
+    const privacyRequestLabels: Record<string, string> = {
+        export_data: t('account.privacy_request_export', 'Data export'),
+        restrict_processing: t(
+            'account.privacy_request_restrict',
+            'Restrict processing',
+        ),
+        lift_processing_restriction: t(
+            'account.privacy_request_resume',
+            'Resume processing',
+        ),
+        delete_account: t(
+            'account.privacy_request_delete_account',
+            'Account deletion',
+        ),
+    };
+    const privacyStatusLabels: Record<string, string> = {
+        pending: t('account.privacy_status_pending', 'Pending'),
+        completed: t('account.privacy_status_completed', 'Completed'),
+        rejected: t('account.privacy_status_rejected', 'Rejected'),
+    };
+    const privacyRequestHistory: PrivacyRequestMetadata[] = privacyRequests.map(
+        (privacyRequest) => ({
+            id: privacyRequest.id,
+            typeLabel:
+                privacyRequestLabels[privacyRequest.type] ??
+                privacyRequest.type,
+            statusLabel:
+                privacyStatusLabels[privacyRequest.status] ??
+                privacyRequest.status,
+            requestedAtLabel: privacyRequest.requested_at
+                ? new Date(privacyRequest.requested_at).toLocaleString()
+                : '—',
+            resolvedAtLabel: privacyRequest.resolved_at
+                ? new Date(privacyRequest.resolved_at).toLocaleString()
+                : null,
+        }),
+    );
 
     return (
         <div className="space-y-8">
@@ -765,6 +806,64 @@ export default function ProfilePage() {
                                 'Restrict data processing',
                             )}
                 </button>
+            </section>
+
+            <section className="border-border rounded-xl border p-6">
+                <h2 className="mb-2 text-base font-semibold">
+                    {t('account.privacy_requests', 'Privacy request history')}
+                </h2>
+                <p className="text-muted-foreground mb-4 text-sm">
+                    {t(
+                        'account.privacy_requests_desc',
+                        'Audit trail of your export, processing restriction, and deletion requests.',
+                    )}
+                </p>
+                {privacyRequestHistory.length === 0 ? (
+                    <p className="text-muted-foreground text-sm">
+                        {t(
+                            'account.privacy_requests_empty',
+                            'No privacy requests have been recorded yet.',
+                        )}
+                    </p>
+                ) : (
+                    <ul className="space-y-3">
+                        {privacyRequestHistory.map((privacyRequest) => (
+                            <li
+                                key={privacyRequest.id}
+                                className="border-border rounded-lg border p-4"
+                            >
+                                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium">
+                                            {privacyRequest.typeLabel}
+                                        </p>
+                                        <p className="text-muted-foreground text-xs">
+                                            {t(
+                                                'account.requested_at',
+                                                'Requested at',
+                                            )}
+                                            {': '}
+                                            {privacyRequest.requestedAtLabel}
+                                        </p>
+                                        {privacyRequest.resolvedAtLabel && (
+                                            <p className="text-muted-foreground text-xs">
+                                                {t(
+                                                    'account.resolved_at',
+                                                    'Resolved at',
+                                                )}
+                                                {': '}
+                                                {privacyRequest.resolvedAtLabel}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <span className="bg-muted inline-flex rounded-full px-2.5 py-1 text-xs font-medium">
+                                        {privacyRequest.statusLabel}
+                                    </span>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </section>
 
             {/* ── Danger zone ───────────────────────────────────────────── */}

@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $category
  * @property string|null $ip
  * @property string|null $user_agent
+ * @property array<string, mixed>|null $policy_version_snapshot
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  *
@@ -49,6 +50,7 @@ use Illuminate\Database\Eloquent\Model;
     'ip',
     'user_agent',
     'consent_version',
+    'policy_version_snapshot',
 ])]
 #[Table(name: 'cookie_consents')]
 class CookieConsent extends Model
@@ -59,6 +61,7 @@ class CookieConsent extends Model
     {
         return [
             'granted' => 'boolean',
+            'policy_version_snapshot' => 'array',
         ];
     }
 }

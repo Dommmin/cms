@@ -17,6 +17,10 @@ export interface CookieSettings {
     analytics_description?: string;
     marketing_description?: string;
     consent_version?: string;
+    consent_version_snapshot?: {
+        privacy_policy?: string | null;
+        cookie_policy?: string | null;
+    };
 }
 export interface CookieConsentProps {
     settings?: CookieSettings;

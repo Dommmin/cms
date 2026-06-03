@@ -12,10 +12,13 @@ use App\Http\Requests\Api\V1\UpdatePasswordRequest;
 use App\Http\Requests\Api\V1\UpdateProfileRequest;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Models\Order;
+use App\Models\PrivacyRequest;
 use App\Models\ProductReview;
 use App\Models\Setting;
 use App\Models\Theme;
 use App\Notifications\AccountDeletedNotification;
+use App\Services\LegalDocumentVersionService;
+use App\Services\PrivacyRequestService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -24,6 +27,11 @@ use Illuminate\Validation\ValidationException;
 
 class ProfileController extends ApiController
 {
+    public function __construct(
+        private readonly PrivacyRequestService $privacyRequestService,
+        private readonly LegalDocumentVersionService $legalDocumentVersionService,
+    ) {}
+
     public function show(Request $request): JsonResponse
     {
         return $this->ok(new UserResource($request->user()->load('customer.addresses')));
@@ -84,6 +92,14 @@ class ProfileController extends ApiController
 
         // GDPR Art. 19 — Send confirmation email before anonymization
         $user->notify(new AccountDeletedNotification);
+        $this->privacyRequestService->logCompleted(
+            $user,
+            'delete_account',
+            [
+                'processing_restricted_at' => $user->processing_restricted_at?->toIso8601String(),
+            ],
+            'Account anonymized after authenticated deletion request.',
+        );
 
         (new AnonymizeUserData)->handle($user);
 
@@ -140,6 +156,13 @@ class ProfileController extends ApiController
             'subscribed_at' => $customer->newsletterSubscriber->created_at,
         ] : null;
 
+        $this->privacyRequestService->logCompleted(
+            $user,
+            'export_data',
+            ['exported_at' => now()->toIso8601String()],
+            'Self-service personal data export generated.',
+        );
+
         return $this->ok([
             'exported_at' => now()->toIso8601String(),
             'account' => [
@@ -147,6 +170,10 @@ class ProfileController extends ApiController
                 'email' => $user->email,
                 'created_at' => $user->created_at,
                 'processing_restricted_at' => $user->processing_restricted_at,
+                'privacy_requests' => PrivacyRequest::query()
+                    ->where('user_id', $user->id)
+                    ->latest('requested_at')
+                    ->get(['type', 'status', 'requested_at', 'resolved_at', 'resolution_note']),
             ],
             'profile' => $customer ? [
                 'first_name' => $customer->first_name,
@@ -174,6 +201,10 @@ class ProfileController extends ApiController
         $grouped = $settings->groupBy('group')->map(fn ($group) => $group->mapWithKeys(fn ($setting): array => [
             $setting->key => $setting->value,
         ]));
+        $cookieSettings = $grouped->get('cookie', collect());
+        $cookieSettings['consent_version'] = $this->legalDocumentVersionService->consentVersionToken();
+        $cookieSettings['consent_version_snapshot'] = $this->legalDocumentVersionService->consentVersionSnapshot();
+        $grouped->put('cookie', $cookieSettings);
 
         $activeTheme = Theme::query()->where('is_active', true)->first([
             'slug', 'tokens', 'typography', 'spacing', 'buttons', 'containers',
@@ -182,6 +213,10 @@ class ProfileController extends ApiController
         return $this->ok([
             'settings' => $grouped,
             'modules' => config('modules'),
+            'legal' => [
+                'consent_version' => $this->legalDocumentVersionService->consentVersionToken(),
+                'consent_version_snapshot' => $this->legalDocumentVersionService->consentVersionSnapshot(),
+            ],
             'theme' => $activeTheme ? [
                 'slug' => $activeTheme->slug,
                 'tokens' => $activeTheme->tokens,
@@ -199,6 +234,12 @@ class ProfileController extends ApiController
     public function restrictProcessing(RestrictProcessingRequest $request): JsonResponse
     {
         $request->user()->update(['processing_restricted_at' => now()]);
+        $this->privacyRequestService->logCompleted(
+            $request->user(),
+            'restrict_processing',
+            ['restricted_at' => $request->user()->processing_restricted_at?->toIso8601String()],
+            'Processing restriction enabled by the user.',
+        );
 
         return $this->ok(['message' => 'Data processing has been restricted.']);
     }
@@ -209,7 +250,34 @@ class ProfileController extends ApiController
     public function liftProcessingRestriction(RestrictProcessingRequest $request): JsonResponse
     {
         $request->user()->update(['processing_restricted_at' => null]);
+        $this->privacyRequestService->logCompleted(
+            $request->user(),
+            'lift_processing_restriction',
+            null,
+            'Processing restriction removed by the user.',
+        );
 
         return $this->noContent();
+    }
+
+    public function privacyRequests(Request $request): JsonResponse
+    {
+        return $this->ok([
+            'data' => PrivacyRequest::query()
+                ->where('user_id', $request->user()->id)
+                ->latest('requested_at')
+                ->get()
+                ->map(fn (PrivacyRequest $privacyRequest): array => [
+                    'id' => $privacyRequest->id,
+                    'type' => $privacyRequest->type,
+                    'status' => $privacyRequest->status,
+                    'email' => $privacyRequest->email,
+                    'payload' => $privacyRequest->payload,
+                    'resolution_note' => $privacyRequest->resolution_note,
+                    'requested_at' => $privacyRequest->requested_at->toIso8601String(),
+                    'resolved_at' => $privacyRequest->resolved_at?->toIso8601String(),
+                ])
+                ->values(),
+        ]);
     }
 }

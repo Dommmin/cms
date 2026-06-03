@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\CookieConsent;
+use App\Models\PrivacyRequest;
 use App\Models\User;
 use App\Notifications\AccountDeletedNotification;
 use Illuminate\Support\Facades\Notification;
@@ -80,6 +81,18 @@ it('returns default consent when no session id or auth provided', function (): v
         ]);
 });
 
+it('returns policy version snapshot with consent payload', function (): void {
+    $this->getJson('/api/v1/consent')
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'consent_version',
+            'policy_version_snapshot' => [
+                'privacy_policy',
+                'cookie_policy',
+            ],
+        ]);
+});
+
 // ── POST /api/v1/consent ──────────────────────────────────────────────────────
 
 it('stores consent for authenticated user', function (): void {
@@ -126,6 +139,22 @@ it('updates consent for user via post', function (): void {
     ]);
 });
 
+it('stores computed policy version snapshot on cookie consent records', function (): void {
+    $user = User::factory()->create();
+
+    $this->actingAs($user, 'sanctum')
+        ->postJson('/api/v1/consent', [
+            'analytics' => false,
+            'marketing' => true,
+            'functional' => true,
+        ])
+        ->assertCreated();
+
+    expect(
+        CookieConsent::query()->where('user_id', $user->id)->first()?->policy_version_snapshot,
+    )->toBeArray();
+});
+
 // ── DELETE /api/v1/consent/{category} ─────────────────────────────────────────
 
 it('withdraws consent for specific category', function (): void {
@@ -159,6 +188,11 @@ it('sets processing_restricted_at when user restricts processing', function (): 
         ->assertJson(['message' => 'Data processing has been restricted.']);
 
     expect($user->fresh()->processing_restricted_at)->not->toBeNull();
+    $this->assertDatabaseHas('privacy_requests', [
+        'user_id' => $user->id,
+        'type' => 'restrict_processing',
+        'status' => 'completed',
+    ]);
 });
 
 it('requires authentication to restrict processing', function (): void {
@@ -176,6 +210,11 @@ it('clears processing_restricted_at when user lifts restriction', function (): v
         ->assertNoContent();
 
     expect($user->fresh()->processing_restricted_at)->toBeNull();
+    $this->assertDatabaseHas('privacy_requests', [
+        'user_id' => $user->id,
+        'type' => 'lift_processing_restriction',
+        'status' => 'completed',
+    ]);
 });
 
 it('requires authentication to lift processing restriction', function (): void {
@@ -220,4 +259,24 @@ it('includes null processing_restricted_at in data export when not restricted', 
         ->getJson('/api/v1/profile/export')
         ->assertSuccessful()
         ->assertJsonPath('account.processing_restricted_at', null);
+});
+
+it('returns privacy request history endpoint for authenticated user', function (): void {
+    $user = User::factory()->create();
+
+    PrivacyRequest::query()->create([
+        'user_id' => $user->id,
+        'type' => 'export_data',
+        'status' => 'completed',
+        'email' => $user->email,
+        'requested_at' => now()->subMinute(),
+        'resolved_at' => now(),
+    ]);
+
+    $this->actingAs($user, 'sanctum')
+        ->getJson('/api/v1/profile/privacy-requests')
+        ->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.type', 'export_data')
+        ->assertJsonPath('data.0.status', 'completed');
 });

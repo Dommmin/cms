@@ -53,6 +53,10 @@ use Spatie\ModelStates\HasStates;
  * @property string $currency_code
  * @property string|null $notes
  * @property string|null $guest_email
+ * @property string|null $terms_consent_version
+ * @property string|null $privacy_consent_version
+ * @property array<string, mixed>|null $legal_version_snapshot
+ * @property Carbon|null $terms_accepted_at
  * @property Carbon $created_at
  * @property Collection<int, OrderItem> $items
  * @property Customer|null $customer
@@ -112,6 +116,7 @@ use Spatie\ModelStates\HasStates;
     'customer_id', 'guest_email', 'billing_address_id', 'shipping_address_id',
     'status', 'subtotal', 'discount_amount', 'shipping_cost', 'tax_amount', 'total',
     'currency_code', 'exchange_rate', 'notes', 'ga_client_id', 'baselinker_order_id',
+    'terms_consent_version', 'privacy_consent_version', 'legal_version_snapshot', 'terms_accepted_at',
 ])]
 #[Table(name: 'orders')]
 class Order extends Model
@@ -291,6 +296,8 @@ class Order extends Model
         return [
             'status' => OrderState::class,
             'invoice_issued_at' => 'datetime',
+            'legal_version_snapshot' => 'array',
+            'terms_accepted_at' => 'datetime',
         ];
     }
 

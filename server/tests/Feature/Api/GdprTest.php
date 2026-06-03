@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\Customer;
 use App\Models\NewsletterSubscriber;
 use App\Models\Order;
+use App\Models\PrivacyRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -110,6 +111,42 @@ describe('GDPR Data Export (GET /api/v1/profile/export)', function (): void {
             ->assertOk();
 
         expect($response->json('newsletter'))->toBeNull();
+    });
+
+    it('logs export as a completed privacy request', function (): void {
+        $this->withToken($this->token)
+            ->getJson('/api/v1/profile/export')
+            ->assertOk();
+
+        $this->assertDatabaseHas('privacy_requests', [
+            'user_id' => $this->user->id,
+            'type' => 'export_data',
+            'status' => 'completed',
+        ]);
+    });
+
+    it('includes privacy request history in export payload', function (): void {
+        PrivacyRequest::query()->create([
+            'user_id' => $this->user->id,
+            'type' => 'restrict_processing',
+            'status' => 'completed',
+            'email' => $this->user->email,
+            'requested_at' => now()->subHour(),
+            'resolved_at' => now()->subMinutes(30),
+        ]);
+
+        $response = $this->withToken($this->token)
+            ->getJson('/api/v1/profile/export')
+            ->assertOk();
+
+        expect($response->json('account.privacy_requests'))->toHaveCount(2);
+        expect($response->json('account.privacy_requests'))
+            ->sequence(
+                fn ($request) => $request->toHaveKey('type'),
+                fn ($request) => $request->toHaveKey('type'),
+            );
+        expect(collect($response->json('account.privacy_requests'))->pluck('type')->all())
+            ->toContain('restrict_processing', 'export_data');
     });
 });
 
@@ -229,5 +266,16 @@ describe('GDPR Right to Erasure (DELETE /api/v1/profile)', function (): void {
             ->assertOk();
 
         $this->assertSoftDeleted('customers', ['id' => $customerId]);
+    });
+
+    it('logs account deletion as a completed privacy request', function (): void {
+        $this->withToken($this->token)
+            ->deleteJson('/api/v1/profile', ['password' => 'Password123!'])
+            ->assertOk();
+
+        $this->assertDatabaseHas('privacy_requests', [
+            'type' => 'delete_account',
+            'status' => 'completed',
+        ]);
     });
 });

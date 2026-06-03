@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreConsentRequest;
 use App\Models\CookieConsent;
+use App\Services\LegalDocumentVersionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -20,6 +21,8 @@ class ConsentController extends ApiController
         $userId = $request->user()?->id;
         $sessionId = $request->header('X-Session-ID');
 
+        $versionService = resolve(LegalDocumentVersionService::class);
+
         $query = CookieConsent::query();
 
         if ($userId) {
@@ -31,7 +34,8 @@ class ConsentController extends ApiController
                 'functional' => true,
                 'analytics' => false,
                 'marketing' => false,
-                'consent_version' => null,
+                'consent_version' => $versionService->consentVersionToken(),
+                'policy_version_snapshot' => $versionService->consentVersionSnapshot(),
             ]);
         }
 
@@ -40,17 +44,21 @@ class ConsentController extends ApiController
         $analyticsConsent = $consents->get('analytics');
         $marketingConsent = $consents->get('marketing');
 
+        $latestConsent = $consents->first();
+
         return $this->ok([
             'functional' => true,
             'analytics' => $analyticsConsent instanceof CookieConsent && (bool) $analyticsConsent->granted,
             'marketing' => $marketingConsent instanceof CookieConsent && (bool) $marketingConsent->granted,
-            'consent_version' => $consents->first()?->consent_version,
+            'consent_version' => $latestConsent ? $latestConsent->consent_version : $versionService->consentVersionToken(),
+            'policy_version_snapshot' => $latestConsent ? $latestConsent->policy_version_snapshot : $versionService->consentVersionSnapshot(),
         ]);
     }
 
     public function store(StoreConsentRequest $request): JsonResponse
     {
         $data = $request->validated();
+        $versionService = resolve(LegalDocumentVersionService::class);
 
         $categories = [
             'functional' => true,
@@ -59,7 +67,8 @@ class ConsentController extends ApiController
         ];
 
         $sessionId = $data['session_id'] ?? null;
-        $consentVersion = $data['consent_version'] ?? null;
+        $consentVersion = $versionService->consentVersionToken();
+        $policyVersionSnapshot = $versionService->consentVersionSnapshot();
         $ip = $request->ip();
         $userAgent = $request->userAgent();
         $userId = $request->user()?->id;
@@ -73,6 +82,7 @@ class ConsentController extends ApiController
                 'ip' => $ip,
                 'user_agent' => $userAgent,
                 'consent_version' => $consentVersion,
+                'policy_version_snapshot' => $policyVersionSnapshot,
             ]);
         }
 

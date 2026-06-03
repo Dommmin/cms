@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart, LogOut, Package, User } from 'lucide-react';
+import { Heart, LogOut, Package, RefreshCw, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -29,6 +29,11 @@ export default function AccountLayout({
             href: '/account/orders',
             label: t('account.my_orders', 'Orders'),
             icon: Package,
+        },
+        {
+            href: '/account/returns',
+            label: t('account.returns', 'Returns'),
+            icon: RefreshCw,
         },
         {
             href: '/wishlist',

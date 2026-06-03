@@ -8,6 +8,7 @@ import {
     deleteAccount,
     deleteAddress,
     getAddresses,
+    getPrivacyRequests,
     getProfile,
     setDefaultAddress,
     updateAddress,
@@ -20,6 +21,7 @@ import type { UpdatePasswordPayload, UpdateProfilePayload } from '@/types/api';
 export const profileKeys = {
     profile: ['profile'] as const,
     addresses: ['profile', 'addresses'] as const,
+    privacyRequests: ['profile', 'privacy-requests'] as const,
 };
 
 export function useProfile() {
@@ -67,6 +69,14 @@ export function useAddresses(enabled = true) {
     return useQuery({
         queryKey: profileKeys.addresses,
         queryFn: getAddresses,
+        enabled,
+    });
+}
+
+export function usePrivacyRequests(enabled = true) {
+    return useQuery({
+        queryKey: profileKeys.privacyRequests,
+        queryFn: getPrivacyRequests,
         enabled,
     });
 }

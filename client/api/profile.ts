@@ -2,6 +2,7 @@ import { apiDelete, apiGet, apiGetMany, apiPost, apiPut } from '@/lib/api';
 import { api } from '@/lib/axios';
 import type {
     Address,
+    PrivacyRequest,
     UpdatePasswordPayload,
     UpdateProfilePayload,
     User,
@@ -32,6 +33,10 @@ export async function deleteAccount(password: string): Promise<void> {
 export async function exportData(): Promise<Blob> {
     const { data } = await api.get('/profile/export', { responseType: 'blob' });
     return data as Blob;
+}
+
+export async function getPrivacyRequests(): Promise<PrivacyRequest[]> {
+    return apiGetMany<PrivacyRequest>('/profile/privacy-requests');
 }
 
 // ── Addresses ─────────────────────────────────────────────────────────────────

@@ -4,6 +4,8 @@ import { Cookie, X } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
+import { useStorefrontRoutes } from '@/hooks/use-cms';
+import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
 import { updateConsent } from '@/lib/datalayer';
 import { COOKIE_CONSENT_OPEN_EVENT } from '@/providers/cookie-consent-provider';
@@ -24,6 +26,20 @@ const DEFAULT_COOKIE_COPY = {
     marketingDescription:
         'Used to show relevant ads and measure their effectiveness (e.g. Google Ads, Meta Pixel).',
 };
+
+function localiseUrl(
+    url: string | null | undefined,
+    lp: (path: string) => string,
+): string | null {
+    if (!url || url === '#') return null;
+    if (
+        url.startsWith('http://') ||
+        url.startsWith('https://') ||
+        url.startsWith('//')
+    )
+        return url;
+    return lp(url);
+}
 
 function getStoredConsent(): StoredConsent | null {
     if (typeof window === 'undefined') return null;
@@ -83,6 +99,8 @@ const FOCUSABLE =
 
 export function CookieConsent({ settings = {} }: CookieConsentProps) {
     const { t, locale } = useTranslation();
+    const lp = useLocalePath();
+    const { data: storefrontRoutes } = useStorefrontRoutes();
     const [visible, setVisible] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
     const [prefs, setPrefs] = useState<ConsentState>({
@@ -190,8 +208,22 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                 DEFAULT_COOKIE_COPY.bannerDescription)
             ? localizedBannerDescription
             : (settings.banner_description ?? localizedBannerDescription);
-    const privacyUrl = settings.privacy_policy_url ?? '/privacy-policy';
-    const cookiePolicyUrl = settings.cookie_policy_url ?? '/cookie-policy';
+    const privacyUrl = localiseUrl(
+        storefrontRoutes?.privacy_policy ?? settings.privacy_policy_url,
+        lp,
+    );
+    const cookiePolicyUrl = localiseUrl(
+        storefrontRoutes?.cookie_policy ?? settings.cookie_policy_url,
+        lp,
+    );
+    const privacyPolicyLabel = t(
+        'cookie.privacy_policy',
+        locale === 'pl' ? 'Polityka prywatności' : 'Privacy Policy',
+    );
+    const cookiePolicyLabel = t(
+        'cookie.cookie_policy',
+        locale === 'pl' ? 'Polityka cookies' : 'Cookie Policy',
+    );
     const analyticsDesc =
         locale !== 'en' &&
         (!settings.analytics_description ||
@@ -256,29 +288,31 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                                     )}
                                 </button>
                                 {' · '}
-                                <Link
-                                    href={privacyUrl}
-                                    className="text-foreground font-medium underline"
-                                >
-                                    {t(
-                                        'cookie.privacy_policy',
-                                        locale === 'pl'
-                                            ? 'Polityka prywatności'
-                                            : 'Privacy Policy',
-                                    )}
-                                </Link>
+                                {privacyUrl ? (
+                                    <Link
+                                        href={privacyUrl}
+                                        className="text-foreground font-medium underline"
+                                    >
+                                        {privacyPolicyLabel}
+                                    </Link>
+                                ) : (
+                                    <span className="text-foreground font-medium">
+                                        {privacyPolicyLabel}
+                                    </span>
+                                )}
                                 {' · '}
-                                <Link
-                                    href={cookiePolicyUrl}
-                                    className="text-foreground font-medium underline"
-                                >
-                                    {t(
-                                        'cookie.cookie_policy',
-                                        locale === 'pl'
-                                            ? 'Polityka cookies'
-                                            : 'Cookie Policy',
-                                    )}
-                                </Link>
+                                {cookiePolicyUrl ? (
+                                    <Link
+                                        href={cookiePolicyUrl}
+                                        className="text-foreground font-medium underline"
+                                    >
+                                        {cookiePolicyLabel}
+                                    </Link>
+                                ) : (
+                                    <span className="text-foreground font-medium">
+                                        {cookiePolicyLabel}
+                                    </span>
+                                )}
                             </p>
                         </div>
                         <div className="flex shrink-0 items-center gap-2">
@@ -482,14 +516,16 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                                     ? 'Możesz zmienić preferencje w dowolnym momencie przez'
                                     : 'You can change your preferences at any time via the',
                             )}{' '}
-                            <Link href={cookiePolicyUrl} className="underline">
-                                {t(
-                                    'cookie.cookie_policy',
-                                    locale === 'pl'
-                                        ? 'Politykę cookies'
-                                        : 'Cookie Policy',
-                                )}
-                            </Link>{' '}
+                            {cookiePolicyUrl ? (
+                                <Link
+                                    href={cookiePolicyUrl}
+                                    className="underline"
+                                >
+                                    {cookiePolicyLabel}
+                                </Link>
+                            ) : (
+                                <span>{cookiePolicyLabel}</span>
+                            )}{' '}
                             {t(
                                 'cookie.footer_note_suffix',
                                 locale === 'pl'
