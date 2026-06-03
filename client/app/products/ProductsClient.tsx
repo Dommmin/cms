@@ -834,88 +834,72 @@ export default function ProductsClient() {
                                     </div>
                                 )}
                             </div>
-
-                            {data?.meta && data.meta.last_page > 1 && (
-                                <Pagination className="mt-8">
-                                    <PaginationContent>
-                                        <PaginationItem>
-                                            <PaginationPrevious
-                                                onClick={() =>
-                                                    setParam(
-                                                        'page',
-                                                        String(
-                                                            data.meta!
-                                                                .current_page -
-                                                                1,
-                                                        ),
-                                                    )
-                                                }
-                                                disabled={
-                                                    data.meta.current_page <= 1
-                                                }
-                                            />
-                                        </PaginationItem>
-
-                                        {buildPaginationItems(
-                                            data.meta.current_page,
-                                            data.meta.last_page,
-                                        ).map((item, index) =>
-                                            item === 'ellipsis' ? (
-                                                <PaginationItem
-                                                    key={`ellipsis-${index}`}
-                                                >
-                                                    <PaginationEllipsis />
-                                                </PaginationItem>
-                                            ) : (
-                                                <PaginationItem key={item}>
-                                                    <PaginationLink
-                                                        isActive={
-                                                            item ===
-                                                            data.meta!
-                                                                .current_page
-                                                        }
-                                                        onClick={() =>
-                                                            setParam(
-                                                                'page',
-                                                                String(item),
-                                                            )
-                                                        }
-                                                        aria-label={t(
-                                                            'shop.go_to_page',
-                                                            `Go to page ${item}`,
-                                                        )}
-                                                    >
-                                                        {item}
-                                                    </PaginationLink>
-                                                </PaginationItem>
-                                            ),
-                                        )}
-
-                                        <PaginationItem>
-                                            <PaginationNext
-                                                onClick={() =>
-                                                    setParam(
-                                                        'page',
-                                                        String(
-                                                            data.meta!
-                                                                .current_page +
-                                                                1,
-                                                        ),
-                                                    )
-                                                }
-                                                disabled={
-                                                    data.meta.current_page >=
-                                                    data.meta.last_page
-                                                }
-                                            />
-                                        </PaginationItem>
-                                    </PaginationContent>
-                                </Pagination>
-                            )}
                         </>
                     )}
                 </div>
             </div>
+
+            {data?.meta && data.meta.last_page > 1 && (
+                <Pagination className="mt-8">
+                    <PaginationContent>
+                        <PaginationItem>
+                            <PaginationPrevious
+                                onClick={() =>
+                                    setParam(
+                                        'page',
+                                        String(data.meta!.current_page - 1),
+                                    )
+                                }
+                                disabled={data.meta.current_page <= 1}
+                            />
+                        </PaginationItem>
+
+                        {buildPaginationItems(
+                            data.meta.current_page,
+                            data.meta.last_page,
+                        ).map((item, index) =>
+                            item === 'ellipsis' ? (
+                                <PaginationItem key={`ellipsis-${index}`}>
+                                    <PaginationEllipsis />
+                                </PaginationItem>
+                            ) : (
+                                <PaginationItem key={item}>
+                                    <PaginationLink
+                                        isActive={
+                                            item === data.meta!.current_page
+                                        }
+                                        onClick={() =>
+                                            setParam('page', String(item))
+                                        }
+                                        aria-label={t(
+                                            'shop.go_to_page',
+                                            `Go to page ${item}`,
+                                        )}
+                                    >
+                                        {item}
+                                    </PaginationLink>
+                                </PaginationItem>
+                            ),
+                        )}
+
+                        <PaginationItem>
+                            <PaginationNext
+                                onClick={() =>
+                                    setParam(
+                                        'page',
+                                        String(data.meta!.current_page + 1),
+                                    )
+                                }
+                                disabled={
+                                    data.meta.current_page >=
+                                    data.meta.last_page
+                                }
+                            />
+                        </PaginationItem>
+                    </PaginationContent>
+                </Pagination>
+            )}
+
             <BackToTop />
         </div>
     );
