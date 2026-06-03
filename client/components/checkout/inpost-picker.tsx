@@ -5,13 +5,14 @@ import type { InPostPoint, InpostPickerProps } from './inpost-picker.types';
 
 function InpostScript() {
     useEffect(() => {
+        const src = 'https://geowidget.inpost.pl/inpost-geowidget.js';
+        const existingScript = document.querySelector(`script[src="${src}"]`);
+        if (existingScript) return;
+
         const script = document.createElement('script');
-        script.src = 'https://geowidget.inpost.pl/inpost-geowidget.js';
+        script.src = src;
         script.async = true;
         document.head.appendChild(script);
-        return () => {
-            document.head.removeChild(script);
-        };
     }, []);
     return null;
 }

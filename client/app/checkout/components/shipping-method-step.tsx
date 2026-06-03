@@ -1,6 +1,15 @@
 'use client';
 
-import { InpostPicker } from '@/components/checkout/inpost-picker';
+import dynamic from 'next/dynamic';
+
+const InpostPicker = dynamic(
+    () =>
+        import('@/components/checkout/inpost-picker').then((m) => ({
+            default: m.InpostPicker,
+        })),
+    { ssr: false },
+);
+
 import { PickupPointPicker } from '@/components/checkout/pickup-point-picker';
 import { useTranslation } from '@/hooks/use-translation';
 
