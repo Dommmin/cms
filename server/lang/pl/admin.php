@@ -584,6 +584,13 @@ return
         'blog_post_unpublished' => 'Wpis został wycofany z publikacji',
         'blog_post_featured' => 'Wpis oznaczony jako wyróżniony',
         'blog_post_unfeatured' => 'Wpis usunięty z wyróżnionych',
+        'theme_created' => 'Motyw został utworzony',
+        'theme_updated' => 'Motyw został zaktualizowany',
+        'theme_deleted' => 'Motyw został usunięty',
+        'theme_activated' => 'Motyw został aktywowany',
+        'theme_disabled' => 'Niestandardowy motyw został wyłączony',
+        'theme_duplicated' => 'Motyw został skopiowany',
+        'theme_cannot_delete_used' => 'Nie można usunąć motywu używanego przez strony',
     ],
     'sort' => [
         'created_desc' => 'Najnowsze',

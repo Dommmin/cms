@@ -47,7 +47,7 @@ class ThemeController extends Controller
             Theme::query()->create($data);
         });
 
-        return to_route('admin.themes.index')->with('success', 'Motyw został utworzony');
+        return to_route('admin.themes.index')->with('success', 'misc.theme_created');
     }
 
     public function show(Theme $theme): Response
@@ -84,18 +84,18 @@ class ThemeController extends Controller
             $theme->update($data);
         });
 
-        return back()->with('success', 'Motyw został zaktualizowany');
+        return back()->with('success', 'misc.theme_updated');
     }
 
     public function destroy(Theme $theme): RedirectResponse
     {
         if ($theme->pages()->exists()) {
-            return back()->with('error', 'Nie można usunąć motywu używanego przez strony');
+            return back()->with('error', 'misc.theme_cannot_delete_used');
         }
 
         $theme->delete();
 
-        return back()->with('success', 'Motyw został usunięty');
+        return back()->with('success', 'misc.theme_deleted');
     }
 
     public function activate(Theme $theme): RedirectResponse
@@ -105,14 +105,14 @@ class ThemeController extends Controller
             $theme->update(['is_active' => true]);
         });
 
-        return back()->with('success', 'Motyw został aktywowany');
+        return back()->with('success', 'misc.theme_activated');
     }
 
     public function disable(): RedirectResponse
     {
         Theme::query()->where('is_active', true)->update(['is_active' => false]);
 
-        return back()->with('success', 'Niestandardowy motyw został wyłączony');
+        return back()->with('success', 'misc.theme_disabled');
     }
 
     public function duplicate(Theme $theme): RedirectResponse
@@ -123,6 +123,6 @@ class ThemeController extends Controller
         $newTheme->is_active = false;
         $newTheme->save();
 
-        return to_route('admin.themes.edit', $newTheme)->with('success', 'Motyw został skopiowany');
+        return to_route('admin.themes.edit', $newTheme)->with('success', 'misc.theme_duplicated');
     }
 }

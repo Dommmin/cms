@@ -530,6 +530,13 @@ return
         'blog_post_unpublished' => 'Blog post unpublished successfully',
         'blog_post_featured' => 'Blog post marked as featured',
         'blog_post_unfeatured' => 'Blog post removed from featured',
+        'theme_created' => 'Theme created successfully',
+        'theme_updated' => 'Theme updated successfully',
+        'theme_deleted' => 'Theme deleted successfully',
+        'theme_activated' => 'Theme activated',
+        'theme_disabled' => 'Custom theme disabled',
+        'theme_duplicated' => 'Theme duplicated',
+        'theme_cannot_delete_used' => 'Cannot delete theme used by pages',
     ],
     'sort' => [
         'created_desc' => 'Newest',
