@@ -34,7 +34,7 @@ export default function BlogCategoriesIndex({
                         {resolveLocalizedText(row.original.name)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                        {row.original.slug}
+                        {resolveLocalizedText(row.original.slug)}
                     </p>
                     {row.original.parent && (
                         <Badge variant="outline" className="mt-1 text-xs">

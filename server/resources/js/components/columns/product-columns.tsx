@@ -34,7 +34,7 @@ export function useProductColumns(): ColumnDef<ProductRow>[] {
                             {resolveLocalizedText(row.original.name)}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                            /{row.original.slug}
+                            /{resolveLocalizedText(row.original.slug)}
                         </div>
                     </div>
                 </div>

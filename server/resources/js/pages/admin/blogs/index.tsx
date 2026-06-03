@@ -32,7 +32,7 @@ export default function BlogsIndex({ blogs, filters }: IndexProps) {
                         {resolveLocalizedText(row.original.name)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                        {row.original.slug}
+                        {resolveLocalizedText(row.original.slug)}
                     </p>
                 </div>
             ),

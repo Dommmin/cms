@@ -1,7 +1,7 @@
 export type ProductRow = {
     id: number;
     name: string | Record<string, string>;
-    slug: string;
+    slug: string | Record<string, string>;
     price: number;
     is_active: boolean;
     is_saleable: boolean;

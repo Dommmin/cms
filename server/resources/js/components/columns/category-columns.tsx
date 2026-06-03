@@ -59,7 +59,7 @@ export function useCategoryColumns(): ColumnDef<CategoryRow>[] {
             header: __('column.slug', 'Slug'),
             cell: ({ row }) => (
                 <span className="font-mono text-sm text-muted-foreground">
-                    /{row.original.slug}
+                    /{resolveLocalizedText(row.original.slug)}
                 </span>
             ),
         },

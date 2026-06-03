@@ -1,7 +1,7 @@
 export type BlogCategory = {
     id: number;
     name: string | Record<string, string>;
-    slug: string;
+    slug: string | Record<string, string>;
     description: string | Record<string, string> | null;
     is_active: boolean;
     position: number;

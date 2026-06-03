@@ -1,7 +1,7 @@
 export interface Blog {
     id: number;
     name: string | Record<string, string>;
-    slug: string;
+    slug: string | Record<string, string>;
     layout: string;
     posts_per_page: number;
     commentable: boolean;
