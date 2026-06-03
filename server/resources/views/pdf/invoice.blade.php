@@ -113,10 +113,10 @@
             @foreach($order->items as $item)
             <tr>
                 <td>{{ $item->product_name }}</td>
-                <td>{{ $item->variant_sku }}</td>
+                <td>{{ $item->sku }}</td>
                 <td class="text-right">{{ number_format($item->unit_price / 100, 2) }} {{ $order->currency_code }}</td>
                 <td class="text-right">{{ $item->quantity }}</td>
-                <td class="text-right">{{ number_format($item->subtotal / 100, 2) }} {{ $order->currency_code }}</td>
+                <td class="text-right">{{ number_format($item->total_price / 100, 2) }} {{ $order->currency_code }}</td>
             </tr>
             @endforeach
         </tbody>
