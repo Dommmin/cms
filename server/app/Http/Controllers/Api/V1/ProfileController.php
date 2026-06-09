@@ -11,14 +11,20 @@ use App\Http\Requests\Api\V1\RestrictProcessingRequest;
 use App\Http\Requests\Api\V1\UpdatePasswordRequest;
 use App\Http\Requests\Api\V1\UpdateProfileRequest;
 use App\Http\Resources\Api\V1\UserResource;
+use App\Models\BlogPost;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\GlobalSlot;
 use App\Models\Order;
 use App\Models\PrivacyRequest;
+use App\Models\Product;
 use App\Models\ProductReview;
 use App\Models\Setting;
 use App\Models\Theme;
 use App\Notifications\AccountDeletedNotification;
 use App\Services\LegalDocumentVersionService;
 use App\Services\PrivacyRequestService;
+use App\Services\StorefrontPathService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -210,6 +216,179 @@ class ProfileController extends ApiController
             'slug', 'tokens', 'typography', 'spacing', 'buttons', 'containers',
         ]);
 
+        $activeSlots = GlobalSlot::query()
+            ->active()
+            ->with('reusableBlock')
+            ->orderBy('position')
+            ->get();
+
+        $relationsToResolve = [];
+        foreach ($activeSlots as $slot) {
+            $block = $slot->reusableBlock;
+            if ($block && is_array($block->relations_config)) {
+                foreach ($block->relations_config as $rel) {
+                    $type = $rel['relation_type'] ?? null;
+                    $id = $rel['relation_id'] ?? null;
+                    if ($type && $id) {
+                        $relationsToResolve[$type][] = $id;
+                    }
+                }
+            }
+        }
+
+        $relationLookup = [];
+        $pathService = resolve(StorefrontPathService::class);
+
+        foreach ($relationsToResolve as $type => $ids) {
+            $ids = array_values(array_unique($ids));
+            if ($type === 'product' && config('modules.ecommerce')) {
+                $products = Product::with(['thumbnail.media', 'brand', 'category', 'activeVariants:id,product_id,price,compare_at_price'])
+                    ->whereIn('id', $ids)->get();
+
+                foreach ($products as $product) {
+                    $variants = $product->activeVariants;
+                    $prices = $variants->pluck('price');
+                    $priceMin = $prices->min() ?? 0;
+                    $priceMax = $prices->max() ?? 0;
+                    $isOnSale = $variants->some(fn ($v): bool => $v->compare_at_price && $v->compare_at_price > $v->price);
+                    $maxDiscount = $variants->map(fn ($v): ?int => $v->compare_at_price && $v->price
+                        ? (int) round((1 - $v->price / $v->compare_at_price) * 100)
+                        : null
+                    )->filter()->max();
+                    $cheapestOnSale = $variants
+                        ->filter(fn ($v): bool => $v->compare_at_price && $v->compare_at_price > $v->price)
+                        ->sortBy('price')
+                        ->first();
+
+                    $relationLookup[$type][$product->id] = [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'slug' => $product->slug,
+                        'public_url' => $pathService->productPath($product),
+                        'short_description' => $product->short_description,
+                        'price_min' => $priceMin,
+                        'price_max' => $priceMax,
+                        'is_active' => $product->is_active,
+                        'is_on_sale' => $isOnSale,
+                        'discount_percentage' => $maxDiscount ?: null,
+                        'compare_at_price_min' => $cheapestOnSale?->compare_at_price,
+                        'omnibus_price_min' => null,
+                        'variants' => $variants->map(fn ($v): array => [
+                            'id' => $v->id,
+                            'price' => $v->price,
+                            'compare_at_price' => $v->compare_at_price,
+                        ])->values()->toArray(),
+                        'thumbnail' => ($thumbnail = $product->thumbnail) && ($media = $thumbnail->media) ? [
+                            'url' => $media->getUrl(),
+                            'alt' => $media->name ?: $product->name,
+                        ] : null,
+                        'brand' => $product->brand ? [
+                            'id' => $product->brand->id,
+                            'name' => $product->brand->name,
+                            'slug' => $product->brand->slug,
+                            'public_url' => $pathService->brandPath($product->brand),
+                        ] : null,
+                        'category' => [
+                            'id' => $product->category->id,
+                            'name' => $product->category->name,
+                            'slug' => $product->category->slug,
+                            'image_url' => $product->category->image_path,
+                            'public_url' => $pathService->categoryPath($product->category),
+                        ],
+                        'images' => [],
+                        'attributes' => [],
+                        'created_at' => $product->created_at->toIso8601String(),
+                    ];
+                }
+            } elseif ($type === 'blog_post') {
+                $posts = BlogPost::with(['author', 'category'])->whereIn('id', $ids)->get();
+
+                foreach ($posts as $post) {
+                    $relationLookup[$type][$post->id] = [
+                        'id' => $post->id,
+                        'title' => $post->title,
+                        'slug' => $post->slug,
+                        'public_url' => $pathService->blogPostPath($post),
+                        'excerpt' => $post->excerpt,
+                        'featured_image' => $post->featured_image,
+                        'published_at' => $post->published_at?->toIso8601String(),
+                        'reading_time' => $post->reading_time,
+                        'author' => $post->author ? ['id' => $post->author->id, 'name' => $post->author->name] : null,
+                        'category' => $post->category ? [
+                            'id' => $post->category->id,
+                            'name' => $post->category->name,
+                            'slug' => $post->category->slug,
+                        ] : null,
+                    ];
+                }
+            } elseif ($type === 'category') {
+                $categories = Category::query()->whereIn('id', $ids)->get();
+
+                foreach ($categories as $cat) {
+                    $relationLookup[$type][$cat->id] = [
+                        'id' => $cat->id,
+                        'name' => $cat->name,
+                        'slug' => $cat->slug,
+                        'description' => $cat->description,
+                        'image_url' => $cat->image_path,
+                        'parent_id' => $cat->parent_id,
+                        'public_url' => $pathService->categoryPath($cat),
+                    ];
+                }
+            } elseif ($type === 'brand') {
+                $brands = Brand::query()->whereIn('id', $ids)->get();
+
+                foreach ($brands as $brand) {
+                    $relationLookup[$type][$brand->id] = [
+                        'id' => $brand->id,
+                        'name' => $brand->name,
+                        'slug' => $brand->slug,
+                        'logo_url' => $brand->logo_path,
+                        'public_url' => $pathService->brandPath($brand),
+                    ];
+                }
+            }
+        }
+
+        $slots = [];
+        foreach ($activeSlots->groupBy(fn (GlobalSlot $slot): string => $slot->location->value) as $loc => $locationSlots) {
+            $mappedSlots = [];
+            foreach ($locationSlots as $slot) {
+                $block = $slot->reusableBlock;
+                $relations = [];
+
+                if ($block && is_array($block->relations_config)) {
+                    foreach ($block->relations_config as $index => $rel) {
+                        $type = $rel['relation_type'] ?? null;
+                        $id = $rel['relation_id'] ?? null;
+                        $key = $rel['relation_key'] ?? null;
+
+                        $relations[] = [
+                            'id' => 0,
+                            'relation_type' => $type,
+                            'relation_id' => $id,
+                            'relation_key' => $key,
+                            'position' => $rel['position'] ?? $index,
+                            'metadata' => $rel['metadata'] ?? null,
+                            'data' => ($type && $id) ? ($relationLookup[$type][$id] ?? null) : null,
+                        ];
+                    }
+                }
+
+                $mappedSlots[] = [
+                    'id' => $slot->id,
+                    'label' => $slot->label,
+                    'block_type' => $block ? $block->type : 'custom_html',
+                    'configuration' => $block ? $block->configuration : ($slot->configuration ?? []),
+                    'relations' => $relations,
+                    'settings' => $slot->settings ?? [],
+                    'position' => $slot->position,
+                ];
+            }
+
+            $slots[$loc] = $mappedSlots;
+        }
+
         return $this->ok([
             'settings' => $grouped,
             'modules' => config('modules'),
@@ -225,6 +404,7 @@ class ProfileController extends ApiController
                 'buttons' => $activeTheme->buttons,
                 'containers' => $activeTheme->containers,
             ] : null,
+            'slots' => $slots,
         ]);
     }
 
