@@ -14,7 +14,9 @@ use App\Models\ShippingMethod;
 use App\Models\User;
 use App\Services\CartService;
 use App\Services\CheckoutService;
+use App\Services\InventoryService;
 use App\Services\PaymentGatewayManager;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -142,19 +144,20 @@ class CheckoutController extends ApiController
         return ShippingMethodResource::collection($methods);
     }
 
-    public function reserve(Request $request, \App\Services\InventoryService $inventoryService): JsonResponse
+    public function reserve(Request $request, InventoryService $inventoryService): JsonResponse
     {
         /** @var User|null $user */
         $user = auth('sanctum')->user();
         $cartToken = $request->header('X-Cart-Token');
 
         $cart = $this->cartService->getOrCreateCart($user, is_string($cartToken) ? $cartToken : null);
-        
+
         try {
             $inventoryService->reserveCart($cart, 15);
+
             return $this->ok(['message' => 'Cart reserved for 15 minutes', 'expires_at' => now()->addMinutes(15)]);
-        } catch (\Exception $e) {
-            return $this->error($e->getMessage(), 400);
+        } catch (Exception $exception) {
+            abort(400, $exception->getMessage());
         }
     }
 
@@ -167,10 +170,10 @@ class CheckoutController extends ApiController
 
         $order = $this->checkoutService->checkout(
             user: $user,
-            shippingMethodId: $data['shipping_method_id'],
+            shippingMethodId: $data['shipping_method_id'] ?? null,
             paymentProvider: PaymentProviderEnum::from($data['payment_provider']),
             billingAddress: $data['billing_address'],
-            shippingAddress: $data['shipping_address'],
+            shippingAddress: $data['shipping_address'] ?? null,
             guestEmail: $data['guest_email'] ?? null,
             cartToken: is_string($cartToken) ? $cartToken : null,
             pickupPointId: $data['pickup_point_id'] ?? null,

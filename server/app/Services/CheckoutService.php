@@ -38,10 +38,10 @@ class CheckoutService
      */
     public function checkout(
         ?User $user,
-        int $shippingMethodId,
+        ?int $shippingMethodId,
         PaymentProviderEnum $paymentProvider,
         array $billingAddress,
-        array $shippingAddress,
+        ?array $shippingAddress,
         ?string $guestEmail = null,
         ?string $cartToken = null,
         ?string $pickupPointId = null,
@@ -74,9 +74,9 @@ class CheckoutService
 
         abort_if($cart->isEmpty(), 422, 'Cart is empty');
 
-        $shippingMethod = ShippingMethod::query()->where('is_active', true)->findOrFail($shippingMethodId);
-
         [$discountAmount, $freeShipping] = $this->resolveDiscount($cart);
+
+        $requiresShipping = $cart->items->contains(fn ($item) => $item->variant->product->productType->is_shippable ?? true);
 
         $affiliateCode = $this->resolveAffiliateCode($referralCode);
         if ($affiliateCode instanceof AffiliateCode) {
@@ -88,21 +88,32 @@ class CheckoutService
         $subtotal = $cart->subtotal();
         $subtotalAfterDiscount = max(0, $subtotal - $discountAmount);
 
-        $totalWeightKg = $this->calculateTotalWeightKg($cart);
-
-        $shippingCost = $freeShipping ? 0 : $shippingMethod->calculateCost($totalWeightKg, $subtotalAfterDiscount);
-
         $taxAmount = $this->calculateTaxAmount($cart);
 
-        $total = max(0, $subtotalAfterDiscount + $shippingCost);
-
         $billing = $this->firstOrCreateAddress($billingAddress, $customer, AddressTypeEnum::BILLING);
-        $shipping = $this->firstOrCreateAddress($shippingAddress, $customer, AddressTypeEnum::SHIPPING);
+
+        if ($requiresShipping) {
+            abort_if($shippingMethodId === null, 422, 'Shipping method is required');
+            $shippingMethod = ShippingMethod::query()->where('is_active', true)->findOrFail($shippingMethodId);
+            $totalWeightKg = $this->calculateTotalWeightKg($cart);
+            $shippingCost = $freeShipping ? 0 : $shippingMethod->calculateCost($totalWeightKg, $subtotalAfterDiscount);
+            $shipping = $this->firstOrCreateAddress($shippingAddress ?? $billingAddress, $customer, AddressTypeEnum::SHIPPING);
+        } else {
+            $shippingMethod = null;
+            $shippingCost = 0;
+            $shipping = $billing;
+        }
+
+        $total = max(0, $subtotalAfterDiscount + $shippingCost);
         $legalSnapshot = $this->legalDocumentVersionService->checkoutLegalSnapshot();
 
-        $initialStatus = $paymentProvider === PaymentProviderEnum::CASH_ON_DELIVERY
-            ? OrderStatusEnum::PENDING
-            : OrderStatusEnum::AWAITING;
+        if ($total === 0) {
+            $initialStatus = OrderStatusEnum::PROCESSING;
+        } else {
+            $initialStatus = $paymentProvider === PaymentProviderEnum::CASH_ON_DELIVERY
+                ? OrderStatusEnum::PENDING
+                : OrderStatusEnum::AWAITING;
+        }
 
         $order = Order::query()->create([
             'reference_number' => Order::generateReferenceNumber(),
@@ -146,18 +157,21 @@ class CheckoutService
             'payload' => null,
         ]);
 
-        Shipment::query()->create([
-            'order_id' => $order->id,
-            'shipping_method_id' => $shippingMethod->id,
-            'carrier' => $shippingMethod->carrier->value,
-            'tracking_number' => null,
-            'label_url' => null,
-            'status' => ShipmentStatusEnum::PENDING->value,
-            'pickup_point_id' => $pickupPointId,
-            'carrier_payload' => null,
-        ]);
+        if ($shippingMethod) {
+            Shipment::query()->create([
+                'order_id' => $order->id,
+                'shipping_method_id' => $shippingMethod->id,
+                'carrier' => $shippingMethod->carrier->value,
+                'tracking_number' => null,
+                'label_url' => null,
+                'status' => ShipmentStatusEnum::PENDING->value,
+                'pickup_point_id' => $pickupPointId,
+                'carrier_payload' => null,
+            ]);
+        }
 
-        $inventoryService = app(\App\Services\InventoryService::class);
+        $inventoryService = resolve(InventoryService::class);
+        $inventoryService->reserveCart($cart, 0);
         $inventoryService->commitCartReservations($cart);
 
         $cart->items()->delete();

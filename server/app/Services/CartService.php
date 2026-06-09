@@ -36,15 +36,11 @@ class CartService
                 $this->mergeGuestCartIntoCustomer($user, $cartToken);
             }
 
-            $cart = $user->customer->cart;
-            if ($cart instanceof Cart) {
-                return $cart;
-            }
-
-            $cart = new Cart([
+            $cart = Cart::query()->firstOrCreate([
                 'customer_id' => $user->customer->id,
             ]);
-            $cart->save();
+
+            $user->customer->setRelation('cart', $cart);
 
             return $cart;
         }
