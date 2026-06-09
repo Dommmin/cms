@@ -55,8 +55,8 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
             Route::get('{slug}/products', [BrandController::class, 'products'])->name('products');
         });
         Route::get('promotions', [PromotionController::class, 'index'])->name('promotions.index');
-        Route::post('returns/lookup', [ReturnController::class, 'lookup'])->name('returns.lookup');
-        Route::post('returns/guest-request', [ReturnController::class, 'storeGuest'])->middleware('idempotent')->name('returns.guest-request');
+        Route::post('returns/lookup', [ReturnController::class, 'lookup'])->middleware('throttle:api.strict')->name('returns.lookup');
+        Route::post('returns/guest-request', [ReturnController::class, 'storeGuest'])->middleware(['idempotent', 'throttle:api.strict'])->name('returns.guest-request');
 
         // Flash Sales
         Route::get('flash-sales', [FlashSaleController::class, 'index'])->name('flash-sales.index');
@@ -68,10 +68,10 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
 
         // Checkout (public — no auth required)
         Route::get('checkout/shipping-methods', [CheckoutController::class, 'shippingMethods'])->name('checkout.shipping-methods');
-        Route::post('checkout/reserve', [CheckoutController::class, 'reserve'])->name('checkout.reserve');
+        Route::post('checkout/reserve', [CheckoutController::class, 'reserve'])->middleware('throttle:api.strict')->name('checkout.reserve');
         Route::get('checkout/payment-methods', [CheckoutController::class, 'paymentMethods'])->name('checkout.payment-methods');
         Route::get('checkout/pickup-points', [PickupPointsController::class, 'index'])->name('checkout.pickup-points');
-        Route::post('checkout', [CheckoutController::class, 'checkout'])->middleware('idempotent')->name('checkout');
+        Route::post('checkout', [CheckoutController::class, 'checkout'])->middleware(['idempotent', 'throttle:api.strict'])->name('checkout');
     });
 
     // ── Cart (guest + auth) ──────────────────────────────────────────────────

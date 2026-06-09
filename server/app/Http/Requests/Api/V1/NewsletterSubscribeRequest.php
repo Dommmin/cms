@@ -23,7 +23,11 @@ class NewsletterSubscribeRequest extends FormRequest
         return [
             'email' => ['required', 'email', 'max:255'],
             'first_name' => ['nullable', 'string', 'max:255'],
-            'cf_turnstile_response' => ['nullable', 'string', new TurnstileRule],
+            'cf_turnstile_response' => [
+                config('services.cloudflare.turnstile_secret') ? 'required' : 'nullable',
+                'string',
+                new TurnstileRule(),
+            ],
         ];
     }
 }

@@ -28,7 +28,11 @@ class FormController extends ApiController
         }
 
         $request->validate([
-            'cf_turnstile_response' => ['nullable', 'string', new TurnstileRule],
+            'cf_turnstile_response' => [
+                config('services.cloudflare.turnstile_secret') ? 'required' : 'nullable',
+                'string',
+                new TurnstileRule(),
+            ],
         ]);
 
         $rules = [];
