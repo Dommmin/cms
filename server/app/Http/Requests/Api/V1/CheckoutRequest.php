@@ -7,6 +7,7 @@ namespace App\Http\Requests\Api\V1;
 use App\Concerns\AddressValidationRules;
 use App\Enums\PaymentProviderEnum;
 use App\Models\ShippingMethod;
+use App\Rules\VatId;
 use App\Services\CartService;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -61,7 +62,7 @@ class CheckoutRequest extends FormRequest
             'nullable',
             'string',
             'max:50',
-            new \App\Rules\VatId(),
+            new VatId(),
         ];
 
         if ($requiresShipping) {

@@ -6,18 +6,20 @@ namespace App\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Translation\PotentiallyTranslatedString;
 
 class VatId implements ValidationRule
 {
     /**
      * Run the validation rule.
      *
-     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     * @param  Closure(string):PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value)) {
             $fail('Numer VAT/NIP musi być ciągiem znaków.');
+
             return;
         }
 
@@ -26,6 +28,7 @@ class VatId implements ValidationRule
 
         if (empty($clean)) {
             $fail('Numer VAT/NIP nie może być pusty.');
+
             return;
         }
 
@@ -35,6 +38,7 @@ class VatId implements ValidationRule
             if (! $this->validatePolishNip($nip)) {
                 $fail('Podany numer NIP jest niepoprawny.');
             }
+
             return;
         }
 
@@ -47,12 +51,13 @@ class VatId implements ValidationRule
             $euCountries = [
                 'AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'ES', 'FI',
                 'FR', 'GR', 'HR', 'HU', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT',
-                'NL', 'PT', 'RO', 'SE', 'SI', 'SK'
+                'NL', 'PT', 'RO', 'SE', 'SI', 'SK',
             ];
 
             if (! in_array($countryPrefix, $euCountries, true)) {
                 $fail('Niepoprawny prefiks kraju dla numeru VAT UE.');
             }
+
             return;
         }
 

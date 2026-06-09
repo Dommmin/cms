@@ -15,13 +15,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Translatable\HasTranslations;
-
 /**
  * @property int $id
  * @property string $name
@@ -85,7 +84,7 @@ use Spatie\Translatable\HasTranslations;
  *
  * @mixin Model
  */
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Translatable\HasTranslations;
 
 #[Fillable([
     'carrier', 'name', 'description', 'is_active', 'min_weight', 'max_weight',

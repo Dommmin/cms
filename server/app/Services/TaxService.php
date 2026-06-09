@@ -5,21 +5,19 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\CartItem;
-use App\Models\OrderItem;
 use App\Models\ProductVariant;
-use App\Models\ShippingMethod;
 use App\Models\Setting;
+use App\Models\ShippingMethod;
 use App\Models\TaxRate;
-use App\Models\TaxZone;
 use App\Models\TaxZoneCountry;
 use Illuminate\Support\Collection;
 
 class TaxService
 {
-    private const EU_COUNTRIES = [
+    private const array EU_COUNTRIES = [
         'AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'ES', 'FI',
         'FR', 'GR', 'HR', 'HU', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT',
-        'NL', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK'
+        'NL', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK',
     ];
 
     /**
@@ -63,7 +61,7 @@ class TaxService
         }
 
         // 4. Fallback to variant's own effective tax rate relation regardless of country code
-        if ($effectiveRate) {
+        if ($effectiveRate instanceof TaxRate) {
             return $effectiveRate;
         }
 
@@ -92,10 +90,8 @@ class TaxService
         }
 
         // B2B Reverse Charge inside EU (excluding PL since PL seller charging PL buyer is standard)
-        if ($customerType === 'business' && ! empty($vatId)) {
-            if ($countryCode !== 'PL') {
-                return 'reverse_charge';
-            }
+        if ($customerType === 'business' && ! in_array($vatId, [null, '', '0'], true) && $countryCode !== 'PL') {
+            return 'reverse_charge';
         }
 
         return 'standard';
@@ -194,23 +190,21 @@ class TaxService
                 if ($behavior === 'fixed' && $methodRate instanceof TaxRate) {
                     $shippingRatePercent = (int) $methodRate->rate;
                     $shippingRateName = $methodRate->name;
-                } else {
+                } elseif ($itemRates->isNotEmpty()) {
                     // Highest cart rate
-                    if ($itemRates->isNotEmpty()) {
-                        $highestRate = $itemRates->sortByDesc('rate')->first();
-                        if ($highestRate instanceof TaxRate) {
-                            $shippingRatePercent = (int) $highestRate->rate;
-                            $shippingRateName = $highestRate->name;
-                        } else {
-                            $defaultRate = TaxRate::default() ?? $this->getFallbackRate();
-                            $shippingRatePercent = (int) $defaultRate->rate;
-                            $shippingRateName = $defaultRate->name;
-                        }
+                    $highestRate = $itemRates->sortByDesc('rate')->first();
+                    if ($highestRate instanceof TaxRate) {
+                        $shippingRatePercent = (int) $highestRate->rate;
+                        $shippingRateName = $highestRate->name;
                     } else {
                         $defaultRate = TaxRate::default() ?? $this->getFallbackRate();
                         $shippingRatePercent = (int) $defaultRate->rate;
                         $shippingRateName = $defaultRate->name;
                     }
+                } else {
+                    $defaultRate = TaxRate::default() ?? $this->getFallbackRate();
+                    $shippingRatePercent = (int) $defaultRate->rate;
+                    $shippingRateName = $defaultRate->name;
                 }
             }
 
@@ -242,6 +236,7 @@ class TaxService
         $rate->rate = 23;
         $rate->name = 'VAT 23%';
         $rate->country_code = 'PL';
+
         return $rate;
     }
 }

@@ -21,14 +21,11 @@ use App\Models\Payment;
 use App\Models\Referral;
 use App\Models\Shipment;
 use App\Models\ShippingMethod;
-use App\Models\TaxRate;
 use App\Models\User;
 use App\Services\Hooks\Checkout\CheckoutCompletedAction;
 use App\Services\Hooks\Checkout\CheckoutCreatingFilter;
 use App\Services\Hooks\Facades\Hook;
 use Illuminate\Support\Arr;
-
-use App\Services\TaxService;
 
 class CheckoutService
 {
@@ -136,12 +133,12 @@ class CheckoutService
         );
 
         $total = max(0, $subtotalAfterDiscount + $shippingCost);
-        
+
         // Adjust tax amounts proportionally if discount is applied
         $finalTaxAmount = $taxDetails['total_tax'];
         $finalItemsTax = $taxDetails['items_tax'];
         $finalShippingTax = $taxDetails['shipping_tax'];
-        
+
         if ($discountAmount > 0 && $taxDetails['total_gross'] > 0) {
             $discountRatio = $total / $taxDetails['total_gross'];
             $finalTaxAmount = (int) round($taxDetails['total_tax'] * $discountRatio);

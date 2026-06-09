@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Api;
 
+use App\Enums\SettingTypeEnum;
 use App\Enums\ShippingCarrierEnum;
 use App\Models\Category;
 use App\Models\Customer;
@@ -17,6 +18,7 @@ use App\Models\TaxRate;
 use App\Models\TaxZone;
 use App\Models\TaxZoneCountry;
 use App\Models\User;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 if (! function_exists('makeTestVariantTax')) {
@@ -107,9 +109,9 @@ describe('Tax Engine & B2B Checkout', function (): void {
         // Reset Settings
         Setting::query()->updateOrCreate(
             ['group' => 'ecommerce', 'key' => 'shipping_tax_behavior'],
-            ['value' => 'highest_cart_rate', 'type' => \App\Enums\SettingTypeEnum::String]
+            ['value' => 'highest_cart_rate', 'type' => SettingTypeEnum::String]
         );
-        \Illuminate\Support\Facades\Notification::fake();
+        Notification::fake();
     });
 
     it('Scenario 1: Polish B2C (Domestic standard VAT)', function (): void {
@@ -143,6 +145,7 @@ describe('Tax Engine & B2B Checkout', function (): void {
             ]);
 
         $response->assertStatus(201);
+
         $order = Order::query()->latest('id')->first();
 
         // 123.00 PLN gross (100.00 net, 23.00 VAT)
@@ -186,6 +189,7 @@ describe('Tax Engine & B2B Checkout', function (): void {
             ]);
 
         $response->assertStatus(201);
+
         $order = Order::query()->latest('id')->first();
 
         expect($order->customer_type)->toBe('business');
@@ -243,6 +247,7 @@ describe('Tax Engine & B2B Checkout', function (): void {
             ]);
 
         $response->assertStatus(201);
+
         $order = Order::query()->latest('id')->first();
 
         // German 19% should be matched via Tax Zone.
@@ -284,6 +289,7 @@ describe('Tax Engine & B2B Checkout', function (): void {
             ]);
 
         $response->assertStatus(201);
+
         $order = Order::query()->latest('id')->first();
 
         // Reverse charge applies! Tax should be 0.
@@ -321,6 +327,7 @@ describe('Tax Engine & B2B Checkout', function (): void {
             ]);
 
         $response->assertStatus(201);
+
         $order = Order::query()->latest('id')->first();
 
         // Export outside EU is exempt from tax
@@ -359,6 +366,7 @@ describe('Tax Engine & B2B Checkout', function (): void {
             ]);
 
         $response->assertStatus(201);
+
         $order = Order::query()->latest('id')->first();
 
         // Item VAT: 800
@@ -369,10 +377,9 @@ describe('Tax Engine & B2B Checkout', function (): void {
         // Fixed shipping tax rate behavior (e.g. always 23%)
         Setting::query()->updateOrCreate(
             ['group' => 'ecommerce', 'key' => 'shipping_tax_behavior'],
-            ['value' => 'fixed', 'type' => \App\Enums\SettingTypeEnum::String]
+            ['value' => 'fixed', 'type' => SettingTypeEnum::String]
         );
         $this->shippingMethod->update(['tax_rate_id' => $this->taxRatePL23->id]);
-
 
         $this->actingAs($user, 'sanctum')
             ->postJson('/api/v1/cart/items', ['variant_id' => $variant->id, 'quantity' => 1]);
@@ -398,6 +405,7 @@ describe('Tax Engine & B2B Checkout', function (): void {
             ]);
 
         $response2->assertStatus(201);
+
         $order2 = Order::query()->latest('id')->first();
 
         // Item VAT: 800 (at 8% rate)
@@ -495,7 +503,7 @@ describe('Tax Engine & B2B Checkout', function (): void {
 
         // Request Proforma PDF download
         $response = $this->actingAs($user, 'sanctum')
-            ->getJson("/api/v1/orders/{$order->reference_number}/proforma");
+            ->getJson(sprintf('/api/v1/orders/%s/proforma', $order->reference_number));
 
         // Should return PDF download response (typically 200 with headers)
         $response->assertStatus(200)
