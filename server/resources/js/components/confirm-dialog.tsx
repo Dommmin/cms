@@ -12,6 +12,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/hooks/use-translation';
 import type {
     ConfirmButtonProps,
     ConfirmDialogProps,
@@ -20,16 +21,26 @@ import type {
 export function ConfirmDialog({
     open,
     onOpenChange,
-    title = 'Are you sure?',
-    description = 'This action cannot be undone.',
+    title,
+    description,
     onConfirm,
     confirmUrl,
     confirmMethod = 'delete',
-    confirmLabel = 'Confirm',
-    cancelLabel = 'Cancel',
+    confirmLabel,
+    cancelLabel,
     variant = 'default',
 }: ConfirmDialogProps) {
     const [loading, setLoading] = useState(false);
+    const __ = useTranslation();
+
+    const displayTitle = title ?? __('dialog.are_you_sure', 'Are you sure?');
+    const displayDescription =
+        description ??
+        __('dialog.cannot_be_undone', 'This action cannot be undone.');
+    const displayConfirmLabel =
+        confirmLabel ?? __('dialog.confirm_label', 'Confirm');
+    const displayCancelLabel =
+        cancelLabel ?? __('dialog.cancel_label', 'Cancel');
 
     const handleConfirm = useCallback(async () => {
         setLoading(true);
@@ -60,14 +71,14 @@ export function ConfirmDialog({
         <AlertDialog open={open} onOpenChange={onOpenChange}>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>{title}</AlertDialogTitle>
+                    <AlertDialogTitle>{displayTitle}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        {description}
+                        {displayDescription}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel disabled={loading}>
-                        {cancelLabel}
+                        {displayCancelLabel}
                     </AlertDialogCancel>
                     <AlertDialogAction
                         onClick={(e: MouseEvent<HTMLButtonElement>) => {
@@ -81,7 +92,9 @@ export function ConfirmDialog({
                                 : ''
                         }
                     >
-                        {loading ? 'Processing...' : confirmLabel}
+                        {loading
+                            ? __('misc.processing', 'Processing...')
+                            : displayConfirmLabel}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
@@ -91,10 +104,10 @@ export function ConfirmDialog({
 
 export function ConfirmButton({
     onConfirm,
-    title = 'Are you sure?',
-    description = 'This action cannot be undone.',
-    confirmLabel = 'Confirm',
-    cancelLabel = 'Cancel',
+    title,
+    description,
+    confirmLabel,
+    cancelLabel,
     variant = 'outline',
     size = 'default',
     disabled = false,
@@ -102,6 +115,16 @@ export function ConfirmButton({
     children,
 }: ConfirmButtonProps) {
     const [open, setOpen] = useState(false);
+    const __ = useTranslation();
+
+    const displayTitle = title ?? __('dialog.are_you_sure', 'Are you sure?');
+    const displayDescription =
+        description ??
+        __('dialog.cannot_be_undone', 'This action cannot be undone.');
+    const displayConfirmLabel =
+        confirmLabel ?? __('dialog.confirm_label', 'Confirm');
+    const displayCancelLabel =
+        cancelLabel ?? __('dialog.cancel_label', 'Cancel');
 
     return (
         <>
@@ -117,11 +140,11 @@ export function ConfirmButton({
             <ConfirmDialog
                 open={open}
                 onOpenChange={setOpen}
-                title={title}
-                description={description}
+                title={displayTitle}
+                description={displayDescription}
                 onConfirm={onConfirm}
-                confirmLabel={confirmLabel}
-                cancelLabel={cancelLabel}
+                confirmLabel={displayConfirmLabel}
+                cancelLabel={displayCancelLabel}
                 variant="destructive"
             />
         </>

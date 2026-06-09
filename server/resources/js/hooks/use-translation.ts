@@ -11,15 +11,20 @@ type AdminTranslations = Record<string, Record<string, string>>;
 export function useTranslation(): (
     key: string,
     params?: Record<string, string | number> | string,
-    fallback?: string
+    fallback?: string,
 ) => string {
     const { adminTranslations = {} } = usePage<{
         adminTranslations: AdminTranslations;
     }>().props;
     const [locale] = useAdminLocale();
 
-    return (key: string, params?: Record<string, string | number> | string, fallback?: string): string => {
-        let resolvedParams: Record<string, string | number> | undefined = undefined;
+    return (
+        key: string,
+        params?: Record<string, string | number> | string,
+        fallback?: string,
+    ): string => {
+        let resolvedParams: Record<string, string | number> | undefined =
+            undefined;
         let resolvedFallback = fallback;
 
         if (typeof params === 'string') {
@@ -28,17 +33,20 @@ export function useTranslation(): (
             resolvedParams = params;
         }
 
-        const defaultFallback = typeof resolvedFallback === 'string' ? resolvedFallback : key;
+        const defaultFallback =
+            typeof resolvedFallback === 'string' ? resolvedFallback : key;
 
-        let translation = (
+        let translation =
             adminTranslations[locale]?.[key] ??
             adminTranslations['en']?.[key] ??
-            defaultFallback
-        );
+            defaultFallback;
 
         if (resolvedParams) {
             Object.entries(resolvedParams).forEach(([k, v]) => {
-                translation = translation.replace(new RegExp(`:${k}`, 'g'), String(v));
+                translation = translation.replace(
+                    new RegExp(`:${k}`, 'g'),
+                    String(v),
+                );
             });
         }
 
