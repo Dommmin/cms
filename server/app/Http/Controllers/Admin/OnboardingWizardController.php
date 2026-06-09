@@ -26,7 +26,7 @@ class OnboardingWizardController extends Controller
     public function index(): Response
     {
         // Get all settings mapped by group.key
-        $settings = Setting::query()->get()->mapWithKeys(function ($setting) {
+        $settings = Setting::query()->get()->mapWithKeys(function ($setting): array {
             $value = $setting->value;
             if ($setting->type->value === 'encrypted' && $value) {
                 $value = '••••••••';
@@ -36,14 +36,14 @@ class OnboardingWizardController extends Controller
         })->toArray();
 
         // Get shipping methods
-        $shippingMethods = ShippingMethod::query()->orderBy('id')->get()->map(fn ($m) => [
+        $shippingMethods = ShippingMethod::query()->orderBy('id')->get()->map(fn ($m): array => [
             'id' => $m->id,
             'name' => $m->name,
             'base_price' => $m->base_price / 100, // convert to float representation
             'is_active' => $m->is_active,
-            'carrier' => $m->carrier?->value,
+            'carrier' => $m->carrier->value,
             'free_shipping_threshold' => $m->free_shipping_threshold ? ($m->free_shipping_threshold / 100) : null,
-        ])->toArray();
+        ])->all();
 
         // Get tax rates
         $taxRates = TaxRate::query()->orderBy('id')->get()->toArray();
@@ -69,7 +69,7 @@ class OnboardingWizardController extends Controller
             $menuData = [
                 'id' => $menu->id,
                 'name' => $menu->name,
-                'items' => $menu->items->map(fn ($item) => $this->serializeItem($item))->values()->toArray(),
+                'items' => $menu->items->map(fn (MenuItem $item): array => $this->serializeItem($item))->values()->all(),
             ];
         }
 
@@ -97,6 +97,7 @@ class OnboardingWizardController extends Controller
         } elseif (! is_array($completedSteps)) {
             $completedSteps = [];
         }
+
         $currentStep = Setting::get('wizard', 'current_step', 'brand');
         $isCompleted = filter_var(Setting::get('wizard', 'is_completed', false), FILTER_VALIDATE_BOOLEAN);
 
@@ -117,37 +118,18 @@ class OnboardingWizardController extends Controller
 
     public function saveStep(Request $request, string $step): RedirectResponse
     {
-        switch ($step) {
-            case 'brand':
-                $this->saveBrandStep($request);
-                break;
-            case 'domain':
-                $this->saveDomainStep($request);
-                break;
-            case 'payments':
-                $this->savePaymentsStep($request);
-                break;
-            case 'shipping':
-                $this->saveShippingStep($request);
-                break;
-            case 'taxes':
-                $this->saveTaxesStep($request);
-                break;
-            case 'homepage':
-                $this->saveHomepageStep($request);
-                break;
-            case 'menu':
-                $this->saveMenuStep($request);
-                break;
-            case 'seo':
-                $this->saveSeoStep($request);
-                break;
-            case 'legal':
-                $this->saveLegalStep($request);
-                break;
-            default:
-                abort(404, 'Invalid step');
-        }
+        match ($step) {
+            'brand' => $this->saveBrandStep($request),
+            'domain' => $this->saveDomainStep($request),
+            'payments' => $this->savePaymentsStep($request),
+            'shipping' => $this->saveShippingStep($request),
+            'taxes' => $this->saveTaxesStep($request),
+            'homepage' => $this->saveHomepageStep($request),
+            'menu' => $this->saveMenuStep($request),
+            'seo' => $this->saveSeoStep($request),
+            'legal' => $this->saveLegalStep($request),
+            default => abort(404, 'Invalid step'),
+        };
 
         // Update onboarding progress
         $completedSteps = Setting::get('wizard', 'completed_steps');
@@ -156,6 +138,7 @@ class OnboardingWizardController extends Controller
         } elseif (! is_array($completedSteps)) {
             $completedSteps = [];
         }
+
         if (! in_array($step, $completedSteps, true)) {
             $completedSteps[] = $step;
             Setting::set('wizard', 'completed_steps', $completedSteps);
@@ -177,7 +160,7 @@ class OnboardingWizardController extends Controller
         Setting::set('wizard', 'is_completed', true);
         Setting::set('wizard', 'current_step', 'completed');
 
-        return redirect()->route('admin.dashboard')->with('success', 'Gratulacje! Setup wizard został pomyślnie ukończony.');
+        return to_route('admin.dashboard')->with('success', 'Gratulacje! Setup wizard został pomyślnie ukończony.');
     }
 
     private function serializeItem(MenuItem $item): array
@@ -210,6 +193,7 @@ class OnboardingWizardController extends Controller
 
         $section = $homePage->sections()->first();
         if (! $section) {
+            /** @var PageSection $section */
             $section = PageSection::query()->create([
                 'page_id' => $homePage->id,
                 'name' => 'Hero Section',
@@ -221,13 +205,15 @@ class OnboardingWizardController extends Controller
             ]);
         }
 
+        assert($section instanceof PageSection);
+
         $block = PageBlock::query()
             ->where('page_id', $homePage->id)
             ->where('type', PageBlockTypeEnum::HeroBanner)
             ->first();
 
         if (! $block) {
-            $block = PageBlock::query()->create([
+            return PageBlock::query()->create([
                 'page_id' => $homePage->id,
                 'section_id' => $section->id,
                 'type' => PageBlockTypeEnum::HeroBanner,
@@ -250,13 +236,13 @@ class OnboardingWizardController extends Controller
     {
         $page = Page::query()->where('system_page_key', $key)->first();
         if (! $page) {
-            $page = Page::query()->create([
+            return Page::query()->create([
                 'title' => ['en' => $title],
                 'slug' => ['en' => $slug],
                 'page_type' => PageTypeEnum::Module,
                 'module_name' => 'content',
-                'module_config' => ['html' => "<p>Default content for {$title}.</p>"],
-                'content' => "<p>Default content for {$title}.</p>",
+                'module_config' => ['html' => sprintf('<p>Default content for %s.</p>', $title)],
+                'content' => sprintf('<p>Default content for %s.</p>', $title),
                 'is_published' => true,
                 'published_at' => now(),
                 'system_page_key' => $key,
@@ -321,6 +307,7 @@ class OnboardingWizardController extends Controller
             if ($val === '••••••••') {
                 return;
             }
+
             Setting::set($group, $key, $val);
         };
 
@@ -395,7 +382,7 @@ class OnboardingWizardController extends Controller
             $attributes = [
                 'name' => $rateData['name'],
                 'rate' => (int) $rateData['rate'],
-                'country_code' => mb_strtoupper($rateData['country_code']),
+                'country_code' => mb_strtoupper((string) $rateData['country_code']),
                 'is_active' => $rateData['is_active'],
                 'is_default' => $rateData['is_default'],
             ];

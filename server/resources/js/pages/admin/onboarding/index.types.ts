@@ -46,6 +46,8 @@ export interface WizardState {
 }
 
 export interface OnboardingProps {
+    // Dynamic configuration store values of varying types (string, number, boolean)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     settings: Record<string, any>;
     shippingMethods: ShippingMethod[];
     taxRates: TaxRate[];
