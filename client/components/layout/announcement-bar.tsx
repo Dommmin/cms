@@ -5,8 +5,10 @@ import { X } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import type { SlotEntry } from '@/app/layout.types';
 import { apiGetMany } from '@/lib/api';
 import { useModules } from '@/providers/modules-provider';
+import { SlotRenderer } from '../slots/slot-renderer';
 import type { BannerPromotion, CountdownProps } from './announcement-bar.types';
 
 function useCountdown(endsAt: string | null) {
@@ -51,7 +53,15 @@ function Countdown({ endsAt }: CountdownProps) {
     );
 }
 
-export function AnnouncementBar() {
+export function AnnouncementBar({ slots }: { slots?: SlotEntry[] }) {
+    if (slots && slots.length > 0) {
+        return <SlotRenderer slots={slots} location="announcement_bar" />;
+    }
+
+    return <PromotionsAnnouncementBar />;
+}
+
+function PromotionsAnnouncementBar() {
     const [dismissed, setDismissed] = useState<number | null>(null);
     const [index, setIndex] = useState(0);
     const { ecommerce } = useModules();

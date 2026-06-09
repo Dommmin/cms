@@ -22,6 +22,7 @@ import { ThemeInit } from '@/components/layout/theme-init';
 import { Maintenance } from '@/components/maintenance';
 import { BlockAnimationObserver } from '@/components/page-builder/block-animation-observer';
 import { PwaServiceWorker } from '@/components/pwa-service-worker';
+import { SlotZone } from '@/components/slots/slot-zone';
 import { ThemeStyles } from '@/components/theme-styles';
 import { getI18nConfig } from '@/lib/i18n-server';
 import { buildOrganization, buildWebSite } from '@/lib/schema';
@@ -58,7 +59,7 @@ export const viewport: Viewport = {
 
 // Cached per-request: both generateMetadata and RootLayout share one fetch
 
-const getPublicSettings = cache(async () =>
+export const getPublicSettings = cache(async () =>
     serverFetch<PublicSettingsResponse>('/settings/public', {
         revalidate: 300,
         tags: ['settings'],
@@ -213,7 +214,14 @@ export default async function RootLayout({
                                 <TranslationProvider initialLocale={locale}>
                                     <AdminBar entity={adminPreviewEntity} />
                                     <div className="flex min-h-screen flex-col">
-                                        <AnnouncementBar />
+                                        <AnnouncementBar
+                                            slots={
+                                                publicSettings?.slots?.[
+                                                    'announcement_bar'
+                                                ]
+                                            }
+                                        />
+                                        <SlotZone location="top_info_bar" />
                                         <Header
                                             modules={modules}
                                             siteName={siteName}
@@ -226,8 +234,12 @@ export default async function RootLayout({
                                                 {children}
                                             </PageTransition>
                                         </main>
+                                        <SlotZone location="trust_bar" />
+                                        <SlotZone location="footer_columns" />
                                         <Footer />
                                         <MobileBottomNav modules={modules} />
+                                        <SlotZone location="sticky_cta" />
+                                        <SlotZone location="support_panel" />
                                     </div>
                                     <CookieConsent settings={cookieSettings} />
                                     <ChatWidgetLoader />
