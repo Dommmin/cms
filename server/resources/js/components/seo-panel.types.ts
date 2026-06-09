@@ -14,6 +14,7 @@ export type SeoPanelProps = {
     urlPath?: string;
     titleFallback?: string;
     descriptionFallback?: string;
+    contentLength?: number;
 };
 
 export type CharCounterProps = {
@@ -34,4 +35,6 @@ export type SeoHealthOptions = {
     displayTitle: string;
     displayDescription: string;
     showCanonical: boolean;
+    contentLength?: number;
+    urlPath?: string;
 };
