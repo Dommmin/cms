@@ -21,8 +21,8 @@ valid, and which ones were removed because they no longer reflect the codebase.
 | File | Decision | Notes |
 |---|---|---|
 | `docs/page-builder.md` | Keep | Still accurate as the Page Builder contract and usage guide; reviewed and status-marked |
-| `docs/PAGE_BUILDER_RTE_AUDIT_2026-05-06.md` | Keep | Active detailed backlog; many items implemented, but not fully closed |
-| `docs/ADMIN_UI_AUDIT_2026-05-05.md` | Keep | Active detailed backlog; reviewed and status-marked |
+| `docs/PAGE_BUILDER_RTE_AUDIT_2026-05-06.md` | Keep | Active detailed backlog; publication webhooks, translation interpolation, and builder/RTE fixes were reviewed against code |
+| `docs/ADMIN_UI_AUDIT_2026-05-05.md` | Keep | Active detailed backlog; translation completion, delete-confirm placeholders, and related admin polish were reviewed against code |
 | `docs/multi-site-locale.md` | Keep | Locale cloning and locale-specific pages are implemented; doc remains useful and status-marked |
 | `docs/backend.md` | Keep | Still matches the Laravel/backend structure closely |
 | `docs/frontend.md` | Keep | Updated current frontend contexts and storefront/admin guidance |
@@ -48,6 +48,9 @@ valid, and which ones were removed because they no longer reflect the codebase.
 - New backlog or audit notes should not be created as scattered dated TODO files
   when the topic already belongs in `docs/PLATFORM_AUDIT_AND_ROADMAP_2026-06-09.md`
   or one of the two active detailed audit files.
+- After the latest code review, the security-hardening changes and new targeted
+  tests were synchronized back into `docs/PLATFORM_AUDIT_AND_ROADMAP_2026-06-09.md`
+  and `docs/project-status.md` to avoid drift between code and audits.
 - If a future dated doc is created for a focused implementation stream, it should
   either become the active source of truth for that stream or be removed once its
   content is verified as implemented.

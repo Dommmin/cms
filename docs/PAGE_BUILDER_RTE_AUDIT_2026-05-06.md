@@ -17,8 +17,8 @@ Ten plik **nie nadaje się jeszcze do usunięcia**, ale duża część audytu zo
 | Autosave reliability | wdrożone | Osobny endpoint autosave, debounce, preview refresh, `beforeunload`, blokada nawigacji |
 | Usunięcie legacy edytora demo | wdrożone | Stary `components/editor/` i demo route już nie istnieją |
 | `[object Object]` / translatable title + `rich_content` edit | wdrożone | `resolveLocalizedText()` i pola `rich_content` są już w page edit UI |
-| Headless cache / publish coherence | częściowo | Jest `page.published`/`page.unpublished` + revalidation; brak pełnego domknięcia ETag i analogicznych eventów dla wszystkich typów treści |
-| RTE URL validation + i18n + debounce | głównie wdrożone | Relatywne URL-e, `useTranslation()`, `ContentHealthPlugin`, debounce w `HtmlPlugin` są obecne |
+| Headless cache / publish coherence | wdrożone | Dodano webhooki i eventy dla `product.published`/`unpublished` oraz `blog_post.published`/`unpublished` |
+| RTE URL validation + i18n + debounce | wdrożone | Weryfikacja URL, i18n w hooku `useTranslation()` (parametry) oraz media delete i toolbar i18n wdrożone |
 | Dalszy polish / refaktor UX buildera i RTE | otwarte | Nadal sensowny backlog szczegółowy |
 
 ### Co zostało potwierdzone w kodzie

@@ -6,10 +6,10 @@
 
 ## P0 — Security / hardening
 
-- Verify every inbound webhook, starting with MailerLite.
-- Add stricter throttling and anti-bot protection to anonymous support chat flows.
-- Remove or gate debug/health endpoints in production.
-- Harden trusted-proxy handling for Cloudflare client IP forwarding.
+- Standardize security headers across storefront and admin surfaces.
+- Require explicit signature verification and tests for every inbound webhook integration.
+- Keep strict throttling and risk controls on all anonymous write endpoints, not only support chat.
+- Formalize outbound-integration safeguards: allowlists, timeouts, retries and circuit breakers.
 
 ## P1 — Merchant simplicity and extensibility
 

@@ -145,6 +145,10 @@ final class WebhookController extends Controller
             'product.created',
             'product.updated',
             'product.deleted',
+            'product.published',
+            'product.unpublished',
+            'blog_post.published',
+            'blog_post.unpublished',
             'return.requested',
             'return.approved',
         ];

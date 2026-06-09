@@ -34,6 +34,15 @@ more detailed sub-backlogs that are not fully closed yet:
 | `docs/PAGE_BUILDER_RTE_AUDIT_2026-05-06.md` | Partially implemented; several core items shipped, but detailed Page Builder/RTE polish backlog still active |
 | `docs/ADMIN_UI_AUDIT_2026-05-05.md` | Largely still open; mainly admin UX/UI cleanup and consistency backlog |
 
+## Recently Verified On 2026-06-09
+
+- MailerLite inbound newsletter webhook now requires `X-MailerLite-Signature` HMAC verification using `services.mailerlite.webhook_secret` or the API key fallback.
+- Anonymous support chat endpoints now run behind `throttle:api.strict`, and guest conversation creation requires Turnstile when the secret is configured.
+- `/api/health?fresh=1` now requires local environment, authenticated access, or a valid `X-Health-Token`.
+- `/debug-glitchtip` is now blocked outside `local`, `testing`, and `staging`.
+- `TrustCloudflareProxies` now accepts `CF-Connecting-IP` only from trusted Cloudflare ranges, with local/testing allowances for loopback and private Docker networks.
+- Publish/unpublish webhook coverage now includes products and blog posts in addition to pages.
+
 ## Current Platform Snapshot
 
 ### Clearly implemented
@@ -65,25 +74,25 @@ more detailed sub-backlogs that are not fully closed yet:
 
 ### Highest-priority findings
 
-1. `MailerLiteWebhookController` accepts newsletter webhook payloads without any signature or shared-secret verification. Anyone who can reach the endpoint can unsubscribe or delete subscribers if they know the payload shape.
-2. Public support chat endpoints are exposed without route throttling or bot challenge. This creates a spam and resource-abuse path for anonymous conversation creation and message posting.
-3. `TrustCloudflareProxies` trusts `CF-Connecting-IP` directly in application code. If the edge/proxy layer ever forwards spoofed headers, rate limiting, audit logs and abuse controls become bypassable.
-4. `/debug-glitchtip` is publicly reachable and intentionally throws an exception. In production this is an avoidable monitoring-noise and denial-of-observability vector.
-5. Public health endpoint supports a `fresh` mode that triggers active health checks. That is useful operationally, but it should not be anonymously triggerable on the internet.
+1. Security hardening for MailerLite webhooks, support chat abuse controls, trusted proxy handling, `/debug-glitchtip`, and `/api/health?fresh` has now been implemented and covered by targeted feature tests.
+2. Security headers are still not described as a standardized cross-surface baseline for storefront and admin in one place. CSP exists on storefront, but broader header posture still needs unification and explicit verification.
+3. Outbound/inbound integration verification is still inconsistent at platform level: MailerLite is covered now, but the same “every webhook must be verified and documented” standard should be enforced across all future integrations.
+4. SSRF posture for external integrations is still process-dependent. Outbound allowlists, explicit timeout ceilings, and retry/circuit-breaker conventions should be formalized centrally.
+5. Merchant-extensibility security boundaries are still immature: there is no first-class hook/plugin model with scoped permissions, which raises long-term insecure-design risk once custom extensions grow.
 
 ### OWASP Top 10 view
 
 | Category | Status | Notes |
 |---|---|---|
-| A01 Broken Access Control | Partial | Core auth/policies/roles exist, but some public operational endpoints need tighter protection |
+| A01 Broken Access Control | Good/Partial | Core auth/policies/roles exist, and public operational endpoint exposure was tightened; continue auditing extension/admin edge cases |
 | A02 Cryptographic Failures | Good | Payment/webhook signatures, encrypted settings and token auth are present; keep secret rotation operationalized |
 | A03 Injection | Good/Partial | Validation and ORM usage are generally strong; continue reviewing reporting/custom-query surfaces |
 | A04 Insecure Design | Partial | Extensibility, plugin isolation and merchant self-service flows are not yet systematized |
-| A05 Security Misconfiguration | Partial | CSP exists on storefront, but debug/test/health/integration endpoints still need stricter production posture |
+| A05 Security Misconfiguration | Good/Partial | Production posture improved for debug/health/proxy handling; next step is a standardized header baseline and deployment verification |
 | A06 Vulnerable Components | Process-dependent | Requires regular `composer audit` / `npm audit` / CI enforcement |
-| A07 Identification and Authentication Failures | Good | Fortify, Sanctum, rate limits and 2FA exist; public chat/forms still need stronger anti-abuse posture |
-| A08 Software and Data Integrity Failures | Partial | Webhook signature coverage is inconsistent across integrations |
-| A09 Security Logging and Monitoring Failures | Good/Partial | Activity logs and monitoring exist; spoofable client IP weakens trust in logs if proxy config drifts |
+| A07 Identification and Authentication Failures | Good/Partial | Fortify, Sanctum, rate limits and 2FA exist; guest chat now has anti-bot support, but broader anonymous-form abuse review should continue |
+| A08 Software and Data Integrity Failures | Good/Partial | MailerLite signature verification is now enforced; keep the same standard for every inbound integration |
+| A09 Security Logging and Monitoring Failures | Good/Partial | Activity logs and monitoring exist; trusted-proxy spoofing risk was reduced, but ops verification still matters |
 | A10 SSRF | Partial | Many outbound integrations exist; central outbound allowlisting and timeout/retry policy should be hardened further |
 
 ## Status of Your Suggested Features
@@ -106,12 +115,10 @@ more detailed sub-backlogs that are not fully closed yet:
 
 ### P0 — Security and platform hardening
 
-- Add signed-secret verification for every inbound webhook that does not have it yet, starting with MailerLite.
-- Put `throttle:api.strict` or dedicated limiters plus Turnstile/risk checks on anonymous support-chat creation and message posting.
-- Remove or strictly gate `/debug-glitchtip` outside local/staging.
-- Restrict “fresh” health execution to internal/authenticated callers.
-- Replace blind `CF-Connecting-IP` trust with trusted-proxy enforcement that only accepts Cloudflare headers from trusted proxy ranges.
 - Standardize security headers across storefront and admin surfaces: CSP, frame-ancestors, referrer-policy, permissions-policy, X-Content-Type-Options.
+- Document and enforce a platform rule that every inbound webhook requires explicit signature verification and tests before release.
+- Keep anonymous support/chat/forms on dedicated strict rate limits and risk controls; extend the same review to every public write endpoint.
+- Operationalize proxy hardening in deployment checklists so application middleware and edge config cannot drift apart.
 
 ### P0 — Merchant simplicity
 

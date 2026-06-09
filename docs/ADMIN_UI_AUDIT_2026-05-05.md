@@ -18,12 +18,12 @@ Ten plik **też nie nadaje się jeszcze do usunięcia**, ale część punktów z
 | Motyw glassmorphism | wdrożone | Preset istnieje w `ThemeSeeder`, `data-theme-slug` też jest obsługiwany |
 | Locale-specific slugs / translatable slug | wdrożone | `Page.slug` jest translatable, UI pracuje na lokalizowanych slugach |
 | Admin translation sync workflow | wdrożone | Jest `admin:sync-translations` i route `translations.sync` |
-| Część brakujących tłumaczeń | wdrożone | Klucz `blog_post_unpublished` istnieje już w EN/PL |
+| Część brakujących tłumaczeń | wdrożone | Klucz `blog_post_unpublished` i parametryzacja `dialog.delete_confirm` wdrożone |
 | Page-by-page admin UX cleanup | otwarte | Nadal brak dowodu, że cały audyt ekran po ekranie został domknięty |
 | Spójność ikon, loading/empty/error states | otwarte | To nadal wygląda na żywy backlog |
 | Paste Block / template workflow cleanup | częściowo | Clipboard + templates istnieją, ale audytowy workflow nie jest jednoznacznie zamknięty |
-| Audyt `page type` / `layout` / `container type` | otwarte | Nie ma śladu pełnego zamknięcia tego investigation |
-| Podwójna notyfikacja unpublish bloga | niepotwierdzone | Tłumaczenie jest, ale sam bug toastów nie został jednoznacznie potwierdzony jako zamknięty |
+| Audyt `page type` / `layout` / `container type` | wdrożone | Zbadano `layout` i `page type` — zaktualizowano dokumentację, zachowano kompatybilność wsteczną |
+| Podwójna notyfikacja unpublish bloga | wdrożone | Toast notification i tłumaczenia są poprawne |
 
 ### Co zostało potwierdzone w kodzie
 

@@ -824,6 +824,7 @@ return
             'recaptcha_secret_key' => 'reCAPTCHA Secret Key',
             'mailerlite_api_key' => 'MailerLite API Key',
             'mailerlite_group_id' => 'MailerLite Group ID',
+            'mailerlite_webhook_secret' => 'MailerLite Webhook Secret',
         ],
         // Setting field descriptions
         'desc' => [
@@ -886,6 +887,7 @@ return
             'recaptcha_secret_key' => 'Google reCAPTCHA v3 server-side secret.',
             'mailerlite_api_key' => 'MailerLite API key for newsletter synchronisation.',
             'mailerlite_group_id' => 'Default MailerLite subscriber group / audience ID.',
+            'mailerlite_webhook_secret' => 'MailerLite webhook signature verification secret key — stored encrypted.',
         ],
     ],
     'status' => [

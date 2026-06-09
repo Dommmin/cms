@@ -896,6 +896,7 @@ return
             'recaptcha_secret_key' => 'Tajny klucz reCAPTCHA',
             'mailerlite_api_key' => 'Klucz API MailerLite',
             'mailerlite_group_id' => 'ID grupy MailerLite',
+            'mailerlite_webhook_secret' => 'Sekret webhooka MailerLite',
         ],
         // Opisy pól ustawień
         'desc' => [
@@ -958,6 +959,7 @@ return
             'recaptcha_secret_key' => 'Tajny klucz serwerowy Google reCAPTCHA v3.',
             'mailerlite_api_key' => 'Klucz API MailerLite do synchronizacji newslettera.',
             'mailerlite_group_id' => 'Domyślne ID grupy/audience MailerLite.',
+            'mailerlite_webhook_secret' => 'Sekret podpisywania webhooka MailerLite do weryfikacji sygnatur — przechowywany zaszyfrowany.',
         ],
     ],
     'status' => [

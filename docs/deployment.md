@@ -269,7 +269,7 @@ Cloudflare provides free DDoS protection, WAF, and bot protection. All features 
 
 ### 2. Cloudflare Turnstile (CAPTCHA)
 
-Turnstile is a free, privacy-preserving CAPTCHA that protects login, register, newsletter, and contact forms.
+Turnstile is a free, privacy-preserving CAPTCHA that protects login, register, newsletter, contact forms, and anonymous support conversation starts.
 
 **Setup:**
 
@@ -286,11 +286,11 @@ CLOUDFLARE_TURNSTILE_SECRET_KEY=your_secret_key_here
 NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY=your_site_key_here
 ```
 
-The widget renders automatically on login, register, newsletter, and contact forms. If the keys are not set, the widget is hidden and validation is skipped (dev mode).
+The widget renders automatically on login, register, newsletter, and contact forms. If you enable guest support chat protection, make sure the storefront chat entry form also sends `cf_turnstile_response`. If the keys are not set, the widget is hidden and validation is skipped (dev mode).
 
 ### 3. Real IP from Cloudflare (`CF-Connecting-IP`)
 
-The `TrustCloudflareProxies` middleware (registered in `bootstrap/app.php`) reads the real visitor IP from the `CF-Connecting-IP` header. This ensures:
+The `TrustCloudflareProxies` middleware (registered in `bootstrap/app.php`) reads the real visitor IP from the `CF-Connecting-IP` header only when the request comes from trusted Cloudflare IP ranges. This ensures:
 - Rate limiting applies to real IPs, not Cloudflare proxy IPs.
 - Form submission deduplication by IP works correctly.
 
@@ -300,8 +300,8 @@ The `TrustCloudflareProxies` middleware (registered in `bootstrap/app.php`) read
 # In your server block, before proxy_pass to PHP-FPM:
 # Only allow CF-Connecting-IP from Cloudflare's IP ranges.
 # Cloudflare publishes ranges at https://www.cloudflare.com/ips/
-# For simplicity, clear it and let the middleware fall back to REMOTE_ADDR
-# if a request arrives without going through Cloudflare:
+# If a request arrives without going through Cloudflare, the middleware falls
+# back to REMOTE_ADDR and ignores spoofed CF-Connecting-IP headers:
 real_ip_header CF-Connecting-IP;
 set_real_ip_from 103.21.244.0/22;
 set_real_ip_from 103.22.200.0/22;
@@ -326,6 +326,22 @@ set_real_ip_from 2405:8100::/32;
 set_real_ip_from 2a06:98c0::/29;
 set_real_ip_from 2c0f:f248::/32;
 ```
+
+### 3a. MailerLite Webhook Verification
+
+If you use MailerLite webhooks, configure a dedicated signing secret so inbound
+unsubscribe/delete events are verified before they touch subscriber state.
+
+```bash
+# server/.env
+MAILERLITE_API_KEY=your_mailerlite_api_key
+MAILERLITE_GROUP_ID=your_default_group_id
+MAILERLITE_WEBHOOK_SECRET=your_mailerlite_webhook_secret
+```
+
+You can also store the webhook secret in admin settings under Integrations.
+When present there, the encrypted admin value overrides the default runtime
+configuration.
 
 ### 4. WAF Custom Rules (5 Free Rules)
 

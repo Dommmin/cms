@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Rules\TurnstileRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StartSupportConversationRequest extends FormRequest
@@ -23,6 +24,11 @@ class StartSupportConversationRequest extends FormRequest
             'subject' => ['required', 'string', 'max:255'],
             'body' => ['required', 'string', 'max:5000'],
             'channel' => ['sometimes', 'string', 'in:widget,email'],
+            'cf_turnstile_response' => [
+                config('services.cloudflare.turnstile_secret') && $isGuest ? 'required' : 'nullable',
+                'string',
+                new TurnstileRule(),
+            ],
         ];
     }
 }

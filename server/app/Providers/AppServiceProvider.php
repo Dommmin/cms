@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Models\Page;
+use App\Models\BlogPost;
 use App\Observers\MediaObserver;
 use App\Observers\PageObserver;
+use App\Observers\BlogPostObserver;
 use App\Services\PushNotificationService;
 use Carbon\CarbonImmutable;
 use Dedoc\Scramble\Scramble;
@@ -74,6 +76,7 @@ class AppServiceProvider extends ServiceProvider
         // are registered by their respective ServiceProviders.
         Page::observe(PageObserver::class);
         Media::observe(MediaObserver::class);
+        BlogPost::observe(BlogPostObserver::class);
     }
 
     protected function configureRateLimiting(): void
@@ -246,6 +249,10 @@ class AppServiceProvider extends ServiceProvider
 
             if ($v = $decode($rows['mailerlite_group_id'] ?? null)) {
                 config(['services.mailerlite.group_id' => $v]);
+            }
+
+            if ($v = $decrypt($decode($rows['mailerlite_webhook_secret'] ?? null))) {
+                config(['services.mailerlite.webhook_secret' => $v]);
             }
 
             // GA4 Measurement Protocol

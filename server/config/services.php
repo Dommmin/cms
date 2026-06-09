@@ -123,6 +123,12 @@ return [
         'turnstile_secret' => env('CLOUDFLARE_TURNSTILE_SECRET_KEY'),
     ],
 
+    'mailerlite' => [
+        'api_key' => env('MAILERLITE_API_KEY'),
+        'group_id' => env('MAILERLITE_GROUP_ID'),
+        'webhook_secret' => env('MAILERLITE_WEBHOOK_SECRET'),
+    ],
+
     'vapid' => [
         'public_key' => env('VAPID_PUBLIC_KEY'),
         'private_key' => env('VAPID_PRIVATE_KEY'),

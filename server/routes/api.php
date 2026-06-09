@@ -33,6 +33,15 @@ use Spatie\Health\ResultStores\ResultStore;
 // ── Health check (public, no auth) ──────────────────────────────────────────
 Route::get('health', function (ResultStore $resultStore) {
     if (request()->has('fresh')) {
+        $isAuthorized = app()->environment('local') ||
+            auth('sanctum')->check() ||
+            auth('web')->check() ||
+            (request()->header('X-Health-Token') && request()->header('X-Health-Token') === config('health.secret_token'));
+
+        if (! $isAuthorized) {
+            return response()->json(['message' => 'Unauthorized fresh health execution.'], 403);
+        }
+
         Artisan::call(RunHealthChecksCommand::class);
     }
 
@@ -138,7 +147,7 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
     });
 
     // ── Support (public + optional auth) ────────────────────────────────────
-    Route::prefix('support')->name('support.')->group(function (): void {
+    Route::prefix('support')->name('support.')->middleware('throttle:api.strict')->group(function (): void {
         Route::post('conversations', [SupportController::class, 'store'])->name('conversations.store');
         Route::get('conversations/{token}', [SupportController::class, 'show'])->name('conversations.show');
         Route::post('conversations/{token}/messages', [SupportController::class, 'addMessage'])->name('conversations.messages.store');
