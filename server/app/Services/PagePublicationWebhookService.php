@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Page;
+use App\Services\Hooks\Cms\PagePublishedAction;
+use App\Services\Hooks\Facades\Hook;
 
 final readonly class PagePublicationWebhookService
 {
@@ -15,6 +17,7 @@ final readonly class PagePublicationWebhookService
     public function dispatchPublished(Page $page, string $source): void
     {
         $this->webhookService->dispatch('page.published', $this->payload($page, $source));
+        Hook::action(new PagePublishedAction($page));
     }
 
     public function dispatchUnpublished(Page $page, string $source): void

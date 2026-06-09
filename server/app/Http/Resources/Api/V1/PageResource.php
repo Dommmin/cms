@@ -31,7 +31,9 @@ class PageResource extends JsonResource
         $autoPostsLookup = $this->resolveAutoSourcePosts($page, $relationLookup);
         $locale = app()->getLocale();
 
-        return [
+        $seo = $page->getSeoMetadata();
+
+        $data = [
             'id' => $page->id,
             'title' => $page->title,
             'slug' => $page->getTranslation('slug', $locale, false),
@@ -42,11 +44,11 @@ class PageResource extends JsonResource
             'system_page_key' => $page->system_page_key,
             'module_config' => $page->module_config,
             'content' => $page->content,
-            'seo_title' => $page->seo_title,
-            'seo_description' => $page->seo_description,
-            'seo_canonical' => $page->seo_canonical,
-            'meta_robots' => $page->meta_robots ?? 'index, follow',
-            'og_image' => $page->og_image,
+            'seo_title' => $seo['title'],
+            'seo_description' => $seo['description'],
+            'seo_canonical' => $seo['canonical'],
+            'meta_robots' => $seo['robots'],
+            'og_image' => $seo['og_image'],
             'sitemap_exclude' => (bool) $page->sitemap_exclude,
             'sections' => $page->relationLoaded('sections') ? $page->sections->map(fn ($section): array => [
                 'id' => $section->id,
@@ -67,6 +69,10 @@ class PageResource extends JsonResource
                 ]) : [],
             ]) : [],
         ];
+
+        $filter = \App\Services\Hooks\Facades\Hook::filter(new \App\Services\Hooks\Cms\PageRenderFilter($data, $page));
+
+        return $filter->pageData;
     }
 
     /**

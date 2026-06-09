@@ -215,7 +215,11 @@ class ProductVariant extends Model
             ->sortByDesc('min_quantity')
             ->first();
 
-        return $matching instanceof ProductVariantPriceTier ? $matching->price : $this->price;
+        $price = $matching instanceof ProductVariantPriceTier ? $matching->price : $this->price;
+
+        $filter = \App\Services\Hooks\Facades\Hook::filter(new \App\Services\Hooks\Pricing\ProductPriceFilter($price, $this, $quantity));
+
+        return $filter->price;
     }
 
     public function priceHistory(): HasMany

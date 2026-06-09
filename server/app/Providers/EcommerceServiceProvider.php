@@ -32,8 +32,10 @@ use App\Listeners\TrackPurchaseInGA4;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\Customer;
 use App\Models\Wishlist;
 use App\Observers\CategoryObserver;
+use App\Observers\CustomerObserver;
 use App\Observers\ProductObserver;
 use App\Observers\ProductVariantPriceObserver;
 use App\Observers\WishlistObserver;
@@ -118,6 +120,7 @@ class EcommerceServiceProvider extends ServiceProvider
         ProductVariant::observe(ProductVariantPriceObserver::class);
         Category::observe(CategoryObserver::class);
         Wishlist::observe(WishlistObserver::class);
+        Customer::observe(CustomerObserver::class);
     }
 
     protected function registerEventListeners(): void

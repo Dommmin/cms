@@ -166,12 +166,15 @@ class ShippingMethod extends Model
     {
         // Free shipping jeśli wartość zamówienia przekracza próg
         if ($this->free_shipping_threshold && $orderValueCents >= $this->free_shipping_threshold) {
-            return 0;
+            $cost = 0;
+        } else {
+            $cost = $this->base_price + (int) round($weightKg * $this->price_per_kg);
+            $cost = max(0, $cost);
         }
 
-        $cost = $this->base_price + (int) round($weightKg * $this->price_per_kg);
+        $filter = \App\Services\Hooks\Facades\Hook::filter(new \App\Services\Hooks\Shipping\ShippingCostFilter($cost, $this, $weightKg, $orderValueCents));
 
-        return max(0, $cost);
+        return $filter->cost;
     }
 
     /** Czy metoda wymaga wyboru punktu odbioru (paczkomat)? */

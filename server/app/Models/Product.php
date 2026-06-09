@@ -136,6 +136,7 @@ class Product extends Model implements HasMedia
     use LogsActivity;
     use SanitizesTranslatableHtml;
     use Searchable;
+    use \App\Traits\HasSeoMetadata;
 
     /** @var array<int, string> */
     public array $translatable = ['name', 'slug', 'description', 'short_description'];

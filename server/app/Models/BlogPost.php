@@ -147,6 +147,7 @@ class BlogPost extends Model
     use LogsActivity;
     use SanitizesTranslatableHtml;
     use Searchable;
+    use \App\Traits\HasSeoMetadata;
 
     /** @var array<int, string> */
     public array $translatable = ['title', 'slug', 'excerpt', 'content'];

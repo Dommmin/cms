@@ -23,6 +23,9 @@ use App\Models\Shipment;
 use App\Models\ShippingMethod;
 use App\Models\TaxRate;
 use App\Models\User;
+use App\Services\Hooks\Checkout\CheckoutCompletedAction;
+use App\Services\Hooks\Checkout\CheckoutCreatingFilter;
+use App\Services\Hooks\Facades\Hook;
 use Illuminate\Support\Arr;
 
 class CheckoutService
@@ -115,7 +118,7 @@ class CheckoutService
                 : OrderStatusEnum::AWAITING;
         }
 
-        $order = Order::query()->create([
+        $orderData = [
             'reference_number' => Order::generateReferenceNumber(),
             'customer_id' => $customer?->id,
             'guest_email' => $customer === null ? $guestEmail : null,
@@ -135,7 +138,12 @@ class CheckoutService
             'privacy_consent_version' => $legalSnapshot['privacy_policy'],
             'legal_version_snapshot' => $legalSnapshot,
             'terms_accepted_at' => now(),
-        ]);
+        ];
+
+        $filter = Hook::filter(new CheckoutCreatingFilter($orderData, $cart));
+        $orderData = $filter->orderData;
+
+        $order = Order::query()->create($orderData);
 
         /** @var CartItem $cartItem */
         foreach ($cart->items as $cartItem) {
@@ -191,6 +199,8 @@ class CheckoutService
         }
 
         $order->load(['items.variant.product', 'billingAddress', 'shippingAddress', 'payment', 'shipment', 'statusHistory']);
+
+        Hook::action(new CheckoutCompletedAction($order));
 
         return $order;
     }

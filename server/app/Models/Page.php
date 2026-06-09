@@ -172,6 +172,7 @@ class Page extends Model
     use HasTranslations;
     use LogsActivity;
     use SanitizesTranslatableHtml;
+    use \App\Traits\HasSeoMetadata;
 
     /** @var array<int, string> */
     public array $translatable = ['title', 'slug', 'excerpt', 'content', 'rich_content'];

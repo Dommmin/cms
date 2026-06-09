@@ -110,6 +110,7 @@ class Category extends Model
     use HasVersions;
     use LogsActivity;
     use Searchable;
+    use \App\Traits\HasSeoMetadata;
 
     /** @var array<int, string> */
     public array $translatable = ['name', 'slug', 'description'];
