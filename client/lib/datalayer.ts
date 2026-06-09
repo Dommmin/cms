@@ -254,6 +254,66 @@ export function trackPurchase(order: {
     });
 }
 
+export function trackAddShippingInfo(
+    cartValue: number, // cents
+    currency: string,
+    shippingTier: string,
+    items: Array<{
+        variant_id: number | string;
+        product: { name: string; category?: { name?: string } };
+        unit_price: number; // cents
+        quantity: number;
+    }>,
+): void {
+    pushDataLayer({ ecommerce: null });
+    pushDataLayer({
+        event: 'add_shipping_info',
+        ecommerce: {
+            currency,
+            value: +(cartValue / 100).toFixed(2),
+            shipping_tier: shippingTier,
+            items: items.map((item, index) => ({
+                item_id: String(item.variant_id),
+                item_name: item.product.name,
+                item_category: item.product.category?.name,
+                price: +(item.unit_price / 100).toFixed(2),
+                quantity: item.quantity,
+                index,
+            })) satisfies Ga4Item[],
+        },
+    });
+}
+
+export function trackAddPaymentInfo(
+    cartValue: number, // cents
+    currency: string,
+    paymentType: string,
+    items: Array<{
+        variant_id: number | string;
+        product: { name: string; category?: { name?: string } };
+        unit_price: number; // cents
+        quantity: number;
+    }>,
+): void {
+    pushDataLayer({ ecommerce: null });
+    pushDataLayer({
+        event: 'add_payment_info',
+        ecommerce: {
+            currency,
+            value: +(cartValue / 100).toFixed(2),
+            payment_type: paymentType,
+            items: items.map((item, index) => ({
+                item_id: String(item.variant_id),
+                item_name: item.product.name,
+                item_category: item.product.category?.name,
+                price: +(item.unit_price / 100).toFixed(2),
+                quantity: item.quantity,
+                index,
+            })) satisfies Ga4Item[],
+        },
+    });
+}
+
 // ── Non-ecommerce events ───────────────────────────────────────────────────────
 
 export function trackSignUp(): void {

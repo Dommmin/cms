@@ -1,9 +1,11 @@
 'use client';
 
 import { ChevronDown, RotateCcw, ShieldCheck, Truck } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { useApplyDiscount, useRemoveDiscount } from '@/hooks/use-cart';
 import { useStorefrontRoutes } from '@/hooks/use-cms';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useTranslation } from '@/hooks/use-translation';
@@ -15,14 +17,50 @@ export function OrderSummary({
     effectiveShipping,
     error,
     isPending,
-    selectedMethod,
     submitAttempted,
     subtotal,
     termsAccepted,
     total,
     onTermsAcceptedChange,
     formatPrice,
-}: OrderSummaryProps) {
+}: Omit<OrderSummaryProps, 'selectedMethod'>) {
+    const { mutate: applyCode, isPending: applyingCode } = useApplyDiscount();
+    const { mutate: removeCode, isPending: removingCode } = useRemoveDiscount();
+    const [promoCode, setPromoCode] = useState('');
+    const [promoError, setPromoError] = useState<string | null>(null);
+
+    const handleApplyPromo = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!promoCode.trim()) return;
+        setPromoError(null);
+        applyCode(promoCode.trim(), {
+            onSuccess: () => {
+                setPromoCode('');
+            },
+            onError: (err: unknown) => {
+                const axiosError = err as {
+                    response?: {
+                        data?: {
+                            errors?: { code?: string[] };
+                            message?: string;
+                        };
+                    };
+                    message?: string;
+                };
+                const msg =
+                    axiosError.response?.data?.errors?.code?.[0] ||
+                    axiosError.response?.data?.message ||
+                    axiosError.message ||
+                    'Invalid code';
+                setPromoError(msg);
+            },
+        });
+    };
+
+    const handleRemovePromo = () => {
+        setPromoError(null);
+        removeCode();
+    };
     const { t } = useTranslation();
     const lp = useLocalePath();
     const { data: storefrontRoutes } = useStorefrontRoutes();
@@ -83,21 +121,96 @@ export function OrderSummary({
                     {cart.items.map((item) => (
                         <li
                             key={item.id}
-                            className="flex items-center justify-between gap-2 py-2"
+                            className="flex items-center gap-3 py-2.5"
                         >
-                            <span className="text-muted-foreground truncate">
-                                {item.product?.name ??
-                                    t('product.no_image', 'Product')}
-                                <span className="ml-1 text-xs">
-                                    x{item.quantity}
+                            <div className="bg-muted border-border relative h-14 w-14 shrink-0 rounded-lg border">
+                                {item.product?.thumbnail?.url ? (
+                                    <Image
+                                        src={item.product.thumbnail.url}
+                                        alt={item.product.name}
+                                        fill
+                                        className="rounded-lg object-cover"
+                                        sizes="56px"
+                                    />
+                                ) : (
+                                    <div className="text-muted-foreground flex h-full items-center justify-center text-[10px]">
+                                        No img
+                                    </div>
+                                )}
+                                <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-neutral-600 text-[10px] font-semibold text-white">
+                                    {item.quantity}
                                 </span>
-                            </span>
-                            <span className="shrink-0 font-medium">
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <p className="text-foreground truncate text-sm font-medium">
+                                    {item.product?.name ??
+                                        t('product.no_image', 'Product')}
+                                </p>
+                                {item.variant?.sku && (
+                                    <p className="text-muted-foreground font-mono text-[10px]">
+                                        {item.variant.sku}
+                                    </p>
+                                )}
+                            </div>
+                            <span className="shrink-0 text-sm font-medium">
                                 {formatPrice(item.subtotal)}
                             </span>
                         </li>
                     ))}
                 </ul>
+
+                {/* Promo code input block */}
+                <div className="border-border border-t pt-4 pb-4">
+                    {!cart.discount_code ? (
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                placeholder={t(
+                                    'checkout.promo_placeholder',
+                                    'Promo code',
+                                )}
+                                value={promoCode}
+                                onChange={(e) => setPromoCode(e.target.value)}
+                                disabled={applyingCode}
+                                className="border-input bg-background focus:ring-ring h-9 flex-1 rounded-lg border px-3 text-xs outline-none focus:ring-2"
+                            />
+                            <button
+                                type="button"
+                                onClick={handleApplyPromo}
+                                disabled={applyingCode || !promoCode.trim()}
+                                className="h-9 cursor-pointer rounded-lg bg-neutral-800 px-4 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-50 dark:bg-neutral-200 dark:text-black"
+                            >
+                                {applyingCode
+                                    ? '...'
+                                    : t('checkout.apply_promo', 'Apply')}
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex items-center justify-between rounded-lg bg-green-50 px-3 py-2 text-xs text-green-700 dark:bg-green-950/30 dark:text-green-400">
+                            <span className="font-medium">
+                                {t('checkout.promo_code', 'Code')}:{' '}
+                                <span className="font-bold">
+                                    {cart.discount_code}
+                                </span>
+                            </span>
+                            <button
+                                type="button"
+                                onClick={handleRemovePromo}
+                                disabled={removingCode}
+                                className="text-destructive cursor-pointer font-semibold hover:underline"
+                            >
+                                {removingCode
+                                    ? '...'
+                                    : t('checkout.remove_promo', 'Remove')}
+                            </button>
+                        </div>
+                    )}
+                    {promoError && (
+                        <p className="text-destructive mt-1.5 text-xs font-medium">
+                            {promoError}
+                        </p>
+                    )}
+                </div>
 
                 <div className="border-border space-y-1.5 border-t pt-3 text-sm">
                     <div className="flex justify-between">
@@ -219,9 +332,9 @@ export function OrderSummary({
 
             <button
                 type="submit"
-                disabled={isPending || !selectedMethod || !termsAccepted}
+                disabled={isPending}
                 aria-busy={isPending}
-                className="bg-primary text-primary-foreground mt-4 w-full rounded-xl px-4 py-3 text-sm font-semibold hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                className="bg-primary text-primary-foreground mt-4 w-full cursor-pointer rounded-xl px-4 py-3 text-sm font-semibold hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
                 {isPending
                     ? t('checkout.placing_order', 'Placing order...')

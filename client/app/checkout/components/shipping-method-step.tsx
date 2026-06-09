@@ -23,6 +23,7 @@ export function ShippingMethodStep({
     selectedShippingMethod,
     shippingMethods,
     subtotal,
+    submitAttempted,
     onMethodChange,
     onPickupPointChange,
     formatPrice,
@@ -30,10 +31,32 @@ export function ShippingMethodStep({
     const { t } = useTranslation();
 
     return (
-        <div className="border-border rounded-xl border p-5">
+        <div
+            className={`border-border rounded-xl border p-5 transition-colors ${
+                submitAttempted &&
+                (selectedMethod === null ||
+                    (selectedShippingMethod?.requires_pickup_point &&
+                        !pickupPointId))
+                    ? 'border-destructive/60 bg-destructive/5'
+                    : ''
+            }`}
+        >
             <h2 className="mb-3 text-sm font-semibold">
                 {t('checkout.shipping_method', 'Shipping Method')}
             </h2>
+
+            {submitAttempted && selectedMethod === null && (
+                <p
+                    role="alert"
+                    id="shipping-method-error"
+                    className="text-destructive mb-3 animate-pulse text-xs font-semibold"
+                >
+                    {t(
+                        'checkout.shipping_method_required',
+                        'Please select a shipping method.',
+                    )}
+                </p>
+            )}
             {isLoading ? (
                 <div className="space-y-2">
                     {[1, 2].map((i) => (
@@ -139,6 +162,21 @@ export function ShippingMethodStep({
                         onChange={(id) => onPickupPointChange(id)}
                     />
                 ))}
+
+            {submitAttempted &&
+                selectedShippingMethod?.requires_pickup_point &&
+                !pickupPointId && (
+                    <p
+                        role="alert"
+                        id="pickup-point-error"
+                        className="text-destructive mt-2 animate-pulse text-xs font-semibold"
+                    >
+                        {t(
+                            'checkout.pickup_point_required',
+                            'Please select a pickup point.',
+                        )}
+                    </p>
+                )}
         </div>
     );
 }
