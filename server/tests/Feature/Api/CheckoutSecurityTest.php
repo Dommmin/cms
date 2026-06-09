@@ -176,7 +176,7 @@ describe('Checkout – price integrity', function (): void {
         expect($response->json('order.total'))->toBeGreaterThanOrEqual(0);
     });
 
-    it('stock quantity is NOT decremented after checkout (documenting current behavior)', function (): void {
+    it('stock quantity is decremented after checkout', function (): void {
         [$user, , $variant] = secureCheckoutCart(price: 1000, qty: 2);
         $stockBefore = $variant->stock_quantity;
         $shipping = secureShipping();
@@ -191,9 +191,8 @@ describe('Checkout – price integrity', function (): void {
                 'shipping_address' => secureCheckoutAddress(),
             ])->assertStatus(201);
 
-        // Current design: stock is NOT decremented at checkout time.
-        // This is a known limitation — concurrent orders can oversell.
-        expect($variant->fresh()->stock_quantity)->toBe($stockBefore);
+        // Fixed design: stock IS decremented at checkout time.
+        expect($variant->fresh()->stock_quantity)->toBe($stockBefore - 2);
     });
 });
 
