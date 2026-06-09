@@ -3,6 +3,41 @@
 > **Architektura: HEADLESS** — backend Laravel obsługuje wielu konsumentów (Next.js client, panel Inertia, REST `/api/v1/*`, ewentualnie kolejne klienty: mobile, RSS, feed Google Merchant, integracje webhookowe).
 > **Konsekwencja:** każda walidacja, sanityzacja i normalizacja musi żyć **po stronie serwera**. Klient ma prawo dodawać warstwy obronne, ale nigdy ich zastępować. Nie zakładamy, że jedyny renderer HTML to obecny Next.js.
 
+## Review Status — 2026-06-09
+
+Ten plik **nie nadaje się jeszcze do usunięcia**, ale duża część audytu została już wdrożona.
+
+### Status zbiorczy
+
+| Obszar | Status | Uwagi |
+|---|---|---|
+| Server-side HTML/CSS sanitization | wdrożone | Jest `mews/purifier`, profile sanitizacji, `CssSanitizerService`, testy HTML/XSS |
+| Walidacja snapshotu Page Buildera | wdrożone | Jest `BlockConfigurationValidator` i `PageBuilderSnapshotValidator` |
+| Optimistic locking + transactional save | wdrożone | `expected_version`, `lockForUpdate()`, increment `version`, testy konfliktów |
+| Autosave reliability | wdrożone | Osobny endpoint autosave, debounce, preview refresh, `beforeunload`, blokada nawigacji |
+| Usunięcie legacy edytora demo | wdrożone | Stary `components/editor/` i demo route już nie istnieją |
+| `[object Object]` / translatable title + `rich_content` edit | wdrożone | `resolveLocalizedText()` i pola `rich_content` są już w page edit UI |
+| Headless cache / publish coherence | częściowo | Jest `page.published`/`page.unpublished` + revalidation; brak pełnego domknięcia ETag i analogicznych eventów dla wszystkich typów treści |
+| RTE URL validation + i18n + debounce | głównie wdrożone | Relatywne URL-e, `useTranslation()`, `ContentHealthPlugin`, debounce w `HtmlPlugin` są obecne |
+| Dalszy polish / refaktor UX buildera i RTE | otwarte | Nadal sensowny backlog szczegółowy |
+
+### Co zostało potwierdzone w kodzie
+
+- Sanitization i testy: `server/tests/Feature/HtmlSanitizationTest.php`
+- Wspólna walidacja snapshotu: `server/app/Services/PageBuilder/BlockConfigurationValidator.php`, `server/app/Services/PageBuilder/PageBuilderSnapshotValidator.php`
+- Transakcyjny save + locking: `server/app/Http/Controllers/Admin/Cms/PageBuilderController.php`
+- Osobny autosave endpoint: `server/routes/admin/cms.php`
+- Debounced autosave + `beforeunload`: `server/resources/js/pages/admin/cms/pages/builder.tsx`
+- Usunięty legacy editor: brak `server/resources/js/components/editor/`, brak route demo w `server/routes/admin.php`
+- `rich_content` i poprawny display title: `server/resources/js/pages/admin/cms/pages/edit.tsx`, `server/resources/js/pages/admin/cms/pages/builder.tsx`
+- RTE link validation: `server/resources/js/components/ui/rich-text-editor/lexical/link-url.ts`
+
+### Decyzja
+
+- **Nie usuwać**.
+- Traktować jako **szczegółowy backlog follow-upów** dla buildera/RTE.
+- Po domknięciu pozostałych punktów można go skrócić albo przenieść do jednego zbiorczego pliku roadmapy.
+
 ---
 
 ## P0 — Bezpieczeństwo (XSS) ⚠️ produkcyjne ryzyko

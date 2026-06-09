@@ -1,5 +1,13 @@
 # Page Builder — Developer & User Guide
 
+> Review Status — 2026-06-09
+>
+> Keep this file. It still matches the current Page Builder contract and remains
+> one of the primary references for builder architecture and usage.
+>
+> For open hardening and polish work, read this together with
+> `docs/PAGE_BUILDER_RTE_AUDIT_2026-05-06.md`.
+
 ## Table of Contents
 
 1. [User Guide — How to Use the Builder](#user-guide)

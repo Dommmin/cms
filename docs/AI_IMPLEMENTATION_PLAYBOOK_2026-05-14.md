@@ -4,7 +4,7 @@
 
 Ten dokument jest instrukcją operacyjną dla AI/developera wdrażającego plan z:
 
-- `docs/STAFF_ENGINEER_DESIGN_PLAN_2026-05-14.md`
+- `docs/PLATFORM_AUDIT_AND_ROADMAP_2026-06-09.md`
 - `docs/PAGE_BUILDER_RTE_AUDIT_2026-05-06.md`
 - `docs/ADMIN_UI_AUDIT_2026-05-05.md`
 - `docs/page-builder.md`
@@ -65,7 +65,7 @@ Nie uruchamiaj `php artisan`, `pint` ani testów Laravel bezpośrednio na hości
 
 Po zmianie funkcji zaktualizuj:
 
-- `docs/STAFF_ENGINEER_DESIGN_PLAN_2026-05-14.md`, jeśli zmienił się status lub zakres.
+- `docs/PLATFORM_AUDIT_AND_ROADMAP_2026-06-09.md`, jeśli zmienił się status lub zakres.
 - `docs/page-builder.md`, jeśli zmienia się kontrakt buildera.
 - `server/docs/USER_GUIDE.md`, jeśli zmienia się workflow redaktora.
 - `server/docs/DEVELOPER_GUIDE.md`, jeśli zmienia się sposób rozszerzania.

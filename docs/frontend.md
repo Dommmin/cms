@@ -240,6 +240,9 @@ Configure an active CMS webhook with the same secret and the storefront URL
 
 ## Mobile App (`mobile/`)
 
+Current parity gaps and next product steps are tracked in
+`docs/PLATFORM_AUDIT_AND_ROADMAP_2026-06-09.md`.
+
 Expo Router app backed by the same Laravel REST API as `client/`.
 
 ```

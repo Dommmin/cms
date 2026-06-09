@@ -1,5 +1,12 @@
 # Audyt i Plan Rozwoju CMS — Enterprise Readiness
 
+> Historical note — 2026-06-09
+>
+> This file is kept as a deep enterprise planning artifact, not as the primary
+> source of truth for current status. Some sections describe historical plans or
+> intermediate states. For the current platform snapshot, active risks and
+> backlog, use `docs/PLATFORM_AUDIT_AND_ROADMAP_2026-06-09.md`.
+
 > **Data audytu:** 2026-04-15 (aktualizacja — faktury VAT, JPK_V7, partial shipments, draft orders, custom roles, customer tags, 2FA UI, analytics reports)
 > **Cel:** Doprowadzenie projektu do poziomu enterprise (Shopify, Media Expert, x-kom)
 > **Aktualny poziom gotowości:** ~97% mid-market, ~85% enterprise
@@ -623,9 +630,9 @@ if (config('modules.ecommerce') && config('modules.marketing')) {
 12. **Multi-warehouse inventory** — ⏳ (opcjonalnie)
 13. **~~Content approval workflow~~** ✅ — **NAPRAWIONE:** `approval_status` (draft/in_review/approved) + `reviewer_id/review_note/submitted_for_review_at/approved_at` na tabeli `pages`; `PageApprovalController` (submitForReview/approve/reject); przyciski akcji w BuilderToolbar; Dialog na notatkę odrzucenia
 14. **~~Admin impersonation~~** ✅ — **NAPRAWIONE:** ImpersonateCustomer action + CustomerController methods
-15. **~~Canary/blue-green deployments~~** ✅ — **DOKUMENTACJA:** K8s Rollout config in PHASE3_ENHANCEMENTS.md
-16. **~~A/B testing~~** ✅ — **DOKUMENTACJA:** ABTestService + config in PHASE3_ENHANCEMENTS.md
-17. **~~GraphQL API~~** ✅ — **DOKUMENTACJA:** rebing/graphql-laravel setup in PHASE3_ENHANCEMENTS.md
+15. **Canary/blue-green deployments** — ⏳ optional / not current source of truth
+16. **A/B testing** — ⏳ optional; treat as backlog, not implemented
+17. **GraphQL API** — ⏳ optional; treat as backlog, not implemented
 
 **Wszystkie niedokończone elementy (non-optional) zaimplementowane!**
 

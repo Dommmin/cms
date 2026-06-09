@@ -136,10 +136,10 @@ Refactor [component/file]:
 ## Implement Paynow Gateway
 
 ```
-Implement the next phase from docs/PAYNOW_IMPLEMENTATION_PLAN.md.
+Extend or adjust the existing Paynow integration using the current codebase and feature map.
 
 Before coding:
-- Read AGENTS.md, .ai/guide.md, .ai/rules.md, and docs/PAYNOW_IMPLEMENTATION_PLAN.md
+- Read AGENTS.md, .ai/guide.md, .ai/rules.md
 - Read existing PayU/P24 gateway, client, webhook and test code
 - Verify current official Paynow API v3 docs at docs.paynow.pl
 

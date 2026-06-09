@@ -1,5 +1,11 @@
 # Multi-Site Per Locale
 
+> Review Status — 2026-06-09
+>
+> Keep this file. The locale-specific page model and clone-site workflow are
+> implemented in the codebase, so this remains a useful focused reference rather
+> than an obsolete plan.
+
 ## Koncepcja
 
 Zamiast tłumaczeń per-pole (spatie/laravel-translatable na stronach), każda witryna językowa to **oddzielny zestaw stron** z tym samym `slug`, ale innym `locale`.

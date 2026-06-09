@@ -4,6 +4,43 @@
 **Status:** Backlog — do realizacji etapami
 **Kontekst:** Po wdrożeniu nowej palety kolorów (indigo/dark sidebar) + 6 custom themes użytkownik zgłosił szereg problemów wizualnych i funkcjonalnych w panelu admina.
 
+## Review Status — 2026-06-09
+
+Ten plik **też nie nadaje się jeszcze do usunięcia**, ale część punktów została już wdrożona.
+
+### Status zbiorczy
+
+| Obszar | Status | Uwagi |
+|---|---|---|
+| Scrollbar sidebara | wdrożone | Custom scrollbar jest już w `server/resources/css/app.css` |
+| Border/shadow sidebara | wdrożone | Został miękki shadow bez opisanego wcześniej obcego borderu |
+| `cursor-pointer` w bazowym `Button` | wdrożone | Jest w `server/resources/js/components/ui/button.tsx` |
+| Motyw glassmorphism | wdrożone | Preset istnieje w `ThemeSeeder`, `data-theme-slug` też jest obsługiwany |
+| Locale-specific slugs / translatable slug | wdrożone | `Page.slug` jest translatable, UI pracuje na lokalizowanych slugach |
+| Admin translation sync workflow | wdrożone | Jest `admin:sync-translations` i route `translations.sync` |
+| Część brakujących tłumaczeń | wdrożone | Klucz `blog_post_unpublished` istnieje już w EN/PL |
+| Page-by-page admin UX cleanup | otwarte | Nadal brak dowodu, że cały audyt ekran po ekranie został domknięty |
+| Spójność ikon, loading/empty/error states | otwarte | To nadal wygląda na żywy backlog |
+| Paste Block / template workflow cleanup | częściowo | Clipboard + templates istnieją, ale audytowy workflow nie jest jednoznacznie zamknięty |
+| Audyt `page type` / `layout` / `container type` | otwarte | Nie ma śladu pełnego zamknięcia tego investigation |
+| Podwójna notyfikacja unpublish bloga | niepotwierdzone | Tłumaczenie jest, ale sam bug toastów nie został jednoznacznie potwierdzony jako zamknięty |
+
+### Co zostało potwierdzone w kodzie
+
+- Scrollbar i sidebar polish: `server/resources/css/app.css`
+- `cursor-pointer` w przyciskach: `server/resources/js/components/ui/button.tsx`
+- `data-theme-slug`: `server/resources/js/components/active-theme-sync.tsx`, `server/resources/views/app.blade.php`
+- Motyw `glassmorphism`: `server/database/seeders/ThemeSeeder.php`
+- Translatable slugs: `server/app/Models/Page.php`, `server/resources/js/pages/admin/cms/pages/edit.tsx`
+- Sync tłumaczeń: `server/app/Console/Commands/SyncAdminTranslations.php`, `server/routes/admin.php`
+- Klucz tłumaczenia unpublish bloga: `server/lang/en/admin.php`, `server/lang/pl/admin.php`
+
+### Decyzja
+
+- **Nie usuwać**.
+- Traktować jako **aktywny backlog UI/UX dla admina**, a nie jako zakończony plan.
+- Gdyby celem było porządkowanie, można go później skrócić do listy wyłącznie nadal otwartych punktów.
+
 ---
 
 ## Etap 1 — Szybkie poprawki wizualne (CSS / komponenty)
