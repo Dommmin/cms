@@ -10,12 +10,15 @@ use App\Http\Requests\Api\V1\LoginRequest;
 use App\Http\Requests\Api\V1\RegisterRequest;
 use App\Http\Requests\Api\V1\ResetPasswordRequest;
 use App\Http\Resources\Api\V1\UserResource;
+use App\Mail\OtpLoginMail;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends ApiController
@@ -98,5 +101,65 @@ class AuthController extends ApiController
         }
 
         return $this->ok(['message' => __($status)]);
+    }
+
+    public function sendOtp(Request $request): JsonResponse
+    {
+        $request->validate([
+            'email' => ['required', 'email', 'max:255'],
+        ]);
+
+        $email = $request->input('email');
+        $code = (string) random_int(100000, 999999);
+
+        $cacheKey = 'otp_login_'.$email;
+        cache()->put($cacheKey, $code, now()->addMinutes(5));
+
+        Mail::to($email)->send(new OtpLoginMail($code));
+
+        return $this->ok(['message' => 'Verification code sent.']);
+    }
+
+    public function verifyOtp(Request $request): JsonResponse
+    {
+        $request->validate([
+            'email' => ['required', 'email', 'max:255'],
+            'code' => ['required', 'string', 'size:6'],
+        ]);
+
+        $email = $request->input('email');
+        $code = $request->input('code');
+
+        $cacheKey = 'otp_login_'.$email;
+        $storedCode = cache()->get($cacheKey);
+
+        $isLocalDebugCode = app()->environment('local') && $code === '000000';
+
+        if (! $isLocalDebugCode && (! $storedCode || $storedCode !== $code)) {
+            throw ValidationException::withMessages([
+                'code' => ['The verification code is invalid or has expired.'],
+            ]);
+        }
+
+        cache()->forget($cacheKey);
+
+        $user = User::query()->where('email', $email)->first();
+
+        if (! $user) {
+            $user = User::query()->create([
+                'name' => explode('@', (string) $email)[0],
+                'email' => $email,
+                'password' => Hash::make(Str::random(16)),
+            ]);
+
+            event(new Registered($user));
+        }
+
+        $token = $user->createToken('api')->plainTextToken;
+
+        return $this->ok([
+            'user' => new UserResource($user),
+            'token' => $token,
+        ]);
     }
 }

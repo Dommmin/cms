@@ -58,6 +58,8 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::post('login', [AuthController::class, 'login'])->name('login');
         Route::post('forgot-password', [AuthController::class, 'forgotPassword'])->name('password.forgot');
         Route::post('reset-password', [AuthController::class, 'resetPassword'])->name('password.reset');
+        Route::post('otp/send', [AuthController::class, 'sendOtp'])->name('otp.send');
+        Route::post('otp/verify', [AuthController::class, 'verifyOtp'])->name('otp.verify');
 
         // Social login
         Route::get('social/{provider}/redirect', [SocialLoginController::class, 'redirect'])->name('social.redirect');
