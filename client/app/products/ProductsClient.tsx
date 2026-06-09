@@ -1,5 +1,6 @@
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import {
     LayoutGrid,
     LayoutList,
@@ -711,51 +712,79 @@ export default function ProductsClient({
                 </div>
             )}
 
-            {showFilters && (
-                <div
-                    id="products-filters-drawer"
-                    className="fixed inset-0 z-50 lg:hidden"
-                    role="dialog"
-                    aria-modal="true"
-                >
-                    <button
-                        type="button"
-                        className="absolute inset-0 bg-black/40"
-                        aria-label={t('shop.close_filters', 'Close filters')}
-                        onClick={() => setShowFilters(false)}
-                    />
-                    <div className="bg-card absolute right-0 bottom-0 left-0 max-h-[88vh] overflow-auto rounded-t-2xl border-t p-4 shadow-2xl">
-                        <div className="mb-4 flex items-center justify-between">
-                            <span className="text-sm font-semibold">
-                                {t('shop.filters', 'Filters')}
-                            </span>
-                            <button
-                                type="button"
-                                onClick={() => setShowFilters(false)}
-                                className="hover:bg-accent flex h-10 w-10 items-center justify-center rounded-full"
-                                aria-label={t(
-                                    'shop.close_filters',
-                                    'Close filters',
-                                )}
-                            >
-                                <X className="h-5 w-5" />
-                            </button>
-                        </div>
-                        {renderFiltersPanel('products-mobile-filters')}
+            <AnimatePresence>
+                {showFilters && (
+                    <div
+                        id="products-filters-drawer"
+                        className="fixed inset-0 z-50 lg:hidden"
+                        role="dialog"
+                        aria-modal="true"
+                    >
+                        <motion.button
+                            type="button"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute inset-0 cursor-default bg-black/40"
+                            aria-label={t(
+                                'shop.close_filters',
+                                'Close filters',
+                            )}
+                            onClick={() => setShowFilters(false)}
+                        />
+                        <motion.div
+                            initial={{ y: '100%' }}
+                            animate={{ y: 0 }}
+                            exit={{ y: '100%' }}
+                            transition={{
+                                type: 'spring',
+                                damping: 25,
+                                stiffness: 250,
+                            }}
+                            className="bg-card absolute right-0 bottom-0 left-0 max-h-[88vh] overflow-auto rounded-t-2xl border-t p-4 shadow-2xl"
+                        >
+                            <div className="mb-4 flex items-center justify-between">
+                                <span className="text-sm font-semibold">
+                                    {t('shop.filters', 'Filters')}
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowFilters(false)}
+                                    className="hover:bg-accent flex h-10 w-10 items-center justify-center rounded-full"
+                                    aria-label={t(
+                                        'shop.close_filters',
+                                        'Close filters',
+                                    )}
+                                >
+                                    <X className="h-5 w-5" />
+                                </button>
+                            </div>
+                            {renderFiltersPanel('products-mobile-filters')}
+                        </motion.div>
                     </div>
-                </div>
-            )}
-
-            <div
-                className={`grid gap-6 ${showDesktopFilters ? 'lg:grid-cols-[18rem_minmax(0,1fr)]' : 'grid-cols-1'}`}
-            >
-                {showDesktopFilters && (
-                    <aside className="hidden lg:block">
-                        <div className="border-border bg-card sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-[var(--store-card-radius)] border p-4 shadow-[var(--store-shadow-soft)]">
-                            {renderFiltersPanel('products-desktop-filters')}
-                        </div>
-                    </aside>
                 )}
+            </AnimatePresence>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-[auto_minmax(0,1fr)]">
+                <AnimatePresence initial={false}>
+                    {showDesktopFilters && (
+                        <motion.aside
+                            initial={{ width: 0, opacity: 0 }}
+                            animate={{ width: 288, opacity: 1 }}
+                            exit={{ width: 0, opacity: 0 }}
+                            transition={{
+                                duration: 0.3,
+                                ease: [0.16, 1, 0.3, 1],
+                            }}
+                            className="hidden overflow-hidden lg:block"
+                        >
+                            <div className="border-border bg-card sticky top-24 max-h-[calc(100vh-7rem)] w-[18rem] overflow-y-auto rounded-[var(--store-card-radius)] border p-4 shadow-[var(--store-shadow-soft)]">
+                                {renderFiltersPanel('products-desktop-filters')}
+                            </div>
+                        </motion.aside>
+                    )}
+                </AnimatePresence>
 
                 <div className="min-w-0">
                     {isLoading ? (
