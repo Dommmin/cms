@@ -300,7 +300,6 @@ export function AddressFieldset({
                 fields: ['address_components'],
             })) as google.maps.places.PlaceResult | string;
 
-            // @ts-ignore
             if (
                 typeof details === 'string' ||
                 !details ||
@@ -314,7 +313,6 @@ export function AddressFieldset({
             let postal = '';
             let country = value.country_code;
 
-            // @ts-ignore
             details.address_components.forEach((c) => {
                 const types = c.types;
                 if (types.includes('route')) streetName = c.long_name;
