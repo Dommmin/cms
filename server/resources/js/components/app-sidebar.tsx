@@ -19,6 +19,7 @@ import {
     HelpCircle,
     Image,
     Languages,
+    Layout,
     LayoutGrid,
     LibraryBig,
     Link2,
@@ -56,6 +57,7 @@ import * as AnalyticsController from '@/actions/App/Http/Controllers/Admin/Analy
 import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
 import * as BlogCategoryController from '@/actions/App/Http/Controllers/Admin/BlogCategoryController';
 import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
+import * as GlobalSlotController from '@/actions/App/Http/Controllers/Admin/Cms/GlobalSlotController';
 import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import * as ReusableBlockController from '@/actions/App/Http/Controllers/Admin/Cms/ReusableBlockController';
 import * as CookieConsentController from '@/actions/App/Http/Controllers/Admin/CookieConsentController';
@@ -145,6 +147,11 @@ export function AppSidebar() {
             title: __('nav.global_blocks', 'Global Blocks'),
             href: ReusableBlockController.index.url(),
             icon: LibraryBig,
+        },
+        {
+            title: __('nav.global_slots', 'Global Slots'),
+            href: GlobalSlotController.index.url(),
+            icon: Layout,
         },
         {
             title: __('nav.menus', 'Menus'),
