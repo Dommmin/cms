@@ -346,6 +346,9 @@ export default function Edit({
                                 errors={errors}
                                 urlPath={`products?category=${slug}`}
                                 titleFallback={nameValues[defaultLocale] ?? ''}
+                                contentLength={
+                                    (descValues[defaultLocale] || '').replace(/<[^>]*>/g, '').trim().length
+                                }
                             />
                         </TabsContent>
                     </Tabs>

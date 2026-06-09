@@ -1,3 +1,5 @@
+import { api } from '@/lib/axios';
+
 declare global {
     interface Window {
         dataLayer: Array<Record<string, unknown>>;
@@ -7,6 +9,51 @@ declare global {
 
 export type ConsentCategory = 'analytics' | 'marketing' | 'functional';
 export type ConsentState = 'granted' | 'denied';
+
+function getAnalyticsSessionId(): string {
+    if (typeof window === 'undefined') return '';
+    let sessionId = sessionStorage.getItem('analytics_session_id');
+    if (!sessionId) {
+        sessionId =
+            typeof crypto !== 'undefined' && crypto.randomUUID
+                ? crypto.randomUUID()
+                : Math.random().toString(36).substring(2, 15);
+        sessionStorage.setItem('analytics_session_id', sessionId);
+    }
+    return sessionId;
+}
+
+export function trackBackendEvent(
+    eventName: string,
+    payload: {
+        product_id?: number | string | null;
+        product_variant_id?: number | string | null;
+        metadata?: Record<string, unknown>;
+    } = {},
+): void {
+    if (typeof window === 'undefined') return;
+    try {
+        const sessionId = getAnalyticsSessionId();
+        const url = window.location.href;
+        const referrer = document.referrer || '';
+
+        api.post('/analytics/events', {
+            session_id: sessionId,
+            event_name: eventName,
+            product_id: payload.product_id ? Number(payload.product_id) : null,
+            product_variant_id: payload.product_variant_id
+                ? Number(payload.product_variant_id)
+                : null,
+            url: url,
+            referrer: referrer,
+            metadata: payload.metadata || {},
+        }).catch(() => {
+            // Ignore background errors
+        });
+    } catch {
+        // Ignore
+    }
+}
 
 export interface DataLayerEvent {
     event: string;
@@ -121,6 +168,14 @@ export function trackViewItem(item: {
             ],
         },
     });
+    trackBackendEvent('view_item', {
+        product_id: item.id,
+        metadata: {
+            name: item.name,
+            price: item.price,
+            currency: item.currency ?? 'PLN',
+        },
+    });
 }
 
 export function trackAddToCart(item: {
@@ -131,6 +186,7 @@ export function trackAddToCart(item: {
     currency?: string;
     category?: string;
     discount?: number; // cents
+    productId?: number | string;
 }): void {
     pushDataLayer({ ecommerce: null });
     pushDataLayer({
@@ -151,6 +207,17 @@ export function trackAddToCart(item: {
                     index: 0,
                 } satisfies Ga4Item,
             ],
+        },
+    });
+    trackBackendEvent('add_to_cart', {
+        product_id: item.productId,
+        product_variant_id: item.id,
+        metadata: {
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            currency: item.currency ?? 'PLN',
+            discount: item.discount,
         },
     });
 }
@@ -207,6 +274,18 @@ export function trackBeginCheckout(
             })) satisfies Ga4Item[],
         },
     });
+    trackBackendEvent('begin_checkout', {
+        metadata: {
+            value: cartValue,
+            currency,
+            items: items.map((item) => ({
+                variant_id: item.variant_id,
+                name: item.product.name,
+                price: item.unit_price,
+                quantity: item.quantity,
+            })),
+        },
+    });
 }
 
 export function trackPurchase(order: {
@@ -223,6 +302,7 @@ export function trackPurchase(order: {
         quantity: number;
         discount?: number; // cents
     }>;
+    discountCode?: string;
 }): void {
     pushDataLayer({ ecommerce: null });
     pushDataLayer({
@@ -250,6 +330,23 @@ export function trackPurchase(order: {
                     : undefined,
                 index,
             })) satisfies Ga4Item[],
+        },
+    });
+    trackBackendEvent('purchase', {
+        metadata: {
+            transaction_id: order.transactionId,
+            revenue: order.revenue,
+            currency: order.currency,
+            tax: order.tax,
+            shipping: order.shippingCost,
+            discount_code: order.discountCode || null,
+            items: order.items.map((item) => ({
+                variant_id: item.item_id,
+                name: item.item_name,
+                price: item.price,
+                quantity: item.quantity,
+                discount: item.discount,
+            })),
         },
     });
 }
@@ -310,6 +407,19 @@ export function trackAddPaymentInfo(
                 quantity: item.quantity,
                 index,
             })) satisfies Ga4Item[],
+        },
+    });
+    trackBackendEvent('payment_step', {
+        metadata: {
+            value: cartValue,
+            currency,
+            payment_type: paymentType,
+            items: items.map((item) => ({
+                variant_id: item.variant_id,
+                name: item.product.name,
+                price: item.unit_price,
+                quantity: item.quantity,
+            })),
         },
     });
 }

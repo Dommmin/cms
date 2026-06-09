@@ -370,6 +370,9 @@ export default function EditBlogPost({
                                                 ? Object.values(data.title)[0]
                                                 : ''
                                         }
+                                        contentLength={
+                                            (data.content?.[defaultLocale] || '').replace(/<[^>]*>/g, '').trim().length
+                                        }
                                     />
                                 </TabsContent>
                             </Tabs>

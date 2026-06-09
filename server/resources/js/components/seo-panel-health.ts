@@ -71,5 +71,43 @@ export function analyzeSeoHealth(
         });
     }
 
+    // Thin content heuristic
+    if (options.contentLength !== undefined && options.contentLength < 300) {
+        issues.push({
+            id: 'thin-content',
+            severity: 'warning',
+            message: `Thin content: Main body text is too short (${options.contentLength}/300 chars), which may harm search index quality.`,
+        });
+    }
+
+    // Broken slug / redirect concerns
+    if (options.urlPath) {
+        const slug = options.urlPath.split('/').pop() || '';
+
+        if (/[A-Z]/.test(slug)) {
+            issues.push({
+                id: 'slug-uppercase',
+                severity: 'warning',
+                message: 'Slug contains uppercase letters. Use lowercase to prevent canonical indexing conflicts.',
+            });
+        }
+
+        if (/\s/.test(slug) || slug.includes('%20')) {
+            issues.push({
+                id: 'slug-spaces',
+                severity: 'error',
+                message: 'Slug contains spaces. This causes URL-encoding (%20) and broken links.',
+            });
+        }
+
+        if (/[^a-z0-9\-_]/.test(slug) && !/[A-Z]/.test(slug)) {
+            issues.push({
+                id: 'slug-special-chars',
+                severity: 'warning',
+                message: 'Slug contains special characters. Stick to alphanumeric characters and hyphens.',
+            });
+        }
+    }
+
     return issues;
 }

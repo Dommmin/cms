@@ -89,12 +89,18 @@ export function useCheckout() {
         mutationFn: (payload: CheckoutPayload) => checkout(payload),
         onSuccess: (order) => {
             if (!order) return;
+            const cartData = queryClient.getQueryData<{
+                discount_code?: string | null;
+            }>(['cart']);
+            const discountCode = cartData?.discount_code ?? undefined;
+
             queryClient.invalidateQueries({ queryKey: orderKeys.all });
             queryClient.invalidateQueries({ queryKey: ['cart'] });
             trackPurchase({
                 transactionId: order.reference_number,
                 revenue: order.total,
                 currency: order.currency_code,
+                discountCode,
                 items: order.items.map((i) => ({
                     item_id: i.id,
                     item_name: i.product_name,

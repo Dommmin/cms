@@ -42,6 +42,7 @@ export function useAddToCart() {
                     quantity: variables.quantity,
                     price: item.unit_price,
                     currency: cart.currency,
+                    productId: item.product.id,
                 });
             }
         },

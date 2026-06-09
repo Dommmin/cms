@@ -3,6 +3,7 @@
 import { GitCompareArrows, Heart, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { toast } from 'react-toastify';
 
 import { PriceDisplay } from '@/components/price-display';
@@ -20,6 +21,7 @@ import {
     useIsInWishlist,
     useRemoveFromWishlist,
 } from '@/hooks/use-wishlist';
+import { trackBackendEvent } from '@/lib/datalayer';
 import { resolveProductPath } from '@/lib/public-paths';
 import type { ProductCardProps } from './product-card.types';
 
@@ -28,6 +30,16 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
     const lp = useLocalePath();
     const firstVariantId = product.variants?.[0]?.id ?? 0;
     const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
+
+    useEffect(() => {
+        trackBackendEvent('impression', {
+            product_id: product.id,
+            metadata: {
+                name: product.name,
+                price: product.price_min,
+            },
+        });
+    }, [product.id, product.name, product.price_min]);
     const inWishlist = useIsInWishlist(firstVariantId);
     const inComparison = useIsInComparison(product.id);
     const comparisonIds = useComparisonIds();

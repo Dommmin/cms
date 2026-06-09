@@ -42,6 +42,7 @@ class DatabaseSeeder extends Seeder
             ShippingMethodSeeder::class,
             CurrencySeeder::class,
             EmailTemplateSeeder::class,
+            AnalyticsEventSeeder::class,
         ]);
 
         // ── Newsletter (seeded only when module is active) ───────────────────

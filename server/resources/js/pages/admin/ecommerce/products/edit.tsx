@@ -1642,7 +1642,7 @@ export default function Edit({
                                                             string
                                                         >
                                                     }
-                                                    urlPath={`products/${formData.slug || 'product-slug'}`}
+                                                    urlPath={`products/${formData.slug?.[defaultLocale] || 'product-slug'}`}
                                                     titleFallback={
                                                         typeof formData.name ===
                                                         'object'
@@ -1652,6 +1652,9 @@ export default function Edit({
                                                             : String(
                                                                   formData.name,
                                                               )
+                                                    }
+                                                    contentLength={
+                                                        (formData.description?.[defaultLocale] || '').replace(/<[^>]*>/g, '').trim().length
                                                     }
                                                 />
                                             </div>
