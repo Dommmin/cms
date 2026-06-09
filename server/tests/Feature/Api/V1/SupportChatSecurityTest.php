@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Models\User;
 use App\Models\SupportConversation;
+use App\Models\User;
+use App\Services\TurnstileService;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 
@@ -12,7 +13,7 @@ beforeEach(function (): void {
 });
 
 it('has throttling middleware applied to support routes', function (): void {
-    $routes = collect(Route::getRoutes())->filter(fn ($r) => str_starts_with($r->uri(), 'api/v1/support'));
+    $routes = collect(Route::getRoutes())->filter(fn ($r): bool => str_starts_with((string) $r->uri(), 'api/v1/support'));
 
     expect($routes)->not->toBeEmpty();
     foreach ($routes as $route) {
@@ -34,7 +35,7 @@ it('requires cf_turnstile_response for guest starting a conversation when turnst
 });
 
 it('allows guest to start a conversation with valid cf_turnstile_response', function (): void {
-    $this->mock(\App\Services\TurnstileService::class, function ($mock) {
+    $this->mock(TurnstileService::class, function ($mock): void {
         $mock->shouldReceive('verify')->once()->andReturn(true);
     });
 

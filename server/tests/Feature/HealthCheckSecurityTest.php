@@ -13,7 +13,7 @@ beforeEach(function (): void {
 });
 
 it('allows fresh health check in local environment', function (): void {
-    App::detectEnvironment(fn () => 'local');
+    App::detectEnvironment(fn (): string => 'local');
     Artisan::shouldReceive('call')->with(RunHealthChecksCommand::class)->once()->andReturn(0);
 
     $this->getJson('/api/health?fresh')
@@ -21,7 +21,7 @@ it('allows fresh health check in local environment', function (): void {
 });
 
 it('denies fresh health check in production environment anonymously without token', function (): void {
-    App::detectEnvironment(fn () => 'production');
+    App::detectEnvironment(fn (): string => 'production');
     Artisan::shouldReceive('call')->never();
 
     $this->getJson('/api/health?fresh')
@@ -30,7 +30,7 @@ it('denies fresh health check in production environment anonymously without toke
 });
 
 it('allows fresh health check in production environment with valid X-Health-Token', function (): void {
-    App::detectEnvironment(fn () => 'production');
+    App::detectEnvironment(fn (): string => 'production');
     Artisan::shouldReceive('call')->with(RunHealthChecksCommand::class)->once()->andReturn(0);
 
     $this->getJson('/api/health?fresh', [
@@ -40,7 +40,7 @@ it('allows fresh health check in production environment with valid X-Health-Toke
 });
 
 it('allows fresh health check in production environment for authenticated users', function (): void {
-    App::detectEnvironment(fn () => 'production');
+    App::detectEnvironment(fn (): string => 'production');
     Artisan::shouldReceive('call')->with(RunHealthChecksCommand::class)->once()->andReturn(0);
 
     $user = User::factory()->create();

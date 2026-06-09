@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\App;
 
 it('allows access to debug-glitchtip and throws exception in testing environment', function (): void {
-    App::detectEnvironment(fn () => 'testing');
+    App::detectEnvironment(fn (): string => 'testing');
 
     $this->expectException(Exception::class);
     $this->expectExceptionMessage('Test GlitchTip error!');
@@ -15,7 +15,7 @@ it('allows access to debug-glitchtip and throws exception in testing environment
 });
 
 it('returns 404 for debug-glitchtip in production environment', function (): void {
-    App::detectEnvironment(fn () => 'production');
+    App::detectEnvironment(fn (): string => 'production');
 
     $this->get('/debug-glitchtip')
         ->assertStatus(404);

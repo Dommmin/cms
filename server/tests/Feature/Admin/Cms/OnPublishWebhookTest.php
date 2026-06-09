@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Enums\BlogPostStatusEnum;
 use App\Jobs\DeliverWebhookJob;
 use App\Models\BlogPost;
 use App\Models\Product;
 use App\Models\Webhook;
-use App\Enums\BlogPostStatusEnum;
 use Illuminate\Support\Facades\Queue;
 
 it('dispatches a product.published webhook when product is created active', function (): void {
