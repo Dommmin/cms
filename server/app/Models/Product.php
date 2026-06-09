@@ -9,6 +9,7 @@ use App\Concerns\HasTags;
 use App\Concerns\HasVersions;
 use App\Concerns\SanitizesTranslatableHtml;
 use App\Enums\ReviewStatusEnum;
+use App\Traits\HasSeoMetadata;
 use Carbon\CarbonImmutable;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
@@ -129,6 +130,7 @@ class Product extends Model implements HasMedia
 {
     use HasFactory;
     use HasMetafields;
+    use HasSeoMetadata;
     use HasTags;
     use HasTranslations;
     use HasVersions;
@@ -136,7 +138,6 @@ class Product extends Model implements HasMedia
     use LogsActivity;
     use SanitizesTranslatableHtml;
     use Searchable;
-    use \App\Traits\HasSeoMetadata;
 
     /** @var array<int, string> */
     public array $translatable = ['name', 'slug', 'description', 'short_description'];

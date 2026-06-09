@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Concerns\HasMetafields;
 use App\Concerns\HasTags;
 use App\Concerns\HasVersions;
+use App\Traits\HasSeoMetadata;
 use Carbon\CarbonImmutable;
 use Database\Factories\CategoryFactory;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
@@ -105,12 +106,12 @@ class Category extends Model
 {
     use HasFactory;
     use HasMetafields;
+    use HasSeoMetadata;
     use HasTags;
     use HasTranslations;
     use HasVersions;
     use LogsActivity;
     use Searchable;
-    use \App\Traits\HasSeoMetadata;
 
     /** @var array<int, string> */
     public array $translatable = ['name', 'slug', 'description'];

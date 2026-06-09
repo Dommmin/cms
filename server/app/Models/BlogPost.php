@@ -9,6 +9,7 @@ use App\Concerns\HasTags;
 use App\Concerns\HasVersions;
 use App\Concerns\SanitizesTranslatableHtml;
 use App\Enums\BlogPostStatusEnum;
+use App\Traits\HasSeoMetadata;
 use Carbon\CarbonImmutable;
 use Database\Factories\BlogPostFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -141,13 +142,13 @@ class BlogPost extends Model
 {
     use HasFactory;
     use HasMetafields;
+    use HasSeoMetadata;
     use HasTags;
     use HasTranslations;
     use HasVersions;
     use LogsActivity;
     use SanitizesTranslatableHtml;
     use Searchable;
-    use \App\Traits\HasSeoMetadata;
 
     /** @var array<int, string> */
     public array $translatable = ['title', 'slug', 'excerpt', 'content'];

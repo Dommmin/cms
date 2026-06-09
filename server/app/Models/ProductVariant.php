@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Builders\ProductVariantBuilder;
+use App\Services\Hooks\Facades\Hook;
+use App\Services\Hooks\Pricing\ProductPriceFilter;
 use Carbon\CarbonImmutable;
 use Database\Factories\ProductVariantFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -217,7 +219,7 @@ class ProductVariant extends Model
 
         $price = $matching instanceof ProductVariantPriceTier ? $matching->price : $this->price;
 
-        $filter = \App\Services\Hooks\Facades\Hook::filter(new \App\Services\Hooks\Pricing\ProductPriceFilter($price, $this, $quantity));
+        $filter = Hook::filter(new ProductPriceFilter($price, $this, $quantity));
 
         return $filter->price;
     }

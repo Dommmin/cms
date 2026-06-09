@@ -9,7 +9,7 @@ use App\Models\Cart;
 final class CheckoutCreatingFilter
 {
     /**
-     * @param array<string, mixed> $orderData
+     * @param  array<string, mixed>  $orderData
      */
     public function __construct(
         public array $orderData,

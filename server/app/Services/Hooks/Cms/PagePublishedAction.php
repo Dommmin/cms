@@ -6,9 +6,9 @@ namespace App\Services\Hooks\Cms;
 
 use App\Models\Page;
 
-final class PagePublishedAction
+final readonly class PagePublishedAction
 {
     public function __construct(
-        public readonly Page $page
+        public Page $page
     ) {}
 }

@@ -66,8 +66,12 @@ describe('HookManager – action', function (): void {
     it('supports multiple listeners at the same priority', function (): void {
         $count = 0;
 
-        Hook::listen(CustomerRegisteredAction::class, function () use (&$count): void { $count++; }, 10);
-        Hook::listen(CustomerRegisteredAction::class, function () use (&$count): void { $count++; }, 10);
+        Hook::listen(CustomerRegisteredAction::class, function () use (&$count): void {
+            $count++;
+        }, 10);
+        Hook::listen(CustomerRegisteredAction::class, function () use (&$count): void {
+            $count++;
+        }, 10);
 
         Hook::action(new CustomerRegisteredAction(Customer::factory()->make()));
 
@@ -93,7 +97,7 @@ describe('HookManager – filter (object-based)', function (): void {
         }, 10);
 
         Hook::listen(ShippingCostFilter::class, function (ShippingCostFilter $f): void {
-            $f->cost = $f->cost - 100; // subtract 1 PLN in grosze
+            $f->cost -= 100; // subtract 1 PLN in grosze
         }, 20);
 
         $method = ShippingMethod::factory()->make();
@@ -276,10 +280,10 @@ describe('CheckoutCreatingFilter – filter object', function (): void {
 
 describe('Hook Facade', function (): void {
     it('resolves the HookManager singleton', function (): void {
-        expect(app('hook.manager'))->toBeInstanceOf(HookManager::class);
+        expect(resolve('hook.manager'))->toBeInstanceOf(HookManager::class);
     });
 
     it('is the same singleton instance across calls', function (): void {
-        expect(app('hook.manager'))->toBe(app('hook.manager'));
+        expect(resolve('hook.manager'))->toBe(resolve('hook.manager'));
     });
 });

@@ -9,6 +9,7 @@ use App\Concerns\HasTags;
 use App\Concerns\SanitizesTranslatableHtml;
 use App\Enums\PageLayoutEnum;
 use App\Enums\PageTypeEnum;
+use App\Traits\HasSeoMetadata;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Database\Factories\PageFactory;
@@ -168,11 +169,11 @@ class Page extends Model
 {
     use HasFactory;
     use HasMetafields;
+    use HasSeoMetadata;
     use HasTags;
     use HasTranslations;
     use LogsActivity;
     use SanitizesTranslatableHtml;
-    use \App\Traits\HasSeoMetadata;
 
     /** @var array<int, string> */
     public array $translatable = ['title', 'slug', 'excerpt', 'content', 'rich_content'];

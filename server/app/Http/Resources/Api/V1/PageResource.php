@@ -10,6 +10,8 @@ use App\Models\Category;
 use App\Models\Form;
 use App\Models\Page;
 use App\Models\Product;
+use App\Services\Hooks\Cms\PageRenderFilter;
+use App\Services\Hooks\Facades\Hook;
 use App\Services\StorefrontPathService;
 use BackedEnum;
 use Illuminate\Http\Request;
@@ -70,7 +72,7 @@ class PageResource extends JsonResource
             ]) : [],
         ];
 
-        $filter = \App\Services\Hooks\Facades\Hook::filter(new \App\Services\Hooks\Cms\PageRenderFilter($data, $page));
+        $filter = Hook::filter(new PageRenderFilter($data, $page));
 
         return $filter->pageData;
     }

@@ -6,9 +6,9 @@ namespace App\Services\Hooks\Customer;
 
 use App\Models\Customer;
 
-final class CustomerRegisteredAction
+final readonly class CustomerRegisteredAction
 {
     public function __construct(
-        public readonly Customer $customer
+        public Customer $customer
     ) {}
 }

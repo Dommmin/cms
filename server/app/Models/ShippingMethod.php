@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ShippingCarrierEnum;
+use App\Services\Hooks\Facades\Hook;
+use App\Services\Hooks\Shipping\ShippingCostFilter;
 use Carbon\CarbonImmutable;
 use Database\Factories\ShippingMethodFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -172,7 +174,7 @@ class ShippingMethod extends Model
             $cost = max(0, $cost);
         }
 
-        $filter = \App\Services\Hooks\Facades\Hook::filter(new \App\Services\Hooks\Shipping\ShippingCostFilter($cost, $this, $weightKg, $orderValueCents));
+        $filter = Hook::filter(new ShippingCostFilter($cost, $this, $weightKg, $orderValueCents));
 
         return $filter->cost;
     }

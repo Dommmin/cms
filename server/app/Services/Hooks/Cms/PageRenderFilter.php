@@ -9,7 +9,7 @@ use App\Models\Page;
 final class PageRenderFilter
 {
     /**
-     * @param array<string, mixed> $pageData
+     * @param  array<string, mixed>  $pageData
      */
     public function __construct(
         public array $pageData,

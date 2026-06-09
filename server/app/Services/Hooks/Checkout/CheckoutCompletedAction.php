@@ -6,9 +6,9 @@ namespace App\Services\Hooks\Checkout;
 
 use App\Models\Order;
 
-final class CheckoutCompletedAction
+final readonly class CheckoutCompletedAction
 {
     public function __construct(
-        public readonly Order $order
+        public Order $order
     ) {}
 }
