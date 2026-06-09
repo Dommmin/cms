@@ -144,7 +144,7 @@ export function BlogPostClient({
 
             <div
                 className="prose prose-lg mt-8"
-                dangerouslySetInnerHTML={{ __html: html }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
             />
 
             {post.author && (

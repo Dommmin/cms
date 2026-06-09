@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { CompareButton } from '@/components/compare-button';
 import { LiveViewers } from '@/components/live-viewers';
 import { ProductCard } from '@/components/product-card';
+import { sanitizeHtml } from '@/lib/sanitize';
 import type {
     DeliveryPanelProps,
     ProductBuyBoxProps,
@@ -403,7 +404,7 @@ export function ProductTabs({
                         aria-labelledby="tab-description"
                         className="prose prose-lg"
                         dangerouslySetInnerHTML={{
-                            __html: product.description ?? '',
+                            __html: sanitizeHtml(product.description ?? ''),
                         }}
                     />
                 )}
