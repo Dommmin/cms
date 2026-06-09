@@ -11,6 +11,8 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Shipment;
 use App\Models\ShipmentItem;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class ShipmentService
 {
@@ -64,11 +66,11 @@ class ShipmentService
             if ($enum && $enum !== ShippingCarrierEnum::PICKUP) {
                 try {
                     $this->carrierManager->driver($enum)->createShipment($order, $shipmentData);
-                } catch (\Throwable $e) {
-                    \Illuminate\Support\Facades\Log::error('Failed to create shipment in carrier API', [
+                } catch (Throwable $e) {
+                    Log::error('Failed to create shipment in carrier API', [
                         'shipment_id' => $shipment->id,
                         'carrier' => $shipment->carrier,
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                 }
             }
