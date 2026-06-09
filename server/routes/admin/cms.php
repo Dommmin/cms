@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Admin\Cms\GlobalSlotController;
 use App\Http\Controllers\Admin\Cms\PageApprovalController;
 use App\Http\Controllers\Admin\Cms\PageBuilderController;
 use App\Http\Controllers\Admin\Cms\PageController;
@@ -48,6 +49,17 @@ Route::prefix('cms')->name('cms.')->group(function (): void {
     Route::post('pages/{page}/builder/sections/{section}/blocks', [PageBuilderController::class, 'addBlock'])->name('pages.builder.blocks.add');
     Route::put('pages/{page}/builder/sections/{section}/blocks/{block}', [PageBuilderController::class, 'updateBlock'])->name('pages.builder.blocks.update');
     Route::delete('pages/{page}/builder/sections/{section}/blocks/{block}', [PageBuilderController::class, 'deleteBlock'])->name('pages.builder.blocks.delete');
+
+    // Global Slots
+    Route::post('global-slots/reorder', [GlobalSlotController::class, 'reorder'])->name('global-slots.reorder');
+    Route::patch('global-slots/{globalSlot}/toggle', [GlobalSlotController::class, 'toggle'])->name('global-slots.toggle');
+    Route::resource('global-slots', GlobalSlotController::class)->except(['create', 'edit', 'show'])
+        ->names([
+            'index' => 'global-slots.index',
+            'store' => 'global-slots.store',
+            'update' => 'global-slots.update',
+            'destroy' => 'global-slots.destroy',
+        ]);
 
     // Section Templates
     Route::get('section-templates', [SectionTemplateController::class, 'index'])->name('section-templates.index');
