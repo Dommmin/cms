@@ -28,11 +28,14 @@ use App\Services\Hooks\Checkout\CheckoutCreatingFilter;
 use App\Services\Hooks\Facades\Hook;
 use Illuminate\Support\Arr;
 
+use App\Services\TaxService;
+
 class CheckoutService
 {
     public function __construct(
         private readonly CartService $cartService,
         private readonly LegalDocumentVersionService $legalDocumentVersionService,
+        private readonly TaxService $taxService,
     ) {}
 
     /**
@@ -50,7 +53,9 @@ class CheckoutService
         ?string $pickupPointId = null,
         ?string $notes = null,
         ?string $referralCode = null,
-        ?string $gaClientId = null
+        ?string $gaClientId = null,
+        ?string $customerType = 'individual',
+        ?bool $wantsInvoice = false
     ): Order {
         if ($user instanceof User) {
             if (! $user->customer) {
@@ -91,7 +96,16 @@ class CheckoutService
         $subtotal = $cart->subtotal();
         $subtotalAfterDiscount = max(0, $subtotal - $discountAmount);
 
-        $taxAmount = $this->calculateTaxAmount($cart);
+        $resolvedCustomerType = $customerType ?? 'individual';
+        $isExempt = $customer?->is_tax_exempt ?? false;
+
+        if ($customer && $resolvedCustomerType === 'business') {
+            $customer->update([
+                'customer_type' => 'business',
+                'company_name' => $billingAddress['company_name'] ?? $customer->company_name,
+                'tax_id' => $billingAddress['vat_id'] ?? $customer->tax_id,
+            ]);
+        }
 
         $billing = $this->firstOrCreateAddress($billingAddress, $customer, AddressTypeEnum::BILLING);
 
@@ -107,7 +121,34 @@ class CheckoutService
             $shipping = $billing;
         }
 
+        // Run Tax calculation using TaxService
+        $billingCountry = $billingAddress['country_code'] ?? 'PL';
+        $billingVatId = $billingAddress['vat_id'] ?? null;
+
+        $taxDetails = $this->taxService->calculateCartTax(
+            items: $cart->items,
+            countryCode: $billingCountry,
+            customerType: $resolvedCustomerType,
+            vatId: $billingVatId,
+            isTaxExempt: $isExempt,
+            shippingCost: $shippingCost,
+            shippingMethodId: $shippingMethodId
+        );
+
         $total = max(0, $subtotalAfterDiscount + $shippingCost);
+        
+        // Adjust tax amounts proportionally if discount is applied
+        $finalTaxAmount = $taxDetails['total_tax'];
+        $finalItemsTax = $taxDetails['items_tax'];
+        $finalShippingTax = $taxDetails['shipping_tax'];
+        
+        if ($discountAmount > 0 && $taxDetails['total_gross'] > 0) {
+            $discountRatio = $total / $taxDetails['total_gross'];
+            $finalTaxAmount = (int) round($taxDetails['total_tax'] * $discountRatio);
+            $finalItemsTax = (int) round($taxDetails['items_tax'] * $discountRatio);
+            $finalShippingTax = (int) round($taxDetails['shipping_tax'] * $discountRatio);
+        }
+
         $legalSnapshot = $this->legalDocumentVersionService->checkoutLegalSnapshot();
 
         if ($total === 0) {
@@ -121,6 +162,11 @@ class CheckoutService
         $orderData = [
             'reference_number' => Order::generateReferenceNumber(),
             'customer_id' => $customer?->id,
+            'customer_type' => $resolvedCustomerType,
+            'is_tax_exempt' => $isExempt,
+            'wants_invoice' => (bool) $wantsInvoice,
+            'buyer_company_name' => $resolvedCustomerType === 'business' ? ($billingAddress['company_name'] ?? null) : null,
+            'buyer_vat_id' => $resolvedCustomerType === 'business' ? ($billingAddress['vat_id'] ?? null) : null,
             'guest_email' => $customer === null ? $guestEmail : null,
             'billing_address_id' => $billing->id,
             'shipping_address_id' => $shipping->id,
@@ -128,7 +174,9 @@ class CheckoutService
             'subtotal' => $subtotal,
             'discount_amount' => $discountAmount,
             'shipping_cost' => $shippingCost,
-            'tax_amount' => $taxAmount,
+            'tax_amount' => $finalTaxAmount,
+            'items_tax_amount' => $finalItemsTax,
+            'shipping_tax_amount' => $finalShippingTax,
             'total' => $total,
             'currency_code' => 'PLN',
             'exchange_rate' => 1.0,
@@ -214,19 +262,6 @@ class CheckoutService
             $weight = (float) ($variant->weight ?? 0);
 
             return $weight * (int) $item->quantity;
-        });
-    }
-
-    private function calculateTaxAmount(Cart $cart): int
-    {
-        return (int) $cart->items->sum(function ($item): int {
-            /** @var CartItem $item */
-            $variant = $item->variant;
-
-            $gross = $variant->price * (int) $item->quantity;
-            $taxRate = $variant->effectiveTaxRate();
-
-            return $taxRate instanceof TaxRate ? $taxRate->taxFromGross($gross) : 0;
         });
     }
 

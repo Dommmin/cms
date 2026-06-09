@@ -23,6 +23,19 @@ class InvoiceService
             ->toResponse(request());
     }
 
+    public function downloadProforma(Order $order): Response
+    {
+        $order->loadMissing(['items', 'billingAddress', 'shippingAddress', 'customer']);
+
+        return Pdf::view('pdf.invoice', [
+            'order' => $order,
+            'is_proforma' => true,
+        ])
+            ->name(sprintf('proforma-%s.pdf', $order->reference_number))
+            ->download()
+            ->toResponse(request());
+    }
+
     public function save(Order $order, string $path): void
     {
         $this->ensureInvoiceNumber($order);

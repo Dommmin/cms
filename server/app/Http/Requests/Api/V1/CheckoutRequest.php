@@ -32,6 +32,8 @@ class CheckoutRequest extends FormRequest
         $requiresShipping = $cart->items->contains(fn ($item) => $item->variant->product->productType->is_shippable ?? true);
 
         $rules = [
+            'customer_type' => ['nullable', 'string', 'in:individual,business'],
+            'wants_invoice' => ['nullable', 'boolean'],
             'guest_email' => ['nullable', 'email', 'max:255'],
             'payment_provider' => ['required', 'string', new Enum(PaymentProviderEnum::class)],
             'payment_method' => ['nullable', 'string', Rule::in(['blik', 'card', 'apple_pay', 'google_pay', 'bank_transfer', 'paynow', 'paypo'])],
@@ -46,6 +48,21 @@ class CheckoutRequest extends FormRequest
         ];
 
         $rules = array_merge($rules, collect($addressRules)->mapWithKeys(fn ($r, $k): array => ['billing_address.'.$k => $r])->all());
+
+        // Override billing address B2B rules
+        $rules['billing_address.company_name'] = [
+            Rule::requiredIf($this->input('customer_type') === 'business'),
+            'nullable',
+            'string',
+            'max:255',
+        ];
+        $rules['billing_address.vat_id'] = [
+            Rule::requiredIf($this->input('customer_type') === 'business'),
+            'nullable',
+            'string',
+            'max:50',
+            new \App\Rules\VatId(),
+        ];
 
         if ($requiresShipping) {
             $rules['shipping_method_id'] = ['required', 'integer', 'exists:shipping_methods,id'];

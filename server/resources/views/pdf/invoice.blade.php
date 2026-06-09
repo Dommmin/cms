@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faktura {{ $order->invoice_number ?? $order->reference_number }}</title>
+    <title>{{ isset($is_proforma) && $is_proforma ? 'Faktura Proforma' : 'Faktura VAT' }} {{ $order->invoice_number ?? $order->reference_number }}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; font-size: 14px; color: #333; padding: 40px; }
@@ -35,11 +35,13 @@
     <div class="header">
         <div class="company">
             <h1>{{ config('app.name') }}</h1>
-            <p>Faktura VAT</p>
+            <p>{{ isset($is_proforma) && $is_proforma ? 'Faktura Proforma' : 'Faktura VAT' }}</p>
         </div>
         <div class="invoice-info">
-            <h2>Faktura VAT</h2>
-            @if($order->invoice_number)
+            <h2>{{ isset($is_proforma) && $is_proforma ? 'Faktura Proforma' : 'Faktura VAT' }}</h2>
+            @if(isset($is_proforma) && $is_proforma)
+            <p class="invoice-number">{{ $order->reference_number }}</p>
+            @elseif($order->invoice_number)
             <p class="invoice-number">{{ $order->invoice_number }}</p>
             @endif
             <p><strong>Nr zamówienia:</strong> {{ $order->reference_number }}</p>
@@ -125,29 +127,42 @@
     <div class="totals">
         <table>
             <tr>
-                <td>Suma netto</td>
-                <td class="text-right">{{ number_format($order->subtotal / 100, 2) }} {{ $order->currency_code }}</td>
+                <td>Wartość produktów netto</td>
+                <td class="text-right">{{ number_format(($order->subtotal - ($order->items_tax_amount ?? 0)) / 100, 2) }} {{ $order->currency_code }}</td>
             </tr>
             @if($order->discount_amount > 0)
             <tr>
-                <td>Rabat</td>
-                <td class="text-right">-{{ number_format($order->discount_amount / 100, 2) }} {{ $order->currency_code }}</td>
+                <td>Rabat netto</td>
+                <td class="text-right">-{{ number_format(($order->discount_amount - ((($order->items_tax_amount ?? 0) + ($order->shipping_tax_amount ?? 0)) - $order->tax_amount)) / 100, 2) }} {{ $order->currency_code }}</td>
+            </tr>
+            @endif
+            @if($order->shipping_cost > 0)
+            <tr>
+                <td>Koszt wysyłki netto</td>
+                <td class="text-right">{{ number_format(($order->shipping_cost - ($order->shipping_tax_amount ?? 0)) / 100, 2) }} {{ $order->currency_code }}</td>
             </tr>
             @endif
             <tr>
-                <td>Dostawa</td>
-                <td class="text-right">{{ number_format($order->shipping_cost / 100, 2) }} {{ $order->currency_code }}</td>
-            </tr>
-            @if($order->tax_amount > 0)
-            <tr>
-                <td>VAT</td>
+                <td>Podatek VAT</td>
                 <td class="text-right">{{ number_format($order->tax_amount / 100, 2) }} {{ $order->currency_code }}</td>
             </tr>
-            @endif
             <tr class="total-row">
-                <td>Do zapłaty</td>
+                <td>Do zapłaty (brutto)</td>
                 <td class="text-right">{{ number_format($order->total / 100, 2) }} {{ $order->currency_code }}</td>
             </tr>
+            @if(($order->customer_type ?? 'individual') === 'business' && $order->billingAddress && $order->billingAddress->country_code !== 'PL' && !empty($order->buyer_vat_id))
+            <tr>
+                <td colspan="2" style="font-size: 11px; color: #666; text-align: right; padding-top: 4px;">
+                    Odwrotne obciążenie / Reverse charge
+                </td>
+            </tr>
+            @elseif($order->is_tax_exempt)
+            <tr>
+                <td colspan="2" style="font-size: 11px; color: #666; text-align: right; padding-top: 4px;">
+                    Transakcja zwolniona z podatku / Tax exempt transaction
+                </td>
+            </tr>
+            @endif
         </table>
     </div>
 

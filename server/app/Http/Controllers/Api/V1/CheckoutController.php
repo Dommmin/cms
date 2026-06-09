@@ -180,6 +180,8 @@ class CheckoutController extends ApiController
             notes: $data['notes'] ?? null,
             referralCode: $data['referral_code'] ?? null,
             gaClientId: $data['ga_client_id'] ?? null,
+            customerType: $data['customer_type'] ?? 'individual',
+            wantsInvoice: (bool) ($data['wants_invoice'] ?? false),
         );
 
         // Order confirmation email is sent via OrderCreated event listener

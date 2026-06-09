@@ -127,6 +127,18 @@ class OrderController extends ApiController
         return $invoiceService->download($order);
     }
 
+    public function proforma(Request $request, string $reference, InvoiceService $invoiceService): Response
+    {
+        $customer = $request->user()->customer;
+
+        $order = Order::query()
+            ->where('reference_number', $reference)
+            ->where('customer_id', $customer?->id)
+            ->firstOrFail();
+
+        return $invoiceService->downloadProforma($order);
+    }
+
     public function reorder(Request $request, string $reference, CartService $cartService): JsonResponse
     {
         $customer = $request->user()->customer;
