@@ -1,5 +1,6 @@
 import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
+import { buildStaticSecurityHeaders } from './lib/security-headers';
 
 const errorTrackingDsn =
     process.env.NEXT_PUBLIC_GLITCHTIP_DSN ?? process.env.NEXT_PUBLIC_SENTRY_DSN;
@@ -70,21 +71,15 @@ const nextConfig: NextConfig = {
     },
 
     async headers() {
+        const securityHeaders = buildStaticSecurityHeaders({
+            includeStrictTransportSecurity:
+                process.env.NODE_ENV === 'production',
+        });
+
         return [
             {
                 source: '/(.*)',
-                headers: [
-                    { key: 'X-Content-Type-Options', value: 'nosniff' },
-                    { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-                    {
-                        key: 'Referrer-Policy',
-                        value: 'strict-origin-when-cross-origin',
-                    },
-                    {
-                        key: 'Permissions-Policy',
-                        value: 'camera=(), microphone=(), geolocation=(self "https://geowidget-app.inpost.pl" "https://geowidget.inpost.pl")',
-                    },
-                ],
+                headers: securityHeaders,
             },
             {
                 source: '/_next/static/(.*)',

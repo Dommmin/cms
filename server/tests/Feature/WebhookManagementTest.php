@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Webhook;
 use App\Models\WebhookDelivery;
 use App\Services\WebhookService;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Spatie\Permission\Models\Role;
 
@@ -54,6 +55,16 @@ it('validates url format on store', function (): void {
         ->post(route('admin.webhooks.store'), [
             'name' => 'Test',
             'url' => 'not-a-url',
+            'events' => ['order.created'],
+        ])
+        ->assertSessionHasErrors(['url']);
+});
+
+it('rejects insecure public webhook targets on store', function (): void {
+    $this->actingAs($this->user)
+        ->post(route('admin.webhooks.store'), [
+            'name' => 'Test',
+            'url' => 'http://example.com/webhook',
             'events' => ['order.created'],
         ])
         ->assertSessionHasErrors(['url']);
@@ -141,4 +152,25 @@ it('generates secret automatically on create', function (): void {
     $webhook = Webhook::factory()->create();
     expect($webhook->secret)->not->toBeEmpty();
     expect(mb_strlen((string) $webhook->secret))->toBe(64);
+});
+
+it('blocks outbound deliveries to disallowed webhook targets without making an HTTP request', function (): void {
+    Http::fake();
+
+    config()->set('security.outbound_webhooks.allow_local_targets', false);
+
+    $webhook = Webhook::factory()->create([
+        'url' => 'https://127.0.0.1/webhook',
+    ]);
+
+    $job = new DeliverWebhookJob($webhook, 'order.created', ['order_id' => 1]);
+    $job->handle();
+
+    Http::assertNothingSent();
+
+    $delivery = WebhookDelivery::query()->latest()->first();
+
+    expect($delivery)->not->toBeNull()
+        ->and($delivery?->status)->toBe('failed')
+        ->and($delivery?->response_body)->toBe('Webhook URL must target a public endpoint.');
 });

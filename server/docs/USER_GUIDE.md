@@ -148,7 +148,7 @@ Pages are the building blocks of your website. Navigate to **CMS > Pages**.
 
 Every page has a draft state and a published state. Editing a page modifies the draft. Click **Publish** to push the draft live. This means you can safely work on changes without affecting the live site.
 
-When a page is published, unpublished, or processed by the scheduled publishing task, the system can notify configured webhooks so external storefront, CDN, or search indexing integrations can refresh their cached content. For the bundled storefront, create an active webhook for `page.published` and `page.unpublished` that points to `/api/cms/revalidate` and uses the same secret as the storefront environment.
+When a page is published, unpublished, or processed by the scheduled publishing task, the system can notify configured webhooks so external storefront, CDN, or search indexing integrations can refresh their cached content. For the bundled storefront, create an active webhook for `page.published` and `page.unpublished` that points to `/api/cms/revalidate`, uses the same secret as the storefront environment, and is exposed as a reachable HTTPS endpoint outside local development.
 
 **SEO fields** are available on each page: title, meta description, and Open Graph settings. Fill these in to help search engines and social media display your content correctly. The SEO panel shows a content quality summary, search preview, and Open Graph preview so you can fix missing or overly long fields before publishing.
 

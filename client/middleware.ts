@@ -1,3 +1,4 @@
+import { buildContentSecurityPolicy } from '@/lib/security-headers';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -98,32 +99,12 @@ function generateNonce(): string {
     return btoa(String.fromCharCode(...array));
 }
 
-function getCspHeader(nonce: string): string {
-    const isDev = process.env.NODE_ENV === 'development';
-    const frameAncestors = isDev
-        ? "frame-ancestors 'self' http://localhost:*"
-        : "frame-ancestors 'self'";
-
-    return [
-        `default-src 'self'`,
-        `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://www.googletagmanager.com ${isDev ? "'unsafe-eval'" : ''}`,
-        `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
-        `img-src 'self' data: blob: https: ${isDev ? 'http:' : ''}`,
-        `font-src 'self' https://fonts.gstatic.com`,
-        `connect-src 'self' https: ${isDev ? 'http://localhost:*' : ''}`,
-        `frame-src 'self' https://www.google.com https://geowidget-app.inpost.pl https://geowidget.inpost.pl`,
-        `object-src 'none'`,
-        `base-uri 'self'`,
-        `form-action 'self'`,
-        frameAncestors,
-        `upgrade-insecure-requests`,
-    ]
-        .filter(Boolean)
-        .join('; ');
-}
-
 export async function middleware(request: NextRequest) {
     const nonce = generateNonce();
+    const cspHeader = buildContentSecurityPolicy({
+        isDevelopment: process.env.NODE_ENV === 'development',
+        nonce,
+    });
     const { locales, defaultLocale } = await getI18nConfig();
     const { pathname } = request.nextUrl;
     const pathLocale = pathname.split('/')[1] ?? '';
@@ -138,7 +119,7 @@ export async function middleware(request: NextRequest) {
         redirectUrl.pathname = cleanPath;
         const response = NextResponse.redirect(redirectUrl, 307);
         setLocaleCookie(response, defaultLocale);
-        response.headers.set('Content-Security-Policy', getCspHeader(nonce));
+        response.headers.set('Content-Security-Policy', cspHeader);
         response.headers.set('x-nonce', nonce);
         return response;
     }
@@ -159,10 +140,7 @@ export async function middleware(request: NextRequest) {
                 request: { headers: requestHeaders },
             });
             setLocaleCookie(response, pathLocale);
-            response.headers.set(
-                'Content-Security-Policy',
-                getCspHeader(nonce),
-            );
+            response.headers.set('Content-Security-Policy', cspHeader);
             return response;
         }
 
@@ -171,7 +149,7 @@ export async function middleware(request: NextRequest) {
             request: { headers: requestHeaders },
         });
         setLocaleCookie(response, pathLocale);
-        response.headers.set('Content-Security-Policy', getCspHeader(nonce));
+        response.headers.set('Content-Security-Policy', cspHeader);
         return response;
     }
 
@@ -185,10 +163,7 @@ export async function middleware(request: NextRequest) {
             const redirectUrl = request.nextUrl.clone();
             redirectUrl.pathname = `/${preferred}${pathname === '/' ? '' : pathname}`;
             const response = NextResponse.redirect(redirectUrl);
-            response.headers.set(
-                'Content-Security-Policy',
-                getCspHeader(nonce),
-            );
+            response.headers.set('Content-Security-Policy', cspHeader);
             return response;
         }
     }
@@ -201,7 +176,7 @@ export async function middleware(request: NextRequest) {
         request: { headers: requestHeaders },
     });
     setLocaleCookie(response, defaultLocale);
-    response.headers.set('Content-Security-Policy', getCspHeader(nonce));
+    response.headers.set('Content-Security-Policy', cspHeader);
     return response;
 }
 

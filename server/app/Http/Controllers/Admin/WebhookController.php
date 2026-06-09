@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreWebhookRequest;
+use App\Http\Requests\Admin\UpdateWebhookRequest;
 use App\Jobs\DeliverWebhookJob;
 use App\Models\Webhook;
 use App\Models\WebhookDelivery;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -47,18 +48,9 @@ final class WebhookController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StoreWebhookRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'url' => ['required', 'url', 'max:2048'],
-            'description' => ['nullable', 'string', 'max:1000'],
-            'events' => ['required', 'array', 'min:1'],
-            'events.*' => ['required', 'string', 'in:'.implode(',', $this->availableEvents())],
-            'is_active' => ['boolean'],
-        ]);
-
-        $webhook = Webhook::query()->create($validated);
+        $webhook = Webhook::query()->create($request->validated());
 
         return to_route('admin.webhooks.index')
             ->with('success', sprintf('Webhook "%s" created successfully.', $webhook->name));
@@ -72,18 +64,9 @@ final class WebhookController extends Controller
         ]);
     }
 
-    public function update(Request $request, Webhook $webhook): RedirectResponse
+    public function update(UpdateWebhookRequest $request, Webhook $webhook): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'url' => ['required', 'url', 'max:2048'],
-            'description' => ['nullable', 'string', 'max:1000'],
-            'events' => ['required', 'array', 'min:1'],
-            'events.*' => ['required', 'string', 'in:'.implode(',', $this->availableEvents())],
-            'is_active' => ['boolean'],
-        ]);
-
-        $webhook->update($validated);
+        $webhook->update($request->validated());
 
         return to_route('admin.webhooks.index')
             ->with('success', sprintf('Webhook "%s" updated successfully.', $webhook->name));

@@ -169,6 +169,9 @@ Middleware is registered in `bootstrap/app.php` with no `Kernel.php`:
 
 ```php
 ->withMiddleware(function (Middleware $middleware): void {
+    $middleware->prepend(TrustCloudflareProxies::class);
+    $middleware->prepend(SecurityHeaders::class);
+
     $middleware->web(append: [
         HandleAppearance::class,
         HandleInertiaRequests::class,
@@ -190,6 +193,8 @@ Middleware is registered in `bootstrap/app.php` with no `Kernel.php`:
     ]);
 })
 ```
+
+`SecurityHeaders` is global for admin + API responses. It applies `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`, and `X-Permitted-Cross-Domain-Policies` to every response, adds HSTS when the request is secure (or forwarded as HTTPS), and emits nonce-based CSP only for HTML responses so Vite/Inertia scripts can use the per-request nonce safely.
 
 ### Named Route Conventions
 
@@ -315,6 +320,8 @@ Autopay is not implemented yet. If added, it should follow the same gateway/clie
 **P24 sub-services:** `P24Client` (Basic Auth HTTP), `P24SignatureService` (SHA256 signature generation/verification).
 
 **Webhooks:** `POST /api/v1/webhooks/payu`, `POST /api/v1/webhooks/p24` and `POST /api/v1/webhooks/paynow` → dispatches `ProcessPaymentWebhook` job (3 tries, 10s backoff). Webhook signatures are verified synchronously before queuing.
+
+**Outbound webhook standard:** Admin-managed outbound webhooks are validated by Form Requests and `OutboundWebhookPolicy`. Public HTTPS targets are required by default; localhost/private-network destinations are blocked unless `WEBHOOK_ALLOW_LOCAL_TARGETS=true` is explicitly enabled for local integration work. `DeliverWebhookJob` also enforces the same policy at send time, adds `X-Webhook-Event` / `X-Webhook-Signature` headers, uses a 3s connect timeout and 10s total timeout, and records failed attempts in `webhook_deliveries`.
 
 **Payment status polling:** `GET /api/v1/payments/{payment}/status` — authenticated, returns `{status, order_reference}`. Frontend polls every 3s while `status === 'pending'` (BLIK flow). For P24 this polling also resolves failed/cancelled returns, because P24 sends `urlStatus` notifications only for successful payments.
 
@@ -845,6 +852,12 @@ Notifications use Server-Sent Events:
 ---
 
 ## 14. Extension Patterns
+
+Before adding any inbound or outbound integration, follow the platform standard:
+
+- inbound webhooks must verify provider signatures or shared secrets before queue dispatch
+- outbound callbacks must use the shared webhook delivery flow or match its guarantees: public HTTPS target, explicit timeout, failure recording, and no silent localhost/private-network calls in production
+- admin validation belongs in Form Requests, not inline controller rules
 
 ### 14.1 Adding a New Admin CRUD Module
 

@@ -67,6 +67,8 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - **Wishlists** — per customer
 - **Reviews** — with images, helpful votes, moderation
 - **Affiliates + Referrals** — codes, commission tracking (pending/approved/paid)
+- **Tax Engine & B2B Mode** — Geographic tax zones (`tax_zones`, `tax_zone_countries`), customer-country rate matching (OSS), Polish NIP & EU VAT validation, customer types (`individual`/`business`), reverse charge rules, dynamic shipping tax behavior, gross-valued calculations, proforma invoice downloads.
+
 
 ### Newsletter
 - Subscribers, segments, campaigns (with tracking: opens, clicks, sends)

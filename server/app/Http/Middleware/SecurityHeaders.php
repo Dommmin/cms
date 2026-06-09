@@ -26,11 +26,19 @@ class SecurityHeaders
         /** @var Response $response */
         $response = $next($request);
 
-        // Standard security headers on all responses
-        $response->headers->set('X-Content-Type-Options', 'nosniff');
-        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
-        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
-        $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(self)');
+        /** @var array<string, string> $headers */
+        $headers = config('security.headers', []);
+
+        $response->headers->set('X-Content-Type-Options', (string) $headers['x_content_type_options']);
+        $response->headers->set('X-Frame-Options', (string) $headers['x_frame_options']);
+        $response->headers->set('Referrer-Policy', (string) $headers['referrer_policy']);
+        $response->headers->set('Permissions-Policy', (string) $headers['permissions_policy']);
+        $response->headers->set('Cross-Origin-Opener-Policy', (string) $headers['cross_origin_opener_policy']);
+        $response->headers->set('X-Permitted-Cross-Domain-Policies', (string) $headers['x_permitted_cross_domain_policies']);
+
+        if ($request->isSecure() || $request->header('X-Forwarded-Proto') === 'https') {
+            $response->headers->set('Strict-Transport-Security', (string) $headers['strict_transport_security']);
+        }
 
         // Content Security Policy for HTML responses
         $contentType = $response->headers->get('Content-Type');

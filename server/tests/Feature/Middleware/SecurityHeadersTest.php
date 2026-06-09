@@ -21,6 +21,8 @@ it('applies standard security headers to HTML responses', function (): void {
     $response->assertHeader('X-Frame-Options', 'SAMEORIGIN');
     $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     $response->assertHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(self)');
+    $response->assertHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    $response->assertHeader('X-Permitted-Cross-Domain-Policies', 'none');
     $response->assertHeader('Content-Security-Policy');
 });
 
@@ -32,7 +34,15 @@ it('applies standard security headers to JSON responses but omits CSP', function
     $response->assertHeader('X-Frame-Options', 'SAMEORIGIN');
     $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     $response->assertHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(self)');
+    $response->assertHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    $response->assertHeader('X-Permitted-Cross-Domain-Policies', 'none');
     $response->assertHeaderMissing('Content-Security-Policy');
+});
+
+it('adds strict transport security on secure requests', function (): void {
+    $response = $this->withHeaders(['X-Forwarded-Proto' => 'https'])->get('/_test_security_headers_html');
+
+    $response->assertHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
 });
 
 it('generates and matches the Vite dynamic nonce in CSP', function (): void {
