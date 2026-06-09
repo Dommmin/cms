@@ -86,3 +86,22 @@ export async function handleSocialCallback(
     );
     return data;
 }
+
+export async function sendOtp(email: string): Promise<{ message: string }> {
+    const { data } = await api.post<{ message: string }>('/auth/otp/send', {
+        email,
+    });
+    return data;
+}
+
+export async function verifyOtp(payload: {
+    email: string;
+    code: string;
+}): Promise<AuthResponse> {
+    const { data } = await api.post<AuthResponse>('/auth/otp/verify', {
+        ...payload,
+        cart_token: getCartToken(),
+        wishlist_token: getWishlistToken(),
+    });
+    return data;
+}

@@ -1,5 +1,6 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -26,14 +27,14 @@ import { useTranslation } from '@/hooks/use-translation';
 import { getToken } from '@/lib/axios';
 import {
     getGaClientId,
+    trackAddPaymentInfo,
+    trackAddShippingInfo,
     trackBeginCheckout,
     trackPurchase,
 } from '@/lib/datalayer';
 import type { Address } from '@/types/api';
-import type { StepState } from './checkout.types';
 import { CheckoutAddressSection } from './components/checkout-address-section';
 import { CheckoutPaymentSection } from './components/checkout-payment-section';
-import { CheckoutStepIndicator } from './components/checkout-step-indicator';
 import { GuestEmailStep } from './components/guest-email-step';
 import { OrderSummary } from './components/order-summary';
 import { ShippingMethodStep } from './components/shipping-method-step';
@@ -76,11 +77,18 @@ export default function CheckoutPage() {
     const router = useRouter();
     const { t } = useTranslation();
     const lp = useLocalePath();
+    const queryClient = useQueryClient();
     const { data: storefrontRoutes } = useStorefrontRoutes();
     const [mounted] = useState(() => typeof window !== 'undefined');
-    const [token] = useState<string | null>(() =>
+    const [token, setToken] = useState<string | null>(() =>
         typeof window !== 'undefined' ? getToken() : null,
     );
+
+    const handleLoginSuccess = (newToken: string) => {
+        setToken(newToken);
+        void queryClient.invalidateQueries({ queryKey: ['profile'] });
+        void queryClient.invalidateQueries({ queryKey: ['cart'] });
+    };
     const { data: cart, isLoading: cartLoading } = useCart();
     const { data: shippingMethods = [], isLoading: methodsLoading } =
         useShippingMethods();
@@ -135,6 +143,14 @@ export default function CheckoutPage() {
         if (!method?.requires_pickup_point) {
             setPickupPointId('');
         }
+        if (method && cart) {
+            trackAddShippingInfo(
+                cart.subtotal,
+                cart.currency,
+                method.name,
+                cart.items,
+            );
+        }
     };
 
     // Pre-fill default address when saved addresses load
@@ -174,84 +190,90 @@ export default function CheckoutPage() {
     const effectiveShipping =
         freeThreshold !== null && subtotal >= freeThreshold ? 0 : shippingCost;
     const total = subtotal + effectiveShipping;
-    const billingComplete = Object.keys(validateAddress(billing)).length === 0;
-    const shippingAddressComplete =
-        sameAddress || Object.keys(validateAddress(shipping)).length === 0;
-    const addressStepComplete =
-        (token !== null || guestEmail.trim().length > 0) &&
-        billingComplete &&
-        shippingAddressComplete;
-    const shippingStepComplete =
-        selectedMethod !== null &&
-        selectedShippingMethod?.configured === true &&
-        (!selectedShippingMethod.requires_pickup_point ||
-            pickupPointId.trim().length > 0);
-    const selectedPaymentProvider = paymentProviderFor(paymentMethod);
-    const selectedPaymentConfig = paymentMethods?.find(
-        (method) => method.id === selectedPaymentProvider,
-    );
-    const paymentProviderConfigured = selectedPaymentConfig?.configured ?? true;
-    const paymentInputComplete =
-        paymentMethod === 'blik' && selectedPaymentProvider === 'payu'
-            ? blikCode.length === 6
-            : paymentMethod === 'apple_pay' || paymentMethod === 'google_pay'
-              ? paymentToken.length > 0
-              : true;
-    const paymentStepComplete =
-        paymentProviderConfigured && paymentInputComplete;
-    const currentStepIndex = !addressStepComplete
-        ? 0
-        : !shippingStepComplete
-          ? 1
-          : !paymentStepComplete
-            ? 2
-            : 3;
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setSubmitAttempted(true);
 
-        // Guest email required when not authenticated
-        if (!token && !guestEmail.trim()) return;
+        let hasErrors = false;
 
-        // Client-side validation before submitting
+        // 1. Guest email
+        if (!token && !guestEmail.trim()) {
+            hasErrors = true;
+        }
+
+        // 2. Addresses
         const billingErrors = validateAddress(billing);
         const shippingErrors = !sameAddress ? validateAddress(shipping) : {};
         if (
             Object.keys(billingErrors).length > 0 ||
             Object.keys(shippingErrors).length > 0
         ) {
-            return;
+            hasErrors = true;
         }
 
-        if (!selectedMethod || !cart || cart.items.length === 0) return;
+        // 3. Shipping method selection
+        if (!selectedMethod) {
+            hasErrors = true;
+        } else {
+            const selectedShippingCfg = shippingMethods.find(
+                (m) => m.id === selectedMethod,
+            );
+            if (selectedShippingCfg && !selectedShippingCfg.configured) {
+                hasErrors = true;
+            }
+            // 4. Pickup point selection
+            if (selectedShippingCfg?.requires_pickup_point && !pickupPointId) {
+                hasErrors = true;
+            }
+        }
 
-        // Prevent submitting with an unconfigured shipping method
-        const selectedShippingCfg = shippingMethods.find(
-            (m) => m.id === selectedMethod,
-        );
-        if (selectedShippingCfg && !selectedShippingCfg.configured) return;
+        // 5. Terms acceptance
+        if (!termsAccepted) {
+            hasErrors = true;
+        }
 
+        // 6. Payment method/provider checks
         const selectedProvider = paymentProviderFor(paymentMethod);
-
-        // Native PayU BLIK requires a 6-digit code. Paynow BLIK runs in hosted redirect.
         if (
             paymentMethod === 'blik' &&
             selectedProvider === 'payu' &&
             blikCode.length !== 6
-        )
-            return;
+        ) {
+            hasErrors = true;
+        }
 
-        // Locker method requires a pickup point
-        if (selectedShippingMethod?.requires_pickup_point && !pickupPointId)
+        // If any validations failed, scroll to the first invalid field or error message and abort.
+        if (hasErrors) {
+            setTimeout(() => {
+                const firstErrorEl = document.querySelector(
+                    '[aria-invalid="true"], [role="alert"], #shipping-method-error, #pickup-point-error, #terms-error',
+                );
+                if (firstErrorEl) {
+                    firstErrorEl.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                    });
+                    if (
+                        firstErrorEl instanceof HTMLInputElement ||
+                        firstErrorEl instanceof HTMLTextAreaElement ||
+                        firstErrorEl instanceof HTMLSelectElement
+                    ) {
+                        firstErrorEl.focus();
+                    }
+                }
+            }, 50);
             return;
+        }
+
+        if (!cart || cart.items.length === 0) return;
 
         const shippingAddr = sameAddress ? billing : shipping;
 
         checkout(
             {
                 guest_email: !token ? guestEmail : undefined,
-                shipping_method_id: selectedMethod,
+                shipping_method_id: selectedMethod!,
                 pickup_point_id: pickupPointId || undefined,
                 payment_provider: selectedProvider,
                 payment_method:
@@ -388,21 +410,6 @@ export default function CheckoutPage() {
         );
     }
 
-    const CHECKOUT_STEPS = [
-        { label: t('checkout.step_address', 'Address') },
-        { label: t('checkout.step_shipping', 'Shipping') },
-        { label: t('checkout.step_payment', 'Payment') },
-        { label: t('checkout.step_review', 'Review') },
-    ];
-
-    function getStepState(index: number): StepState {
-        if (index < currentStepIndex) return 'completed';
-
-        if (index === currentStepIndex) return 'current';
-
-        return 'upcoming';
-    }
-
     return (
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
             {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY && (
@@ -415,101 +422,119 @@ export default function CheckoutPage() {
                 {t('checkout.title', 'Checkout')}
             </h1>
 
-            {/* Step progress */}
-            <nav
-                aria-label={t('checkout.progress', 'Checkout progress')}
-                className="mb-8"
-            >
-                <ol className="flex items-center gap-0">
-                    {CHECKOUT_STEPS.map((step, i) => {
-                        return (
-                            <li
-                                key={step.label}
-                                className="flex flex-1 items-center"
-                            >
-                                <CheckoutStepIndicator
-                                    label={step.label}
-                                    number={i + 1}
-                                    state={getStepState(i)}
-                                />
-                                {i < CHECKOUT_STEPS.length - 1 && (
-                                    <span
-                                        className={`mx-2 h-px flex-1 ${
-                                            i < currentStepIndex
-                                                ? 'bg-primary/60'
-                                                : 'bg-border'
-                                        }`}
-                                        aria-hidden="true"
-                                    />
-                                )}
-                            </li>
-                        );
-                    })}
-                </ol>
-            </nav>
-
             <form onSubmit={handleSubmit} noValidate>
-                <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
                     {/* ── Left column: forms ── */}
-                    <div className="space-y-6 lg:col-span-2">
-                        {!token && (
-                            <GuestEmailStep
-                                guestEmail={guestEmail}
+                    <div className="space-y-6 lg:col-span-3">
+                        {/* ── Card 1: Contact & Address ── */}
+                        <div className="border-border bg-card/50 space-y-5 rounded-xl border p-5 shadow-sm">
+                            <div className="border-border flex items-center gap-3 border-b pb-3">
+                                <span className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold">
+                                    1
+                                </span>
+                                <h2 className="text-base font-semibold">
+                                    {t(
+                                        'checkout.contact_and_shipping',
+                                        'Contact & Shipping',
+                                    )}
+                                </h2>
+                            </div>
+                            {!token && (
+                                <GuestEmailStep
+                                    guestEmail={guestEmail}
+                                    submitAttempted={submitAttempted}
+                                    onGuestEmailChange={setGuestEmail}
+                                    onLoginSuccess={handleLoginSuccess}
+                                />
+                            )}
+                            <CheckoutAddressSection
+                                billing={billing}
+                                sameAddress={sameAddress}
+                                savedAddresses={savedAddresses}
+                                saveBilling={saveBilling}
+                                saveShipping={saveShipping}
+                                shipping={shipping}
                                 submitAttempted={submitAttempted}
-                                onGuestEmailChange={setGuestEmail}
+                                token={token}
+                                onBillingChange={setBilling}
+                                onSameAddressChange={setSameAddress}
+                                onSaveBillingChange={setSaveBilling}
+                                onSaveShippingChange={setSaveShipping}
+                                onShippingChange={setShipping}
                             />
-                        )}
+                        </div>
 
-                        <CheckoutAddressSection
-                            billing={billing}
-                            sameAddress={sameAddress}
-                            savedAddresses={savedAddresses}
-                            saveBilling={saveBilling}
-                            saveShipping={saveShipping}
-                            shipping={shipping}
-                            submitAttempted={submitAttempted}
-                            token={token}
-                            onBillingChange={setBilling}
-                            onSameAddressChange={setSameAddress}
-                            onSaveBillingChange={setSaveBilling}
-                            onSaveShippingChange={setSaveShipping}
-                            onShippingChange={setShipping}
-                        />
+                        {/* ── Card 2: Shipping Method ── */}
+                        <div className="border-border bg-card/50 space-y-4 rounded-xl border p-5 shadow-sm">
+                            <div className="border-border flex items-center gap-3 border-b pb-3">
+                                <span className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold">
+                                    2
+                                </span>
+                                <h2 className="text-base font-semibold">
+                                    {t(
+                                        'checkout.shipping_method_section',
+                                        'Shipping Method',
+                                    )}
+                                </h2>
+                            </div>
+                            <ShippingMethodStep
+                                billing={billing}
+                                isLoading={methodsLoading}
+                                pickupPointId={pickupPointId}
+                                selectedMethod={selectedMethod}
+                                selectedShippingMethod={selectedShippingMethod}
+                                shippingMethods={shippingMethods}
+                                subtotal={subtotal}
+                                submitAttempted={submitAttempted}
+                                onMethodChange={handleMethodChange}
+                                onPickupPointChange={setPickupPointId}
+                                formatPrice={formatPrice}
+                            />
+                        </div>
 
-                        <ShippingMethodStep
-                            billing={billing}
-                            isLoading={methodsLoading}
-                            pickupPointId={pickupPointId}
-                            selectedMethod={selectedMethod}
-                            selectedShippingMethod={selectedShippingMethod}
-                            shippingMethods={shippingMethods}
-                            subtotal={subtotal}
-                            onMethodChange={handleMethodChange}
-                            onPickupPointChange={setPickupPointId}
-                            formatPrice={formatPrice}
-                        />
-
-                        <CheckoutPaymentSection
-                            blikCode={blikCode}
-                            currencyCode={currencyCode}
-                            isPickup={isPickup}
-                            paymentMethod={paymentMethod}
-                            paymentMethods={paymentMethods}
-                            total={total}
-                            onApplePayToken={setPaymentToken}
-                            onBlikCode={setBlikCode}
-                            onGooglePayToken={setPaymentToken}
-                            onPaymentMethodChange={(method) => {
-                                setPaymentMethod(method);
-                                setPaymentToken('');
-                            }}
-                        />
+                        {/* ── Card 3: Payment Method ── */}
+                        <div className="border-border bg-card/50 space-y-4 rounded-xl border p-5 shadow-sm">
+                            <div className="border-border flex items-center gap-3 border-b pb-3">
+                                <span className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold">
+                                    3
+                                </span>
+                                <h2 className="text-base font-semibold">
+                                    {t(
+                                        'checkout.payment_method_section',
+                                        'Payment Method',
+                                    )}
+                                </h2>
+                            </div>
+                            <CheckoutPaymentSection
+                                blikCode={blikCode}
+                                currencyCode={currencyCode}
+                                isPickup={isPickup}
+                                paymentMethod={paymentMethod}
+                                paymentMethods={paymentMethods}
+                                total={total}
+                                onApplePayToken={setPaymentToken}
+                                onBlikCode={setBlikCode}
+                                onGooglePayToken={setPaymentToken}
+                                onPaymentMethodChange={(method) => {
+                                    setPaymentMethod(method);
+                                    setPaymentToken('');
+                                    if (cart) {
+                                        trackAddPaymentInfo(
+                                            cart.subtotal,
+                                            cart.currency,
+                                            method,
+                                            cart.items,
+                                        );
+                                    }
+                                }}
+                            />
+                        </div>
 
                         {/* Notes */}
-                        <div>
+                        <div className="border-border bg-card/50 rounded-xl border p-5 shadow-sm">
                             <label
                                 htmlFor="order-notes"
-                                className="mb-1 block text-sm font-medium"
+                                className="mb-2 block text-sm font-medium"
                             >
                                 {t(
                                     'checkout.optional_notes',
@@ -532,13 +557,12 @@ export default function CheckoutPage() {
                     </div>
 
                     {/* ── Right column: summary ── */}
-                    <div className="lg:col-span-1">
+                    <div className="lg:col-span-2">
                         <OrderSummary
                             cart={cart}
                             effectiveShipping={effectiveShipping}
                             error={error}
                             isPending={isPending}
-                            selectedMethod={selectedMethod}
                             submitAttempted={submitAttempted}
                             subtotal={subtotal}
                             termsAccepted={termsAccepted}

@@ -23,6 +23,7 @@ export type GuestEmailStepProps = {
     guestEmail: string;
     submitAttempted: boolean;
     onGuestEmailChange: (value: string) => void;
+    onLoginSuccess: (token: string) => void;
 };
 
 export type ShippingMethodStepProps = {
@@ -33,6 +34,7 @@ export type ShippingMethodStepProps = {
     selectedShippingMethod: ShippingMethod | undefined;
     shippingMethods: ShippingMethod[];
     subtotal: number;
+    submitAttempted: boolean;
     onMethodChange: (id: number) => void;
     onPickupPointChange: (id: string) => void;
     formatPrice: (amount: number) => string;
