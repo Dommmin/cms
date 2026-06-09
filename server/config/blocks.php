@@ -119,6 +119,7 @@ return [
                         'label' => 'Primary Button Style',
                         'enum' => ['primary', 'secondary', 'outline', 'ghost'],
                         'default' => 'primary',
+                        'advanced' => true
                     ],
                     'cta2_text' => [
                         'type' => 'string',
@@ -136,12 +137,14 @@ return [
                         'label' => 'Secondary Button Style',
                         'enum' => ['primary', 'secondary', 'outline', 'ghost'],
                         'default' => 'outline',
+                        'advanced' => true
                     ],
                     'text_alignment' => [
                         'type' => 'string',
                         'label' => 'Text Alignment',
                         'enum' => ['left', 'center', 'right'],
                         'default' => 'center',
+                        'advanced' => true
                     ],
                     'overlay_opacity' => [
                         'type' => 'integer',
@@ -149,6 +152,7 @@ return [
                         'min' => 0,
                         'max' => 100,
                         'default' => 40,
+                        'advanced' => true
                     ],
                     'min_height' => [
                         'type' => 'integer',
@@ -156,6 +160,7 @@ return [
                         'min' => 200,
                         'max' => 1000,
                         'default' => 500,
+                        'advanced' => true
                     ],
                 ],
             ],
@@ -182,6 +187,7 @@ return [
                         'label' => 'Max Width',
                         'enum' => ['narrow', 'medium', 'wide', 'full'],
                         'default' => 'medium',
+                        'advanced' => true
                     ],
                 ],
             ],
@@ -217,6 +223,7 @@ return [
                         'label' => 'Display Mode',
                         'enum' => ['grid', 'carousel', 'list'],
                         'default' => 'grid',
+                        'advanced' => true
                     ],
                     'items_per_row' => [
                         'type' => 'integer',
@@ -224,6 +231,7 @@ return [
                         'min' => 1,
                         'max' => 6,
                         'default' => 4,
+                        'advanced' => true
                     ],
                     'max_items' => [
                         'type' => 'integer',
@@ -231,6 +239,7 @@ return [
                         'min' => 1,
                         'max' => 48,
                         'default' => 8,
+                        'advanced' => true
                     ],
                     'show_price' => [
                         'type' => 'boolean',
@@ -273,6 +282,7 @@ return [
                         'min' => 2,
                         'max' => 6,
                         'default' => 4,
+                        'advanced' => true
                     ],
                     'show_labels' => [
                         'type' => 'boolean',
@@ -284,6 +294,7 @@ return [
                         'label' => 'Card Style',
                         'enum' => ['square', 'circle', 'wide'],
                         'default' => 'square',
+                        'advanced' => true
                     ],
                 ],
             ],
@@ -333,12 +344,14 @@ return [
                         'label' => 'Background Color',
                         'format' => 'color',
                         'default' => '#1e293b',
+                        'advanced' => true
                     ],
                     'text_color' => [
                         'type' => 'string',
                         'label' => 'Text Color',
                         'format' => 'color',
                         'default' => '#ffffff',
+                        'advanced' => true
                     ],
                 ],
             ],
@@ -385,6 +398,7 @@ return [
                         'type' => 'string',
                         'label' => 'Background Color',
                         'format' => 'color',
+                        'advanced' => true
                     ],
                 ],
             ],
@@ -412,6 +426,7 @@ return [
                         'label' => 'Display Mode',
                         'enum' => ['grid', 'carousel', 'single'],
                         'default' => 'grid',
+                        'advanced' => true
                     ],
                     'show_rating' => [
                         'type' => 'boolean',
@@ -463,6 +478,7 @@ return [
                         'min' => 2,
                         'max' => 6,
                         'default' => 3,
+                        'advanced' => true
                     ],
                     'enable_lightbox' => [
                         'type' => 'boolean',
@@ -505,22 +521,26 @@ return [
                         'type' => 'boolean',
                         'label' => 'Autoplay (muted)',
                         'default' => false,
+                        'advanced' => true
                     ],
                     'loop' => [
                         'type' => 'boolean',
                         'label' => 'Loop',
                         'default' => false,
+                        'advanced' => true
                     ],
                     'show_controls' => [
                         'type' => 'boolean',
                         'label' => 'Show Player Controls',
                         'default' => true,
+                        'advanced' => true
                     ],
                     'aspect_ratio' => [
                         'type' => 'string',
                         'label' => 'Aspect Ratio',
                         'enum' => ['16:9', '4:3', '1:1', '9:16'],
                         'default' => '16:9',
+                        'advanced' => true
                     ],
                 ],
             ],
@@ -582,17 +602,20 @@ return [
                         'label' => 'Column Ratio',
                         'enum' => ['50-50', '60-40', '40-60', '70-30', '30-70'],
                         'default' => '50-50',
+                        'advanced' => true
                     ],
                     'vertical_alignment' => [
                         'type' => 'string',
                         'label' => 'Vertical Alignment',
                         'enum' => ['top', 'middle', 'bottom'],
                         'default' => 'top',
+                        'advanced' => true
                     ],
                     'reverse_on_mobile' => [
                         'type' => 'boolean',
                         'label' => 'Reverse Column Order on Mobile',
                         'default' => false,
+                        'advanced' => true
                     ],
                 ],
             ],
@@ -623,6 +646,7 @@ return [
                         'label' => 'Vertical Alignment',
                         'enum' => ['top', 'middle', 'bottom'],
                         'default' => 'top',
+                        'advanced' => true
                     ],
                 ],
             ],
@@ -646,6 +670,7 @@ return [
                         'type' => 'boolean',
                         'label' => 'Allow Multiple Items Open',
                         'default' => false,
+                        'advanced' => true
                     ],
                     'items' => [
                         'type' => 'array',
@@ -768,6 +793,7 @@ return [
                         'min' => 1,
                         'max' => 24,
                         'default' => 4,
+                        'advanced' => true
                     ],
                     'columns' => [
                         'type' => 'integer',
@@ -775,12 +801,14 @@ return [
                         'min' => 1,
                         'max' => 4,
                         'default' => 3,
+                        'advanced' => true
                     ],
                     'display_mode' => [
                         'type' => 'string',
                         'label' => 'Display Mode',
                         'enum' => ['grid', 'list', 'carousel'],
                         'default' => 'grid',
+                        'advanced' => true
                     ],
                     'show_excerpt' => [
                         'type' => 'boolean',
@@ -847,6 +875,7 @@ return [
                         'label' => 'Card Style',
                         'enum' => ['plain', 'card', 'bordered', 'icon'],
                         'default' => 'plain',
+                        'advanced' => true
                     ],
                     'columns' => [
                         'type' => 'integer',
@@ -854,6 +883,7 @@ return [
                         'min' => 2,
                         'max' => 5,
                         'default' => 4,
+                        'advanced' => true
                     ],
                     'animate_numbers' => [
                         'type' => 'boolean',
@@ -929,6 +959,7 @@ return [
                         'label' => 'Style',
                         'enum' => ['plain', 'gradient', 'dark', 'brand', 'image'],
                         'default' => 'gradient',
+                        'advanced' => true
                     ],
                     'primary_label' => [
                         'type' => 'string',
@@ -1080,6 +1111,7 @@ return [
                         'min' => 2,
                         'max' => 8,
                         'default' => 5,
+                        'advanced' => true
                     ],
                     'logo_height' => [
                         'type' => 'integer',
@@ -1147,6 +1179,7 @@ return [
                         'label' => 'Style',
                         'enum' => ['light', 'dark', 'brand'],
                         'default' => 'dark',
+                        'advanced' => true
                     ],
                 ],
             ],
@@ -1220,6 +1253,7 @@ return [
                         'min' => 2,
                         'max' => 5,
                         'default' => 4,
+                        'advanced' => true
                     ],
                     'members' => [
                         'type' => 'array',
@@ -1258,6 +1292,7 @@ return [
                         'label' => 'Item Style',
                         'enum' => ['horizontal', 'centered', 'compact'],
                         'default' => 'horizontal',
+                        'advanced' => true
                     ],
                     'icon_color' => ['type' => 'string', 'label' => 'Icon Color', 'format' => 'color'],
                     'items' => [
@@ -1325,6 +1360,7 @@ return [
                         'label' => 'Style',
                         'enum' => ['row', 'card', 'minimal'],
                         'default' => 'row',
+                        'advanced' => true
                     ],
                     'badges' => [
                         'type' => 'array',

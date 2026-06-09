@@ -58,6 +58,7 @@ export type SchemaPropertyBase = {
     placeholder?: string;
     default?: unknown;
     required?: boolean;
+    advanced?: boolean;
 };
 
 export type StringSchemaProperty = SchemaPropertyBase & {

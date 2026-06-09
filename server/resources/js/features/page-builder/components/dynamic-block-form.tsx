@@ -18,23 +18,7 @@ import type {
     RelationSectionProps,
 } from './dynamic-block-form.types';
 
-const simpleModeFieldKeys = new Set([
-    'title',
-    'heading',
-    'subtitle',
-    'description',
-    'content',
-    'primary_label',
-    'secondary_label',
-    'primary_url',
-    'secondary_url',
-    'cta_text',
-    'cta_url',
-    'cta2_text',
-    'cta2_url',
-    'button_text',
-    'button_url',
-]);
+// simpleModeFieldKeys removed in favor of schema.advanced flag
 
 export function DynamicBlockForm({
     block,
@@ -59,8 +43,8 @@ export function DynamicBlockForm({
     const visibleProperties =
         editorMode === 'simple'
             ? Object.fromEntries(
-                  Object.entries(properties).filter(([key]) =>
-                      simpleModeFieldKeys.has(key),
+                  Object.entries(properties).filter(
+                      ([_, propSchema]) => !propSchema.advanced,
                   ),
               )
             : properties;

@@ -87,7 +87,7 @@ export function PageBuilder({
     const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
     const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<'cards' | 'canvas'>('cards');
-    const [editorMode, setEditorMode] = useState<EditorMode>('advanced');
+    const [editorMode, setEditorMode] = useState<EditorMode>('simple');
     const [inspectorOpen, setInspectorOpen] = useState(false);
 
     useEffect(() => {
