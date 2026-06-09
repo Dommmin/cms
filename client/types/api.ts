@@ -869,3 +869,23 @@ export interface SupportConversation {
     created_at: string;
     messages: SupportMessage[];
 }
+
+// ── Global Slots ──────────────────────────────────────────────────────────────
+
+export interface SlotSettings {
+    full_width?: boolean;
+    sticky?: boolean;
+    dismissible?: boolean;
+    bg_color?: string | null;
+    padding?: 'none' | 'sm' | 'md' | 'lg';
+}
+
+export interface SlotEntry {
+    id: number;
+    label: string;
+    block_type: string;
+    configuration: Record<string, unknown>;
+    relations?: BlockRelation[];
+    settings: SlotSettings;
+    position: number;
+}

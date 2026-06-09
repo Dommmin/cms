@@ -1,4 +1,5 @@
 import type { CookieSettings } from '@/components/cookie-consent.types';
+import type { BlockRelation } from '@/types/api';
 
 export type Modules = {
     blog: boolean;
@@ -40,6 +41,24 @@ export type ActiveTheme = {
     } | null;
 };
 
+export type SlotSettings = {
+    full_width?: boolean;
+    sticky?: boolean;
+    dismissible?: boolean;
+    bg_color?: string | null;
+    padding?: 'none' | 'sm' | 'md' | 'lg';
+};
+
+export type SlotEntry = {
+    id: number;
+    label: string;
+    block_type: string;
+    configuration: Record<string, unknown>;
+    relations?: BlockRelation[];
+    settings: SlotSettings;
+    position: number;
+};
+
 export type PublicSettingsResponse = {
     settings: {
         general?: {
@@ -71,4 +90,5 @@ export type PublicSettingsResponse = {
     };
     modules?: Modules;
     theme?: ActiveTheme | null;
+    slots?: Record<string, SlotEntry[]>;
 };
