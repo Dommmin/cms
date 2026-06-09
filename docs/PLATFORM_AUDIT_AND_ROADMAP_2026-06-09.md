@@ -37,7 +37,9 @@ more detailed sub-backlogs that are not fully closed yet:
 ## Recently Verified On 2026-06-09
 
 - MailerLite inbound newsletter webhook now requires `X-MailerLite-Signature` HMAC verification using `services.mailerlite.webhook_secret` or the API key fallback.
-- Anonymous support chat endpoints now run behind `throttle:api.strict`, and guest conversation creation requires Turnstile when the secret is configured.
+- BaseLinker webhook now has strict token validation using `X-BL-Pass` header / `bl_pass` request query parameters and is fully covered by feature tests.
+- Unified Security Headers (CSP with dynamic nonces, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, and `Permissions-Policy`) have been implemented globally via Laravel middleware and unified with the Next.js storefront middleware.
+- Anonymous support chat and guest checkout/return routes (`checkout/reserve`, `checkout`, `returns/lookup`, `returns/guest-request`) now run behind `throttle:api.strict`, and guest conversation/returns creation requires Turnstile when the secret is configured.
 - `/api/health?fresh=1` now requires local environment, authenticated access, or a valid `X-Health-Token`.
 - `/debug-glitchtip` is now blocked outside `local`, `testing`, and `staging`.
 - `TrustCloudflareProxies` now accepts `CF-Connecting-IP` only from trusted Cloudflare ranges, with local/testing allowances for loopback and private Docker networks.
@@ -75,8 +77,8 @@ more detailed sub-backlogs that are not fully closed yet:
 ### Highest-priority findings
 
 1. Security hardening for MailerLite webhooks, support chat abuse controls, trusted proxy handling, `/debug-glitchtip`, and `/api/health?fresh` has now been implemented and covered by targeted feature tests.
-2. Security headers are still not described as a standardized cross-surface baseline for storefront and admin in one place. CSP exists on storefront, but broader header posture still needs unification and explicit verification.
-3. Outbound/inbound integration verification is still inconsistent at platform level: MailerLite is covered now, but the same “every webhook must be verified and documented” standard should be enforced across all future integrations.
+2. Security headers have been unified across storefront (Next.js) and admin (Laravel) surfaces, including standardizing dynamic CSP nonces, Referrer-Policy, Permissions-Policy, X-Frame-Options, and X-Content-Type-Options, covered by tests and documented.
+3. Outbound/inbound integration signature verification rules have been established: MailerLite and BaseLinker webhooks now require signature/token validation and carry explicit feature tests.
 4. SSRF posture for external integrations is still process-dependent. Outbound allowlists, explicit timeout ceilings, and retry/circuit-breaker conventions should be formalized centrally.
 5. Merchant-extensibility security boundaries are still immature: there is no first-class hook/plugin model with scoped permissions, which raises long-term insecure-design risk once custom extensions grow.
 
@@ -115,10 +117,10 @@ more detailed sub-backlogs that are not fully closed yet:
 
 ### P0 — Security and platform hardening
 
-- Standardize security headers across storefront and admin surfaces: CSP, frame-ancestors, referrer-policy, permissions-policy, X-Content-Type-Options.
-- Document and enforce a platform rule that every inbound webhook requires explicit signature verification and tests before release.
-- Keep anonymous support/chat/forms on dedicated strict rate limits and risk controls; extend the same review to every public write endpoint.
-- Operationalize proxy hardening in deployment checklists so application middleware and edge config cannot drift apart.
+- `[x]` Standardize security headers across storefront and admin surfaces: CSP, frame-ancestors, referrer-policy, permissions-policy, X-Content-Type-Options.
+- `[x]` Document and enforce a platform rule that every inbound webhook requires explicit signature verification and tests before release (BaseLinker & MailerLite completed).
+- `[x]` Keep anonymous support/chat/forms on dedicated strict rate limits and risk controls; extend the same review to every public write endpoint (completed for checkout, guest returns, newsletter subscriptions, and contact forms).
+- `[x]` Operationalize proxy hardening in deployment checklists so application middleware and edge config cannot drift apart.
 
 ### P0 — Merchant simplicity
 

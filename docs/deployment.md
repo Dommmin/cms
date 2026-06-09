@@ -343,6 +343,26 @@ You can also store the webhook secret in admin settings under Integrations.
 When present there, the encrypted admin value overrides the default runtime
 configuration.
 
+### 3b. BaseLinker Webhook Verification
+
+For BaseLinker webhook integration, you must configure a webhook token to verify signature authenticity:
+
+```bash
+# server/.env
+BASELINKER_API_TOKEN=your_baselinker_api_token
+BASELINKER_WEBHOOK_TOKEN=your_baselinker_webhook_token
+```
+
+Like other integrations, you can also store these values inside the database via the admin settings panel (Settings → Integrations). The webhook controller uses the `X-BL-Pass` header (or `bl_pass` request argument) compared against this token.
+
+### 3c. Platform Security Headers & CSP
+
+The platform implements standard unified security headers to prevent Clickjacking, MIME-sniffing, XSS, and authorization/feature policy bypasses:
+
+- **Next.js Storefront**: Headers (CSP, Referrer-Policy, X-Content-Type-Options, Permissions-Policy) are configured in `client/next.config.ts` and dynamic nonces are handled in `client/middleware.ts`.
+- **Laravel Backend / Inertia Admin**: A global middleware `SecurityHeaders` applies security headers. For HTML responses, it injects a Content-Security-Policy (CSP) header featuring a cryptographically secure, per-request dynamic nonce (integrated with Vite via `Vite::cspNonce()`).
+- Inline scripts and styles in `resources/views/app.blade.php` must carry `nonce="{{ Vite::cspNonce() }}"` to satisfy the strict-dynamic CSP policy.
+
 ### 4. WAF Custom Rules (5 Free Rules)
 
 In Cloudflare dashboard → **Security** → **WAF** → **Custom rules** → click **Create rule**:

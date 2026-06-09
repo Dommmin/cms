@@ -18,7 +18,7 @@ The platform is no longer in an MVP-only state. The codebase already includes:
 - mobile Expo storefront MVP,
 - e-commerce core with inventory reservations, shipping integrations, payments, returns, reviews and invoices,
 - merchant-facing SEO, analytics, VAT and reporting foundations,
-- verified security hardening for MailerLite webhooks, support chat abuse controls, trusted proxy handling, health/debug endpoints, and publication webhooks for pages, products and blog posts.
+- verified security hardening for MailerLite/BaseLinker webhooks, unified security headers (CSP, frame-ancestors, referrer/permissions policies), support chat abuse controls, guest checkout/return rate limiting, trusted proxy handling, health/debug endpoints, and publication webhooks for pages, products and blog posts.
 
 ## Main Open Gaps
 
@@ -35,4 +35,4 @@ Older dated implementation plans were intentionally removed after verification a
 
 Targeted verification on 2026-06-09:
 
-- `php artisan test --compact tests/Feature/Api/V1/MailerLiteWebhookControllerTest.php tests/Feature/Api/V1/SupportChatSecurityTest.php tests/Feature/Middleware/TrustCloudflareProxiesTest.php tests/Feature/HealthCheckSecurityTest.php tests/Feature/DebugGateTest.php tests/Feature/Admin/Cms/OnPublishWebhookTest.php`
+- `php artisan test --compact tests/Feature/Api/V1/MailerLiteWebhookControllerTest.php tests/Feature/Api/V1/BaseLinkerWebhookTest.php tests/Feature/Api/V1/SupportChatSecurityTest.php tests/Feature/Middleware/TrustCloudflareProxiesTest.php tests/Feature/Middleware/SecurityHeadersTest.php tests/Feature/HealthCheckSecurityTest.php tests/Feature/DebugGateTest.php tests/Feature/Admin/Cms/OnPublishWebhookTest.php`
