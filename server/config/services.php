@@ -129,6 +129,12 @@ return [
         'webhook_secret' => env('MAILERLITE_WEBHOOK_SECRET'),
     ],
 
+    'baselinker' => [
+        'api_token' => env('BASELINKER_API_TOKEN'),
+        'webhook_token' => env('BASELINKER_WEBHOOK_TOKEN'),
+        'status_map' => [],
+    ],
+
     'vapid' => [
         'public_key' => env('VAPID_PUBLIC_KEY'),
         'private_key' => env('VAPID_PRIVATE_KEY'),

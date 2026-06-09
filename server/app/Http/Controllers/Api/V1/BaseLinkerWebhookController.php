@@ -50,7 +50,7 @@ class BaseLinkerWebhookController extends ApiController
         if (isset($statusMap[$statusId])) {
             $newStatus = OrderStatusEnum::tryFrom($statusMap[$statusId]);
             if ($newStatus && $order->status->getValue() !== $newStatus->value) {
-                $order->changeStatus($newStatus, 'baselinker', 'Status changed to BaseLinker ID '.$statusId);
+                $order->changeStatus($newStatus, 'system', 'Status changed to BaseLinker ID '.$statusId);
             }
         }
 
