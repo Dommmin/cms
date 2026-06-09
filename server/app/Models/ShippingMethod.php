@@ -85,12 +85,14 @@ use Spatie\Translatable\HasTranslations;
  *
  * @mixin Model
  */
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 #[Fillable([
     'carrier', 'name', 'description', 'is_active', 'min_weight', 'max_weight',
     'min_order_value', 'free_shipping_threshold', 'base_price', 'price_per_kg',
     'estimated_days_min', 'estimated_days_max',
     'max_length_cm', 'max_width_cm', 'max_depth_cm',
-    'requires_signature', 'insurance_available',
+    'requires_signature', 'insurance_available', 'tax_rate_id',
 ])]
 #[Table(name: 'shipping_methods')]
 class ShippingMethod extends Model
@@ -120,6 +122,11 @@ class ShippingMethod extends Model
     public function shipments(): HasMany
     {
         return $this->hasMany(Shipment::class);
+    }
+
+    public function taxRate(): BelongsTo
+    {
+        return $this->belongsTo(TaxRate::class);
     }
 
     public function restrictedProducts(): BelongsToMany

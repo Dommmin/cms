@@ -113,8 +113,9 @@ use Spatie\ModelStates\HasStates;
  */
 #[Fillable([
     'reference_number', 'invoice_number', 'invoice_issued_at', 'buyer_vat_id', 'buyer_company_name',
-    'customer_id', 'guest_email', 'billing_address_id', 'shipping_address_id',
-    'status', 'subtotal', 'discount_amount', 'shipping_cost', 'tax_amount', 'total',
+    'customer_id', 'customer_type', 'is_tax_exempt', 'wants_invoice',
+    'guest_email', 'billing_address_id', 'shipping_address_id',
+    'status', 'subtotal', 'discount_amount', 'shipping_cost', 'tax_amount', 'items_tax_amount', 'shipping_tax_amount', 'total',
     'currency_code', 'exchange_rate', 'notes', 'ga_client_id', 'baselinker_order_id',
     'terms_consent_version', 'privacy_consent_version', 'legal_version_snapshot', 'terms_accepted_at',
 ])]
@@ -295,6 +296,8 @@ class Order extends Model
     {
         return [
             'status' => OrderState::class,
+            'is_tax_exempt' => 'boolean',
+            'wants_invoice' => 'boolean',
             'invoice_issued_at' => 'datetime',
             'legal_version_snapshot' => 'array',
             'terms_accepted_at' => 'datetime',

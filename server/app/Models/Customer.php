@@ -32,14 +32,15 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property int $user_id
  * @property string|null $first_name
  * @property string|null $last_name
+ * @property string $customer_type
  * @property string|null $company_name
  * @property string|null $tax_id
+ * @property bool $is_tax_exempt
  * @property string|null $notes
  * @property array<array-key, mixed>|null $tags
  * @property bool $is_active
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
- * @property CarbonImmutable|null $deleted_at
  * @property-read Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Collection<int, Address> $addresses
@@ -78,8 +79,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @mixin Model
  */
 #[Fillable([
-    'user_id', 'first_name', 'last_name', 'email',
-    'phone', 'company_name', 'tax_id', 'notes', 'is_active', 'tags',
+    'user_id', 'customer_type', 'first_name', 'last_name', 'email',
+    'phone', 'company_name', 'tax_id', 'is_tax_exempt', 'notes', 'is_active', 'tags',
     'sms_notifications', 'birth_date',
 ])]
 #[Table(name: 'customers')]
@@ -206,6 +207,7 @@ class Customer extends Model
     {
         return [
             'is_active' => 'boolean',
+            'is_tax_exempt' => 'boolean',
             'tags' => 'array',
             'sms_notifications' => 'boolean',
             'birth_date' => 'date',

@@ -16,11 +16,14 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 /**
  * @property int $id
  * @property string $name
  * @property int $rate
- * @property string $country_code
+ * @property string|null $country_code
+ * @property int|null $tax_zone_id
  * @property bool $is_active
  * @property bool $is_default
  * @property CarbonImmutable|null $created_at
@@ -31,6 +34,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property-read int|null $categories_count
  * @property-read Collection<int, ProductVariant> $variants
  * @property-read int|null $variants_count
+ * @property-read TaxZone|null $taxZone
  *
  * @method static Builder<static>|TaxRate newModelQuery()
  * @method static Builder<static>|TaxRate newQuery()
@@ -47,7 +51,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @mixin Model
  */
 #[Fillable([
-    'name', 'rate', 'country_code', 'is_active', 'is_default',
+    'name', 'rate', 'country_code', 'is_active', 'is_default', 'tax_zone_id',
 ])]
 #[Table(name: 'tax_rates')]
 class TaxRate extends Model
@@ -63,6 +67,11 @@ class TaxRate extends Model
     public static function default(): ?self
     {
         return self::query()->where('is_default', true)->first();
+    }
+
+    public function taxZone(): BelongsTo
+    {
+        return $this->belongsTo(TaxZone::class);
     }
 
     public function getActivitylogOptions(): LogOptions
