@@ -2,7 +2,15 @@
 
 declare(strict_types=1);
 
+use App\Enums\MenuLocationEnum;
+use App\Enums\PageBlockTypeEnum;
+use App\Models\Menu;
+use App\Models\MenuItem;
+use App\Models\Page;
+use App\Models\PageBlock;
 use App\Models\Setting;
+use App\Models\ShippingMethod;
+use App\Models\TaxRate;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
@@ -36,6 +44,7 @@ it('saves brand step settings and updates progress', function (): void {
     if (is_string($completed)) {
         $completed = json_decode($completed, true) ?: [];
     }
+
     expect($completed)->toContain('brand');
     expect(Setting::get('wizard', 'current_step'))->toBe('domain');
 });
@@ -96,7 +105,7 @@ it('saves payments step settings', function (): void {
 });
 
 it('saves shipping step settings', function (): void {
-    $method = App\Models\ShippingMethod::factory()->create([
+    $method = ShippingMethod::factory()->create([
         'name' => 'Courier',
         'is_active' => false,
         'base_price' => 1500,
@@ -127,7 +136,7 @@ it('saves shipping step settings', function (): void {
 });
 
 it('saves taxes step settings', function (): void {
-    $rate = App\Models\TaxRate::query()->create([
+    $rate = TaxRate::query()->create([
         'name' => 'VAT 23%',
         'rate' => 23,
         'country_code' => 'PL',
@@ -167,12 +176,12 @@ it('saves homepage step settings', function (): void {
         ])
         ->assertRedirect();
 
-    $homePage = App\Models\Page::query()->where('slug->en', 'home')->first();
+    $homePage = Page::query()->where('slug->en', 'home')->first();
     expect($homePage)->not->toBeNull();
 
-    $heroBlock = App\Models\PageBlock::query()
+    $heroBlock = PageBlock::query()
         ->where('page_id', $homePage->id)
-        ->where('type', App\Enums\PageBlockTypeEnum::HeroBanner)
+        ->where('type', PageBlockTypeEnum::HeroBanner)
         ->first();
 
     expect($heroBlock)->not->toBeNull();
@@ -202,10 +211,10 @@ it('saves menu step settings', function (): void {
         ])
         ->assertRedirect();
 
-    $menu = App\Models\Menu::query()->where('location', App\Enums\MenuLocationEnum::Header->value)->first();
+    $menu = Menu::query()->where('location', MenuLocationEnum::Header->value)->first();
     expect($menu)->not->toBeNull();
     expect($menu->items()->count())->toBe(1);
-    expect(App\Models\MenuItem::query()->where('menu_id', $menu->id)->count())->toBe(2);
+    expect(MenuItem::query()->where('menu_id', $menu->id)->count())->toBe(2);
 });
 
 it('saves legal step settings', function (): void {
@@ -216,11 +225,11 @@ it('saves legal step settings', function (): void {
         ])
         ->assertRedirect();
 
-    $privacyPage = App\Models\Page::query()->where('system_page_key', 'privacy_policy')->first();
+    $privacyPage = Page::query()->where('system_page_key', 'privacy_policy')->first();
     expect($privacyPage)->not->toBeNull();
     expect($privacyPage->content)->toContain('Privacy Policy', 'Our rules');
 
-    $termsPage = App\Models\Page::query()->where('system_page_key', 'terms_of_service')->first();
+    $termsPage = Page::query()->where('system_page_key', 'terms_of_service')->first();
     expect($termsPage)->not->toBeNull();
     expect($termsPage->content)->toContain('Terms of Service', 'Use agreement');
 });
