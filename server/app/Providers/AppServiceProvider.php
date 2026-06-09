@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Models\Page;
 use App\Models\BlogPost;
+use App\Models\Page;
+use App\Observers\BlogPostObserver;
 use App\Observers\MediaObserver;
 use App\Observers\PageObserver;
-use App\Observers\BlogPostObserver;
 use App\Services\PushNotificationService;
 use Carbon\CarbonImmutable;
 use Dedoc\Scramble\Scramble;

@@ -8,9 +8,8 @@ use App\Http\Controllers\SeoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/debug-glitchtip', function (): void {
-    if (! app()->environment('local', 'testing', 'staging')) {
-        abort(404);
-    }
+    abort_unless(app()->environment('local', 'testing', 'staging'), 404);
+
     throw new Exception('Test GlitchTip error!');
 });
 

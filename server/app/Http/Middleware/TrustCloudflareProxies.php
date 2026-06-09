@@ -60,19 +60,11 @@ class TrustCloudflareProxies
 
     private function isTrustedProxy(string $ip): bool
     {
-        if (app()->environment('local', 'testing')) {
-            if ($ip === '127.0.0.1' || $ip === '::1' || str_starts_with($ip, '172.') || str_starts_with($ip, '192.168.') || str_starts_with($ip, '10.')) {
-                return true;
-            }
+        if (app()->environment('local', 'testing') && ($ip === '127.0.0.1' || $ip === '::1' || str_starts_with($ip, '172.') || str_starts_with($ip, '192.168.') || str_starts_with($ip, '10.'))) {
+            return true;
         }
 
-        foreach (self::CLOUDFLARE_IPS as $range) {
-            if ($this->ipInCidr($ip, $range)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(self::CLOUDFLARE_IPS, fn (string $range): bool => $this->ipInCidr($ip, $range));
     }
 
     private function ipInCidr(string $ip, string $cidr): bool
@@ -84,15 +76,16 @@ class TrustCloudflareProxies
 
         [$network, $prefix] = $parts;
 
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) && 
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) &&
             filter_var($network, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             $ipLong = ip2long($ip);
             $networkLong = ip2long($network);
             $mask = ~((1 << (32 - (int) $prefix)) - 1);
+
             return ($ipLong & $mask) === ($networkLong & $mask);
         }
 
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) && 
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) &&
             filter_var($network, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
             $ipBinary = inet_pton($ip);
             $networkBinary = inet_pton($network);
@@ -102,15 +95,15 @@ class TrustCloudflareProxies
 
             $ipBits = '';
             for ($i = 0; $i < 16; $i++) {
-                $ipBits .= str_pad(decbin(ord($ipBinary[$i])), 8, '0', STR_PAD_LEFT);
+                $ipBits .= mb_str_pad(decbin(ord($ipBinary[$i])), 8, '0', STR_PAD_LEFT);
             }
 
             $networkBits = '';
             for ($i = 0; $i < 16; $i++) {
-                $networkBits .= str_pad(decbin(ord($networkBinary[$i])), 8, '0', STR_PAD_LEFT);
+                $networkBits .= mb_str_pad(decbin(ord($networkBinary[$i])), 8, '0', STR_PAD_LEFT);
             }
 
-            return substr($ipBits, 0, (int) $prefix) === substr($networkBits, 0, (int) $prefix);
+            return mb_substr($ipBits, 0, (int) $prefix) === mb_substr($networkBits, 0, (int) $prefix);
         }
 
         return false;

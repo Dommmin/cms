@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Observers;
 
-use App\Models\BlogPost;
 use App\Enums\BlogPostStatusEnum;
+use App\Models\BlogPost;
 use App\Services\WebhookService;
 
 class BlogPostObserver

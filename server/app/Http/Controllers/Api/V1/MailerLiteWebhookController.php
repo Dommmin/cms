@@ -31,7 +31,7 @@ class MailerLiteWebhookController extends ApiController
         }
 
         $payload = $request->getContent();
-        $expectedSignature = base64_encode(hash_hmac('sha256', $payload, $secret, true));
+        $expectedSignature = base64_encode(hash_hmac('sha256', $payload, (string) $secret, true));
 
         if (! hash_equals($expectedSignature, $signature)) {
             return response()->json(['message' => 'Invalid signature.'], 401);
