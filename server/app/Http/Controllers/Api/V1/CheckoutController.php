@@ -142,6 +142,22 @@ class CheckoutController extends ApiController
         return ShippingMethodResource::collection($methods);
     }
 
+    public function reserve(Request $request, \App\Services\InventoryService $inventoryService): JsonResponse
+    {
+        /** @var User|null $user */
+        $user = auth('sanctum')->user();
+        $cartToken = $request->header('X-Cart-Token');
+
+        $cart = $this->cartService->getOrCreateCart($user, is_string($cartToken) ? $cartToken : null);
+        
+        try {
+            $inventoryService->reserveCart($cart, 15);
+            return $this->ok(['message' => 'Cart reserved for 15 minutes', 'expires_at' => now()->addMinutes(15)]);
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), 400);
+        }
+    }
+
     public function checkout(CheckoutRequest $request): JsonResponse
     {
         $data = $request->validated();

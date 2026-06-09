@@ -157,6 +157,9 @@ class CheckoutService
             'carrier_payload' => null,
         ]);
 
+        $inventoryService = app(\App\Services\InventoryService::class);
+        $inventoryService->commitCartReservations($cart);
+
         $cart->items()->delete();
         $cart->update(['discount_code' => null]);
 

@@ -68,6 +68,7 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
 
         // Checkout (public — no auth required)
         Route::get('checkout/shipping-methods', [CheckoutController::class, 'shippingMethods'])->name('checkout.shipping-methods');
+        Route::post('checkout/reserve', [CheckoutController::class, 'reserve'])->name('checkout.reserve');
         Route::get('checkout/payment-methods', [CheckoutController::class, 'paymentMethods'])->name('checkout.payment-methods');
         Route::get('checkout/pickup-points', [PickupPointsController::class, 'index'])->name('checkout.pickup-points');
         Route::post('checkout', [CheckoutController::class, 'checkout'])->middleware('idempotent')->name('checkout');

@@ -23,4 +23,5 @@ Schedule::command('user:prune')->monthly();
 Schedule::command('marketing:process')->daily();
 Schedule::command('subscriptions:process')->hourly();
 Schedule::command('flash-sales:deactivate-expired')->everyFiveMinutes();
+Schedule::command('inventory:release-expired')->everyMinute();
 Schedule::command('scout:import-search')->dailyAt('03:00');
