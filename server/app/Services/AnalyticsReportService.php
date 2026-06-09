@@ -27,37 +27,37 @@ class AnalyticsReportService
         $start = $period['start'];
         $end = $period['end'];
 
-        $registered = Customer::query()
+        $getUniqueSessions = fn (string $eventName) => \App\Models\AnalyticsEvent::query()
+            ->where('event_name', $eventName)
             ->whereBetween('created_at', [$start, $end])
-            ->count();
+            ->distinct('session_id')
+            ->count('session_id');
 
-        $addedToCart = Cart::query()
-            ->whereBetween('created_at', [$start, $end])
-            ->count();
+        $impressions = $getUniqueSessions('impression');
+        $productViews = $getUniqueSessions('view_item');
+        $addedToCart = $getUniqueSessions('add_to_cart');
+        $startedCheckout = $getUniqueSessions('begin_checkout');
+        $paymentStep = $getUniqueSessions('payment_step');
+        $completedPurchase = $getUniqueSessions('purchase');
 
-        $startedCheckout = Order::query()
-            ->whereBetween('created_at', [$start, $end])
-            ->count();
+        $maxSessions = max($impressions, 1);
 
-        $completedPurchase = Order::query()
-            ->whereBetween('created_at', [$start, $end])
-            ->whereIn('status', [
-                OrderStatusEnum::PROCESSING->value,
-                OrderStatusEnum::SHIPPED->value,
-                OrderStatusEnum::DELIVERED->value,
-            ])
-            ->count();
+        $stages = [
+            ['name' => 'Impressions', 'count' => $impressions, 'rate' => 100.0],
+            ['name' => 'Product Views', 'count' => $productViews, 'rate' => round($productViews / $maxSessions * 100, 1)],
+            ['name' => 'Added to Cart', 'count' => $addedToCart, 'rate' => round($addedToCart / $maxSessions * 100, 1)],
+            ['name' => 'Started Checkout', 'count' => $startedCheckout, 'rate' => round($startedCheckout / $maxSessions * 100, 1)],
+            ['name' => 'Payment Step', 'count' => $paymentStep, 'rate' => round($paymentStep / $maxSessions * 100, 1)],
+            ['name' => 'Completed Purchase', 'count' => $completedPurchase, 'rate' => round($completedPurchase / $maxSessions * 100, 1)],
+        ];
 
         return [
-            'stages' => [
-                ['name' => 'Registered Customers', 'count' => $registered, 'rate' => 100.0],
-                ['name' => 'Added to Cart', 'count' => $addedToCart, 'rate' => $registered > 0 ? round($addedToCart / $registered * 100, 1) : 0],
-                ['name' => 'Started Checkout', 'count' => $startedCheckout, 'rate' => $registered > 0 ? round($startedCheckout / $registered * 100, 1) : 0],
-                ['name' => 'Completed Purchase', 'count' => $completedPurchase, 'rate' => $registered > 0 ? round($completedPurchase / $registered * 100, 1) : 0],
-            ],
+            'stages' => $stages,
             'cart_to_checkout_rate' => $addedToCart > 0 ? round($startedCheckout / $addedToCart * 100, 1) : 0,
             'checkout_to_purchase_rate' => $startedCheckout > 0 ? round($completedPurchase / $startedCheckout * 100, 1) : 0,
-            'overall_conversion_rate' => $registered > 0 ? round($completedPurchase / $registered * 100, 1) : 0,
+            'overall_conversion_rate' => $impressions > 0 ? round($completedPurchase / $impressions * 100, 1) : 0,
+            'landing_pages' => $this->landingPagesReport($period),
+            'promotions' => $this->promoAttributionReport($period),
         ];
     }
 
@@ -362,5 +362,112 @@ class AnalyticsReportService
     {
         $el = $doc->createElement($tag, htmlspecialchars($value));
         $parent->appendChild($el);
+    }
+
+    /**
+     * Landing pages with conversions report.
+     *
+     * @param  array{start: Carbon, end: Carbon}  $period
+     * @return array<int, array<string, mixed>>
+     */
+    public function landingPagesReport(array $period): array
+    {
+        $start = $period['start'];
+        $end = $period['end'];
+
+        $firstEventIds = \App\Models\AnalyticsEvent::query()
+            ->whereBetween('created_at', [$start, $end])
+            ->selectRaw('session_id, MIN(id) as first_event_id')
+            ->groupBy('session_id')
+            ->get()
+            ->pluck('first_event_id')
+            ->toArray();
+
+        if (empty($firstEventIds)) {
+            return [];
+        }
+
+        $sessionLandingPages = \App\Models\AnalyticsEvent::query()
+            ->whereIn('id', $firstEventIds)
+            ->pluck('url', 'session_id');
+
+        $purchasingSessions = \App\Models\AnalyticsEvent::query()
+            ->where('event_name', 'purchase')
+            ->whereBetween('created_at', [$start, $end])
+            ->get()
+            ->keyBy('session_id');
+
+        $stats = [];
+        foreach ($sessionLandingPages as $sessionId => $url) {
+            $path = parse_url($url, PHP_URL_PATH) ?: '/';
+            $path = preg_replace('/^\/(pl|en)($|\/)/', '/', $path) ?: '/';
+
+            if (!isset($stats[$path])) {
+                $stats[$path] = [
+                    'url' => $path,
+                    'sessions' => 0,
+                    'conversions' => 0,
+                    'revenue' => 0,
+                ];
+            }
+
+            $stats[$path]['sessions']++;
+
+            if ($purchasingSessions->has($sessionId)) {
+                $stats[$path]['conversions']++;
+                $purchaseEvent = $purchasingSessions->get($sessionId);
+                $metadata = $purchaseEvent->metadata;
+                $revenue = isset($metadata['revenue']) ? (int) $metadata['revenue'] : 0;
+                $stats[$path]['revenue'] += $revenue;
+            }
+        }
+
+        usort($stats, fn ($a, $b) => $b['sessions'] <=> $a['sessions']);
+
+        return array_slice($stats, 0, 20);
+    }
+
+    /**
+     * Promo attribution report.
+     *
+     * @param  array{start: Carbon, end: Carbon}  $period
+     * @return array<int, array<string, mixed>>
+     */
+    public function promoAttributionReport(array $period): array
+    {
+        $start = $period['start'];
+        $end = $period['end'];
+
+        $purchaseEvents = \App\Models\AnalyticsEvent::query()
+            ->where('event_name', 'purchase')
+            ->whereBetween('created_at', [$start, $end])
+            ->get();
+
+        $stats = [];
+        foreach ($purchaseEvents as $event) {
+            $meta = $event->metadata;
+            $code = $meta['discount_code'] ?? null;
+            if (!$code) {
+                continue;
+            }
+
+            $code = strtoupper((string) $code);
+            $revenue = isset($meta['revenue']) ? (int) $meta['revenue'] : 0;
+
+            if (!isset($stats[$code])) {
+                $stats[$code] = [
+                    'code' => $code,
+                    'purchases' => 0,
+                    'revenue' => 0,
+                ];
+            }
+
+            $stats[$code]['purchases']++;
+            $stats[$code]['revenue'] += $revenue;
+        }
+
+        usort($stats, fn ($a, $b) => $b['revenue'] <=> $a['revenue']);
+
+        return array_values($stats);
     }
 }

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\AddressController;
+use App\Http\Controllers\Api\V1\AnalyticsEventController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\SocialLoginController;
@@ -107,6 +108,8 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::get('consent', [ConsentController::class, 'index'])->name('consent.index');
         Route::post('consent', [ConsentController::class, 'store'])->name('consent.store');
         Route::delete('consent/{category}', [ConsentController::class, 'withdraw'])->name('consent.withdraw');
+
+        Route::post('analytics/events', [AnalyticsEventController::class, 'store'])->name('analytics.events.store');
 
         Route::get('metafields/{type}/{id}', new ApiMetafieldController()->forResource(...))->name('metafields.for-resource');
         Route::get('tags', [TagController::class, 'index'])->name('tags.index');
