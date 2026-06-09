@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Enums\OrderStatusEnum;
 use App\Enums\ShipmentStatusEnum;
+use App\Enums\ShippingCarrierEnum;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Shipment;
@@ -13,6 +14,10 @@ use App\Models\ShipmentItem;
 
 class ShipmentService
 {
+    public function __construct(
+        private readonly ShippingCarrierManager $carrierManager
+    ) {}
+
     /**
      * Create a partial shipment for selected order items.
      *
@@ -52,6 +57,22 @@ class ShipmentService
 
         /** @var Shipment $loaded */
         $loaded = $shipment->load('items.orderItem');
+
+        // Dispatch to carrier API if configured
+        if ($shipment->carrier) {
+            $enum = ShippingCarrierEnum::tryFrom($shipment->carrier);
+            if ($enum && $enum !== ShippingCarrierEnum::PICKUP) {
+                try {
+                    $this->carrierManager->driver($enum)->createShipment($order, $shipmentData);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::error('Failed to create shipment in carrier API', [
+                        'shipment_id' => $shipment->id,
+                        'carrier' => $shipment->carrier,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+        }
 
         return $loaded;
     }
