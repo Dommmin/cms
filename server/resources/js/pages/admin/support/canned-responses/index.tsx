@@ -72,10 +72,9 @@ export default function CannedResponsesIndex({ canned_responses }: IndexProps) {
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Response')}
-                        description={__(
-                            'dialog.cannot_be_undone',
-                            'Are you sure you want to delete this canned response?',
-                        )}
+                        description={__('dialog.delete_confirm', {
+                            name: row.original.title,
+                        })}
                         onConfirm={() => {
                             router.delete(
                                 SupportCannedResponseController.destroy.url(

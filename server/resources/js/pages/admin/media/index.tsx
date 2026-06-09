@@ -390,7 +390,11 @@ export default function Index() {
                                             'dialog.delete_file',
                                             'Delete File',
                                         )}
-                                        description={__('dialog.delete_confirm', { name: selectedItem.name }, `Are you sure you want to delete "${selectedItem.name}"? This action cannot be undone.`)}
+                                        description={__(
+                                            'dialog.delete_confirm',
+                                            { name: selectedItem.name },
+                                            `Are you sure you want to delete "${selectedItem.name}"? This action cannot be undone.`,
+                                        )}
                                         onConfirm={handleDelete}
                                     >
                                         <TrashIcon className="mr-2 h-4 w-4" />

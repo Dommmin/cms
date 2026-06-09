@@ -160,8 +160,10 @@ export default function MetafieldDefinitionsIndex({
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title="Delete Definition"
-                        description="Are you sure? This action cannot be undone."
+                        title={__('dialog.delete_title', 'Delete Definition')}
+                        description={__('dialog.delete_confirm', {
+                            name: row.original.name,
+                        })}
                         onConfirm={() => {
                             router.delete(
                                 MetafieldDefinitionController.destroy.url(

@@ -111,7 +111,9 @@ export default function SubscribersIndex({ subscribers, filters }: IndexProps) {
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Subscriber')}
-                        description={`Are you sure you want to delete "${row.original.email}"?`}
+                        description={__('dialog.delete_confirm', {
+                            name: row.original.email,
+                        })}
                         onConfirm={() => {
                             router.delete(
                                 NewsletterSubscriberController.destroy.url(

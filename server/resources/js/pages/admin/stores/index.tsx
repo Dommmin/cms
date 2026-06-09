@@ -97,10 +97,9 @@ export default function StoresIndex({ stores, filters }: IndexProps) {
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Store')}
-                        description={__(
-                            'dialog.cannot_be_undone',
-                            'Are you sure you want to delete this store? This action cannot be undone.',
-                        )}
+                        description={__('dialog.delete_confirm', {
+                            name: row.original.name,
+                        })}
                         onConfirm={() => {
                             router.delete(
                                 StoreController.destroy.url(row.original.id),

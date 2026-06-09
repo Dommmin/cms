@@ -46,7 +46,9 @@ export default function Edit({ automation, triggers }: EditPageProps) {
                             method="delete"
                             onBefore={() =>
                                 confirm(
-                                    'Are you sure you want to delete this automation?',
+                                    __('dialog.delete_confirm', {
+                                        name: automation.name,
+                                    }),
                                 )
                             }
                         >

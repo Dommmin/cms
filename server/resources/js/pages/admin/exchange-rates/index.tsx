@@ -85,7 +85,9 @@ export default function ExchangeRatesIndex({
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Rate')}
-                        description={`Are you sure you want to delete this exchange rate?`}
+                        description={__('dialog.delete_confirm', {
+                            name: row.original.currency.code,
+                        })}
                         onConfirm={() => {
                             router.delete(
                                 ExchangeRateController.destroy.url(

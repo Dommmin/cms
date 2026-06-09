@@ -193,11 +193,10 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
                     <ConfirmButton
                         variant="outline"
                         size="sm"
-                        title={__('webhook.delete_title', 'Delete Webhook')}
-                        description={__(
-                            'webhook.delete_description',
-                            'Are you sure you want to delete this webhook? This action cannot be undone.',
-                        )}
+                        title={__('dialog.delete_title', 'Delete Webhook')}
+                        description={__('dialog.delete_confirm', {
+                            name: row.original.url,
+                        })}
                         onConfirm={() =>
                             router.delete(
                                 WebhookController.destroy.url(row.original.id),

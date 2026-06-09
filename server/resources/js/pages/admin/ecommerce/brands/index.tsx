@@ -122,7 +122,10 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                                             'dialog.delete_title',
                                             'Delete Brand',
                                         )}
-                                        description={`${__('dialog.are_you_sure', 'Are you sure you want to delete')} "${row.original.name}"?`}
+                                        description={__(
+                                            'dialog.delete_confirm',
+                                            { name: row.original.name },
+                                        )}
                                         onConfirm={() => {
                                             router.delete(
                                                 BrandController.destroy.url(

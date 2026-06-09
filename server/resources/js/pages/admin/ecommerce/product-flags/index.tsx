@@ -142,7 +142,10 @@ export default function ProductFlagsIndex({ flags, filters }: IndexProps) {
                                             'dialog.delete_title',
                                             'Delete Flag',
                                         )}
-                                        description={`Are you sure you want to delete "${row.original.name}"?`}
+                                        description={__(
+                                            'dialog.delete_confirm',
+                                            { name: row.original.name },
+                                        )}
                                         onConfirm={() => {
                                             router.delete(
                                                 ProductFlagController.destroy.url(

@@ -178,7 +178,9 @@ export default function CampaignsIndex({ campaigns, filters }: IndexProps) {
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Campaign')}
-                        description={`Are you sure you want to delete "${row.original.name}"?`}
+                        description={__('dialog.delete_confirm', {
+                            name: row.original.name,
+                        })}
                         onConfirm={() => {
                             router.delete(
                                 NewsletterCampaignController.destroy.url(

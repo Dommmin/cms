@@ -100,7 +100,9 @@ export default function CurrenciesIndex({ currencies, filters }: IndexProps) {
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Currency')}
-                        description={`Are you sure you want to delete "${row.original.code}"?`}
+                        description={__('dialog.delete_confirm', {
+                            name: row.original.code,
+                        })}
                         onConfirm={() => {
                             router.delete(
                                 CurrencyController.destroy.url(row.original.id),

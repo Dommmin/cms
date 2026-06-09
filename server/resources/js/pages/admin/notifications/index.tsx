@@ -153,10 +153,11 @@ export default function NotificationsIndex({
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Notification')}
-                        description={__(
-                            'dialog.cannot_be_undone',
-                            'Are you sure you want to delete this notification?',
-                        )}
+                        description={__('dialog.delete_confirm', {
+                            name:
+                                row.original.type ||
+                                `Notification #${row.original.id}`,
+                        })}
                         onConfirm={() => {
                             router.delete(
                                 AppNotificationController.destroy.url(

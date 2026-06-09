@@ -93,10 +93,9 @@ export default function SubmissionsIndex({
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Submission')}
-                        description={__(
-                            'dialog.are_you_sure',
-                            'Are you sure you want to delete this submission?',
-                        )}
+                        description={__('dialog.delete_confirm', {
+                            name: `Submission #${row.original.id}`,
+                        })}
                         onConfirm={() => {
                             router.delete(
                                 FormSubmissionController.destroy.url([

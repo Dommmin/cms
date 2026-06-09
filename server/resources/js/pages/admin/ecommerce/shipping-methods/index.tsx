@@ -102,7 +102,9 @@ export default function ShippingMethodsIndex({ methods, filters }: IndexProps) {
                             'dialog.delete_title',
                             'Delete Shipping Method',
                         )}
-                        description={`Are you sure you want to delete "${resolveLocalizedText(row.original.name)}"?`}
+                        description={__('dialog.delete_confirm', {
+                            name: resolveLocalizedText(row.original.name),
+                        })}
                         onConfirm={() => {
                             router.delete(
                                 ShippingMethodController.destroy.url(

@@ -120,7 +120,10 @@ export default function AttributesIndex({ attributes, filters }: IndexProps) {
                                             'dialog.delete_title',
                                             'Delete Attribute',
                                         )}
-                                        description={`${__('dialog.are_you_sure', 'Are you sure you want to delete')} "${row.original.name}"?`}
+                                        description={__(
+                                            'dialog.delete_confirm',
+                                            { name: row.original.name },
+                                        )}
                                         onConfirm={() => {
                                             router.delete(
                                                 AttributeController.destroy.url(

@@ -128,7 +128,9 @@ export default function ThemesIndex({ themes, filters }: IndexProps) {
                         variant="outline"
                         size="sm"
                         title={__('dialog.delete_title', 'Delete Theme')}
-                        description={`Are you sure you want to delete "${row.original.name}"?`}
+                        description={__('dialog.delete_confirm', {
+                            name: row.original.name,
+                        })}
                         onConfirm={() => {
                             router.delete(
                                 ThemeController.destroy.url(row.original.id),
