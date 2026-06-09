@@ -24,7 +24,9 @@ export async function serverFetch<T>(
     },
 ): Promise<T> {
     const locale = options?.locale;
-    const url = `${BASE_URL}${path}`;
+    const separator = path.includes('?') ? '&' : '?';
+    const localizedPath = locale ? `${path}${separator}locale=${locale}` : path;
+    const url = `${BASE_URL}${localizedPath}`;
 
     const nextOpts: { revalidate?: number; tags?: string[] } = {};
     let cacheDirective: RequestInit['cache'] | undefined;

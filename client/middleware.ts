@@ -1,8 +1,8 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-const FALLBACK_LOCALES = ['pl', 'en'];
-const FALLBACK_DEFAULT_LOCALE = 'pl';
+const FALLBACK_LOCALES = ['en', 'pl'];
+const FALLBACK_DEFAULT_LOCALE = 'en';
 const API_URL =
     process.env.API_URL ??
     process.env.NEXT_PUBLIC_API_URL ??
@@ -136,7 +136,7 @@ export async function middleware(request: NextRequest) {
                 : pathname.slice(defaultLocale.length + 1);
         const redirectUrl = request.nextUrl.clone();
         redirectUrl.pathname = cleanPath;
-        const response = NextResponse.redirect(redirectUrl, 301);
+        const response = NextResponse.redirect(redirectUrl, 307);
         setLocaleCookie(response, defaultLocale);
         response.headers.set('Content-Security-Policy', getCspHeader(nonce));
         response.headers.set('x-nonce', nonce);

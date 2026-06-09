@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import { getPage } from '@/api/cms';
 import { JsonLd } from '@/components/json-ld';
 import { PageRenderer } from '@/components/page-builder/page-renderer';
-import type { I18nConfig, Locale } from '@/lib/i18n';
+import { localePath, type I18nConfig, type Locale } from '@/lib/i18n';
 import { getI18nConfig } from '@/lib/i18n-server';
 import { buildFaqPage, buildWebPage } from '@/lib/schema';
 import { absoluteUrl } from '@/lib/seo';
@@ -232,6 +232,16 @@ function PageContent({
 }) {
     if (!page || (!page.is_published && !isPreview)) {
         notFound();
+    }
+
+    // Redirect to the canonical localized URL if the path segment slug matches in another language
+    // e.g. /pl/categories -> /pl/kategorie
+    if (!isPreview) {
+        const canonicalPath = localePath(locale, page.path, i18nConfig);
+        const currentPath = localePath(locale, slug.join('/'), i18nConfig);
+        if (canonicalPath !== currentPath) {
+            redirect(canonicalPath);
+        }
     }
 
     const path = page.path;

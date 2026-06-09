@@ -449,19 +449,31 @@ class Page extends Model
         string $locale,
         ?int $parentId
     ): ?self {
-        $baseQuery = fn () => self::query()
+        $baseQuery = fn (string $loc) => self::query()
             ->where('is_published', true)
-            ->where(function ($q) use ($segment, $locale): void {
-                $q->where('slug->'.$locale, $segment);
+            ->where(function ($q) use ($segment, $loc): void {
+                $q->where('slug->'.$loc, $segment);
             })
             ->when($parentId === null,
                 fn ($q) => $q->whereNull('parent_id'),
                 fn ($q) => $q->where('parent_id', $parentId),
             );
 
-        $found = $baseQuery()->where('locale', $locale)->first();
+        $found = $baseQuery($locale)->where('locale', $locale)->first();
 
-        $resolved = $found ?? $baseQuery()->whereNull('locale')->first();
+        $resolved = $found ?? $baseQuery($locale)->whereNull('locale')->first();
+
+        // Alternate locale fallback: if not resolved, try matching the slug in other system locales
+        if (! $resolved) {
+            $otherLocales = $locale === 'en' ? ['pl'] : ['en'];
+            foreach ($otherLocales as $altLoc) {
+                $altFound = $baseQuery($altLoc)->where('locale', $altLoc)->first();
+                $resolved = $altFound ?? $baseQuery($altLoc)->whereNull('locale')->first();
+                if ($resolved) {
+                    break;
+                }
+            }
+        }
 
         if (! $resolved && $segment === 'home' && $parentId === null) {
             return self::query()
