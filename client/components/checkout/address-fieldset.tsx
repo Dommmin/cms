@@ -2,6 +2,7 @@
 
 import { MapPin } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import usePlacesAutocomplete, { getDetails } from 'use-places-autocomplete';
 import { z } from 'zod/v4';
 
 import type { AddressPayload } from '@/api/checkout';
@@ -10,7 +11,6 @@ import type { Address } from '@/types/api';
 import type {
     AddressErrors,
     AddressFieldsetProps,
-    NominatimResult,
 } from './address-fieldset.types';
 
 // ── Postal-code patterns per country ──────────────────────────────────────
@@ -103,53 +103,7 @@ function validateAddress(value: AddressPayload): AddressErrors {
     return errors;
 }
 
-// ── Nominatim address autocomplete ─────────────────────────────────────────
-
-function useAddressSearch(query: string, country: string) {
-    const [results, setResults] = useState<NominatimResult[]>([]);
-    const [loading, setLoading] = useState(false);
-    const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-        undefined,
-    );
-
-    useEffect(() => {
-        if (query.length < 4) {
-            setResults([]);
-            return;
-        }
-        clearTimeout(timerRef.current);
-        timerRef.current = setTimeout(async () => {
-            setLoading(true);
-            try {
-                const params = new URLSearchParams({
-                    q: query,
-                    format: 'json',
-                    addressdetails: '1',
-                    limit: '5',
-                    countrycodes: country.toLowerCase(),
-                });
-                const res = await fetch(
-                    `https://nominatim.openstreetmap.org/search?${params}`,
-                    {
-                        headers: {
-                            'Accept-Language': 'pl',
-                            'User-Agent': 'StoreCMS/1.0',
-                        },
-                    },
-                );
-                const data: NominatimResult[] = await res.json();
-                setResults(data);
-            } catch {
-                setResults([]);
-            } finally {
-                setLoading(false);
-            }
-        }, 500);
-        return () => clearTimeout(timerRef.current);
-    }, [query, country]);
-
-    return { results, loading };
-}
+// ── Nominatim address autocomplete removed in favor of Google Places ───
 
 // ── Saved address picker ───────────────────────────────────────────────────
 
@@ -287,11 +241,23 @@ export function AddressFieldset({
     const [touched, setTouched] = useState<
         Partial<Record<keyof AddressPayload, boolean>>
     >({});
-    const [streetQuery, setStreetQuery] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
     const suggestionsRef = useRef<HTMLDivElement>(null);
-    const { results: suggestions, loading: suggestionsLoading } =
-        useAddressSearch(streetQuery, value.country_code);
+
+    const {
+        ready,
+        value: streetQuery,
+        suggestions: { status, data: suggestions },
+        setValue: setStreetQuery,
+        clearSuggestions,
+    } = usePlacesAutocomplete({
+        requestOptions: {
+            componentRestrictions: {
+                country: value.country_code.toLowerCase(),
+            },
+        },
+        debounce: 300,
+    });
 
     const errors = validateAddress(value);
 
@@ -321,28 +287,62 @@ export function AddressFieldset({
         return () => document.removeEventListener('mousedown', handleClick);
     }, []);
 
-    function applySuggestion(result: NominatimResult) {
-        const a = result.address;
-        const street = [a.road, a.house_number].filter(Boolean).join(' ');
-        const city = a.city ?? a.town ?? a.village ?? '';
-        const postal = a.postcode ?? '';
-        const country = (a.country_code ?? value.country_code).toUpperCase();
-
-        onChange({
-            ...value,
-            street: street || value.street,
-            city: city || value.city,
-            postal_code: formatPostalCode(postal, country),
-            country_code: country,
-        });
-        setStreetQuery('');
+    async function applySuggestion(
+        suggestion: google.maps.places.AutocompletePrediction,
+    ) {
+        setStreetQuery(suggestion.description, false);
+        clearSuggestions();
         setShowSuggestions(false);
-        setTouched((prev) => ({
-            ...prev,
-            street: true,
-            city: true,
-            postal_code: true,
-        }));
+
+        try {
+            const details = (await getDetails({
+                placeId: suggestion.place_id,
+                fields: ['address_components'],
+            })) as google.maps.places.PlaceResult | string;
+
+            // @ts-ignore
+            if (
+                typeof details === 'string' ||
+                !details ||
+                !details.address_components
+            )
+                return;
+
+            let streetName = '';
+            let streetNumber = '';
+            let city = '';
+            let postal = '';
+            let country = value.country_code;
+
+            // @ts-ignore
+            details.address_components.forEach((c) => {
+                const types = c.types;
+                if (types.includes('route')) streetName = c.long_name;
+                if (types.includes('street_number')) streetNumber = c.long_name;
+                if (types.includes('locality') || types.includes('postal_town'))
+                    city = c.long_name;
+                if (types.includes('postal_code')) postal = c.long_name;
+                if (types.includes('country')) country = c.short_name;
+            });
+
+            const street = [streetName, streetNumber].filter(Boolean).join(' ');
+
+            onChange({
+                ...value,
+                street: street || value.street,
+                city: city || value.city,
+                postal_code: formatPostalCode(postal, country),
+                country_code: country,
+            });
+            setTouched((prev) => ({
+                ...prev,
+                street: true,
+                city: true,
+                postal_code: true,
+            }));
+        } catch (error) {
+            console.error('Error fetching place details', error);
+        }
     }
 
     return (
@@ -436,11 +436,17 @@ export function AddressFieldset({
                                 id={`${autocompleteSection}-street`}
                                 required
                                 autoComplete={`${autocompleteSection} street-address`}
-                                value={value.street}
+                                value={
+                                    ready
+                                        ? streetQuery || value.street
+                                        : value.street
+                                }
                                 onChange={(e) => {
                                     set('street', e.target.value);
-                                    setStreetQuery(e.target.value);
-                                    setShowSuggestions(true);
+                                    if (ready) {
+                                        setStreetQuery(e.target.value);
+                                        setShowSuggestions(true);
+                                    }
                                 }}
                                 onBlur={() => touch('street')}
                                 aria-describedby={
@@ -451,34 +457,38 @@ export function AddressFieldset({
                                 aria-invalid={!!err('street')}
                                 className={inputCls(err('street'))}
                                 placeholder="np. ul. Marszałkowska 1"
+                                disabled={
+                                    !ready &&
+                                    !!process.env
+                                        .NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+                                }
                             />
-                            {suggestionsLoading && (
-                                <MapPin className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 animate-pulse" />
-                            )}
                         </div>
 
                         {/* Suggestions dropdown */}
-                        {showSuggestions && suggestions.length > 0 && (
-                            <ul className="border-border bg-popover absolute top-full right-0 left-0 z-50 mt-1 max-h-56 overflow-y-auto rounded-lg border shadow-lg">
-                                {suggestions.map((s) => (
-                                    <li key={s.place_id}>
-                                        <button
-                                            type="button"
-                                            onMouseDown={(e) => {
-                                                e.preventDefault();
-                                                applySuggestion(s);
-                                            }}
-                                            className="hover:bg-accent flex w-full items-start gap-2 px-3 py-2 text-left text-sm"
-                                        >
-                                            <MapPin className="text-muted-foreground mt-0.5 h-3.5 w-3.5 shrink-0" />
-                                            <span className="text-foreground">
-                                                {s.display_name}
-                                            </span>
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
+                        {showSuggestions &&
+                            status === 'OK' &&
+                            suggestions.length > 0 && (
+                                <ul className="border-border bg-popover absolute top-full right-0 left-0 z-50 mt-1 max-h-56 overflow-y-auto rounded-lg border shadow-lg">
+                                    {suggestions.map((s) => (
+                                        <li key={s.place_id}>
+                                            <button
+                                                type="button"
+                                                onMouseDown={(e) => {
+                                                    e.preventDefault();
+                                                    applySuggestion(s);
+                                                }}
+                                                className="hover:bg-accent flex w-full items-start gap-2 px-3 py-2 text-left text-sm"
+                                            >
+                                                <MapPin className="text-muted-foreground mt-0.5 h-3.5 w-3.5 shrink-0" />
+                                                <span className="text-foreground">
+                                                    {s.description}
+                                                </span>
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                     </div>
                 </Field>
 

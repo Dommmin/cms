@@ -3,6 +3,7 @@
 import { ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Script from 'next/script';
 import { useEffect, useState } from 'react';
 
 import { type AddressPayload } from '@/api/checkout';
@@ -404,6 +405,12 @@ export default function CheckoutPage() {
 
     return (
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+            {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY && (
+                <Script
+                    src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
+                    strategy="lazyOnload"
+                />
+            )}
             <h1 className="mb-6 text-3xl font-bold">
                 {t('checkout.title', 'Checkout')}
             </h1>
