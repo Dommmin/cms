@@ -8,12 +8,12 @@ use App\Models\Webhook;
 use App\Models\WebhookDelivery;
 use App\Services\OutboundWebhookPolicy;
 use Exception;
-use JsonException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Http;
+use JsonException;
 use RuntimeException;
 
 #[Backoff(60)]

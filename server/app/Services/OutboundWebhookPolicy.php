@@ -14,8 +14,8 @@ final class OutboundWebhookPolicy
             return 'Webhook URL is invalid.';
         }
 
-        $scheme = strtolower((string) ($parts['scheme'] ?? ''));
-        $host = strtolower((string) ($parts['host'] ?? ''));
+        $scheme = mb_strtolower((string) ($parts['scheme'] ?? ''));
+        $host = mb_strtolower((string) ($parts['host'] ?? ''));
 
         if ($host === '') {
             return 'Webhook URL must include a host.';

@@ -4,6 +4,4 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
-final class StoreWebhookRequest extends WebhookRequest
-{
-}
+final class StoreWebhookRequest extends WebhookRequest {}
