@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import {
     AlertTriangle,
+    ArrowRight,
     CheckCircle2,
     ChevronDown,
     ChevronUp,
@@ -9,6 +10,7 @@ import {
     EyeOff,
     LayoutDashboard,
     RotateCcw,
+    Sparkles,
     Star,
     Trash2,
     X,
@@ -211,6 +213,7 @@ type DashboardQuickAction = {
 export default function Dashboard({
     widgetShells,
     onboarding,
+    onboardingWizard,
     widgets: deferredWidgets,
 }: DashboardProps) {
     const __ = useTranslation();
@@ -622,6 +625,31 @@ export default function Dashboard({
                         </Button>
                     </div>
                 </div>
+
+                {/* Onboarding Setup Wizard Banner */}
+                {!onboardingWizard.is_completed && (
+                    <div className="rounded-xl border border-blue-500/20 bg-gradient-to-r from-blue-500/10 via-indigo-500/5 to-transparent p-5 shadow-sm backdrop-blur-md dark:border-blue-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex items-start gap-3">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
+                                <Sparkles className="h-5 w-5 animate-pulse" />
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-semibold text-foreground">
+                                    {__('onboarding.banner.title', 'Skonfiguruj swój sklep')}
+                                </h3>
+                                <p className="text-xs text-muted-foreground mt-0.5 max-w-2xl">
+                                    {__('onboarding.banner.desc', 'Użyj naszego kreatora wdrożenia, aby w prosty sposób skonfigurować branding, bramki płatności, metody dostaw, domyślne podatki oraz stronę główną.')}
+                                </p>
+                            </div>
+                        </div>
+                        <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-700 text-white shrink-0">
+                            <Link href="/panel/onboarding">
+                                {__('onboarding.banner.button', 'Otwórz Setup Wizard')}
+                                <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                            </Link>
+                        </Button>
+                    </div>
+                )}
 
                 {/* Onboarding checklist */}
                 <OnboardingChecklist steps={onboarding} />

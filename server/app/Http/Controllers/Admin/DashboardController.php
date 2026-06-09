@@ -13,6 +13,7 @@ use App\Models\Page;
 use App\Models\Product;
 use App\Models\ProductReview;
 use App\Models\ProductVariant;
+use App\Models\Setting;
 use App\Models\ShippingMethod;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -42,6 +43,11 @@ class DashboardController extends Controller
         return Inertia::render('admin/dashboard', [
             'widgetShells' => $shells,
             'onboarding' => $this->getOnboardingStatus(),
+            'onboardingWizard' => [
+                'is_completed' => filter_var(Setting::get('wizard', 'is_completed', false), FILTER_VALIDATE_BOOLEAN),
+                'current_step' => Setting::get('wizard', 'current_step', 'brand'),
+                'completed_steps' => json_decode((string) Setting::get('wizard', 'completed_steps', '[]'), true),
+            ],
             'widgets' => Inertia::defer(fn () => $widgets->map(fn ($w): array => [
                 'id' => $w->id,
                 'title' => $w->title,

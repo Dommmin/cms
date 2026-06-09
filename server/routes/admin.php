@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\NewsletterCampaignController;
 use App\Http\Controllers\Admin\NewsletterSegmentController;
 use App\Http\Controllers\Admin\NewsletterSubscriberController;
 use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\OnboardingWizardController;
 use App\Http\Controllers\Admin\PreviewController;
 use App\Http\Controllers\Admin\PrivacyRequestController;
 use App\Http\Controllers\Admin\ReferralController;
@@ -227,6 +228,13 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('panel')->name(
         Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
         Route::post('settings/mail/test', [SettingsController::class, 'testMail'])->name('settings.mail.test');
+    });
+
+    // Onboarding Wizard (admin only)
+    Route::middleware('role:admin|super-admin')->group(function (): void {
+        Route::get('onboarding', [OnboardingWizardController::class, 'index'])->name('onboarding.index');
+        Route::post('onboarding/step/{step}', [OnboardingWizardController::class, 'saveStep'])->name('onboarding.save-step');
+        Route::post('onboarding/complete', [OnboardingWizardController::class, 'complete'])->name('onboarding.complete');
     });
 
     // i18n — Locales & Translations

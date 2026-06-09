@@ -18,8 +18,15 @@ export interface OnboardingStep {
     url: string;
 }
 
+export interface OnboardingWizardState {
+    is_completed: boolean;
+    current_step: string;
+    completed_steps: string[];
+}
+
 export interface DashboardProps {
     widgetShells: WidgetShell[];
     onboarding: OnboardingStep[];
+    onboardingWizard: OnboardingWizardState;
     widgets: Widget[] | undefined; // deferred — undefined until loaded
 }
