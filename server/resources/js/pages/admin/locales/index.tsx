@@ -243,7 +243,7 @@ export default function LocalesIndex({
                         'Manage supported languages',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button onClick={openCreate}>
                             <PlusIcon className="mr-2 h-4 w-4" />
                             {__('action.add', 'Add Locale')}
@@ -269,6 +269,8 @@ export default function LocalesIndex({
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={LocaleController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => row.code}
                 />
             </Wrapper>
 

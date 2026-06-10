@@ -3,6 +3,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { useState } from 'react';
 import * as ActivityLogController from '@/actions/App/Http/Controllers/Admin/ActivityLogController';
 import DataTable from '@/components/data-table';
+import ListFilters from '@/components/list-filters';
 import { PageHeader } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -71,6 +72,13 @@ export default function ActivityLogIndex({
 }: IndexProps) {
     const __ = useTranslation();
     const [localFilters, setLocalFilters] = useState(filters);
+    const activeFilterCount = [
+        localFilters.causer_id,
+        localFilters.log_name,
+        localFilters.event,
+        localFilters.date_from,
+        localFilters.date_to,
+    ].filter(Boolean).length;
 
     const applyFilters = () => {
         router.get(
@@ -171,8 +179,12 @@ export default function ActivityLogIndex({
                     )}
                 />
 
-                {/* Filters */}
-                <div className="mb-6 grid grid-cols-2 gap-3 rounded-xl border bg-card p-4 md:grid-cols-5">
+                <ListFilters
+                    activeCount={activeFilterCount}
+                    description="Filter activity by user, model, action, and date range."
+                    className="mb-6"
+                    contentClassName="sm:grid sm:grid-cols-2 sm:items-end sm:gap-3 lg:grid-cols-5"
+                >
                     <div className="space-y-1">
                         <Label className="text-xs">
                             {__('table.user', 'User')}
@@ -328,7 +340,7 @@ export default function ActivityLogIndex({
                         />
                     </div>
 
-                    <div className="col-span-2 flex items-end gap-2 md:col-span-5">
+                    <div className="flex flex-col gap-2 sm:col-span-2 sm:flex-row sm:items-end lg:col-span-5">
                         <Button size="sm" onClick={applyFilters}>
                             {__('activity_log.apply_filters', 'Apply Filters')}
                         </Button>
@@ -362,7 +374,7 @@ export default function ActivityLogIndex({
                             {__('activity_log.entries', 'entries')}
                         </span>
                     </div>
-                </div>
+                </ListFilters>
 
                 <DataTable
                     columns={columns}
@@ -375,6 +387,7 @@ export default function ActivityLogIndex({
                         prev_page_url: activities.prev_page_url,
                         next_page_url: activities.next_page_url,
                     }}
+                    mobilePrimaryColumns={4}
                 />
             </Wrapper>
         </AppLayout>

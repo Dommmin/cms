@@ -152,6 +152,8 @@ export default function CookieConsentsIndex({
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={CookieConsentController.index.url()}
+                    mobilePrimaryColumns={3}
+                    mobileCardTitle={(row) => row.session_id.slice(0, 12)}
                 />
             </Wrapper>
         </AppLayout>

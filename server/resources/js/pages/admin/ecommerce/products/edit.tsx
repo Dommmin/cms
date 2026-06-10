@@ -19,7 +19,11 @@ import {
     type MediaItem,
     type SelectedImage,
 } from '@/components/media-picker-modal';
-import { PageHeader, PageHeaderActions } from '@/components/page-header';
+import {
+    PageHeader,
+    PageHeaderActions,
+    PageHeaderOverflowMenu,
+} from '@/components/page-header';
 import { SeoPanel } from '@/components/seo-panel';
 import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
@@ -352,50 +356,6 @@ export default function Edit({
                     description={`Update details for ${product.name?.[defaultLocale] ?? ''}`}
                 >
                     <PageHeaderActions>
-                        <Button variant="outline" asChild>
-                            <a
-                                href={`${frontendUrl}/products/${product.slug?.[defaultLocale] ?? ''}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                <ExternalLink className="mr-2 h-4 w-4" />
-                                View on Site
-                            </a>
-                        </Button>
-                        <Button variant="outline" asChild>
-                            <a
-                                href={PreviewController.url({
-                                    query: {
-                                        url: `${frontendUrl}/products/${product.slug?.[defaultLocale] ?? ''}`,
-                                        entity_type: 'product',
-                                        entity_id: String(product.id),
-                                        entity_name:
-                                            product.name?.[defaultLocale] ??
-                                            product.slug?.[defaultLocale] ??
-                                            '',
-                                        admin_url: ProductController.edit.url(
-                                            product.id,
-                                        ),
-                                    },
-                                })}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                <EyeIcon className="mr-2 h-4 w-4" />
-                                Preview
-                            </a>
-                        </Button>
-                        <Button asChild variant="outline">
-                            <Link
-                                href={ProductVariantController.index.url(
-                                    product.id,
-                                )}
-                                prefetch
-                                cacheFor={30}
-                            >
-                                Manage Variants
-                            </Link>
-                        </Button>
                         <Button asChild variant="outline">
                             <Link
                                 href={ProductController.index.url()}
@@ -403,9 +363,126 @@ export default function Edit({
                                 cacheFor={30}
                             >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                Back to Products
+                                <span className="hidden sm:inline">
+                                    Back to Products
+                                </span>
+                                <span className="sm:hidden">Back</span>
                             </Link>
                         </Button>
+
+                        <div className="hidden items-center gap-2 sm:flex">
+                            <Button variant="outline" asChild>
+                                <a
+                                    href={`${frontendUrl}/products/${product.slug?.[defaultLocale] ?? ''}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <ExternalLink className="mr-2 h-4 w-4" />
+                                    View on Site
+                                </a>
+                            </Button>
+                            <Button variant="outline" asChild>
+                                <a
+                                    href={PreviewController.url({
+                                        query: {
+                                            url: `${frontendUrl}/products/${product.slug?.[defaultLocale] ?? ''}`,
+                                            entity_type: 'product',
+                                            entity_id: String(product.id),
+                                            entity_name:
+                                                product.name?.[defaultLocale] ??
+                                                product.slug?.[defaultLocale] ??
+                                                '',
+                                            admin_url:
+                                                ProductController.edit.url(
+                                                    product.id,
+                                                ),
+                                        },
+                                    })}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <EyeIcon className="mr-2 h-4 w-4" />
+                                    Preview
+                                </a>
+                            </Button>
+                            <Button asChild variant="outline">
+                                <Link
+                                    href={ProductVariantController.index.url(
+                                        product.id,
+                                    )}
+                                    prefetch
+                                    cacheFor={30}
+                                >
+                                    Manage Variants
+                                </Link>
+                            </Button>
+                        </div>
+
+                        <div className="sm:hidden">
+                            <PageHeaderOverflowMenu>
+                                <Button
+                                    variant="outline"
+                                    asChild
+                                    className="w-full justify-start"
+                                >
+                                    <a
+                                        href={`${frontendUrl}/products/${product.slug?.[defaultLocale] ?? ''}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <ExternalLink className="mr-2 h-4 w-4" />
+                                        View on Site
+                                    </a>
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    asChild
+                                    className="w-full justify-start"
+                                >
+                                    <a
+                                        href={PreviewController.url({
+                                            query: {
+                                                url: `${frontendUrl}/products/${product.slug?.[defaultLocale] ?? ''}`,
+                                                entity_type: 'product',
+                                                entity_id: String(product.id),
+                                                entity_name:
+                                                    product.name?.[
+                                                        defaultLocale
+                                                    ] ??
+                                                    product.slug?.[
+                                                        defaultLocale
+                                                    ] ??
+                                                    '',
+                                                admin_url:
+                                                    ProductController.edit.url(
+                                                        product.id,
+                                                    ),
+                                            },
+                                        })}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <EyeIcon className="mr-2 h-4 w-4" />
+                                        Preview
+                                    </a>
+                                </Button>
+                                <Button
+                                    asChild
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                >
+                                    <Link
+                                        href={ProductVariantController.index.url(
+                                            product.id,
+                                        )}
+                                        prefetch
+                                        cacheFor={30}
+                                    >
+                                        Manage Variants
+                                    </Link>
+                                </Button>
+                            </PageHeaderOverflowMenu>
+                        </div>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -446,8 +523,11 @@ export default function Edit({
                                         value={activeTab}
                                         onValueChange={setActiveTab}
                                     >
-                                        <TabsList className="grid w-full grid-cols-5">
-                                            <TabsTrigger value="general">
+                                        <TabsList className="flex h-auto w-full snap-x scrollbar-none justify-start overflow-x-auto bg-muted p-1 sm:grid sm:grid-cols-5">
+                                            <TabsTrigger
+                                                value="general"
+                                                className="snap-align-start shrink-0"
+                                            >
                                                 <Settings className="mr-2 h-4 w-4" />
                                                 General
                                                 {generalErrors > 0 && (
@@ -456,7 +536,10 @@ export default function Edit({
                                                     </span>
                                                 )}
                                             </TabsTrigger>
-                                            <TabsTrigger value="pricing">
+                                            <TabsTrigger
+                                                value="pricing"
+                                                className="snap-align-start shrink-0"
+                                            >
                                                 <Settings className="mr-2 h-4 w-4" />
                                                 Pricing & Stock
                                                 {pricingErrors > 0 && (
@@ -465,7 +548,10 @@ export default function Edit({
                                                     </span>
                                                 )}
                                             </TabsTrigger>
-                                            <TabsTrigger value="media">
+                                            <TabsTrigger
+                                                value="media"
+                                                className="snap-align-start shrink-0"
+                                            >
                                                 <ImageIcon className="mr-2 h-4 w-4" />
                                                 Media
                                                 {mediaErrors > 0 && (
@@ -474,7 +560,10 @@ export default function Edit({
                                                     </span>
                                                 )}
                                             </TabsTrigger>
-                                            <TabsTrigger value="metadata">
+                                            <TabsTrigger
+                                                value="metadata"
+                                                className="snap-align-start shrink-0"
+                                            >
                                                 <Search className="mr-2 h-4 w-4" />
                                                 SEO
                                                 {metadataErrors > 0 && (
@@ -483,7 +572,10 @@ export default function Edit({
                                                     </span>
                                                 )}
                                             </TabsTrigger>
-                                            <TabsTrigger value="price_history">
+                                            <TabsTrigger
+                                                value="price_history"
+                                                className="snap-align-start shrink-0"
+                                            >
                                                 <Clock className="mr-2 h-4 w-4" />
                                                 Price History
                                             </TabsTrigger>

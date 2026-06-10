@@ -31,4 +31,7 @@ export type IndexProps = {
         status?: string;
         channel?: string;
     };
+    types: Array<{ value: string; label: string }>;
+    channels: Array<{ value: string; label: string }>;
+    statuses: Array<{ value: string; label: string }>;
 };

@@ -14,4 +14,7 @@ export interface DataTableProps<T> {
     onSortChange?: (sort: string) => void;
     baseUrl?: string;
     className?: string;
+    mobilePrimaryColumns?: number;
+    mobileCardTitle?: (row: T, rowIndex: number) => React.ReactNode;
+    mobileEmptyLabel?: string;
 }

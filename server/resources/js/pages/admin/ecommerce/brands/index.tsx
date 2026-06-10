@@ -3,9 +3,18 @@ import { PencilIcon, Plus, Tag, TrashIcon } from 'lucide-react';
 import * as BrandController from '@/actions/App/Http/Controllers/Admin/Ecommerce/BrandController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
+import ListFilters from '@/components/list-filters';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -21,6 +30,20 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function BrandsIndex({ brands, filters }: IndexProps) {
     const __ = useTranslation();
+    const activeFilterCount = [filters.is_active].filter(Boolean).length;
+
+    const updateFilters = (
+        nextFilters: Partial<Pick<IndexProps['filters'], 'is_active'>>,
+    ) => {
+        router.get(
+            BrandController.index.url(),
+            { ...filters, ...nextFilters },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -31,7 +54,7 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                     title={__('page.brands', 'Brands')}
                     description={`${brands.total} product brands`}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button asChild variant="outline">
                             <Link
                                 href={BrandController.create.url()}
@@ -44,6 +67,49 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
+
+                <ListFilters
+                    activeCount={activeFilterCount}
+                    description={__(
+                        'page.brands_filters_desc',
+                        'Filter brands by active status.',
+                    )}
+                    contentClassName="sm:max-w-xs"
+                >
+                    <div className="space-y-2">
+                        <Label htmlFor="brand-status-filter">
+                            {__('column.status', 'Status')}
+                        </Label>
+                        <Select
+                            value={filters.is_active || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    is_active: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="brand-status-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__('column.status', 'Status')}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                <SelectItem value="1">
+                                    {__('status.active', 'Active')}
+                                </SelectItem>
+                                <SelectItem value="0">
+                                    {__('status.inactive', 'Inactive')}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </ListFilters>
 
                 <DataTable
                     columns={[
@@ -156,6 +222,8 @@ export default function BrandsIndex({ brands, filters }: IndexProps) {
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={BrandController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => row.name}
                 />
             </Wrapper>
         </AppLayout>

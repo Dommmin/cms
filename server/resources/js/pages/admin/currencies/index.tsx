@@ -132,7 +132,7 @@ export default function CurrenciesIndex({ currencies, filters }: IndexProps) {
                         'Manage currencies and exchange rates',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Link href={CurrencyController.create.url()}>
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
@@ -160,6 +160,8 @@ export default function CurrenciesIndex({ currencies, filters }: IndexProps) {
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={CurrencyController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => row.code}
                 />
             </Wrapper>
         </AppLayout>

@@ -29,7 +29,7 @@ export default function CustomersIndex({ customers, filters }: IndexProps) {
                     title="Customers"
                     description={`${customers.total} registered customers`}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button variant="outline" asChild>
                             <a href={CustomerController.exportMethod.url()}>
                                 <DownloadIcon className="mr-2 h-4 w-4" />
@@ -122,6 +122,19 @@ export default function CustomersIndex({ customers, filters }: IndexProps) {
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={CustomerController.index.url()}
+                    mobilePrimaryColumns={5}
+                    mobileCardTitle={(row) => (
+                        <div className="min-w-0">
+                            <div className="font-medium">
+                                {row.first_name} {row.last_name}
+                            </div>
+                            {row.company_name && (
+                                <p className="truncate text-xs text-muted-foreground">
+                                    {row.company_name}
+                                </p>
+                            )}
+                        </div>
+                    )}
                 />
             </Wrapper>
         </AppLayout>

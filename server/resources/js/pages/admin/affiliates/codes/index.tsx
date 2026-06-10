@@ -6,9 +6,18 @@ import * as AffiliateCodeController from '@/actions/App/Http/Controllers/Admin/A
 import * as ReferralController from '@/actions/App/Http/Controllers/Admin/ReferralController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
+import ListFilters from '@/components/list-filters';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -29,6 +38,21 @@ function formatDiscount(code: AffiliateCode): string {
 
 export default function CodesIndex({ codes, filters }: IndexProps) {
     const __ = useTranslation();
+    const activeFilterCount = [filters.status].filter(Boolean).length;
+
+    const updateFilters = (
+        nextFilters: Partial<Pick<IndexProps['filters'], 'status'>>,
+    ) => {
+        router.get(
+            AffiliateCodeController.index.url(),
+            { ...filters, ...nextFilters },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
+
     const columns: ColumnDef<AffiliateCode>[] = [
         {
             accessorKey: 'code',
@@ -149,7 +173,7 @@ export default function CodesIndex({ codes, filters }: IndexProps) {
                         'Manage referral codes and track affiliate performance',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Link href={ReferralController.index.url()}>
                             <Button variant="outline">
                                 {__('action.show', 'View Referrals')}
@@ -163,6 +187,49 @@ export default function CodesIndex({ codes, filters }: IndexProps) {
                         </Link>
                     </PageHeaderActions>
                 </PageHeader>
+
+                <ListFilters
+                    activeCount={activeFilterCount}
+                    description={__(
+                        'page.affiliates_filters_desc',
+                        'Filter affiliate codes by active state.',
+                    )}
+                    contentClassName="sm:max-w-xs"
+                >
+                    <div className="space-y-2">
+                        <Label htmlFor="affiliate-code-status-filter">
+                            {__('column.status', 'Status')}
+                        </Label>
+                        <Select
+                            value={filters.status || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    status: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="affiliate-code-status-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__('column.status', 'Status')}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                <SelectItem value="active">
+                                    {__('status.active', 'Active')}
+                                </SelectItem>
+                                <SelectItem value="inactive">
+                                    {__('status.inactive', 'Inactive')}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </ListFilters>
 
                 <DataTable
                     columns={columns}
@@ -182,6 +249,8 @@ export default function CodesIndex({ codes, filters }: IndexProps) {
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={AffiliateCodeController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => row.code}
                 />
             </Wrapper>
         </AppLayout>

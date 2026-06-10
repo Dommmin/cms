@@ -99,6 +99,8 @@ export default function EmailTemplatesIndex({ templates }: IndexProps) {
                         prev_page_url: templates.prev_page_url,
                         next_page_url: templates.next_page_url,
                     }}
+                    mobilePrimaryColumns={3}
+                    mobileCardTitle={(row) => row.name}
                 />
             </Wrapper>
         </AppLayout>

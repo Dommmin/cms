@@ -189,7 +189,7 @@ export default function AutomationsIndex({ campaigns }: IndexProps) {
                     title="Marketing Automations"
                     description="Automated campaigns triggered by customer behavior"
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button asChild>
                             <Link href={AutomationController.create.url()}>
                                 <PlusIcon className="mr-2 h-4 w-4" />
@@ -199,7 +199,14 @@ export default function AutomationsIndex({ campaigns }: IndexProps) {
                     </PageHeaderActions>
                 </PageHeader>
 
-                <DataTable data={campaigns} columns={columns} />
+                <DataTable
+                    data={campaigns}
+                    columns={columns}
+                    mobilePrimaryColumns={3}
+                    mobileCardTitle={(row) => (
+                        <div className="font-medium">{row.name}</div>
+                    )}
+                />
             </Wrapper>
         </AppLayout>
     );

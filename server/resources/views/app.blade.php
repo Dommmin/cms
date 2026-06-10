@@ -41,6 +41,9 @@
 
         <title data-inertia>{{ config('app.name', 'Laravel') }}</title>
 
+        <link rel="manifest" href="/manifest.json">
+        <meta name="theme-color" content="#09090b">
+
         <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -51,6 +54,17 @@
         @viteReactRefresh
         @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
         @inertiaHead
+
+        {{-- Register PWA Service Worker --}}
+        <script nonce="{{ Vite::cspNonce() }}">
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(reg => console.log('ServiceWorker registered:', reg.scope))
+                        .catch(err => console.log('ServiceWorker registration failed:', err));
+                });
+            }
+        </script>
     </head>
     <body class="font-sans antialiased">
         @inertia

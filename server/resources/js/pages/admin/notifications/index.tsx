@@ -5,9 +5,18 @@ import toast from 'react-hot-toast';
 import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
+import ListFilters from '@/components/list-filters';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -34,8 +43,32 @@ const channelIcons: Record<string, string> = {
 export default function NotificationsIndex({
     notifications,
     filters,
+    types,
+    channels,
+    statuses,
 }: IndexProps) {
     const __ = useTranslation();
+    const activeFilterCount = [
+        filters.type,
+        filters.channel,
+        filters.status,
+    ].filter(Boolean).length;
+
+    const updateFilters = (
+        nextFilters: Partial<
+            Pick<IndexProps['filters'], 'type' | 'channel' | 'status'>
+        >,
+    ) => {
+        router.get(
+            AppNotificationController.index.url(),
+            { ...filters, ...nextFilters },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
+
     const columns: ColumnDef<AppNotification>[] = [
         {
             accessorKey: 'type',
@@ -188,7 +221,7 @@ export default function NotificationsIndex({
                         'Manage system notifications',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button asChild variant="outline">
                             <Link
                                 href={AppNotificationController.create.url()}
@@ -201,6 +234,124 @@ export default function NotificationsIndex({
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
+
+                <ListFilters
+                    activeCount={activeFilterCount}
+                    description={__(
+                        'page.notifications_filters_desc',
+                        'Narrow notifications by type, channel, and delivery status.',
+                    )}
+                    contentClassName="sm:grid sm:grid-cols-3 sm:items-end sm:gap-4"
+                >
+                    <div className="space-y-2">
+                        <Label htmlFor="notification-type-filter">
+                            {__('column.type', 'Type')}
+                        </Label>
+                        <Select
+                            value={filters.type || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    type: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="notification-type-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__('column.type', 'Type')}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                {types.map((type) => (
+                                    <SelectItem
+                                        key={type.value}
+                                        value={type.value}
+                                    >
+                                        {type.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="notification-channel-filter">
+                            {__('column.channel', 'Channel')}
+                        </Label>
+                        <Select
+                            value={filters.channel || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    channel: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="notification-channel-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__(
+                                        'column.channel',
+                                        'Channel',
+                                    )}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                {channels.map((channel) => (
+                                    <SelectItem
+                                        key={channel.value}
+                                        value={channel.value}
+                                    >
+                                        {channel.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="notification-status-filter">
+                            {__('column.status', 'Status')}
+                        </Label>
+                        <Select
+                            value={filters.status || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    status: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="notification-status-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__('column.status', 'Status')}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                {statuses.map((status) => (
+                                    <SelectItem
+                                        key={status.value}
+                                        value={status.value}
+                                    >
+                                        {status.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </ListFilters>
 
                 <DataTable
                     columns={columns}
@@ -220,6 +371,8 @@ export default function NotificationsIndex({
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={AppNotificationController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => row.type}
                 />
             </Wrapper>
         </AppLayout>

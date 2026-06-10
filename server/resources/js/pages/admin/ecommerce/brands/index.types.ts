@@ -19,6 +19,6 @@ export interface IndexProps {
     brands: PaginationData;
     filters: {
         search?: string;
-        is_active?: boolean;
+        is_active?: string;
     };
 }

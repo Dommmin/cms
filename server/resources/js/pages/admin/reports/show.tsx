@@ -6,7 +6,11 @@ import {
     PencilIcon,
 } from 'lucide-react';
 import * as CustomReportController from '@/actions/App/Http/Controllers/Admin/CustomReportController';
-import { PageHeader, PageHeaderActions } from '@/components/page-header';
+import {
+    PageHeader,
+    PageHeaderActions,
+    PageHeaderOverflowMenu,
+} from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
@@ -40,36 +44,84 @@ export default function ShowReport({ report, results }: ShowProps) {
                     }
                 >
                     <PageHeaderActions>
-                        <Button asChild variant="outline">
-                            <a
-                                href={CustomReportController.exportMethod.url(
-                                    report.id,
-                                )}
-                            >
-                                <DownloadIcon className="mr-2 h-4 w-4" />
-                                Export CSV
-                            </a>
-                        </Button>
-                        <Button asChild variant="outline">
-                            <a
-                                href={CustomReportController.exportExcel.url(
-                                    report.id,
-                                )}
-                            >
-                                <FileSpreadsheetIcon className="mr-2 h-4 w-4" />
-                                Export Excel
-                            </a>
-                        </Button>
-                        <Button asChild variant="outline">
-                            <a
-                                href={CustomReportController.exportPdf.url(
-                                    report.id,
-                                )}
-                            >
-                                <FileTextIcon className="mr-2 h-4 w-4" />
-                                Export PDF
-                            </a>
-                        </Button>
+                        <div className="hidden items-center gap-2 sm:flex">
+                            <Button asChild variant="outline">
+                                <a
+                                    href={CustomReportController.exportMethod.url(
+                                        report.id,
+                                    )}
+                                >
+                                    <DownloadIcon className="mr-2 h-4 w-4" />
+                                    Export CSV
+                                </a>
+                            </Button>
+                            <Button asChild variant="outline">
+                                <a
+                                    href={CustomReportController.exportExcel.url(
+                                        report.id,
+                                    )}
+                                >
+                                    <FileSpreadsheetIcon className="mr-2 h-4 w-4" />
+                                    Export Excel
+                                </a>
+                            </Button>
+                            <Button asChild variant="outline">
+                                <a
+                                    href={CustomReportController.exportPdf.url(
+                                        report.id,
+                                    )}
+                                >
+                                    <FileTextIcon className="mr-2 h-4 w-4" />
+                                    Export PDF
+                                </a>
+                            </Button>
+                        </div>
+                        <div className="sm:hidden">
+                            <PageHeaderOverflowMenu>
+                                <Button
+                                    asChild
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                >
+                                    <a
+                                        href={CustomReportController.exportMethod.url(
+                                            report.id,
+                                        )}
+                                    >
+                                        <DownloadIcon className="mr-2 h-4 w-4" />
+                                        Export CSV
+                                    </a>
+                                </Button>
+                                <Button
+                                    asChild
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                >
+                                    <a
+                                        href={CustomReportController.exportExcel.url(
+                                            report.id,
+                                        )}
+                                    >
+                                        <FileSpreadsheetIcon className="mr-2 h-4 w-4" />
+                                        Export Excel
+                                    </a>
+                                </Button>
+                                <Button
+                                    asChild
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                >
+                                    <a
+                                        href={CustomReportController.exportPdf.url(
+                                            report.id,
+                                        )}
+                                    >
+                                        <FileTextIcon className="mr-2 h-4 w-4" />
+                                        Export PDF
+                                    </a>
+                                </Button>
+                            </PageHeaderOverflowMenu>
+                        </div>
                         <Button asChild>
                             <Link
                                 href={CustomReportController.edit.url(
@@ -141,13 +193,13 @@ export default function ShowReport({ report, results }: ShowProps) {
                 ) : (
                     <div className="rounded-xl border">
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
+                            <table className="w-full text-xs md:text-sm">
                                 <thead>
                                     <tr className="border-b bg-muted/50">
                                         {results.columns.map((col) => (
                                             <th
                                                 key={col}
-                                                className="px-4 py-3 text-left font-medium text-muted-foreground"
+                                                className="px-2 py-2 text-left font-medium whitespace-nowrap text-muted-foreground md:px-4 md:py-3"
                                             >
                                                 {col.replace(/_/g, ' ')}
                                             </th>
@@ -163,7 +215,7 @@ export default function ShowReport({ report, results }: ShowProps) {
                                             {results.columns.map((col) => (
                                                 <td
                                                     key={col}
-                                                    className="px-4 py-3"
+                                                    className="px-2 py-2 whitespace-nowrap md:px-4 md:py-3"
                                                 >
                                                     {row[col] !== null &&
                                                     row[col] !== undefined

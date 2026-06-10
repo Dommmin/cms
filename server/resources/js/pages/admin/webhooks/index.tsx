@@ -231,7 +231,7 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
                         'Manage webhooks that notify external systems about events.',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button asChild>
                             <Link href={WebhookController.create.url()}>
                                 <PlusIcon className="mr-2 h-4 w-4" />
@@ -241,7 +241,12 @@ export default function WebhooksIndex({ webhooks }: IndexProps) {
                     </PageHeaderActions>
                 </PageHeader>
 
-                <DataTable columns={columns} data={webhooks} />
+                <DataTable
+                    columns={columns}
+                    data={webhooks}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => row.name}
+                />
             </Wrapper>
         </AppLayout>
     );

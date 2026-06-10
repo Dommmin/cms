@@ -334,41 +334,97 @@ export default function CustomerShowPage({
                                         {__('misc.no_orders', 'No orders yet.')}
                                     </p>
                                 ) : (
-                                    <table className="w-full text-sm">
-                                        <thead className="bg-muted/40 text-xs text-muted-foreground">
-                                            <tr>
-                                                <th className="px-4 py-2.5 text-left font-medium">
-                                                    {__(
-                                                        'column.reference',
-                                                        'Reference',
+                                    <>
+                                        {/* Mobile Card Layout */}
+                                        <div className="divide-y md:hidden">
+                                            {customer.orders.map((order) => {
+                                                const color =
+                                                    ORDER_STATUS_COLORS[
+                                                        order.status
+                                                    ] ??
+                                                    'bg-gray-100 text-gray-700';
+                                                return (
+                                                    <div
+                                                        key={order.id}
+                                                        className="flex items-center justify-between p-4"
+                                                    >
+                                                        <div className="space-y-1">
+                                                            <div className="font-mono text-sm font-semibold">
+                                                                #
+                                                                {
+                                                                    order.reference_number
+                                                                }
+                                                            </div>
+                                                            <div className="text-xs text-muted-foreground">
+                                                                {fmtDate(
+                                                                    order.created_at,
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <div className="space-y-1.5 text-right">
+                                                            <div className="text-sm font-medium">
+                                                                {fmt(
+                                                                    order.total,
+                                                                )}
+                                                            </div>
+                                                            <span
+                                                                className={cn(
+                                                                    'inline-flex rounded-full px-2 py-0.5 text-xs font-medium',
+                                                                    color,
+                                                                )}
+                                                            >
+                                                                {order.status}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+
+                                        {/* Desktop Table Layout */}
+                                        <div className="hidden overflow-x-auto md:block">
+                                            <table className="w-full text-sm">
+                                                <thead className="bg-muted/40 text-xs text-muted-foreground">
+                                                    <tr>
+                                                        <th className="px-4 py-2.5 text-left font-medium">
+                                                            {__(
+                                                                'column.reference',
+                                                                'Reference',
+                                                            )}
+                                                        </th>
+                                                        <th className="px-4 py-2.5 text-left font-medium">
+                                                            {__(
+                                                                'column.status',
+                                                                'Status',
+                                                            )}
+                                                        </th>
+                                                        <th className="px-4 py-2.5 text-right font-medium">
+                                                            {__(
+                                                                'column.total',
+                                                                'Total',
+                                                            )}
+                                                        </th>
+                                                        <th className="px-4 py-2.5 text-right font-medium">
+                                                            {__(
+                                                                'column.date',
+                                                                'Date',
+                                                            )}
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {customer.orders.map(
+                                                        (order) => (
+                                                            <OrderRow
+                                                                key={order.id}
+                                                                order={order}
+                                                            />
+                                                        ),
                                                     )}
-                                                </th>
-                                                <th className="px-4 py-2.5 text-left font-medium">
-                                                    {__(
-                                                        'column.status',
-                                                        'Status',
-                                                    )}
-                                                </th>
-                                                <th className="px-4 py-2.5 text-right font-medium">
-                                                    {__(
-                                                        'column.total',
-                                                        'Total',
-                                                    )}
-                                                </th>
-                                                <th className="px-4 py-2.5 text-right font-medium">
-                                                    {__('column.date', 'Date')}
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {customer.orders.map((order) => (
-                                                <OrderRow
-                                                    key={order.id}
-                                                    order={order}
-                                                />
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </>
                                 )}
                             </div>
 

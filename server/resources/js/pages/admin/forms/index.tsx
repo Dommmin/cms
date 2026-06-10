@@ -144,7 +144,7 @@ export default function Index({
                         'Manage contact forms and surveys',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button asChild variant="outline">
                             <Link
                                 href={FormController.create.url()}
@@ -173,6 +173,8 @@ export default function Index({
                     searchPlaceholder="Search forms..."
                     searchValue={filters.search ?? ''}
                     baseUrl={FormController.index.url()}
+                    mobilePrimaryColumns={3}
+                    mobileCardTitle={(row) => row.name}
                 />
             </Wrapper>
         </AppLayout>

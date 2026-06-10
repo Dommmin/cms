@@ -110,7 +110,36 @@ export default function InventoryReport({ data }: InventoryProps) {
                                 zero stock
                             </p>
                         </div>
-                        <div className="overflow-x-auto">
+                        {/* Mobile view */}
+                        <div className="divide-y md:hidden">
+                            {out_of_stock_items.map((item) => (
+                                <div key={item.id} className="space-y-2 p-4">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div>
+                                            <div className="text-sm font-medium">
+                                                {item.name}
+                                            </div>
+                                            <div className="mt-0.5 font-mono text-xs text-muted-foreground">
+                                                {item.sku}
+                                            </div>
+                                        </div>
+                                        <div className="shrink-0">
+                                            <StatusBadge status={item.status} />
+                                        </div>
+                                    </div>
+                                    <div className="text-right text-xs">
+                                        <span className="text-muted-foreground">
+                                            Price:
+                                        </span>{' '}
+                                        <span className="font-semibold tabular-nums">
+                                            {formatPrice(item.price)}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        {/* Desktop view */}
+                        <div className="hidden overflow-x-auto md:block">
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b bg-muted/50">
@@ -167,7 +196,56 @@ export default function InventoryReport({ data }: InventoryProps) {
                                 Top 20 variants by (qty × price)
                             </p>
                         </div>
-                        <div className="overflow-x-auto">
+                        {/* Mobile view */}
+                        <div className="divide-y md:hidden">
+                            {top_by_value.map((item) => (
+                                <div key={item.id} className="space-y-2 p-4">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div>
+                                            <div className="text-sm font-medium">
+                                                {item.name}
+                                            </div>
+                                            <div className="mt-0.5 font-mono text-xs text-muted-foreground">
+                                                {item.sku}
+                                            </div>
+                                        </div>
+                                        <div className="shrink-0">
+                                            <StatusBadge status={item.status} />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-2 border-t border-dashed pt-1 text-xs">
+                                        <div>
+                                            <div className="text-[10px] text-muted-foreground uppercase">
+                                                Qty
+                                            </div>
+                                            <div className="font-medium tabular-nums">
+                                                {item.stock_quantity.toLocaleString()}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[10px] text-muted-foreground uppercase">
+                                                Unit Price
+                                            </div>
+                                            <div className="font-medium tabular-nums">
+                                                {formatPrice(item.price)}
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-[10px] text-muted-foreground uppercase">
+                                                Stock Value
+                                            </div>
+                                            <div className="font-semibold tabular-nums">
+                                                {formatPrice(
+                                                    item.stock_value ?? 0,
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        {/* Desktop view */}
+                        <div className="hidden overflow-x-auto md:block">
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b bg-muted/50">

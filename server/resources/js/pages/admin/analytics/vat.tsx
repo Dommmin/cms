@@ -57,7 +57,7 @@ export default function VatReport({ data, filters }: VatProps) {
                 </PageHeader>
 
                 {/* Date filters */}
-                <div className="mb-6 flex flex-wrap items-end gap-4 rounded-xl border bg-card p-4">
+                <div className="mb-6 flex flex-col gap-4 rounded-xl border bg-card p-4 sm:flex-row sm:items-end">
                     <div className="space-y-1">
                         <Label htmlFor="from">From</Label>
                         <Input
@@ -65,7 +65,7 @@ export default function VatReport({ data, filters }: VatProps) {
                             type="date"
                             value={from}
                             onChange={(e) => setFrom(e.target.value)}
-                            className="w-40"
+                            className="w-full sm:w-40"
                         />
                     </div>
                     <div className="space-y-1">
@@ -75,10 +75,12 @@ export default function VatReport({ data, filters }: VatProps) {
                             type="date"
                             value={to}
                             onChange={(e) => setTo(e.target.value)}
-                            className="w-40"
+                            className="w-full sm:w-40"
                         />
                     </div>
-                    <Button onClick={applyFilters}>Apply</Button>
+                    <Button onClick={applyFilters} className="w-full sm:w-auto">
+                        Apply
+                    </Button>
                 </div>
 
                 {/* Summary cards */}
@@ -139,7 +141,89 @@ export default function VatReport({ data, filters }: VatProps) {
                                 Monthly Breakdown
                             </h2>
                         </div>
-                        <div className="overflow-x-auto">
+                        {/* Mobile view */}
+                        <div className="divide-y md:hidden">
+                            {data.by_month.map((row) => (
+                                <div key={row.month} className="space-y-2 p-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="font-semibold tabular-nums">
+                                            {row.month}
+                                        </div>
+                                        <div className="text-xs text-muted-foreground">
+                                            <span className="font-medium text-foreground tabular-nums">
+                                                {row.count.toLocaleString()}
+                                            </span>{' '}
+                                            orders
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-2 border-t border-dashed pt-1 text-xs">
+                                        <div>
+                                            <div className="text-[10px] font-normal text-muted-foreground uppercase">
+                                                Net
+                                            </div>
+                                            <div className="font-medium tabular-nums">
+                                                {formatPrice(row.net)}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[10px] font-normal text-muted-foreground uppercase">
+                                                VAT
+                                            </div>
+                                            <div className="font-semibold text-amber-600 tabular-nums dark:text-amber-400">
+                                                {formatPrice(row.vat)}
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-[10px] font-normal text-muted-foreground uppercase">
+                                                Gross
+                                            </div>
+                                            <div className="font-semibold tabular-nums">
+                                                {formatPrice(row.gross)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            {/* Total row for mobile */}
+                            <div className="space-y-2 bg-muted/30 p-4 font-semibold">
+                                <div className="flex items-center justify-between text-sm">
+                                    <div>Total</div>
+                                    <div className="tabular-nums">
+                                        {data.orders_count.toLocaleString()}{' '}
+                                        orders
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2 border-t border-muted pt-1 text-xs">
+                                    <div>
+                                        <div className="text-[10px] font-normal text-muted-foreground uppercase">
+                                            Net
+                                        </div>
+                                        <div className="tabular-nums">
+                                            {formatPrice(data.net_total)}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-[10px] font-normal text-muted-foreground uppercase">
+                                            VAT
+                                        </div>
+                                        <div className="text-amber-600 tabular-nums dark:text-amber-400">
+                                            {formatPrice(data.vat_total)}
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-[10px] font-normal text-muted-foreground uppercase">
+                                            Gross
+                                        </div>
+                                        <div className="tabular-nums">
+                                            {formatPrice(data.gross_total)}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Desktop view */}
+                        <div className="hidden overflow-x-auto md:block">
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b bg-muted/50">

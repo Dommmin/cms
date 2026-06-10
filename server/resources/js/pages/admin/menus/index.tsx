@@ -122,7 +122,7 @@ export default function MenusIndex({ menus, filters }: IndexProps) {
                         'Manage navigation menus',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Link href={MenuController.create.url()}>
                             <Button variant="outline">
                                 <PlusIcon className="mr-2 h-4 w-4" />
@@ -150,6 +150,8 @@ export default function MenusIndex({ menus, filters }: IndexProps) {
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={MenuController.index.url()}
+                    mobilePrimaryColumns={3}
+                    mobileCardTitle={(row) => row.name}
                 />
             </Wrapper>
         </AppLayout>

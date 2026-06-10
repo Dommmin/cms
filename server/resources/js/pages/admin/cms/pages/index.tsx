@@ -6,6 +6,7 @@ import { usePageColumns } from '@/components/columns/page-columns';
 
 import DataTable from '@/components/data-table';
 import InputError from '@/components/input-error';
+import ListFilters from '@/components/list-filters';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import {
@@ -28,6 +29,7 @@ import {
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
+import { resolveLocalizedText } from '@/lib/localized-text';
 
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
@@ -178,6 +180,7 @@ export default function Index({
     const { locales } = usePage().props as { locales: SharedLocale[] };
 
     const activeLocale = filters.locale ?? 'all';
+    const activeFilterCount = activeLocale !== 'all' ? 1 : 0;
 
     function setLocaleFilter(locale: string) {
         const params: Record<string, string> = {};
@@ -209,7 +212,7 @@ export default function Index({
                         'Manage CMS pages and content',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         {locales.length > 0 && (
                             <CloneSiteDialog locales={locales} />
                         )}
@@ -226,8 +229,7 @@ export default function Index({
                     </PageHeaderActions>
                 </PageHeader>
 
-                {/* Locale filter tabs */}
-                <div className="mb-4 flex flex-wrap gap-1 border-b pb-2">
+                <div className="mb-4 hidden flex-wrap gap-1 border-b pb-2 sm:flex">
                     {localeTabs.map((tab) => (
                         <button
                             key={tab.value}
@@ -242,6 +244,28 @@ export default function Index({
                         </button>
                     ))}
                 </div>
+
+                <ListFilters
+                    activeCount={activeFilterCount}
+                    description="Filter pages by locale."
+                    className="mb-4 sm:hidden"
+                >
+                    <Select
+                        value={activeLocale}
+                        onValueChange={setLocaleFilter}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="All locales" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {localeTabs.map((tab) => (
+                                <SelectItem key={tab.value} value={tab.value}>
+                                    {tab.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </ListFilters>
 
                 <DataTable
                     columns={pageColumns}
@@ -261,6 +285,8 @@ export default function Index({
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={PageController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => resolveLocalizedText(row.title)}
                 />
             </Wrapper>
         </AppLayout>

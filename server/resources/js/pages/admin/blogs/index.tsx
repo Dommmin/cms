@@ -120,7 +120,7 @@ export default function BlogsIndex({ blogs, filters }: IndexProps) {
                         'Manage blog containers for your posts',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Link href={BlogController.create.url()}>
                             <Button variant="outline">
                                 <PlusIcon className="mr-2 h-4 w-4" />
@@ -148,6 +148,8 @@ export default function BlogsIndex({ blogs, filters }: IndexProps) {
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={BlogController.index.url()}
+                    mobilePrimaryColumns={3}
+                    mobileCardTitle={(row) => resolveLocalizedText(row.name)}
                 />
             </Wrapper>
         </AppLayout>

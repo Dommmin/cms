@@ -172,7 +172,7 @@ export default function ReportsIndex({ reports }: IndexProps) {
                     title="Custom Reports"
                     description="Build and run ad-hoc reports on your data."
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button asChild>
                             <Link href={CustomReportController.create.url()}>
                                 <PlusIcon className="mr-2 h-4 w-4" />
@@ -182,7 +182,12 @@ export default function ReportsIndex({ reports }: IndexProps) {
                     </PageHeaderActions>
                 </PageHeader>
 
-                <DataTable columns={columns} data={reports} />
+                <DataTable
+                    columns={columns}
+                    data={reports}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => row.name}
+                />
             </Wrapper>
         </AppLayout>
     );

@@ -126,7 +126,7 @@ export default function FaqsIndex({
                         'Manage frequently asked questions',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Link href={FaqController.create.url()}>
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
@@ -154,6 +154,8 @@ export default function FaqsIndex({
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={FaqController.index.url()}
+                    mobilePrimaryColumns={3}
+                    mobileCardTitle={(row) => row.question}
                 />
             </Wrapper>
         </AppLayout>

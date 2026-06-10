@@ -21,6 +21,7 @@ export interface IndexProps {
     discounts: PaginationData;
     filters: {
         search?: string;
-        is_active?: boolean;
+        is_active?: string;
+        type?: string;
     };
 }

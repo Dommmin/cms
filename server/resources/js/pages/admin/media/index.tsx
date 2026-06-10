@@ -112,14 +112,14 @@ export default function Index() {
                     )}
                 />
 
-                <div className="flex flex-1 overflow-hidden">
+                <div className="flex flex-1 flex-col overflow-hidden md:flex-row">
                     <MediaBrowser
                         onItemClick={handleItemClick}
                         selectedIds={selectedItem ? [selectedItem.id] : []}
                     />
 
                     {selectedItem && (
-                        <div className="w-80 shrink-0 overflow-y-auto border-l bg-muted/30">
+                        <div className="w-full shrink-0 overflow-y-auto border-t bg-muted/30 md:w-80 md:border-t-0 md:border-l">
                             <div className="flex items-center justify-between border-b px-4 py-3">
                                 <h3 className="font-semibold">
                                     {__('misc.details', 'Details')}

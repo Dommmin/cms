@@ -93,7 +93,7 @@ export default function OrdersIndex({
                         'Manage customer orders',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button variant="outline" asChild>
                             <a href={exportMethod.url()}>
                                 <DownloadIcon className="mr-2 h-4 w-4" />
@@ -110,18 +110,18 @@ export default function OrdersIndex({
                 </PageHeader>
 
                 {selectedIds.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-3 rounded-md border bg-muted/50 px-4 py-3">
+                    <div className="flex flex-col gap-3 rounded-md border bg-muted/50 px-4 py-3 sm:flex-row sm:flex-wrap sm:items-center">
                         <span className="text-sm font-medium">
                             {selectedIds.length}{' '}
                             {selectedIds.length === 1 ? 'order' : 'orders'}{' '}
                             selected
                         </span>
-                        <div className="flex flex-1 items-center gap-2">
+                        <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
                             <Select
                                 value={bulkStatus}
                                 onValueChange={setBulkStatus}
                             >
-                                <SelectTrigger className="h-8 w-[180px]">
+                                <SelectTrigger className="h-8 w-full sm:w-[180px]">
                                     <SelectValue placeholder="Change status..." />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -138,6 +138,7 @@ export default function OrdersIndex({
                             <Button
                                 size="sm"
                                 disabled={!bulkStatus}
+                                className="w-full sm:w-auto"
                                 onClick={handleBulkSubmit}
                             >
                                 Apply
@@ -145,6 +146,7 @@ export default function OrdersIndex({
                             <Button
                                 size="sm"
                                 variant="ghost"
+                                className="w-full sm:w-auto"
                                 onClick={() => {
                                     setSelectedIds([]);
                                     setBulkStatus('');
@@ -174,6 +176,8 @@ export default function OrdersIndex({
                     )}
                     searchValue={filters?.search ?? ''}
                     baseUrl={OrderController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => `#${row.order_number}`}
                 />
             </Wrapper>
         </AppLayout>

@@ -38,7 +38,7 @@ export default function CustomerSegmentsIndex({ segments }: IndexProps) {
                     title="Customer Segments"
                     description={`${segments.total} segments`}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button asChild variant="outline">
                             <Link
                                 href={CustomerSegmentController.create.url()}
@@ -168,6 +168,8 @@ export default function CustomerSegmentsIndex({ segments }: IndexProps) {
                         prev_page_url: segments.prev_page_url ?? null,
                         next_page_url: segments.next_page_url ?? null,
                     }}
+                    mobilePrimaryColumns={3}
+                    mobileCardTitle={(row) => row.name}
                 />
             </Wrapper>
         </AppLayout>

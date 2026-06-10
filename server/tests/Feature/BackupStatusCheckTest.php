@@ -26,7 +26,7 @@ it('fails when no backup status exists', function (): void {
     $check = new BackupStatusCheck();
     $result = $check->run();
 
-    expect($result->status->value)->toBe(Status::failed()->value);
+    expect($result->status->value)->toBe(Status::FAILED->value);
     expect($result->notificationMessage)->toContain('No backup status record found');
 });
 
@@ -42,7 +42,7 @@ it('fails when last backup status is failed', function (): void {
     $check = new BackupStatusCheck();
     $result = $check->run();
 
-    expect($result->status->value)->toBe(Status::failed()->value);
+    expect($result->status->value)->toBe(Status::FAILED->value);
     expect($result->notificationMessage)->toContain('failed');
 });
 
@@ -58,7 +58,7 @@ it('fails when last backup is too old', function (): void {
     $check = new BackupStatusCheck();
     $result = $check->run();
 
-    expect($result->status->value)->toBe(Status::failed()->value);
+    expect($result->status->value)->toBe(Status::FAILED->value);
     expect($result->notificationMessage)->toContain('hours ago');
 });
 
@@ -74,7 +74,7 @@ it('succeeds when backup is fresh and successful', function (): void {
     $check = new BackupStatusCheck();
     $result = $check->run();
 
-    expect($result->status->value)->toBe(Status::ok()->value);
+    expect($result->status->value)->toBe(Status::OK->value);
     expect($result->notificationMessage)->toContain('Last successful backup was 2 hours ago');
 });
 
@@ -88,6 +88,6 @@ it('falls back to cache if status file does not exist', function (): void {
     $check = new BackupStatusCheck();
     $result = $check->run();
 
-    expect($result->status->value)->toBe(Status::ok()->value);
+    expect($result->status->value)->toBe(Status::OK->value);
     expect($result->notificationMessage)->toContain('Last successful backup was 3 hours ago');
 });

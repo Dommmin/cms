@@ -11,5 +11,6 @@ export type NotificationPayload =
     | {
           data?: AdminNotification[];
           unread_count?: number;
+          read_ids?: string[];
       }
     | undefined;

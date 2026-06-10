@@ -565,26 +565,35 @@ export default function EditVariant({
                     </div>
 
                     {data.tiers.length > 0 && (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead>
-                                    <tr className="border-b text-left text-xs text-muted-foreground">
-                                        <th className="pr-4 pb-2 font-medium">
-                                            Min Qty
-                                        </th>
-                                        <th className="pr-4 pb-2 font-medium">
-                                            Max Qty
-                                        </th>
-                                        <th className="pr-4 pb-2 font-medium">
-                                            Price (PLN)
-                                        </th>
-                                        <th className="pb-2 font-medium"></th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y">
-                                    {data.tiers.map((tier, index) => (
-                                        <tr key={index} className="py-2">
-                                            <td className="py-2 pr-4">
+                        <>
+                            {/* Mobile Tiered Pricing List */}
+                            <div className="divide-y md:hidden">
+                                {data.tiers.map((tier, index) => (
+                                    <div
+                                        key={index}
+                                        className="space-y-3 py-4 first:pt-0"
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs font-semibold text-muted-foreground">
+                                                Tier #{index + 1}
+                                            </span>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() =>
+                                                    removeTier(index)
+                                                }
+                                                aria-label="Remove tier"
+                                            >
+                                                <TrashIcon className="h-4 w-4 text-destructive" />
+                                            </Button>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="space-y-1">
+                                                <Label className="text-xs">
+                                                    Min Qty
+                                                </Label>
                                                 <Input
                                                     type="number"
                                                     min="1"
@@ -596,7 +605,6 @@ export default function EditVariant({
                                                             e.target.value,
                                                         )
                                                     }
-                                                    className="w-24"
                                                     placeholder="1"
                                                 />
                                                 <InputError
@@ -611,8 +619,11 @@ export default function EditVariant({
                                                         ]
                                                     }
                                                 />
-                                            </td>
-                                            <td className="py-2 pr-4">
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label className="text-xs">
+                                                    Max Qty
+                                                </Label>
                                                 <Input
                                                     type="number"
                                                     min="1"
@@ -626,7 +637,6 @@ export default function EditVariant({
                                                             e.target.value,
                                                         )
                                                     }
-                                                    className="w-24"
                                                     placeholder="∞"
                                                 />
                                                 <InputError
@@ -641,54 +651,170 @@ export default function EditVariant({
                                                         ]
                                                     }
                                                 />
-                                            </td>
-                                            <td className="py-2 pr-4">
-                                                <Input
-                                                    type="number"
-                                                    step="0.01"
-                                                    min="0"
-                                                    value={tier.price}
-                                                    onChange={(e) =>
-                                                        updateTier(
-                                                            index,
-                                                            'price',
-                                                            e.target.value,
-                                                        )
-                                                    }
-                                                    className="w-32"
-                                                    placeholder="0.00"
-                                                />
-                                                <InputError
-                                                    message={
-                                                        (
-                                                            tierErrors as Record<
-                                                                string,
-                                                                string
-                                                            >
-                                                        )[
-                                                            `tiers.${index}.price`
-                                                        ]
-                                                    }
-                                                />
-                                            </td>
-                                            <td className="py-2">
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() =>
-                                                        removeTier(index)
-                                                    }
-                                                    aria-label="Remove tier"
-                                                >
-                                                    <TrashIcon className="h-4 w-4 text-destructive" />
-                                                </Button>
-                                            </td>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <Label className="text-xs">
+                                                Price (PLN)
+                                            </Label>
+                                            <Input
+                                                type="number"
+                                                step="0.01"
+                                                min="0"
+                                                value={tier.price}
+                                                onChange={(e) =>
+                                                    updateTier(
+                                                        index,
+                                                        'price',
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                placeholder="0.00"
+                                            />
+                                            <InputError
+                                                message={
+                                                    (
+                                                        tierErrors as Record<
+                                                            string,
+                                                            string
+                                                        >
+                                                    )[`tiers.${index}.price`]
+                                                }
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Desktop Tiered Pricing Table */}
+                            <div className="hidden overflow-x-auto md:block">
+                                <table className="w-full text-sm">
+                                    <thead>
+                                        <tr className="border-b text-left text-xs text-muted-foreground">
+                                            <th className="pr-4 pb-2 font-medium">
+                                                Min Qty
+                                            </th>
+                                            <th className="pr-4 pb-2 font-medium">
+                                                Max Qty
+                                            </th>
+                                            <th className="pr-4 pb-2 font-medium">
+                                                Price (PLN)
+                                            </th>
+                                            <th className="pb-2 font-medium"></th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                    </thead>
+                                    <tbody className="divide-y">
+                                        {data.tiers.map((tier, index) => (
+                                            <tr key={index} className="py-2">
+                                                <td className="py-2 pr-4">
+                                                    <Input
+                                                        type="number"
+                                                        min="1"
+                                                        value={
+                                                            tier.min_quantity
+                                                        }
+                                                        onChange={(e) =>
+                                                            updateTier(
+                                                                index,
+                                                                'min_quantity',
+                                                                e.target.value,
+                                                            )
+                                                        }
+                                                        className="w-24"
+                                                        placeholder="1"
+                                                    />
+                                                    <InputError
+                                                        message={
+                                                            (
+                                                                tierErrors as Record<
+                                                                    string,
+                                                                    string
+                                                                >
+                                                            )[
+                                                                `tiers.${index}.min_quantity`
+                                                            ]
+                                                        }
+                                                    />
+                                                </td>
+                                                <td className="py-2 pr-4">
+                                                    <Input
+                                                        type="number"
+                                                        min="1"
+                                                        value={
+                                                            tier.max_quantity ??
+                                                            ''
+                                                        }
+                                                        onChange={(e) =>
+                                                            updateTier(
+                                                                index,
+                                                                'max_quantity',
+                                                                e.target.value,
+                                                            )
+                                                        }
+                                                        className="w-24"
+                                                        placeholder="∞"
+                                                    />
+                                                    <InputError
+                                                        message={
+                                                            (
+                                                                tierErrors as Record<
+                                                                    string,
+                                                                    string
+                                                                >
+                                                            )[
+                                                                `tiers.${index}.max_quantity`
+                                                            ]
+                                                        }
+                                                    />
+                                                </td>
+                                                <td className="py-2 pr-4">
+                                                    <Input
+                                                        type="number"
+                                                        step="0.01"
+                                                        min="0"
+                                                        value={tier.price}
+                                                        onChange={(e) =>
+                                                            updateTier(
+                                                                index,
+                                                                'price',
+                                                                e.target.value,
+                                                            )
+                                                        }
+                                                        className="w-32"
+                                                        placeholder="0.00"
+                                                    />
+                                                    <InputError
+                                                        message={
+                                                            (
+                                                                tierErrors as Record<
+                                                                    string,
+                                                                    string
+                                                                >
+                                                            )[
+                                                                `tiers.${index}.price`
+                                                            ]
+                                                        }
+                                                    />
+                                                </td>
+                                                <td className="py-2">
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            removeTier(index)
+                                                        }
+                                                        aria-label="Remove tier"
+                                                    >
+                                                        <TrashIcon className="h-4 w-4 text-destructive" />
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </>
                     )}
 
                     {data.tiers.length === 0 && (

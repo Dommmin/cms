@@ -19,6 +19,7 @@ export interface IndexProps {
     types: PaginationData;
     filters: {
         search?: string;
-        has_variants?: boolean;
+        has_variants?: string;
+        is_shippable?: string;
     };
 }

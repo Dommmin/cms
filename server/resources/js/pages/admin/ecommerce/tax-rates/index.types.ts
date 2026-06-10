@@ -19,6 +19,7 @@ export interface IndexProps {
     taxRates: PaginationData;
     filters: {
         search?: string;
-        is_active?: boolean;
+        is_active?: string;
+        is_default?: string;
     };
 }

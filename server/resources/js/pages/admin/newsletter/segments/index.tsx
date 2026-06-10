@@ -116,7 +116,7 @@ export default function SegmentsIndex({ segments, filters }: IndexProps) {
                         'Manage subscriber segments',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Link href={NewsletterSegmentController.create.url()}>
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
@@ -144,6 +144,8 @@ export default function SegmentsIndex({ segments, filters }: IndexProps) {
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={NewsletterSegmentController.index.url()}
+                    mobilePrimaryColumns={3}
+                    mobileCardTitle={(row) => row.name}
                 />
             </Wrapper>
         </AppLayout>

@@ -30,7 +30,7 @@ export default function AttributesIndex({ attributes, filters }: IndexProps) {
                     title={__('page.attributes', 'Attributes')}
                     description={`${attributes.total} product attributes`}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button asChild variant="outline">
                             <Link
                                 href={AttributeController.create.url()}
@@ -154,6 +154,8 @@ export default function AttributesIndex({ attributes, filters }: IndexProps) {
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={AttributeController.index.url()}
+                    mobilePrimaryColumns={3}
+                    mobileCardTitle={(row) => row.name}
                 />
             </Wrapper>
         </AppLayout>

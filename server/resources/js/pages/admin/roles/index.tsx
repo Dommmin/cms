@@ -4,6 +4,7 @@ import { useState } from 'react';
 import * as RoleController from '@/actions/App/Http/Controllers/Admin/RoleController';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
     Table,
     TableBody,
@@ -62,7 +63,7 @@ export default function Index({ roles }: { roles: Role[] }) {
                         'Manage user roles and their permissions',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button asChild>
                             <Link href={RoleController.create.url()}>
                                 <Plus className="mr-2 h-4 w-4" />
@@ -72,7 +73,83 @@ export default function Index({ roles }: { roles: Role[] }) {
                     </PageHeaderActions>
                 </PageHeader>
 
-                <div className="rounded-md border">
+                <div className="space-y-4 md:hidden">
+                    {roles.map((role) => (
+                        <Card key={role.id}>
+                            <CardContent className="space-y-4 p-4">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="font-medium">
+                                                {role.name}
+                                            </h3>
+                                            {role.is_system && (
+                                                <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                                                    system
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className="text-sm text-muted-foreground">
+                                            {role.users_count}{' '}
+                                            {__('label.users', 'Users')}
+                                        </p>
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">
+                                        {role.permissions.length}{' '}
+                                        {__('label.permissions', 'Permissions')}
+                                    </div>
+                                </div>
+                                <div className="flex flex-wrap gap-1">
+                                    {role.permissions
+                                        .slice(0, 5)
+                                        .map((permission) => (
+                                            <span
+                                                key={permission.id}
+                                                className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium"
+                                            >
+                                                {permission.name}
+                                            </span>
+                                        ))}
+                                    {role.permissions.length > 5 && (
+                                        <span className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                                            +{role.permissions.length - 5} more
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    {role.name !== 'super-admin' && (
+                                        <Link
+                                            href={RoleController.edit.url({
+                                                id: role.id,
+                                            })}
+                                            className="text-sm text-primary hover:underline"
+                                        >
+                                            {__('action.edit', 'Edit')}
+                                        </Link>
+                                    )}
+                                    {!role.is_system &&
+                                        role.users_count === 0 && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                                                disabled={
+                                                    deletingId === role.id
+                                                }
+                                                onClick={() =>
+                                                    handleDelete(role)
+                                                }
+                                            >
+                                                <Trash2 className="h-3.5 w-3.5" />
+                                            </Button>
+                                        )}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+
+                <div className="hidden rounded-md border md:block">
                     <Table>
                         <TableHeader>
                             <TableRow>

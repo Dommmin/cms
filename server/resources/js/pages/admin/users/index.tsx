@@ -42,7 +42,7 @@ export default function Index({
                         'Manage panel users and their roles',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button asChild variant="outline">
                             <Link
                                 href={UserController.trashed.url()}
@@ -85,6 +85,8 @@ export default function Index({
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={UserController.index.url()}
+                    mobilePrimaryColumns={3}
+                    mobileCardTitle={(row) => row.name}
                 />
             </Wrapper>
         </AppLayout>

@@ -1,11 +1,20 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon } from 'lucide-react';
 import * as ReturnRequestController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ReturnRequestController';
 import DataTable from '@/components/data-table';
+import ListFilters from '@/components/list-filters';
 import { PageHeader } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -41,6 +50,25 @@ export default function ReturnsIndex({
     returnTypes,
 }: IndexProps) {
     const __ = useTranslation();
+    const activeFilterCount = [filters.status, filters.return_type].filter(
+        Boolean,
+    ).length;
+
+    const updateFilters = (
+        nextFilters: Partial<
+            Pick<IndexProps['filters'], 'status' | 'return_type'>
+        >,
+    ) => {
+        router.get(
+            ReturnRequestController.index.url(),
+            { ...filters, ...nextFilters },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
+
     const columns: ColumnDef<ReturnRequest>[] = [
         {
             accessorKey: 'reference_number',
@@ -152,6 +180,86 @@ export default function ReturnsIndex({
                     )}
                 />
 
+                <ListFilters
+                    activeCount={activeFilterCount}
+                    description={__(
+                        'page.returns_filters_desc',
+                        'Filter requests by lifecycle status and return type.',
+                    )}
+                    contentClassName="sm:grid sm:grid-cols-2 sm:items-end sm:gap-4"
+                >
+                    <div className="space-y-2">
+                        <Label htmlFor="return-status-filter">
+                            {__('column.status', 'Status')}
+                        </Label>
+                        <Select
+                            value={filters.status || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    status: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="return-status-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__('column.status', 'Status')}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                {statuses.map((status) => (
+                                    <SelectItem
+                                        key={status.value}
+                                        value={status.value}
+                                    >
+                                        {status.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="return-type-filter">
+                            {__('column.type', 'Type')}
+                        </Label>
+                        <Select
+                            value={filters.return_type || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    return_type: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="return-type-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__('column.type', 'Type')}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                {returnTypes.map((type) => (
+                                    <SelectItem
+                                        key={type.value}
+                                        value={type.value}
+                                    >
+                                        {type.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </ListFilters>
+
                 <DataTable
                     columns={columns}
                     data={returns.data}
@@ -170,6 +278,8 @@ export default function ReturnsIndex({
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={ReturnRequestController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => row.reference_number}
                 />
             </Wrapper>
         </AppLayout>

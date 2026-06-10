@@ -143,6 +143,10 @@ export default function FormSubmissionsIndex({
                 <DataTable
                     columns={columns}
                     data={submissions.data}
+                    mobilePrimaryColumns={2}
+                    mobileCardTitle={(row) => (
+                        <span className="font-mono text-xs">#{row.id}</span>
+                    )}
                     pagination={{
                         current_page: submissions.current_page,
                         last_page: submissions.last_page,

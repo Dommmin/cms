@@ -50,6 +50,7 @@ import {
     Webhook,
     Zap,
 } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 
 import * as ActivityLogController from '@/actions/App/Http/Controllers/Admin/ActivityLogController';
 import * as AffiliateCodeController from '@/actions/App/Http/Controllers/Admin/AffiliateCodeController';
@@ -136,6 +137,7 @@ const footerNavItems: NavItem[] = [];
 export function AppSidebar() {
     const __ = useTranslation();
     const { modules } = usePage().props;
+    const sidebarContentRef = useRef<HTMLDivElement | null>(null);
 
     const contentNavItems: NavItem[] = [
         {
@@ -485,6 +487,31 @@ export function AppSidebar() {
     const page = usePage();
     const currentUrl = page.url;
 
+    useEffect(() => {
+        const sidebarContent = sidebarContentRef.current;
+
+        if (!sidebarContent) {
+            return;
+        }
+
+        const activeElement = sidebarContent.querySelector<HTMLElement>(
+            '[data-sidebar="menu-sub-button"][data-active="true"], [data-sidebar="menu-button"][data-active="true"]',
+        );
+
+        if (!activeElement) {
+            return;
+        }
+
+        const frame = window.requestAnimationFrame(() => {
+            activeElement.scrollIntoView({
+                block: 'center',
+                inline: 'nearest',
+            });
+        });
+
+        return () => window.cancelAnimationFrame(frame);
+    }, [currentUrl]);
+
     const isActive = (href: unknown): boolean => {
         if (!href || typeof href !== 'string') return false;
         return (
@@ -580,7 +607,7 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent>
+            <SidebarContent ref={sidebarContentRef}>
                 <SidebarGroup>
                     <SidebarMenu>
                         <SidebarMenuItem>

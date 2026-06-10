@@ -11,9 +11,18 @@ import {
 import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
+import ListFilters from '@/components/list-filters';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -37,10 +46,34 @@ const STATUS_BADGE: Record<
 export default function BlogPostsIndex({
     posts,
     filters,
-    statuses: _statuses,
-    categories: _categories,
+    statuses,
+    categories,
 }: IndexProps) {
     const __ = useTranslation();
+    const activeFilterCount = [
+        filters.category_id,
+        filters.status,
+        filters.content_type,
+    ].filter(Boolean).length;
+
+    const updateFilters = (
+        nextFilters: Partial<
+            Pick<
+                IndexProps['filters'],
+                'category_id' | 'status' | 'content_type'
+            >
+        >,
+    ) => {
+        router.get(
+            BlogPostController.index.url(),
+            { ...filters, ...nextFilters },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
+
     const columns: ColumnDef<BlogPost>[] = [
         {
             accessorKey: 'title',
@@ -190,7 +223,7 @@ export default function BlogPostsIndex({
                         'Manage your blog content',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Link href={BlogPostController.create.url()}>
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
@@ -199,6 +232,119 @@ export default function BlogPostsIndex({
                         </Link>
                     </PageHeaderActions>
                 </PageHeader>
+
+                <ListFilters
+                    activeCount={activeFilterCount}
+                    description={__(
+                        'page.blog_posts_filters_desc',
+                        'Filter posts by category, status, and content type.',
+                    )}
+                    contentClassName="sm:grid sm:grid-cols-3 sm:items-end sm:gap-4"
+                >
+                    <div className="space-y-2">
+                        <Label htmlFor="blog-category-filter">
+                            {__('column.category', 'Category')}
+                        </Label>
+                        <Select
+                            value={filters.category_id || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    category_id: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="blog-category-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__(
+                                        'column.category',
+                                        'Category',
+                                    )}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                {categories.map((category) => (
+                                    <SelectItem
+                                        key={category.id}
+                                        value={String(category.id)}
+                                    >
+                                        {category.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="blog-status-filter">
+                            {__('column.status', 'Status')}
+                        </Label>
+                        <Select
+                            value={filters.status || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    status: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="blog-status-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__('column.status', 'Status')}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                {statuses.map((status) => (
+                                    <SelectItem
+                                        key={status.value}
+                                        value={status.value}
+                                    >
+                                        {status.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="blog-type-filter">
+                            {__('column.type', 'Type')}
+                        </Label>
+                        <Select
+                            value={filters.content_type || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    content_type: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="blog-type-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__('column.type', 'Type')}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                <SelectItem value="article">Article</SelectItem>
+                                <SelectItem value="page">Page</SelectItem>
+                                <SelectItem value="news">News</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </ListFilters>
 
                 <DataTable
                     columns={columns}
@@ -218,6 +364,8 @@ export default function BlogPostsIndex({
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={BlogPostController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => resolveLocalizedText(row.title)}
                 />
             </Wrapper>
         </AppLayout>

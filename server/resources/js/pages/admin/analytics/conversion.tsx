@@ -48,7 +48,7 @@ export default function ConversionReport({ data, filters }: ConversionProps) {
                 />
 
                 {/* Date filters */}
-                <div className="mb-6 flex flex-wrap items-end gap-4 rounded-xl border bg-card p-4">
+                <div className="mb-6 flex flex-col gap-4 rounded-xl border bg-card p-4 sm:flex-row sm:items-end">
                     <div className="space-y-1">
                         <Label htmlFor="from">From</Label>
                         <Input
@@ -56,7 +56,7 @@ export default function ConversionReport({ data, filters }: ConversionProps) {
                             type="date"
                             value={from}
                             onChange={(e) => setFrom(e.target.value)}
-                            className="w-40"
+                            className="w-full sm:w-40"
                         />
                     </div>
                     <div className="space-y-1">
@@ -66,10 +66,12 @@ export default function ConversionReport({ data, filters }: ConversionProps) {
                             type="date"
                             value={to}
                             onChange={(e) => setTo(e.target.value)}
-                            className="w-40"
+                            className="w-full sm:w-40"
                         />
                     </div>
-                    <Button onClick={applyFilters}>Apply</Button>
+                    <Button onClick={applyFilters} className="w-full sm:w-auto">
+                        Apply
+                    </Button>
                 </div>
 
                 {/* Conversion rate metrics */}
@@ -176,66 +178,138 @@ export default function ConversionReport({ data, filters }: ConversionProps) {
                                     No landing page event data recorded.
                                 </div>
                             ) : (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm">
-                                        <thead>
-                                            <tr className="border-b bg-muted/50 text-left font-medium text-muted-foreground">
-                                                <th className="px-6 py-3">
-                                                    Path
-                                                </th>
-                                                <th className="px-6 py-3 text-right">
-                                                    Sessions
-                                                </th>
-                                                <th className="px-6 py-3 text-right">
-                                                    Conversions
-                                                </th>
-                                                <th className="px-6 py-3 text-right">
-                                                    CR
-                                                </th>
-                                                <th className="px-6 py-3 text-right">
-                                                    Revenue
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {data.landing_pages.map((row) => {
-                                                const cr =
-                                                    row.sessions > 0
-                                                        ? round(
-                                                              (row.conversions /
-                                                                  row.sessions) *
-                                                                  100,
-                                                              1,
-                                                          )
-                                                        : 0;
-                                                return (
-                                                    <tr
-                                                        key={row.url}
-                                                        className="border-b last:border-0 hover:bg-muted/30"
-                                                    >
-                                                        <td className="px-6 py-3 font-mono text-xs">
-                                                            {row.url}
-                                                        </td>
-                                                        <td className="px-6 py-3 text-right tabular-nums">
-                                                            {row.sessions}
-                                                        </td>
-                                                        <td className="px-6 py-3 text-right tabular-nums">
-                                                            {row.conversions}
-                                                        </td>
-                                                        <td className="px-6 py-3 text-right tabular-nums">
-                                                            {cr}%
-                                                        </td>
-                                                        <td className="px-6 py-3 text-right font-medium text-green-600 tabular-nums dark:text-green-400">
-                                                            {formatMoney(
-                                                                row.revenue,
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                <>
+                                    {/* Mobile card layout */}
+                                    <div className="divide-y md:hidden">
+                                        {data.landing_pages.map((row) => {
+                                            const cr =
+                                                row.sessions > 0
+                                                    ? round(
+                                                          (row.conversions /
+                                                              row.sessions) *
+                                                              100,
+                                                          1,
+                                                      )
+                                                    : 0;
+                                            return (
+                                                <div
+                                                    key={row.url}
+                                                    className="space-y-2 p-4"
+                                                >
+                                                    <div className="font-mono text-xs font-semibold break-all">
+                                                        {row.url}
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-2 text-xs">
+                                                        <div>
+                                                            <span className="text-muted-foreground">
+                                                                Sessions:
+                                                            </span>{' '}
+                                                            <span className="font-medium tabular-nums">
+                                                                {row.sessions}
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-muted-foreground">
+                                                                Conversions:
+                                                            </span>{' '}
+                                                            <span className="font-medium tabular-nums">
+                                                                {
+                                                                    row.conversions
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-muted-foreground">
+                                                                CR:
+                                                            </span>{' '}
+                                                            <span className="font-medium tabular-nums">
+                                                                {cr}%
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-muted-foreground">
+                                                                Revenue:
+                                                            </span>{' '}
+                                                            <span className="font-semibold text-green-600 tabular-nums dark:text-green-400">
+                                                                {formatMoney(
+                                                                    row.revenue,
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+
+                                    {/* Desktop table layout */}
+                                    <div className="hidden overflow-x-auto md:block">
+                                        <table className="w-full text-sm">
+                                            <thead>
+                                                <tr className="border-b bg-muted/50 text-left font-medium text-muted-foreground">
+                                                    <th className="px-6 py-3">
+                                                        Path
+                                                    </th>
+                                                    <th className="px-6 py-3 text-right">
+                                                        Sessions
+                                                    </th>
+                                                    <th className="px-6 py-3 text-right">
+                                                        Conversions
+                                                    </th>
+                                                    <th className="px-6 py-3 text-right">
+                                                        CR
+                                                    </th>
+                                                    <th className="px-6 py-3 text-right">
+                                                        Revenue
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {data.landing_pages.map(
+                                                    (row) => {
+                                                        const cr =
+                                                            row.sessions > 0
+                                                                ? round(
+                                                                      (row.conversions /
+                                                                          row.sessions) *
+                                                                          100,
+                                                                      1,
+                                                                  )
+                                                                : 0;
+                                                        return (
+                                                            <tr
+                                                                key={row.url}
+                                                                className="border-b last:border-0 hover:bg-muted/30"
+                                                            >
+                                                                <td className="px-6 py-3 font-mono text-xs">
+                                                                    {row.url}
+                                                                </td>
+                                                                <td className="px-6 py-3 text-right tabular-nums">
+                                                                    {
+                                                                        row.sessions
+                                                                    }
+                                                                </td>
+                                                                <td className="px-6 py-3 text-right tabular-nums">
+                                                                    {
+                                                                        row.conversions
+                                                                    }
+                                                                </td>
+                                                                <td className="px-6 py-3 text-right tabular-nums">
+                                                                    {cr}%
+                                                                </td>
+                                                                <td className="px-6 py-3 text-right font-medium text-green-600 tabular-nums dark:text-green-400">
+                                                                    {formatMoney(
+                                                                        row.revenue,
+                                                                    )}
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    },
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </>
                             )}
                         </div>
                     </TabsContent>
@@ -259,45 +333,84 @@ export default function ConversionReport({ data, filters }: ConversionProps) {
                                     period.
                                 </div>
                             ) : (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm">
-                                        <thead>
-                                            <tr className="border-b bg-muted/50 text-left font-medium text-muted-foreground">
-                                                <th className="px-6 py-3">
-                                                    Promo Code
-                                                </th>
-                                                <th className="px-6 py-3 text-right">
-                                                    Orders
-                                                </th>
-                                                <th className="px-6 py-3 text-right">
-                                                    Attributed Revenue
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {data.promotions.map((row) => (
-                                                <tr
-                                                    key={row.code}
-                                                    className="border-b last:border-0 hover:bg-muted/30"
-                                                >
-                                                    <td className="px-6 py-3">
-                                                        <span className="rounded bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-                                                            {row.code}
+                                <>
+                                    {/* Mobile card layout */}
+                                    <div className="divide-y md:hidden">
+                                        {data.promotions.map((row) => (
+                                            <div
+                                                key={row.code}
+                                                className="flex items-center justify-between p-4"
+                                            >
+                                                <div>
+                                                    <span className="rounded bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                                                        {row.code}
+                                                    </span>
+                                                </div>
+                                                <div className="space-y-1 text-right text-xs">
+                                                    <div>
+                                                        <span className="text-muted-foreground">
+                                                            Orders:
+                                                        </span>{' '}
+                                                        <span className="font-medium tabular-nums">
+                                                            {row.purchases}
                                                         </span>
-                                                    </td>
-                                                    <td className="px-6 py-3 text-right font-medium tabular-nums">
-                                                        {row.purchases}
-                                                    </td>
-                                                    <td className="px-6 py-3 text-right font-semibold text-green-600 tabular-nums dark:text-green-400">
-                                                        {formatMoney(
-                                                            row.revenue,
-                                                        )}
-                                                    </td>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-muted-foreground">
+                                                            Revenue:
+                                                        </span>{' '}
+                                                        <span className="font-semibold text-green-600 tabular-nums dark:text-green-400">
+                                                            {formatMoney(
+                                                                row.revenue,
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Desktop table layout */}
+                                    <div className="hidden overflow-x-auto md:block">
+                                        <table className="w-full text-sm">
+                                            <thead>
+                                                <tr className="border-b bg-muted/50 text-left font-medium text-muted-foreground">
+                                                    <th className="px-6 py-3">
+                                                        Promo Code
+                                                    </th>
+                                                    <th className="px-6 py-3 text-right">
+                                                        Orders
+                                                    </th>
+                                                    <th className="px-6 py-3 text-right">
+                                                        Attributed Revenue
+                                                    </th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                            </thead>
+                                            <tbody>
+                                                {data.promotions.map((row) => (
+                                                    <tr
+                                                        key={row.code}
+                                                        className="border-b last:border-0 hover:bg-muted/30"
+                                                    >
+                                                        <td className="px-6 py-3">
+                                                            <span className="rounded bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                                                                {row.code}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-3 text-right font-medium tabular-nums">
+                                                            {row.purchases}
+                                                        </td>
+                                                        <td className="px-6 py-3 text-right font-semibold text-green-600 tabular-nums dark:text-green-400">
+                                                            {formatMoney(
+                                                                row.revenue,
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </>
                             )}
                         </div>
                     </TabsContent>

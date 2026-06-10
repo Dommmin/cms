@@ -47,3 +47,4 @@ server/supervisord.pid
 .agents/
 mobile/.agents/
 
+.playwright-mcp

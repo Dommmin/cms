@@ -1,11 +1,20 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { EyeIcon } from 'lucide-react';
 import * as PrivacyRequestController from '@/actions/App/Http/Controllers/Admin/PrivacyRequestController';
 import DataTable from '@/components/data-table';
+import ListFilters from '@/components/list-filters';
 import { PageHeader } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -28,6 +37,23 @@ export default function PrivacyRequestsIndex({
     stats,
 }: IndexProps) {
     const __ = useTranslation();
+    const activeFilterCount = [filters.type, filters.status].filter(
+        Boolean,
+    ).length;
+
+    const updateFilters = (
+        nextFilters: Partial<Pick<IndexProps['filters'], 'type' | 'status'>>,
+    ) => {
+        router.get(
+            PrivacyRequestController.index.url(),
+            { ...filters, ...nextFilters },
+            {
+                preserveScroll: true,
+                preserveState: true,
+            },
+        );
+    };
+
     const columns: ColumnDef<PrivacyRequest>[] = [
         {
             accessorKey: 'type',
@@ -128,6 +154,80 @@ export default function PrivacyRequestsIndex({
                     )}
                 />
 
+                <ListFilters
+                    activeCount={activeFilterCount}
+                    description={__(
+                        'page.privacy_requests_filters_desc',
+                        'Filter requests by request type and current status.',
+                    )}
+                    contentClassName="sm:grid sm:grid-cols-2 sm:items-end sm:gap-4"
+                >
+                    <div className="space-y-2">
+                        <Label htmlFor="privacy-type-filter">
+                            {__('column.type', 'Type')}
+                        </Label>
+                        <Select
+                            value={filters.type || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    type: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="privacy-type-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__('column.type', 'Type')}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                <SelectItem value="export">Export</SelectItem>
+                                <SelectItem value="delete">Delete</SelectItem>
+                                <SelectItem value="restrict">
+                                    Restrict
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="privacy-status-filter">
+                            {__('column.status', 'Status')}
+                        </Label>
+                        <Select
+                            value={filters.status || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    status: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="privacy-status-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__('column.status', 'Status')}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                {Object.keys(statusColors).map((status) => (
+                                    <SelectItem key={status} value={status}>
+                                        {status}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </ListFilters>
+
                 <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
                     <div className="rounded-lg border bg-card p-4">
                         <div className="text-sm text-muted-foreground">
@@ -173,6 +273,8 @@ export default function PrivacyRequestsIndex({
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={PrivacyRequestController.index.url()}
+                    mobilePrimaryColumns={3}
+                    mobileCardTitle={(row) => row.type}
                 />
             </Wrapper>
         </AppLayout>

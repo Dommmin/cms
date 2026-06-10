@@ -19,4 +19,5 @@ export type MethodsData = {
 export type IndexProps = {
     methods: MethodsData;
     filters: { search?: string; is_active?: string; carrier?: string };
+    carriers: Array<{ value: string; label: string }>;
 };
