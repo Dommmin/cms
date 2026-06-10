@@ -7,6 +7,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Enums\OrderStatusEnum;
 use App\Http\Controllers\Api\ApiController;
 use App\Models\Order;
+use App\Services\Webhooks\BaseLinkerIncomingWebhookVerifier;
+use App\Services\Webhooks\IncomingWebhookHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -17,43 +19,47 @@ class BaseLinkerWebhookController extends ApiController
      * Handle incoming webhooks from BaseLinker (e.g., order status change).
      * Needs to verify token for security.
      */
-    public function handle(Request $request): JsonResponse
-    {
-        $password = $request->header('X-BL-Pass', $request->input('bl_pass'));
-        $expectedToken = config('services.baselinker.webhook_token');
+    public function handle(
+        Request $request,
+        IncomingWebhookHandler $handler,
+        BaseLinkerIncomingWebhookVerifier $verifier,
+    ): JsonResponse {
+        return $handler->handle(
+            $request,
+            $verifier,
+            function (array $payload): void {
+                $action = $payload['action'] ?? null;
 
-        if (! $expectedToken || $password !== $expectedToken) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
+                if ($action !== 'status') {
+                    return;
+                }
 
-        $action = $request->input('action');
-        if ($action !== 'status') {
-            return $this->ok([]);
-        }
+                $blOrderId = $payload['order_id'] ?? null;
+                $statusId = (int) ($payload['status_id'] ?? 0);
 
-        $blOrderId = $request->input('order_id');
-        $statusId = (int) $request->input('status_id');
+                if (! is_string($blOrderId) || $blOrderId === '') {
+                    return;
+                }
 
-        $order = Order::query()->where('baselinker_order_id', $blOrderId)->first();
+                $order = Order::query()->where('baselinker_order_id', $blOrderId)->first();
 
-        if (! $order) {
-            Log::warning('BaseLinker webhook: Order not found locally', ['baselinker_id' => $blOrderId]);
+                if (! $order) {
+                    Log::warning('BaseLinker webhook: Order not found locally', ['baselinker_id' => $blOrderId]);
 
-            return $this->ok([]);
-        }
+                    return;
+                }
 
-        // Map BaseLinker status IDs to local statuses.
-        // In a real scenario, these mappings should be configurable via settings.
-        // For demonstration, we just log it or apply some hardcoded mappings.
-        $statusMap = config('services.baselinker.status_map', []);
+                /** @var array<int, string> $statusMap */
+                $statusMap = config('services.baselinker.status_map', []);
 
-        if (isset($statusMap[$statusId])) {
-            $newStatus = OrderStatusEnum::tryFrom($statusMap[$statusId]);
-            if ($newStatus && $order->status->getValue() !== $newStatus->value) {
-                $order->changeStatus($newStatus, 'system', 'Status changed to BaseLinker ID '.$statusId);
-            }
-        }
-
-        return $this->ok([]);
+                if (isset($statusMap[$statusId])) {
+                    $newStatus = OrderStatusEnum::tryFrom($statusMap[$statusId]);
+                    if ($newStatus && $order->status->getValue() !== $newStatus->value) {
+                        $order->changeStatus($newStatus, 'system', 'Status changed to BaseLinker ID '.$statusId);
+                    }
+                }
+            },
+            [],
+        );
     }
 }

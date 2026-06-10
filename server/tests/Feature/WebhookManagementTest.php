@@ -6,6 +6,7 @@ use App\Jobs\DeliverWebhookJob;
 use App\Models\User;
 use App\Models\Webhook;
 use App\Models\WebhookDelivery;
+use App\Services\Webhooks\OutboundWebhookDeliveryService;
 use App\Services\WebhookService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
@@ -164,7 +165,7 @@ it('blocks outbound deliveries to disallowed webhook targets without making an H
     ]);
 
     $job = new DeliverWebhookJob($webhook, 'order.created', ['order_id' => 1]);
-    $job->handle();
+    $job->handle(resolve(OutboundWebhookDeliveryService::class));
 
     Http::assertNothingSent();
 

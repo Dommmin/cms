@@ -119,6 +119,7 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - **Activity Log** — spatie/activitylog on key models
 - **Model Versioning** — Product, BlogPost, Category (50/30/30 versions), compare + restore UI
 - **Health Checks** — spatie/laravel-health endpoint
+- **Security Headers + Webhook Standards** — Laravel global `SecurityHeaders` middleware and Next.js storefront headers/CSP both enforce `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`, `X-Permitted-Cross-Domain-Policies`, nonce-based CSP on HTML, and HSTS on secure storefront/admin traffic; inbound provider webhooks run through a shared verifier/handler abstraction (`IncomingWebhookVerifierInterface`, provider verifier, `IncomingWebhookHandler`), while outbound admin webhooks use `OutboundWebhookDeliveryService` for public-HTTPS target policy, signed headers, timeouts, normalized results, and consistent delivery tracking
 - **Dashboard Widgets** — configurable per-user
 - **Cookie Consents** — GDPR, read-only admin view
 - **Schema.org** — WebSite, Org, BlogPosting, Product, LocalBusiness, FAQPage (client)

@@ -6,15 +6,12 @@ namespace App\Jobs;
 
 use App\Models\Webhook;
 use App\Models\WebhookDelivery;
-use App\Services\OutboundWebhookPolicy;
+use App\Services\Webhooks\OutboundWebhookDeliveryService;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\Tries;
-use Illuminate\Support\Facades\Http;
-use JsonException;
-use RuntimeException;
 
 #[Backoff(60)]
 #[Tries(3)]
@@ -28,79 +25,33 @@ final class DeliverWebhookJob implements ShouldQueue
         public readonly array $payload,
     ) {}
 
-    public function handle(): void
+    public function handle(OutboundWebhookDeliveryService $deliveryService): void
     {
-        $urlViolation = OutboundWebhookPolicy::violationFor($this->webhook->url);
-
-        if ($urlViolation !== null) {
-            WebhookDelivery::query()->create([
-                'webhook_id' => $this->webhook->id,
-                'event' => $this->event,
-                'payload' => $this->payload,
-                'status' => 'failed',
-                'attempt' => $this->attempts(),
-                'response_status' => null,
-                'response_body' => $urlViolation,
-                'duration_ms' => 0,
-                'delivered_at' => now(),
-            ]);
-
-            Webhook::query()->where('id', $this->webhook->id)->increment('failure_count');
-            $this->fail(new RuntimeException($urlViolation));
-
-            return;
-        }
-
-        $requestBody = [
-            'event' => $this->event,
-            'timestamp' => now()->toIso8601String(),
-            'data' => $this->payload,
-        ];
-
         try {
-            $body = json_encode($requestBody, JSON_THROW_ON_ERROR);
-        } catch (JsonException $exception) {
-            throw new RuntimeException('Unable to encode webhook payload.', previous: $exception);
-        }
-
-        $signature = hash_hmac('sha256', $body, $this->webhook->secret);
-
-        $start = microtime(true);
-
-        try {
-            $response = Http::connectTimeout(3)
-                ->timeout(10)
-                ->withHeaders([
-                    'Content-Type' => 'application/json',
-                    'User-Agent' => 'CMS-Webhook/1.0',
-                    'X-Webhook-Event' => $this->event,
-                    'X-Webhook-Signature' => 'sha256='.$signature,
-                ])
-                ->post($this->webhook->url, $requestBody);
-
-            $duration = (int) ((microtime(true) - $start) * 1000);
-            $status = $response->successful() ? 'success' : 'failed';
+            $result = $deliveryService->deliver($this->webhook, $this->event, $this->payload);
 
             WebhookDelivery::query()->create([
                 'webhook_id' => $this->webhook->id,
                 'event' => $this->event,
                 'payload' => $this->payload,
-                'status' => $status,
+                'status' => $result->status,
                 'attempt' => $this->attempts(),
-                'response_status' => $response->status(),
-                'response_body' => mb_substr($response->body(), 0, 1000),
-                'duration_ms' => $duration,
+                'response_status' => $result->responseStatus,
+                'response_body' => $result->responseBody,
+                'duration_ms' => $result->durationMs,
                 'delivered_at' => now(),
             ]);
 
-            if ($status === 'success') {
+            if ($result->successful()) {
                 $this->webhook->update([
                     'last_triggered_at' => now(),
                     'failure_count' => 0,
                 ]);
             } else {
                 Webhook::query()->where('id', $this->webhook->id)->increment('failure_count');
-                $this->fail('HTTP '.$response->status());
+                $this->fail($result->responseStatus !== null
+                    ? 'HTTP '.$result->responseStatus
+                    : $result->responseBody);
             }
         } catch (Exception $exception) {
             Webhook::query()->where('id', $this->webhook->id)->increment('failure_count');

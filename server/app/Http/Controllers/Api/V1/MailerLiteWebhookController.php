@@ -6,6 +6,8 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\ApiController;
 use App\Models\NewsletterSubscriber;
+use App\Services\Webhooks\IncomingWebhookHandler;
+use App\Services\Webhooks\MailerLiteIncomingWebhookVerifier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -16,50 +18,42 @@ class MailerLiteWebhookController extends ApiController
      * Handle incoming webhooks from MailerLite
      * e.g., subscriber.unsubscribed, subscriber.deleted
      */
-    public function handle(Request $request): JsonResponse
-    {
-        $signature = $request->header('X-MailerLite-Signature');
+    public function handle(
+        Request $request,
+        IncomingWebhookHandler $handler,
+        MailerLiteIncomingWebhookVerifier $verifier,
+    ): JsonResponse {
+        return $handler->handle(
+            $request,
+            $verifier,
+            function (array $payload): void {
+                /** @var array<int, array<string, mixed>> $events */
+                $events = $payload['events'] ?? [];
 
-        if (! $signature) {
-            return response()->json(['message' => 'Signature missing.'], 401);
-        }
+                foreach ($events as $event) {
+                    $type = $event['type'] ?? null;
+                    $email = $event['data']['subscriber']['email'] ?? null;
+                    if (! is_string($email)) {
+                        continue;
+                    }
+                    if ($email === '') {
+                        continue;
+                    }
 
-        $secret = config('services.mailerlite.webhook_secret') ?: config('services.mailerlite.api_key');
+                    $subscriber = NewsletterSubscriber::query()->where('email', $email)->first();
 
-        if (! $secret) {
-            return response()->json(['message' => 'Verification secret not configured.'], 500);
-        }
+                    if (! $subscriber) {
+                        continue;
+                    }
 
-        $payload = $request->getContent();
-        $expectedSignature = base64_encode(hash_hmac('sha256', $payload, (string) $secret, true));
-
-        if (! hash_equals($expectedSignature, $signature)) {
-            return response()->json(['message' => 'Invalid signature.'], 401);
-        }
-
-        $events = $request->input('events', []);
-
-        foreach ($events as $event) {
-            $type = $event['type'] ?? null;
-            $email = $event['data']['subscriber']['email'] ?? null;
-
-            if (! $email) {
-                continue;
-            }
-
-            $subscriber = NewsletterSubscriber::query()->where('email', $email)->first();
-
-            if (! $subscriber) {
-                continue;
-            }
-
-            match ($type) {
-                'subscriber.unsubscribed' => $subscriber->unsubscribe('mailerlite_webhook'),
-                'subscriber.deleted' => $subscriber->delete(),
-                default => Log::debug('Unhandled MailerLite webhook type: '.$type),
-            };
-        }
-
-        return $this->ok([]);
+                    match ($type) {
+                        'subscriber.unsubscribed' => $subscriber->unsubscribe('mailerlite_webhook'),
+                        'subscriber.deleted' => $subscriber->delete(),
+                        default => Log::debug('Unhandled MailerLite webhook type: '.$type),
+                    };
+                }
+            },
+            [],
+        );
     }
 }

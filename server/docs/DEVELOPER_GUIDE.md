@@ -319,9 +319,9 @@ Autopay is not implemented yet. If added, it should follow the same gateway/clie
 
 **P24 sub-services:** `P24Client` (Basic Auth HTTP), `P24SignatureService` (SHA256 signature generation/verification).
 
-**Webhooks:** `POST /api/v1/webhooks/payu`, `POST /api/v1/webhooks/p24` and `POST /api/v1/webhooks/paynow` → dispatches `ProcessPaymentWebhook` job (3 tries, 10s backoff). Webhook signatures are verified synchronously before queuing.
+**Webhooks:** `POST /api/v1/webhooks/payu`, `POST /api/v1/webhooks/p24` and `POST /api/v1/webhooks/paynow` → dispatch `ProcessPaymentWebhook` after passing through the shared inbound webhook stack: `IncomingWebhookVerifierInterface` + provider-specific verifier + `IncomingWebhookHandler`.
 
-**Outbound webhook standard:** Admin-managed outbound webhooks are validated by Form Requests and `OutboundWebhookPolicy`. Public HTTPS targets are required by default; localhost/private-network destinations are blocked unless `WEBHOOK_ALLOW_LOCAL_TARGETS=true` is explicitly enabled for local integration work. `DeliverWebhookJob` also enforces the same policy at send time, adds `X-Webhook-Event` / `X-Webhook-Signature` headers, uses a 3s connect timeout and 10s total timeout, and records failed attempts in `webhook_deliveries`.
+**Outbound webhook standard:** Admin-managed outbound webhooks are validated by Form Requests and `OutboundWebhookPolicy`. Delivery goes through `OutboundWebhookDeliveryService`, while `DeliverWebhookJob` handles retries and persistence only. Public HTTPS targets are required by default; localhost/private-network destinations are blocked unless `WEBHOOK_ALLOW_LOCAL_TARGETS=true` is explicitly enabled for local integration work. The shared delivery service adds `X-Webhook-Event` / `X-Webhook-Signature`, uses a 3s connect timeout and 10s total timeout, and returns a normalized result that is stored in `webhook_deliveries`.
 
 **Payment status polling:** `GET /api/v1/payments/{payment}/status` — authenticated, returns `{status, order_reference}`. Frontend polls every 3s while `status === 'pending'` (BLIK flow). For P24 this polling also resolves failed/cancelled returns, because P24 sends `urlStatus` notifications only for successful payments.
 
@@ -855,8 +855,8 @@ Notifications use Server-Sent Events:
 
 Before adding any inbound or outbound integration, follow the platform standard:
 
-- inbound webhooks must verify provider signatures or shared secrets before queue dispatch
-- outbound callbacks must use the shared webhook delivery flow or match its guarantees: public HTTPS target, explicit timeout, failure recording, and no silent localhost/private-network calls in production
+- inbound webhooks must implement `IncomingWebhookVerifierInterface`, return a `WebhookVerificationResult`, and be executed through `IncomingWebhookHandler`
+- outbound callbacks must use `OutboundWebhookDeliveryService` or match its guarantees: public HTTPS target, explicit timeout, signed headers, normalized delivery result, and no silent localhost/private-network calls in production
 - admin validation belongs in Form Requests, not inline controller rules
 
 ### 14.1 Adding a New Admin CRUD Module
