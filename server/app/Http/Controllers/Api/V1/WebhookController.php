@@ -10,6 +10,7 @@ use App\Services\Webhooks\IncomingWebhookHandler;
 use App\Services\Webhooks\P24IncomingWebhookVerifier;
 use App\Services\Webhooks\PaynowIncomingWebhookVerifier;
 use App\Services\Webhooks\PayUIncomingWebhookVerifier;
+use App\Services\Webhooks\StripeIncomingWebhookVerifier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -42,6 +43,16 @@ class WebhookController extends ApiController
     ): JsonResponse {
         return $handler->handle($request, $verifier, function (array $payload): void {
             dispatch(new ProcessPaymentWebhook('paynow', $payload));
+        });
+    }
+
+    public function stripe(
+        Request $request,
+        IncomingWebhookHandler $handler,
+        StripeIncomingWebhookVerifier $verifier,
+    ): JsonResponse {
+        return $handler->handle($request, $verifier, function (array $payload): void {
+            dispatch(new ProcessPaymentWebhook('stripe', $payload));
         });
     }
 }

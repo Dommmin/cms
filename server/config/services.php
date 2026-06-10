@@ -74,6 +74,14 @@ return [
         'base_url' => env('PAYNOW_BASE_URL', 'https://api.sandbox.paynow.pl'),
     ],
 
+    // Stripe is managed from the admin Settings panel; these act as bootstrap
+    // fallbacks until the cached admin values are loaded at boot.
+    'stripe' => [
+        'key' => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+    ],
+
     'apple_pay' => [
         'merchant_id' => env('APPLE_PAY_MERCHANT_ID'),
         'cert_path' => env('APPLE_PAY_CERT_PATH'),

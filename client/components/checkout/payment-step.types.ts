@@ -7,6 +7,7 @@ export type PaymentMethodValue =
     | 'paynow'
     | 'paypo'
     | 'p24'
+    | 'stripe'
     | 'cash_on_delivery'
     | 'bank_transfer';
 export interface PaymentStepProps {

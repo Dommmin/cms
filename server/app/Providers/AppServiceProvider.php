@@ -87,6 +87,8 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('api.public', fn (Request $r) => Limit::perMinute(60)->by($r->ip()));
 
+        RateLimiter::for('api.analytics', fn (Request $r) => Limit::perMinute(300)->by($r->ip()));
+
         RateLimiter::for('api.auth', fn (Request $r) => Limit::perMinute(300)->by($r->user()?->id ?: $r->ip()));
     }
 
@@ -227,19 +229,6 @@ class AppServiceProvider extends ServiceProvider
 
             if ($v = $decrypt($decode($rows['cloudflare_turnstile_site_key'] ?? null))) {
                 config(['services.cloudflare.turnstile_site' => $v]);
-            }
-
-            // Stripe
-            if ($v = $decode($rows['stripe_public_key'] ?? null)) {
-                config(['services.stripe.key' => $v]);
-            }
-
-            if ($v = $decrypt($decode($rows['stripe_secret_key'] ?? null))) {
-                config(['services.stripe.secret' => $v]);
-            }
-
-            if ($v = $decrypt($decode($rows['stripe_webhook_secret'] ?? null))) {
-                config(['services.stripe.webhook_secret' => $v]);
             }
 
             // MailerLite

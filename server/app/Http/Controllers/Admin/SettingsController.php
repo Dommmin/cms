@@ -47,6 +47,10 @@ class SettingsController extends Controller
                 continue;
             }
 
+            if ($setting->type === SettingTypeEnum::Encrypted && $rawValue === '••••••••') {
+                continue;
+            }
+
             if ($setting->type === SettingTypeEnum::Boolean) {
                 $value = json_encode(filter_var($rawValue, FILTER_VALIDATE_BOOLEAN));
             } elseif ($setting->type === SettingTypeEnum::Integer) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Queries\Admin;
 
+use App\Enums\SettingTypeEnum;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 
@@ -26,6 +27,13 @@ class SettingsIndexQuery
             ->orderBy('group')
             ->orderBy('key')
             ->paginate(50)
+            ->through(function (Setting $setting): Setting {
+                if ($setting->type === SettingTypeEnum::Encrypted && filled($setting->value)) {
+                    $setting->value = '••••••••';
+                }
+
+                return $setting;
+            })
             ->withQueryString();
     }
 

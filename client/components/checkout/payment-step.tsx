@@ -54,6 +54,14 @@ const METHOD_DEFS: Array<{
         providerIds: ['p24'],
     },
     {
+        value: 'stripe',
+        labelKey: 'checkout.method_stripe',
+        labelDefault: 'Stripe Checkout',
+        descKey: 'checkout.method_stripe_desc',
+        descDefault: 'Card, wallets and local payment methods via Stripe',
+        providerIds: ['stripe'],
+    },
+    {
         value: 'bank_transfer',
         labelKey: 'checkout.method_bank_transfer',
         labelDefault: 'Bank Transfer',
@@ -225,16 +233,14 @@ export function PaymentStep({
                                     {/* Missing config notice */}
                                     {isUnconfigured &&
                                         cfg !== undefined &&
-                                        cfg.missing_env.length > 0 && (
+                                        cfg.missing_settings.length > 0 && (
                                             <div className="mt-1.5 flex items-start gap-1.5 rounded-md bg-amber-50 px-2 py-1.5 dark:bg-amber-950">
                                                 <AlertTriangle className="mt-px h-3 w-3 shrink-0 text-amber-600 dark:text-amber-400" />
                                                 <span className="text-xs text-amber-700 dark:text-amber-300">
-                                                    Set in{' '}
-                                                    <code className="rounded bg-amber-100 px-0.5 dark:bg-amber-900">
-                                                        server/.env
-                                                    </code>
-                                                    :{' '}
-                                                    {cfg.missing_env.join(', ')}
+                                                    Configure in Admin Settings:{' '}
+                                                    {cfg.missing_settings.join(
+                                                        ', ',
+                                                    )}
                                                 </span>
                                             </div>
                                         )}

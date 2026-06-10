@@ -21,6 +21,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Cashier\Billable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -112,6 +113,7 @@ use Spatie\Permission\Traits\HasRoles;
 ])]
 class User extends Authenticatable implements MustVerifyEmail
 {
+    use Billable;
     use HasApiTokens;
     use HasFactory;
     use HasRoles;

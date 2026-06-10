@@ -342,6 +342,9 @@ it('reports paynow payment configuration status in checkout methods', function (
         ->assertJsonFragment([
             'id' => 'paynow',
             'configured' => false,
-            'missing_env' => ['PAYNOW_API_KEY', 'PAYNOW_SIGNATURE_KEY'],
+            'missing_settings' => [
+                'payments.paynow_api_key',
+                'payments.paynow_signature_key',
+            ],
         ]);
 });

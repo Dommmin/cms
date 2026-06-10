@@ -20,6 +20,8 @@ use App\Infrastructure\Payments\PayU\PayUClient;
 use App\Infrastructure\Payments\PayU\PayUGateway;
 use App\Infrastructure\Payments\PayU\PayUTokenService;
 use App\Infrastructure\Payments\PayU\PayUWebhookVerifier;
+use App\Infrastructure\Payments\Stripe\StripeCheckoutSessionService;
+use App\Infrastructure\Payments\Stripe\StripeGateway;
 use App\Infrastructure\Shipping\Furgonetka\FurgonetkaCarrier;
 use App\Infrastructure\Shipping\Furgonetka\FurgonetkaClient;
 use App\Infrastructure\Shipping\Furgonetka\FurgonetkaTokenService;
@@ -68,6 +70,8 @@ class EcommerceServiceProvider extends ServiceProvider
         $this->app->singleton(PaynowSignatureService::class);
         $this->app->singleton(PaynowClient::class);
         $this->app->singleton(PaynowGateway::class);
+        $this->app->singleton(StripeCheckoutSessionService::class);
+        $this->app->singleton(StripeGateway::class);
 
         $this->app->singleton(FurgonetkaTokenService::class);
         $this->app->singleton(FurgonetkaClient::class);
@@ -89,6 +93,7 @@ class EcommerceServiceProvider extends ServiceProvider
             PaymentProviderEnum::P24->value => $app->make(P24Gateway::class),
             PaymentProviderEnum::PAYU->value => $app->make(PayUGateway::class),
             PaymentProviderEnum::PAYNOW->value => $app->make(PaynowGateway::class),
+            PaymentProviderEnum::STRIPE->value => $app->make(StripeGateway::class),
             PaymentProviderEnum::CASH_ON_DELIVERY->value => new CashOnDeliveryGateway(),
             PaymentProviderEnum::BANK_TRANSFER->value => new BankTransferGateway(),
         ]));
@@ -222,6 +227,22 @@ class EcommerceServiceProvider extends ServiceProvider
 
             $paynowSandbox = $decode($rows['paynow_sandbox'] ?? null) ?? true;
             config(['services.paynow.base_url' => $paynowSandbox ? 'https://api.sandbox.paynow.pl' : 'https://api.paynow.pl']);
+
+            // Stripe
+            if ($v = $decode($rows['stripe_public_key'] ?? null)) {
+                config(['services.stripe.key' => $v]);
+                config(['cashier.key' => $v]);
+            }
+
+            if ($v = $decrypt($decode($rows['stripe_secret_key'] ?? null))) {
+                config(['services.stripe.secret' => $v]);
+                config(['cashier.secret' => $v]);
+            }
+
+            if ($v = $decrypt($decode($rows['stripe_webhook_secret'] ?? null))) {
+                config(['services.stripe.webhook_secret' => $v]);
+                config(['cashier.webhook.secret' => $v]);
+            }
 
             // Bank Transfer
             foreach (['account_name', 'iban', 'swift', 'bank_name'] as $field) {

@@ -307,19 +307,21 @@ $gateway = app(PaymentGatewayManager::class)->driver(PaymentProviderEnum::P24);
 $payment = $gateway->createPayment($order, $data);
 ```
 
-Registered gateways: `P24Gateway` (in `Infrastructure/Payments/P24/`), `PayUGateway` (in `Infrastructure/Payments/PayU/`), `PaynowGateway` (in `Infrastructure/Payments/Paynow/`), `CashOnDeliveryGateway`, and `BankTransferGateway`.
+Registered gateways: `P24Gateway` (in `Infrastructure/Payments/P24/`), `PayUGateway` (in `Infrastructure/Payments/PayU/`), `PaynowGateway` (in `Infrastructure/Payments/Paynow/`), `StripeGateway` (in `Infrastructure/Payments/Stripe/`), `CashOnDeliveryGateway`, and `BankTransferGateway`.
 
 Paynow uses API v3 hosted/redirect payments with `Api-Key`, `Idempotency-Key` and `Signature` headers. `PaynowSignatureService` owns HMAC-SHA256/Base64 request signatures and notification signature verification. `WebhookController::paynow()` verifies `Signature` synchronously before dispatching `ProcessPaymentWebhook`.
 
+Stripe uses Cashier + hosted Stripe Checkout for one-off order payments. Credentials are managed in the admin Settings panel under the `payments` group (`payments.stripe_public_key`, `payments.stripe_secret_key`, `payments.stripe_webhook_secret`) and then loaded into `config('services.stripe.*')` at boot. `StripeCheckoutSessionService` wraps Cashier checkout session creation / retrieval / refund operations, while `StripeIncomingWebhookVerifier` verifies `Stripe-Signature` headers before `WebhookController::stripe()` dispatches `ProcessPaymentWebhook`. The Stripe checkout session metadata stores `order_id`, `payment_id` and `reference_number` so webhook handling can map the session back to local commerce records.
+
 Autopay is not implemented yet. If added, it should follow the same gateway/client/verifier shape as PayU, P24 and Paynow, including a dedicated enum value, config keys, webhook route, synchronous signature verification before queue dispatch, feature tests, and admin settings fields for credentials.
 
-`processPayment(Payment $payment, array $options = [])` accepts: `customer_ip`, `payment_method` (`blik`|`card`|`apple_pay`|`google_pay`|`bank_transfer`), `blik_code`, `payment_token`, `return_url`, `continue_url`. Returns `['action' => 'redirect'|'wait'|'none', 'redirect_url' => ?string, 'message' => string]`.
+`processPayment(Payment $payment, array $options = [])` accepts: `customer_ip`, `payment_method` (`blik`|`card`|`apple_pay`|`google_pay`|`bank_transfer`|`stripe`), `blik_code`, `payment_token`, `return_url`, `continue_url`. Returns `['action' => 'redirect'|'wait'|'none', 'redirect_url' => ?string, 'message' => string]`.
 
 **PayU sub-services:** `PayUTokenService` (OAuth2 token caching), `PayUClient` (HTTP calls with auto-retry on 401), `PayUWebhookVerifier` (MD5 signature check).
 
 **P24 sub-services:** `P24Client` (Basic Auth HTTP), `P24SignatureService` (SHA256 signature generation/verification).
 
-**Webhooks:** `POST /api/v1/webhooks/payu`, `POST /api/v1/webhooks/p24` and `POST /api/v1/webhooks/paynow` → dispatch `ProcessPaymentWebhook` after passing through the shared inbound webhook stack: `IncomingWebhookVerifierInterface` + provider-specific verifier + `IncomingWebhookHandler`.
+**Webhooks:** `POST /api/v1/webhooks/payu`, `POST /api/v1/webhooks/p24`, `POST /api/v1/webhooks/paynow` and `POST /api/v1/webhooks/stripe` → dispatch `ProcessPaymentWebhook` after passing through the shared inbound webhook stack: `IncomingWebhookVerifierInterface` + provider-specific verifier + `IncomingWebhookHandler`.
 
 **Outbound webhook standard:** Admin-managed outbound webhooks are validated by Form Requests and `OutboundWebhookPolicy`. Delivery goes through `OutboundWebhookDeliveryService`, while `DeliverWebhookJob` handles retries and persistence only. Public HTTPS targets are required by default; localhost/private-network destinations are blocked unless `WEBHOOK_ALLOW_LOCAL_TARGETS=true` is explicitly enabled for local integration work. The shared delivery service adds `X-Webhook-Event` / `X-Webhook-Signature`, uses a 3s connect timeout and 10s total timeout, and returns a normalized result that is stored in `webhook_deliveries`.
 
@@ -1329,6 +1331,7 @@ Setting::set('integrations', 'google_analytics_id', 'G-XXXXXXXXXX');
 Settings are cached per group for 1 hour. The cache key is `settings.{group}`. The cache is flushed in the `SettingsController` after saving.
 
 **Mail settings** override is handled specially in `AppServiceProvider::configureMailFromSettings()` — it reads the `mail` group and overrides `config('mail.*')` at boot time, cached for 1 hour.
+**Integration settings** are also applied at boot in `AppServiceProvider::configureIntegrationsFromSettings()` and `EcommerceServiceProvider::configurePaymentsFromSettings()`. Stripe credentials live in `settings` rows under the `payments` group (`payments.stripe_public_key`, `payments.stripe_secret_key`, `payments.stripe_webhook_secret`) and override the fallback `config/services.php` values once the admin panel settings are loaded.
 
 ---
 

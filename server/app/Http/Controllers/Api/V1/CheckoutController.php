@@ -30,9 +30,9 @@ class CheckoutController extends ApiController
     ) {}
 
     /**
-     * Return available payment providers and whether their credentials are configured
-     * in server/.env. Unconfigured providers are returned so the frontend can display
-     * a clear "set these variables to enable this payment method" message.
+     * Return available payment providers and whether their admin settings are configured.
+     * Unconfigured providers are returned so the frontend can display a clear
+     * "configure these settings in the admin panel" message.
      */
     public function paymentMethods(): JsonResponse
     {
@@ -40,7 +40,7 @@ class CheckoutController extends ApiController
             [
                 'id' => 'cash_on_delivery',
                 'configured' => true,
-                'missing_env' => [],
+                'missing_settings' => [],
             ],
             [
                 'id' => 'payu',
@@ -48,11 +48,11 @@ class CheckoutController extends ApiController
                     && ! empty(config('services.payu.client_secret'))
                     && ! empty(config('services.payu.pos_id'))
                     && ! empty(config('services.payu.md5_key')),
-                'missing_env' => array_values(array_filter([
-                    empty(config('services.payu.client_id')) ? 'PAYU_CLIENT_ID' : null,
-                    empty(config('services.payu.client_secret')) ? 'PAYU_CLIENT_SECRET' : null,
-                    empty(config('services.payu.pos_id')) ? 'PAYU_POS_ID' : null,
-                    empty(config('services.payu.md5_key')) ? 'PAYU_MD5_KEY' : null,
+                'missing_settings' => array_values(array_filter([
+                    empty(config('services.payu.client_id')) ? 'payments.payu_client_id' : null,
+                    empty(config('services.payu.client_secret')) ? 'payments.payu_client_secret' : null,
+                    empty(config('services.payu.pos_id')) ? 'payments.payu_pos_id' : null,
+                    empty(config('services.payu.md5_key')) ? 'payments.payu_md5_key' : null,
                 ])),
             ],
             [
@@ -61,29 +61,40 @@ class CheckoutController extends ApiController
                     && ! empty(config('services.p24.pos_id'))
                     && ! empty(config('services.p24.crc'))
                     && ! empty(config('services.p24.api_key')),
-                'missing_env' => array_values(array_filter([
-                    empty(config('services.p24.merchant_id')) ? 'P24_MERCHANT_ID' : null,
-                    empty(config('services.p24.pos_id')) ? 'P24_POS_ID' : null,
-                    empty(config('services.p24.crc')) ? 'P24_CRC' : null,
-                    empty(config('services.p24.api_key')) ? 'P24_API_KEY' : null,
+                'missing_settings' => array_values(array_filter([
+                    empty(config('services.p24.merchant_id')) ? 'payments.p24_merchant_id' : null,
+                    empty(config('services.p24.pos_id')) ? 'payments.p24_pos_id' : null,
+                    empty(config('services.p24.crc')) ? 'payments.p24_crc' : null,
+                    empty(config('services.p24.api_key')) ? 'payments.p24_api_key' : null,
                 ])),
             ],
             [
                 'id' => 'paynow',
                 'configured' => ! empty(config('services.paynow.api_key'))
                     && ! empty(config('services.paynow.signature_key')),
-                'missing_env' => array_values(array_filter([
-                    empty(config('services.paynow.api_key')) ? 'PAYNOW_API_KEY' : null,
-                    empty(config('services.paynow.signature_key')) ? 'PAYNOW_SIGNATURE_KEY' : null,
+                'missing_settings' => array_values(array_filter([
+                    empty(config('services.paynow.api_key')) ? 'payments.paynow_api_key' : null,
+                    empty(config('services.paynow.signature_key')) ? 'payments.paynow_signature_key' : null,
+                ])),
+            ],
+            [
+                'id' => 'stripe',
+                'configured' => ! empty(config('services.stripe.key'))
+                    && ! empty(config('services.stripe.secret'))
+                    && ! empty(config('services.stripe.webhook_secret')),
+                'missing_settings' => array_values(array_filter([
+                    empty(config('services.stripe.key')) ? 'payments.stripe_public_key' : null,
+                    empty(config('services.stripe.secret')) ? 'payments.stripe_secret_key' : null,
+                    empty(config('services.stripe.webhook_secret')) ? 'payments.stripe_webhook_secret' : null,
                 ])),
             ],
             [
                 'id' => 'paypo',
                 'configured' => ! empty(config('services.paynow.api_key'))
                     && ! empty(config('services.paynow.signature_key')),
-                'missing_env' => array_values(array_filter([
-                    empty(config('services.paynow.api_key')) ? 'PAYNOW_API_KEY' : null,
-                    empty(config('services.paynow.signature_key')) ? 'PAYNOW_SIGNATURE_KEY' : null,
+                'missing_settings' => array_values(array_filter([
+                    empty(config('services.paynow.api_key')) ? 'payments.paynow_api_key' : null,
+                    empty(config('services.paynow.signature_key')) ? 'payments.paynow_signature_key' : null,
                 ])),
             ],
             [
@@ -91,10 +102,10 @@ class CheckoutController extends ApiController
                 'configured' => ! empty(config('services.apple_pay.merchant_id'))
                     && ! empty(config('services.apple_pay.cert_path'))
                     && ! empty(config('services.apple_pay.key_path')),
-                'missing_env' => array_values(array_filter([
-                    empty(config('services.apple_pay.merchant_id')) ? 'APPLE_PAY_MERCHANT_ID' : null,
-                    empty(config('services.apple_pay.cert_path')) ? 'APPLE_PAY_CERT_PATH' : null,
-                    empty(config('services.apple_pay.key_path')) ? 'APPLE_PAY_KEY_PATH' : null,
+                'missing_settings' => array_values(array_filter([
+                    empty(config('services.apple_pay.merchant_id')) ? 'apple_pay.merchant_id' : null,
+                    empty(config('services.apple_pay.cert_path')) ? 'apple_pay.cert_path' : null,
+                    empty(config('services.apple_pay.key_path')) ? 'apple_pay.key_path' : null,
                 ])),
             ],
             [
@@ -102,18 +113,18 @@ class CheckoutController extends ApiController
                 // Google Pay flows through PayU
                 'configured' => ! empty(config('services.payu.client_id'))
                     && ! empty(config('services.payu.client_secret')),
-                'missing_env' => array_values(array_filter([
-                    empty(config('services.payu.client_id')) ? 'PAYU_CLIENT_ID' : null,
-                    empty(config('services.payu.client_secret')) ? 'PAYU_CLIENT_SECRET' : null,
+                'missing_settings' => array_values(array_filter([
+                    empty(config('services.payu.client_id')) ? 'payments.payu_client_id' : null,
+                    empty(config('services.payu.client_secret')) ? 'payments.payu_client_secret' : null,
                 ])),
             ],
             [
                 'id' => 'bank_transfer',
                 'configured' => ! empty(config('services.bank_transfer.account_name'))
                     && ! empty(config('services.bank_transfer.iban')),
-                'missing_env' => array_values(array_filter([
-                    empty(config('services.bank_transfer.account_name')) ? 'BANK_TRANSFER_ACCOUNT_NAME' : null,
-                    empty(config('services.bank_transfer.iban')) ? 'BANK_TRANSFER_IBAN' : null,
+                'missing_settings' => array_values(array_filter([
+                    empty(config('services.bank_transfer.account_name')) ? 'payments.bank_transfer_account_name' : null,
+                    empty(config('services.bank_transfer.iban')) ? 'payments.bank_transfer_iban' : null,
                 ])),
             ],
         ];

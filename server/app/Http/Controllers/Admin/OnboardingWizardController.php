@@ -293,6 +293,7 @@ class OnboardingWizardController extends Controller
         $validated = $request->validate([
             'stripe_public_key' => ['nullable', 'string', 'max:255'],
             'stripe_secret_key' => ['nullable', 'string', 'max:255'],
+            'stripe_webhook_secret' => ['nullable', 'string', 'max:255'],
             'payu_client_id' => ['nullable', 'string', 'max:255'],
             'payu_client_secret' => ['nullable', 'string', 'max:255'],
             'payu_pos_id' => ['nullable', 'string', 'max:255'],
@@ -317,8 +318,9 @@ class OnboardingWizardController extends Controller
             Setting::set($group, $key, $val);
         };
 
-        Setting::set('integrations', 'stripe_public_key', $validated['stripe_public_key'] ?? null);
-        $updateEncryptedSetting('integrations', 'stripe_secret_key', $validated['stripe_secret_key'] ?? null);
+        Setting::set('payments', 'stripe_public_key', $validated['stripe_public_key'] ?? null);
+        $updateEncryptedSetting('payments', 'stripe_secret_key', $validated['stripe_secret_key'] ?? null);
+        $updateEncryptedSetting('payments', 'stripe_webhook_secret', $validated['stripe_webhook_secret'] ?? null);
 
         Setting::set('payments', 'payu_client_id', $validated['payu_client_id'] ?? null);
         $updateEncryptedSetting('payments', 'payu_client_secret', $validated['payu_client_secret'] ?? null);

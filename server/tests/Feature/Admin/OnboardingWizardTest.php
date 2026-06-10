@@ -80,6 +80,7 @@ it('saves payments step settings', function (): void {
         ->post(route('admin.onboarding.save-step', 'payments'), [
             'stripe_public_key' => 'pk_test_stripe_key',
             'stripe_secret_key' => 'sk_test_stripe_key',
+            'stripe_webhook_secret' => 'whsec_test_stripe_secret',
             'payu_client_id' => '123456',
             'payu_client_secret' => 'payu_secret',
             'payu_pos_id' => '987654',
@@ -97,8 +98,9 @@ it('saves payments step settings', function (): void {
         ])
         ->assertRedirect();
 
-    expect(Setting::get('integrations', 'stripe_public_key'))->toBe('pk_test_stripe_key')
-        ->and(Setting::get('integrations', 'stripe_secret_key'))->toBe('sk_test_stripe_key')
+    expect(Setting::get('payments', 'stripe_public_key'))->toBe('pk_test_stripe_key')
+        ->and(Setting::get('payments', 'stripe_secret_key'))->toBe('sk_test_stripe_key')
+        ->and(Setting::get('payments', 'stripe_webhook_secret'))->toBe('whsec_test_stripe_secret')
         ->and(Setting::get('payments', 'payu_client_id'))->toBe('123456')
         ->and(Setting::get('payments', 'payu_client_secret'))->toBe('payu_secret')
         ->and(Setting::get('payments', 'bank_transfer_iban'))->toBe('PL12345678901234567890123456');

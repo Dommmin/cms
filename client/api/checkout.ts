@@ -25,12 +25,13 @@ export interface PaymentMethodConfig {
         | 'paynow'
         | 'paypo'
         | 'p24'
+        | 'stripe'
         | 'apple_pay'
         | 'google_pay'
         | 'bank_transfer';
     configured: boolean;
-    /** Names of missing env vars in server/.env */
-    missing_env: string[];
+    /** Paths of missing admin settings, e.g. ["payments.stripe_public_key"] */
+    missing_settings: string[];
 }
 
 export interface BankDetails {

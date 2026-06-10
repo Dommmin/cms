@@ -87,6 +87,10 @@ class Payment extends Model
             return $this->payload['redirectUrl'] ?? null;
         }
 
+        if ($this->provider === PaymentProviderEnum::STRIPE) {
+            return $this->payload['url'] ?? $this->payload['checkout_url'] ?? null;
+        }
+
         return null;
     }
 

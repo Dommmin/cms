@@ -587,12 +587,13 @@ Supported payment providers:
 | PayU | Native BLIK code flow and existing Apple Pay / Google Pay token flow |
 | Przelewy24 | Redirect payment fallback for Polish online payments |
 | Paynow | Hosted/redirect online payments, including PayPo/deferred payment option |
+| Stripe Checkout | Hosted card / wallet / local-method checkout for foreign payments |
 | Bank Transfer | Manual bank transfer details shown after order placement |
 | Cash on Delivery | Pay on delivery or at pickup |
 
 You can configure more than one online provider at the same time. This is recommended because each provider can cover different payment methods and gives the store a fallback if one operator has an outage. Checkout should expose methods like BLIK, PayPo, card wallets and bank transfer to customers; the system maps those methods to the configured provider behind the scenes.
 
-To disable a provider, clear its required credentials in **Settings > Payments**. Manual methods are available when their required public details are configured.
+Stripe is configured in **Settings > Payments > Stripe** together with the other online payment providers. To disable a provider, clear its required admin settings in **Settings > Payments**. Manual methods are available when their required public details are configured.
 
 ---
 

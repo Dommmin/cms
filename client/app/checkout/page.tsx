@@ -180,6 +180,7 @@ export default function CheckoutPage() {
             return isProviderConfigured('payu') ? 'payu' : 'paynow';
         }
         if (method === 'apple_pay' || method === 'google_pay') return 'payu';
+        if (method === 'stripe') return 'stripe';
 
         return method;
     };
@@ -279,7 +280,8 @@ export default function CheckoutPage() {
                 payment_provider: selectedProvider,
                 payment_method:
                     paymentMethod !== 'cash_on_delivery' &&
-                    paymentMethod !== 'p24'
+                    paymentMethod !== 'p24' &&
+                    paymentMethod !== 'stripe'
                         ? paymentMethod
                         : undefined,
                 blik_code:

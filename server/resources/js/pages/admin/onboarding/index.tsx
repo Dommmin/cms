@@ -71,8 +71,10 @@ export default function Onboarding({
                 settings['general.maintenance_mode'] === true,
         }),
         payments: useForm({
-            stripe_public_key: settings['integrations.stripe_public_key'] || '',
-            stripe_secret_key: settings['integrations.stripe_secret_key'] || '',
+            stripe_public_key: settings['payments.stripe_public_key'] || '',
+            stripe_secret_key: settings['payments.stripe_secret_key'] || '',
+            stripe_webhook_secret:
+                settings['payments.stripe_webhook_secret'] || '',
             payu_client_id: settings['payments.payu_client_id'] || '',
             payu_client_secret: settings['payments.payu_client_secret'] || '',
             payu_pos_id: settings['payments.payu_pos_id'] || '',
@@ -980,7 +982,35 @@ export default function Onboarding({
                                                         forms.payments.data
                                                             .stripe_secret_key
                                                             ? '••••••••'
-                                                            : 'sk_live_...'
+                                                        : 'sk_live_...'
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="space-y-1 sm:col-span-2">
+                                                <Label
+                                                    htmlFor="stripe_webhook_secret"
+                                                    className="text-xs"
+                                                >
+                                                    Webhook Signing Secret
+                                                </Label>
+                                                <Input
+                                                    id="stripe_webhook_secret"
+                                                    type="password"
+                                                    value={
+                                                        forms.payments.data
+                                                            .stripe_webhook_secret
+                                                    }
+                                                    onChange={(e) =>
+                                                        forms.payments.setData(
+                                                            'stripe_webhook_secret',
+                                                            e.target.value,
+                                                        )
+                                                    }
+                                                    placeholder={
+                                                        forms.payments.data
+                                                            .stripe_webhook_secret
+                                                            ? '••••••••'
+                                                            : 'whsec_...'
                                                     }
                                                 />
                                             </div>
