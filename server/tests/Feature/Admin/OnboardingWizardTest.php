@@ -220,8 +220,8 @@ it('saves menu step settings', function (): void {
 it('saves legal step settings', function (): void {
     $this->actingAs($this->user)
         ->post(route('admin.onboarding.save-step', 'legal'), [
-            'privacy_policy_content' => '<h1>Privacy Policy</h1><p>Our rules...</p>',
-            'terms_of_service_content' => '<h1>Terms of Service</h1><p>Use agreement...</p>',
+            'privacy_policy_content' => '<p>Privacy Policy: Our rules...</p>',
+            'terms_of_service_content' => '<p>Terms of Service: Use agreement...</p>',
         ])
         ->assertRedirect();
 

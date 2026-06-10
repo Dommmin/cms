@@ -19,6 +19,7 @@ function SuccessContent() {
     const lp = useLocalePath();
     const { data: storefrontRoutes } = useStorefrontRoutes();
     const { formatPrice } = useCurrency();
+    const productListing = storefrontRoutes?.product_listing;
 
     const [bankDetails, setBankDetails] = useState<BankDetails | null>(null);
 
@@ -193,15 +194,18 @@ function SuccessContent() {
 
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
                 {isGuest ? (
-                    <Link
-                        href={lp(
-                            storefrontRoutes?.product_listing ?? '/products',
-                        )}
-                        className="bg-primary text-primary-foreground inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-medium hover:opacity-90"
-                    >
-                        <ShoppingBag className="h-4 w-4" />
-                        {t('checkout.continue_shopping', 'Continue Shopping')}
-                    </Link>
+                    productListing ? (
+                        <Link
+                            href={lp(productListing)}
+                            className="bg-primary text-primary-foreground inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-medium hover:opacity-90"
+                        >
+                            <ShoppingBag className="h-4 w-4" />
+                            {t(
+                                'checkout.continue_shopping',
+                                'Continue Shopping',
+                            )}
+                        </Link>
+                    ) : null
                 ) : (
                     <>
                         <Link
@@ -211,19 +215,18 @@ function SuccessContent() {
                             <Package className="h-4 w-4" />
                             {t('account.my_orders', 'My Orders')}
                         </Link>
-                        <Link
-                            href={lp(
-                                storefrontRoutes?.product_listing ??
-                                    '/products',
-                            )}
-                            className="border-border hover:bg-accent inline-flex items-center justify-center gap-2 rounded-xl border px-6 py-3 text-sm font-medium"
-                        >
-                            <ShoppingBag className="h-4 w-4" />
-                            {t(
-                                'checkout.continue_shopping',
-                                'Continue Shopping',
-                            )}
-                        </Link>
+                        {productListing ? (
+                            <Link
+                                href={lp(productListing)}
+                                className="border-border hover:bg-accent inline-flex items-center justify-center gap-2 rounded-xl border px-6 py-3 text-sm font-medium"
+                            >
+                                <ShoppingBag className="h-4 w-4" />
+                                {t(
+                                    'checkout.continue_shopping',
+                                    'Continue Shopping',
+                                )}
+                            </Link>
+                        ) : null}
                     </>
                 )}
             </div>

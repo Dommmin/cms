@@ -1183,7 +1183,6 @@ class PagesDemoSeeder extends Seeder
     private function privacyPolicyHtmlPl(): string
     {
         return <<<'HTML'
-<h1>Polityka prywatności</h1>
 <p><em>Obowiązuje od 1 stycznia 2024 r.</em></p>
 <h2>1. Administrator danych</h2>
 <p>Administratorem Twoich danych osobowych jest nasza firma. W sprawach dotyczących ochrony danych możesz skontaktować się z nami pod adresem: privacy@przyklad.pl.</p>
@@ -1210,7 +1209,6 @@ HTML;
     private function termsOfServiceHtmlPl(): string
     {
         return <<<'HTML'
-<h1>Regulamin sklepu internetowego</h1>
 <p><em>Obowiązuje od 1 stycznia 2024 r.</em></p>
 <h2>1. Postanowienia ogólne</h2>
 <p>Niniejszy regulamin określa zasady korzystania ze sklepu internetowego, składania zamówień oraz prawa i obowiązki Kupującego i Sprzedającego.</p>
@@ -1232,7 +1230,6 @@ HTML;
     private function shippingPolicyHtmlPl(): string
     {
         return <<<'HTML'
-<h1>Polityka wysyłki</h1>
 <h2>Czas realizacji</h2>
 <p>Zamówienia złożone przed godz. 13:00 w dni robocze są wysyłane tego samego dnia. Zamówienia złożone po godz. 13:00 lub w weekendy są wysyłane następnego dnia roboczego.</p>
 <h2>Opcje dostawy</h2>
@@ -1254,7 +1251,6 @@ HTML;
     private function returnPolicyHtmlPl(): string
     {
         return <<<'HTML'
-<h1>Polityka zwrotów i reklamacji</h1>
 <h2>30-dniowe prawo do zwrotu</h2>
 <p>Oferujemy 30-dniowe okno zwrotu od daty dostawy. Produkty muszą być nieużywane, w oryginalnym opakowaniu i z dowodem zakupu.</p>
 <h2>Jak zwrócić towar?</h2>
@@ -1278,7 +1274,6 @@ HTML;
     private function cookiePolicyHtmlPl(): string
     {
         return <<<'HTML'
-<h1>Polityka plików cookies</h1>
 <h2>Czym są pliki cookies?</h2>
 <p>Pliki cookies to małe pliki tekstowe zapisywane na Twoim urządzeniu podczas odwiedzania naszej strony. Pomagają nam zapamiętać Twoje preferencje i poprawić Twoje doświadczenia zakupowe.</p>
 <h2>Rodzaje plików cookies</h2>
@@ -1353,7 +1348,6 @@ HTML;
     private function privacyPolicyHtml(): string
     {
         return <<<'HTML'
-<h1>Privacy Policy</h1>
 <p><em>Last updated: February 2026</em></p>
 <p>We are committed to protecting your personal data and your right to privacy.</p>
 <h2>1. Data Controller</h2>
@@ -1381,7 +1375,6 @@ HTML;
     private function termsOfServiceHtml(): string
     {
         return <<<'HTML'
-<h1>Terms of Service</h1>
 <p><em>Last updated: February 2026</em></p>
 <p>By placing an order you agree to these terms.</p>
 <h2>1. Orders</h2>
@@ -1398,7 +1391,6 @@ HTML;
     private function shippingPolicyHtml(): string
     {
         return <<<'HTML'
-<h1>Shipping Policy</h1>
 <p><em>Last updated: February 2026</em></p>
 <h2>Standard Shipping</h2>
 <ul><li>3–5 business days (EU) — €4.99 / <strong>Free over €75</strong></li></ul>
@@ -1417,7 +1409,6 @@ HTML;
     private function returnPolicyHtml(): string
     {
         return <<<'HTML'
-<h1>Return &amp; Refund Policy</h1>
 <p><em>Last updated: February 2026</em></p>
 <p><strong>30-day</strong> return window from delivery date.</p>
 <h2>Eligibility</h2>
@@ -1437,7 +1428,6 @@ HTML;
     private function cookiePolicyHtml(): string
     {
         return <<<'HTML'
-<h1>Cookie Policy</h1>
 <p><em>Last updated: February 2026</em></p>
 <h2>Types of Cookies</h2>
 <ul>

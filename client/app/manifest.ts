@@ -55,12 +55,6 @@ export default function manifest(): MetadataRoute.Manifest {
         ],
         shortcuts: [
             {
-                name: 'Products',
-                short_name: 'Products',
-                url: '/products',
-                icons: [{ src: '/pwa/icon-192.png', sizes: '192x192' }],
-            },
-            {
                 name: 'Cart',
                 short_name: 'Cart',
                 url: '/cart',

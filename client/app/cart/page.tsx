@@ -31,6 +31,7 @@ export default function CartPage() {
     const { formatPrice } = useCurrency();
     const token = getToken();
     const checkoutHref = lp(token ? '/checkout' : '/checkout/options');
+    const productListing = storefrontRoutes?.product_listing;
 
     if (isLoading) {
         return (
@@ -61,12 +62,14 @@ export default function CartPage() {
                 <p className="text-muted-foreground mb-8">
                     {t('cart.empty_desc', 'Your cart is empty.')}
                 </p>
-                <Link
-                    href={lp(storefrontRoutes?.product_listing ?? '/products')}
-                    className="bg-primary text-primary-foreground inline-flex items-center rounded-xl px-6 py-3 font-semibold hover:opacity-90"
-                >
-                    {t('cart.start_shopping', 'Start Shopping')}
-                </Link>
+                {productListing ? (
+                    <Link
+                        href={lp(productListing)}
+                        className="bg-primary text-primary-foreground inline-flex items-center rounded-xl px-6 py-3 font-semibold hover:opacity-90"
+                    >
+                        {t('cart.start_shopping', 'Start Shopping')}
+                    </Link>
+                ) : null}
             </div>
         );
     }
@@ -113,7 +116,7 @@ export default function CartPage() {
                                                 ? resolveProductPath(
                                                       item.product,
                                                   )
-                                                : '/products',
+                                                : (productListing ?? '/'),
                                         )}
                                         className="leading-tight font-medium hover:underline"
                                     >
@@ -247,14 +250,14 @@ export default function CartPage() {
                     >
                         {t('cart.proceed', 'Proceed to Checkout')}
                     </Link>
-                    <Link
-                        href={lp(
-                            storefrontRoutes?.product_listing ?? '/products',
-                        )}
-                        className="text-muted-foreground hover:text-foreground mt-3 block text-center text-sm"
-                    >
-                        {t('cart.continue_shopping', 'Continue Shopping')}
-                    </Link>
+                    {productListing ? (
+                        <Link
+                            href={lp(productListing)}
+                            className="text-muted-foreground hover:text-foreground mt-3 block text-center text-sm"
+                        >
+                            {t('cart.continue_shopping', 'Continue Shopping')}
+                        </Link>
+                    ) : null}
                 </div>
             </div>
 

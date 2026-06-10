@@ -62,7 +62,7 @@ function pendingFromSearchParams(
 }
 
 export default function ProductsClient({
-    basePath = '/products',
+    basePath,
     initialCategory,
     initialBrand,
     title,

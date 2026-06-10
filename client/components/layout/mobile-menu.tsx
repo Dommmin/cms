@@ -207,21 +207,25 @@ export function MobileMenu({ items, categories, siteName }: MobileMenuProps) {
 
                         {categories.length > 0 && (
                             <div className="border-border border-b">
-                                <Link
-                                    href={lp(
-                                        storefrontRoutes?.product_listing ??
-                                            '/products',
-                                    )}
-                                    onClick={closeMenu}
-                                    className="border-border flex items-center gap-3 border-b px-4 py-3.5"
-                                >
-                                    <div className="bg-muted flex h-9 w-9 items-center justify-center rounded-lg">
-                                        <ShoppingBag className="text-muted-foreground h-4 w-4" />
-                                    </div>
-                                    <span className="text-sm font-medium">
-                                        {t('nav.all_products', 'All Products')}
-                                    </span>
-                                </Link>
+                                {storefrontRoutes?.product_listing && (
+                                    <Link
+                                        href={lp(
+                                            storefrontRoutes.product_listing,
+                                        )}
+                                        onClick={closeMenu}
+                                        className="border-border flex items-center gap-3 border-b px-4 py-3.5"
+                                    >
+                                        <div className="bg-muted flex h-9 w-9 items-center justify-center rounded-lg">
+                                            <ShoppingBag className="text-muted-foreground h-4 w-4" />
+                                        </div>
+                                        <span className="text-sm font-medium">
+                                            {t(
+                                                'nav.all_products',
+                                                'All Products',
+                                            )}
+                                        </span>
+                                    </Link>
+                                )}
 
                                 {categories.map((cat) => {
                                     const hasChildren =

@@ -9,6 +9,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Page;
 use App\Models\Product;
+use RuntimeException;
 
 class StorefrontPathService
 {
@@ -36,22 +37,38 @@ class StorefrontPathService
 
     public function productListingPath(?string $locale = null): string
     {
-        return $this->systemPagePath('product_listing', $locale, '/products') ?? '/products';
+        $path = $this->systemPagePath('product_listing', $locale);
+
+        throw_if($path === null, RuntimeException::class, 'Missing product listing system page.');
+
+        return $path;
     }
 
     public function categoryListingPath(?string $locale = null): string
     {
-        return $this->systemPagePath('category_listing', $locale, '/categories') ?? '/categories';
+        $path = $this->systemPagePath('category_listing', $locale);
+
+        throw_if($path === null, RuntimeException::class, 'Missing category listing system page.');
+
+        return $path;
     }
 
     public function brandListingPath(?string $locale = null): string
     {
-        return $this->systemPagePath('brand_listing', $locale, '/brands') ?? '/brands';
+        $path = $this->systemPagePath('brand_listing', $locale);
+
+        throw_if($path === null, RuntimeException::class, 'Missing brand listing system page.');
+
+        return $path;
     }
 
     public function blogListingPath(?string $locale = null): string
     {
-        return $this->systemPagePath('blog_listing', $locale, '/blog') ?? '/blog';
+        $path = $this->systemPagePath('blog_listing', $locale);
+
+        throw_if($path === null, RuntimeException::class, 'Missing blog listing system page.');
+
+        return $path;
     }
 
     public function searchPath(?string $locale = null): string

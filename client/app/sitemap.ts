@@ -50,7 +50,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             ]),
         ),
     ]);
-    const productListingPath = productListingPage?.path ?? '/products';
+    const productListingPath = productListingPage?.path ?? null;
     const faqPath = faqPage?.path ?? '/faq';
     const blogListingPathByLocale = Object.fromEntries(blogListingPages);
     const blogListingPath = blogListingPathByLocale[defaultLocale] ?? '/blog';
@@ -59,16 +59,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entries.push(
         sitemapEntry(i18nConfig, '/', defaultLocale, undefined, 'daily', 1.0),
     );
-    entries.push(
-        sitemapEntry(
-            i18nConfig,
-            productListingPath,
-            defaultLocale,
-            undefined,
-            'daily',
-            0.9,
-        ),
-    );
+    if (productListingPath) {
+        entries.push(
+            sitemapEntry(
+                i18nConfig,
+                productListingPath,
+                defaultLocale,
+                undefined,
+                'daily',
+                0.9,
+            ),
+        );
+    }
     entries.push(
         sitemapEntry(
             i18nConfig,
@@ -95,13 +97,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         const products = await serverFetch<PaginatedResponse<Product>>(
             '/products?per_page=500',
         );
-        for (const product of products.data.filter((p) => !p.sitemap_exclude)) {
+        for (const product of products.data.filter(
+            (p) => !p.sitemap_exclude && !!p.public_url,
+        )) {
             const d = product.created_at ? new Date(product.created_at) : null;
             entries.push(
                 sitemapEntry(
                     i18nConfig,
-                    product.public_url ??
-                        `${productListingPath}/${product.slug}`,
+                    product.public_url!,
                     defaultLocale,
                     d && !isNaN(d.getTime()) ? d : new Date(),
                     'weekly',

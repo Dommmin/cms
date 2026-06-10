@@ -15,7 +15,7 @@ export interface ActiveFilterChip {
 }
 
 export interface ProductsClientProps {
-    basePath?: string;
+    basePath: string;
     initialCategory?: string;
     initialBrand?: string;
     title?: string | null;

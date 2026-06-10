@@ -2,7 +2,12 @@ import { sanitizeHtml } from '@/lib/sanitize';
 import type { Faq, Page } from '@/types/api';
 import type { ModuleRendererProps } from './module-renderer.types';
 import { BlogModule } from './modules/blog-module';
+import { FaqClientModule } from './modules/faq-client-module';
+import { FlashSalesHubModule } from './modules/flash-sales-hub-module';
+import { GuestOrderTrackerModule } from './modules/guest-order-tracker-module';
+import { NewsletterPreferencesModule } from './modules/newsletter-preferences-module';
 import { ReturnsPortalModule } from './modules/returns-portal-module';
+import { StoreLocatorModule } from './modules/store-locator-module';
 import {
     BrandListingModule,
     CategoryListingModule,
@@ -43,29 +48,11 @@ function FaqModule({ page }: { page: Page }) {
     const items = (page.module_config?.items as Faq[] | undefined) ?? [];
 
     return (
-        <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-            <h1 className="mb-8 text-3xl font-bold">{page.title}</h1>
-            <div className="divide-border border-border flex flex-col divide-y overflow-hidden rounded-xl border">
-                {items.map((faq) => (
-                    <details key={faq.id} className="group px-6 py-4">
-                        <summary className="cursor-pointer font-medium marker:content-none">
-                            <span className="flex items-center justify-between gap-4">
-                                {faq.question}
-                                <span className="shrink-0 transition-transform group-open:rotate-180">
-                                    ▾
-                                </span>
-                            </span>
-                        </summary>
-                        <div
-                            className="prose prose-sm dark:prose-invert mt-3"
-                            dangerouslySetInnerHTML={{
-                                __html: sanitizeHtml(faq.answer),
-                            }}
-                        />
-                    </details>
-                ))}
-            </div>
-        </div>
+        <FaqClientModule
+            items={items}
+            pageTitle={page.title}
+            pageExcerpt={page.excerpt ?? undefined}
+        />
     );
 }
 
@@ -95,6 +82,19 @@ export function ModuleRenderer({
             return <CategoryListingModule page={page} locale={locale} />;
         case 'brand_listing':
             return <BrandListingModule page={page} locale={locale} />;
+        case 'store_locator':
+            return <StoreLocatorModule page={page} />;
+        case 'flash_sales_hub':
+            return <FlashSalesHubModule page={page} />;
+        case 'guest_order_tracker':
+            return <GuestOrderTrackerModule page={page} />;
+        case 'newsletter_preferences':
+            return (
+                <NewsletterPreferencesModule
+                    page={page}
+                    searchParams={searchParams}
+                />
+            );
         default:
             if (process.env.NODE_ENV === 'development') {
                 return (

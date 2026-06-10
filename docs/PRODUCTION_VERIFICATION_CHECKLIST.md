@@ -11,15 +11,15 @@
 
 ## P0 - Przed produkcją
 
-- [ ] `APP_ENV=production`, `APP_DEBUG=false`
-- [ ] `.env.production` uzupełnione i zsynchronizowane z deploymentem
-- [ ] backup bazy i plików działa
+- [x] `APP_ENV=production`, `APP_DEBUG=false`
+- [x] `.env.production` / secret produkcyjny uzupełnione i zsynchronizowane z deploymentem
+- [x] backup bazy i plików ma działający proces i skrypty
 - [ ] restore drill został wykonany i zakończył się sukcesem
-- [ ] monitoring i alerting są aktywne
+- [x] monitoring i alerting są aktywne
 - [x] health checks są dostępne i zabezpieczone
 - [x] debug endpoints są zablokowane poza dozwolonymi środowiskami
-- [ ] queue workers są stabilne
-- [ ] scheduler działa cyklicznie
+- [x] queue workers są stabilne
+- [x] scheduler działa cyklicznie
 - [x] trusted proxy / edge config jest zgodny z aplikacją
 - [x] security headers są aktywne na adminie i storefront
 
@@ -27,8 +27,8 @@
 
 - [x] każdy inbound webhook ma jawne sprawdzenie sygnatury lub tokenu
 - [x] publiczne endpointy write mają sensowne rate limits
-- [ ] guest checkout / returns / support forms mają anti-abuse protections
-- [ ] outbound integracje używają ustalonych timeoutów i retry policy
+- [x] guest checkout / returns / support forms mają anti-abuse protections
+- [x] outbound integracje używają ustalonych timeoutów i retry policy
 - [x] outbound requests nie idą do prywatnych / localhost targetów w production
 - [x] logowanie błędów integracji działa i daje ślad diagnostyczny
 
@@ -49,14 +49,14 @@
 ## P1 - CMS i admin
 
 - [x] Page Builder zapisuje i publikuje treści
-- [ ] Page Builder preview działa
+- [x] Page Builder preview działa
 - [x] Rich Text Editor nie przepuszcza XSS
 - [x] snapshot / walidacja buildera działa po stronie serwera
 - [x] autosave działa i nie gubi zmian
 - [x] optimistic locking chroni przed nadpisaniem zmian
 - [ ] tłumaczenia admina są kompletne w najważniejszych ekranach
 - [ ] loading / empty / error states są spójne
-- [ ] najważniejsze CRUD-y admina mają poprawne role i policy
+- [x] najważniejsze CRUD-y admina mają poprawne role i policy
 
 ## P1 - SEO i widoczność
 
@@ -64,8 +64,8 @@
 - [x] sitemap i robots są poprawne
 - [x] canonical / locale handling działa
 - [x] schema.org / JSON-LD są poprawne
-- [ ] panel SEO pokazuje stan i ostrzeżenia
-- [ ] redirecti / indeksowalność / broken links są obsługiwane lub świadomie odłożone
+- [x] panel SEO pokazuje stan i ostrzeżenia
+- [x] redirecti / indeksowalność / broken links są obsługiwane lub świadomie odłożone
 
 ## P1 - Analytics i raportowanie
 
@@ -77,18 +77,18 @@
 ## P1 - UX i onboarding
 
 - [x] setup wizard prowadzi przez podstawową konfigurację sklepu
-- [ ] starter kit / theme preset działa
-- [ ] global sections / widget areas mają jasny model obsługi lub są świadomie odłożone
+- [x] starter kit / theme preset działa
+- [x] global sections / widget areas mają model obsługi (global slots, reusable blocks, section templates)
 - [ ] checkout UX nie wymaga zbędnych kroków
-- [ ] mobile layout działa na typowych breakpointach
+- [x] mobile layout działa na typowych breakpointach
 
 ## P2 - Platforma
 
-- [ ] extensibility model jest zdefiniowany albo świadomie odłożony
-- [ ] plugin / hook boundaries są opisane
-- [ ] tax engine / B2B rules mają jasny zakres albo backlog
-- [ ] gift cards / store credit mają status decyzji produktowej
-- [ ] A/B testing / personalization są poza zakresem release i nazwane jako future work
+- [x] extensibility model jest zdefiniowany albo świadomie odłożony
+- [x] plugin / hook boundaries są opisane
+- [x] tax engine / B2B rules mają jasny zakres albo backlog
+- [x] gift cards / store credit mają status decyzji produktowej
+- [x] A/B testing / personalization są poza zakresem release i nazwane jako future work
 
 ## Po deployu
 
@@ -96,7 +96,7 @@
 - [ ] brak świeżych błędów w logach
 - [ ] queue depth wraca do normy
 - [ ] cache i revalidation działają
-- [ ] smoke test storefrontu na desktop i mobile
+- [x] smoke test storefrontu na desktop i mobile
 - [ ] smoke test admina na najważniejszych ekranach
 
 ## Referencje

@@ -442,6 +442,41 @@ export interface Order {
     created_at: string;
 }
 
+export interface GuestOrderTrackingResult {
+    reference_number: string;
+    status: OrderStatus;
+    created_at: string;
+    subtotal: number;
+    shipping_cost: number;
+    discount_amount: number;
+    total: number;
+    currency_code: string;
+    items: Array<{
+        id: number;
+        product_name: string;
+        variant_sku: string;
+        quantity: number;
+        unit_price: number;
+    }>;
+    payment: {
+        provider: string;
+        status: string;
+        amount: number;
+    } | null;
+    shipment: {
+        carrier: string;
+        tracking_number: string | null;
+        tracking_url: string | null;
+        status: string;
+        shipped_at: string | null;
+    } | null;
+    status_history: Array<{
+        new_status: string;
+        notes: string | null;
+        changed_at: string;
+    }>;
+}
+
 // ── Shipping ──────────────────────────────────────────────────────────────────
 
 export interface ShippingMethod {
@@ -525,6 +560,26 @@ export interface NewsletterSubscribePayload {
     email: string;
     name?: string;
     cf_turnstile_response?: string;
+}
+
+export interface NewsletterSegment {
+    id: number;
+    name: string;
+    description: string | null;
+}
+
+export interface NewsletterPreferences {
+    email: string;
+    first_name: string | null;
+    is_active: boolean;
+    active_segments: number[];
+    available_segments: NewsletterSegment[];
+}
+
+export interface UpdateNewsletterPreferencesPayload {
+    first_name?: string | null;
+    is_active: boolean;
+    segments: number[];
 }
 
 // ── Forms ─────────────────────────────────────────────────────────────────────
@@ -754,13 +809,13 @@ export interface Store {
     lng: number;
 }
 
-// ── FAQ ───────────────────────────────────────────────────────────────────────
-
 export interface Faq {
     id: number;
     question: string;
     answer: string;
     position: number;
+    category?: string | null;
+    is_active?: boolean;
 }
 
 // ── Settings ──────────────────────────────────────────────────────────────────

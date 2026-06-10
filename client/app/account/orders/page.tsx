@@ -27,6 +27,7 @@ export default function OrdersPage() {
     const { t } = useTranslation();
     const lp = useLocalePath();
     const { formatPrice } = useCurrency();
+    const productListing = storefrontRoutes?.product_listing;
 
     if (isLoading) {
         return (
@@ -61,14 +62,14 @@ export default function OrdersPage() {
                             "You haven't placed any orders yet.",
                         )}
                     </p>
-                    <Link
-                        href={lp(
-                            storefrontRoutes?.product_listing ?? '/products',
-                        )}
-                        className="bg-primary text-primary-foreground mt-4 inline-flex items-center rounded-xl px-6 py-2.5 text-sm font-semibold hover:opacity-90"
-                    >
-                        {t('account.start_shopping', 'Start Shopping')}
-                    </Link>
+                    {productListing ? (
+                        <Link
+                            href={lp(productListing)}
+                            className="bg-primary text-primary-foreground mt-4 inline-flex items-center rounded-xl px-6 py-2.5 text-sm font-semibold hover:opacity-90"
+                        >
+                            {t('account.start_shopping', 'Start Shopping')}
+                        </Link>
+                    ) : null}
                 </div>
             ) : (
                 <div className="space-y-3">

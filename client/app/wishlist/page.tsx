@@ -26,6 +26,7 @@ export default function WishlistPage() {
     const { data: storefrontRoutes } = useStorefrontRoutes();
     const lp = useLocalePath();
     const { t } = useTranslation();
+    const productListing = storefrontRoutes?.product_listing;
 
     if (isLoading) {
         return (
@@ -79,14 +80,14 @@ export default function WishlistPage() {
                             'Save products you love and come back to them later.',
                         )}
                     </p>
-                    <Link
-                        href={lp(
-                            storefrontRoutes?.product_listing ?? '/products',
-                        )}
-                        className="bg-primary text-primary-foreground mt-6 inline-block rounded-xl px-6 py-2.5 text-sm font-semibold hover:opacity-90"
-                    >
-                        {t('wishlist.browse_products', 'Browse products')}
-                    </Link>
+                    {productListing ? (
+                        <Link
+                            href={lp(productListing)}
+                            className="bg-primary text-primary-foreground mt-6 inline-block rounded-xl px-6 py-2.5 text-sm font-semibold hover:opacity-90"
+                        >
+                            {t('wishlist.browse_products', 'Browse products')}
+                        </Link>
+                    ) : null}
                 </div>
             ) : (
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">

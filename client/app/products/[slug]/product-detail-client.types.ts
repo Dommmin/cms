@@ -1,4 +1,4 @@
 export interface ProductDetailClientProps {
     slug: string;
-    basePath?: string;
+    basePath: string;
 }

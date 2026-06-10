@@ -162,19 +162,20 @@ export function MegaMenu({ items, categories }: MegaMenuProps) {
                                     </ul>
 
                                     <div className="border-border mt-3 border-t pt-3">
-                                        <Link
-                                            href={lp(
-                                                storefrontRoutes?.product_listing ??
-                                                    '/products',
-                                            )}
-                                            onClick={() => setOpenKey(null)}
-                                            className="text-primary px-3 text-xs font-medium hover:underline"
-                                        >
-                                            {t(
-                                                'nav.view_all_products',
-                                                'View all products →',
-                                            )}
-                                        </Link>
+                                        {storefrontRoutes?.product_listing && (
+                                            <Link
+                                                href={lp(
+                                                    storefrontRoutes.product_listing,
+                                                )}
+                                                onClick={() => setOpenKey(null)}
+                                                className="text-primary px-3 text-xs font-medium hover:underline"
+                                            >
+                                                {t(
+                                                    'nav.view_all_products',
+                                                    'View all products →',
+                                                )}
+                                            </Link>
+                                        )}
                                     </div>
                                 </div>
 

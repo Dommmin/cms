@@ -12,6 +12,7 @@ import type { FlashSalesResponse } from './page.types';
 export default function FlashSalesClient() {
     const lp = useLocalePath();
     const { data: storefrontRoutes } = useStorefrontRoutes();
+    const productListing = storefrontRoutes?.product_listing;
     const [data, setData] = useState<FlashSalesResponse | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -53,14 +54,14 @@ export default function FlashSalesClient() {
                     <p className="text-muted-foreground text-lg">
                         No active flash sales right now. Check back soon!
                     </p>
-                    <Link
-                        href={lp(
-                            storefrontRoutes?.product_listing ?? '/products',
-                        )}
-                        className="mt-4 inline-block text-sm underline"
-                    >
-                        Browse all products
-                    </Link>
+                    {productListing ? (
+                        <Link
+                            href={lp(productListing)}
+                            className="mt-4 inline-block text-sm underline"
+                        >
+                            Browse all products
+                        </Link>
+                    ) : null}
                 </div>
             ) : (
                 <div className="space-y-6">

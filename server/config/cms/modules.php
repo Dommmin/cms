@@ -58,4 +58,34 @@ return [
         'frontend_renderer' => 'returns_portal',
         'module_config_schema' => [],
     ],
+    'store_locator' => [
+        'label' => 'Lokalizator sklepów stacjonarnych',
+        'description' => 'Dynamiczna mapa i lista sklepów fizycznych z filtrowaniem miast.',
+        'frontend_renderer' => 'store_locator',
+        'module_config_schema' => [
+            'default_zoom' => ['nullable', 'integer', 'min:1', 'max:20'],
+            'initial_city' => ['nullable', 'string', 'max:255'],
+        ],
+    ],
+    'flash_sales_hub' => [
+        'label' => 'Centrum wyprzedaży błyskawicznych',
+        'description' => 'Lista aktywnych i nadchodzących promocji limitowanych czasowo z odliczaniem.',
+        'frontend_renderer' => 'flash_sales_hub',
+        'module_config_schema' => [
+            'show_expired' => ['required', 'boolean'],
+            'limit' => ['nullable', 'integer', 'min:1'],
+        ],
+    ],
+    'guest_order_tracker' => [
+        'label' => 'Śledzenie zamówienia (Gość)',
+        'description' => 'Formularz śledzenia statusu zamówienia i przesyłek po numerze referencyjnym i e-mail.',
+        'frontend_renderer' => 'guest_order_tracker',
+        'module_config_schema' => [],
+    ],
+    'newsletter_preferences' => [
+        'label' => 'Zarządzanie preferencjami newslettera',
+        'description' => 'Strona do zarządzania subskrypcją i tematami newslettera dla RODO/GDPR.',
+        'frontend_renderer' => 'newsletter_preferences',
+        'module_config_schema' => [],
+    ],
 ];

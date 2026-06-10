@@ -208,4 +208,60 @@ class OrderController extends ApiController
             'reference_number' => $returnRequest->reference_number,
         ]);
     }
+
+    public function trackGuest(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'reference_number' => ['required', 'string'],
+            'email' => ['required', 'email'],
+        ]);
+
+        $order = Order::query()
+            ->where('reference_number', $data['reference_number'])
+            ->where(function ($query) use ($data): void {
+                $query->where('guest_email', $data['email'])
+                    ->orWhereHas('customer.user', function ($q) use ($data): void {
+                        $q->where('email', $data['email']);
+                    });
+            })
+            ->with(['items', 'payment', 'shipment', 'statusHistory'])
+            ->first();
+
+        abort_unless($order, 404, 'Order not found with provided reference number and email.');
+
+        return $this->ok([
+            'reference_number' => $order->reference_number,
+            'status' => $order->status->getValue(),
+            'created_at' => $order->created_at,
+            'subtotal' => $order->subtotal,
+            'shipping_cost' => $order->shipping_cost,
+            'discount_amount' => $order->discount_amount,
+            'total' => $order->total,
+            'currency_code' => $order->currency_code,
+            'items' => $order->items->map(fn ($item): array => [
+                'id' => $item->id,
+                'product_name' => $item->product_name,
+                'variant_sku' => $item->variant_sku,
+                'quantity' => $item->quantity,
+                'unit_price' => $item->unit_price,
+            ]),
+            'payment' => $order->payment ? [
+                'provider' => $order->payment->provider,
+                'status' => $order->payment->status,
+                'amount' => $order->payment->amount,
+            ] : null,
+            'shipment' => $order->shipment ? [
+                'carrier' => $order->shipment->carrier,
+                'tracking_number' => $order->shipment->tracking_number,
+                'tracking_url' => $order->shipment->tracking_url,
+                'status' => $order->shipment->status,
+                'shipped_at' => $order->shipment->shipped_at,
+            ] : null,
+            'status_history' => $order->statusHistory->map(fn ($h): array => [
+                'new_status' => $h->new_status,
+                'notes' => $h->notes,
+                'changed_at' => $h->changed_at,
+            ]),
+        ]);
+    }
 }

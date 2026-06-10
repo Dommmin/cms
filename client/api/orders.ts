@@ -2,6 +2,7 @@ import { getCartToken } from '@/api/cart';
 import { apiGet, apiGetMany, apiGetPage, apiPost } from '@/lib/api';
 import { api } from '@/lib/axios';
 import type {
+    GuestOrderTrackingResult,
     Order,
     OrderReturn,
     PaginatedResponse,
@@ -127,4 +128,14 @@ export async function checkout(
     payload: CheckoutPayload,
 ): Promise<Order | null> {
     return apiPost<Order>('/checkout', payload);
+}
+
+export async function trackGuestOrder(params: {
+    reference_number: string;
+    email: string;
+}): Promise<GuestOrderTrackingResult | null> {
+    const { data } = await api.get<GuestOrderTrackingResult>('/orders/track', {
+        params,
+    });
+    return data ?? null;
 }

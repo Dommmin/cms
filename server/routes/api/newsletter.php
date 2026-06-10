@@ -11,6 +11,8 @@ Route::prefix('v1')->name('api.v1.')->middleware('throttle:api.public')->group(f
     Route::post('newsletter/unsubscribe', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
     Route::get('newsletter/confirm/{token}', [NewsletterController::class, 'confirmSubscription'])->name('newsletter.confirm');
     Route::get('newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribeByToken'])->name('newsletter.unsubscribe.token');
+    Route::get('newsletter/preferences/{token}', [NewsletterController::class, 'getPreferences'])->name('newsletter.preferences.get');
+    Route::post('newsletter/preferences/{token}', [NewsletterController::class, 'updatePreferences'])->name('newsletter.preferences.update');
 
     // Webhooks
     Route::post('newsletter/webhooks/mailerlite', [MailerLiteWebhookController::class, 'handle'])->name('newsletter.webhooks.mailerlite');

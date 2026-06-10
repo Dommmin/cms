@@ -79,6 +79,7 @@ export default function CheckoutPage() {
     const lp = useLocalePath();
     const queryClient = useQueryClient();
     const { data: storefrontRoutes } = useStorefrontRoutes();
+    const productListing = storefrontRoutes?.product_listing;
     const [mounted] = useState(() => typeof window !== 'undefined');
     const [token, setToken] = useState<string | null>(() =>
         typeof window !== 'undefined' ? getToken() : null,
@@ -400,12 +401,14 @@ export default function CheckoutPage() {
                         'Add items to your cart before checkout.',
                     )}
                 </p>
-                <Link
-                    href={lp(storefrontRoutes?.product_listing ?? '/products')}
-                    className="bg-primary text-primary-foreground inline-flex items-center rounded-xl px-6 py-3 text-sm font-medium hover:opacity-90"
-                >
-                    {t('checkout.browse_products', 'Browse products')}
-                </Link>
+                {productListing ? (
+                    <Link
+                        href={lp(productListing)}
+                        className="bg-primary text-primary-foreground inline-flex items-center rounded-xl px-6 py-3 text-sm font-medium hover:opacity-90"
+                    >
+                        {t('checkout.browse_products', 'Browse products')}
+                    </Link>
+                ) : null}
             </div>
         );
     }

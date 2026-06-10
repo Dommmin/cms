@@ -33,10 +33,11 @@ export async function GET(): Promise<Response> {
 
     const items = products
         .filter((p) => p.is_active)
+        .filter((p) => !!p.public_url)
         .map((product) => {
             const price = formatPrice(product.price_min);
             const imageUrl = product.thumbnail?.url ?? '';
-            const productUrl = `${SITE_URL}${product.public_url ?? `/products/${product.slug}`}`;
+            const productUrl = `${SITE_URL}${product.public_url}`;
             const availability = product.variants.some(
                 (v) => v.is_available && v.stock_quantity > 0,
             )

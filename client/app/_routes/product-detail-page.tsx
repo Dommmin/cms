@@ -13,11 +13,11 @@ import type { Product } from '@/types/api';
 export async function generateProductMetadata({
     slug,
     locale,
-    basePath = '/products',
+    basePath,
 }: {
     slug: string;
     locale?: string;
-    basePath?: string;
+    basePath: string;
 }): Promise<Metadata> {
     try {
         const resolvedLocale = locale
@@ -65,7 +65,7 @@ export function ProductPage({
     basePath,
 }: {
     slug: string;
-    basePath?: string;
+    basePath: string;
 }) {
     return <ProductDetailClient slug={slug} basePath={basePath} />;
 }

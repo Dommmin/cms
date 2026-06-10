@@ -38,13 +38,6 @@ export function BlogListClient({
 
     return (
         <div className="store-wide-shell mx-auto w-full px-4 py-12 sm:px-6 lg:px-8">
-            <div className="mb-10 text-center">
-                <h1 className="text-4xl font-bold">Blog</h1>
-                <p className="text-muted-foreground mt-2">
-                    Articles, news and inspiration
-                </p>
-            </div>
-
             <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
                 {categories.length > 0 && (
                     <div className="flex flex-wrap gap-2">

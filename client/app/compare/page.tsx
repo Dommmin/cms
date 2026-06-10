@@ -28,6 +28,7 @@ export default function ComparePage() {
     const lp = useLocalePath();
     const { data: storefrontRoutes } = useStorefrontRoutes();
     const [mounted, setMounted] = useState(false);
+    const productListing = storefrontRoutes?.product_listing;
     useEffect(() => {
         startTransition(() => setMounted(true));
     }, []);
@@ -59,12 +60,14 @@ export default function ComparePage() {
                         'Add products to compare from the product listing.',
                     )}
                 </p>
-                <Link
-                    href={lp(storefrontRoutes?.product_listing ?? '/products')}
-                    className="bg-primary text-primary-foreground inline-flex items-center rounded-xl px-6 py-3 text-sm font-medium hover:opacity-90"
-                >
-                    {t('compare.browse', 'Browse products')}
-                </Link>
+                {productListing ? (
+                    <Link
+                        href={lp(productListing)}
+                        className="bg-primary text-primary-foreground inline-flex items-center rounded-xl px-6 py-3 text-sm font-medium hover:opacity-90"
+                    >
+                        {t('compare.browse', 'Browse products')}
+                    </Link>
+                ) : null}
             </div>
         );
     }
@@ -81,12 +84,14 @@ export default function ComparePage() {
                         'You need at least 2 products to compare. Add another product from the listing.',
                     )}
                 </p>
-                <Link
-                    href={lp(storefrontRoutes?.product_listing ?? '/products')}
-                    className="bg-primary text-primary-foreground inline-flex items-center rounded-xl px-6 py-3 text-sm font-medium hover:opacity-90"
-                >
-                    {t('compare.browse', 'Browse products')}
-                </Link>
+                {productListing ? (
+                    <Link
+                        href={lp(productListing)}
+                        className="bg-primary text-primary-foreground inline-flex items-center rounded-xl px-6 py-3 text-sm font-medium hover:opacity-90"
+                    >
+                        {t('compare.browse', 'Browse products')}
+                    </Link>
+                ) : null}
             </div>
         );
     }
@@ -415,17 +420,17 @@ export default function ComparePage() {
             {/* Add more CTA */}
             {ids.length < 4 && (
                 <div className="mt-8 text-center">
-                    <Link
-                        href={lp(
-                            storefrontRoutes?.product_listing ?? '/products',
-                        )}
-                        className="border-input hover:bg-accent inline-flex items-center rounded-xl border px-5 py-2.5 text-sm font-medium"
-                    >
-                        {t(
-                            'compare.add_more',
-                            '+ Add another product to compare',
-                        )}
-                    </Link>
+                    {productListing ? (
+                        <Link
+                            href={lp(productListing)}
+                            className="border-input hover:bg-accent inline-flex items-center rounded-xl border px-5 py-2.5 text-sm font-medium"
+                        >
+                            {t(
+                                'compare.add_more',
+                                '+ Add another product to compare',
+                            )}
+                        </Link>
+                    ) : null}
                 </div>
             )}
         </div>

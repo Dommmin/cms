@@ -35,7 +35,7 @@ import {
 
 export default function ProductDetailClient({
     slug,
-    basePath = '/products',
+    basePath,
 }: ProductDetailClientProps) {
     const { data: product, isLoading } = useProduct(slug);
     const { data: reviewsData } = useProductReviews(slug);

@@ -1,5 +1,10 @@
-import { apiGet, apiGetPage } from '@/lib/api';
-import type { PaginatedResponse, Product, ProductReview } from '@/types/api';
+import { apiGet, apiGetMany, apiGetPage } from '@/lib/api';
+import type {
+    FlashSale,
+    PaginatedResponse,
+    Product,
+    ProductReview,
+} from '@/types/api';
 
 export interface ProductFilters {
     page?: number;
@@ -76,4 +81,8 @@ export async function getProductReviews(
     params: { page?: number; per_page?: number } = {},
 ): Promise<PaginatedResponse<ProductReview>> {
     return apiGetPage<ProductReview>(`/products/${slug}/reviews`, { params });
+}
+
+export async function getFlashSales(): Promise<FlashSale[]> {
+    return apiGetMany<FlashSale>('/flash-sales');
 }
