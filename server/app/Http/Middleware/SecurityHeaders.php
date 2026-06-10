@@ -60,8 +60,11 @@ class SecurityHeaders
                 "base-uri 'self'",
                 "form-action 'self'",
                 $frameAncestors,
-                'upgrade-insecure-requests',
             ];
+
+            if (! $isDev) {
+                $csp[] = 'upgrade-insecure-requests';
+            }
 
             $response->headers->set('Content-Security-Policy', implode('; ', $csp));
         }

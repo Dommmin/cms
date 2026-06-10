@@ -14,7 +14,7 @@ class AnalyticsEventSeeder extends Seeder
 {
     public function run(): void
     {
-        $products = Product::query()->get();
+        $products = Product::query()->with('variants')->get();
         if ($products->isEmpty()) {
             return;
         }
