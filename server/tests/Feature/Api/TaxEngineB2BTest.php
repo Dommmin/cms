@@ -18,6 +18,7 @@ use App\Models\TaxRate;
 use App\Models\TaxZone;
 use App\Models\TaxZoneCountry;
 use App\Models\User;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
@@ -72,6 +73,10 @@ if (! function_exists('makeTestAuthUserTax')) {
 
 describe('Tax Engine & B2B Checkout', function (): void {
     beforeEach(function (): void {
+        Http::fake([
+            'ec.europa.eu/*' => Http::response(['isValid' => true], 200),
+        ]);
+
         // Clear tax zones and rates to ensure predictable state
         TaxZoneCountry::query()->delete();
         TaxZone::query()->delete();

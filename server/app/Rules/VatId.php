@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Rules;
 
+use App\Services\ViesService;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Translation\PotentiallyTranslatedString;
@@ -56,6 +57,15 @@ class VatId implements ValidationRule
 
             if (! in_array($countryPrefix, $euCountries, true)) {
                 $fail('Niepoprawny prefiks kraju dla numeru VAT UE.');
+
+                return;
+            }
+
+            $viesService = resolve(ViesService::class);
+            $isValid = $viesService->validateVat($countryPrefix, $vatNumber);
+
+            if ($isValid === false) {
+                $fail('Podany numer VAT UE jest nieaktywny lub niepoprawny w bazie VIES.');
             }
 
             return;
