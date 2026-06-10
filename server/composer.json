@@ -34,7 +34,7 @@
         "spatie/laravel-model-states": "^2.13",
         "spatie/laravel-pdf": "^2.6",
         "spatie/laravel-permission": "^7.0",
-        "spatie/laravel-query-builder": "^6.4",
+        "spatie/laravel-query-builder": "^7.3",
         "spatie/laravel-sitemap": "^7.3",
         "spatie/laravel-sluggable": "^3.7",
         "spatie/laravel-translatable": "^6.12",
