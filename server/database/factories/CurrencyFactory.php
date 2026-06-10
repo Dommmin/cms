@@ -20,10 +20,10 @@ class CurrencyFactory extends Factory
     public function definition(): array
     {
         return [
-            'code' => $this->faker->unique()->randomElement(['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'INR', 'BRL']),
-            'name' => $this->faker->randomElement(['US Dollar', 'Euro', 'British Pound', 'Japanese Yen', 'Canadian Dollar', 'Australian Dollar', 'Swiss Franc', 'Chinese Yuan', 'Indian Rupee', 'Brazilian Real']),
-            'symbol' => $this->faker->randomElement(['$', '€', '£', '¥', 'C$', 'A$', 'Fr', '¥', '₹', 'R$']),
-            'decimal_places' => $this->faker->numberBetween(0, 4),
+            'code' => fake()->unique()->randomElement(['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'INR', 'BRL']),
+            'name' => fake()->randomElement(['US Dollar', 'Euro', 'British Pound', 'Japanese Yen', 'Canadian Dollar', 'Australian Dollar', 'Swiss Franc', 'Chinese Yuan', 'Indian Rupee', 'Brazilian Real']),
+            'symbol' => fake()->randomElement(['$', '€', '£', '¥', 'C$', 'A$', 'Fr', '¥', '₹', 'R$']),
+            'decimal_places' => fake()->numberBetween(0, 4),
             'is_active' => true,
             'is_base' => false,
         ];

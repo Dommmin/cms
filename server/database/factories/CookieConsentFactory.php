@@ -17,12 +17,12 @@ class CookieConsentFactory extends Factory
     public function definition(): array
     {
         return [
-            'session_id' => $this->faker->uuid(),
+            'session_id' => fake()->uuid(),
             'user_id' => null,
-            'category' => $this->faker->randomElement(['functional', 'analytics', 'marketing']),
-            'granted' => $this->faker->boolean(),
-            'ip' => $this->faker->ipv4(),
-            'user_agent' => $this->faker->userAgent(),
+            'category' => fake()->randomElement(['functional', 'analytics', 'marketing']),
+            'granted' => fake()->boolean(),
+            'ip' => fake()->ipv4(),
+            'user_agent' => fake()->userAgent(),
             'consent_version' => 'v1',
         ];
     }

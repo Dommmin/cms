@@ -18,11 +18,11 @@ class ProductTypeFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->name(),
-            'slug' => $this->faker->slug(),
-            'has_variants' => $this->faker->boolean(),
-            'variant_selection_attributes' => $this->faker->words(),
-            'is_shippable' => $this->faker->boolean(),
+            'name' => fake()->name(),
+            'slug' => fake()->slug(),
+            'has_variants' => fake()->boolean(),
+            'variant_selection_attributes' => fake()->words(),
+            'is_shippable' => fake()->boolean(),
             'created_at' => Date::now(),
             'updated_at' => Date::now(),
         ];

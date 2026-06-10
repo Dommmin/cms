@@ -19,15 +19,15 @@ class ProductFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->faker->unique()->words(3, true);
+        $name = fake()->unique()->words(3, true);
 
         return [
             'product_type_id' => ProductType::factory(),
             'category_id' => Category::factory(),
             'name' => $name,
             'slug' => ['en' => Str::slug($name).'-'.Str::random(5)],
-            'description' => $this->faker->paragraph(),
-            'short_description' => $this->faker->sentence(),
+            'description' => fake()->paragraph(),
+            'short_description' => fake()->sentence(),
             'is_active' => true,
             'is_saleable' => true,
         ];

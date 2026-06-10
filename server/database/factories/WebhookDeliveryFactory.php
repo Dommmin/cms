@@ -18,17 +18,17 @@ class WebhookDeliveryFactory extends Factory
      */
     public function definition(): array
     {
-        $status = $this->faker->randomElement(['success', 'failed', 'pending']);
+        $status = fake()->randomElement(['success', 'failed', 'pending']);
 
         return [
             'webhook_id' => Webhook::factory(),
-            'event' => $this->faker->randomElement(['order.created', 'order.paid', 'product.updated']),
-            'payload' => ['id' => $this->faker->uuid(), 'test' => false],
+            'event' => fake()->randomElement(['order.created', 'order.paid', 'product.updated']),
+            'payload' => ['id' => fake()->uuid(), 'test' => false],
             'status' => $status,
-            'attempt' => $this->faker->numberBetween(1, 3),
+            'attempt' => fake()->numberBetween(1, 3),
             'response_status' => $status === 'pending' ? null : ($status === 'success' ? 200 : 500),
-            'response_body' => $status === 'pending' ? null : $this->faker->sentence(),
-            'duration_ms' => $status === 'pending' ? null : $this->faker->numberBetween(50, 2000),
+            'response_body' => $status === 'pending' ? null : fake()->sentence(),
+            'duration_ms' => $status === 'pending' ? null : fake()->numberBetween(50, 2000),
             'delivered_at' => $status === 'pending' ? null : now(),
         ];
     }

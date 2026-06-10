@@ -24,8 +24,8 @@ class FlashSaleFactory extends Factory
         return [
             'product_id' => Product::factory(),
             'variant_id' => null,
-            'name' => $this->faker->words(2, true).' Sale',
-            'sale_price' => $this->faker->numberBetween(500, 10000),
+            'name' => fake()->words(2, true).' Sale',
+            'sale_price' => fake()->numberBetween(500, 10000),
             'starts_at' => $startsAt,
             'ends_at' => $endsAt,
             'stock_limit' => null,

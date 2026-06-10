@@ -20,9 +20,9 @@ class CustomerSegmentFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->words(3, true),
-            'description' => $this->faker->optional()->sentence(),
-            'type' => $this->faker->randomElement(['manual', 'dynamic']),
+            'name' => fake()->words(3, true),
+            'description' => fake()->optional()->sentence(),
+            'type' => fake()->randomElement(['manual', 'dynamic']),
             'rules' => null,
             'customers_count' => 0,
             'is_active' => true,

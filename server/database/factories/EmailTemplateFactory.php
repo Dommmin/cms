@@ -18,11 +18,11 @@ class EmailTemplateFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->words(3, true),
-            'key' => $this->faker->unique()->slug(2),
-            'subject' => $this->faker->sentence(5),
-            'body' => '<p>'.$this->faker->paragraph().'</p>',
-            'description' => $this->faker->optional()->sentence(),
+            'name' => fake()->words(3, true),
+            'key' => fake()->unique()->slug(2),
+            'subject' => fake()->sentence(5),
+            'body' => '<p>'.fake()->paragraph().'</p>',
+            'description' => fake()->optional()->sentence(),
             'is_active' => true,
             'variables' => ['{{customer_name}}', '{{shop_name}}'],
         ];

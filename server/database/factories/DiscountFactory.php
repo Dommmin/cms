@@ -17,15 +17,15 @@ class DiscountFactory extends Factory
 
     public function definition(): array
     {
-        $type = $this->faker->randomElement(['percentage', 'fixed_amount', 'free_shipping']);
+        $type = fake()->randomElement(['percentage', 'fixed_amount', 'free_shipping']);
 
         return [
             'code' => mb_strtoupper(Str::random(8)),
-            'name' => $this->faker->words(3, true),
+            'name' => fake()->words(3, true),
             'type' => $type,
             'value' => match ($type) {
-                'percentage' => $this->faker->numberBetween(5, 50),
-                'fixed_amount' => $this->faker->numberBetween(10, 200),
+                'percentage' => fake()->numberBetween(5, 50),
+                'fixed_amount' => fake()->numberBetween(10, 200),
                 default => null,
             },
             'apply_to' => 'all',

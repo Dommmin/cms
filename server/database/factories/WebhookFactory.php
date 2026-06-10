@@ -18,15 +18,15 @@ class WebhookFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->words(3, true),
-            'url' => $this->faker->url(),
+            'name' => fake()->words(3, true),
+            'url' => fake()->url(),
             'secret' => bin2hex(random_bytes(32)),
-            'events' => $this->faker->randomElements(
+            'events' => fake()->randomElements(
                 ['order.created', 'order.paid', 'order.shipped', 'customer.created', 'page.published', 'product.updated'],
-                $this->faker->numberBetween(1, 3),
+                fake()->numberBetween(1, 3),
             ),
             'is_active' => true,
-            'description' => $this->faker->optional()->sentence(),
+            'description' => fake()->optional()->sentence(),
             'failure_count' => 0,
         ];
     }

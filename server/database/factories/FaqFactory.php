@@ -20,13 +20,13 @@ class FaqFactory extends Factory
     public function definition(): array
     {
         return [
-            'question' => $this->faker->sentence().'?',
-            'answer' => $this->faker->paragraph(3),
-            'category' => $this->faker->randomElement(['General', 'Technical', 'Billing', 'Support']),
-            'position' => $this->faker->numberBetween(1, 100),
+            'question' => fake()->sentence().'?',
+            'answer' => fake()->paragraph(3),
+            'category' => fake()->randomElement(['General', 'Technical', 'Billing', 'Support']),
+            'position' => fake()->numberBetween(1, 100),
             'is_active' => true,
-            'views_count' => $this->faker->numberBetween(0, 1000),
-            'helpful_count' => $this->faker->numberBetween(0, 100),
+            'views_count' => fake()->numberBetween(0, 1000),
+            'helpful_count' => fake()->numberBetween(0, 100),
         ];
     }
 }

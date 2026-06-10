@@ -17,17 +17,17 @@ class CategoryFactory extends Factory
 
     public function definition(): array
     {
-        $slug = $this->faker->slug();
+        $slug = fake()->slug();
 
         return [
-            'name' => $this->faker->name(),
+            'name' => fake()->name(),
             'slug' => ['en' => $slug],
-            'description' => $this->faker->text(),
-            'image_path' => $this->faker->word(),
-            'is_active' => $this->faker->boolean(),
-            'position' => $this->faker->numberBetween(0, 255),
-            'seo_title' => $this->faker->word(),
-            'seo_description' => $this->faker->text(),
+            'description' => fake()->text(),
+            'image_path' => fake()->word(),
+            'is_active' => fake()->boolean(),
+            'position' => fake()->numberBetween(0, 255),
+            'seo_title' => fake()->word(),
+            'seo_description' => fake()->text(),
             'created_at' => Date::now(),
             'updated_at' => Date::now(),
 

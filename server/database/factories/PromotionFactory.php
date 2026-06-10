@@ -25,36 +25,36 @@ class PromotionFactory extends Factory
         $types = ['percentage', 'fixed_amount', 'buy_x_get_y', 'free_shipping'];
         $applyTo = ['all', 'specific_products', 'specific_categories'];
 
-        $type = $this->faker->randomElement($types);
-        $applyToType = $this->faker->randomElement($applyTo);
+        $type = fake()->randomElement($types);
+        $applyToType = fake()->randomElement($applyTo);
 
         $data = [
-            'name' => $this->faker->words(3, true),
-            'slug' => $this->faker->slug(),
-            'description' => $this->faker->sentence(),
+            'name' => fake()->words(3, true),
+            'slug' => fake()->slug(),
+            'description' => fake()->sentence(),
             'type' => $type,
             'apply_to' => $applyToType,
-            'is_active' => $this->faker->boolean(80), // 80% chance of being active
-            'is_stackable' => $this->faker->boolean(30), // 30% chance of being stackable
-            'priority' => $this->faker->numberBetween(0, 100),
-            'starts_at' => $this->faker->optional(0.3)->dateTimeBetween('-1 month', '+1 month'),
-            'ends_at' => $this->faker->optional(0.4)->dateTimeBetween('+1 week', '+6 months'),
+            'is_active' => fake()->boolean(80), // 80% chance of being active
+            'is_stackable' => fake()->boolean(30), // 30% chance of being stackable
+            'priority' => fake()->numberBetween(0, 100),
+            'starts_at' => fake()->optional(0.3)->dateTimeBetween('-1 month', '+1 month'),
+            'ends_at' => fake()->optional(0.4)->dateTimeBetween('+1 week', '+6 months'),
             'metadata' => null,
         ];
 
         // Add value based on type
         switch ($type) {
             case 'percentage':
-                $data['value'] = $this->faker->numberBetween(5, 50);
+                $data['value'] = fake()->numberBetween(5, 50);
                 break;
             case 'fixed_amount':
-                $data['value'] = $this->faker->numberBetween(10, 200);
+                $data['value'] = fake()->numberBetween(10, 200);
                 break;
             case 'buy_x_get_y':
                 $data['metadata'] = [
-                    'buy_quantity' => $this->faker->numberBetween(1, 3),
-                    'get_quantity' => $this->faker->numberBetween(1, 2),
-                    'discount_percentage' => $this->faker->randomElement([50, 75, 100]),
+                    'buy_quantity' => fake()->numberBetween(1, 3),
+                    'get_quantity' => fake()->numberBetween(1, 2),
+                    'discount_percentage' => fake()->randomElement([50, 75, 100]),
                 ];
                 $data['value'] = null;
                 break;
@@ -64,12 +64,12 @@ class PromotionFactory extends Factory
         }
 
         // Add optional constraints
-        if ($this->faker->boolean(30)) {
-            $data['min_value'] = $this->faker->numberBetween(50, 500);
+        if (fake()->boolean(30)) {
+            $data['min_value'] = fake()->numberBetween(50, 500);
         }
 
-        if ($this->faker->boolean(20)) {
-            $data['max_discount'] = $this->faker->numberBetween(100, 1000);
+        if (fake()->boolean(20)) {
+            $data['max_discount'] = fake()->numberBetween(100, 1000);
         }
 
         return $data;
@@ -104,7 +104,7 @@ class PromotionFactory extends Factory
     {
         return $this->state(fn (array $attributes): array => [
             'type' => 'percentage',
-            'value' => $percentage ?? $this->faker->numberBetween(5, 50),
+            'value' => $percentage ?? fake()->numberBetween(5, 50),
             'metadata' => null,
         ]);
     }
@@ -116,7 +116,7 @@ class PromotionFactory extends Factory
     {
         return $this->state(fn (array $attributes): array => [
             'type' => 'fixed_amount',
-            'value' => $amount ?? $this->faker->numberBetween(10, 200),
+            'value' => $amount ?? fake()->numberBetween(10, 200),
             'metadata' => null,
         ]);
     }
@@ -215,8 +215,8 @@ class PromotionFactory extends Factory
     public function withDates(?DateTimeImmutable $startsAt = null, ?DateTimeImmutable $endsAt = null): static
     {
         return $this->state(fn (array $attributes): array => [
-            'starts_at' => $startsAt ?? $this->faker->dateTimeBetween('-1 month', '+1 month'),
-            'ends_at' => $endsAt ?? $this->faker->dateTimeBetween('+1 week', '+6 months'),
+            'starts_at' => $startsAt ?? fake()->dateTimeBetween('-1 month', '+1 month'),
+            'ends_at' => $endsAt ?? fake()->dateTimeBetween('+1 week', '+6 months'),
         ]);
     }
 

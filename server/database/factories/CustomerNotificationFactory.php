@@ -20,9 +20,9 @@ final class CustomerNotificationFactory extends Factory
         return [
             'user_id' => User::factory(),
             'customer_id' => null,
-            'type' => $this->faker->randomElement(['order_status', 'return_status', 'low_stock', 'flash_sale', 'general']),
-            'title' => $this->faker->sentence(4),
-            'body' => $this->faker->paragraph(),
+            'type' => fake()->randomElement(['order_status', 'return_status', 'low_stock', 'flash_sale', 'general']),
+            'title' => fake()->sentence(4),
+            'body' => fake()->paragraph(),
             'data' => null,
             'read_at' => null,
             'action_url' => null,
