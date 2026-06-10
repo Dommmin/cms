@@ -56,12 +56,6 @@ class Payment extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'provider' => PaymentProviderEnum::class,
-        'status' => PaymentStatusEnum::class,
-        'payload' => 'array',
-    ];
-
     /**
      * @return BelongsTo<Order, $this>
      */
@@ -94,5 +88,14 @@ class Payment extends Model
         }
 
         return null;
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'provider' => PaymentProviderEnum::class,
+            'status' => PaymentStatusEnum::class,
+            'payload' => 'array',
+        ];
     }
 }

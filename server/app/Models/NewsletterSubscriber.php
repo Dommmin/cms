@@ -76,16 +76,6 @@ class NewsletterSubscriber extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'tags' => 'array',
-        'consent_given' => 'boolean',
-        'consent_given_at' => 'datetime',
-        'is_active' => 'boolean',
-        'unsubscribed_at' => 'datetime',
-        'is_bounced' => 'boolean',
-        'bounced_at' => 'datetime',
-    ];
-
     /**
      * @return BelongsTo<Customer, $this>
      */
@@ -150,5 +140,18 @@ class NewsletterSubscriber extends Model
     public function segments(): BelongsToMany
     {
         return $this->belongsToMany(NewsletterSegment::class, 'newsletter_segment_subscriber');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'tags' => 'array',
+            'consent_given' => 'boolean',
+            'consent_given_at' => 'datetime',
+            'is_active' => 'boolean',
+            'unsubscribed_at' => 'datetime',
+            'is_bounced' => 'boolean',
+            'bounced_at' => 'datetime',
+        ];
     }
 }

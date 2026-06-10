@@ -14,9 +14,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 /**
  * @property int $id
@@ -79,20 +79,12 @@ class Promotion extends Model
     use HasFactory;
     use LogsActivity;
 
-    protected $casts = [
-        'is_active' => 'boolean',
-        'is_stackable' => 'boolean',
-        'starts_at' => 'datetime',
-        'ends_at' => 'datetime',
-        'metadata' => 'array',
-    ];
-
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logOnly(['name', 'type', 'value', 'is_active'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
+            ->dontLogEmptyChanges()
             ->useLogName('promotion');
     }
 
@@ -187,5 +179,16 @@ class Promotion extends Model
     protected function ordered($query)
     {
         return $query->orderBy('priority')->orderBy('name');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'is_stackable' => 'boolean',
+            'starts_at' => 'datetime',
+            'ends_at' => 'datetime',
+            'metadata' => 'array',
+        ];
     }
 }

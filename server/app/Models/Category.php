@@ -20,9 +20,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Laravel\Scout\Searchable;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -121,12 +121,6 @@ class Category extends Model
 
     protected int $maxVersions = 30;
 
-    protected $casts = [
-        'is_active' => 'boolean',
-        'sitemap_exclude' => 'boolean',
-        'rules' => 'array',
-    ];
-
     public static function roots()
     {
         return self::query()->where('parent_id')->orderBy('position')->get();
@@ -168,7 +162,7 @@ class Category extends Model
         return LogOptions::defaults()
             ->logOnly(['name', 'slug', 'is_active', 'parent_id'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
+            ->dontLogEmptyChanges()
             ->useLogName('category');
     }
 
@@ -220,5 +214,14 @@ class Category extends Model
         }
 
         return $path;
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'sitemap_exclude' => 'boolean',
+            'rules' => 'array',
+        ];
     }
 }

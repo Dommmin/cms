@@ -15,9 +15,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Crypt;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 /**
  * @property int $id
@@ -59,12 +59,6 @@ class Setting extends Model
 {
     use HasFactory;
     use LogsActivity;
-
-    protected $casts = [
-        'type' => SettingTypeEnum::class,
-        'is_public' => 'boolean',
-        'value' => 'json',
-    ];
 
     /** Pobierz wartość ustawienia */
     public static function get(string $group, string $key, mixed $default = null): mixed
@@ -137,7 +131,16 @@ class Setting extends Model
         return LogOptions::defaults()
             ->logOnly(['value'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
+            ->dontLogEmptyChanges()
             ->useLogName('setting');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'type' => SettingTypeEnum::class,
+            'is_public' => 'boolean',
+            'value' => 'json',
+        ];
     }
 }

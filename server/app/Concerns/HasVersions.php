@@ -108,21 +108,15 @@ trait HasVersions
      */
     protected function getVersionedAttributes(): array
     {
-        $prop = 'versionedAttributes';
-
-        // @phpstan-ignore-next-line property_exists always evaluates to true in current models using this trait
-        return property_exists($this, $prop)
-            ? $this->$prop
+        return property_exists($this::class, 'versionedAttributes')
+            ? $this->versionedAttributes
             : [];
     }
 
     protected function getMaxVersions(): int
     {
-        $prop = 'maxVersions';
-
-        // @phpstan-ignore-next-line property_exists always evaluates to true in current models using this trait
-        return property_exists($this, $prop)
-            ? $this->$prop
+        return property_exists($this::class, 'maxVersions')
+            ? $this->maxVersions
             : 50;
     }
 

@@ -48,12 +48,6 @@ class PrivacyRequest extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'payload' => 'array',
-        'requested_at' => 'datetime',
-        'resolved_at' => 'datetime',
-    ];
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -62,5 +56,14 @@ class PrivacyRequest extends Model
     public function processedByUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'processed_by_user_id');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'payload' => 'array',
+            'requested_at' => 'datetime',
+            'resolved_at' => 'datetime',
+        ];
     }
 }

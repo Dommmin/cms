@@ -9,6 +9,7 @@ use Database\Factories\OrderItemFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -102,8 +103,8 @@ class OrderItem extends Model
         return $this->shipped_quantity >= $this->quantity;
     }
 
-    protected function getRemainingToShipAttribute(): int
+    protected function remainingToShip(): Attribute
     {
-        return max(0, $this->quantity - $this->shipped_quantity);
+        return Attribute::make(get: fn (): int => max(0, $this->quantity - $this->shipped_quantity));
     }
 }

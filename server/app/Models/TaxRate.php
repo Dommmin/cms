@@ -13,9 +13,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 /**
  * @property int $id
@@ -58,11 +58,6 @@ class TaxRate extends Model
     use HasFactory;
     use LogsActivity;
 
-    protected $casts = [
-        'is_active' => 'boolean',
-        'is_default' => 'boolean',
-    ];
-
     public static function default(): ?self
     {
         return self::query()->where('is_default', true)->first();
@@ -78,7 +73,7 @@ class TaxRate extends Model
         return LogOptions::defaults()
             ->logOnly(['name', 'rate'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
+            ->dontLogEmptyChanges()
             ->useLogName('tax_rate');
     }
 
@@ -102,5 +97,13 @@ class TaxRate extends Model
     public function netFromGross(int $grossPrice): int
     {
         return (int) round($grossPrice / (1 + $this->rate / 100));
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'is_default' => 'boolean',
+        ];
     }
 }

@@ -57,12 +57,6 @@ class Attribute extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'type' => AttributeTypeEnum::class,
-        'is_filterable' => 'boolean',
-        'is_variant_selection' => 'boolean',
-    ];
-
     public function values(): HasMany
     {
         return $this->hasMany(AttributeValue::class)->orderBy('position');
@@ -71,5 +65,14 @@ class Attribute extends Model
     public function productTypes(): BelongsToMany
     {
         return $this->belongsToMany(ProductType::class, 'product_type_attributes');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'type' => AttributeTypeEnum::class,
+            'is_filterable' => 'boolean',
+            'is_variant_selection' => 'boolean',
+        ];
     }
 }

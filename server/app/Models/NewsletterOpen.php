@@ -43,10 +43,6 @@ class NewsletterOpen extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'opened_at' => 'datetime',
-    ];
-
     public function campaign(): BelongsTo
     {
         return $this->belongsTo(NewsletterCampaign::class);
@@ -55,5 +51,12 @@ class NewsletterOpen extends Model
     public function subscriber(): BelongsTo
     {
         return $this->belongsTo(NewsletterSubscriber::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'opened_at' => 'datetime',
+        ];
     }
 }

@@ -49,12 +49,6 @@ class ShippingZone extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'is_active' => 'boolean',
-        'base_rate' => 'integer',
-        'per_kg_rate' => 'integer',
-    ];
-
     public function countries(): HasMany
     {
         return $this->hasMany(ShippingZoneCountry::class);
@@ -63,5 +57,14 @@ class ShippingZone extends Model
     public function calculateShippingCost(float $weightKg, int $orderValue): int
     {
         return $this->base_rate + (int) ($this->per_kg_rate * $weightKg);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'base_rate' => 'integer',
+            'per_kg_rate' => 'integer',
+        ];
     }
 }

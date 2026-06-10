@@ -49,12 +49,15 @@ class FormSubmission extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'payload' => 'array',
-    ];
-
     public function form(): BelongsTo
     {
         return $this->belongsTo(Form::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'payload' => 'array',
+        ];
     }
 }

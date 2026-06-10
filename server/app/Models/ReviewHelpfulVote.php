@@ -41,10 +41,6 @@ class ReviewHelpfulVote extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'is_helpful' => 'boolean',
-    ];
-
     public function review(): BelongsTo
     {
         return $this->belongsTo(ProductReview::class);
@@ -53,5 +49,12 @@ class ReviewHelpfulVote extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_helpful' => 'boolean',
+        ];
     }
 }

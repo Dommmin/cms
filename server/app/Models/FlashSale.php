@@ -10,14 +10,15 @@ use Database\Factories\FlashSaleFactory;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Date;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 /**
  * @property int $id
@@ -70,7 +71,7 @@ class FlashSale extends Model
         return LogOptions::defaults()
             ->logOnly(['name', 'sale_price', 'starts_at', 'ends_at', 'is_active'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
+            ->dontLogEmptyChanges()
             ->useLogName('flash_sale');
     }
 
@@ -129,27 +130,28 @@ class FlashSale extends Model
             });
     }
 
-    protected function getStatusAttribute(): string
+    protected function status(): Attribute
     {
-        $now = Date::now();
+        return Attribute::make(get: function (): string {
+            $now = Date::now();
+            if (! $this->is_active) {
+                return 'inactive';
+            }
 
-        if (! $this->is_active) {
-            return 'inactive';
-        }
+            if ($this->starts_at > $now) {
+                return 'scheduled';
+            }
 
-        if ($this->starts_at > $now) {
-            return 'scheduled';
-        }
+            if ($this->ends_at < $now) {
+                return 'ended';
+            }
 
-        if ($this->ends_at < $now) {
-            return 'ended';
-        }
+            if ($this->stock_limit !== null && $this->stock_sold >= $this->stock_limit) {
+                return 'exhausted';
+            }
 
-        if ($this->stock_limit !== null && $this->stock_sold >= $this->stock_limit) {
-            return 'exhausted';
-        }
-
-        return 'active';
+            return 'active';
+        });
     }
 
     protected function casts(): array

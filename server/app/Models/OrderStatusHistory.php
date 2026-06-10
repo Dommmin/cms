@@ -48,12 +48,15 @@ class OrderStatusHistory extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'changed_at' => 'datetime',
-    ];
-
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'changed_at' => 'datetime',
+        ];
     }
 }

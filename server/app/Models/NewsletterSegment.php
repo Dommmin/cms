@@ -45,13 +45,16 @@ class NewsletterSegment extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'rules' => 'array',
-        'is_active' => 'boolean',
-    ];
-
     public function campaigns(): HasMany
     {
         return $this->hasMany(NewsletterCampaign::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'rules' => 'array',
+            'is_active' => 'boolean',
+        ];
     }
 }

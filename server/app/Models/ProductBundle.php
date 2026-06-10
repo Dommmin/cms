@@ -51,11 +51,6 @@ class ProductBundle extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'discount_percentage' => 'integer',
-        'is_active' => 'boolean',
-    ];
-
     /**
      * @return BelongsTo<Product, $this>
      */
@@ -83,5 +78,13 @@ class ProductBundle extends Model
         }
 
         return $total;
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'discount_percentage' => 'integer',
+            'is_active' => 'boolean',
+        ];
     }
 }

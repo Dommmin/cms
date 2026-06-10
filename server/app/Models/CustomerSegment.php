@@ -54,12 +54,6 @@ class CustomerSegment extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'rules' => 'array',
-        'customers_count' => 'integer',
-        'is_active' => 'boolean',
-    ];
-
     /**
      * Customers in this segment (for manual segments).
      */
@@ -97,5 +91,14 @@ class CustomerSegment extends Model
         // Update pivot table for manual segment relationships
         $this->customers()->sync($customerIds);
         $this->update(['customers_count' => count($customerIds)]);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'rules' => 'array',
+            'customers_count' => 'integer',
+            'is_active' => 'boolean',
+        ];
     }
 }

@@ -54,15 +54,18 @@ class FormField extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'options' => 'array',
-        'validation' => 'array',
-        'settings' => 'array',
-        'is_required' => 'boolean',
-    ];
-
     public function form(): BelongsTo
     {
         return $this->belongsTo(Form::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'options' => 'array',
+            'validation' => 'array',
+            'settings' => 'array',
+            'is_required' => 'boolean',
+        ];
     }
 }

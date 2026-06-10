@@ -44,12 +44,15 @@ class ReturnStatusHistory extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'changed_at' => 'datetime',
-    ];
-
     public function return(): BelongsTo
     {
         return $this->belongsTo(ReturnRequest::class, 'return_id');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'changed_at' => 'datetime',
+        ];
     }
 }

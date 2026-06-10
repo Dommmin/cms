@@ -65,11 +65,6 @@ class Address extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'type' => AddressTypeEnum::class,
-        'is_default' => 'boolean',
-    ];
-
     /**
      * Create a new Eloquent query builder for the model.
      *
@@ -99,5 +94,13 @@ class Address extends Model
         ];
 
         return implode(', ', array_filter($parts));
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'type' => AddressTypeEnum::class,
+            'is_default' => 'boolean',
+        ];
     }
 }

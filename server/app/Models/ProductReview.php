@@ -63,11 +63,6 @@ class ProductReview extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'status' => ReviewStatusEnum::class,
-        'is_verified_purchase' => 'boolean',
-    ];
-
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
@@ -98,5 +93,13 @@ class ProductReview extends Model
     {
         $count = $this->helpfulVotes()->where('is_helpful', true)->count();
         $this->update(['helpful_count' => $count]);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'status' => ReviewStatusEnum::class,
+            'is_verified_purchase' => 'boolean',
+        ];
     }
 }

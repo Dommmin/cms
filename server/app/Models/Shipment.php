@@ -64,11 +64,6 @@ class Shipment extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'status' => ShipmentStatusEnum::class,
-        'carrier_payload' => 'array',
-    ];
-
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
@@ -82,5 +77,13 @@ class Shipment extends Model
     public function shippingMethod(): BelongsTo
     {
         return $this->belongsTo(ShippingMethod::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'status' => ShipmentStatusEnum::class,
+            'carrier_payload' => 'array',
+        ];
     }
 }

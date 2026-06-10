@@ -57,12 +57,6 @@ class PageBlock extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'type' => PageBlockTypeEnum::class,
-        'configuration' => 'array',
-        'is_active' => 'boolean',
-    ];
-
     public function page(): BelongsTo
     {
         return $this->belongsTo(Page::class, 'page_id');
@@ -179,5 +173,14 @@ class PageBlock extends Model
         }
 
         return $data;
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'type' => PageBlockTypeEnum::class,
+            'configuration' => 'array',
+            'is_active' => 'boolean',
+        ];
     }
 }

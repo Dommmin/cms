@@ -57,10 +57,6 @@ class ProductFlag extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
-
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'product_flag_product')
@@ -78,5 +74,12 @@ class ProductFlag extends Model
     protected function ordered($query)
     {
         return $query->orderBy('position')->orderBy('name');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+        ];
     }
 }

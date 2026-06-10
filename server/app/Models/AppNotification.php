@@ -61,17 +61,20 @@ class AppNotification extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'type' => NotificationTypeEnum::class,
-        'channel' => NotificationChannelEnum::class,
-        'status' => NotificationStatusEnum::class,
-        'metadata' => 'array',
-        'sent_at' => 'datetime',
-        'failed_at' => 'datetime',
-    ];
-
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'type' => NotificationTypeEnum::class,
+            'channel' => NotificationChannelEnum::class,
+            'status' => NotificationStatusEnum::class,
+            'metadata' => 'array',
+            'sent_at' => 'datetime',
+            'failed_at' => 'datetime',
+        ];
     }
 }

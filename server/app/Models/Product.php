@@ -24,9 +24,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Scout\Searchable;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
@@ -153,22 +153,12 @@ class Product extends Model implements HasMedia
 
     protected int $maxVersions = 50;
 
-    protected $casts = [
-        'is_active' => 'boolean',
-        'is_saleable' => 'boolean',
-        'is_search_promoted' => 'boolean',
-        'is_featured' => 'boolean',
-        'available_from' => 'datetime',
-        'available_until' => 'datetime',
-        'sitemap_exclude' => 'boolean',
-    ];
-
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logOnly(['name', 'slug', 'is_active', 'is_saleable'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
+            ->dontLogEmptyChanges()
             ->useLogName('product');
     }
 
@@ -357,5 +347,18 @@ class Product extends Model implements HasMedia
             ->where(function (Builder $q) use ($now): void {
                 $q->whereNull('available_until')->orWhere('available_until', '>=', $now);
             });
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'is_saleable' => 'boolean',
+            'is_search_promoted' => 'boolean',
+            'is_featured' => 'boolean',
+            'available_from' => 'datetime',
+            'available_until' => 'datetime',
+            'sitemap_exclude' => 'boolean',
+        ];
     }
 }

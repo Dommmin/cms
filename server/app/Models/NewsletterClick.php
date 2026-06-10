@@ -47,10 +47,6 @@ class NewsletterClick extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'clicked_at' => 'datetime',
-    ];
-
     public function campaign(): BelongsTo
     {
         return $this->belongsTo(NewsletterCampaign::class);
@@ -59,5 +55,12 @@ class NewsletterClick extends Model
     public function subscriber(): BelongsTo
     {
         return $this->belongsTo(NewsletterSubscriber::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'clicked_at' => 'datetime',
+        ];
     }
 }

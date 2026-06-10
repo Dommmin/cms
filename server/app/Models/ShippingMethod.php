@@ -18,9 +18,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 /**
  * @property int $id
  * @property string $name
@@ -102,19 +102,12 @@ class ShippingMethod extends Model
 
     public array $translatable = ['name', 'description'];
 
-    protected $casts = [
-        'carrier' => ShippingCarrierEnum::class,
-        'is_active' => 'boolean',
-        'requires_signature' => 'boolean',
-        'insurance_available' => 'boolean',
-    ];
-
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logOnly(['name', 'base_price', 'is_active'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
+            ->dontLogEmptyChanges()
             ->useLogName('shipping_method');
     }
 
@@ -188,7 +181,10 @@ class ShippingMethod extends Model
     /** Czy metoda wymaga wyboru punktu odbioru (paczkomat)? */
     public function requiresPickupPoint(): bool
     {
-        return $this->carrier->requiresPickupPoint();
+        /** @var ShippingCarrierEnum $carrier */
+        $carrier = $this->carrier;
+
+        return $carrier->requiresPickupPoint();
     }
 
     public function hasMaxDimensions(): bool
@@ -206,5 +202,15 @@ class ShippingMethod extends Model
         }
 
         return $weightKg <= $this->max_weight;
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'carrier' => ShippingCarrierEnum::class,
+            'is_active' => 'boolean',
+            'requires_signature' => 'boolean',
+            'insurance_available' => 'boolean',
+        ];
     }
 }

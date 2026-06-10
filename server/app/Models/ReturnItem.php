@@ -44,10 +44,6 @@ class ReturnItem extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'condition' => ReturnItemConditionEnum::class,
-    ];
-
     public function return(): BelongsTo
     {
         return $this->belongsTo(ReturnRequest::class, 'return_id');
@@ -56,5 +52,12 @@ class ReturnItem extends Model
     public function orderItem(): BelongsTo
     {
         return $this->belongsTo(OrderItem::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'condition' => ReturnItemConditionEnum::class,
+        ];
     }
 }

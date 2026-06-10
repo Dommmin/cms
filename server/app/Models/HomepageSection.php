@@ -28,9 +28,12 @@ class HomepageSection extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'type' => HomepageSectionTypeEnum::class,
-        'configuration' => 'array',
-        'is_active' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'type' => HomepageSectionTypeEnum::class,
+            'configuration' => 'array',
+            'is_active' => 'boolean',
+        ];
+    }
 }

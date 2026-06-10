@@ -26,11 +26,6 @@ final class AnalyticsEvent extends Model
     use HasFactory;
     use HasFactory;
 
-    protected $casts = [
-        'metadata' => 'array',
-        'created_at' => 'datetime',
-    ];
-
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
@@ -46,5 +41,13 @@ final class AnalyticsEvent extends Model
         self::creating(function (AnalyticsEvent $event): void {
             $event->created_at ??= now();
         });
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'metadata' => 'array',
+            'created_at' => 'datetime',
+        ];
     }
 }

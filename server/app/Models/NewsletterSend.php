@@ -53,12 +53,6 @@ class NewsletterSend extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'sent_at' => 'datetime',
-        'delivered_at' => 'datetime',
-        'failed_at' => 'datetime',
-    ];
-
     public function campaign(): BelongsTo
     {
         return $this->belongsTo(NewsletterCampaign::class);
@@ -67,5 +61,14 @@ class NewsletterSend extends Model
     public function subscriber(): BelongsTo
     {
         return $this->belongsTo(NewsletterSubscriber::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'sent_at' => 'datetime',
+            'delivered_at' => 'datetime',
+            'failed_at' => 'datetime',
+        ];
     }
 }

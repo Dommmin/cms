@@ -49,12 +49,6 @@ class PolicyDocumentVersion extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'effective_from' => 'datetime',
-        'published_at' => 'datetime',
-        'is_current' => 'boolean',
-    ];
-
     public function page(): BelongsTo
     {
         return $this->belongsTo(Page::class);
@@ -63,5 +57,14 @@ class PolicyDocumentVersion extends Model
     protected function scopeCurrent(Builder $query): Builder
     {
         return $query->where('is_current', true);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'effective_from' => 'datetime',
+            'published_at' => 'datetime',
+            'is_current' => 'boolean',
+        ];
     }
 }

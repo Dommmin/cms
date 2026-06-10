@@ -54,12 +54,6 @@ class ProductType extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'has_variants' => 'boolean',
-        'variant_selection_attributes' => 'array',
-        'is_shippable' => 'boolean',
-    ];
-
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
@@ -74,5 +68,14 @@ class ProductType extends Model
     public function attributes(): BelongsToMany
     {
         return $this->belongsToMany(Attribute::class, 'product_type_attributes');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'has_variants' => 'boolean',
+            'variant_selection_attributes' => 'array',
+            'is_shippable' => 'boolean',
+        ];
     }
 }

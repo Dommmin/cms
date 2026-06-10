@@ -48,12 +48,6 @@ class LoyaltyPoint extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'balance' => 'integer',
-        'total_earned' => 'integer',
-        'total_spent' => 'integer',
-    ];
-
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
@@ -62,5 +56,14 @@ class LoyaltyPoint extends Model
     public function transactions(): HasMany
     {
         return $this->hasMany(LoyaltyTransaction::class, 'customer_id');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'balance' => 'integer',
+            'total_earned' => 'integer',
+            'total_spent' => 'integer',
+        ];
     }
 }

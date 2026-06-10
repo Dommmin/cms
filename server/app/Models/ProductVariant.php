@@ -18,9 +18,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -122,16 +122,6 @@ class ProductVariant extends Model
     /** @var array<string> */
     public array $translatable = ['name'];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-        'is_default' => 'boolean',
-        'is_digital' => 'boolean',
-        'backorder_allowed' => 'boolean',
-        'available_at' => 'datetime',
-        'download_limit' => 'integer',
-        'download_expiry_days' => 'integer',
-    ];
-
     /**
      * Create a new Eloquent query builder for the model.
      *
@@ -151,7 +141,7 @@ class ProductVariant extends Model
         return LogOptions::defaults()
             ->logOnly(['sku', 'barcode', 'ean', 'upc', 'price', 'stock_quantity', 'is_active', 'is_digital', 'stock_status', 'backorder_allowed'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
+            ->dontLogEmptyChanges()
             ->useLogName('product_variant');
     }
 
@@ -333,5 +323,18 @@ class ProductVariant extends Model
     public function hasDownloads(): bool
     {
         return $this->is_digital && $this->downloads()->exists();
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'is_default' => 'boolean',
+            'is_digital' => 'boolean',
+            'backorder_allowed' => 'boolean',
+            'available_at' => 'datetime',
+            'download_limit' => 'integer',
+            'download_expiry_days' => 'integer',
+        ];
     }
 }

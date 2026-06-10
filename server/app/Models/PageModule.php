@@ -78,13 +78,6 @@ class PageModule extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'has_list_page' => 'boolean',
-        'has_detail_page' => 'boolean',
-        'is_active' => 'boolean',
-        'is_system' => 'boolean',
-    ];
-
     public function layouts(): HasMany
     {
         return $this->hasMany(ModuleLayout::class);
@@ -143,5 +136,15 @@ class PageModule extends Model
             $routeKey,
             $this->detail_route_pattern
         );
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'has_list_page' => 'boolean',
+            'has_detail_page' => 'boolean',
+            'is_active' => 'boolean',
+            'is_system' => 'boolean',
+        ];
     }
 }

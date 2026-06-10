@@ -13,9 +13,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 /**
  * @property int $id
@@ -62,10 +62,6 @@ class Brand extends Model
     use LogsActivity;
     use SoftDeletes;
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
-
     public static function active(): Builder
     {
         return self::query()->where('is_active', true);
@@ -76,12 +72,19 @@ class Brand extends Model
         return LogOptions::defaults()
             ->logOnly(['name', 'is_active'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
+            ->dontLogEmptyChanges()
             ->useLogName('brand');
     }
 
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+        ];
     }
 }

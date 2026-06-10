@@ -63,12 +63,6 @@ class ModuleLayout extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'configuration_schema' => 'array',
-        'default_configuration' => 'array',
-        'is_active' => 'boolean',
-    ];
-
     public function module(): BelongsTo
     {
         return $this->belongsTo(PageModule::class, 'page_module_id');
@@ -77,5 +71,14 @@ class ModuleLayout extends Model
     public function pages(): HasMany
     {
         return $this->hasMany(Page::class, 'module_layout_id');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'configuration_schema' => 'array',
+            'default_configuration' => 'array',
+            'is_active' => 'boolean',
+        ];
     }
 }

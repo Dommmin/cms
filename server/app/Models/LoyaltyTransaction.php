@@ -55,11 +55,6 @@ class LoyaltyTransaction extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'points' => 'integer',
-        'balance_after' => 'integer',
-    ];
-
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
@@ -68,5 +63,13 @@ class LoyaltyTransaction extends Model
     public function source(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'points' => 'integer',
+            'balance_after' => 'integer',
+        ];
     }
 }

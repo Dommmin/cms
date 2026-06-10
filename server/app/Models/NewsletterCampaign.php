@@ -105,17 +105,6 @@ class NewsletterCampaign extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'audience_type' => AudienceTypeEnum::class,
-        'type' => CampaignTypeEnum::class,
-        'status' => CampaignStatusEnum::class,
-        'trigger' => CampaignTriggerEnum::class,
-        'target_tags' => 'array',
-        'scheduled_at' => 'datetime',
-        'started_sending_at' => 'datetime',
-        'finished_sending_at' => 'datetime',
-    ];
-
     public function segment(): BelongsTo
     {
         return $this->belongsTo(NewsletterSegment::class);
@@ -154,5 +143,19 @@ class NewsletterCampaign extends Model
         }
 
         return round(($this->total_clicked / $this->total_sent) * 100, 1);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'audience_type' => AudienceTypeEnum::class,
+            'type' => CampaignTypeEnum::class,
+            'status' => CampaignStatusEnum::class,
+            'trigger' => CampaignTriggerEnum::class,
+            'target_tags' => 'array',
+            'scheduled_at' => 'datetime',
+            'started_sending_at' => 'datetime',
+            'finished_sending_at' => 'datetime',
+        ];
     }
 }

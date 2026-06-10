@@ -48,10 +48,6 @@ class Wishlist extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'is_public' => 'boolean',
-    ];
-
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
@@ -60,5 +56,12 @@ class Wishlist extends Model
     public function items(): HasMany
     {
         return $this->hasMany(WishlistItem::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_public' => 'boolean',
+        ];
     }
 }

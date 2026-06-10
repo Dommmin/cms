@@ -59,11 +59,6 @@ class BlockRelation extends Model
     use HasFactory;
     use HasFactory;
 
-    protected $casts = [
-        'metadata' => 'array',
-        'position' => 'integer',
-    ];
-
     public function block(): BelongsTo
     {
         return $this->belongsTo(PageBlock::class, 'page_block_id');
@@ -103,5 +98,13 @@ class BlockRelation extends Model
     protected function ordered(Builder $query): Builder
     {
         return $query->orderBy('position');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'metadata' => 'array',
+            'position' => 'integer',
+        ];
     }
 }

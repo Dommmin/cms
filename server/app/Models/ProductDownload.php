@@ -57,11 +57,6 @@ class ProductDownload extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'file_size' => 'integer',
-        'position' => 'integer',
-    ];
-
     public function variant(): BelongsTo
     {
         return $this->belongsTo(ProductVariant::class, 'product_variant_id');
@@ -93,5 +88,13 @@ class ProductDownload extends Model
         }
 
         return route('api.v1.downloads.show', $this);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'file_size' => 'integer',
+            'position' => 'integer',
+        ];
     }
 }

@@ -46,11 +46,6 @@ class Menu extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'location' => MenuLocationEnum::class,
-        'is_active' => 'boolean',
-    ];
-
     public static function byLocation(MenuLocationEnum $location): ?self
     {
         return self::query()->where('location', $location->value)->where('is_active', true)->first();
@@ -64,5 +59,13 @@ class Menu extends Model
     public function allItems(): HasMany
     {
         return $this->hasMany(MenuItem::class)->orderBy('position');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'location' => MenuLocationEnum::class,
+            'is_active' => 'boolean',
+        ];
     }
 }

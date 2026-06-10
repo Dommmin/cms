@@ -32,10 +32,6 @@ class TaxZone extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
-
     public function countries(): HasMany
     {
         return $this->hasMany(TaxZoneCountry::class);
@@ -44,5 +40,12 @@ class TaxZone extends Model
     public function taxRates(): HasMany
     {
         return $this->hasMany(TaxRate::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+        ];
     }
 }

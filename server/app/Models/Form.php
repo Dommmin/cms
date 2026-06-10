@@ -12,9 +12,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 /**
  * @property int $id
@@ -64,19 +64,12 @@ class Form extends Model
     use HasFactory;
     use LogsActivity;
 
-    protected $casts = [
-        'settings' => 'array',
-        'notify_emails' => 'array',
-        'is_active' => 'boolean',
-        'allow_multiple' => 'boolean',
-    ];
-
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logOnly(['name', 'is_active'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
+            ->dontLogEmptyChanges()
             ->useLogName('form');
     }
 
@@ -88,5 +81,15 @@ class Form extends Model
     public function submissions(): HasMany
     {
         return $this->hasMany(FormSubmission::class)->latest();
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'settings' => 'array',
+            'notify_emails' => 'array',
+            'is_active' => 'boolean',
+            'allow_multiple' => 'boolean',
+        ];
     }
 }

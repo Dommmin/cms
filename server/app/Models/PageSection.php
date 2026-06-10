@@ -55,11 +55,6 @@ class PageSection extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'settings' => 'array',
-        'is_active' => 'boolean',
-    ];
-
     public function page(): BelongsTo
     {
         return $this->belongsTo(Page::class, 'page_id');
@@ -73,5 +68,13 @@ class PageSection extends Model
     public function allBlocks(): HasMany
     {
         return $this->hasMany(PageBlock::class, 'section_id')->orderBy('position');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'settings' => 'array',
+            'is_active' => 'boolean',
+        ];
     }
 }

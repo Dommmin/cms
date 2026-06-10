@@ -13,9 +13,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 /**
  * Theme model representing UI/themes configuration stored in the database.
@@ -79,27 +79,30 @@ class Theme extends Model
     use HasFactory;
     use LogsActivity;
 
-    protected $casts = [
-        'tokens' => 'array',
-        'typography' => 'array',
-        'spacing' => 'array',
-        'buttons' => 'array',
-        'containers' => 'array',
-        'settings' => 'array',
-        'is_active' => 'boolean',
-    ];
-
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logOnly(['name', 'is_active'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
+            ->dontLogEmptyChanges()
             ->useLogName('theme');
     }
 
     public function pages(): HasMany
     {
         return $this->hasMany(Page::class, 'theme_id');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'tokens' => 'array',
+            'typography' => 'array',
+            'spacing' => 'array',
+            'buttons' => 'array',
+            'containers' => 'array',
+            'settings' => 'array',
+            'is_active' => 'boolean',
+        ];
     }
 }

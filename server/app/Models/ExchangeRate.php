@@ -43,13 +43,16 @@ class ExchangeRate extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'rate' => 'float',
-        'fetched_at' => 'datetime',
-    ];
-
     public function currency(): BelongsTo
     {
         return $this->belongsTo(Currency::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'rate' => 'float',
+            'fetched_at' => 'datetime',
+        ];
     }
 }

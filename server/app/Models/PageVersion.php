@@ -54,11 +54,6 @@ class PageVersion extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'snapshot' => 'array',
-        'is_autosave' => 'boolean',
-    ];
-
     public function page(): BelongsTo
     {
         return $this->belongsTo(Page::class, 'page_id');
@@ -67,5 +62,13 @@ class PageVersion extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'snapshot' => 'array',
+            'is_autosave' => 'boolean',
+        ];
     }
 }

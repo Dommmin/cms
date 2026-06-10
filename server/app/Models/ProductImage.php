@@ -8,6 +8,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -51,10 +52,6 @@ class ProductImage extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'is_thumbnail' => 'boolean',
-    ];
-
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
@@ -70,8 +67,15 @@ class ProductImage extends Model
         return $this->belongsTo(Media::class, 'media_id');
     }
 
-    protected function getPathAttribute(): string
+    protected function path(): Attribute
     {
-        return $this->media?->getUrl() ?? '';
+        return Attribute::make(get: fn () => $this->media?->getUrl() ?? '');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_thumbnail' => 'boolean',
+        ];
     }
 }

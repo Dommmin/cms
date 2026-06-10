@@ -48,10 +48,6 @@ class PagePreviewToken extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'expires_at' => 'datetime',
-    ];
-
     public function page(): BelongsTo
     {
         return $this->belongsTo(Page::class, 'page_id');
@@ -65,5 +61,12 @@ class PagePreviewToken extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'expires_at' => 'datetime',
+        ];
     }
 }

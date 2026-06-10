@@ -41,10 +41,6 @@ class ProductTypeAttribute extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'is_required' => 'boolean',
-    ];
-
     public function productType(): BelongsTo
     {
         return $this->belongsTo(ProductType::class);
@@ -53,5 +49,12 @@ class ProductTypeAttribute extends Model
     public function attribute(): BelongsTo
     {
         return $this->belongsTo(Attribute::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_required' => 'boolean',
+        ];
     }
 }

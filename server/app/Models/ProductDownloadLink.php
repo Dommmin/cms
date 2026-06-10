@@ -59,12 +59,6 @@ class ProductDownloadLink extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'expires_at' => 'datetime',
-        'max_downloads' => 'integer',
-        'download_count' => 'integer',
-    ];
-
     public static function generateToken(): string
     {
         return Str::random(64);
@@ -103,5 +97,14 @@ class ProductDownloadLink extends Model
     public function incrementDownloadCount(): void
     {
         $this->increment('download_count');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'expires_at' => 'datetime',
+            'max_downloads' => 'integer',
+            'download_count' => 'integer',
+        ];
     }
 }

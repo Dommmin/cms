@@ -20,10 +20,6 @@ class InventoryReservation extends Model
     use HasFactory;
     use HasFactory;
 
-    protected $casts = [
-        'expires_at' => 'datetime',
-    ];
-
     public function variant(): BelongsTo
     {
         return $this->belongsTo(ProductVariant::class, 'product_variant_id');
@@ -32,5 +28,12 @@ class InventoryReservation extends Model
     public function cart(): BelongsTo
     {
         return $this->belongsTo(Cart::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'expires_at' => 'datetime',
+        ];
     }
 }

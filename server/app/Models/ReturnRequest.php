@@ -66,11 +66,6 @@ class ReturnRequest extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'return_type' => ReturnTypeEnum::class,
-        'status' => ReturnStatusEnum::class,
-    ];
-
     public static function generateReferenceNumber(): string
     {
         $year = date('Y');
@@ -120,5 +115,13 @@ class ReturnRequest extends Model
             'notes' => $notes,
             'changed_at' => now(),
         ]);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'return_type' => ReturnTypeEnum::class,
+            'status' => ReturnStatusEnum::class,
+        ];
     }
 }

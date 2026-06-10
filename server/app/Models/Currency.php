@@ -51,11 +51,6 @@ class Currency extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'is_active' => 'boolean',
-        'is_base' => 'boolean',
-    ];
-
     public static function base(): self
     {
         return self::query()->where('is_base', true)->first()
@@ -104,5 +99,13 @@ class Currency extends Model
             'EUR' => $formatted.' €',
             default => $formatted.' '.$this->symbol,
         };
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'is_base' => 'boolean',
+        ];
     }
 }
