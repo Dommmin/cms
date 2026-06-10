@@ -5,10 +5,11 @@
 set -euo pipefail
 
 # Configuration
-DB_HOST="${DB_HOST:-localhost}"
-DB_PORT="${DB_PORT:-5432}"
-DB_USER="${DB_USER:-laravel}"
-DB_NAME="${DB_NAME:-laravel}"
+DB_HOST="${DB_HOST:-mysql}"
+DB_PORT="${DB_PORT:-3306}"
+DB_USER="${DB_USER:-root}"
+DB_PASSWORD="${DB_PASSWORD:-secret}"
+DB_NAME="${DB_NAME:-cms}"
 DB_TEST_NAME="${DB_NAME}_test"
 S3_BUCKET="${S3_BACKUP_BUCKET:-}"
 S3_PREFIX="backups-db"
@@ -28,8 +29,8 @@ log() {
 error_handler() {
     log "ERROR: Backup verification failed!"
     # Cleanup
-    dropdb -h "$DB_HOST" -U "$DB_USER" "$DB_TEST_NAME" 2>/dev/null || true
-    rm -f /tmp/test_backup_*.sql.gz
+    mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" -e "DROP DATABASE IF EXISTS ${DB_TEST_NAME};" 2>/dev/null || true
+    rm -f /tmp/db_backup_*.sql.gz
     exit 1
 }
 
@@ -56,19 +57,18 @@ aws s3 cp "s3://${S3_BUCKET}/${S3_PREFIX}/${LATEST_BACKUP}" "/tmp/${LATEST_BACKU
 
 # Create test database
 log "Creating test database..."
-dropdb -h "$DB_HOST" -U "$DB_USER" "$DB_TEST_NAME" 2>/dev/null || true
-createdb -h "$DB_HOST" -U "$DB_USER" "$DB_TEST_NAME"
+mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" -e "DROP DATABASE IF EXISTS ${DB_TEST_NAME}; CREATE DATABASE ${DB_TEST_NAME};"
 
 # Restore backup to test database
 log "Restoring backup to test database..."
-gunzip -c "/tmp/${LATEST_BACKUP}" | psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_TEST_NAME" -q
+gunzip -c "/tmp/${LATEST_BACKUP}" | mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" "${DB_TEST_NAME}"
 
 # Verify integrity (check critical tables)
 log "Verifying backup integrity..."
 CRITICAL_TABLES=("users" "products" "orders" "customers" "categories")
 
 for table in "${CRITICAL_TABLES[@]}"; do
-    COUNT=$(psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_TEST_NAME" -t -c "SELECT COUNT(*) FROM ${table}")
+    COUNT=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" -N -B "${DB_TEST_NAME}" -e "SELECT COUNT(*) FROM ${table};")
     log "Table ${table}: ${COUNT} rows"
     
     if [ "$COUNT" -eq 0 ]; then
@@ -78,13 +78,17 @@ done
 
 # Check foreign key constraints
 log "Checking foreign key constraints..."
-psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_TEST_NAME" -c \
-    "SELECT conname FROM pg_constraint WHERE contype = 'f';" | \
-    grep -q "fk_" && log "Foreign key constraints OK" || log "WARNING: Missing foreign key constraints"
+FK_COUNT=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" -N -B -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA='${DB_TEST_NAME}' AND REFERENCED_TABLE_NAME IS NOT NULL;")
+
+if [ "$FK_COUNT" -gt 0 ]; then
+    log "Foreign key constraints OK (${FK_COUNT} constraints found)"
+else
+    log "WARNING: Missing or zero foreign key constraints"
+fi
 
 # Cleanup
 log "Cleaning up..."
-dropdb -h "$DB_HOST" -U "$DB_USER" "$DB_TEST_NAME"
+mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" -e "DROP DATABASE IF EXISTS ${DB_TEST_NAME};"
 rm -f "/tmp/${LATEST_BACKUP}"
 
 log "✅ Backup verification completed successfully!"

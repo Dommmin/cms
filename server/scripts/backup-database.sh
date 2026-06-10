@@ -5,14 +5,20 @@
 set -euo pipefail
 
 # Configuration
-DB_HOST="${DB_HOST:-postgres}"
-DB_PORT="${DB_PORT:-5432}"
-DB_NAME="${DB_NAME:-laravel}"
-DB_USER="${DB_USER:-laravel}"
+DB_HOST="${DB_HOST:-mysql}"
+DB_PORT="${DB_PORT:-3306}"
+DB_NAME="${DB_NAME:-cms}"
+DB_USER="${DB_USER:-root}"
+DB_PASSWORD="${DB_PASSWORD:-secret}"
 S3_BUCKET="${S3_BACKUP_BUCKET:-}"
 S3_PREFIX="backups-db"
 DATE=$(date +%Y%m%d_%H%M%S)
 BACKUP_FILE="/tmp/db_backup_${DATE}.sql.gz"
+
+# Resolve status file path relative to Laravel root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+APP_ROOT="$(dirname "$SCRIPT_DIR")"
+STATUS_FILE="${APP_ROOT}/storage/app/private/backup-status.json"
 
 # Validate required env vars
 if [ -z "$S3_BUCKET" ]; then
@@ -29,7 +35,9 @@ log() {
 error_handler() {
     log "ERROR: Backup failed!"
     rm -f "$BACKUP_FILE"
-    # Send alert to Sentry/monitoring
+    # Write failure to status file
+    mkdir -p "$(dirname "$STATUS_FILE")"
+    echo "{\"last_backup_time\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"status\": \"failed\", \"size\": 0}" > "$STATUS_FILE"
     exit 1
 }
 
@@ -37,15 +45,15 @@ trap error_handler ERR
 
 # Check if database is accessible
 log "Checking database connectivity..."
-if ! pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" > /dev/null 2>&1; then
+if ! mysqladmin ping -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" > /dev/null 2>&1; then
     log "ERROR: Cannot connect to database at $DB_HOST:$DB_PORT"
     exit 1
 fi
 
 # Create backup
 log "Creating database backup..."
-pg_dump -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" \
-    --no-owner --no-acl --clean --if-exists \
+mysqldump -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" \
+    --single-transaction --routines --triggers --databases "$DB_NAME" \
     | gzip > "$BACKUP_FILE"
 
 # Check backup size
@@ -61,6 +69,11 @@ aws s3 cp "$BACKUP_FILE" "s3://${S3_BUCKET}/${S3_PREFIX}/db_backup_${DATE}.sql.g
 # Cleanup local file
 rm -f "$BACKUP_FILE"
 log "Local backup file removed"
+
+# Write success to status file
+mkdir -p "$(dirname "$STATUS_FILE")"
+echo "{\"last_backup_time\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"status\": \"success\", \"size\": $BACKUP_SIZE}" > "$STATUS_FILE"
+log "Status JSON updated at $STATUS_FILE"
 
 # Cleanup old backups (keep last 30 days)
 log "Cleaning up old backups..."
