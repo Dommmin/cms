@@ -54,7 +54,7 @@ class DashboardService
     private function getCmsStats(CarbonInterface $start, CarbonInterface $end): array
     {
         return [
-            'published_pages' => Page::query()->where('status', 'published')->count(),
+            'published_pages' => Page::query()->where('is_published', true)->count(),
             'published_posts' => BlogPost::query()->where('status', 'published')->count(),
             'new_form_submissions' => FormSubmission::query()
                 ->whereBetween('created_at', [$start, $end])

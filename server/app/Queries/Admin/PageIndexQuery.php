@@ -22,7 +22,11 @@ class PageIndexQuery
                     ->orWhere('slug', 'like', sprintf('%%%s%%', $search));
             })
             ->when($this->request->status, function ($query, $status): void {
-                $query->where('status', $status);
+                if ($status === 'published') {
+                    $query->where('is_published', true);
+                } elseif ($status === 'draft') {
+                    $query->where('is_published', false);
+                }
             })
             ->when($this->request->has('is_home'), function ($query): void {
                 $query->where('is_home', $this->request->boolean('is_home'));
