@@ -19,19 +19,19 @@ class StarterKitService
     public function applyKit(string $kitKey): array
     {
         $kit = config('cms.starter_kits.'.$kitKey);
-        throw_unless($kit, RuntimeException::class, "Starter Kit [{$kitKey}] not found.");
+        throw_unless($kit, RuntimeException::class, sprintf('Starter Kit [%s] not found.', $kitKey));
 
         $presetKey = Arr::get($kit, 'design_preset', 'minimal');
         $designPreset = config('cms.design_presets.'.$presetKey);
-        
+
         $theme = null;
         if ($designPreset) {
             // Unset current active themes
             Theme::query()->update(['is_active' => false]);
-            
+
             $theme = Theme::query()->create([
-                'name' => $kit['label'] . ' Theme',
-                'slug' => Str::slug($kit['label'] . ' ' . uniqid()),
+                'name' => $kit['label'].' Theme',
+                'slug' => Str::slug($kit['label'].' '.uniqid()),
                 'tokens' => $designPreset['tokens'] ?? null,
                 'typography' => $designPreset['typography'] ?? null,
                 'spacing' => $designPreset['spacing'] ?? null,
