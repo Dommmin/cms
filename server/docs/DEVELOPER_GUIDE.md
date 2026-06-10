@@ -1236,8 +1236,8 @@ In `ModelVersionController`, add `my-model` to the `$allowedTypes` array to perm
 ### 14.7 Adding Activity Logging
 
 ```php
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
 
 class MyModel extends Model
 {
@@ -1248,7 +1248,7 @@ class MyModel extends Model
         return LogOptions::defaults()
             ->logOnly(['name', 'status', 'is_active'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
+            ->dontLogEmptyChanges();
     }
 }
 ```
