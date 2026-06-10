@@ -36,7 +36,7 @@ class AnalyticsEventSeeder extends Seeder
         // Seed 150 sessions over the last 30 days
         for ($i = 0; $i < 150; $i++) {
             $sessionId = Str::uuid()->toString();
-            $date = now()->subDays(rand(0, 29))->subHours(rand(0, 23))->subMinutes(rand(0, 59));
+            $date = now()->subDays(random_int(0, 29))->subHours(random_int(0, 23))->subMinutes(random_int(0, 59));
 
             $landingUrl = $landingUrls[array_rand($landingUrls)];
             $referrer = $referrers[array_rand($referrers)];
@@ -53,12 +53,12 @@ class AnalyticsEventSeeder extends Seeder
             ]);
 
             // Step 2: View Item (80% chance)
-            if (rand(1, 100) > 80) {
+            if (random_int(1, 100) > 80) {
                 continue;
             }
 
-            $productUrl = "http://localhost:3000/products/{$product->slug}";
-            $date = $date->copy()->addMinutes(rand(1, 5));
+            $productUrl = 'http://localhost:3000/products/'.$product->slug;
+            $date = $date->copy()->addMinutes(random_int(1, 5));
             AnalyticsEvent::query()->create([
                 'session_id' => $sessionId,
                 'event_name' => 'view_item',
@@ -67,17 +67,17 @@ class AnalyticsEventSeeder extends Seeder
                 'referrer' => $landingUrl,
                 'metadata' => [
                     'name' => $product->getTranslation('name', 'en', false),
-                    'price' => $product->price_min,
+                    'price' => $product->priceRange()['min'],
                 ],
                 'created_at' => $date,
             ]);
 
             // Step 3: Add to Cart (50% chance)
-            if (rand(1, 100) > 50) {
+            if (random_int(1, 100) > 50) {
                 continue;
             }
 
-            $date = $date->copy()->addMinutes(rand(1, 3));
+            $date = $date->copy()->addMinutes(random_int(1, 3));
             AnalyticsEvent::query()->create([
                 'session_id' => $sessionId,
                 'event_name' => 'add_to_cart',
@@ -87,44 +87,44 @@ class AnalyticsEventSeeder extends Seeder
                 'referrer' => $productUrl,
                 'metadata' => [
                     'name' => $product->getTranslation('name', 'en', false),
-                    'price' => $product->price_min,
+                    'price' => $product->priceRange()['min'],
                     'quantity' => 1,
                 ],
                 'created_at' => $date,
             ]);
 
             // Step 4: Begin Checkout (60% chance)
-            if (rand(1, 100) > 60) {
+            if (random_int(1, 100) > 60) {
                 continue;
             }
 
             $checkoutUrl = 'http://localhost:3000/checkout';
-            $date = $date->copy()->addMinutes(rand(1, 3));
+            $date = $date->copy()->addMinutes(random_int(1, 3));
             AnalyticsEvent::query()->create([
                 'session_id' => $sessionId,
                 'event_name' => 'begin_checkout',
                 'url' => $checkoutUrl,
                 'referrer' => $productUrl,
                 'metadata' => [
-                    'value' => $product->price_min,
+                    'value' => $product->priceRange()['min'],
                     'currency' => 'PLN',
                 ],
                 'created_at' => $date,
             ]);
 
             // Step 5: Payment Step (80% chance)
-            if (rand(1, 100) > 80) {
+            if (random_int(1, 100) > 80) {
                 continue;
             }
 
-            $date = $date->copy()->addMinutes(rand(1, 2));
+            $date = $date->copy()->addMinutes(random_int(1, 2));
             AnalyticsEvent::query()->create([
                 'session_id' => $sessionId,
                 'event_name' => 'payment_step',
                 'url' => $checkoutUrl,
                 'referrer' => $checkoutUrl,
                 'metadata' => [
-                    'value' => $product->price_min,
+                    'value' => $product->priceRange()['min'],
                     'currency' => 'PLN',
                     'payment_type' => 'card',
                 ],
@@ -132,17 +132,18 @@ class AnalyticsEventSeeder extends Seeder
             ]);
 
             // Step 6: Purchase (75% chance)
-            if (rand(1, 100) > 75) {
+            if (random_int(1, 100) > 75) {
                 continue;
             }
 
-            $date = $date->copy()->addMinutes(rand(1, 2));
-            $usePromo = rand(1, 100) > 50;
-            $promoCode = $usePromo ? ['SAVE10', 'WELCOME5', 'FREE2026'][rand(0, 2)] : null;
-            $revenue = $product->price_min;
+            $date = $date->copy()->addMinutes(random_int(1, 2));
+            $usePromo = random_int(1, 100) > 50;
+            $promoCode = $usePromo ? ['SAVE10', 'WELCOME5', 'FREE2026'][random_int(0, 2)] : null;
+            $revenue = $product->priceRange()['min'];
             if ($promoCode === 'SAVE10') {
                 $revenue = (int) ($revenue * 0.9);
             }
+
             if ($promoCode === 'WELCOME5') {
                 $revenue = max(0, $revenue - 500);
             }
@@ -153,7 +154,7 @@ class AnalyticsEventSeeder extends Seeder
                 'url' => 'http://localhost:3000/checkout/success',
                 'referrer' => $checkoutUrl,
                 'metadata' => [
-                    'transaction_id' => 'ORD-'.strtoupper(Str::random(8)),
+                    'transaction_id' => 'ORD-'.mb_strtoupper(Str::random(8)),
                     'revenue' => $revenue,
                     'currency' => 'PLN',
                     'discount_code' => $promoCode,
@@ -165,12 +166,12 @@ class AnalyticsEventSeeder extends Seeder
         // Seed some zero-result search logs
         $queries = ['iphone 17', 'playstation 6', 'nikon camera', 'wool sweater', 'electric scooter'];
         foreach ($queries as $q) {
-            for ($k = 0; $k < rand(3, 12); $k++) {
+            for ($k = 0; $k < random_int(3, 12); $k++) {
                 SearchLog::query()->create([
                     'query' => $q,
                     'results_count' => 0,
                     'is_autocomplete' => false,
-                    'created_at' => now()->subDays(rand(1, 20)),
+                    'created_at' => now()->subDays(random_int(1, 20)),
                 ]);
             }
         }

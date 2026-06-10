@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\OrderStatusEnum;
-use App\Models\Cart;
+use App\Models\AnalyticsEvent;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\ProductVariant;
@@ -27,7 +27,7 @@ class AnalyticsReportService
         $start = $period['start'];
         $end = $period['end'];
 
-        $getUniqueSessions = fn (string $eventName) => \App\Models\AnalyticsEvent::query()
+        $getUniqueSessions = fn (string $eventName) => AnalyticsEvent::query()
             ->where('event_name', $eventName)
             ->whereBetween('created_at', [$start, $end])
             ->distinct('session_id')
@@ -358,12 +358,6 @@ class AnalyticsReportService
         return (string) $doc->saveXML();
     }
 
-    private function addEl(DOMDocument $doc, DOMElement $parent, string $tag, string $value): void
-    {
-        $el = $doc->createElement($tag, htmlspecialchars($value));
-        $parent->appendChild($el);
-    }
-
     /**
      * Landing pages with conversions report.
      *
@@ -375,7 +369,7 @@ class AnalyticsReportService
         $start = $period['start'];
         $end = $period['end'];
 
-        $firstEventIds = \App\Models\AnalyticsEvent::query()
+        $firstEventIds = AnalyticsEvent::query()
             ->whereBetween('created_at', [$start, $end])
             ->selectRaw('session_id, MIN(id) as first_event_id')
             ->groupBy('session_id')
@@ -387,11 +381,11 @@ class AnalyticsReportService
             return [];
         }
 
-        $sessionLandingPages = \App\Models\AnalyticsEvent::query()
+        $sessionLandingPages = AnalyticsEvent::query()
             ->whereIn('id', $firstEventIds)
             ->pluck('url', 'session_id');
 
-        $purchasingSessions = \App\Models\AnalyticsEvent::query()
+        $purchasingSessions = AnalyticsEvent::query()
             ->where('event_name', 'purchase')
             ->whereBetween('created_at', [$start, $end])
             ->get()
@@ -399,10 +393,10 @@ class AnalyticsReportService
 
         $stats = [];
         foreach ($sessionLandingPages as $sessionId => $url) {
-            $path = parse_url($url, PHP_URL_PATH) ?: '/';
+            $path = parse_url((string) $url, PHP_URL_PATH) ?: '/';
             $path = preg_replace('/^\/(pl|en)($|\/)/', '/', $path) ?: '/';
 
-            if (!isset($stats[$path])) {
+            if (! isset($stats[$path])) {
                 $stats[$path] = [
                     'url' => $path,
                     'sessions' => 0,
@@ -422,7 +416,7 @@ class AnalyticsReportService
             }
         }
 
-        usort($stats, fn ($a, $b) => $b['sessions'] <=> $a['sessions']);
+        usort($stats, fn (array $a, array $b): int => $b['sessions'] <=> $a['sessions']);
 
         return array_slice($stats, 0, 20);
     }
@@ -438,7 +432,7 @@ class AnalyticsReportService
         $start = $period['start'];
         $end = $period['end'];
 
-        $purchaseEvents = \App\Models\AnalyticsEvent::query()
+        $purchaseEvents = AnalyticsEvent::query()
             ->where('event_name', 'purchase')
             ->whereBetween('created_at', [$start, $end])
             ->get();
@@ -447,14 +441,14 @@ class AnalyticsReportService
         foreach ($purchaseEvents as $event) {
             $meta = $event->metadata;
             $code = $meta['discount_code'] ?? null;
-            if (!$code) {
+            if (! $code) {
                 continue;
             }
 
-            $code = strtoupper((string) $code);
+            $code = mb_strtoupper((string) $code);
             $revenue = isset($meta['revenue']) ? (int) $meta['revenue'] : 0;
 
-            if (!isset($stats[$code])) {
+            if (! isset($stats[$code])) {
                 $stats[$code] = [
                     'code' => $code,
                     'purchases' => 0,
@@ -466,8 +460,14 @@ class AnalyticsReportService
             $stats[$code]['revenue'] += $revenue;
         }
 
-        usort($stats, fn ($a, $b) => $b['revenue'] <=> $a['revenue']);
+        usort($stats, fn (array $a, array $b): int => $b['revenue'] <=> $a['revenue']);
 
-        return array_values($stats);
+        return $stats;
+    }
+
+    private function addEl(DOMDocument $doc, DOMElement $parent, string $tag, string $value): void
+    {
+        $el = $doc->createElement($tag, htmlspecialchars($value));
+        $parent->appendChild($el);
     }
 }
