@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Health;
 
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Date;
 use Spatie\Health\Checks\Check;
 use Spatie\Health\Checks\Result;
+use Throwable;
 
 class BackupStatusCheck extends Check
 {
@@ -19,24 +20,25 @@ class BackupStatusCheck extends Check
             return Result::make()->failed('No backup status record found. Database backup might not have run yet.');
         }
 
-        $lastBackup = Carbon::parse($statusData['last_backup_time']);
+        $lastBackup = Date::parse($statusData['last_backup_time']);
         $hoursSinceBackup = (int) now()->diffInHours($lastBackup, true);
         $status = $statusData['status'];
 
         if ($status === 'failed') {
-            return Result::make()->failed("The last backup attempted on {$lastBackup->toDateTimeString()} UTC failed.");
+            return Result::make()->failed(sprintf('The last backup attempted on %s UTC failed.', $lastBackup->toDateTimeString()));
         }
 
         if ($hoursSinceBackup > 26) {
-            return Result::make()->failed("Last backup was {$hoursSinceBackup} hours ago (fresh backup expected within 26 hours).");
+            return Result::make()->failed(sprintf('Last backup was %d hours ago (fresh backup expected within 26 hours).', $hoursSinceBackup));
         }
 
         if ($hoursSinceBackup > 25) {
-            return Result::make()->warning("Last backup was {$hoursSinceBackup} hours ago.");
+            return Result::make()->warning(sprintf('Last backup was %d hours ago.', $hoursSinceBackup));
         }
 
         $sizeMb = isset($statusData['size']) ? round($statusData['size'] / 1024 / 1024, 2) : 0;
-        return Result::make()->ok("Last successful backup was {$hoursSinceBackup} hours ago (Size: {$sizeMb} MB).");
+
+        return Result::make()->ok(sprintf('Last successful backup was %d hours ago (Size: %s MB).', $hoursSinceBackup, $sizeMb));
     }
 
     /**
@@ -55,7 +57,7 @@ class BackupStatusCheck extends Check
                         return $decoded;
                     }
                 }
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 // Ignore and fall back to cache
             }
         }
