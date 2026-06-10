@@ -44,7 +44,7 @@
         "@inertiajs/react": "^3.0.0",
         "@inertiajs/vite": "^3.0.0",
         "@lexical/clipboard": "^0.40.0",
-        "@lexical/code": "^0.40.0",
+        "@lexical/code": "^0.45.0",
         "@lexical/file": "^0.40.0",
         "@lexical/hashtag": "^0.40.0",
         "@lexical/history": "^0.40.0",
