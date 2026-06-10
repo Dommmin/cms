@@ -21,7 +21,7 @@ class NewsletterServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(NewsletterProvider::class, function (): NewsletterProvider {
+        $this->app->singleton(function (): NewsletterProvider {
             try {
                 $provider = (string) Setting::get('newsletter', 'newsletter_provider', 'mailerlite');
             } catch (Throwable) {
