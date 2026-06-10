@@ -114,11 +114,11 @@ scout-import:
 # Setup test database
 setup-test-db:
 	docker compose exec mysql mysql -uroot -psecret -e "CREATE DATABASE IF NOT EXISTS laravel_test;"
-	docker compose exec php php artisan migrate --env=testing
+	docker compose exec -e DB_CONNECTION=mysql -e DB_DATABASE=laravel_test php php artisan migrate:fresh
 
 # Run tests
 test: setup-test-db
-	docker compose exec php php artisan test --env=testing
+	docker compose exec -e DB_CONNECTION=mysql -e DB_DATABASE=laravel_test php php artisan test
 
 # Auto-fix all code style issues (run before committing)
 # Applies pint, rector, eslint --fix, prettier --write in the correct order
@@ -165,7 +165,7 @@ check:
 	@echo ">>> [10/10] Mobile TS: ESLint"
 	npm --prefix mobile run lint
 	@echo ">>> [8/8] Tests (Pest parallel)"
-	docker compose exec php php -d memory_limit=512M vendor/bin/pest --parallel --processes=$(PEST_PARALLEL_PROCESSES)
+	docker compose exec -e DB_CONNECTION=mysql -e DB_DATABASE=laravel_test php php -d memory_limit=512M vendor/bin/pest --parallel --processes=$(PEST_PARALLEL_PROCESSES)
 	@echo ">>> All checks passed. Safe to push."
 
 # Mobile / Expo app
