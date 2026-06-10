@@ -19,6 +19,7 @@ Rules every AI tool (Claude Code, Codex, Gemini, Copilot, Cursor, Junie, Cline, 
 9. **MUST** update `.ai/guide.md` (+ `server/docs/*`) when a feature is added or changed
 10. **MUST** ask before any git branch / commit / push (see Git section)
 11. **MUST** verify: "would a staff engineer approve this diff?"
+12. **MUST** run `make audit` when requested to perform a security audit or security check to properly verify vulnerabilities inside the Docker environment.
 
 ## Core Rules — FORBIDDEN
 
@@ -147,11 +148,12 @@ Project skills live in `.claude/skills/` — committed to the repo, shared with 
 
 ### Before deploy / final release validation
 
-Use the two Makefile commands — they are the canonical full validation workflow:
+Use the Makefile commands — they are the canonical validation workflow:
 
 ```bash
 make fix    # auto-fixes everything: pint → rector → pint → eslint --fix → prettier
 make check  # read-only CI mirror: fails if anything is wrong (same checks as GitHub Actions)
+make audit  # security audit: runs composer outdated + npm audits inside Docker
 ```
 
 **Workflow for AI:**
