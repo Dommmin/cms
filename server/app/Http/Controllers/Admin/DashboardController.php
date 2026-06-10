@@ -46,7 +46,7 @@ class DashboardController extends Controller
             'onboardingWizard' => [
                 'is_completed' => filter_var(Setting::get('wizard', 'is_completed', false), FILTER_VALIDATE_BOOLEAN),
                 'current_step' => Setting::get('wizard', 'current_step', 'brand'),
-                'completed_steps' => json_decode((string) Setting::get('wizard', 'completed_steps', '[]'), true),
+                'completed_steps' => is_array($completedSteps = Setting::get('wizard', 'completed_steps', [])) ? $completedSteps : (json_decode((string) $completedSteps, true) ?: []),
             ],
             'widgets' => Inertia::defer(fn () => $widgets->map(fn ($w): array => [
                 'id' => $w->id,
