@@ -12,7 +12,7 @@ import {
     Star,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
+import * as NotificationController from '@/actions/App/Http/Controllers/Admin/NotificationController';
 import { cn } from '@/lib/utils';
 import type {
     AdminNotification,
@@ -119,7 +119,7 @@ export function NotificationBell() {
     const fetchNotifications = useCallback(async () => {
         try {
             const { data } = await axios.get<NotificationPayload>(
-                AppNotificationController.index.url(),
+                NotificationController.index.url(),
                 {
                     headers: {
                         Accept: 'application/json',
