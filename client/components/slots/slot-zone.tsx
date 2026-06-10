@@ -1,4 +1,4 @@
-import { getPublicSettings } from '@/app/layout';
+import { getPublicSettings } from '@/api/settings';
 import { SlotRenderer } from './slot-renderer';
 
 interface SlotZoneProps {

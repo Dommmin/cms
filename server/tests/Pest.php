@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Models\Page;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 /*
@@ -19,6 +21,26 @@ use Tests\TestCase;
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
     ->in('Feature');
+
+pest()->beforeEach(function (): void {
+    if (Schema::hasTable('pages')) {
+        $systemPages = [
+            'blog_listing' => 'Blog',
+            'product_listing' => 'Products',
+            'category_listing' => 'Categories',
+            'brand_listing' => 'Brands',
+        ];
+
+        foreach ($systemPages as $key => $title) {
+            Page::factory()->published()->create([
+                'system_page_key' => $key,
+                'locale' => null,
+                'title' => ['en' => $title],
+                'slug' => ['en' => mb_strtolower($title)],
+            ]);
+        }
+    }
+})->in('Feature');
 
 /*
 |--------------------------------------------------------------------------

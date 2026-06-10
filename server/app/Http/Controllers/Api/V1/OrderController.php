@@ -11,6 +11,7 @@ use App\Http\Requests\Api\V1\StoreReturnRequestRequest;
 use App\Http\Resources\Api\V1\OrderResource;
 use App\Models\CartItem;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Services\CartService;
 use App\Services\InvoiceService;
@@ -227,7 +228,7 @@ class OrderController extends ApiController
             ->with(['items', 'payment', 'shipment', 'statusHistory'])
             ->first();
 
-        abort_unless($order, 404, 'Order not found with provided reference number and email.');
+        abort_unless($order !== null, 404, 'Order not found with provided reference number and email.');
 
         return $this->ok([
             'reference_number' => $order->reference_number,
@@ -238,10 +239,10 @@ class OrderController extends ApiController
             'discount_amount' => $order->discount_amount,
             'total' => $order->total,
             'currency_code' => $order->currency_code,
-            'items' => $order->items->map(fn ($item): array => [
+            'items' => $order->items->map(fn (OrderItem $item): array => [
                 'id' => $item->id,
                 'product_name' => $item->product_name,
-                'variant_sku' => $item->variant_sku,
+                'variant_sku' => $item->sku,
                 'quantity' => $item->quantity,
                 'unit_price' => $item->unit_price,
             ]),
@@ -255,7 +256,7 @@ class OrderController extends ApiController
                 'tracking_number' => $order->shipment->tracking_number,
                 'tracking_url' => $order->shipment->tracking_url,
                 'status' => $order->shipment->status,
-                'shipped_at' => $order->shipment->shipped_at,
+                'shipped_at' => $order->shipment->updated_at,
             ] : null,
             'status_history' => $order->statusHistory->map(fn ($h): array => [
                 'new_status' => $h->new_status,

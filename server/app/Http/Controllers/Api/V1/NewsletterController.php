@@ -89,7 +89,7 @@ class NewsletterController extends ApiController
             ->with('segments')
             ->first();
 
-        abort_unless($subscriber, 404, 'Subscriber not found.');
+        abort_unless($subscriber !== null, 404, 'Subscriber not found.');
 
         $allSegments = NewsletterSegment::query()
             ->where('is_active', true)
@@ -108,7 +108,7 @@ class NewsletterController extends ApiController
     {
         $subscriber = NewsletterSubscriber::query()->where('token', $token)->first();
 
-        abort_unless($subscriber, 404, 'Subscriber not found.');
+        abort_unless($subscriber !== null, 404, 'Subscriber not found.');
 
         $data = $request->validate([
             'first_name' => ['nullable', 'string', 'max:255'],

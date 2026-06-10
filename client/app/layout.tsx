@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono, Playfair_Display } from 'next/font/google';
 import { cookies, headers } from 'next/headers';
 
-import { cache } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -26,13 +25,12 @@ import { SlotZone } from '@/components/slots/slot-zone';
 import { ThemeStyles } from '@/components/theme-styles';
 import { getI18nConfig } from '@/lib/i18n-server';
 import { buildOrganization, buildWebSite } from '@/lib/schema';
-import { serverFetch } from '@/lib/server-fetch';
 import { ModulesProvider } from '@/providers/modules-provider';
 import { QueryProvider } from '@/providers/query-provider';
 import { TranslationProvider } from '@/providers/translation-provider';
 
+import { getPublicSettings } from '@/api/settings';
 import './globals.css';
-import type { PublicSettingsResponse } from './layout.types';
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
@@ -58,13 +56,6 @@ export const viewport: Viewport = {
 };
 
 // Cached per-request: both generateMetadata and RootLayout share one fetch
-
-export const getPublicSettings = cache(async () =>
-    serverFetch<PublicSettingsResponse>('/settings/public', {
-        revalidate: 300,
-        tags: ['settings'],
-    }).catch(() => null),
-);
 
 export async function generateMetadata(): Promise<Metadata> {
     const publicSettings = await getPublicSettings();

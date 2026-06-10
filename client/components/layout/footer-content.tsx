@@ -28,6 +28,8 @@ export function FooterContent({
     mainItems,
     legalItems,
     currentYear,
+    siteName,
+    siteDescription,
 }: FooterContentProps) {
     const { t } = useTranslation();
     const lp = useLocalePath();
@@ -69,13 +71,14 @@ export function FooterContent({
                             href="/"
                             className="text-primary text-lg font-bold tracking-tight"
                         >
-                            Store
+                            {siteName ?? 'Store'}
                         </Link>
                         <p className="text-muted-foreground mt-2 text-sm">
-                            {t(
-                                'footer.tagline',
-                                'Curated fashion, home décor and lifestyle essentials — crafted to last.',
-                            )}
+                            {siteDescription ||
+                                t(
+                                    'footer.tagline',
+                                    'Curated fashion, home décor and lifestyle essentials — crafted to last.',
+                                )}
                         </p>
                     </div>
 
@@ -114,7 +117,7 @@ export function FooterContent({
 
                 <div className="border-border mt-8 flex flex-col items-center justify-between gap-4 border-t pt-8 sm:flex-row">
                     <p className="text-muted-foreground text-xs">
-                        © {currentYear} Store.{' '}
+                        © {currentYear} {siteName ?? 'Store'}.{' '}
                         {t('footer.rights', 'All rights reserved.')}
                     </p>
                     <div className="flex items-center gap-4">
