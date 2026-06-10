@@ -26,6 +26,7 @@ use App\Infrastructure\Shipping\Furgonetka\FurgonetkaTokenService;
 use App\Infrastructure\Shipping\InPost\InPostClient;
 use App\Infrastructure\Shipping\InPost\InPostLockerCarrier;
 use App\Infrastructure\Shipping\PickupCarrier;
+use App\Listeners\GenerateDigitalDownloadLinks;
 use App\Listeners\SendShippingNotification;
 use App\Listeners\SyncOrderToBaseLinkerListener;
 use App\Listeners\TrackPurchaseInGA4;
@@ -128,6 +129,7 @@ class EcommerceServiceProvider extends ServiceProvider
         Event::listen(OrderShipped::class, SendShippingNotification::class);
         Event::listen(OrderPaid::class, TrackPurchaseInGA4::class);
         Event::listen(OrderPaid::class, SyncOrderToBaseLinkerListener::class);
+        Event::listen(OrderPaid::class, GenerateDigitalDownloadLinks::class);
     }
 
     protected function loadRoutes(): void

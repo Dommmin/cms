@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\BrandController;
 use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\CheckoutController;
+use App\Http\Controllers\Api\V1\DownloadsController;
 use App\Http\Controllers\Api\V1\FlashSaleController;
 use App\Http\Controllers\Api\V1\GusController;
 use App\Http\Controllers\Api\V1\OrderController;
@@ -72,6 +73,10 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::get('checkout/payment-methods', [CheckoutController::class, 'paymentMethods'])->name('checkout.payment-methods');
         Route::get('checkout/pickup-points', [PickupPointsController::class, 'index'])->name('checkout.pickup-points');
         Route::post('checkout', [CheckoutController::class, 'checkout'])->middleware(['idempotent', 'throttle:api.strict'])->name('checkout');
+
+        // Secure digital downloads
+        Route::get('downloads/{token}', [DownloadsController::class, 'show'])->name('downloads.show');
+        Route::get('downloads/{token}/files/{fileId}', [DownloadsController::class, 'download'])->name('downloads.files');
     });
 
     // ── Cart (guest + auth) ──────────────────────────────────────────────────
