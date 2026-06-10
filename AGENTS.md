@@ -44,6 +44,16 @@ docker compose exec node npm run build
 - **Server (Laravel + Inertia admin)**: `server/AGENTS.md` (auto-managed by Boost; version-specific)
 - **Client (Next.js storefront)**: `client/AGENTS.md`
 
+## Preferred Global Codex Skills
+
+- **`ux-ui-review`**: use for UI/UX reviews of storefront pages, admin panels, forms, dashboards, checkout, and page-builder screens; prefer concrete component-level feedback.
+- **`architecture-review`**: use for structural review of Laravel, Inertia, Next.js, payments, search, queues, and module boundaries.
+- **`laravel-senior-review`**: use for backend-focused Laravel review of services, controllers, validation, Eloquent, transactions, authorization, and tests.
+- **`glitchtip-triage`**: use when a task starts from a GlitchTip issue, event, stack trace, or production error.
+- **`codebase-recon`**: use before larger refactors, unfamiliar subsystems, or bug hunts that likely depend on git history, hotspots, and recent change patterns.
+- **`webapp-testing`**: use for dynamic UI verification in `client/` and the Inertia admin SPA in `server/`; prefer targeted Playwright checks, screenshots, and browser log inspection over ad hoc guessing.
+- Built-in session skills already preferred when available: `gh-fix-ci` for failing GitHub Actions, `gh-address-comments` for PR review follow-up, `browser` for local browser interaction, `seo-audit` for storefront SEO diagnostics.
+
 ## Project Structure
 
 ```
