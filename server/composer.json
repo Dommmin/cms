@@ -27,7 +27,7 @@
         "minishlink/web-push": "^10.0",
         "sentry/sentry-laravel": "^4.24",
         "spatie/image-optimizer": "^1.8",
-        "spatie/laravel-activitylog": "^4.12",
+        "spatie/laravel-activitylog": "^5.0",
         "spatie/laravel-data": "^4.19",
         "spatie/laravel-health": "^1.39",
         "spatie/laravel-medialibrary": "^11.19",
