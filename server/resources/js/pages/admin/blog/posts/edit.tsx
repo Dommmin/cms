@@ -371,7 +371,12 @@ export default function EditBlogPost({
                                                 : ''
                                         }
                                         contentLength={
-                                            (data.content?.[defaultLocale] || '').replace(/<[^>]*>/g, '').trim().length
+                                            (
+                                                data.content?.[defaultLocale] ||
+                                                ''
+                                            )
+                                                .replace(/<[^>]*>/g, '')
+                                                .trim().length
                                         }
                                     />
                                 </TabsContent>

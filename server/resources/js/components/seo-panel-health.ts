@@ -88,7 +88,8 @@ export function analyzeSeoHealth(
             issues.push({
                 id: 'slug-uppercase',
                 severity: 'warning',
-                message: 'Slug contains uppercase letters. Use lowercase to prevent canonical indexing conflicts.',
+                message:
+                    'Slug contains uppercase letters. Use lowercase to prevent canonical indexing conflicts.',
             });
         }
 
@@ -96,7 +97,8 @@ export function analyzeSeoHealth(
             issues.push({
                 id: 'slug-spaces',
                 severity: 'error',
-                message: 'Slug contains spaces. This causes URL-encoding (%20) and broken links.',
+                message:
+                    'Slug contains spaces. This causes URL-encoding (%20) and broken links.',
             });
         }
 
@@ -104,7 +106,8 @@ export function analyzeSeoHealth(
             issues.push({
                 id: 'slug-special-chars',
                 severity: 'warning',
-                message: 'Slug contains special characters. Stick to alphanumeric characters and hyphens.',
+                message:
+                    'Slug contains special characters. Stick to alphanumeric characters and hyphens.',
             });
         }
     }

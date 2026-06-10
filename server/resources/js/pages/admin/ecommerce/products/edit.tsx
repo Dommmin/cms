@@ -1654,7 +1654,17 @@ export default function Edit({
                                                               )
                                                     }
                                                     contentLength={
-                                                        (formData.description?.[defaultLocale] || '').replace(/<[^>]*>/g, '').trim().length
+                                                        (
+                                                            formData
+                                                                .description?.[
+                                                                defaultLocale
+                                                            ] || ''
+                                                        )
+                                                            .replace(
+                                                                /<[^>]*>/g,
+                                                                '',
+                                                            )
+                                                            .trim().length
                                                     }
                                                 />
                                             </div>
