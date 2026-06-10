@@ -87,7 +87,7 @@ class ElectronicsSeeder extends Seeder
         $this->createProductTypes();
 
         $this->command->info('Creating products (1000+)...');
-        Activity::withoutLogs(fn () => Product::withoutSyncingToSearch(fn () => $this->createProducts()));
+        Activity::withoutLogging(fn () => Product::withoutSyncingToSearch(fn () => $this->createProducts()));
 
         $this->command->info('Electronics seeding completed!');
     }
