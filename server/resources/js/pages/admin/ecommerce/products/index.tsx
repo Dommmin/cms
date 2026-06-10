@@ -5,7 +5,12 @@ import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommer
 import { useProductColumns } from '@/components/columns/product-columns';
 
 import DataTable from '@/components/data-table';
-import { PageHeader, PageHeaderActions } from '@/components/page-header';
+import ListFilters from '@/components/list-filters';
+import {
+    PageHeader,
+    PageHeaderActions,
+    PageHeaderOverflowMenu,
+} from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import {
     Select,
@@ -17,6 +22,7 @@ import {
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
+import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
 import ImportDialog from './ImportDialog';
 import type { ProductData } from './index.types';
@@ -35,6 +41,7 @@ export default function ProductsIndex({
     const __ = useTranslation();
     const productColumns = useProductColumns();
     const [importOpen, setImportOpen] = useState(false);
+    const activeFilterCount = filters.is_featured ? 1 : 0;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -47,34 +54,70 @@ export default function ProductsIndex({
                         'Manage products catalog',
                     )}
                 >
-                    <PageHeaderActions>
-                        <Button variant="outline" asChild>
-                            <a href={ProductController.exportMethod.url()}>
-                                <DownloadIcon className="mr-2 h-4 w-4" />
-                                {__('action.export_csv', 'Export CSV')}
-                            </a>
-                        </Button>
-                        <Button
-                            variant="outline"
-                            onClick={() => setImportOpen(true)}
-                        >
-                            <UploadIcon className="mr-2 h-4 w-4" />
-                            {__('action.import', 'Import')}
-                        </Button>
-                        <Button asChild variant="outline">
-                            <Link
-                                href={ProductController.create.url()}
-                                prefetch
-                                cacheFor={30}
+                    <PageHeaderActions compact>
+                        <div className="flex w-full items-center gap-2 sm:hidden">
+                            <Button asChild className="flex-1">
+                                <Link
+                                    href={ProductController.create.url()}
+                                    prefetch
+                                    cacheFor={30}
+                                >
+                                    <PlusIcon className="mr-2 h-4 w-4" />
+                                    {__('action.add', 'Add Product')}
+                                </Link>
+                            </Button>
+                            <PageHeaderOverflowMenu label="More">
+                                <Button variant="outline" asChild>
+                                    <a
+                                        href={ProductController.exportMethod.url()}
+                                    >
+                                        <DownloadIcon className="mr-2 h-4 w-4" />
+                                        {__('action.export_csv', 'Export CSV')}
+                                    </a>
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setImportOpen(true)}
+                                >
+                                    <UploadIcon className="mr-2 h-4 w-4" />
+                                    {__('action.import', 'Import')}
+                                </Button>
+                            </PageHeaderOverflowMenu>
+                        </div>
+
+                        <div className="hidden items-center gap-2 sm:flex sm:flex-wrap sm:justify-end">
+                            <Button variant="outline" asChild>
+                                <a href={ProductController.exportMethod.url()}>
+                                    <DownloadIcon className="mr-2 h-4 w-4" />
+                                    {__('action.export_csv', 'Export CSV')}
+                                </a>
+                            </Button>
+                            <Button
+                                variant="outline"
+                                onClick={() => setImportOpen(true)}
                             >
-                                <PlusIcon className="mr-2 h-4 w-4" />
-                                {__('action.add', 'Add Product')}
-                            </Link>
-                        </Button>
+                                <UploadIcon className="mr-2 h-4 w-4" />
+                                {__('action.import', 'Import')}
+                            </Button>
+                            <Button asChild>
+                                <Link
+                                    href={ProductController.create.url()}
+                                    prefetch
+                                    cacheFor={30}
+                                >
+                                    <PlusIcon className="mr-2 h-4 w-4" />
+                                    {__('action.add', 'Add Product')}
+                                </Link>
+                            </Button>
+                        </div>
                     </PageHeaderActions>
                 </PageHeader>
 
-                <div className="flex items-center gap-2">
+                <ListFilters
+                    activeCount={activeFilterCount}
+                    description="Filter product visibility and listing state."
+                    contentClassName="sm:justify-start"
+                >
                     <Select
                         value={filters.is_featured ?? 'all'}
                         onValueChange={(value) => {
@@ -95,7 +138,7 @@ export default function ProductsIndex({
                             );
                         }}
                     >
-                        <SelectTrigger className="w-[160px]">
+                        <SelectTrigger className="w-full sm:w-[180px]">
                             <SelectValue placeholder="Featured..." />
                         </SelectTrigger>
                         <SelectContent>
@@ -104,7 +147,7 @@ export default function ProductsIndex({
                             <SelectItem value="0">Not featured</SelectItem>
                         </SelectContent>
                     </Select>
-                </div>
+                </ListFilters>
 
                 <DataTable
                     columns={productColumns}
@@ -124,6 +167,18 @@ export default function ProductsIndex({
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={ProductController.index.url()}
+                    mobilePrimaryColumns={5}
+                    mobileCardTitle={(row) => {
+                        const product = row as ProductData['data'][number];
+
+                        return (
+                            <div className="min-w-0">
+                                <div className="font-medium">
+                                    {resolveLocalizedText(product.name)}
+                                </div>
+                            </div>
+                        );
+                    }}
                 />
             </Wrapper>
 

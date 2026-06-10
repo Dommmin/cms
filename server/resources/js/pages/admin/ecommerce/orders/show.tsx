@@ -17,6 +17,7 @@ import * as AdminOrderCreateController from '@/actions/App/Http/Controllers/Admi
 import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
 
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
+import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
 import { useAdminLocale } from '@/hooks/use-admin-locale';
 import { useTranslation } from '@/hooks/use-translation';
@@ -289,38 +290,45 @@ export default function OrderShow({
                 >
                     <PageHeaderActions>
                         {order.status === 'draft' && (
-                            <Link
-                                href={AdminOrderCreateController.confirm.url({
+                            <Button asChild>
+                                <Link
+                                    href={AdminOrderCreateController.confirm.url(
+                                        {
+                                            order: order.id,
+                                        },
+                                    )}
+                                    method="post"
+                                    as="button"
+                                >
+                                    <SendHorizonal className="h-4 w-4" />
+                                    Confirm Draft
+                                </Link>
+                            </Button>
+                        )}
+                        <Button asChild variant="outline">
+                            <a
+                                href={OrderRoutes.invoice.url({
                                     order: order.id,
                                 })}
-                                method="post"
-                                as="button"
-                                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                                target="_blank"
+                                rel="noreferrer"
                             >
-                                <SendHorizonal className="h-4 w-4" />
-                                Confirm Draft
+                                <Download className="h-4 w-4" />
+                                {order.invoice_number
+                                    ? order.invoice_number
+                                    : 'Download Invoice'}
+                            </a>
+                        </Button>
+                        <Button asChild variant="outline">
+                            <Link
+                                href={OrderController.index.url()}
+                                prefetch
+                                cacheFor={30}
+                            >
+                                <ArrowLeft className="h-4 w-4" />
+                                {__('action.back', 'Back')}
                             </Link>
-                        )}
-                        <a
-                            href={OrderRoutes.invoice.url({ order: order.id })}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm hover:bg-accent"
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            <Download className="h-4 w-4" />
-                            {order.invoice_number
-                                ? order.invoice_number
-                                : 'Download Invoice'}
-                        </a>
-                        <Link
-                            href={OrderController.index.url()}
-                            prefetch
-                            cacheFor={30}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm hover:bg-accent"
-                        >
-                            <ArrowLeft className="h-4 w-4" />
-                            {__('action.back', 'Back')}
-                        </Link>
+                        </Button>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -372,73 +380,147 @@ export default function OrderShow({
                                     {order.items?.length ?? 0})
                                 </h2>
                             </div>
-                            <table className="w-full text-sm">
-                                <thead className="bg-muted/40 text-xs text-muted-foreground">
-                                    <tr>
-                                        <th className="px-5 py-2.5 text-left font-medium">
-                                            {__('column.product', 'Product')}
-                                        </th>
-                                        <th className="px-3 py-2.5 text-right font-medium">
-                                            {__('column.price', 'Price')}
-                                        </th>
-                                        <th className="px-3 py-2.5 text-right font-medium">
-                                            {__('column.qty', 'Qty')}
-                                        </th>
-                                        <th className="px-5 py-2.5 text-right font-medium">
-                                            {__('column.total', 'Total')}
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-border">
-                                    {(order.items ?? []).map((item) => {
-                                        const name =
-                                            getLocalized(
-                                                item.variant?.product?.name,
-                                            ) ||
-                                            item.product_name ||
-                                            __('misc.product', 'Product');
-                                        const attrs = item.variant?.attributes
-                                            ? Object.entries(
-                                                  item.variant.attributes,
-                                              )
-                                                  .map(([k, v]) => `${k}: ${v}`)
-                                                  .join(', ')
-                                            : null;
-                                        return (
-                                            <tr key={item.id}>
-                                                <td className="px-5 py-3">
-                                                    <p className="font-medium">
-                                                        {name}
-                                                    </p>
-                                                    {attrs && (
-                                                        <p className="text-xs text-muted-foreground">
-                                                            {attrs}
-                                                        </p>
-                                                    )}
-                                                    {(item.sku ||
-                                                        item.variant?.sku) && (
-                                                        <p className="text-xs text-muted-foreground">
-                                                            SKU:{' '}
-                                                            {item.sku ??
-                                                                item.variant
-                                                                    ?.sku}
-                                                        </p>
-                                                    )}
-                                                </td>
-                                                <td className="px-3 py-3 text-right text-muted-foreground">
-                                                    {fmt(item.unit_price)}
-                                                </td>
-                                                <td className="px-3 py-3 text-right">
-                                                    {item.quantity}
-                                                </td>
-                                                <td className="px-5 py-3 text-right font-medium">
+                            {/* Mobile items view */}
+                            <div className="divide-y divide-border md:hidden">
+                                {(order.items ?? []).map((item) => {
+                                    const name =
+                                        getLocalized(
+                                            item.variant?.product?.name,
+                                        ) ||
+                                        item.product_name ||
+                                        __('misc.product', 'Product');
+                                    const attrs = item.variant?.attributes
+                                        ? Object.entries(
+                                              item.variant.attributes,
+                                          )
+                                              .map(([k, v]) => `${k}: ${v}`)
+                                              .join(', ')
+                                        : null;
+                                    return (
+                                        <div
+                                            key={item.id}
+                                            className="space-y-2 p-4"
+                                        >
+                                            <div>
+                                                <div className="text-sm font-medium">
+                                                    {name}
+                                                </div>
+                                                {attrs && (
+                                                    <div className="mt-0.5 text-xs text-muted-foreground">
+                                                        {attrs}
+                                                    </div>
+                                                )}
+                                                {(item.sku ||
+                                                    item.variant?.sku) && (
+                                                    <div className="mt-0.5 font-mono text-xs text-muted-foreground">
+                                                        SKU:{' '}
+                                                        {item.sku ??
+                                                            item.variant?.sku}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center justify-between pt-1 text-xs">
+                                                <div>
+                                                    <span className="text-muted-foreground">
+                                                        Qty:
+                                                    </span>{' '}
+                                                    <span className="font-semibold tabular-nums">
+                                                        {item.quantity}
+                                                    </span>
+                                                    <span className="mx-2 text-muted-foreground">
+                                                        ×
+                                                    </span>
+                                                    <span className="text-muted-foreground">
+                                                        {fmt(item.unit_price)}
+                                                    </span>
+                                                </div>
+                                                <div className="font-semibold tabular-nums">
                                                     {fmt(item.subtotal)}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Desktop items view */}
+                            <div className="hidden overflow-x-auto md:block">
+                                <table className="w-full text-sm">
+                                    <thead className="bg-muted/40 text-xs text-muted-foreground">
+                                        <tr>
+                                            <th className="px-5 py-2.5 text-left font-medium">
+                                                {__(
+                                                    'column.product',
+                                                    'Product',
+                                                )}
+                                            </th>
+                                            <th className="px-3 py-2.5 text-right font-medium">
+                                                {__('column.price', 'Price')}
+                                            </th>
+                                            <th className="px-3 py-2.5 text-right font-medium">
+                                                {__('column.qty', 'Qty')}
+                                            </th>
+                                            <th className="px-5 py-2.5 text-right font-medium">
+                                                {__('column.total', 'Total')}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-border">
+                                        {(order.items ?? []).map((item) => {
+                                            const name =
+                                                getLocalized(
+                                                    item.variant?.product?.name,
+                                                ) ||
+                                                item.product_name ||
+                                                __('misc.product', 'Product');
+                                            const attrs = item.variant
+                                                ?.attributes
+                                                ? Object.entries(
+                                                      item.variant.attributes,
+                                                  )
+                                                      .map(
+                                                          ([k, v]) =>
+                                                              `${k}: ${v}`,
+                                                      )
+                                                      .join(', ')
+                                                : null;
+                                            return (
+                                                <tr key={item.id}>
+                                                    <td className="px-5 py-3">
+                                                        <p className="font-medium">
+                                                            {name}
+                                                        </p>
+                                                        {attrs && (
+                                                            <p className="text-xs text-muted-foreground">
+                                                                {attrs}
+                                                            </p>
+                                                        )}
+                                                        {(item.sku ||
+                                                            item.variant
+                                                                ?.sku) && (
+                                                            <p className="text-xs text-muted-foreground">
+                                                                SKU:{' '}
+                                                                {item.sku ??
+                                                                    item.variant
+                                                                        ?.sku}
+                                                            </p>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-3 py-3 text-right text-muted-foreground">
+                                                        {fmt(item.unit_price)}
+                                                    </td>
+                                                    <td className="px-3 py-3 text-right">
+                                                        {item.quantity}
+                                                    </td>
+                                                    <td className="px-5 py-3 text-right font-medium">
+                                                        {fmt(item.subtotal)}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
 
                             {/* Totals */}
                             <div className="border-t border-border px-5 py-4">

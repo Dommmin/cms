@@ -64,118 +64,185 @@ export default function Trashed({ users }: { users: PaginatedUsers }) {
                         {__('empty.no_users', 'No deleted users found.')}
                     </p>
                 ) : (
-                    <div className="rounded-md border">
-                        <table className="w-full text-sm">
-                            <thead>
-                                <tr className="border-b bg-muted/50">
-                                    <th className="px-4 py-3 text-left font-medium">
-                                        {__('column.name', 'Name')}
-                                    </th>
-                                    <th className="px-4 py-3 text-left font-medium">
-                                        {__('column.email', 'Email')}
-                                    </th>
-                                    <th className="px-4 py-3 text-left font-medium">
-                                        {__('column.updated_at', 'Deleted At')}
-                                    </th>
-                                    <th className="px-4 py-3 text-right font-medium">
-                                        {__('column.actions', 'Actions')}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {users.data.map((user) => (
-                                    <tr
-                                        key={user.id}
-                                        className="border-b last:border-0"
-                                    >
-                                        <td className="px-4 py-3">
+                    <>
+                        <div className="hidden rounded-md border md:block">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="border-b bg-muted/50">
+                                        <th className="px-4 py-3 text-left font-medium">
+                                            {__('column.name', 'Name')}
+                                        </th>
+                                        <th className="px-4 py-3 text-left font-medium">
+                                            {__('column.email', 'Email')}
+                                        </th>
+                                        <th className="px-4 py-3 text-left font-medium">
+                                            {__(
+                                                'column.updated_at',
+                                                'Deleted At',
+                                            )}
+                                        </th>
+                                        <th className="px-4 py-3 text-right font-medium">
+                                            {__('column.actions', 'Actions')}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {users.data.map((user) => (
+                                        <tr
+                                            key={user.id}
+                                            className="border-b last:border-0"
+                                        >
+                                            <td className="px-4 py-3">
+                                                {user.name}
+                                            </td>
+                                            <td className="px-4 py-3 text-muted-foreground">
+                                                {user.email}
+                                            </td>
+                                            <td className="px-4 py-3 text-muted-foreground">
+                                                {new Date(
+                                                    user.deleted_at,
+                                                ).toLocaleDateString()}
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <div className="flex justify-end gap-2">
+                                                    <Form
+                                                        action={restore.url(
+                                                            user.id,
+                                                        )}
+                                                        method="post"
+                                                    >
+                                                        {({ processing }) => (
+                                                            <Button
+                                                                type="submit"
+                                                                variant="outline"
+                                                                size="sm"
+                                                                disabled={
+                                                                    processing
+                                                                }
+                                                            >
+                                                                <RotateCcwIcon className="mr-1 h-3 w-3" />
+                                                                {__(
+                                                                    'action.restore',
+                                                                    'Restore',
+                                                                )}
+                                                            </Button>
+                                                        )}
+                                                    </Form>
+
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            setConfirmUserId(
+                                                                user.id,
+                                                            )
+                                                        }
+                                                    >
+                                                        <Trash2Icon className="mr-1 h-3 w-3" />
+                                                        {__(
+                                                            'action.delete',
+                                                            'Delete Permanently',
+                                                        )}
+                                                    </Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Mobile view */}
+                        <div className="space-y-4 md:hidden">
+                            {users.data.map((user) => (
+                                <div
+                                    key={user.id}
+                                    className="space-y-3 rounded-xl border bg-card p-4"
+                                >
+                                    <div className="space-y-1">
+                                        <div className="text-sm font-semibold">
                                             {user.name}
-                                        </td>
-                                        <td className="px-4 py-3 text-muted-foreground">
+                                        </div>
+                                        <div className="text-xs text-muted-foreground">
                                             {user.email}
-                                        </td>
-                                        <td className="px-4 py-3 text-muted-foreground">
+                                        </div>
+                                        <div className="text-xs text-muted-foreground">
+                                            Deleted:{' '}
                                             {new Date(
                                                 user.deleted_at,
                                             ).toLocaleDateString()}
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <div className="flex justify-end gap-2">
-                                                <Form
-                                                    action={restore.url(
-                                                        user.id,
-                                                    )}
-                                                    method="post"
-                                                >
-                                                    {({ processing }) => (
-                                                        <Button
-                                                            type="submit"
-                                                            variant="outline"
-                                                            size="sm"
-                                                            disabled={
-                                                                processing
-                                                            }
-                                                        >
-                                                            <RotateCcwIcon className="mr-1 h-3 w-3" />
-                                                            {__(
-                                                                'action.restore',
-                                                                'Restore',
-                                                            )}
-                                                        </Button>
-                                                    )}
-                                                </Form>
-
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 pt-1">
+                                        <Form
+                                            action={restore.url(user.id)}
+                                            method="post"
+                                            className="flex-1"
+                                        >
+                                            {({ processing }) => (
                                                 <Button
+                                                    type="submit"
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() =>
-                                                        setConfirmUserId(
-                                                            user.id,
-                                                        )
-                                                    }
+                                                    disabled={processing}
+                                                    className="w-full text-xs"
                                                 >
-                                                    <Trash2Icon className="mr-1 h-3 w-3" />
+                                                    <RotateCcwIcon className="mr-1 h-3 w-3" />
                                                     {__(
-                                                        'action.delete',
-                                                        'Delete Permanently',
+                                                        'action.restore',
+                                                        'Restore',
                                                     )}
                                                 </Button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                            )}
+                                        </Form>
+
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() =>
+                                                setConfirmUserId(user.id)
+                                            }
+                                            className="flex-1 text-xs"
+                                        >
+                                            <Trash2Icon className="mr-1 h-3 w-3" />
+                                            {__('action.delete', 'Delete')}
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 )}
 
                 {users.last_page > 1 && (
-                    <div className="mt-4 flex items-center gap-2">
-                        {users.prev_page_url && (
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() =>
-                                    router.visit(users.prev_page_url!)
-                                }
-                            >
-                                Previous
-                            </Button>
-                        )}
-                        <span className="text-sm text-muted-foreground">
+                    <div className="mt-4 flex flex-col items-center justify-between gap-4 sm:flex-row">
+                        <div className="flex items-center gap-2">
+                            {users.prev_page_url && (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        router.visit(users.prev_page_url!)
+                                    }
+                                >
+                                    Previous
+                                </Button>
+                            )}
+                            {users.next_page_url && (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        router.visit(users.next_page_url!)
+                                    }
+                                >
+                                    Next
+                                </Button>
+                            )}
+                        </div>
+                        <span className="text-xs text-muted-foreground sm:text-sm">
                             Page {users.current_page} of {users.last_page}
                         </span>
-                        {users.next_page_url && (
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() =>
-                                    router.visit(users.next_page_url!)
-                                }
-                            >
-                                Next
-                            </Button>
-                        )}
                     </div>
                 )}
             </Wrapper>

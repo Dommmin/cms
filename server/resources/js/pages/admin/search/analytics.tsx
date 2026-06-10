@@ -101,47 +101,75 @@ export default function SearchAnalytics({
                                 </p>
                             </div>
                         ) : (
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-sm">
-                                    <thead>
-                                        <tr className="border-b bg-muted/50">
-                                            <th className="px-4 py-2 text-left font-medium text-muted-foreground">
-                                                #
-                                            </th>
-                                            <th className="px-4 py-2 text-left font-medium text-muted-foreground">
-                                                Query
-                                            </th>
-                                            <th className="px-4 py-2 text-right font-medium text-muted-foreground">
-                                                Count
-                                            </th>
-                                            <th className="px-4 py-2 text-right font-medium text-muted-foreground">
-                                                Avg Results
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {topQueries.map((row, index) => (
-                                            <tr
-                                                key={row.query}
-                                                className="border-b last:border-0 hover:bg-muted/30"
-                                            >
-                                                <td className="px-4 py-2 text-muted-foreground">
-                                                    {index + 1}
-                                                </td>
-                                                <td className="px-4 py-2 font-medium">
-                                                    {row.query}
-                                                </td>
-                                                <td className="px-4 py-2 text-right">
-                                                    {row.count}
-                                                </td>
-                                                <td className="px-4 py-2 text-right text-muted-foreground">
-                                                    {row.avg_results}
-                                                </td>
+                            <>
+                                <div className="hidden overflow-x-auto md:block">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="border-b bg-muted/50">
+                                                <th className="px-4 py-2 text-left font-medium text-muted-foreground">
+                                                    #
+                                                </th>
+                                                <th className="px-4 py-2 text-left font-medium text-muted-foreground">
+                                                    Query
+                                                </th>
+                                                <th className="px-4 py-2 text-right font-medium text-muted-foreground">
+                                                    Count
+                                                </th>
+                                                <th className="px-4 py-2 text-right font-medium text-muted-foreground">
+                                                    Avg Results
+                                                </th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody>
+                                            {topQueries.map((row, index) => (
+                                                <tr
+                                                    key={row.query}
+                                                    className="border-b last:border-0 hover:bg-muted/30"
+                                                >
+                                                    <td className="px-4 py-2 text-muted-foreground">
+                                                        {index + 1}
+                                                    </td>
+                                                    <td className="px-4 py-2 font-medium">
+                                                        {row.query}
+                                                    </td>
+                                                    <td className="px-4 py-2 text-right">
+                                                        {row.count}
+                                                    </td>
+                                                    <td className="px-4 py-2 text-right text-muted-foreground">
+                                                        {row.avg_results}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="divide-y md:hidden">
+                                    {topQueries.map((row, index) => (
+                                        <div
+                                            key={row.query}
+                                            className="flex items-center justify-between gap-4 p-3 text-sm"
+                                        >
+                                            <div className="flex items-center gap-2.5">
+                                                <span className="w-4 shrink-0 text-xs text-muted-foreground">
+                                                    {index + 1}
+                                                </span>
+                                                <span className="font-medium">
+                                                    {row.query}
+                                                </span>
+                                            </div>
+                                            <div className="shrink-0 text-right">
+                                                <div className="text-xs font-semibold">
+                                                    {row.count} searches
+                                                </div>
+                                                <div className="text-[10px] text-muted-foreground">
+                                                    Avg results:{' '}
+                                                    {row.avg_results}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
                         )}
                     </div>
 
@@ -162,40 +190,60 @@ export default function SearchAnalytics({
                                 </p>
                             </div>
                         ) : (
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-sm">
-                                    <thead>
-                                        <tr className="border-b bg-muted/50">
-                                            <th className="px-4 py-2 text-left font-medium text-muted-foreground">
-                                                Query
-                                            </th>
-                                            <th className="px-4 py-2 text-right font-medium text-muted-foreground">
-                                                Count
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {zeroResults.map((row) => (
-                                            <tr
-                                                key={row.query}
-                                                className="border-b last:border-0 hover:bg-muted/30"
-                                            >
-                                                <td className="px-4 py-2">
-                                                    <Badge
-                                                        variant="outline"
-                                                        className="border-orange-300 bg-orange-50 text-orange-700 dark:border-orange-700 dark:bg-orange-950 dark:text-orange-300"
-                                                    >
-                                                        {row.query}
-                                                    </Badge>
-                                                </td>
-                                                <td className="px-4 py-2 text-right font-medium">
-                                                    {row.count}
-                                                </td>
+                            <>
+                                <div className="hidden overflow-x-auto md:block">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="border-b bg-muted/50">
+                                                <th className="px-4 py-2 text-left font-medium text-muted-foreground">
+                                                    Query
+                                                </th>
+                                                <th className="px-4 py-2 text-right font-medium text-muted-foreground">
+                                                    Count
+                                                </th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody>
+                                            {zeroResults.map((row) => (
+                                                <tr
+                                                    key={row.query}
+                                                    className="border-b last:border-0 hover:bg-muted/30"
+                                                >
+                                                    <td className="px-4 py-2">
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="border-orange-300 bg-orange-50 text-orange-700 dark:border-orange-700 dark:bg-orange-950 dark:text-orange-300"
+                                                        >
+                                                            {row.query}
+                                                        </Badge>
+                                                    </td>
+                                                    <td className="px-4 py-2 text-right font-medium">
+                                                        {row.count}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="divide-y md:hidden">
+                                    {zeroResults.map((row) => (
+                                        <div
+                                            key={row.query}
+                                            className="flex items-center justify-between gap-4 p-3 text-sm"
+                                        >
+                                            <Badge
+                                                variant="outline"
+                                                className="border-orange-300 bg-orange-50 text-orange-700 dark:border-orange-700 dark:bg-orange-950 dark:text-orange-300"
+                                            >
+                                                {row.query}
+                                            </Badge>
+                                            <span className="shrink-0 text-xs font-semibold">
+                                                {row.count} times
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
                         )}
                     </div>
                 </div>
@@ -213,54 +261,89 @@ export default function SearchAnalytics({
                             No data for the selected period.
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead>
-                                    <tr className="border-b bg-muted/50">
-                                        <th className="px-4 py-2 text-left font-medium text-muted-foreground">
-                                            Date
-                                        </th>
-                                        <th className="px-4 py-2 text-right font-medium text-muted-foreground">
-                                            Searches
-                                        </th>
-                                        <th className="px-4 py-2 text-left font-medium text-muted-foreground">
-                                            Volume
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {(() => {
-                                        const maxCount = Math.max(
-                                            ...dailyVolume.map((d) => d.count),
-                                            1,
-                                        );
-                                        return dailyVolume.map((row) => (
-                                            <tr
-                                                key={row.date}
-                                                className="border-b last:border-0 hover:bg-muted/30"
-                                            >
-                                                <td className="px-4 py-2 text-muted-foreground">
+                        <>
+                            <div className="hidden overflow-x-auto md:block">
+                                <table className="w-full text-sm">
+                                    <thead>
+                                        <tr className="border-b bg-muted/50">
+                                            <th className="px-4 py-2 text-left font-medium text-muted-foreground">
+                                                Date
+                                            </th>
+                                            <th className="px-4 py-2 text-right font-medium text-muted-foreground">
+                                                Searches
+                                            </th>
+                                            <th className="px-4 py-2 text-left font-medium text-muted-foreground">
+                                                Volume
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {(() => {
+                                            const maxCount = Math.max(
+                                                ...dailyVolume.map(
+                                                    (d) => d.count,
+                                                ),
+                                                1,
+                                            );
+                                            return dailyVolume.map((row) => (
+                                                <tr
+                                                    key={row.date}
+                                                    className="border-b last:border-0 hover:bg-muted/30"
+                                                >
+                                                    <td className="px-4 py-2 text-muted-foreground">
+                                                        {row.date}
+                                                    </td>
+                                                    <td className="px-4 py-2 text-right font-medium">
+                                                        {row.count}
+                                                    </td>
+                                                    <td className="px-4 py-2">
+                                                        <div className="h-2 overflow-hidden rounded-full bg-muted">
+                                                            <div
+                                                                className="h-full rounded-full bg-primary"
+                                                                style={{
+                                                                    width: `${Math.round((row.count / maxCount) * 100)}%`,
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ));
+                                        })()}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="divide-y md:hidden">
+                                {(() => {
+                                    const maxCount = Math.max(
+                                        ...dailyVolume.map((d) => d.count),
+                                        1,
+                                    );
+                                    return dailyVolume.map((row) => (
+                                        <div
+                                            key={row.date}
+                                            className="space-y-2 p-3 text-sm"
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-xs text-muted-foreground">
                                                     {row.date}
-                                                </td>
-                                                <td className="px-4 py-2 text-right font-medium">
-                                                    {row.count}
-                                                </td>
-                                                <td className="px-4 py-2">
-                                                    <div className="h-2 overflow-hidden rounded-full bg-muted">
-                                                        <div
-                                                            className="h-full rounded-full bg-primary"
-                                                            style={{
-                                                                width: `${Math.round((row.count / maxCount) * 100)}%`,
-                                                            }}
-                                                        />
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ));
-                                    })()}
-                                </tbody>
-                            </table>
-                        </div>
+                                                </span>
+                                                <span className="text-xs font-semibold">
+                                                    {row.count} searches
+                                                </span>
+                                            </div>
+                                            <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                                                <div
+                                                    className="h-full rounded-full bg-primary"
+                                                    style={{
+                                                        width: `${Math.round((row.count / maxCount) * 100)}%`,
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    ));
+                                })()}
+                            </div>
+                        </>
                     )}
                 </div>
             </Wrapper>

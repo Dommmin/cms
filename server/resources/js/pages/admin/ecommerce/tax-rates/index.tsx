@@ -3,9 +3,18 @@ import { PencilIcon, Plus, Receipt, Star, TrashIcon } from 'lucide-react';
 import * as TaxRateController from '@/actions/App/Http/Controllers/Admin/Ecommerce/TaxRateController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
+import ListFilters from '@/components/list-filters';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -21,6 +30,24 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
     const __ = useTranslation();
+    const activeFilterCount = [filters.is_active, filters.is_default].filter(
+        Boolean,
+    ).length;
+
+    const updateFilters = (
+        nextFilters: Partial<
+            Pick<IndexProps['filters'], 'is_active' | 'is_default'>
+        >,
+    ) => {
+        router.get(
+            TaxRateController.index.url(),
+            { ...filters, ...nextFilters },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -31,7 +58,7 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                     title={__('page.tax_rates', 'Tax Rates')}
                     description={`${taxRates.total} tax rates configured`}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button asChild variant="outline">
                             <Link
                                 href={TaxRateController.create.url()}
@@ -44,6 +71,85 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
+
+                <ListFilters
+                    activeCount={activeFilterCount}
+                    description={__(
+                        'page.tax_rates_filters_desc',
+                        'Filter tax rates by active and default status.',
+                    )}
+                    contentClassName="sm:grid sm:grid-cols-2 sm:items-end sm:gap-4"
+                >
+                    <div className="space-y-2">
+                        <Label htmlFor="tax-rate-status-filter">
+                            {__('column.status', 'Status')}
+                        </Label>
+                        <Select
+                            value={filters.is_active || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    is_active: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="tax-rate-status-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__('column.status', 'Status')}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                <SelectItem value="1">
+                                    {__('status.active', 'Active')}
+                                </SelectItem>
+                                <SelectItem value="0">
+                                    {__('status.inactive', 'Inactive')}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="tax-rate-default-filter">
+                            {__('column.default', 'Default')}
+                        </Label>
+                        <Select
+                            value={filters.is_default || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    is_default: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="tax-rate-default-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__(
+                                        'column.default',
+                                        'Default',
+                                    )}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                <SelectItem value="1">
+                                    {__('status.yes', 'Yes')}
+                                </SelectItem>
+                                <SelectItem value="0">
+                                    {__('status.no', 'No')}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </ListFilters>
 
                 <DataTable
                     columns={[
@@ -165,6 +271,8 @@ export default function TaxRatesIndex({ taxRates, filters }: IndexProps) {
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={TaxRateController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => row.name}
                 />
             </Wrapper>
         </AppLayout>

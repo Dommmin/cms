@@ -10,4 +10,11 @@ export interface PageHeaderProps {
 export interface PageHeaderActionsProps {
     children: React.ReactNode;
     className?: string;
+    compact?: boolean;
+}
+
+export interface PageHeaderOverflowMenuProps {
+    children: React.ReactNode;
+    className?: string;
+    label?: string;
 }

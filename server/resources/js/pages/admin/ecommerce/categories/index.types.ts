@@ -9,3 +9,8 @@ export type CategoryData = {
     per_page: number;
     total: number;
 };
+export type CategoryFilters = {
+    search?: string;
+    is_active?: string;
+    parent_id?: string;
+};

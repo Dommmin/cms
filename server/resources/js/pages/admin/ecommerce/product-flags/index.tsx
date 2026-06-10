@@ -28,7 +28,7 @@ export default function ProductFlagsIndex({ flags, filters }: IndexProps) {
                     title={__('page.product_flags', 'Product Flags')}
                     description={`${flags.total} product flags`}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button asChild variant="outline">
                             <Link
                                 href={ProductFlagController.create.url()}
@@ -176,6 +176,8 @@ export default function ProductFlagsIndex({ flags, filters }: IndexProps) {
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={ProductFlagController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => row.name}
                 />
             </Wrapper>
         </AppLayout>

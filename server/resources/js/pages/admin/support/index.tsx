@@ -6,9 +6,18 @@ import * as SupportCannedResponseController from '@/actions/App/Http/Controllers
 import * as SupportConversationController from '@/actions/App/Http/Controllers/Admin/SupportConversationController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
+import ListFilters from '@/components/list-filters';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -49,6 +58,24 @@ export default function SupportIndex({
     const __ = useTranslation();
     // Refresh unread counts and new conversations every 30 seconds
     usePoll(30000);
+    const activeFilterCount = [filters.status, filters.assigned_to].filter(
+        Boolean,
+    ).length;
+
+    const updateFilters = (
+        nextFilters: Partial<
+            Pick<IndexProps['filters'], 'status' | 'assigned_to'>
+        >,
+    ) => {
+        router.get(
+            SupportConversationController.index.url(),
+            { ...filters, ...nextFilters },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
 
     const columns: ColumnDef<Conversation>[] = [
         {
@@ -172,7 +199,7 @@ export default function SupportIndex({
                         'Manage customer support conversations',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button asChild variant="outline">
                             <Link
                                 href={SupportCannedResponseController.index.url()}
@@ -184,6 +211,89 @@ export default function SupportIndex({
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
+
+                <ListFilters
+                    activeCount={activeFilterCount}
+                    description={__(
+                        'page.support_filters_desc',
+                        'Filter conversations by status or assigned agent.',
+                    )}
+                    contentClassName="sm:grid sm:grid-cols-2 sm:items-end sm:gap-4"
+                >
+                    <div className="space-y-2">
+                        <Label htmlFor="support-status-filter">
+                            {__('column.status', 'Status')}
+                        </Label>
+                        <Select
+                            value={filters.status || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    status: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="support-status-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__('column.status', 'Status')}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                {statuses.map((status) => (
+                                    <SelectItem
+                                        key={status.value}
+                                        value={status.value}
+                                    >
+                                        {status.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="support-assigned-filter">
+                            {__('column.assigned_to', 'Assigned to')}
+                        </Label>
+                        <Select
+                            value={filters.assigned_to || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    assigned_to: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="support-assigned-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__(
+                                        'column.assigned_to',
+                                        'Assigned to',
+                                    )}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                {(_agents ?? []).map((agent) => (
+                                    <SelectItem
+                                        key={agent.id}
+                                        value={String(agent.id)}
+                                    >
+                                        {agent.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </ListFilters>
 
                 <DataTable
                     columns={columns}
@@ -203,6 +313,8 @@ export default function SupportIndex({
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={SupportConversationController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => row.subject}
                 />
             </Wrapper>
         </AppLayout>

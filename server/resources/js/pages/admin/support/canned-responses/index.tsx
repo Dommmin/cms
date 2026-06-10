@@ -107,7 +107,7 @@ export default function CannedResponsesIndex({ canned_responses }: IndexProps) {
                         'Predefined replies for common questions',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button asChild>
                             <Link
                                 href={SupportCannedResponseController.create.url()}
@@ -133,6 +133,8 @@ export default function CannedResponsesIndex({ canned_responses }: IndexProps) {
                         next_page_url: canned_responses.next_page_url ?? null,
                     }}
                     baseUrl={SupportCannedResponseController.index.url()}
+                    mobilePrimaryColumns={3}
+                    mobileCardTitle={(row) => row.title}
                 />
             </Wrapper>
         </AppLayout>

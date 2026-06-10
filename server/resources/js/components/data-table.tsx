@@ -2,8 +2,10 @@
 
 import { Link, router } from '@inertiajs/react';
 import { flexRender } from '@tanstack/react-table';
+import { ChevronRightIcon } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
     Select,
     SelectContent,
@@ -11,6 +13,13 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+} from '@/components/ui/sheet';
 import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
 import type { DataTableProps } from './data-table.types';
@@ -26,11 +35,15 @@ export default function DataTable<T>({
     onPerPageChange,
     baseUrl,
     className,
+    mobilePrimaryColumns = 3,
+    mobileCardTitle,
+    mobileEmptyLabel,
 }: DataTableProps<T>) {
     'use no memo';
 
     const __ = useTranslation();
     const [search, setSearch] = useState(searchValue);
+    const [detailsRowIndex, setDetailsRowIndex] = useState<number | null>(null);
     const perPageOptions = pagination
         ? Array.from(new Set([10, 25, 50, 100, pagination.per_page])).sort(
               (a, b) => a - b,
@@ -76,10 +89,61 @@ export default function DataTable<T>({
         return undefined;
     };
 
+    const renderHeader = (column: (typeof columns)[number]) =>
+        flexRender(column.header, { column } as never);
+
+    const renderCell = (
+        row: T,
+        rowIndex: number,
+        column: (typeof columns)[number],
+    ) => {
+        const value = getCellValue(row, column, rowIndex);
+
+        return flexRender(column.cell, {
+            row: {
+                original: row,
+                index: rowIndex,
+                getValue: () => value,
+            },
+            column,
+            getValue: () => value,
+        } as never);
+    };
+
+    const visibleColumns = columns.filter((column) => {
+        const meta = (column as { meta?: { mobileHidden?: boolean } }).meta;
+
+        return !meta?.mobileHidden;
+    });
+
+    const mobileSummaryColumns = visibleColumns.slice(
+        0,
+        Math.max(1, mobilePrimaryColumns),
+    );
+    const mobileDetailColumns = visibleColumns.slice(
+        Math.max(1, mobilePrimaryColumns),
+    );
+    const selectedRow = detailsRowIndex !== null ? data[detailsRowIndex] : null;
+    const visibleRangeStart =
+        pagination && pagination.total > 0
+            ? (pagination.current_page - 1) * pagination.per_page + 1
+            : 0;
+    const visibleRangeEnd = pagination
+        ? pagination.total > 0
+            ? Math.min(
+                  pagination.current_page * pagination.per_page,
+                  pagination.total,
+              )
+            : 0
+        : 0;
+
+    const isEmptyValue = (value: unknown): boolean =>
+        value === null || value === undefined || value === '';
+
     return (
         <div className={cn('space-y-4', className)}>
             {searchable && (
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                     <input
                         type="text"
                         placeholder={
@@ -93,15 +157,107 @@ export default function DataTable<T>({
                                 handleSearch();
                             }
                         }}
-                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                        className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                     />
-                    <Button variant="secondary" onClick={handleSearch}>
+                    <Button
+                        variant="secondary"
+                        onClick={handleSearch}
+                        className="w-full sm:w-auto"
+                    >
                         {__('action.search', 'Search')}
                     </Button>
                 </div>
             )}
 
-            <div className="overflow-x-auto rounded-md border">
+            <div className="space-y-3 md:hidden">
+                {data.length === 0 ? (
+                    <Card>
+                        <CardContent className="py-8 text-center text-sm text-muted-foreground">
+                            {mobileEmptyLabel ??
+                                __('empty.no_results', 'No results.')}
+                        </CardContent>
+                    </Card>
+                ) : (
+                    data.map((row, rowIndex) => (
+                        <Card key={rowIndex}>
+                            <CardContent className="space-y-4 p-4">
+                                <div className="space-y-3">
+                                    {mobileCardTitle ? (
+                                        <div className="min-w-0">
+                                            {mobileCardTitle(row, rowIndex)}
+                                        </div>
+                                    ) : (
+                                        <div className="min-w-0">
+                                            {renderCell(
+                                                row,
+                                                rowIndex,
+                                                mobileSummaryColumns[0],
+                                            )}
+                                        </div>
+                                    )}
+
+                                    <dl className="space-y-3">
+                                        {mobileSummaryColumns
+                                            .slice(mobileCardTitle ? 1 : 1)
+                                            .map((column, columnIndex) => {
+                                                const value = getCellValue(
+                                                    row,
+                                                    column,
+                                                    rowIndex,
+                                                );
+
+                                                if (isEmptyValue(value)) {
+                                                    return null;
+                                                }
+
+                                                return (
+                                                    <div
+                                                        key={getColumnId(
+                                                            column,
+                                                            columnIndex,
+                                                        )}
+                                                        className="space-y-1"
+                                                    >
+                                                        <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                                                            {renderHeader(
+                                                                column,
+                                                            )}
+                                                        </dt>
+                                                        <dd className="text-sm">
+                                                            {renderCell(
+                                                                row,
+                                                                rowIndex,
+                                                                column,
+                                                            )}
+                                                        </dd>
+                                                    </div>
+                                                );
+                                            })}
+                                    </dl>
+                                </div>
+
+                                {mobileDetailColumns.length > 0 && (
+                                    <Button
+                                        variant="outline"
+                                        className="w-full justify-between"
+                                        onClick={() =>
+                                            setDetailsRowIndex(rowIndex)
+                                        }
+                                    >
+                                        {__(
+                                            'action.view_details',
+                                            'View details',
+                                        )}
+                                        <ChevronRightIcon className="h-4 w-4" />
+                                    </Button>
+                                )}
+                            </CardContent>
+                        </Card>
+                    ))
+                )}
+            </div>
+
+            <div className="hidden overflow-x-auto rounded-md border md:block">
                 <table className="w-full min-w-max text-sm">
                     <thead className="bg-muted/50">
                         <tr>
@@ -117,9 +273,7 @@ export default function DataTable<T>({
                                             customClassName,
                                         )}
                                     >
-                                        {flexRender(column.header, {
-                                            column,
-                                        } as never)}
+                                        {renderHeader(column)}
                                     </th>
                                 );
                             })}
@@ -142,11 +296,6 @@ export default function DataTable<T>({
                                     className="border-t transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
                                 >
                                     {columns.map((column, colIndex) => {
-                                        const value = getCellValue(
-                                            row,
-                                            column,
-                                            rowIndex,
-                                        );
                                         const columnId = getColumnId(
                                             column,
                                             colIndex,
@@ -164,15 +313,11 @@ export default function DataTable<T>({
                                                     customClassName,
                                                 )}
                                             >
-                                                {flexRender(column.cell, {
-                                                    row: {
-                                                        original: row,
-                                                        index: rowIndex,
-                                                        getValue: () => value,
-                                                    },
+                                                {renderCell(
+                                                    row,
+                                                    rowIndex,
                                                     column,
-                                                    getValue: () => value,
-                                                } as never)}
+                                                )}
                                             </td>
                                         );
                                     })}
@@ -184,23 +329,16 @@ export default function DataTable<T>({
             </div>
 
             {pagination && (
-                <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                     <div className="flex items-center gap-2">
                         <span className="text-sm text-muted-foreground">
-                            {__('misc.showing', 'Showing')}{' '}
-                            {(pagination.current_page - 1) *
-                                pagination.per_page +
-                                1}{' '}
-                            –{' '}
-                            {Math.min(
-                                pagination.current_page * pagination.per_page,
-                                pagination.total,
-                            )}{' '}
-                            {__('misc.of', 'of')} {pagination.total}
+                            {__('misc.showing', 'Showing')} {visibleRangeStart}{' '}
+                            – {visibleRangeEnd} {__('misc.of', 'of')}{' '}
+                            {pagination.total}
                         </span>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                         <Select
                             value={pagination.per_page.toString()}
                             onValueChange={(value) => {
@@ -227,7 +365,7 @@ export default function DataTable<T>({
                                 }
                             }}
                         >
-                            <SelectTrigger className="h-8 w-[70px]">
+                            <SelectTrigger className="h-8 w-full sm:w-[70px]">
                                 <SelectValue
                                     placeholder={pagination.per_page.toString()}
                                 />
@@ -244,21 +382,33 @@ export default function DataTable<T>({
                             </SelectContent>
                         </Select>
 
-                        <div className="flex gap-1">
+                        <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-1">
                             {pagination.prev_page_url ? (
                                 <Link
                                     href={pagination.prev_page_url}
                                     preserveScroll
                                     prefetch
+                                    className="w-full sm:w-auto"
                                 >
-                                    <Button variant="outline" size="sm">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-full"
+                                    >
                                         {__('misc.previous', 'Previous')}
                                     </Button>
                                 </Link>
                             ) : (
-                                <Button variant="outline" size="sm" disabled>
-                                    {__('misc.previous', 'Previous')}
-                                </Button>
+                                <div className="w-full sm:w-auto">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        disabled
+                                        className="w-full"
+                                    >
+                                        {__('misc.previous', 'Previous')}
+                                    </Button>
+                                </div>
                             )}
 
                             {pagination.next_page_url ? (
@@ -266,20 +416,76 @@ export default function DataTable<T>({
                                     href={pagination.next_page_url}
                                     preserveScroll
                                     prefetch
+                                    className="w-full sm:w-auto"
                                 >
-                                    <Button variant="outline" size="sm">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-full"
+                                    >
                                         {__('misc.next', 'Next')}
                                     </Button>
                                 </Link>
                             ) : (
-                                <Button variant="outline" size="sm" disabled>
-                                    {__('misc.next', 'Next')}
-                                </Button>
+                                <div className="w-full sm:w-auto">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        disabled
+                                        className="w-full"
+                                    >
+                                        {__('misc.next', 'Next')}
+                                    </Button>
+                                </div>
                             )}
                         </div>
                     </div>
                 </div>
             )}
+
+            <Sheet
+                open={detailsRowIndex !== null}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setDetailsRowIndex(null);
+                    }
+                }}
+            >
+                <SheetContent side="bottom" className="max-h-[85vh]">
+                    <SheetHeader>
+                        <SheetTitle>
+                            {__('table.details', 'Row details')}
+                        </SheetTitle>
+                        <SheetDescription>
+                            {__(
+                                'table.details_desc',
+                                'Additional row data and actions.',
+                            )}
+                        </SheetDescription>
+                    </SheetHeader>
+
+                    <div className="space-y-4 overflow-y-auto px-4 pb-6">
+                        {selectedRow &&
+                            mobileDetailColumns.map((column, columnIndex) => (
+                                <div
+                                    key={getColumnId(column, columnIndex)}
+                                    className="space-y-1"
+                                >
+                                    <div className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                                        {renderHeader(column)}
+                                    </div>
+                                    <div className="text-sm">
+                                        {renderCell(
+                                            selectedRow,
+                                            detailsRowIndex ?? 0,
+                                            column,
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                    </div>
+                </SheetContent>
+            </Sheet>
         </div>
     );
 }

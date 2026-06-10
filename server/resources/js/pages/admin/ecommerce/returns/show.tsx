@@ -4,7 +4,11 @@ import toast from 'react-hot-toast';
 import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
 import * as ReturnRequestController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ReturnRequestController';
 import { ConfirmButton } from '@/components/confirm-dialog';
-import { PageHeader, PageHeaderActions } from '@/components/page-header';
+import {
+    PageHeader,
+    PageHeaderActions,
+    PageHeaderOverflowMenu,
+} from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Wrapper from '@/components/wrapper';
@@ -93,66 +97,144 @@ export default function Show({
                     description={`Return request • ${formatDateTime(returnRequest.created_at)}`}
                 >
                     <PageHeaderActions>
-                        {canApprove && (
-                            <ConfirmButton
-                                variant="outline"
-                                title={__(
-                                    'dialog.approve_return',
-                                    'Approve Return',
-                                )}
-                                description={__(
-                                    'dialog.approve_return_desc',
-                                    'Are you sure you want to approve this return request?',
-                                )}
-                                onConfirm={handleApprove}
-                            >
-                                <CheckCircle className="mr-2 h-4 w-4" />
-                                {__('action.approve', 'Approve')}
-                            </ConfirmButton>
-                        )}
-                        {canReject && (
-                            <ConfirmButton
-                                variant="outline"
-                                title={__(
-                                    'dialog.reject_return',
-                                    'Reject Return',
-                                )}
-                                description={__(
-                                    'dialog.reject_return_desc',
-                                    'Are you sure you want to reject this return request?',
-                                )}
-                                onConfirm={handleReject}
-                            >
-                                <XCircle className="mr-2 h-4 w-4" />
-                                {__('action.reject', 'Reject')}
-                            </ConfirmButton>
-                        )}
-                        {canProcessRefund && (
-                            <ConfirmButton
-                                variant="outline"
-                                title={__(
-                                    'dialog.process_refund',
-                                    'Process Refund',
-                                )}
-                                description={__(
-                                    'dialog.process_refund_desc',
-                                    'Are you sure you want to process the refund for this return?',
-                                )}
-                                onConfirm={handleProcessRefund}
-                            >
-                                {__('action.process_refund', 'Process Refund')}
-                            </ConfirmButton>
-                        )}
-                        <Button asChild variant="outline">
-                            <Link
-                                href={ReturnRequestController.index.url()}
-                                prefetch
-                                cacheFor={30}
-                            >
-                                <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                {__('action.back', 'Back')}
-                            </Link>
-                        </Button>
+                        <div className="hidden items-center gap-2 sm:flex">
+                            {canApprove && (
+                                <ConfirmButton
+                                    variant="outline"
+                                    title={__(
+                                        'dialog.approve_return',
+                                        'Approve Return',
+                                    )}
+                                    description={__(
+                                        'dialog.approve_return_desc',
+                                        'Are you sure you want to approve this return request?',
+                                    )}
+                                    onConfirm={handleApprove}
+                                >
+                                    <CheckCircle className="mr-2 h-4 w-4" />
+                                    {__('action.approve', 'Approve')}
+                                </ConfirmButton>
+                            )}
+                            {canReject && (
+                                <ConfirmButton
+                                    variant="outline"
+                                    title={__(
+                                        'dialog.reject_return',
+                                        'Reject Return',
+                                    )}
+                                    description={__(
+                                        'dialog.reject_return_desc',
+                                        'Are you sure you want to reject this return request?',
+                                    )}
+                                    onConfirm={handleReject}
+                                >
+                                    <XCircle className="mr-2 h-4 w-4" />
+                                    {__('action.reject', 'Reject')}
+                                </ConfirmButton>
+                            )}
+                            {canProcessRefund && (
+                                <ConfirmButton
+                                    variant="outline"
+                                    title={__(
+                                        'dialog.process_refund',
+                                        'Process Refund',
+                                    )}
+                                    description={__(
+                                        'dialog.process_refund_desc',
+                                        'Are you sure you want to process the refund for this return?',
+                                    )}
+                                    onConfirm={handleProcessRefund}
+                                >
+                                    {__(
+                                        'action.process_refund',
+                                        'Process Refund',
+                                    )}
+                                </ConfirmButton>
+                            )}
+                            <Button asChild variant="outline">
+                                <Link
+                                    href={ReturnRequestController.index.url()}
+                                    prefetch
+                                    cacheFor={30}
+                                >
+                                    <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                                    {__('action.back', 'Back')}
+                                </Link>
+                            </Button>
+                        </div>
+
+                        <div className="flex items-center gap-2 sm:hidden">
+                            <Button asChild variant="outline" size="sm">
+                                <Link
+                                    href={ReturnRequestController.index.url()}
+                                    prefetch
+                                    cacheFor={30}
+                                >
+                                    <ArrowLeftIcon className="h-4 w-4" />
+                                    {__('action.back', 'Back')}
+                                </Link>
+                            </Button>
+                            {(canApprove || canReject || canProcessRefund) && (
+                                <PageHeaderOverflowMenu>
+                                    {canApprove && (
+                                        <ConfirmButton
+                                            variant="outline"
+                                            title={__(
+                                                'dialog.approve_return',
+                                                'Approve Return',
+                                            )}
+                                            description={__(
+                                                'dialog.approve_return_desc',
+                                                'Are you sure you want to approve this return request?',
+                                            )}
+                                            onConfirm={handleApprove}
+                                            className="w-full justify-start"
+                                        >
+                                            <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
+                                            {__('action.approve', 'Approve')}
+                                        </ConfirmButton>
+                                    )}
+                                    {canReject && (
+                                        <ConfirmButton
+                                            variant="outline"
+                                            title={__(
+                                                'dialog.reject_return',
+                                                'Reject Return',
+                                            )}
+                                            description={__(
+                                                'dialog.reject_return_desc',
+                                                'Are you sure you want to reject this return request?',
+                                            )}
+                                            onConfirm={handleReject}
+                                            className="w-full justify-start"
+                                        >
+                                            <XCircle className="mr-2 h-4 w-4 text-destructive" />
+                                            {__('action.reject', 'Reject')}
+                                        </ConfirmButton>
+                                    )}
+                                    {canProcessRefund && (
+                                        <ConfirmButton
+                                            variant="outline"
+                                            title={__(
+                                                'dialog.process_refund',
+                                                'Process Refund',
+                                            )}
+                                            description={__(
+                                                'dialog.process_refund_desc',
+                                                'Are you sure you want to process the refund for this return?',
+                                            )}
+                                            onConfirm={handleProcessRefund}
+                                            className="w-full justify-start"
+                                        >
+                                            {__(
+                                                'action.process_refund',
+                                                'Process Refund',
+                                            )}
+                                        </ConfirmButton>
+                                    )}
+                                </PageHeaderOverflowMenu>
+                            )}
+                        </div>
                     </PageHeaderActions>
                 </PageHeader>
 
@@ -171,58 +253,115 @@ export default function Show({
                                     No items attached to this return.
                                 </div>
                             ) : (
-                                <table className="w-full text-sm">
-                                    <thead>
-                                        <tr className="border-b bg-muted/50 text-left text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                                            <th className="px-6 py-3">
-                                                Product
-                                            </th>
-                                            <th className="px-6 py-3">SKU</th>
-                                            <th className="px-6 py-3">Qty</th>
-                                            <th className="px-6 py-3">
-                                                Condition
-                                            </th>
-                                            <th className="px-6 py-3">Notes</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y">
+                                <>
+                                    <table className="hidden w-full text-sm md:table">
+                                        <thead>
+                                            <tr className="border-b bg-muted/50 text-left text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                                                <th className="px-6 py-3">
+                                                    Product
+                                                </th>
+                                                <th className="px-6 py-3">
+                                                    SKU
+                                                </th>
+                                                <th className="px-6 py-3">
+                                                    Qty
+                                                </th>
+                                                <th className="px-6 py-3">
+                                                    Condition
+                                                </th>
+                                                <th className="px-6 py-3">
+                                                    Notes
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y">
+                                            {returnRequest.items.map((item) => (
+                                                <tr
+                                                    key={item.id}
+                                                    className="hover:bg-muted/30"
+                                                >
+                                                    <td className="px-6 py-3 font-medium">
+                                                        {item.product_variant
+                                                            ?.product?.name ??
+                                                            '—'}
+                                                    </td>
+                                                    <td className="px-6 py-3 font-mono text-xs text-muted-foreground">
+                                                        {item.product_variant
+                                                            ?.sku ?? '—'}
+                                                    </td>
+                                                    <td className="px-6 py-3">
+                                                        {item.quantity}
+                                                    </td>
+                                                    <td className="px-6 py-3">
+                                                        {item.condition ? (
+                                                            <Badge
+                                                                variant="outline"
+                                                                className="text-xs"
+                                                            >
+                                                                {item.condition}
+                                                            </Badge>
+                                                        ) : (
+                                                            <span className="text-muted-foreground">
+                                                                —
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-6 py-3 text-muted-foreground">
+                                                        {item.notes ?? '—'}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+
+                                    {/* Mobile cards view */}
+                                    <div className="divide-y md:hidden">
                                         {returnRequest.items.map((item) => (
-                                            <tr
+                                            <div
                                                 key={item.id}
-                                                className="hover:bg-muted/30"
+                                                className="space-y-3 p-4"
                                             >
-                                                <td className="px-6 py-3 font-medium">
-                                                    {item.product_variant
-                                                        ?.product?.name ?? '—'}
-                                                </td>
-                                                <td className="px-6 py-3 font-mono text-xs text-muted-foreground">
-                                                    {item.product_variant
-                                                        ?.sku ?? '—'}
-                                                </td>
-                                                <td className="px-6 py-3">
-                                                    {item.quantity}
-                                                </td>
-                                                <td className="px-6 py-3">
-                                                    {item.condition ? (
+                                                <div className="flex items-start justify-between gap-4">
+                                                    <div>
+                                                        <div className="text-sm font-medium">
+                                                            {item
+                                                                .product_variant
+                                                                ?.product
+                                                                ?.name ?? '—'}
+                                                        </div>
+                                                        <div className="mt-0.5 font-mono text-xs text-muted-foreground">
+                                                            SKU:{' '}
+                                                            {item
+                                                                .product_variant
+                                                                ?.sku ?? '—'}
+                                                        </div>
+                                                    </div>
+                                                    <Badge
+                                                        variant="secondary"
+                                                        className="shrink-0 text-xs"
+                                                    >
+                                                        Qty: {item.quantity}
+                                                    </Badge>
+                                                </div>
+                                                <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+                                                    {item.condition && (
                                                         <Badge
                                                             variant="outline"
-                                                            className="text-xs"
+                                                            className="h-5 py-0 text-[10px]"
                                                         >
                                                             {item.condition}
                                                         </Badge>
-                                                    ) : (
+                                                    )}
+                                                    {item.notes && (
                                                         <span className="text-muted-foreground">
-                                                            —
+                                                            Notes: {item.notes}
                                                         </span>
                                                     )}
-                                                </td>
-                                                <td className="px-6 py-3 text-muted-foreground">
-                                                    {item.notes ?? '—'}
-                                                </td>
-                                            </tr>
+                                                </div>
+                                            </div>
                                         ))}
-                                    </tbody>
-                                </table>
+                                    </div>
+                                </>
                             )}
                         </div>
 

@@ -118,7 +118,7 @@ export default function ExchangeRatesIndex({
                         'Manage currency exchange rates',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Link href={ExchangeRateController.create.url()}>
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
@@ -140,6 +140,8 @@ export default function ExchangeRatesIndex({
                         next_page_url: rates.next_page_url ?? null,
                     }}
                     baseUrl={ExchangeRateController.index.url()}
+                    mobilePrimaryColumns={3}
+                    mobileCardTitle={(row) => row.currency.code}
                 />
             </Wrapper>
         </AppLayout>

@@ -10,7 +10,10 @@ use App\Models\ProductReview;
 use App\Models\ProductVariant;
 use App\Models\SupportConversation;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -21,11 +24,43 @@ class NotificationController extends Controller
     public function index(): JsonResponse
     {
         $notifications = $this->buildNotifications();
+        $userId = Auth::id();
+        $readIds = Cache::get('admin_read_notifications_'.$userId, []);
+        if (! is_array($readIds)) {
+            $readIds = [];
+        }
+
+        $unreadCount = $notifications->reject(fn ($n): bool => in_array($n['id'], $readIds, true))->count();
 
         return response()->json([
             'data' => $notifications->values(),
-            'unread_count' => $notifications->count(),
+            'unread_count' => $unreadCount,
+            'read_ids' => $readIds,
         ]);
+    }
+
+    public function markAsRead(Request $request): JsonResponse
+    {
+        $ids = $request->input('ids', []);
+        if (! is_array($ids)) {
+            return response()->json(['status' => 'error', 'message' => 'Invalid IDs'], 400);
+        }
+
+        $userId = Auth::id();
+        $cacheKey = 'admin_read_notifications_'.$userId;
+        $existing = Cache::get($cacheKey, []);
+        if (! is_array($existing)) {
+            $existing = [];
+        }
+
+        $updated = array_unique(array_merge($existing, $ids));
+        if (count($updated) > 100) {
+            $updated = array_slice($updated, -100);
+        }
+
+        Cache::put($cacheKey, $updated, now()->addDays(30));
+
+        return response()->json(['status' => 'success']);
     }
 
     public function stream(): StreamedResponse
@@ -44,14 +79,26 @@ class NotificationController extends Controller
                 }
 
                 $notifications = $this->buildNotifications();
-                $hash = md5(serialize($notifications->pluck('id')->sort()->values()->toArray()));
+                $userId = Auth::id();
+                $readIds = Cache::get('admin_read_notifications_'.$userId, []);
+                if (! is_array($readIds)) {
+                    $readIds = [];
+                }
+
+                $unreadCount = $notifications->reject(fn ($n): bool => in_array($n['id'], $readIds, true))->count();
+
+                $hash = md5(serialize([
+                    $notifications->pluck('id')->sort()->values()->toArray(),
+                    $readIds,
+                ]));
 
                 if ($hash !== $lastSentHash) {
                     $lastSentHash = $hash;
                     echo 'event: notifications'."\n";
                     echo 'data: '.json_encode([
                         'data' => $notifications->values(),
-                        'unread_count' => $notifications->count(),
+                        'unread_count' => $unreadCount,
+                        'read_ids' => $readIds,
                     ])."\n\n";
                     ob_flush();
                     flush();

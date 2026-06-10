@@ -129,7 +129,7 @@ export default function StoresIndex({ stores, filters }: IndexProps) {
                         'Manage physical store locations',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Link href={StoreController.create.url()}>
                             <Button>
                                 <PlusIcon className="mr-2 h-4 w-4" />
@@ -180,6 +180,8 @@ export default function StoresIndex({ stores, filters }: IndexProps) {
                         )}
                         searchValue={filters.search ?? ''}
                         baseUrl={StoreController.index.url()}
+                        mobilePrimaryColumns={3}
+                        mobileCardTitle={(row) => row.name}
                     />
                 )}
             </Wrapper>

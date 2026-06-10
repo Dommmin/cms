@@ -157,7 +157,7 @@ export default function ThemesIndex({ themes, filters }: IndexProps) {
                     title={__('page.themes', 'Themes')}
                     description={__('page.themes_desc', 'Manage site themes')}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button
                             variant="outline"
                             onClick={() => {
@@ -207,6 +207,8 @@ export default function ThemesIndex({ themes, filters }: IndexProps) {
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={ThemeController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => row.name}
                 />
             </Wrapper>
         </AppLayout>

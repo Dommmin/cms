@@ -7,6 +7,7 @@ import { PageHeader } from '@/components/page-header';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
+import { resolveLocalizedText } from '@/lib/localized-text';
 import type { BreadcrumbItem } from '@/types';
 import type { IndexProps } from './index.types';
 
@@ -42,6 +43,12 @@ export default function ReviewsIndex({ reviews, filters }: IndexProps) {
                     searchPlaceholder="Search reviews..."
                     searchValue={filters?.search ?? ''}
                     baseUrl={ReviewController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) =>
+                        row.product
+                            ? resolveLocalizedText(row.product.name)
+                            : 'Review'
+                    }
                 />
             </Wrapper>
         </AppLayout>

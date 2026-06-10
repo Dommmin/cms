@@ -106,9 +106,21 @@ export function NotificationBell() {
         (payload: NotificationPayload) => {
             const data = normalizePayload(payload);
             const incoming = data.data;
+            const readIds = Array.isArray(payload?.read_ids)
+                ? payload.read_ids
+                : [];
+
+            setSeenIds((prev) => {
+                const next = new Set(prev);
+                readIds.forEach((id) => next.add(id));
+                return next;
+            });
+
             setNotifications(incoming);
+
+            const readSet = new Set(readIds);
             const newOnes = incoming.filter(
-                (n) => !seenIdsRef.current.has(n.id),
+                (n) => !readSet.has(n.id) && !seenIdsRef.current.has(n.id),
             );
             setUnreadCount(newOnes.length);
             fireBrowserNotifications(newOnes);
@@ -157,17 +169,32 @@ export function NotificationBell() {
         return () => document.removeEventListener('mousedown', handler);
     }, [open]);
 
-    function handleOpen() {
-        setOpen((v) => !v);
-        if (!open) {
-            setSeenIds(new Set(notifications.map((n) => n.id)));
+    async function handleOpen() {
+        const nextOpen = !open;
+        setOpen(nextOpen);
+        if (nextOpen && notifications.length > 0) {
+            const ids = notifications.map((n) => n.id);
+            setSeenIds(new Set(ids));
             setUnreadCount(0);
+            try {
+                await axios.post('/panel/notifications/read', { ids });
+            } catch {
+                // ignore
+            }
         }
     }
 
-    function markAllRead() {
-        setSeenIds(new Set(notifications.map((n) => n.id)));
-        setUnreadCount(0);
+    async function markAllRead() {
+        if (notifications.length > 0) {
+            const ids = notifications.map((n) => n.id);
+            setSeenIds(new Set(ids));
+            setUnreadCount(0);
+            try {
+                await axios.post('/panel/notifications/read', { ids });
+            } catch {
+                // ignore
+            }
+        }
     }
 
     async function requestBrowserPermission() {

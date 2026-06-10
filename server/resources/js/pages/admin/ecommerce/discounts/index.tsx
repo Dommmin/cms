@@ -1,9 +1,18 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Percent, Plus } from 'lucide-react';
 import * as DiscountController from '@/actions/App/Http/Controllers/Admin/Ecommerce/DiscountController';
 import DataTable from '@/components/data-table';
+import ListFilters from '@/components/list-filters';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -19,6 +28,23 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function DiscountsIndex({ discounts, filters }: IndexProps) {
     const __ = useTranslation();
+    const activeFilterCount = [filters.type, filters.is_active].filter(
+        Boolean,
+    ).length;
+
+    const updateFilters = (
+        nextFilters: Partial<Pick<IndexProps['filters'], 'type' | 'is_active'>>,
+    ) => {
+        router.get(
+            DiscountController.index.url(),
+            { ...filters, ...nextFilters },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
+
     const formatDiscount = (type: string, value: number) => {
         if (type === 'percentage') return `${value}%`;
         if (type === 'fixed_amount') return `$${(value / 100).toFixed(2)}`;
@@ -34,7 +60,7 @@ export default function DiscountsIndex({ discounts, filters }: IndexProps) {
                     title={__('page.discounts', 'Discounts')}
                     description={`${discounts.total} discount codes`}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button asChild variant="outline">
                             <Link
                                 href={DiscountController.create.url()}
@@ -47,6 +73,94 @@ export default function DiscountsIndex({ discounts, filters }: IndexProps) {
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
+
+                <ListFilters
+                    activeCount={activeFilterCount}
+                    description={__(
+                        'page.discounts_filters_desc',
+                        'Filter discount codes by type and activity state.',
+                    )}
+                    contentClassName="sm:grid sm:grid-cols-2 sm:items-end sm:gap-4"
+                >
+                    <div className="space-y-2">
+                        <Label htmlFor="discount-type-filter">
+                            {__('column.type', 'Type')}
+                        </Label>
+                        <Select
+                            value={filters.type || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    type: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="discount-type-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__('column.type', 'Type')}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                <SelectItem value="percentage">
+                                    {__(
+                                        'discount.type.percentage',
+                                        'Percentage',
+                                    )}
+                                </SelectItem>
+                                <SelectItem value="fixed_amount">
+                                    {__(
+                                        'discount.type.fixed_amount',
+                                        'Fixed amount',
+                                    )}
+                                </SelectItem>
+                                <SelectItem value="free_shipping">
+                                    {__(
+                                        'discount.type.free_shipping',
+                                        'Free shipping',
+                                    )}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="discount-status-filter">
+                            {__('column.status', 'Status')}
+                        </Label>
+                        <Select
+                            value={filters.is_active || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    is_active: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="discount-status-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__('column.status', 'Status')}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                <SelectItem value="1">
+                                    {__('status.active', 'Active')}
+                                </SelectItem>
+                                <SelectItem value="0">
+                                    {__('status.inactive', 'Inactive')}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </ListFilters>
 
                 <DataTable
                     columns={[
@@ -119,6 +233,8 @@ export default function DiscountsIndex({ discounts, filters }: IndexProps) {
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={DiscountController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => row.code}
                 />
             </Wrapper>
         </AppLayout>

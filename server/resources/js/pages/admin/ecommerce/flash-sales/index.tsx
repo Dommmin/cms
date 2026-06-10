@@ -59,7 +59,7 @@ export default function FlashSalesIndex({ flashSales, filters }: IndexProps) {
                     title="Flash Sales"
                     description={`${flashSales.total} flash sale(s)`}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button asChild variant="outline">
                             <Link
                                 href={FlashSaleController.create.url()}
@@ -182,6 +182,8 @@ export default function FlashSalesIndex({ flashSales, filters }: IndexProps) {
                     searchPlaceholder="Search flash sales..."
                     searchValue={filters.search ?? ''}
                     baseUrl={FlashSaleController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => row.name}
                 />
             </Wrapper>
         </AppLayout>

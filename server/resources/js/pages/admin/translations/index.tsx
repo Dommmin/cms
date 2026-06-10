@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import * as TranslationController from '@/actions/App/Http/Controllers/Admin/TranslationController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
+import ListFilters from '@/components/list-filters';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -90,6 +91,11 @@ export default function TranslationsIndex({
     };
 
     const isMissing = filters.missing === '1' || filters.missing === 'true';
+    const activeFilterCount = [
+        filters.locale && filters.locale !== 'en',
+        filters.group,
+        isMissing,
+    ].filter(Boolean).length;
 
     const columns: ColumnDef<Translation>[] = [
         {
@@ -201,7 +207,7 @@ export default function TranslationsIndex({
                         'Translations are discovered automatically from frontend ()) calls.',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button
                             variant="outline"
                             onClick={handleSync}
@@ -220,8 +226,12 @@ export default function TranslationsIndex({
                     </PageHeaderActions>
                 </PageHeader>
 
-                {/* Filters */}
-                <div className="mb-4 flex flex-wrap items-center gap-3">
+                <ListFilters
+                    activeCount={activeFilterCount}
+                    description="Filter locale, translation group, and missing entries."
+                    className="mb-4"
+                    contentClassName="sm:justify-start"
+                >
                     <Select
                         value={filters.locale ?? 'en'}
                         onValueChange={(v) => handleFilterChange('locale', v)}
@@ -267,11 +277,15 @@ export default function TranslationsIndex({
                         {__('misc.missing_only', 'Missing only')}
                         {isMissing && ' ✓'}
                     </Button>
-                </div>
+                </ListFilters>
 
                 <DataTable
                     columns={columns}
                     data={translations.data}
+                    mobilePrimaryColumns={2}
+                    mobileCardTitle={(row) => (
+                        <span className="font-mono text-sm">{row.key}</span>
+                    )}
                     pagination={{
                         current_page: translations.current_page,
                         last_page: translations.last_page,

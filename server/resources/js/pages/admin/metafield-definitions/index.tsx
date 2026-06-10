@@ -192,7 +192,7 @@ export default function MetafieldDefinitionsIndex({
                     title="Metafield Definitions"
                     description="Define custom metafields for your content types"
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Link href={MetafieldDefinitionController.create.url()}>
                             <Button variant="outline">
                                 <PlusIcon className="mr-2 h-4 w-4" />
@@ -226,6 +226,10 @@ export default function MetafieldDefinitionsIndex({
                 <DataTable
                     columns={columns}
                     data={definitions.data}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => (
+                        <div className="font-medium">{row.name}</div>
+                    )}
                     pagination={{
                         current_page: definitions.current_page,
                         last_page: definitions.last_page,

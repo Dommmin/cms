@@ -75,6 +75,7 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('panel')->name(
     Route::get('search/analytics', [SearchAnalyticsController::class, 'index'])->name('search.analytics');
     Route::resource('search/synonyms', SearchSynonymController::class)->names('search.synonyms')->parameters(['synonyms' => 'synonym']);
     Route::get('/notifications/alerts', [NotificationController::class, 'index'])->name('notifications.alerts');
+    Route::post('/notifications/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::get('/notifications/stream', [NotificationController::class, 'stream'])->name('notifications.stream');
     Route::get('/activity-log', [ActivityLogController::class, 'index'])->middleware('role:admin|super-admin')->name('activity-log.index');
     Route::get('/activity-log/export', [ActivityLogController::class, 'export'])->middleware('role:admin|super-admin')->name('activity-log.export');

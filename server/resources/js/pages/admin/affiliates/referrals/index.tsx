@@ -7,10 +7,19 @@ import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce
 import * as ReferralController from '@/actions/App/Http/Controllers/Admin/ReferralController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
+import ListFilters from '@/components/list-filters';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -42,6 +51,21 @@ export default function ReferralsIndex({
     filters,
 }: IndexProps) {
     const __ = useTranslation();
+    const activeFilterCount = [filters.status].filter(Boolean).length;
+
+    const updateFilters = (
+        nextFilters: Partial<Pick<IndexProps['filters'], 'status'>>,
+    ) => {
+        router.get(
+            ReferralController.index.url(),
+            { ...filters, ...nextFilters },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
+
     const columns: ColumnDef<Referral>[] = [
         {
             accessorKey: 'affiliate_code',
@@ -220,7 +244,7 @@ export default function ReferralsIndex({
                         'Monitor commissions and payout status',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Link href={AffiliateCodeController.index.url()}>
                             <Button variant="outline">
                                 {__('action.manage', 'Manage Codes')}
@@ -228,6 +252,55 @@ export default function ReferralsIndex({
                         </Link>
                     </PageHeaderActions>
                 </PageHeader>
+
+                <ListFilters
+                    activeCount={activeFilterCount}
+                    description={__(
+                        'page.referrals_filters_desc',
+                        'Filter referrals by payout workflow state.',
+                    )}
+                    contentClassName="sm:max-w-xs"
+                >
+                    <div className="space-y-2">
+                        <Label htmlFor="referral-status-filter">
+                            {__('column.status', 'Status')}
+                        </Label>
+                        <Select
+                            value={filters.status || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    status: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="referral-status-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__('column.status', 'Status')}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                <SelectItem value="pending">
+                                    {__('status.pending', 'Pending')}
+                                </SelectItem>
+                                <SelectItem value="approved">
+                                    {__('status.approved', 'Approved')}
+                                </SelectItem>
+                                <SelectItem value="paid">
+                                    {__('status.paid', 'Paid')}
+                                </SelectItem>
+                                <SelectItem value="cancelled">
+                                    {__('status.cancelled', 'Cancelled')}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </ListFilters>
 
                 {/* Stats */}
                 <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -305,6 +378,8 @@ export default function ReferralsIndex({
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={ReferralController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => row.affiliate_code.code}
                 />
             </Wrapper>
         </AppLayout>

@@ -4,8 +4,17 @@ import toast from 'react-hot-toast';
 import * as ProductTypeController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductTypeController';
 import { ConfirmButton } from '@/components/confirm-dialog';
 import DataTable from '@/components/data-table';
+import ListFilters from '@/components/list-filters';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -21,6 +30,25 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function ProductTypesIndex({ types, filters }: IndexProps) {
     const __ = useTranslation();
+    const activeFilterCount = [
+        filters.has_variants,
+        filters.is_shippable,
+    ].filter(Boolean).length;
+
+    const updateFilters = (
+        nextFilters: Partial<
+            Pick<IndexProps['filters'], 'has_variants' | 'is_shippable'>
+        >,
+    ) => {
+        router.get(
+            ProductTypeController.index.url(),
+            { ...filters, ...nextFilters },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -31,7 +59,7 @@ export default function ProductTypesIndex({ types, filters }: IndexProps) {
                     title={__('page.product_types', 'Product Types')}
                     description={`${types.total} product types configured`}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Button asChild variant="outline">
                             <Link
                                 href={ProductTypeController.create.url()}
@@ -44,6 +72,88 @@ export default function ProductTypesIndex({ types, filters }: IndexProps) {
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
+
+                <ListFilters
+                    activeCount={activeFilterCount}
+                    description={__(
+                        'page.product_types_filters_desc',
+                        'Filter product types by variants and shipping behavior.',
+                    )}
+                    contentClassName="sm:grid sm:grid-cols-2 sm:items-end sm:gap-4"
+                >
+                    <div className="space-y-2">
+                        <Label htmlFor="product-type-variants-filter">
+                            {__('column.variants', 'Variants')}
+                        </Label>
+                        <Select
+                            value={filters.has_variants || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    has_variants: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="product-type-variants-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__(
+                                        'column.variants',
+                                        'Variants',
+                                    )}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                <SelectItem value="1">
+                                    {__('status.yes', 'Yes')}
+                                </SelectItem>
+                                <SelectItem value="0">
+                                    {__('status.no', 'No')}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="product-type-shippable-filter">
+                            {__('column.shipping', 'Shipping')}
+                        </Label>
+                        <Select
+                            value={filters.is_shippable || 'all'}
+                            onValueChange={(value) =>
+                                updateFilters({
+                                    is_shippable: value === 'all' ? '' : value,
+                                })
+                            }
+                        >
+                            <SelectTrigger
+                                id="product-type-shippable-filter"
+                                className="w-full"
+                            >
+                                <SelectValue
+                                    placeholder={__(
+                                        'column.shipping',
+                                        'Shipping',
+                                    )}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {__('misc.all', 'All')}
+                                </SelectItem>
+                                <SelectItem value="1">
+                                    {__('status.yes', 'Yes')}
+                                </SelectItem>
+                                <SelectItem value="0">
+                                    {__('status.no', 'No')}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </ListFilters>
 
                 <DataTable
                     columns={[
@@ -152,6 +262,8 @@ export default function ProductTypesIndex({ types, filters }: IndexProps) {
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={ProductTypeController.index.url()}
+                    mobilePrimaryColumns={4}
+                    mobileCardTitle={(row) => row.name}
                 />
             </Wrapper>
         </AppLayout>

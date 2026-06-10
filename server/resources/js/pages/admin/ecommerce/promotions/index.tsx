@@ -8,9 +8,11 @@ import {
     Trash2,
 } from 'lucide-react';
 import * as PromotionController from '@/actions/App/Http/Controllers/Admin/Ecommerce/PromotionController';
+import ListFilters from '@/components/list-filters';
+import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -55,6 +57,11 @@ export default function Index({
     };
 }) {
     const __ = useTranslation();
+    const activeFilterCount = [
+        filters.search,
+        filters.is_active,
+        filters.type,
+    ].filter(Boolean).length;
 
     const handleSearch = (value: string) => {
         router.get(
@@ -101,109 +108,257 @@ export default function Index({
             <Head title="Promotions" />
 
             <Wrapper>
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold">
-                            Promocje Produktowe
-                        </h1>
-                        <p className="text-muted-foreground">
-                            Zarządzaj promocjami na produkty i kategorie
-                        </p>
-                    </div>
-                    <Link href={PromotionController.create.url()}>
-                        <Button>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Dodaj Promocję
+                <PageHeader
+                    title="Promocje Produktowe"
+                    description="Zarządzaj promocjami na produkty i kategorie"
+                >
+                    <PageHeaderActions compact>
+                        <Button asChild>
+                            <Link href={PromotionController.create.url()}>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Dodaj Promocję
+                            </Link>
                         </Button>
-                    </Link>
-                </div>
+                    </PageHeaderActions>
+                </PageHeader>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Filtry</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-                            <div>
-                                <Label htmlFor="search">Szukaj</Label>
-                                <div className="relative">
-                                    <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
-                                    <Input
-                                        id="search"
-                                        placeholder="Szukaj promocji..."
-                                        value={filters.search || ''}
-                                        onChange={(e) =>
-                                            handleSearch(e.target.value)
-                                        }
-                                        className="pl-10"
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <Label htmlFor="is_active">Status</Label>
-                                <Select
-                                    value={filters.is_active || 'all'}
-                                    onValueChange={(value) =>
-                                        handleFilter(
-                                            'is_active',
-                                            value === 'all' ? '' : value,
-                                        )
-                                    }
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Wybierz status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">
-                                            Wszystkie
-                                        </SelectItem>
-                                        <SelectItem value="1">
-                                            Aktywne
-                                        </SelectItem>
-                                        <SelectItem value="0">
-                                            Nieaktywne
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div>
-                                <Label htmlFor="type">Typ</Label>
-                                <Select
-                                    value={filters.type || 'all'}
-                                    onValueChange={(value) =>
-                                        handleFilter(
-                                            'type',
-                                            value === 'all' ? '' : value,
-                                        )
-                                    }
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Wybierz typ" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">
-                                            Wszystkie
-                                        </SelectItem>
-                                        {Object.entries(promotionTypes).map(
-                                            ([key, label]) => (
-                                                <SelectItem
-                                                    key={key}
-                                                    value={key}
-                                                >
-                                                    {label}
-                                                </SelectItem>
-                                            ),
-                                        )}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                <ListFilters
+                    activeCount={activeFilterCount}
+                    description="Filtruj promocje po nazwie, statusie i typie."
+                    contentClassName="sm:grid sm:grid-cols-3 sm:items-end sm:gap-4"
+                >
+                    <div className="space-y-2">
+                        <Label htmlFor="search">Szukaj</Label>
+                        <div className="relative">
+                            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
+                            <Input
+                                id="search"
+                                placeholder="Szukaj promocji..."
+                                value={filters.search || ''}
+                                onChange={(e) => handleSearch(e.target.value)}
+                                className="pl-10"
+                            />
                         </div>
-                    </CardContent>
-                </Card>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="is_active">Status</Label>
+                        <Select
+                            value={filters.is_active || 'all'}
+                            onValueChange={(value) =>
+                                handleFilter(
+                                    'is_active',
+                                    value === 'all' ? '' : value,
+                                )
+                            }
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Wybierz status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Wszystkie</SelectItem>
+                                <SelectItem value="1">Aktywne</SelectItem>
+                                <SelectItem value="0">Nieaktywne</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="type">Typ</Label>
+                        <Select
+                            value={filters.type || 'all'}
+                            onValueChange={(value) =>
+                                handleFilter(
+                                    'type',
+                                    value === 'all' ? '' : value,
+                                )
+                            }
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Wybierz typ" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Wszystkie</SelectItem>
+                                {Object.entries(promotionTypes).map(
+                                    ([key, label]) => (
+                                        <SelectItem key={key} value={key}>
+                                            {label}
+                                        </SelectItem>
+                                    ),
+                                )}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </ListFilters>
 
                 <Card>
                     <CardContent className="p-0">
-                        <div className="overflow-x-auto">
+                        <div className="space-y-3 p-4 md:hidden">
+                            {promotions.data.map((promotion) => (
+                                <Card key={promotion.id}>
+                                    <CardContent className="space-y-4 p-4">
+                                        <div className="space-y-2">
+                                            <div className="font-medium">
+                                                {promotion.name}
+                                            </div>
+                                            {promotion.description && (
+                                                <div className="text-sm text-muted-foreground">
+                                                    {promotion.description}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <dl className="space-y-2 text-sm">
+                                            <div className="space-y-1">
+                                                <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                                                    Typ
+                                                </dt>
+                                                <dd>
+                                                    <Badge variant="outline">
+                                                        {
+                                                            promotionTypes[
+                                                                promotion.type
+                                                            ]
+                                                        }
+                                                    </Badge>
+                                                </dd>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                                                    Zastosowanie
+                                                </dt>
+                                                <dd>
+                                                    <Badge variant="secondary">
+                                                        {
+                                                            applyToTypes[
+                                                                promotion
+                                                                    .apply_to
+                                                            ]
+                                                        }
+                                                    </Badge>
+                                                </dd>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                                                    Wartość
+                                                </dt>
+                                                <dd>
+                                                    {promotion.type ===
+                                                    'free_shipping' ? (
+                                                        <span>
+                                                            Darmowa dostawa
+                                                        </span>
+                                                    ) : promotion.type ===
+                                                      'percentage' ? (
+                                                        <span>
+                                                            {promotion.value}%
+                                                        </span>
+                                                    ) : (
+                                                        <span>
+                                                            {promotion.value} zł
+                                                        </span>
+                                                    )}
+                                                </dd>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                                                    Status
+                                                </dt>
+                                                <dd>
+                                                    <Badge
+                                                        variant={
+                                                            promotion.is_active
+                                                                ? 'default'
+                                                                : 'secondary'
+                                                        }
+                                                    >
+                                                        {promotion.is_active
+                                                            ? 'Aktywna'
+                                                            : 'Nieaktywna'}
+                                                    </Badge>
+                                                </dd>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                                                    Priorytet
+                                                </dt>
+                                                <dd>{promotion.priority}</dd>
+                                            </div>
+                                            {(promotion.starts_at ||
+                                                promotion.ends_at) && (
+                                                <div className="space-y-1">
+                                                    <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                                                        Daty
+                                                    </dt>
+                                                    <dd className="space-y-1">
+                                                        {promotion.starts_at && (
+                                                            <div>
+                                                                Od:{' '}
+                                                                {new Date(
+                                                                    promotion.starts_at,
+                                                                ).toLocaleDateString()}
+                                                            </div>
+                                                        )}
+                                                        {promotion.ends_at && (
+                                                            <div>
+                                                                Do:{' '}
+                                                                {new Date(
+                                                                    promotion.ends_at,
+                                                                ).toLocaleDateString()}
+                                                            </div>
+                                                        )}
+                                                    </dd>
+                                                </div>
+                                            )}
+                                        </dl>
+
+                                        <div className="grid grid-cols-3 gap-2">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() =>
+                                                    togglePromotion(
+                                                        promotion.id,
+                                                    )
+                                                }
+                                            >
+                                                {promotion.is_active ? (
+                                                    <PowerOff className="h-4 w-4" />
+                                                ) : (
+                                                    <Power className="h-4 w-4" />
+                                                )}
+                                            </Button>
+                                            <Button
+                                                asChild
+                                                variant="outline"
+                                                size="sm"
+                                            >
+                                                <Link
+                                                    href={PromotionController.edit.url(
+                                                        promotion.id,
+                                                    )}
+                                                    prefetch
+                                                    cacheFor={30}
+                                                >
+                                                    <PencilIcon className="h-4 w-4" />
+                                                </Link>
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() =>
+                                                    deletePromotion(
+                                                        promotion.id,
+                                                    )
+                                                }
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+
+                        <div className="hidden overflow-x-auto md:block">
                             <table className="w-full">
                                 <thead>
                                     <tr className="border-b">

@@ -144,7 +144,7 @@ export default function SubscribersIndex({ subscribers, filters }: IndexProps) {
                         'Manage newsletter subscribers',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Link
                             href={NewsletterSubscriberController.create.url()}
                         >
@@ -174,6 +174,8 @@ export default function SubscribersIndex({ subscribers, filters }: IndexProps) {
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={NewsletterSubscriberController.index.url()}
+                    mobilePrimaryColumns={3}
+                    mobileCardTitle={(row) => row.email}
                 />
             </Wrapper>
         </AppLayout>

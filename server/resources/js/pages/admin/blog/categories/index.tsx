@@ -124,7 +124,7 @@ export default function BlogCategoriesIndex({
                         'Organize blog posts into categories',
                     )}
                 >
-                    <PageHeaderActions>
+                    <PageHeaderActions compact>
                         <Link href={BlogCategoryController.create.url()}>
                             <Button variant="outline">
                                 <PlusIcon className="mr-2 h-4 w-4" />
@@ -152,6 +152,8 @@ export default function BlogCategoriesIndex({
                     )}
                     searchValue={filters.search ?? ''}
                     baseUrl={BlogCategoryController.index.url()}
+                    mobilePrimaryColumns={3}
+                    mobileCardTitle={(row) => resolveLocalizedText(row.name)}
                 />
             </Wrapper>
         </AppLayout>
