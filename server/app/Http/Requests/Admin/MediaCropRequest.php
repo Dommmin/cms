@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Validator;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class MediaCropRequest extends FormRequest

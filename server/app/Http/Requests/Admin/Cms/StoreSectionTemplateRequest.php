@@ -6,9 +6,9 @@ namespace App\Http\Requests\Admin\Cms;
 
 use App\Services\PageBuilder\PageBuilderSnapshotValidator;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Validation\Validator;
 
 class StoreSectionTemplateRequest extends FormRequest
 {

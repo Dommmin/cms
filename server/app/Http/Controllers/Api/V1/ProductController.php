@@ -37,7 +37,7 @@ class ProductController extends ApiController
         $locale = app()->getLocale();
 
         $query = QueryBuilder::for(Product::available())
-            ->allowedFilters([
+            ->allowedFilters(...[
                 AllowedFilter::callback('name', function ($query, string $value) use ($locale): void {
                     $query->whereJsonContainsLocale('name', $locale, '%'.$value.'%', 'like');
                 }),
@@ -52,7 +52,7 @@ class ProductController extends ApiController
                 AllowedFilter::exact('is_featured'),
                 AllowedFilter::callback('attributes', fn (Builder $query, mixed $value): null => null),
             ])
-            ->allowedSorts([
+            ->allowedSorts(...[
                 'name',
                 'created_at',
                 AllowedSort::custom('price', new VariantPriceSort),
@@ -315,7 +315,7 @@ class ProductController extends ApiController
             : Product::available()->whereHas('categories', fn ($q) => $q->where('categories.id', $category->id));
 
         $products = QueryBuilder::for($baseQuery)
-            ->allowedFilters([
+            ->allowedFilters(...[
                 AllowedFilter::partial('name'),
                 AllowedFilter::exact('brand_id'),
                 AllowedFilter::custom('min_price', new MinPriceFilter),
@@ -324,7 +324,7 @@ class ProductController extends ApiController
                 AllowedFilter::exact('is_featured'),
                 AllowedFilter::callback('attributes', fn (Builder $query, mixed $value): null => null),
             ])
-            ->allowedSorts([
+            ->allowedSorts(...[
                 'name',
                 'created_at',
                 AllowedSort::custom('price', new VariantPriceSort),

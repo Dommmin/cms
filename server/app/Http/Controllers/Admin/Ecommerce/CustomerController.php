@@ -56,7 +56,7 @@ class CustomerController extends Controller
                 'id' => $a->id,
                 'description' => $a->description,
                 'log_name' => $a->log_name,
-                'changes' => $a->changes,
+                'changes' => $a->attribute_changes,
                 'causer' => $a->causer_type ? ['name' => $a->causer instanceof Model ? $a->causer->getAttribute('name') : 'System'] : null,
                 'created_at' => $a->created_at?->toISOString(),
             ]);

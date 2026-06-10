@@ -6,9 +6,9 @@ namespace App\Http\Requests\Admin\Blog;
 
 use App\Models\Blog;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Validator;
 
 class StoreBlogRequest extends FormRequest
 {

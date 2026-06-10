@@ -86,7 +86,7 @@ class CheckoutRequest extends FormRequest
 
             if ($this->input('shipping_method_id')) {
                 $shippingMethod = ShippingMethod::query()->find($this->input('shipping_method_id'));
-                if ($shippingMethod && $shippingMethod->carrier->requiresPickupPoint() && ! $this->input('pickup_point_id')) {
+                if ($shippingMethod && $shippingMethod->requiresPickupPoint() && ! $this->input('pickup_point_id')) {
                     $v->errors()->add('pickup_point_id', 'Wybór punktu odbioru jest wymagany dla tej metody dostawy.');
                 }
             }

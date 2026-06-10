@@ -6,9 +6,9 @@ namespace App\Http\Requests\Admin\Ecommerce;
 
 use App\Models\Category;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Validator;
 
 class StoreCategoryRequest extends FormRequest
 {

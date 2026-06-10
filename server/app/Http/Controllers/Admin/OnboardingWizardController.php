@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\MenuLocationEnum;
 use App\Enums\PageBlockTypeEnum;
 use App\Enums\PageTypeEnum;
+use App\Enums\ShippingCarrierEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use App\Models\MenuItem;
@@ -36,14 +37,19 @@ class OnboardingWizardController extends Controller
         })->toArray();
 
         // Get shipping methods
-        $shippingMethods = ShippingMethod::query()->orderBy('id')->get()->map(fn ($m): array => [
-            'id' => $m->id,
-            'name' => $m->name,
-            'base_price' => $m->base_price / 100, // convert to float representation
-            'is_active' => $m->is_active,
-            'carrier' => $m->carrier->value,
-            'free_shipping_threshold' => $m->free_shipping_threshold ? ($m->free_shipping_threshold / 100) : null,
-        ])->all();
+        $shippingMethods = ShippingMethod::query()->orderBy('id')->get()->map(function (ShippingMethod $m): array {
+            /** @var ShippingCarrierEnum $carrier */
+            $carrier = $m->carrier;
+
+            return [
+                'id' => $m->id,
+                'name' => $m->name,
+                'base_price' => $m->base_price / 100, // convert to float representation
+                'is_active' => $m->is_active,
+                'carrier' => $carrier->value,
+                'free_shipping_threshold' => $m->free_shipping_threshold ? ($m->free_shipping_threshold / 100) : null,
+            ];
+        })->all();
 
         // Get tax rates
         $taxRates = TaxRate::query()->orderBy('id')->get()->toArray();

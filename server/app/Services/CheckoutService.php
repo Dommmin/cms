@@ -9,6 +9,7 @@ use App\Enums\OrderStatusEnum;
 use App\Enums\PaymentProviderEnum;
 use App\Enums\PaymentStatusEnum;
 use App\Enums\ShipmentStatusEnum;
+use App\Enums\ShippingCarrierEnum;
 use App\Models\Address;
 use App\Models\AffiliateCode;
 use App\Models\Cart;
@@ -211,10 +212,12 @@ class CheckoutService
         ]);
 
         if ($shippingMethod) {
+            /** @var ShippingCarrierEnum $carrier */
+            $carrier = $shippingMethod->carrier;
             Shipment::query()->create([
                 'order_id' => $order->id,
                 'shipping_method_id' => $shippingMethod->id,
-                'carrier' => $shippingMethod->carrier->value,
+                'carrier' => $carrier->value,
                 'tracking_number' => null,
                 'label_url' => null,
                 'status' => ShipmentStatusEnum::PENDING->value,

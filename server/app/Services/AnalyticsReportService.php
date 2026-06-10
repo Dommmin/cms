@@ -410,8 +410,9 @@ class AnalyticsReportService
             if ($purchasingSessions->has($sessionId)) {
                 $stats[$path]['conversions']++;
                 $purchaseEvent = $purchasingSessions->get($sessionId);
+                /** @var array|null $metadata */
                 $metadata = $purchaseEvent->metadata;
-                $revenue = isset($metadata['revenue']) ? (int) $metadata['revenue'] : 0;
+                $revenue = (is_array($metadata) && isset($metadata['revenue'])) ? (int) $metadata['revenue'] : 0;
                 $stats[$path]['revenue'] += $revenue;
             }
         }
@@ -439,7 +440,13 @@ class AnalyticsReportService
 
         $stats = [];
         foreach ($purchaseEvents as $event) {
+            /** @var array|null $meta */
             $meta = $event->metadata;
+
+            if (! is_array($meta)) {
+                continue;
+            }
+
             $code = $meta['discount_code'] ?? null;
             if (! $code) {
                 continue;
