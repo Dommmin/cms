@@ -66,12 +66,12 @@ describe('Product Variant Barcode/EAN/UPC', function (): void {
 
     it('barcode fields are stored in database', function (): void {
         makeVariantWithBarcode(['barcode' => 'BARCODE-UNIQUE-123']);
-        makeVariantWithBarcode(['ean' => 'EAN-UNIQUE-456']);
-        makeVariantWithBarcode(['upc' => 'UPC-UNIQUE-789']);
+        makeVariantWithBarcode(['ean' => 'EAN-UNQ-456']);
+        makeVariantWithBarcode(['upc' => 'UPC-UNQ-789']);
 
         $this->assertDatabaseHas('product_variants', ['barcode' => 'BARCODE-UNIQUE-123']);
-        $this->assertDatabaseHas('product_variants', ['ean' => 'EAN-UNIQUE-456']);
-        $this->assertDatabaseHas('product_variants', ['upc' => 'UPC-UNIQUE-789']);
+        $this->assertDatabaseHas('product_variants', ['ean' => 'EAN-UNQ-456']);
+        $this->assertDatabaseHas('product_variants', ['upc' => 'UPC-UNQ-789']);
     });
 
     it('can update variant barcode fields', function (): void {
