@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\BlogPostStatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,7 +20,7 @@ return new class extends Migration
             $table->text('excerpt')->nullable();
             $table->longText('content');
             $table->enum('content_type', ['richtext', 'markdown'])->default('richtext');
-            $table->enum('status', ['draft', 'published', 'archived'])->default('draft');
+            $table->enum('status', array_column(BlogPostStatusEnum::cases(), 'value'))->default(BlogPostStatusEnum::Draft->value);
             $table->string('featured_image')->nullable();
             $table->json('tags')->nullable();
             $table->json('available_locales')->nullable();
