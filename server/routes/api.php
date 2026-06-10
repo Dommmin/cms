@@ -78,7 +78,7 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
 
     // ── Public ───────────────────────────────────────────────────────────────
     Route::middleware('throttle:api.public')->group(function (): void {
-        Route::get('locales', new ApiLocaleController()->index(...))->name('locales.index');
+        Route::get('locales', [ApiLocaleController::class, 'index'])->name('locales.index');
         Route::get('translations/{locale}', [TranslationController::class, 'show'])->name('translations.show');
         Route::get('pages/system/{systemPageKey}', [PageController::class, 'showBySystemPageKey'])->name('pages.system.show');
         Route::get('pages/{slug}', [PageController::class, 'show'])->where('slug', '.*')->name('pages.show');
@@ -86,22 +86,22 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::get('settings/public', [ProfileController::class, 'publicSettings'])->name('settings.public');
         Route::get('storefront/routes', [StorefrontRouteController::class, 'index'])->name('storefront.routes');
         Route::get('faqs', [FaqController::class, 'index'])->name('faqs.index');
-        Route::get('stores', new ApiStoreController()->index(...))->name('stores.index');
-        Route::get('stores/{store}', new ApiStoreController()->show(...))->name('stores.show');
+        Route::get('stores', [ApiStoreController::class, 'index'])->name('stores.index');
+        Route::get('stores/{store}', [ApiStoreController::class, 'show'])->name('stores.show');
 
         // Blogs (containers)
-        Route::get('blogs', new ApiBlogController()->index(...))->name('blogs.index');
-        Route::get('blogs/{slug}', new ApiBlogController()->show(...))->name('blogs.show');
-        Route::get('blogs/{slug}/posts', new ApiBlogController()->posts(...))->name('blogs.posts');
+        Route::get('blogs', [ApiBlogController::class, 'index'])->name('blogs.index');
+        Route::get('blogs/{slug}', [ApiBlogController::class, 'show'])->name('blogs.show');
+        Route::get('blogs/{slug}/posts', [ApiBlogController::class, 'posts'])->name('blogs.posts');
 
         // Blog
         Route::prefix('blog')->name('blog.')->group(function (): void {
-            Route::get('posts', new ApiBlogPostController()->index(...))->name('posts.index');
-            Route::get('posts/{slug}', new ApiBlogPostController()->show(...))->name('posts.show');
-            Route::post('posts/{slug}/view', new ApiBlogPostController()->recordView(...))->name('posts.view');
-            Route::get('posts/{slug}/comments', new ApiBlogCommentController()->index(...))->name('posts.comments.index');
-            Route::get('categories', new ApiBlogCategoryController()->index(...))->name('categories.index');
-            Route::get('categories/{slug}/posts', new ApiBlogPostController()->byCategory(...))->name('categories.posts');
+            Route::get('posts', [ApiBlogPostController::class, 'index'])->name('posts.index');
+            Route::get('posts/{slug}', [ApiBlogPostController::class, 'show'])->name('posts.show');
+            Route::post('posts/{slug}/view', [ApiBlogPostController::class, 'recordView'])->name('posts.view');
+            Route::get('posts/{slug}/comments', [ApiBlogCommentController::class, 'index'])->name('posts.comments.index');
+            Route::get('categories', [ApiBlogCategoryController::class, 'index'])->name('categories.index');
+            Route::get('categories/{slug}/posts', [ApiBlogPostController::class, 'byCategory'])->name('categories.posts');
         });
 
         Route::post('forms/{id}/submit', [FormController::class, 'submit'])->name('forms.submit');
@@ -111,7 +111,7 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
 
         Route::post('analytics/events', [AnalyticsEventController::class, 'store'])->name('analytics.events.store');
 
-        Route::get('metafields/{type}/{id}', new ApiMetafieldController()->forResource(...))->name('metafields.for-resource');
+        Route::get('metafields/{type}/{id}', [ApiMetafieldController::class, 'forResource'])->name('metafields.for-resource');
         Route::get('tags', [TagController::class, 'index'])->name('tags.index');
     });
 
@@ -135,8 +135,8 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::post('addresses/{address}/default', [AddressController::class, 'setDefault'])->name('addresses.default');
 
         // Blog comments + votes (auth required)
-        Route::post('blog/posts/{slug}/comments', new ApiBlogCommentController()->store(...))->name('blog.posts.comments.store');
-        Route::post('blog/posts/{slug}/vote', new ApiBlogPostController()->vote(...))->name('blog.posts.vote');
+        Route::post('blog/posts/{slug}/comments', [ApiBlogCommentController::class, 'store'])->name('blog.posts.comments.store');
+        Route::post('blog/posts/{slug}/vote', [ApiBlogPostController::class, 'vote'])->name('blog.posts.vote');
 
         // Notification center (in-app notifications)
         Route::prefix('notifications')->name('notifications.')->group(function (): void {

@@ -35,14 +35,14 @@ Route::prefix('ecommerce')->name('ecommerce.')->group(function (): void {
         ->except(['show'])
         ->names(['create' => 'ecommerce.products.create', 'edit' => 'ecommerce.products.edit']);
     Route::get('products/{product}', fn (Product $product) => to_route('admin.ecommerce.ecommerce.products.edit', $product));
-    Route::get('orders/export', new AdminOrderController()->export(...))->name('orders.export');
-    Route::post('orders/bulk-update-status', new AdminOrderController()->bulkUpdateStatus(...))->name('orders.bulk-update-status');
-    Route::get('orders/{order}/invoice', new AdminOrderController()->invoice(...))->name('orders.invoice');
+    Route::get('orders/export', [AdminOrderController::class, 'export'])->name('orders.export');
+    Route::post('orders/bulk-update-status', [AdminOrderController::class, 'bulkUpdateStatus'])->name('orders.bulk-update-status');
+    Route::get('orders/{order}/invoice', [AdminOrderController::class, 'invoice'])->name('orders.invoice');
     Route::resource('orders', AdminOrderController::class)
         ->only(['index', 'show'])
         ->names(['create' => 'ecommerce.orders.create', 'edit' => 'ecommerce.orders.edit']);
-    Route::patch('orders/{order}/status', new AdminOrderController()->updateStatus(...))->name('orders.update-status');
-    Route::post('orders/{order}/shipments', new AdminOrderController()->createShipment(...))->name('orders.shipments.store');
+    Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
+    Route::post('orders/{order}/shipments', [AdminOrderController::class, 'createShipment'])->name('orders.shipments.store');
     // Draft orders — admin creates order on behalf of customer
     Route::get('orders/create-draft', [AdminOrderCreateController::class, 'create'])->name('orders.create-draft');
     Route::post('orders/create-draft', [AdminOrderCreateController::class, 'store'])->name('orders.store-draft');
