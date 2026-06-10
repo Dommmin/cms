@@ -152,7 +152,7 @@ jobs:
       
       - name: Restore to Test Database
         run: |
-          mysql -u test_user -p$TEST_DB_PASSWORD test_cms < latest.sql.gz
+          gunzip -c latest.sql.gz | mysql -u test_user -p$TEST_DB_PASSWORD test_cms
           
       - name: Verify Data Integrity
         run: |

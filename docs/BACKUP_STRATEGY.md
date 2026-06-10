@@ -9,7 +9,7 @@
 ## Overview
 
 This document describes the backup strategy for:
-- **Database:** PostgreSQL (primary data store)
+- **Database:** MySQL (primary data store)
 - **Media files:** S3-compatible storage (product images, documents, etc.)
 
 ---
@@ -21,7 +21,7 @@ This document describes the backup strategy for:
 | Type | Frequency | Retention | Storage Location |
 |------|-----------|-----------|------------------|
 | **Full backup** | Daily at 02:00 UTC | 30 days | S3 bucket `backups-db/` |
-| **Point-in-time recovery (PITR)** | Continuous (WAL archives) | 7 days | S3 bucket `backups-wal/` |
+| **Point-in-time recovery (PITR)** | Continuous (binary logs / binlogs) | 7 days | S3 bucket `backups-binlog/` |
 | **On-demand backup** | Manual (before major changes) | 90 days | S3 bucket `backups-manual/` |
 
 ### 1.2 Automated Daily Backups
@@ -33,31 +33,57 @@ This document describes the backup strategy for:
 set -euo pipefail
 
 # Configuration
-DB_HOST="${DB_HOST:-postgres}"
-DB_PORT="${DB_PORT:-5432}"
-DB_NAME="${DB_NAME:-laravel}"
-DB_USER="${DB_USER:-laravel}"
+DB_HOST="${DB_HOST:-mysql}"
+DB_PORT="${DB_PORT:-3306}"
+DB_NAME="${DB_NAME:-cms}"
+DB_USER="${DB_USER:-root}"
+DB_PASSWORD="${DB_PASSWORD:-secret}"
 S3_BUCKET="${S3_BACKUP_BUCKET:-myapp-backups}"
 S3_PREFIX="backups-db"
 DATE=$(date +%Y%m%d_%H%M%S)
 BACKUP_FILE="/tmp/db_backup_${DATE}.sql.gz"
 
+# Resolve status file path relative to Laravel root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+APP_ROOT="$(dirname "$SCRIPT_DIR")"
+STATUS_FILE="${APP_ROOT}/storage/app/private/backup-status.json"
+
+# Function to handle errors
+error_handler() {
+    log "ERROR: Backup failed!"
+    rm -f "$BACKUP_FILE"
+    mkdir -p "$(dirname "$STATUS_FILE")"
+    echo "{\"last_backup_time\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"status\": \"failed\", \"size\": 0}" > "$STATUS_FILE"
+    exit 1
+}
+trap error_handler ERR
+
 # Create backup
 echo "Creating database backup..."
-pg_dump -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" | gzip > "$BACKUP_FILE"
+mysqldump -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" \
+    --single-transaction --routines --triggers --databases "$DB_NAME" \
+    | gzip > "$BACKUP_FILE"
+
+# Check size
+BACKUP_SIZE=$(stat -f%z "$BACKUP_FILE" 2>/dev/null || stat -c%s "$BACKUP_FILE")
 
 # Upload to S3
 echo "Uploading to S3..."
 aws s3 cp "$BACKUP_FILE" "s3://${S3_BUCKET}/${S3_PREFIX}/db_backup_${DATE}.sql.gz" \
   --storage-class STANDARD_IA \
-  --metadata "type=daily,created=${DATE}"
+  --metadata "type=daily,created=${DATE},size=${BACKUP_SIZE}"
 
 # Cleanup local file
 rm -f "$BACKUP_FILE"
 
+# Write success to status file
+mkdir -p "$(dirname "$STATUS_FILE")"
+echo "{\"last_backup_time\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"status\": \"success\", \"size\": $BACKUP_SIZE}" > "$STATUS_FILE"
+
 # Cleanup old backups (keep last 30 days)
 echo "Cleaning up old backups..."
 aws s3 ls "s3://${S3_BUCKET}/${S3_PREFIX}/" | \
+  grep "db_backup_" | \
   awk '{print $4}' | \
   sort | \
   head -n -30 | \
@@ -71,19 +97,19 @@ echo "Backup completed successfully!"
 ### 1.3 Point-in-Time Recovery (PITR)
 
 **Requirements:**
-- PostgreSQL WAL archiving enabled
-- `archive_mode = on` in `postgresql.conf`
-- `archive_command` configured to upload WAL files to S3
+- MySQL binary logging (binlog) enabled
+- `log-bin` configured in `my.cnf`
+- Periodically ship binlogs to S3 bucket `backups-binlog/`
 
-**PostgreSQL Configuration:**
+**MySQL Configuration:**
 
-```conf
-# postgresql.conf
-wal_level = replica
-archive_mode = on
-archive_command = 'aws s3 cp %p s3://myapp-backups/backups-wal/%f'
-max_wal_senders = 3
-wal_keep_size = 1GB
+```ini
+# my.cnf
+[mysqld]
+log-bin = mysql-bin
+binlog-format = ROW
+expire_logs_days = 7
+max_binlog_size = 100M
 ```
 
 ### 1.4 Backup Schedule (Cron)
@@ -108,20 +134,24 @@ set -euo pipefail
 
 # Download latest backup
 LATEST_BACKUP=$(aws s3 ls "s3://${S3_BUCKET}/backups-db/" | \
-  awk '{print $4}' | sort | tail -n 1)
+  awk '{print $4}' | sort -r | head -n 1)
 
-aws s3 cp "s3://${S3_BUCKET}/backups-db/${LATEST_BACKUP}" /tmp/test_backup.sql.gz
+aws s3 cp "s3://${S3_BUCKET}/backups-db/${LATEST_BACKUP}" /tmp/${LATEST_BACKUP}
 
 # Restore to test database (temporary)
-gunzip -c /tmp/test_backup.sql.gz | \
-  psql -h localhost -U laravel -d laravel_test
+mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" -e "DROP DATABASE IF EXISTS test_db; CREATE DATABASE test_db;"
+gunzip -c "/tmp/${LATEST_BACKUP}" | mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" test_db
 
 # Verify integrity (check critical tables)
-psql -h localhost -U laravel -d laravel_test -c \
-  "SELECT COUNT(*) FROM users; SELECT COUNT(*) FROM products; SELECT COUNT(*) FROM orders;"
+CRITICAL_TABLES=("users" "products" "orders" "customers" "categories")
+for table in "${CRITICAL_TABLES[@]}"; do
+    COUNT=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" -N -B test_db -e "SELECT COUNT(*) FROM ${table};")
+    echo "Table ${table}: ${COUNT} rows"
+done
 
 # Cleanup
-rm -f /tmp/test_backup.sql.gz
+mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" -e "DROP DATABASE IF EXISTS test_db;"
+rm -f "/tmp/${LATEST_BACKUP}"
 
 echo "Backup verification completed successfully!"
 ```
@@ -200,20 +230,20 @@ docker compose down
 
 # Restore database
 gunzip -c /tmp/db_backup_20260403.sql.gz | \
-  psql -h postgres -U laravel -d laravel
+  mysql -h mysql -u root -psecret cms
 
 # Start app servers
 docker compose up -d
 ```
 
-**Point-in-Time Recovery:**
+**Point-in-Time Recovery (PITR):**
 
 ```bash
-# 1. Restore base backup
-pg_restore -h postgres -U laravel -d laravel_base /path/to/base_backup
+# 1. Restore the closest full backup
+gunzip -c /tmp/db_backup_base.sql.gz | mysql -h mysql -u root -psecret cms
 
-# 2. Replay WAL files up to target time
-pg_wal_replay --target-time="2026-04-03 14:30:00"
+# 2. Replay binlogs up to target time
+mysqlbinlog --stop-datetime="2026-04-03 14:30:00" /var/lib/mysql/mysql-bin.[0-9]* | mysql -h mysql -u root -psecret cms
 ```
 
 ### 3.2 Media Recovery
@@ -248,15 +278,15 @@ Add to `spatie/laravel-health` checks:
 // config/health.php
 use Spatie\Health\Facades\Health;
 use Spatie\Health\Checks\Checks\DatabaseCheck;
-use Spatie\Health\Checks\Checks\S3MediaCheck;
+use App\Health\BackupStatusCheck;
 
 Health::checks([
     DatabaseCheck::new()
-        ->connection('pgsql')
+        ->connection('mysql')
         ->label('Database Health'),
         
     // Custom check for backup status
-    \App\Health\BackupStatusCheck::new(),
+    BackupStatusCheck::new(),
 ]);
 ```
 
@@ -271,6 +301,8 @@ declare(strict_types=1);
 
 namespace App\Health;
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Spatie\Health\Checks\Check;
 use Spatie\Health\Checks\Result;
 
@@ -278,8 +310,19 @@ class BackupStatusCheck extends Check
 {
     public function run(): Result
     {
-        $lastBackup = $this->getLastBackupTime();
+        $statusData = $this->getBackupStatus();
+
+        if ($statusData === null) {
+            return Result::failed('No backup status record found.');
+        }
+
+        $lastBackup = Carbon::parse($statusData['last_backup_time']);
         $hoursSinceBackup = now()->diffInHours($lastBackup);
+        $status = $statusData['status'] ?? 'unknown';
+
+        if ($status === 'failed') {
+            return Result::failed("The last backup attempted on {$lastBackup->toDateTimeString()} UTC failed.");
+        }
 
         if ($hoursSinceBackup > 26) {
             return Result::failed("Last backup was {$hoursSinceBackup} hours ago");
@@ -289,13 +332,20 @@ class BackupStatusCheck extends Check
             return Result::warning("Last backup was {$hoursSinceBackup} hours ago");
         }
 
-        return Result::ok("Last backup was {$hoursSinceBackup} hours ago");
+        $sizeMb = isset($statusData['size']) ? round($statusData['size'] / 1024 / 1024, 2) : 0;
+        return Result::ok("Last backup was {$hoursSinceBackup} hours ago (Size: {$sizeMb} MB)");
     }
 
-    protected function getLastBackupTime(): \Carbon\Carbon
+    protected function getBackupStatus(): ?array
     {
-        // Check S3 for latest backup file metadata
-        // Or read from database/cache backup log
+        $filePath = storage_path('app/private/backup-status.json');
+        if (file_exists($filePath)) {
+            $content = file_get_contents($filePath);
+            if ($content) {
+                return json_decode($content, true);
+            }
+        }
+        return Cache::get('database_backup:last_status');
     }
 }
 ```
@@ -314,7 +364,7 @@ Configure Sentry alertsfor:
 ### 5.1 Encryption at Rest
 
 - **Database backups:** Encrypted via S3 SSE-S3 or SSE-KMS
-- **WAL archives:** Encrypted via S3 SSE-KMS
+- **Binary logs (binlogs):** Encrypted via S3 SSE-KMS (or locally at rest)
 - **Media files:** Encrypted via S3 SSE-S3
 
 ### 5.2 Access Control
@@ -339,11 +389,11 @@ aws s3api put-bucket-replication \
 
 ## 6. Implementation Checklist
 
-- [ ] Create S3 backup buckets (`myapp-backups`, `myapp-backups-wal`)
+- [ ] Create S3 backup buckets (`myapp-backups`, `myapp-backups-binlog`)
 - [ ] Create IAM user for backup scripts with minimal permissions
 - [ ] Create backup scripts (`backup-database.sh`, `backup-s3-media.sh`, `verify-backup.sh`)
 - [ ] Set up cron jobs for automated backups
-- [ ] Enable PostgreSQL WAL archiving
+- [ ] Enable MySQL binary logging (binlog)
 - [ ] Enable S3 versioning on media bucket
 - [ ] Configure `spatie/laravel-health` backup check
 - [ ] Test backup restore procedure (document recovery time)
@@ -368,7 +418,7 @@ aws s3api put-bucket-replication \
 | Item | Monthly Cost (Estimated) |
 |------|--------------------------|
 | DB backups (30 days, 10GB/day) | ~$3 |
-| WAL archives (7 days, 1GB/day) | ~$0.20 |
+| Binary logs (7 days, 1GB/day) | ~$0.20 |
 | Media backups (S3 STANDARD_IA) | ~$0.01/GB |
 | S3 versioning overhead | ~$0.05/GB |
 | **Total (for 100GB media)** | ~$5-10/month |
@@ -377,6 +427,6 @@ aws s3api put-bucket-replication \
 
 ## References
 
-- [PostgreSQL Backup & Recovery](https://www.postgresql.org/docs/current/backup.html)
+- [MySQL Backup & Recovery](https://dev.mysql.com/doc/refman/8.0/en/backup-and-recovery.html)
 - [AWS S3 Cross-Region Replication](https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html)
 - [Spatie Laravel Health](https://spatie.be/docs/laravel-health)
