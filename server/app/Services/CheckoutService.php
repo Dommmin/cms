@@ -94,7 +94,7 @@ class CheckoutService
         $subtotalAfterDiscount = max(0, $subtotal - $discountAmount);
 
         $resolvedCustomerType = $customerType ?? 'individual';
-        $isExempt = $customer?->is_tax_exempt ?? false;
+        $isExempt = $customer instanceof Customer && $customer->is_tax_exempt;
 
         if ($customer && $resolvedCustomerType === 'business') {
             $customer->update([
