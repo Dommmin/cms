@@ -36,6 +36,7 @@ class MailerLiteWebhookController extends ApiController
                     if (! is_string($email)) {
                         continue;
                     }
+
                     if ($email === '') {
                         continue;
                     }
