@@ -56,7 +56,7 @@ class TranslationController extends Controller
 
         Cache::forget('translations.'.$data['locale_code']);
 
-        return back()->with('success', 'Translation created');
+        return back()->with('success', 'misc.translation_created');
     }
 
     public function update(UpdateTranslationRequest $request, Translation $translation): RedirectResponse
@@ -65,14 +65,14 @@ class TranslationController extends Controller
 
         Cache::forget('translations.'.$translation->locale_code);
 
-        return back()->with('success', 'Translation updated');
+        return back()->with('success', 'misc.translation_updated');
     }
 
     public function sync(): RedirectResponse
     {
         Artisan::call('translations:sync');
 
-        return back()->with('success', 'Translations synced from frontend files');
+        return back()->with('success', 'misc.translations_synced');
     }
 
     public function destroy(Translation $translation): RedirectResponse
@@ -82,6 +82,6 @@ class TranslationController extends Controller
 
         Cache::forget('translations.'.$localeCode);
 
-        return back()->with('success', 'Translation deleted');
+        return back()->with('success', 'misc.translation_deleted');
     }
 }

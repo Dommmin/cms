@@ -71,7 +71,7 @@ class SettingsController extends Controller
             cache()->forget($key);
         }
 
-        return back()->with('success', 'Settings saved');
+        return back()->with('success', 'settings.saved');
     }
 
     public function testMail(TestMailRequest $request): JsonResponse

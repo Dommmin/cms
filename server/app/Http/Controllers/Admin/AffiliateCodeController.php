@@ -50,7 +50,7 @@ class AffiliateCodeController extends Controller
     {
         AffiliateCode::query()->create($request->validated());
 
-        return to_route('admin.affiliates.codes.index')->with('success', 'Affiliate code created successfully.');
+        return to_route('admin.affiliates.codes.index')->with('success', 'misc.affiliate_code_created');
     }
 
     public function edit(AffiliateCode $code): Response
@@ -67,20 +67,20 @@ class AffiliateCodeController extends Controller
     {
         $code->update($request->validated());
 
-        return back()->with('success', 'Affiliate code updated successfully.');
+        return back()->with('success', 'misc.affiliate_code_updated');
     }
 
     public function destroy(AffiliateCode $code): RedirectResponse
     {
         $code->delete();
 
-        return back()->with('success', 'Affiliate code deleted.');
+        return back()->with('success', 'misc.affiliate_code_deleted');
     }
 
     public function toggleActive(AffiliateCode $code): RedirectResponse
     {
         $code->update(['is_active' => ! $code->is_active]);
 
-        return back()->with('success', $code->is_active ? 'Code activated.' : 'Code deactivated.');
+        return back()->with('success', $code->is_active ? 'misc.code_activated' : 'misc.code_deactivated');
     }
 }
