@@ -38,6 +38,7 @@ Rules every AI tool (Claude Code, Codex, Gemini, Copilot, Cursor, Junie, Cline, 
 - **NEVER** add comments that describe WHAT the code does — only non-obvious WHY
 - **NEVER** create branches, commits, or pushes without explicit user consent
 - **NEVER** stage unrelated or auto-generated files (Wayfinder output, other people's work)
+- **NEVER** return hardcoded English strings for success or error flash redirects in backend controllers. ALWAYS return translation keys (e.g., `'settings.saved'`, `'misc.category_created'`) to allow automatic localization on the frontend.
 
 ---
 
