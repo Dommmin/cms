@@ -40,7 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(TrustCloudflareProxies::class);
         $middleware->prepend(SecurityHeaders::class);
 
-        $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+        $middleware->encryptCookies(except: ['appearance', 'sidebar_state', 'admin_locale']);
 
         $middleware->web(append: [
             SetLocale::class,
