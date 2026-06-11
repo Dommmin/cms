@@ -29,6 +29,10 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
     const { t } = useTranslation();
     const lp = useLocalePath();
     const firstVariantId = product.variants?.[0]?.id ?? 0;
+    const defaultVariant = product.variants?.[0];
+    const isPurchasable =
+        !!defaultVariant &&
+        (defaultVariant.is_available || defaultVariant.backorder_allowed);
     const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
     const cardRef = useRef<HTMLDivElement>(null);
 
@@ -80,6 +84,7 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
     return (
         <div
             ref={cardRef}
+            data-testid="product-card"
             className="group border-border bg-card flex flex-col overflow-hidden rounded-[var(--store-card-radius)] border transition-all duration-300 ease-out hover:shadow-[var(--store-shadow-lifted)]"
         >
             <Link
@@ -192,33 +197,47 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
                 </div>
             </Link>
             <div className="px-4 pb-4">
-                <button
-                    onClick={(e) => {
-                        e.preventDefault();
-                        if (!firstVariantId) return;
-                        addToCart(
-                            { variant_id: firstVariantId, quantity: 1 },
-                            {
-                                onSuccess: () =>
-                                    toast.success(
-                                        t(
-                                            'product.added_to_cart',
-                                            'Added to cart!',
+                {!isPurchasable && product.is_active ? (
+                    <Link
+                        href={lp(resolveProductPath(product))}
+                        className="bg-secondary text-secondary-foreground border-input flex min-h-11 w-full items-center justify-center gap-2 rounded-[var(--store-control-radius)] border px-4 text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98]"
+                    >
+                        {t(
+                            'product.notify_when_available',
+                            'Notify when available',
+                        )}
+                    </Link>
+                ) : (
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            if (!firstVariantId) return;
+                            addToCart(
+                                { variant_id: firstVariantId, quantity: 1 },
+                                {
+                                    onSuccess: () =>
+                                        toast.success(
+                                            t(
+                                                'product.added_to_cart',
+                                                'Added to cart!',
+                                            ),
                                         ),
-                                    ),
-                            },
-                        );
-                    }}
-                    disabled={
-                        !product.is_active || !firstVariantId || isAddingToCart
-                    }
-                    className="bg-primary text-primary-foreground flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-[var(--store-control-radius)] px-4 text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
-                >
-                    <ShoppingCart className="h-4 w-4" />
-                    {isAddingToCart
-                        ? t('product.adding', 'Adding…')
-                        : t('product.add_to_cart', 'Add to Cart')}
-                </button>
+                                },
+                            );
+                        }}
+                        disabled={
+                            !product.is_active ||
+                            !firstVariantId ||
+                            isAddingToCart
+                        }
+                        className="bg-primary text-primary-foreground flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-[var(--store-control-radius)] px-4 text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
+                    >
+                        <ShoppingCart className="h-4 w-4" />
+                        {isAddingToCart
+                            ? t('product.adding', 'Adding…')
+                            : t('product.add_to_cart', 'Add to Cart')}
+                    </button>
+                )}
             </div>
         </div>
     );

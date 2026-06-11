@@ -1,6 +1,8 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
+import { toast } from 'react-toastify';
 
 import {
     addCartItem,
@@ -11,6 +13,7 @@ import {
     removeDiscount,
     updateCartItem,
 } from '@/api/cart';
+import { useTranslation } from '@/hooks/use-translation';
 import { trackAddToCart, trackRemoveFromCart } from '@/lib/datalayer';
 
 export const cartKeys = {
@@ -27,6 +30,7 @@ export function useCart() {
 
 export function useAddToCart() {
     const queryClient = useQueryClient();
+    const { t } = useTranslation();
 
     return useMutation({
         mutationFn: addCartItem,
@@ -46,17 +50,58 @@ export function useAddToCart() {
                 });
             }
         },
+        onError: (error: unknown) => {
+            const status = isAxiosError(error)
+                ? error.response?.status
+                : undefined;
+            if (status === 422) {
+                toast.error(
+                    t(
+                        'cart.add_stock_error',
+                        'Product is currently unavailable in the requested quantity.',
+                    ),
+                );
+            } else {
+                toast.error(
+                    t(
+                        'cart.add_error_generic',
+                        'Could not add product to cart. Please try again.',
+                    ),
+                );
+            }
+        },
     });
 }
 
 export function useUpdateCartItem() {
     const queryClient = useQueryClient();
+    const { t } = useTranslation();
 
     return useMutation({
         mutationFn: ({ id, quantity }: { id: number; quantity: number }) =>
             updateCartItem(id, quantity),
         onSuccess: (cart) => {
             queryClient.setQueryData(cartKeys.cart, cart);
+        },
+        onError: (error: unknown) => {
+            const status = isAxiosError(error)
+                ? error.response?.status
+                : undefined;
+            if (status === 422) {
+                toast.error(
+                    t(
+                        'cart.add_stock_error',
+                        'Product is currently unavailable in the requested quantity.',
+                    ),
+                );
+            } else {
+                toast.error(
+                    t(
+                        'cart.update_error_generic',
+                        'Could not update cart quantity.',
+                    ),
+                );
+            }
         },
     });
 }

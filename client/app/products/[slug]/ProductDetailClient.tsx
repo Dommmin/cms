@@ -350,6 +350,7 @@ export default function ProductDetailClient({
                     onShare={handleShare}
                     onSelectAttribute={selectVariantAttribute}
                     isAttributeValueSelectable={isAttributeValueSelectable}
+                    userEmail={user?.email}
                     labels={{
                         selectVariant: t(
                             'product.select_variant',
@@ -385,6 +386,26 @@ export default function ProductDetailClient({
                         ),
                         inStock: t('product.in_stock', 'In stock'),
                         unavailable: t('product.unavailable', 'Unavailable'),
+                        notifyWhenAvailable: t(
+                            'product.notify_when_available',
+                            'Przypomnij jak będzie dostępny',
+                        ),
+                        notifyEmailPlaceholder: t(
+                            'product.notify_email_placeholder',
+                            'Wpisz swój adres e-mail',
+                        ),
+                        notifySubmit: t(
+                            'product.notify_submit',
+                            'Powiadom mnie',
+                        ),
+                        notifySuccess: t(
+                            'product.notify_success',
+                            'Zostaniesz powiadomiony, gdy produkt pojawi się na stanie!',
+                        ),
+                        notifyAlreadySubscribed: t(
+                            'product.notify_already_subscribed',
+                            'Już zapisałeś się na powiadomienia o tym produkcie.',
+                        ),
                     }}
                 />
             </div>

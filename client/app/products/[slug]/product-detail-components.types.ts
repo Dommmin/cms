@@ -57,6 +57,7 @@ export interface ProductBuyBoxProps {
         attributeName: string,
         value: string,
     ) => boolean;
+    userEmail?: string;
     labels: {
         selectVariant: string;
         quantity: string;
@@ -74,6 +75,11 @@ export interface ProductBuyBoxProps {
         returnsHint: string;
         inStock: string;
         unavailable: string;
+        notifyWhenAvailable: string;
+        notifyEmailPlaceholder: string;
+        notifySubmit: string;
+        notifySuccess: string;
+        notifyAlreadySubscribed: string;
     };
 }
 

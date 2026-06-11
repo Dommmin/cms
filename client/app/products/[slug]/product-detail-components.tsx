@@ -4,6 +4,9 @@ import { Share2, ShoppingCart, Star, ThumbsUp, Truck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
+
+import { useSubscribeStock } from '@/hooks/use-products';
 
 import { CompareButton } from '@/components/compare-button';
 import { LiveViewers } from '@/components/live-viewers';
@@ -223,8 +226,52 @@ export function ProductBuyBox({
     onShare,
     onSelectAttribute,
     isAttributeValueSelectable,
+    userEmail,
     labels,
 }: ProductBuyBoxProps) {
+    const [email, setEmail] = useState(userEmail || '');
+    const [prevUserEmail, setPrevUserEmail] = useState(userEmail);
+    const [isSubscribed, setIsSubscribed] = useState(false);
+    const { mutate: subscribeStock, isPending: isSubscribing } =
+        useSubscribeStock();
+
+    if (userEmail !== prevUserEmail) {
+        setPrevUserEmail(userEmail);
+        setEmail(userEmail || '');
+    }
+
+    const isOutOfStock = selectedVariant
+        ? selectedVariant.stock_quantity <= 0 &&
+          !selectedVariant.backorder_allowed
+        : true;
+
+    function handleSubscribe(e: React.FormEvent) {
+        e.preventDefault();
+        const variantId = selectedVariant?.id ?? product.variants?.[0]?.id;
+        if (!variantId) {
+            toast.error('No variant selected');
+            return;
+        }
+
+        subscribeStock(
+            { variantId, email },
+            {
+                onSuccess: (response) => {
+                    const res = response as { status: string };
+                    if (res.status === 'already_subscribed') {
+                        toast.info(labels.notifyAlreadySubscribed);
+                    } else {
+                        toast.success(labels.notifySuccess);
+                        setIsSubscribed(true);
+                    }
+                },
+                onError: () => {
+                    toast.error('Something went wrong. Please try again.');
+                },
+            },
+        );
+    }
+
     return (
         <div>
             {product.brand && (
@@ -277,42 +324,81 @@ export function ProductBuyBox({
                 selectVariantLabel={labels.selectVariant}
             />
 
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-                <span className="text-sm font-medium">{labels.quantity}</span>
-                <div className="border-border flex min-h-11 items-center rounded-[var(--store-control-radius)] border">
-                    <button
-                        type="button"
-                        onClick={() =>
-                            onQuantityChange((value) => Math.max(1, value - 1))
-                        }
-                        className="text-muted-foreground hover:text-foreground h-11 px-3 text-lg leading-none"
-                        aria-label={labels.decreaseQuantity}
-                    >
-                        -
-                    </button>
-                    <span className="min-w-[2.5rem] text-center text-sm font-semibold">
-                        {quantity}
-                    </span>
-                    <button
-                        type="button"
-                        onClick={() => onQuantityChange((value) => value + 1)}
-                        className="text-muted-foreground hover:text-foreground h-11 px-3 text-lg leading-none"
-                        aria-label={labels.increaseQuantity}
-                    >
-                        +
-                    </button>
+            {isOutOfStock ? (
+                <div className="border-border bg-card mt-6 rounded-[var(--store-card-radius)] border p-5 shadow-[var(--store-shadow-soft)]">
+                    <p className="mb-2 text-sm font-semibold">
+                        {labels.notifyWhenAvailable}
+                    </p>
+                    {isSubscribed ? (
+                        <p className="text-sm font-medium text-green-600">
+                            {labels.notifySuccess}
+                        </p>
+                    ) : (
+                        <form onSubmit={handleSubscribe} className="flex gap-2">
+                            <input
+                                type="email"
+                                required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder={labels.notifyEmailPlaceholder}
+                                className="border-input bg-background focus:ring-ring min-h-11 flex-1 rounded-[var(--store-control-radius)] border px-4 text-sm focus:ring-2 focus:outline-none"
+                            />
+                            <button
+                                type="submit"
+                                disabled={isSubscribing}
+                                className="bg-primary text-primary-foreground min-h-11 rounded-[var(--store-control-radius)] px-5 text-sm font-semibold hover:opacity-90 disabled:opacity-50"
+                            >
+                                {isSubscribing ? '...' : labels.notifySubmit}
+                            </button>
+                        </form>
+                    )}
                 </div>
-            </div>
+            ) : (
+                <>
+                    <div className="mt-6 flex flex-wrap items-center gap-3">
+                        <span className="text-sm font-medium">
+                            {labels.quantity}
+                        </span>
+                        <div className="border-border flex min-h-11 items-center rounded-[var(--store-control-radius)] border">
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    onQuantityChange((value) =>
+                                        Math.max(1, value - 1),
+                                    )
+                                }
+                                className="text-muted-foreground hover:text-foreground h-11 px-3 text-lg leading-none"
+                                aria-label={labels.decreaseQuantity}
+                            >
+                                -
+                            </button>
+                            <span className="min-w-[2.5rem] text-center text-sm font-semibold">
+                                {quantity}
+                            </span>
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    onQuantityChange((value) => value + 1)
+                                }
+                                className="text-muted-foreground hover:text-foreground h-11 px-3 text-lg leading-none"
+                                aria-label={labels.increaseQuantity}
+                            >
+                                +
+                            </button>
+                        </div>
+                    </div>
 
-            <button
-                onClick={onAddToCart}
-                disabled={isPending || !product.is_active}
-                aria-busy={isPending}
-                className="bg-primary text-primary-foreground mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-[var(--store-control-radius)] px-6 font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
-            >
-                <ShoppingCart className="h-5 w-5" aria-hidden="true" />
-                {isPending ? labels.adding : labels.addToCart}
-            </button>
+                    <button
+                        onClick={onAddToCart}
+                        disabled={isPending || !product.is_active}
+                        aria-busy={isPending}
+                        className="bg-primary text-primary-foreground mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-[var(--store-control-radius)] px-6 font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
+                    >
+                        <ShoppingCart className="h-5 w-5" aria-hidden="true" />
+                        {isPending ? labels.adding : labels.addToCart}
+                    </button>
+                </>
+            )}
 
             <div className="mt-3 flex gap-2">
                 <CompareButton

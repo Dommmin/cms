@@ -25,6 +25,10 @@ export function ProductListItem({
     const { t } = useTranslation();
     const lp = useLocalePath();
     const firstVariantId = product.variants?.[0]?.id ?? 0;
+    const defaultVariant = product.variants?.[0];
+    const isPurchasable =
+        !!defaultVariant &&
+        (defaultVariant.is_available || defaultVariant.backorder_allowed);
     const { mutate: addToCart, isPending } = useAddToCart();
     const inWishlist = useIsInWishlist(firstVariantId);
     const { mutate: addToWishlist } = useAddToWishlist();
@@ -46,7 +50,10 @@ export function ProductListItem({
     }
 
     return (
-        <div className="border-border bg-card flex flex-col gap-4 rounded-xl border p-4 transition-shadow hover:shadow-md sm:flex-row sm:gap-6">
+        <div
+            data-testid="product-card"
+            className="border-border bg-card flex flex-col gap-4 rounded-xl border p-4 transition-shadow hover:shadow-md sm:flex-row sm:gap-6"
+        >
             {/* Thumbnail */}
             <Link
                 href={lp(resolveProductPath(product))}
@@ -134,46 +141,73 @@ export function ProductListItem({
                     {/* Availability */}
                     <span
                         className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
-                            product.is_active
-                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                : 'bg-muted text-muted-foreground'
+                            !product.is_active
+                                ? 'bg-muted text-muted-foreground'
+                                : isPurchasable
+                                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                  : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                         }`}
                     >
                         <span
-                            className={`h-1.5 w-1.5 rounded-full ${product.is_active ? 'bg-green-500' : 'bg-muted-foreground'}`}
+                            className={`h-1.5 w-1.5 rounded-full ${
+                                !product.is_active
+                                    ? 'bg-muted-foreground'
+                                    : isPurchasable
+                                      ? 'bg-green-500'
+                                      : 'bg-red-500'
+                            }`}
                         />
-                        {product.is_active
-                            ? t('product.in_stock', 'In stock')
-                            : t('product.unavailable', 'Unavailable')}
+                        {!product.is_active
+                            ? t('product.unavailable', 'Unavailable')
+                            : isPurchasable
+                              ? t('product.in_stock', 'In stock')
+                              : t('product.out_of_stock', 'Out of Stock')}
                     </span>
 
                     {/* Add to cart */}
-                    <button
-                        onClick={() => {
-                            if (!firstVariantId) return;
-                            addToCart(
-                                { variant_id: firstVariantId, quantity: 1 },
-                                {
-                                    onSuccess: () =>
-                                        toast.success(
-                                            t(
-                                                'product.added_to_cart',
-                                                'Added to cart!',
+                    {!isPurchasable && product.is_active ? (
+                        <Link
+                            href={lp(resolveProductPath(product))}
+                            className="bg-secondary text-secondary-foreground border-input inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold hover:opacity-90 active:scale-[0.98]"
+                        >
+                            {t(
+                                'product.notify_when_available',
+                                'Notify when available',
+                            )}
+                        </Link>
+                    ) : (
+                        <button
+                            onClick={() => {
+                                if (!firstVariantId) return;
+                                addToCart(
+                                    { variant_id: firstVariantId, quantity: 1 },
+                                    {
+                                        onSuccess: () =>
+                                            toast.success(
+                                                t(
+                                                    'product.added_to_cart',
+                                                    'Added to cart!',
+                                                ),
                                             ),
-                                        ),
-                                },
-                            );
-                        }}
-                        disabled={
-                            !product.is_active || !firstVariantId || isPending
-                        }
-                        className="bg-primary text-primary-foreground inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold hover:opacity-90 disabled:opacity-50"
-                    >
-                        <ShoppingCart className="h-4 w-4" aria-hidden="true" />
-                        {isPending
-                            ? t('product.adding', 'Adding…')
-                            : t('product.add_to_cart', 'Add to Cart')}
-                    </button>
+                                    },
+                                );
+                            }}
+                            disabled={
+                                !product.is_active ||
+                                !firstVariantId ||
+                                isPending
+                            }
+                            className="bg-primary text-primary-foreground inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold hover:opacity-90 disabled:opacity-50"
+                        >
+                            <ShoppingCart
+                                className="h-4 w-4"
+                                aria-hidden="true"
+                            />
+                            {isPending
+                                ? t('product.adding', 'Adding…')
+                                : t('product.add_to_cart', 'Add to Cart')}
+                        </button>
+                    )}
 
                     {/* Wishlist */}
                     {firstVariantId > 0 && (

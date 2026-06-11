@@ -108,3 +108,15 @@ export function useMarkReviewHelpful(slug: string) {
         },
     });
 }
+
+export function useSubscribeStock() {
+    return useMutation({
+        mutationFn: ({
+            variantId,
+            email,
+        }: {
+            variantId: number;
+            email: string;
+        }) => apiPost(`/products/variants/${variantId}/subscribe`, { email }),
+    });
+}
