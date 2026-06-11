@@ -21,6 +21,7 @@ Rules every AI tool (Claude Code, Codex, Gemini, Copilot, Cursor, Junie, Cline, 
 11. **MUST** verify: "would a staff engineer approve this diff?"
 12. **MUST** run `make audit` when requested to perform a security audit or security check to properly verify vulnerabilities inside the Docker environment.
 13. **MUST** maintain module parity: when registering or adding a page-builder/dynamic module on the backend (`server/`), you must also implement and handle its presentation on the frontend storefront (`client/`) in `module-renderer.tsx` to ensure feature alignment.
+14. **MUST** adhere to core software engineering principles: **SOLID** (unless it over-complicates), **DRY**, **KISS**, appropriate **Design Patterns**, and **composition over inheritance**.
 
 ## Core Rules — FORBIDDEN
 
