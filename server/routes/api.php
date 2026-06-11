@@ -109,11 +109,13 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::post('consent', [ConsentController::class, 'store'])->name('consent.store');
         Route::delete('consent/{category}', [ConsentController::class, 'withdraw'])->name('consent.withdraw');
 
-        Route::post('analytics/events', [AnalyticsEventController::class, 'store'])->name('analytics.events.store');
-
         Route::get('metafields/{type}/{id}', [ApiMetafieldController::class, 'forResource'])->name('metafields.for-resource');
         Route::get('tags', [TagController::class, 'index'])->name('tags.index');
     });
+
+    Route::post('analytics/events', [AnalyticsEventController::class, 'store'])
+        ->middleware('throttle:api.analytics')
+        ->name('analytics.events.store');
 
     // ── Authenticated core ───────────────────────────────────────────────────
     Route::middleware(['auth:sanctum', 'throttle:api.auth'])->group(function (): void {

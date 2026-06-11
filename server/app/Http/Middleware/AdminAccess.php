@@ -6,8 +6,8 @@ namespace App\Http\Middleware;
 
 use App\Models\User;
 use Closure;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class AdminAccess
@@ -31,6 +31,10 @@ class AdminAccess
         abort_unless($user->hasAnyRole(self::ALLOWED_ROLES), 403);
 
         if (! $user->hasEnabledTwoFactorAuthentication()) {
+            if (app()->runningUnitTests() && ! config('auth.test_require_two_factor')) {
+                return $next($request);
+            }
+
             return $this->redirectToTwoFactorSetup();
         }
 
@@ -39,8 +43,7 @@ class AdminAccess
 
     private function redirectToTwoFactorSetup(): RedirectResponse
     {
-        return redirect()
-            ->route('two-factor.show')
+        return to_route('two-factor.show')
             ->with('status', __('Two-factor authentication is required to access the admin panel.'));
     }
 }

@@ -14,8 +14,6 @@ use App\Http\Controllers\Admin\CustomReportController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DashboardWidgetController;
 use App\Http\Controllers\Admin\Ecommerce\AddressController;
-use App\Http\Controllers\Admin\Ecommerce\CartController;
-use App\Http\Controllers\Admin\Ecommerce\WishlistController;
 use App\Http\Controllers\Admin\ExchangeRateController;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\FormController;
@@ -156,12 +154,6 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('panel')->name(
 
     // Optional - Read only / relations
     Route::prefix('ecommerce')->name('ecommerce.')->group(function (): void {
-        // Carts (read-only)
-        Route::resource('carts', CartController::class)->only(['index', 'show']);
-
-        // Wishlists (read-only)
-        Route::resource('wishlists', WishlistController::class)->only(['index', 'show']);
-
         // Customer Addresses (nested)
         Route::resource('customers.addresses', AddressController::class)->except(['show']);
         Route::post('customers/{customer}/addresses/{address}/set-default', [AddressController::class, 'setDefault'])->name('customers.addresses.set-default');

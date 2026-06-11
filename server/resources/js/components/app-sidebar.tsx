@@ -15,7 +15,6 @@ import {
     Flag,
     FolderOpen,
     GitBranch,
-    Heart,
     HelpCircle,
     Image,
     Languages,
@@ -38,7 +37,6 @@ import {
     Search,
     Settings,
     Shield,
-    ShoppingBag,
     ShoppingCart,
     Star,
     Tag,
@@ -66,7 +64,6 @@ import * as CurrencyController from '@/actions/App/Http/Controllers/Admin/Curren
 import * as CustomReportController from '@/actions/App/Http/Controllers/Admin/CustomReportController';
 import * as AttributeController from '@/actions/App/Http/Controllers/Admin/Ecommerce/AttributeController';
 import * as BrandController from '@/actions/App/Http/Controllers/Admin/Ecommerce/BrandController';
-import * as CartController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CartController';
 import * as CategoryController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CategoryController';
 import * as CustomerController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CustomerController';
 import * as DiscountController from '@/actions/App/Http/Controllers/Admin/Ecommerce/DiscountController';
@@ -80,7 +77,6 @@ import * as ReturnRequestController from '@/actions/App/Http/Controllers/Admin/E
 import * as ReviewController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ReviewController';
 import * as ShippingMethodController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ShippingMethodController';
 import * as TaxRateController from '@/actions/App/Http/Controllers/Admin/Ecommerce/TaxRateController';
-import * as WishlistController from '@/actions/App/Http/Controllers/Admin/Ecommerce/WishlistController';
 import * as ExchangeRateController from '@/actions/App/Http/Controllers/Admin/ExchangeRateController';
 import * as FaqController from '@/actions/App/Http/Controllers/Admin/FaqController';
 import * as FormController from '@/actions/App/Http/Controllers/Admin/FormController';
@@ -272,16 +268,6 @@ export function AppSidebar() {
                   title: __('nav.reviews', 'Reviews'),
                   href: ReviewController.index.url(),
                   icon: Star,
-              },
-              {
-                  title: __('nav.carts', 'Carts'),
-                  href: CartController.index.url(),
-                  icon: ShoppingBag,
-              },
-              {
-                  title: __('nav.wishlists', 'Wishlists'),
-                  href: WishlistController.index.url(),
-                  icon: Heart,
               },
           ]
         : [];

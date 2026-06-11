@@ -3,7 +3,7 @@
 import { GitCompareArrows, Heart, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 
 import { PriceDisplay } from '@/components/price-display';
@@ -30,15 +30,34 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
     const lp = useLocalePath();
     const firstVariantId = product.variants?.[0]?.id ?? 0;
     const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
+    const cardRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        trackBackendEvent('impression', {
-            product_id: product.id,
-            metadata: {
-                name: product.name,
-                price: product.price_min,
+        if (typeof window === 'undefined') return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    trackBackendEvent('impression', {
+                        product_id: product.id,
+                        metadata: {
+                            name: product.name,
+                            price: product.price_min,
+                        },
+                    });
+                    observer.disconnect();
+                }
             },
-        });
+            { threshold: 0.1 },
+        );
+
+        if (cardRef.current) {
+            observer.observe(cardRef.current);
+        }
+
+        return () => {
+            observer.disconnect();
+        };
     }, [product.id, product.name, product.price_min]);
     const inWishlist = useIsInWishlist(firstVariantId);
     const inComparison = useIsInComparison(product.id);
@@ -59,7 +78,10 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
     }
 
     return (
-        <div className="group border-border bg-card flex flex-col overflow-hidden rounded-[var(--store-card-radius)] border transition-all duration-300 ease-out hover:shadow-[var(--store-shadow-lifted)]">
+        <div
+            ref={cardRef}
+            className="group border-border bg-card flex flex-col overflow-hidden rounded-[var(--store-card-radius)] border transition-all duration-300 ease-out hover:shadow-[var(--store-shadow-lifted)]"
+        >
             <Link
                 href={lp(resolveProductPath(product))}
                 className="flex flex-1 flex-col"

@@ -982,7 +982,7 @@ export default function Onboarding({
                                                         forms.payments.data
                                                             .stripe_secret_key
                                                             ? '••••••••'
-                                                        : 'sk_live_...'
+                                                            : 'sk_live_...'
                                                     }
                                                 />
                                             </div>

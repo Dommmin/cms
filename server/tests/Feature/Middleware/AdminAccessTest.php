@@ -10,6 +10,8 @@ use Spatie\Permission\Models\Role;
 uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
+    config(['auth.test_require_two_factor' => true]);
+
     Route::middleware('admin')->get('/_test/admin-access', fn (): string => 'ok');
 
     foreach (['super-admin'] as $roleName) {
