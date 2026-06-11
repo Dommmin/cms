@@ -41,6 +41,7 @@ use App\Observers\CategoryObserver;
 use App\Observers\CustomerObserver;
 use App\Observers\ProductObserver;
 use App\Observers\ProductVariantPriceObserver;
+use App\Observers\ProductVariantStockObserver;
 use App\Observers\WishlistObserver;
 use App\Services\BaseLinkerService;
 use App\Services\GA4MeasurementProtocolService;
@@ -124,6 +125,7 @@ class EcommerceServiceProvider extends ServiceProvider
     {
         Product::observe(ProductObserver::class);
         ProductVariant::observe(ProductVariantPriceObserver::class);
+        ProductVariant::observe(ProductVariantStockObserver::class);
         Category::observe(CategoryObserver::class);
         Wishlist::observe(WishlistObserver::class);
         Customer::observe(CustomerObserver::class);

@@ -407,6 +407,16 @@ class TranslationSeeder extends Seeder
             ['group' => 'admin', 'key' => 'nav.conversations',       'en' => 'Conversations',      'pl' => 'Rozmowy'],
             ['group' => 'admin', 'key' => 'nav.canned_responses',    'en' => 'Canned Responses',   'pl' => 'Gotowe odpowiedzi'],
             ['group' => 'admin', 'key' => 'nav.settings',            'en' => 'Settings',           'pl' => 'Ustawienia'],
+
+            // ── stock notification & cart errors ────────────────────────────────
+            ['group' => 'product', 'key' => 'notify_when_available', 'en' => 'Notify when available', 'pl' => 'Przypomnij jak będzie dostępny'],
+            ['group' => 'product', 'key' => 'notify_email_placeholder', 'en' => 'Enter your email address', 'pl' => 'Wpisz swój adres e-mail'],
+            ['group' => 'product', 'key' => 'notify_submit', 'en' => 'Notify me', 'pl' => 'Powiadom mnie'],
+            ['group' => 'product', 'key' => 'notify_success', 'en' => 'You will be notified when this product is back in stock!', 'pl' => 'Zostaniesz powiadomiony, gdy produkt pojawi się na stanie!'],
+            ['group' => 'product', 'key' => 'notify_already_subscribed', 'en' => 'You are already subscribed to notifications for this product.', 'pl' => 'Już zapisałeś się na powiadomienia o tym produkcie.'],
+            ['group' => 'cart', 'key' => 'add_stock_error', 'en' => 'Product is currently unavailable in the requested quantity.', 'pl' => 'Produkt jest obecnie niedostępny w wybranej ilości.'],
+            ['group' => 'cart', 'key' => 'add_error_generic', 'en' => 'Could not add product to cart. Please try again.', 'pl' => 'Nie udało się dodać produktu do koszyka. Spróbuj ponownie.'],
+            ['group' => 'cart', 'key' => 'update_error_generic', 'en' => 'Could not update cart quantity.', 'pl' => 'Nie udało się zaktualizować ilości w koszyku.'],
         ];
 
         foreach ($translations as $translation) {
