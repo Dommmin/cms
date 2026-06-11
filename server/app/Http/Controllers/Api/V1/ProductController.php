@@ -16,6 +16,7 @@ use App\Models\Category;
 use App\Models\FlashSale;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\ProductVariantStockSubscription;
 use App\Services\SmartCollectionService;
 use App\Services\StorefrontPathService;
 use App\Sorts\RatingSort;
@@ -73,7 +74,7 @@ class ProductController extends ApiController
                 'thumbnail.media',
                 'category',
                 'brand',
-                'activeVariants:id,product_id,price,compare_at_price,stock_quantity,is_active',
+                'activeVariants:id,product_id,price,compare_at_price,stock_quantity,is_active,backorder_allowed',
                 'activeVariants.priceHistory',
                 'activeVariants.attributeValues.attribute',
                 'activeVariants.attributeValues.attributeValue',
@@ -168,6 +169,7 @@ class ProductController extends ApiController
                 'compare_at_price' => $variant->compare_at_price,
                 'stock_quantity' => $variant->stock_quantity,
                 'is_available' => $variant->isInStock(),
+                'backorder_allowed' => (bool) $variant->backorder_allowed,
                 'is_default' => $variant->is_default,
                 'attributes' => $variant->attributeValues->mapWithKeys(
                     fn ($av): array => [$av->attribute->name => $av->attributeValue->value]
@@ -296,7 +298,7 @@ class ProductController extends ApiController
                     $q->orWhere('brand_id', $product->brand_id);
                 }
             })
-            ->with(['thumbnail.media', 'brand', 'activeVariants:id,product_id,price,compare_at_price'])
+            ->with(['thumbnail.media', 'brand', 'activeVariants:id,product_id,price,compare_at_price,stock_quantity,is_active,backorder_allowed'])
             ->inRandomOrder()
             ->limit(8)
             ->get();
@@ -343,6 +345,36 @@ class ProductController extends ApiController
             ->withQueryString();
 
         return $this->collection(ProductResource::collection($products));
+    }
+
+    public function subscribeStock(Request $request, ProductVariant $variant): JsonResponse
+    {
+        $data = $request->validate([
+            'email' => ['required', 'email'],
+        ]);
+
+        $exists = ProductVariantStockSubscription::query()
+            ->where('product_variant_id', $variant->id)
+            ->where('email', $data['email'])
+            ->whereNull('notified_at')
+            ->exists();
+
+        if ($exists) {
+            return $this->ok([
+                'status' => 'already_subscribed',
+                'message' => 'You are already subscribed to stock notifications for this product.',
+            ]);
+        }
+
+        ProductVariantStockSubscription::query()->create([
+            'product_variant_id' => $variant->id,
+            'email' => $data['email'],
+        ]);
+
+        return $this->created([
+            'status' => 'subscribed',
+            'message' => 'You have successfully subscribed to stock notifications.',
+        ]);
     }
 
     /**

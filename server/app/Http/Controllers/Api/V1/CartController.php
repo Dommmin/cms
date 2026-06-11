@@ -39,7 +39,7 @@ class CartController extends ApiController
         $data = $request->validated();
         $variant = ProductVariant::query()->findOrFail($data['variant_id']);
 
-        if ($variant->stock_quantity < $data['quantity']) {
+        if (! $variant->backorder_allowed && $variant->stock_quantity < $data['quantity']) {
             throw ValidationException::withMessages([
                 'quantity' => [sprintf('Not enough stock available. Available: %d', $variant->stock_quantity)],
             ]);
@@ -53,7 +53,7 @@ class CartController extends ApiController
 
         if ($existing) {
             $newQty = $existing->quantity + $data['quantity'];
-            if ($newQty > $variant->stock_quantity) {
+            if (! $variant->backorder_allowed && $newQty > $variant->stock_quantity) {
                 throw ValidationException::withMessages([
                     'quantity' => [sprintf('Not enough stock available. Available: %d', $variant->stock_quantity)],
                 ]);
@@ -83,7 +83,7 @@ class CartController extends ApiController
         $data = $request->validated();
         $variant = $cartItem->variant;
 
-        if ($data['quantity'] > $variant->stock_quantity) {
+        if (! $variant->backorder_allowed && $data['quantity'] > $variant->stock_quantity) {
             throw ValidationException::withMessages([
                 'quantity' => [sprintf('Not enough stock available. Available: %d', $variant->stock_quantity)],
             ]);

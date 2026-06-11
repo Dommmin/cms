@@ -156,7 +156,7 @@ class OrderController extends ApiController
         $skippedCount = 0;
 
         foreach ($order->items as $item) {
-            if (! $item->variant || ! $item->variant->is_active || $item->variant->stock_quantity < 1) {
+            if (! $item->variant || ! $item->variant->is_active || (! $item->variant->backorder_allowed && $item->variant->stock_quantity < 1)) {
                 $skippedCount++;
 
                 continue;
@@ -169,7 +169,7 @@ class OrderController extends ApiController
             } else {
                 $cart->items()->create([
                     'variant_id' => $item->variant_id,
-                    'quantity' => min($item->quantity, $item->variant->stock_quantity),
+                    'quantity' => $item->variant->backorder_allowed ? $item->quantity : min($item->quantity, $item->variant->stock_quantity),
                 ]);
             }
 

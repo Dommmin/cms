@@ -204,9 +204,17 @@ class ProfileController extends ApiController
     {
         $settings = Setting::query()->where('is_public', true)->get();
 
-        $grouped = $settings->groupBy('group')->map(fn ($group) => $group->mapWithKeys(fn ($setting): array => [
-            $setting->key => $setting->value,
-        ]));
+        $grouped = $settings->groupBy('group')->map(fn ($group) => $group->mapWithKeys(function ($setting): array {
+            $value = $setting->value;
+            if ($setting->type === \App\Enums\SettingTypeEnum::Encrypted && $value) {
+                try {
+                    $value = \Illuminate\Support\Facades\Crypt::decryptString((string) $value);
+                } catch (\Exception) {
+                    $value = null;
+                }
+            }
+            return [$setting->key => $value];
+        }));
         $cookieSettings = $grouped->get('cookie', collect());
         $cookieSettings['consent_version'] = $this->legalDocumentVersionService->consentVersionToken();
         $cookieSettings['consent_version_snapshot'] = $this->legalDocumentVersionService->consentVersionSnapshot();
@@ -242,7 +250,7 @@ class ProfileController extends ApiController
         foreach ($relationsToResolve as $type => $ids) {
             $ids = array_values(array_unique($ids));
             if ($type === 'product' && config('modules.ecommerce')) {
-                $products = Product::with(['thumbnail.media', 'brand', 'category', 'activeVariants:id,product_id,price,compare_at_price'])
+                $products = Product::with(['thumbnail.media', 'brand', 'category', 'activeVariants:id,product_id,price,compare_at_price,stock_quantity,is_active,backorder_allowed'])
                     ->whereIn('id', $ids)->get();
 
                 foreach ($products as $product) {

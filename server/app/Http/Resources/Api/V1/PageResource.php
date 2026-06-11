@@ -152,10 +152,12 @@ class PageResource extends JsonResource
             ->limit($maxNeeded)
             ->get();
 
+        $pathService = resolve(StorefrontPathService::class);
         $serialized = $posts->map(fn ($post): array => [
             'id' => $post->id,
             'title' => $post->title,
             'slug' => $post->slug,
+            'public_url' => $pathService->blogPostPath($post),
             'excerpt' => $post->excerpt,
             'featured_image' => $post->featured_image,
             'published_at' => $post->published_at?->toIso8601String(),
@@ -210,7 +212,7 @@ class PageResource extends JsonResource
             $ids = $relations->pluck('relation_id')->unique()->values()->toArray();
 
             if ($type === 'product' && config('modules.ecommerce')) {
-                $products = Product::with(['thumbnail.media', 'brand', 'category', 'activeVariants:id,product_id,price,compare_at_price'])
+                $products = Product::with(['thumbnail.media', 'brand', 'category', 'activeVariants:id,product_id,price,compare_at_price,stock_quantity,is_active,backorder_allowed'])
                     ->whereIn('id', $ids)->get();
 
                 foreach ($products as $product) {

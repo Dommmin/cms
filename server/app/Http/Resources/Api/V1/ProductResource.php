@@ -70,6 +70,8 @@ class ProductResource extends JsonResource
                     'id' => $v->id,
                     'price' => $v->price,
                     'compare_at_price' => $v->compare_at_price,
+                    'is_available' => $v->isInStock(),
+                    'backorder_allowed' => (bool) $v->backorder_allowed,
                 ])->values()->all();
 
                 $cheapestOnSale = $variants
