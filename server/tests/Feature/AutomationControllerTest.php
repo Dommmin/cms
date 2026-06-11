@@ -77,7 +77,7 @@ describe('Marketing Automations admin', function (): void {
 
     it('guest cannot access automation index', function (): void {
         $this->get(route('admin.marketing.automations.index'))
-            ->assertNotFound();
+            ->assertRedirect(route('login'));
     });
 
     it('shows create form with trigger list', function (): void {

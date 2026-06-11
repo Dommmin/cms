@@ -67,7 +67,7 @@ it('unauthenticated request cannot access excel export', function (): void {
 
     $response = $this->get(route('admin.reports.export.excel', $report));
 
-    $response->assertStatus(404);
+    $response->assertRedirect(route('login'));
 });
 
 it('unauthenticated request cannot access pdf export', function (): void {
@@ -75,5 +75,5 @@ it('unauthenticated request cannot access pdf export', function (): void {
 
     $response = $this->get(route('admin.reports.export.pdf', $report));
 
-    $response->assertStatus(404);
+    $response->assertRedirect(route('login'));
 });

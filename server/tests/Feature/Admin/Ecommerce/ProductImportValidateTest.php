@@ -24,7 +24,7 @@ it('blocks unauthenticated access to validate import', function (): void {
     );
 
     $this->post(route('admin.ecommerce.products.import.validate'), ['file' => $file])
-        ->assertStatus(404);
+        ->assertRedirect(route('login'));
 });
 
 it('validates that a file is required', function (): void {

@@ -21,12 +21,12 @@ toast.success = (message, options) => {
         lastFlashToastTime = now;
         return originalSuccess(message, options);
     }
-    
+
     // Suppress manual toast if a flash toast was shown recently (within 500ms)
     if (now - lastFlashToastTime < 500) {
         return '';
     }
-    
+
     lastManualToastTime = now;
     return originalSuccess(message, options);
 };
@@ -37,12 +37,12 @@ toast.error = (message, options) => {
         lastFlashToastTime = now;
         return originalError(message, options);
     }
-    
+
     // Suppress manual toast if a flash toast was shown recently (within 500ms)
     if (now - lastFlashToastTime < 500) {
         return '';
     }
-    
+
     lastManualToastTime = now;
     return originalError(message, options);
 };

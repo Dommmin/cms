@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Str;
 use Inertia\Middleware;
 
@@ -88,29 +89,29 @@ class HandleInertiaRequests extends Middleware
         }
 
         // 1. Check if the message is a direct key under admin
-        if (str_contains($message, '.') && \Illuminate\Support\Facades\Lang::has('admin.' . $message)) {
-            return __('admin.' . $message);
+        if (str_contains($message, '.') && Lang::has('admin.'.$message)) {
+            return __('admin.'.$message);
         }
-        
-        if (\Illuminate\Support\Facades\Lang::has('admin.misc.' . $message)) {
-            return __('admin.misc.' . $message);
+
+        if (Lang::has('admin.misc.'.$message)) {
+            return __('admin.misc.'.$message);
         }
 
         // 2. Check if the message has a direct translation in flash group (e.g. 'flash.Settings saved')
-        if (\Illuminate\Support\Facades\Lang::has('flash.' . $message)) {
-            return __('flash.' . $message);
+        if (Lang::has('flash.'.$message)) {
+            return __('flash.'.$message);
         }
 
         // 3. Dynamic Entity Pattern: "Entity created/updated/deleted [successfully]"
         if (preg_match('/^([A-Za-z\s]+) (created|updated|deleted)(?:\ssuccessfully)?\.?$/i', $message, $matches)) {
-            $entity = trim($matches[1]);
-            $action = strtolower($matches[2]);
+            $entity = mb_trim($matches[1]);
+            $action = mb_strtolower($matches[2]);
 
             // Load translated entity from flash translations if available
-            $translatedEntity = __('flash.entities.' . $entity);
+            $translatedEntity = __('flash.entities.'.$entity);
 
             // If we found a valid translation (meaning it's not returning the key name)
-            if ($translatedEntity !== 'flash.entities.' . $entity) {
+            if ($translatedEntity !== 'flash.entities.'.$entity) {
                 $locale = app()->getLocale();
                 if ($locale === 'pl') {
                     $actionPl = [
@@ -120,13 +121,13 @@ class HandleInertiaRequests extends Middleware
                     ];
 
                     // Gender adjustments for Polish
-                    if (in_array($entity, ['Brand', 'Role', 'Currency', 'Shipping method'])) {
+                    if (in_array($entity, ['Brand', 'Role', 'Currency', 'Shipping method'], true)) {
                         $actionPl = [
                             'created' => 'została pomyślnie utworzona',
                             'updated' => 'została pomyślnie zaktualizowana',
                             'deleted' => 'została pomyślnie usunięta',
                         ];
-                    } elseif (in_array($entity, ['Order', 'Menu'])) {
+                    } elseif (in_array($entity, ['Order', 'Menu'], true)) {
                         $actionPl = [
                             'created' => 'zostało pomyślnie utworzone',
                             'updated' => 'zostało pomyślnie zaktualizowane',
@@ -136,7 +137,7 @@ class HandleInertiaRequests extends Middleware
 
                     return sprintf('%s %s.', $translatedEntity, $actionPl[$action]);
                 }
-                
+
                 // For other locales (e.g. English), construct the standard string
                 return sprintf('%s %s.', $translatedEntity, $action);
             }

@@ -107,8 +107,8 @@ it('requires admin authentication', function (): void {
         'status' => 'shipped',
     ]);
 
-    // Admin routes return 404 for unauthenticated requests (no web session)
-    $response->assertStatus(404);
+    // Admin routes redirect to login for unauthenticated requests
+    $response->assertRedirect(route('login'));
 
     expect((string) $order->fresh()->status)->toBe('processing');
 });
