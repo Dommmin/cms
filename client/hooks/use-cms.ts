@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 
+import type { PublicSettingsResponse } from '@/app/layout.types';
 import { apiGet, apiGetMany, apiGetPage } from '@/lib/api';
 import type {
     BlogCategory,
@@ -97,6 +98,14 @@ export function useStorefrontRoutes() {
     return useQuery({
         queryKey: ['storefront-routes'],
         queryFn: () => apiGet<StorefrontRoutes>('/storefront/routes'),
+        staleTime: 10 * 60 * 1000,
+    });
+}
+
+export function usePublicSettings() {
+    return useQuery({
+        queryKey: ['public-settings'],
+        queryFn: () => apiGet<PublicSettingsResponse>('/settings/public'),
         staleTime: 10 * 60 * 1000,
     });
 }

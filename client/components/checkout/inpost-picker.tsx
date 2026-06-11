@@ -1,5 +1,6 @@
 'use client';
 
+import { usePublicSettings } from '@/hooks/use-cms';
 import { useEffect, useRef } from 'react';
 import type { InPostPoint, InpostPickerProps } from './inpost-picker.types';
 
@@ -116,7 +117,19 @@ export function InpostPicker({
     onChange,
     language = 'pl',
 }: InpostPickerProps) {
-    const token = process.env.NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN ?? '';
+    const { data: publicSettings, isLoading } = usePublicSettings();
+    const token =
+        publicSettings?.settings.shipping?.inpost_geowidget_token ||
+        process.env.NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN ||
+        '';
+
+    if (isLoading) {
+        return (
+            <div className="text-muted-foreground mt-3 text-sm">
+                Loading map widget settings...
+            </div>
+        );
+    }
 
     if (!token) {
         return (
@@ -125,14 +138,8 @@ export function InpostPicker({
                     InPost Paczkomat picker unavailable — missing token
                 </p>
                 <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
-                    Set the following variable in{' '}
-                    <code className="rounded bg-amber-100 px-1 dark:bg-amber-900">
-                        client/.env.local
-                    </code>
-                    :
-                </p>
-                <p className="mt-1.5 font-mono text-xs text-amber-900 dark:text-amber-100">
-                    NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN=
+                    Please configure the token in settings panel: Settings →
+                    Shipping → InPost Geowidget Token
                 </p>
             </div>
         );

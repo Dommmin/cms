@@ -80,6 +80,12 @@ export type PublicSettingsResponse = {
         };
         social?: Record<string, string>;
         cookie?: CookieSettings;
+        shipping?: {
+            inpost_geowidget_token?: string;
+        };
+        integrations?: {
+            google_maps_api_key?: string;
+        };
     };
     legal?: {
         consent_version: string;

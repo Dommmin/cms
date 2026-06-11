@@ -250,6 +250,7 @@ export function AddressFieldset({
         suggestions: { status, data: suggestions },
         setValue: setStreetQuery,
         clearSuggestions,
+        init,
     } = usePlacesAutocomplete({
         requestOptions: {
             componentRestrictions: {
@@ -257,7 +258,45 @@ export function AddressFieldset({
             },
         },
         debounce: 300,
+        initOnMount:
+            typeof window !== 'undefined' &&
+            !!(window as Window & { google?: typeof google }).google?.maps
+                ?.places,
     });
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const win = window as Window & { google?: typeof google };
+            if (win.google?.maps?.places) {
+                init();
+            } else {
+                const checkGoogleMaps = () => {
+                    if (win.google?.maps?.places) {
+                        init();
+                        return true;
+                    }
+                    return false;
+                };
+
+                if (checkGoogleMaps()) return;
+
+                const interval = setInterval(() => {
+                    if (checkGoogleMaps()) {
+                        clearInterval(interval);
+                    }
+                }, 500);
+
+                const timeout = setTimeout(() => {
+                    clearInterval(interval);
+                }, 30000);
+
+                return () => {
+                    clearInterval(interval);
+                    clearTimeout(timeout);
+                };
+            }
+        }
+    }, [init]);
 
     const errors = validateAddress(value);
 

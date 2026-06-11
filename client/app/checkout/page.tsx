@@ -19,7 +19,7 @@ import {
     usePaymentMethods,
     useShippingMethods,
 } from '@/hooks/use-checkout';
-import { useStorefrontRoutes } from '@/hooks/use-cms';
+import { usePublicSettings, useStorefrontRoutes } from '@/hooks/use-cms';
 import { useCurrency } from '@/hooks/use-currency';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useAddresses, useCreateAddress } from '@/hooks/use-profile';
@@ -79,7 +79,12 @@ export default function CheckoutPage() {
     const lp = useLocalePath();
     const queryClient = useQueryClient();
     const { data: storefrontRoutes } = useStorefrontRoutes();
+    const { data: publicSettings } = usePublicSettings();
     const productListing = storefrontRoutes?.product_listing;
+    const googleMapsApiKey =
+        publicSettings?.settings.integrations?.google_maps_api_key ||
+        process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ||
+        '';
     const [mounted] = useState(() => typeof window !== 'undefined');
     const [token, setToken] = useState<string | null>(() =>
         typeof window !== 'undefined' ? getToken() : null,
@@ -417,9 +422,9 @@ export default function CheckoutPage() {
 
     return (
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-            {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY && (
+            {googleMapsApiKey && (
                 <Script
-                    src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
+                    src={`https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places`}
                     strategy="lazyOnload"
                 />
             )}
