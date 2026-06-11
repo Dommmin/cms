@@ -157,3 +157,47 @@ Run relevant focused tests first, then full quality gates before commit:
 - make fix
 - make check
 ```
+
+---
+
+## Security / Auth / Identity Audit
+
+```text
+Przeprowadź audyt bezpieczeństwa tożsamości i operacji wrażliwych dla CMS + Ecommerce.
+
+Nie ograniczaj się do samego loginu.
+Sprawdź:
+- auth, session, recovery, passkeys, 2FA, OTP, social login
+- role / permissions / policies / guards
+- admin vs storefront jako dwa osobne modele ryzyka
+- audit logs, login history, device history, suspicious activity
+- brute force, enumeration, replay, CSRF, session fixation
+- operacje finansowe, settings, role changes, impersonation, exports
+
+Wynik:
+- opisz stan obecny na bazie kodu
+- wypisz luki i ryzyka
+- podziel rekomendacje na MUST / SHOULD / COULD
+- wskaż konkretnie, co dotyczy klientów, a co adminów
+- jeśli coś jest częściowo wdrożone, nazwij dokładnie brakujące elementy
+```
+
+---
+
+## Security / Auth Implementation
+
+```text
+Zaimplementuj wskazany element security/auth/identity zgodnie z istniejącą architekturą projektu.
+
+Zasady:
+- najpierw znajdź najbliższy existing pattern w repo
+- nie dodawaj nowej architektury bez potrzeby
+- użyj FormRequest dla walidacji
+- dodaj Pest testy dla zachowania
+- jeśli zmieniasz backend contract, sprawdź też client/types/api.ts i powiązane frontendowe użycie
+- dla akcji high-risk rozważ step-up auth i audyt
+
+Przed zakończeniem:
+- sprawdź wpływ na enumy, policy, rate limiting i user experience
+- opisz residual risk, jeśli coś zostało celowo poza zakresem
+```
