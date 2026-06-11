@@ -1,5 +1,5 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import { ShieldBan, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ShieldBan, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 import Heading from '@/components/heading';
 import TwoFactorRecoveryCodes from '@/components/two-factor-recovery-codes';
@@ -132,7 +132,10 @@ export default function TwoFactor({
                 >
                     <div className="space-y-6">
                         <Button asChild variant="ghost" size="sm" className="px-0">
-                            <Link href={dashboard.url()}>Back to panel</Link>
+                            <Link href={dashboard.url()}>
+                                <ArrowLeft />
+                                Back to panel
+                            </Link>
                         </Button>
                         {controls}
                     </div>
