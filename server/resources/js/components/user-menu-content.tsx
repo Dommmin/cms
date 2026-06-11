@@ -1,5 +1,6 @@
 import { Form, Link } from '@inertiajs/react';
-import { LogOut, Settings, Shield } from 'lucide-react';
+import { Lock, LogOut, Shield } from 'lucide-react';
+import PasswordController from '@/actions/App/Http/Controllers/Admin/Security/PasswordController';
 import {
     DropdownMenuItem,
     DropdownMenuLabel,
@@ -8,7 +9,6 @@ import {
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { logout } from '@/routes';
-import { edit as profileEdit } from '@/routes/profile';
 import { show as twoFactorShow } from '@/routes/two-factor';
 import type { UserMenuContentProps } from './user-menu-content.types';
 
@@ -24,9 +24,9 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-                <Link href={profileEdit.url()} className="cursor-pointer">
-                    <Settings className="mr-2 h-4 w-4" />
-                    Profile settings
+                <Link href={PasswordController.edit.url()} className="cursor-pointer">
+                    <Lock className="mr-2 h-4 w-4" />
+                    Password
                 </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>

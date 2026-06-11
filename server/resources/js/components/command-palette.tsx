@@ -7,9 +7,10 @@ import {
     Folders,
     LayoutDashboard,
     Loader2,
+    Lock,
     Package,
     Search,
-    Settings,
+    Shield,
     ShoppingCart,
     Users,
 } from 'lucide-react';
@@ -20,8 +21,9 @@ import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageCo
 import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
 import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
 import * as NewsletterCampaignController from '@/actions/App/Http/Controllers/Admin/NewsletterCampaignController';
-import * as SettingsController from '@/actions/App/Http/Controllers/Admin/SettingsController';
+import PasswordController from '@/actions/App/Http/Controllers/Admin/Security/PasswordController';
 import * as UserController from '@/actions/App/Http/Controllers/Admin/UserController';
+import { show as twoFactorShow } from '@/routes/two-factor';
 
 import { cn } from '@/lib/utils';
 import { dashboard } from '@/routes/admin';
@@ -76,9 +78,15 @@ const NAV_SHORTCUTS: NavShortcut[] = [
     },
     {
         group: 'Navigate',
-        label: 'Settings',
-        url: SettingsController.index.url(),
-        icon: <Settings className="h-4 w-4" />,
+        label: 'Password',
+        url: PasswordController.edit.url(),
+        icon: <Lock className="h-4 w-4" />,
+    },
+    {
+        group: 'Navigate',
+        label: 'Two-factor Auth',
+        url: twoFactorShow.url(),
+        icon: <Shield className="h-4 w-4" />,
     },
 ];
 

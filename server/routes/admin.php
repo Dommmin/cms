@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\OnboardingWizardController;
 use App\Http\Controllers\Admin\PreviewController;
 use App\Http\Controllers\Admin\PrivacyRequestController;
 use App\Http\Controllers\Admin\ReferralController;
+use App\Http\Controllers\Admin\Security\PasswordController as AdminPasswordController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\RteLinkController;
 use App\Http\Controllers\Admin\SearchAnalyticsController;
@@ -78,6 +79,9 @@ Route::middleware(['admin', AdminSessionTimeout::class])->prefix('panel')->name(
     Route::get('/activity-log', [ActivityLogController::class, 'index'])->middleware('role:admin|super-admin')->name('activity-log.index');
     Route::get('/activity-log/export', [ActivityLogController::class, 'export'])->middleware('role:admin|super-admin')->name('activity-log.export');
     Route::get('/preview', PreviewController::class)->name('preview');
+
+    Route::get('security/password', [AdminPasswordController::class, 'edit'])->name('security.password.edit');
+    Route::put('security/password', [AdminPasswordController::class, 'update'])->name('security.password.update');
 
     // Model Versioning
     Route::prefix('versions/{type}/{id}')->name('versions.')->group(function (): void {

@@ -151,7 +151,8 @@ return [
         Features::twoFactorAuthentication([
             'confirm' => true,
             'confirmPassword' => true,
-            // 'window' => 0
+            // Allow a small TOTP clock drift between the device and server.
+            'window' => 2,
         ]),
     ],
 
