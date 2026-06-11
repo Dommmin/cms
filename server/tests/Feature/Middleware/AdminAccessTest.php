@@ -22,9 +22,9 @@ beforeEach(function (): void {
     }
 });
 
-it('hides the admin panel from guests', function (): void {
+it('redirects guests to login from the admin panel', function (): void {
     $this->get('/_test/admin-access')
-        ->assertNotFound();
+        ->assertRedirect(route('login'));
 });
 
 it('forbids authenticated users without an admin role', function (): void {

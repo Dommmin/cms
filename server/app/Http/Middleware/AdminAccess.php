@@ -26,7 +26,9 @@ class AdminAccess
     {
         $user = $request->user();
 
-        abort_unless($user instanceof User, 404);
+        if (! $user instanceof User) {
+            return redirect()->guest(route('login'));
+        }
 
         abort_unless($user->hasAnyRole(self::ALLOWED_ROLES), 403);
 
