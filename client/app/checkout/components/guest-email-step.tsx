@@ -82,9 +82,9 @@ export function GuestEmailStep({
         setIsLoading(true);
         try {
             const response = await verifyOtp({ email: otpEmail, code });
-            setToken(response.token);
+            setToken(response.token!);
             toast.success(t('auth.login_success', 'Successfully logged in!'));
-            onLoginSuccess(response.token);
+            onLoginSuccess(response.token!);
         } catch (err: unknown) {
             const axiosError = err as {
                 response?: {

@@ -23,6 +23,8 @@ use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Cashier\Billable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Passkeys\Contracts\PasskeyUser;
+use Laravel\Passkeys\PasskeyAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
 use Spatie\Activitylog\Models\Activity;
@@ -111,7 +113,7 @@ use Spatie\Permission\Traits\HasRoles;
     'two_factor_recovery_codes',
     'remember_token',
 ])]
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {
     use Billable;
     use HasApiTokens;
@@ -119,6 +121,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasRoles;
     use LogsActivity;
     use Notifiable;
+    use PasskeyAuthenticatable;
     use SoftDeletes;
     use TwoFactorAuthenticatable;
 

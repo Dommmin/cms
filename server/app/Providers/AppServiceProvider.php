@@ -6,6 +6,8 @@ namespace App\Providers;
 
 use App\Models\BlogPost;
 use App\Models\Page;
+use App\Models\PersonalAccessToken;
+use App\Models\User;
 use App\Observers\BlogPostObserver;
 use App\Observers\MediaObserver;
 use App\Observers\PageObserver;
@@ -27,6 +29,8 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Passkeys\Passkeys;
+use Laravel\Sanctum\Sanctum;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
 
@@ -68,6 +72,9 @@ class AppServiceProvider extends ServiceProvider
         $this->configureMailFromSettings();
         $this->configureIntegrationsFromSettings();
         $this->registerObservers();
+
+        Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
+        Passkeys::useUserModel(User::class);
     }
 
     protected function registerObservers(): void

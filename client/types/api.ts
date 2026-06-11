@@ -67,8 +67,10 @@ export interface ConsentPreferences {
 }
 
 export interface AuthResponse {
-    token: string;
-    user: User;
+    token?: string;
+    user?: User;
+    two_factor_challenge?: boolean;
+    challenge_token?: string;
 }
 
 export interface LoginPayload {

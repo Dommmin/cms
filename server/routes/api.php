@@ -6,7 +6,10 @@ use App\Http\Controllers\Api\V1\AddressController;
 use App\Http\Controllers\Api\V1\AnalyticsEventController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
+use App\Http\Controllers\Api\V1\Auth\PasskeyApiController;
+use App\Http\Controllers\Api\V1\Auth\SessionApiController;
 use App\Http\Controllers\Api\V1\Auth\SocialLoginController;
+use App\Http\Controllers\Api\V1\Auth\TwoFactorApiController;
 use App\Http\Controllers\Api\V1\Blog\BlogCategoryController as ApiBlogCategoryController;
 use App\Http\Controllers\Api\V1\Blog\BlogCommentController as ApiBlogCommentController;
 use App\Http\Controllers\Api\V1\Blog\BlogController as ApiBlogController;
@@ -62,6 +65,11 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::post('otp/send', [AuthController::class, 'sendOtp'])->name('otp.send');
         Route::post('otp/verify', [AuthController::class, 'verifyOtp'])->name('otp.verify');
 
+        // 2FA & Passkey public challenge routes
+        Route::post('two-factor/challenge', [TwoFactorApiController::class, 'challenge'])->name('two-factor.challenge');
+        Route::get('passkeys/login/options', [PasskeyApiController::class, 'loginOptions'])->name('passkeys.login.options');
+        Route::post('passkeys/login', [PasskeyApiController::class, 'login'])->name('passkeys.login');
+
         // Social login
         Route::get('social/{provider}/redirect', [SocialLoginController::class, 'redirect'])->name('social.redirect');
         Route::post('social/{provider}/callback', [SocialLoginController::class, 'callback'])->name('social.callback');
@@ -73,6 +81,25 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
                 ->middleware('signed')
                 ->name('email.verify');
             Route::post('email/resend', [EmailVerificationController::class, 'resend'])->name('email.resend');
+
+            // Two-Factor Authentication API
+            Route::get('two-factor/qr-code', [TwoFactorApiController::class, 'qrCode'])->name('two-factor.qr-code');
+            Route::get('two-factor/recovery-codes', [TwoFactorApiController::class, 'recoveryCodes'])->name('two-factor.recovery-codes');
+            Route::post('two-factor/authentication', [TwoFactorApiController::class, 'enable'])->name('two-factor.enable');
+            Route::post('two-factor/confirmed-authentication', [TwoFactorApiController::class, 'confirm'])->name('two-factor.confirm');
+            Route::delete('two-factor/authentication', [TwoFactorApiController::class, 'disable'])->name('two-factor.disable');
+            Route::post('two-factor/recovery-codes', [TwoFactorApiController::class, 'regenerateRecoveryCodes'])->name('two-factor.regenerate-recovery-codes');
+
+            // Passkeys API
+            Route::get('passkeys', [PasskeyApiController::class, 'index'])->name('passkeys.index');
+            Route::get('passkeys/register/options', [PasskeyApiController::class, 'registerOptions'])->name('passkeys.register.options');
+            Route::post('passkeys/register', [PasskeyApiController::class, 'register'])->name('passkeys.register');
+            Route::delete('passkeys/{id}', [PasskeyApiController::class, 'destroy'])->name('passkeys.destroy');
+
+            // Active Sessions API
+            Route::get('sessions', [SessionApiController::class, 'index'])->name('sessions.index');
+            Route::delete('sessions/{id}', [SessionApiController::class, 'destroy'])->name('sessions.destroy');
+            Route::delete('sessions', [SessionApiController::class, 'destroyOthers'])->name('sessions.destroy-others');
         });
     });
 

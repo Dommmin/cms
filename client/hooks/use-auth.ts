@@ -11,6 +11,9 @@ import {
     login,
     logout,
     register,
+    verifyOtp,
+    verifyPasskeyLogin,
+    verifyTwoFactorChallenge,
 } from '@/api/auth';
 import { getCartToken } from '@/api/cart';
 import { clearWishlistToken, getWishlistToken } from '@/api/wishlist';
@@ -127,7 +130,11 @@ export function useLogin() {
 
     const mutation = useMutation({
         mutationFn: (payload: LoginPayload) => login(payload),
-        onSuccess: ({ token, user }) => {
+        onSuccess: (response) => {
+            if (response.two_factor_challenge) {
+                return;
+            }
+            const { token, user } = response;
             const redirect = getPendingRedirect();
             const cartToken = getCartToken();
             const wishlistToken = getWishlistToken();
@@ -138,14 +145,14 @@ export function useLogin() {
 
             if (hasGuestCart || hasGuestWishlist) {
                 // Hold auth state and show the merge dialog.
-                pendingRef.current = { token, user, redirect };
+                pendingRef.current = { token: token!, user, redirect };
                 setMergeDialogState({
                     cartCount: hasGuestCart ? cartCount : 0,
                     wishlistCount: hasGuestWishlist ? wishlistCount : 0,
                 });
             } else {
                 // No guest data — fast path, commit immediately.
-                commitLogin(token, user, redirect);
+                commitLogin(token!, user, redirect);
             }
         },
     });
@@ -176,6 +183,10 @@ export function useLogin() {
             payload: Omit<LoginPayload, 'cart_token' | 'wishlist_token'>,
             options?: Parameters<typeof mutation.mutate>[1],
         ) => mutation.mutate(payload as LoginPayload, options),
+        mutateAsync: (
+            payload: Omit<LoginPayload, 'cart_token' | 'wishlist_token'>,
+            options?: Parameters<typeof mutation.mutateAsync>[1],
+        ) => mutation.mutateAsync(payload as LoginPayload, options),
         mergeDialogState,
         confirmMerge,
     };
@@ -209,13 +220,13 @@ export function useRegister() {
             const hasGuestWishlist = !!wishlistToken && wishlistCount > 0;
 
             if (hasGuestCart || hasGuestWishlist) {
-                pendingRef.current = { token, user, redirect };
+                pendingRef.current = { token: token!, user, redirect };
                 setMergeDialogState({
                     cartCount: hasGuestCart ? cartCount : 0,
                     wishlistCount: hasGuestWishlist ? wishlistCount : 0,
                 });
             } else {
-                commitLogin(token, user, redirect);
+                commitLogin(token!, user, redirect);
             }
         },
     });
@@ -287,9 +298,53 @@ export function useSocialCallback(provider: SocialProvider) {
         onSuccess: ({ token, user }) => {
             // Social login merges silently on the first authenticated cart /
             // wishlist fetch, so keep guest tokens until that happens.
-            commitLogin(token, user, getPendingRedirect(), {
+            commitLogin(token!, user, getPendingRedirect(), {
                 preserveGuestTokens: true,
             });
+        },
+    });
+}
+
+// ── useOtpVerify ─────────────────────────────────────────────────────────────
+
+export function useOtpVerify() {
+    const queryClient = useQueryClient();
+    const commitLogin = buildCommitLogin(setToken, queryClient, trackLogin);
+
+    return useMutation({
+        mutationFn: verifyOtp,
+        onSuccess: (response) => {
+            if (response.two_factor_challenge) return;
+            commitLogin(response.token!, response.user, getPendingRedirect());
+        },
+    });
+}
+
+// ── useTwoFactorChallenge ─────────────────────────────────────────────────────
+
+export function useTwoFactorChallenge() {
+    const queryClient = useQueryClient();
+    const commitLogin = buildCommitLogin(setToken, queryClient, trackLogin);
+
+    return useMutation({
+        mutationFn: verifyTwoFactorChallenge,
+        onSuccess: ({ token, user }) => {
+            commitLogin(token!, user, getPendingRedirect());
+        },
+    });
+}
+
+// ── usePasskeyLogin ───────────────────────────────────────────────────────────
+
+export function usePasskeyLogin() {
+    const queryClient = useQueryClient();
+    const commitLogin = buildCommitLogin(setToken, queryClient, trackLogin);
+
+    return useMutation({
+        mutationFn: verifyPasskeyLogin,
+        onSuccess: (response) => {
+            if (response.two_factor_challenge) return;
+            commitLogin(response.token!, response.user, getPendingRedirect());
         },
     });
 }

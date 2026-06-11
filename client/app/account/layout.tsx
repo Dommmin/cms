@@ -1,6 +1,13 @@
 'use client';
 
-import { Heart, LogOut, Package, RefreshCw, User } from 'lucide-react';
+import {
+    Heart,
+    LogOut,
+    Package,
+    RefreshCw,
+    ShieldCheck,
+    User,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -44,6 +51,11 @@ export default function AccountLayout({
             href: '/account/profile',
             label: t('nav.profile', 'Profile'),
             icon: User,
+        },
+        {
+            href: '/account/security',
+            label: t('account.security', 'Security'),
+            icon: ShieldCheck,
         },
     ];
 

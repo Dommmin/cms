@@ -51,6 +51,16 @@ class AuthController extends ApiController
             ]);
         }
 
+        if ($user->hasEnabledTwoFactorAuthentication()) {
+            $challengeToken = Str::random(40);
+            cache()->put('2fa_challenge_'.$challengeToken, $user->id, now()->addMinutes(5));
+
+            return $this->ok([
+                'two_factor_challenge' => true,
+                'challenge_token' => $challengeToken,
+            ]);
+        }
+
         $token = $user->createToken('api')->plainTextToken;
 
         return $this->ok([
