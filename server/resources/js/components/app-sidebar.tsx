@@ -35,6 +35,7 @@ import {
     Receipt,
     RotateCcw,
     Search,
+    Settings,
     Shield,
     ShoppingCart,
     Star,
@@ -92,6 +93,7 @@ import * as ReferralController from '@/actions/App/Http/Controllers/Admin/Referr
 import * as RoleController from '@/actions/App/Http/Controllers/Admin/RoleController';
 import * as SearchAnalyticsController from '@/actions/App/Http/Controllers/Admin/SearchAnalyticsController';
 import * as SearchSynonymController from '@/actions/App/Http/Controllers/Admin/SearchSynonymController';
+import * as SettingsController from '@/actions/App/Http/Controllers/Admin/SettingsController';
 import * as StoreController from '@/actions/App/Http/Controllers/Admin/StoreController';
 import * as SupportCannedResponseController from '@/actions/App/Http/Controllers/Admin/SupportCannedResponseController';
 import * as SupportConversationController from '@/actions/App/Http/Controllers/Admin/SupportConversationController';
@@ -460,6 +462,11 @@ export function AppSidebar() {
             title: __('nav.privacy_requests', 'Privacy Requests'),
             href: PrivacyRequestController.index.url(),
             icon: Shield,
+        },
+        {
+            title: __('nav.settings', 'Settings'),
+            href: SettingsController.index.url(),
+            icon: Settings,
         },
     ];
 
