@@ -135,6 +135,7 @@ export interface ProductVariant {
     omnibus_price: number | null;
     stock_quantity: number;
     is_available: boolean;
+    backorder_allowed?: boolean;
     attributes: Record<string, string>;
     tax_rate?: number | null;
 }
