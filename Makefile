@@ -114,7 +114,7 @@ scout-import:
 # Setup test database
 setup-test-db:
 	docker compose exec mysql mysql -uroot -psecret -e "CREATE DATABASE IF NOT EXISTS laravel_test;"
-	docker compose exec -e DB_CONNECTION=mysql -e DB_DATABASE=laravel_test php php artisan migrate:fresh
+	docker compose exec -e DB_CONNECTION=mysql -e DB_DATABASE=laravel_test php php artisan migrate
 
 # Run tests
 test: setup-test-db

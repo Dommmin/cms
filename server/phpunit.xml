@@ -37,5 +37,6 @@
         <env name="NIGHTWATCH_ENABLED" value="false"/>
         <env name="SCOUT_DRIVER" value="collection"/>
         <env name="GOTENBERG_URL" value="http://gotenberg:3000"/>
+        <env name="LARAVEL_PDF_DRIVER" value="dompdf"/>
     </php>
 </phpunit>

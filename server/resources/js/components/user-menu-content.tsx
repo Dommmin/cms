@@ -24,7 +24,10 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-                <Link href={PasswordController.edit.url()} className="cursor-pointer">
+                <Link
+                    href={PasswordController.edit.url()}
+                    className="cursor-pointer"
+                >
                     <Lock className="mr-2 h-4 w-4" />
                     Password
                 </Link>

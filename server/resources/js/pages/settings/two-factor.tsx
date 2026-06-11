@@ -7,8 +7,8 @@ import TwoFactorSetupModal from '@/components/two-factor-setup-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
-import AuthLayout from '@/layouts/auth-layout';
 import AppLayout from '@/layouts/app-layout';
+import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { dashboard } from '@/routes/admin';
 import { disable, enable, show } from '@/routes/two-factor';
@@ -131,7 +131,12 @@ export default function TwoFactor({
                     description="Enable or manage two-factor authentication before continuing."
                 >
                     <div className="space-y-6">
-                        <Button asChild variant="ghost" size="sm" className="px-0">
+                        <Button
+                            asChild
+                            variant="ghost"
+                            size="sm"
+                            className="px-0"
+                        >
                             <Link href={dashboard.url()}>
                                 <ArrowLeft />
                                 Back to panel
@@ -142,7 +147,9 @@ export default function TwoFactor({
                 </AuthLayout>
             ) : (
                 <AppLayout breadcrumbs={breadcrumbs}>
-                    <h1 className="sr-only">Two-Factor Authentication Settings</h1>
+                    <h1 className="sr-only">
+                        Two-Factor Authentication Settings
+                    </h1>
 
                     <SettingsLayout>
                         <div className="space-y-6">

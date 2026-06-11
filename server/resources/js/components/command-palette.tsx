@@ -23,10 +23,10 @@ import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommer
 import * as NewsletterCampaignController from '@/actions/App/Http/Controllers/Admin/NewsletterCampaignController';
 import PasswordController from '@/actions/App/Http/Controllers/Admin/Security/PasswordController';
 import * as UserController from '@/actions/App/Http/Controllers/Admin/UserController';
-import { show as twoFactorShow } from '@/routes/two-factor';
 
 import { cn } from '@/lib/utils';
 import { dashboard } from '@/routes/admin';
+import { show as twoFactorShow } from '@/routes/two-factor';
 import type { NavShortcut, SearchResult } from './command-palette.types';
 
 // ── Types ──────────────────────────────────────────────────────────────────
