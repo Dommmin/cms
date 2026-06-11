@@ -26,7 +26,7 @@ class SetLocale
             }
         }
 
-        if ($request->is('admin*') || $request->is('admin/*')) {
+        if ($request->is('admin*') || $request->is('admin/*') || $request->is('panel*') || $request->is('panel/*')) {
             $requested = $request->cookie('admin_locale') ?? config('app.locale');
         } else {
             $requested = $request->query('locale') ?? $request->getPreferredLanguage($active) ?? config('app.locale');
