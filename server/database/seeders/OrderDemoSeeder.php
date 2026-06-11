@@ -125,17 +125,21 @@ class OrderDemoSeeder extends Seeder
 
                 // Create Product Reviews for Delivered orders randomly
                 if ($status === DeliveredState::class && random_int(1, 100) > 70) {
-                    ProductReview::query()->create([
-                        'product_id' => $variant->product_id,
-                        'customer_id' => $customer->id,
-                        'order_id' => $order->id,
-                        'rating' => random_int(3, 5),
-                        'title' => fake()->sentence(3),
-                        'body' => fake()->paragraph(),
-                        'status' => ReviewStatusEnum::Approved,
-                        'is_verified_purchase' => true,
-                        'created_at' => $orderDate->copy()->addDays(random_int(2, 10)),
-                    ]);
+                    ProductReview::query()->firstOrCreate(
+                        [
+                            'product_id' => $variant->product_id,
+                            'customer_id' => $customer->id,
+                        ],
+                        [
+                            'order_id' => $order->id,
+                            'rating' => random_int(3, 5),
+                            'title' => fake()->sentence(3),
+                            'body' => fake()->paragraph(),
+                            'status' => ReviewStatusEnum::Approved,
+                            'is_verified_purchase' => true,
+                            'created_at' => $orderDate->copy()->addDays(random_int(2, 10)),
+                        ]
+                    );
                 }
             }
 

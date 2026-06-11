@@ -56,7 +56,7 @@ class MenuSeeder extends Seeder
             // Non-CMS routes — Custom link type, localised by the frontend
             [
                 'label' => ['en' => 'Shop', 'pl' => 'Sklep'],
-                'url' => '/products',
+                'url' => '/shop',
                 'link_type' => MenuLinkTypeEnum::Custom,
                 'position' => 1,
             ],

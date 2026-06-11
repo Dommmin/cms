@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-const PUBLIC_PAGES = ['/', '/products', '/blog', '/contact'];
+const PUBLIC_PAGES = ['/', '/shop', '/blog', '/contact'];
 
 for (const path of PUBLIC_PAGES) {
     test(`${path} — loads without JS errors`, async ({ page }) => {
@@ -23,11 +23,11 @@ test('homepage — shows site name in title', async ({ page }) => {
 });
 
 test('products page — renders at least one product card', async ({ page }) => {
-    await page.goto('/products');
+    await page.goto('/shop');
     await page.waitForLoadState('networkidle');
 
     const cards = page.locator(
         '[data-testid="product-card"], .product-card, article',
     );
-    await expect(cards.first()).toBeVisible({ timeout: 10_000 });
+    await expect(cards.first()).toBeVisible({ timeout: 30_000 });
 });

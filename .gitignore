@@ -48,3 +48,5 @@ server/supervisord.pid
 mobile/.agents/
 
 .playwright-mcp
+client/playwright-report
+client/test-results

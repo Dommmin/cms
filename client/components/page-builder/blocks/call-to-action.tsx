@@ -33,20 +33,18 @@ export function CallToActionBlock({ block }: CallToActionProps) {
     const isLight = style === 'plain';
 
     return (
-        <div
-            className={`relative rounded-2xl px-8 py-16`}
-            style={{ gap: 'var(--block-gap, 1.5rem)' }}
-        >
+        <div className="relative w-full">
             {style === 'image' && bgImageUrl && (
                 <Image
                     src={bgImageUrl}
                     alt=""
                     fill
-                    className="object-cover opacity-30"
+                    className="absolute inset-0 z-0 rounded-2xl object-cover opacity-30"
                 />
             )}
             <div
-                className={`relative flex flex-col ${containerStyle} rounded-2xl px-8 py-16 ${alignClass}`}
+                className={`relative z-10 flex flex-col ${containerStyle} rounded-2xl px-8 py-16 ${alignClass}`}
+                style={{ gap: 'var(--block-gap, 1.5rem)' }}
             >
                 {cfg.badge_text && (
                     <span className="inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-semibold tracking-wider uppercase">

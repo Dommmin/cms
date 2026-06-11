@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Actions\AnonymizeUserData;
+use App\Enums\SettingTypeEnum;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\DestroyAccountRequest;
 use App\Http\Requests\Api\V1\RestrictProcessingRequest;
@@ -25,9 +26,11 @@ use App\Notifications\AccountDeletedNotification;
 use App\Services\LegalDocumentVersionService;
 use App\Services\PrivacyRequestService;
 use App\Services\StorefrontPathService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -206,13 +209,14 @@ class ProfileController extends ApiController
 
         $grouped = $settings->groupBy('group')->map(fn ($group) => $group->mapWithKeys(function ($setting): array {
             $value = $setting->value;
-            if ($setting->type === \App\Enums\SettingTypeEnum::Encrypted && $value) {
+            if ($setting->type === SettingTypeEnum::Encrypted && $value) {
                 try {
-                    $value = \Illuminate\Support\Facades\Crypt::decryptString((string) $value);
-                } catch (\Exception) {
+                    $value = Crypt::decryptString((string) $value);
+                } catch (Exception) {
                     $value = null;
                 }
             }
+
             return [$setting->key => $value];
         }));
         $cookieSettings = $grouped->get('cookie', collect());

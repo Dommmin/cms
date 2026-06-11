@@ -766,7 +766,7 @@ export default function ProductsClient({
                 )}
             </AnimatePresence>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-[auto_minmax(0,1fr)]">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
                 <AnimatePresence initial={false}>
                     {showDesktopFilters && (
                         <motion.aside
@@ -777,7 +777,7 @@ export default function ProductsClient({
                                 duration: 0.3,
                                 ease: [0.16, 1, 0.3, 1],
                             }}
-                            className="hidden overflow-hidden lg:block"
+                            className="hidden shrink-0 overflow-hidden lg:block"
                         >
                             <div className="border-border bg-card sticky top-24 max-h-[calc(100vh-7rem)] w-[18rem] overflow-y-auto rounded-[var(--store-card-radius)] border p-4 shadow-[var(--store-shadow-soft)]">
                                 {renderFiltersPanel('products-desktop-filters')}
@@ -786,7 +786,7 @@ export default function ProductsClient({
                     )}
                 </AnimatePresence>
 
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                     {isLoading ? (
                         viewMode === 'grid' ? (
                             <div

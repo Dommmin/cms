@@ -108,8 +108,8 @@ class PagesDemoSeeder extends Seeder
             'is_published' => true,
             'published_at' => now(),
             'position' => 1,
-            'seo_title' => 'Shop the Best Fashion, Home & Lifestyle',
-            'seo_description' => 'Discover curated collections of fashion, home décor, beauty, and sportswear. Free shipping on orders over €75.',
+            'seo_title' => 'Enterprise Headless Commerce & CMS Platform',
+            'seo_description' => 'A fully integrated, headless platform for modern merchants. Combine powerful CMS, Product Information Management (PIM), and omnichannel sales.',
         ]);
 
         $page->allSections()->delete();
@@ -117,95 +117,101 @@ class PagesDemoSeeder extends Seeder
         $pos = 1;
 
         // ── 1 · Hero Banner ─────────────────────────────────────────────────
-        $s = $this->section($page, 'hero', 'full-width', 'light', ['padding' => 'none'], $pos++);
+        $s = $this->section($page, 'hero', 'flush', 'light', ['padding' => 'none'], $pos++);
         $this->block($page, $s, 'hero_banner', [
-            'title' => 'Style Meets Substance',
-            'subtitle' => 'Curated fashion, home décor and lifestyle essentials — crafted to last and designed to inspire.',
-            'cta_text' => 'Shop Now',
-            'cta_url' => '/products',
+            'title' => 'The Ultimate Commerce Architecture',
+            'subtitle' => 'Scale your business with our enterprise-grade headless commerce platform. Seamlessly unify product management, content, and omnichannel sales.',
+            'cta_text' => 'Explore Storefront',
+            'cta_url' => '/shop',
             'cta_style' => 'primary',
-            'cta2_text' => 'Explore Collections',
-            'cta2_url' => '/categories',
+            'cta2_text' => 'Admin Dashboard',
+            'cta2_url' => '/admin',
             'cta2_style' => 'outline',
-            'overlay_opacity' => 45,
+            'overlay_opacity' => 60,
             'text_alignment' => 'center',
-            'min_height' => 620,
+            'min_height' => 700,
         ], 1);
 
-        // ── 2 · Trust Badges ─────────────────────────────────────────────────
+        // ── 2 · Trust Badges (Tech Stack) ───────────────────────────────────
         $s = $this->section($page, 'standard', 'contained', 'muted', ['padding' => 'md', 'animation' => 'fade-up'], $pos++);
         $this->block($page, $s, 'trust_badges', [
             'style' => 'row',
             'badges' => [
-                ['icon' => 'truck', 'label' => 'Free Shipping', 'sublabel' => 'On orders over €75'],
-                ['icon' => 'return', 'label' => '30-Day Returns', 'sublabel' => 'Hassle-free returns'],
-                ['icon' => 'lock', 'label' => 'Secure Payments', 'sublabel' => '256-bit SSL encryption'],
-                ['icon' => 'award', 'label' => 'Premium Quality', 'sublabel' => 'Ethically sourced'],
-                ['icon' => 'users', 'label' => '12,000+ Customers', 'sublabel' => 'Trusted worldwide'],
+                ['icon' => 'zap', 'label' => 'Next.js Storefront', 'sublabel' => 'Lightning fast rendering'],
+                ['icon' => 'database', 'label' => 'Laravel Backend', 'sublabel' => 'Robust enterprise API'],
+                ['icon' => 'layout', 'label' => 'Inertia Admin', 'sublabel' => 'React-powered dashboard'],
+                ['icon' => 'shield', 'label' => 'Secure Architecture', 'sublabel' => 'Enterprise-grade security'],
+                ['icon' => 'search', 'label' => 'SEO Optimized', 'sublabel' => 'Built for discoverability'],
             ],
         ], 1);
 
-        // ── 3 · Brands Slider ───────────────────────────────────────────────
-        $s = $this->section($page, 'standard', 'full-width', 'light', ['padding' => 'md', 'animation' => 'fade-in'], $pos++);
-        $brandsBlock = $this->block($page, $s, 'brands_slider', [
-            'title' => 'Our Featured Brands',
-            'source' => 'all',
-            'speed' => 'normal',
-            'logo_height' => 44,
-            'grayscale' => true,
+        // ── 3 · Features Grid ───────────────────────────────────────────────
+        $s = $this->section($page, 'standard', 'contained', 'light', ['padding' => 'xl', 'animation' => 'fade-up'], $pos++);
+        $this->block($page, $s, 'icon_list', [
+            'title' => 'Platform Capabilities',
+            'subtitle' => 'Everything you need to build, scale, and manage a high-performance e-commerce business.',
+            'columns' => 3,
+            'style' => 'centered',
+            'items' => [
+                ['icon' => 'box', 'title' => 'Product Information Management', 'description' => 'Centralize your product catalog with unlimited attributes, variants, and dynamic pricing rules.'],
+                ['icon' => 'edit', 'title' => 'Visual Page Builder', 'description' => 'Empower your marketing team with our drag-and-drop CMS. Build stunning pages without writing code.'],
+                ['icon' => 'globe', 'title' => 'Headless Storefront', 'description' => 'Deliver incredible shopping experiences on any device with our decoupled Next.js architecture.'],
+                ['icon' => 'activity', 'title' => 'Real-time Analytics', 'description' => 'Make data-driven decisions with built-in reports, conversion tracking, and sales analytics.'],
+                ['icon' => 'layers', 'title' => 'Omnichannel Ready', 'description' => 'Sell everywhere. Manage inventory, orders, and returns across all channels from a single dashboard.'],
+                ['icon' => 'users', 'title' => 'Role-Based Access Control', 'description' => 'Granular permissions ensure your team has access only to the tools they need to succeed.'],
+            ],
         ], 1);
-        $this->attachBrands($brandsBlock);
 
         // ── 4 · Stats Counter ───────────────────────────────────────────────
-        $s = $this->section($page, 'standard', 'contained', 'light', ['padding' => 'xl', 'animation' => 'fade-up'], $pos++);
+        $s = $this->section($page, 'standard', 'contained', 'muted', ['padding' => 'xl', 'animation' => 'fade-up'], $pos++);
         $this->block($page, $s, 'stats_counter', [
-            'title' => 'Numbers That Speak for Themselves',
-            'subtitle' => 'Built on trust, driven by quality.',
+            'title' => 'Built for Scale',
+            'subtitle' => 'Performance metrics that drive real business results.',
             'style' => 'plain',
             'columns' => 4,
             'animate_numbers' => true,
             'stats' => [
-                ['value' => '12000', 'suffix' => '+', 'label' => 'Happy Customers', 'icon' => 'users'],
-                ['value' => '98', 'suffix' => '%', 'label' => 'Satisfaction Rate', 'icon' => 'star'],
-                ['value' => '50', 'suffix' => '+', 'label' => 'Curated Brands', 'icon' => 'award'],
-                ['value' => '30', 'suffix' => '', 'label' => 'Day Return Policy', 'icon' => 'shield'],
+                ['value' => '99', 'suffix' => '.9%', 'label' => 'Uptime SLA', 'icon' => 'server'],
+                ['value' => '50', 'suffix' => 'ms', 'label' => 'API Response Time', 'icon' => 'zap'],
+                ['value' => '40', 'suffix' => '%', 'label' => 'Conversion Increase', 'icon' => 'trending-up'],
+                ['value' => '100', 'suffix' => 'k+', 'label' => 'Requests/sec', 'icon' => 'activity'],
             ],
         ], 1);
 
-        // ── 5 · Categories Grid ─────────────────────────────────────────────
-        $s = $this->section($page, 'standard', 'contained', 'muted', ['padding' => 'xl', 'animation' => 'fade-up'], $pos++);
-        $catBlock = $this->block($page, $s, 'categories_grid', [
-            'title' => 'Shop by Category',
-            'subtitle' => "Find exactly what you're looking for",
-            'columns' => 4,
-            'show_title' => true,
-        ], 1);
-        $topCats = Category::query()->whereNull('parent_id')->orderBy('position')->take(4)->get();
-        foreach ($topCats as $i => $cat) {
-            BlockRelation::query()->updateOrCreate(['page_block_id' => $catBlock->id, 'relation_type' => 'category', 'relation_id' => $cat->id], ['relation_key' => 'categories', 'position' => $i + 1, 'metadata' => []]);
-        }
-
-        // ── 6 · How It Works ────────────────────────────────────────────────
+        // ── 5 · How It Works ────────────────────────────────────────────────
         $s = $this->section($page, 'standard', 'contained', 'light', ['padding' => 'xl', 'animation' => 'fade-up'], $pos++);
         $this->block($page, $s, 'steps_process', [
-            'title' => 'How It Works',
-            'subtitle' => 'Shopping with us is simple, transparent, and enjoyable.',
+            'title' => 'Merchant Workflows',
+            'subtitle' => 'Streamline your daily operations with intelligent automation.',
             'layout' => 'horizontal',
             'steps' => [
-                ['title' => 'Browse & Discover', 'description' => 'Explore hundreds of curated products across fashion, home, beauty, and sport.'],
-                ['title' => 'Add to Cart', 'description' => 'Select your size, colour, and quantity. Save favourites to your wishlist.'],
-                ['title' => 'Fast Secure Checkout', 'description' => 'Pay your way — card, PayPal, Apple Pay or BLIK. SSL-encrypted every time.'],
-                ['title' => 'Delivered to You', 'description' => 'Tracked shipping in 3–5 days. Free on orders over €75.'],
+                ['title' => 'Inventory Sync', 'description' => 'Automatically synchronize stock levels across multiple warehouses and sales channels.'],
+                ['title' => 'Order Routing', 'description' => 'Intelligent routing assigns orders to the optimal fulfillment center.'],
+                ['title' => 'Fulfillment', 'description' => 'Generate picking lists, packing slips, and shipping labels with one click.'],
+                ['title' => 'Customer Retention', 'description' => 'Automated follow-ups, review requests, and personalized marketing campaigns.'],
             ],
+        ], 1);
+
+        // ── 6 · Promotional CTA Banner ──────────────────────────────────────
+        $s = $this->section($page, 'banner', 'contained', 'light', ['padding' => 'xl', 'animation' => 'zoom-in'], $pos++);
+        $this->block($page, $s, 'call_to_action', [
+            'title' => 'Experience the Storefront',
+            'subtitle' => 'See our platform in action. Browse our demo store filled with rich product data, variants, and categories.',
+            'alignment' => 'center',
+            'style' => 'gradient',
+            'primary_label' => 'Browse Storefront Demo',
+            'primary_url' => '/shop',
+            'secondary_label' => 'Read the Blog',
+            'secondary_url' => '/blog',
         ], 1);
 
         // ── 7 · Featured Products (Bestsellers) ─────────────────────────────
         $s = $this->section($page, 'standard', 'contained', 'muted', ['padding' => 'xl', 'animation' => 'fade-up'], $pos++);
         $featBlock = $this->block($page, $s, 'featured_products', [
-            'title' => 'Bestsellers',
-            'subtitle' => 'Our most-loved pieces, chosen by the community',
+            'title' => 'Storefront Example: Products',
+            'subtitle' => 'This block dynamically renders your product catalog using the API.',
             'columns' => 4,
-            'view_all_url' => '/products',
+            'view_all_url' => '/shop',
             'view_all_label' => 'View all products',
         ], 1);
         $bestsellers = Product::query()->whereHas('flags', fn ($q) => $q->where('name', 'Bestseller'))->take(8)->get();
@@ -217,77 +223,11 @@ class PagesDemoSeeder extends Seeder
             BlockRelation::query()->updateOrCreate(['page_block_id' => $featBlock->id, 'relation_type' => 'product', 'relation_id' => $product->id], ['relation_key' => 'products', 'position' => $i + 1, 'metadata' => []]);
         }
 
-        // ── 8 · Why Choose Us (Icon List) ───────────────────────────────────
-        $s = $this->section($page, 'standard', 'contained', 'light', ['padding' => 'xl', 'animation' => 'fade-left'], $pos++);
-        $this->block($page, $s, 'icon_list', [
-            'title' => 'Why Thousands Choose Us',
-            'subtitle' => "We've built every part of our service around what matters most to you.",
-            'columns' => 2,
-            'style' => 'horizontal',
-            'items' => [
-                ['icon' => 'leaf', 'title' => 'Ethically Sourced', 'description' => 'Every brand in our network is audited annually for fair wages, safe conditions, and sustainable sourcing practices.'],
-                ['icon' => 'award', 'title' => 'Curated Quality', 'description' => "Our team hand-picks each product. If it doesn't meet our standards for materials and craftsmanship, it doesn't make the cut."],
-                ['icon' => 'truck', 'title' => 'Fast & Free Shipping', 'description' => 'Free tracked delivery on all orders over €75. Orders placed before 1 PM are dispatched the same day.'],
-                ['icon' => 'return', 'title' => 'Easy 30-Day Returns', 'description' => 'Changed your mind? No problem. Return anything within 30 days for a full refund, no questions asked.'],
-                ['icon' => 'lock', 'title' => 'Bank-Grade Security', 'description' => 'Your payment data is protected by 256-bit SSL encryption and processed by a PCI-DSS Level 1 provider.'],
-                ['icon' => 'users', 'title' => 'Dedicated Support', 'description' => 'Real humans available Monday–Friday 9–17. Average response time under 2 hours.'],
-            ],
-        ], 1);
-
-        // ── 9 · Promotional CTA Banner ──────────────────────────────────────
-        $s = $this->section($page, 'banner', 'full-width', 'dark', ['padding' => 'xl', 'animation' => 'zoom-in'], $pos++);
-        $this->block($page, $s, 'call_to_action', [
-            'title' => 'New Season. New Arrivals.',
-            'subtitle' => 'Up to 40% off selected styles — this weekend only. Fresh drops across fashion, home, and beauty.',
-            'alignment' => 'center',
-            'style' => 'gradient',
-            'badge_text' => '🔥 Weekend Flash Sale',
-            'primary_label' => 'Shop the Sale',
-            'primary_url' => '/sale',
-            'secondary_label' => 'View New Arrivals',
-            'secondary_url' => '/new-arrivals',
-        ], 1);
-
-        // ── 10 · Testimonials ───────────────────────────────────────────────
-        $s = $this->section($page, 'standard', 'contained', 'muted', ['padding' => 'xl', 'animation' => 'fade-up'], $pos++);
-        $this->block($page, $s, 'testimonials', [
-            'title' => 'What Our Customers Say',
-            'subtitle' => 'Over 12,000 satisfied customers and counting.',
-            'layout' => 'grid',
-            'columns' => 2,
-            'items' => [
-                [
-                    'author' => 'Anna K.',
-                    'rating' => 5,
-                    'content' => 'Absolutely love the quality. The fabric on my new jacket is buttery soft and the fit is perfect. Delivery was faster than expected — will definitely be ordering again!',
-                    'role' => 'Warsaw, Poland',
-                ],
-                [
-                    'author' => 'Marcus T.',
-                    'rating' => 5,
-                    'content' => 'The packaging was beautiful and the candle set I ordered smells incredible. Perfect gift. Arrived in 2 days — seriously impressive.',
-                    'role' => 'Berlin, Germany',
-                ],
-                [
-                    'author' => 'Sophie R.',
-                    'rating' => 5,
-                    'content' => 'I was hesitant to buy shoes online but the size guide was spot on. They arrived exactly as pictured. Stunning craftsmanship — you can feel the quality.',
-                    'role' => 'Paris, France',
-                ],
-                [
-                    'author' => 'Liam O.',
-                    'rating' => 5,
-                    'content' => 'Great customer service when I needed to exchange a size. The process was seamless and the team replied within an hour. Exceptional all around.',
-                    'role' => 'Dublin, Ireland',
-                ],
-            ],
-        ], 1);
-
-        // ── 11 · Featured Posts ─────────────────────────────────────────────
+        // ── 8 · Featured Posts ─────────────────────────────────────────────
         $s = $this->section($page, 'standard', 'contained', 'light', ['padding' => 'xl', 'animation' => 'fade-up'], $pos++);
         $postsBlock = $this->block($page, $s, 'featured_posts', [
-            'title' => 'From the Journal',
-            'subtitle' => 'Style guides, sustainability stories, and maker spotlights.',
+            'title' => 'Latest Commerce Insights',
+            'subtitle' => 'Content managed directly within the CMS platform.',
             'source' => 'latest',
             'max_items' => 3,
             'columns' => 3,
@@ -302,31 +242,6 @@ class PagesDemoSeeder extends Seeder
         foreach ($latestPosts as $i => $post) {
             BlockRelation::query()->updateOrCreate(['page_block_id' => $postsBlock->id, 'relation_type' => 'blog_post', 'relation_id' => $post->id], ['relation_key' => 'posts', 'position' => $i + 1, 'metadata' => []]);
         }
-
-        // ── 12 · Countdown Timer (Flash Sale) ───────────────────────────────
-        $saleEnd = now()->addDays(3)->setTime(23, 59, 0)->toIso8601String();
-        $s = $this->section($page, 'banner', 'full-width', 'dark', ['padding' => 'xl', 'animation' => 'zoom-in'], $pos++);
-        $this->block($page, $s, 'countdown_timer', [
-            'title' => '⚡ Flash Sale — Ends In',
-            'subtitle' => 'Up to 50% off selected items. Limited stock, limited time.',
-            'target_date' => $saleEnd,
-            'show_labels' => true,
-            'expired_message' => 'This sale has ended. Check back for our next event!',
-            'cta_label' => 'Shop Sale Now',
-            'cta_url' => '/sale',
-            'style' => 'dark',
-        ], 1);
-
-        // ── 13 · Newsletter Signup ──────────────────────────────────────────
-        $s = $this->section($page, 'banner', 'full-width', 'brand', ['padding' => 'xl'], $pos++);
-        $this->block($page, $s, 'newsletter_signup', [
-            'title' => 'Join the Inner Circle',
-            'subtitle' => 'Get early access to new drops, exclusive offers, and style inspiration — straight to your inbox.',
-            'placeholder' => 'Enter your email address',
-            'button_label' => 'Subscribe Free',
-            'success_message' => 'Welcome aboard! Check your inbox for a 10% discount code.',
-            'gdpr_note' => 'By subscribing you agree to our Privacy Policy. Unsubscribe at any time.',
-        ], 1);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -350,7 +265,7 @@ class PagesDemoSeeder extends Seeder
         $pos = 1;
 
         // ── 1 · Hero ─────────────────────────────────────────────────────────
-        $s = $this->section($page, 'hero', 'full-width', 'dark', [], $pos++);
+        $s = $this->section($page, 'hero', 'flush', 'light', ['padding' => 'none'], $pos++);
         $this->block($page, $s, 'hero_banner', [
             'title' => 'Made with Intention',
             'subtitle' => 'We believe great design should be accessible to everyone — without compromising on ethics or the planet.',
@@ -432,14 +347,14 @@ class PagesDemoSeeder extends Seeder
         ], 1);
 
         // ── 7 · CTA ──────────────────────────────────────────────────────────
-        $s = $this->section($page, 'banner', 'full-width', 'dark', ['padding' => 'xl', 'animation' => 'zoom-in'], $pos++);
+        $s = $this->section($page, 'banner', 'contained', 'light', ['padding' => 'xl', 'animation' => 'zoom-in'], $pos++);
         $this->block($page, $s, 'call_to_action', [
             'title' => 'Shop Our Collections',
             'subtitle' => 'Every purchase supports the artisans behind our products and moves us closer to a more sustainable future.',
             'alignment' => 'center',
             'style' => 'gradient',
             'primary_label' => 'Browse All Products',
-            'primary_url' => '/products',
+            'primary_url' => '/shop',
             'secondary_label' => 'Meet Our Brands',
             'secondary_url' => '/brands',
         ], 1);
@@ -636,7 +551,7 @@ class PagesDemoSeeder extends Seeder
         }
 
         // Map
-        $s = $this->section($page, 'standard', 'flush', 'light', ['padding' => 'none', 'animation' => 'fade-in'], $pos++);
+        $s = $this->section($page, 'standard', 'contained', 'light', ['padding' => 'lg', 'animation' => 'fade-in'], $pos++);
         $this->block($page, $s, 'map', [
             'title' => 'Our Office',
             'lat' => 52.229676,
@@ -667,12 +582,12 @@ class PagesDemoSeeder extends Seeder
         $pos = 1;
 
         // ── 1 · Hero Banner ─────────────────────────────────────────────────
-        $s = $this->section($page, 'hero', 'full-width', 'light', ['padding' => 'none'], $pos++);
+        $s = $this->section($page, 'hero', 'flush', 'light', ['padding' => 'none'], $pos++);
         $this->block($page, $s, 'hero_banner', [
             'title' => 'Styl i Jakość w Jednym',
             'subtitle' => 'Starannie wyselekcjonowana moda, dekoracje domu i niezbędniki lifestyle\'owe — stworzone na lata, zaprojektowane z inspiracją.',
             'cta_text' => 'Kup teraz',
-            'cta_url' => '/produkty',
+            'cta_url' => '/sklep',
             'cta_style' => 'primary',
             'cta2_text' => 'Przeglądaj kolekcje',
             'cta2_url' => '/kategorie',
@@ -755,7 +670,7 @@ class PagesDemoSeeder extends Seeder
             'title' => 'Bestsellery',
             'subtitle' => 'Nasze najpopularniejsze produkty, wybrane przez społeczność',
             'columns' => 4,
-            'view_all_url' => '/produkty',
+            'view_all_url' => '/sklep',
             'view_all_label' => 'Zobacz wszystkie produkty',
         ], 1);
         $bestsellers = Product::query()->whereHas('flags', fn ($q) => $q->where('name', 'Bestseller'))->take(8)->get();
@@ -785,7 +700,7 @@ class PagesDemoSeeder extends Seeder
         ], 1);
 
         // ── 9 · Promotional CTA Banner ──────────────────────────────────────
-        $s = $this->section($page, 'banner', 'full-width', 'dark', ['padding' => 'xl', 'animation' => 'zoom-in'], $pos++);
+        $s = $this->section($page, 'banner', 'contained', 'light', ['padding' => 'xl', 'animation' => 'zoom-in'], $pos++);
         $this->block($page, $s, 'call_to_action', [
             'title' => 'Nowy sezon. Nowe kolekcje.',
             'subtitle' => 'Do 40% rabatu na wybrane style — tylko w ten weekend. Nowe produkty z mody, domu i urody.',
@@ -855,7 +770,7 @@ class PagesDemoSeeder extends Seeder
 
         // ── 12 · Countdown Timer (Flash Sale) ───────────────────────────────
         $saleEnd = now()->addDays(3)->setTime(23, 59, 0)->toIso8601String();
-        $s = $this->section($page, 'banner', 'full-width', 'dark', ['padding' => 'xl', 'animation' => 'zoom-in'], $pos++);
+        $s = $this->section($page, 'banner', 'contained', 'light', ['padding' => 'xl', 'animation' => 'zoom-in'], $pos++);
         $this->block($page, $s, 'countdown_timer', [
             'title' => '⚡ Flash Sale — kończy się za',
             'subtitle' => 'Do 50% taniej na wybrane produkty. Ograniczony czas, ograniczone stany.',
@@ -868,7 +783,7 @@ class PagesDemoSeeder extends Seeder
         ], 1);
 
         // ── 13 · Newsletter Signup ──────────────────────────────────────────
-        $s = $this->section($page, 'banner', 'full-width', 'brand', ['padding' => 'xl'], $pos++);
+        $s = $this->section($page, 'banner', 'contained', 'light', ['padding' => 'xl'], $pos++);
         $this->block($page, $s, 'newsletter_signup', [
             'title' => 'Dołącz do naszej społeczności',
             'subtitle' => 'Otrzymuj wcześniejszy dostęp do nowości, ekskluzywne oferty i inspiracje stylistyczne — prosto do swojej skrzynki.',
@@ -896,7 +811,7 @@ class PagesDemoSeeder extends Seeder
         $pos = 1;
 
         // ── 1 · Hero ─────────────────────────────────────────────────────────
-        $s = $this->section($page, 'hero', 'full-width', 'dark', [], $pos++);
+        $s = $this->section($page, 'hero', 'flush', 'light', ['padding' => 'none'], $pos++);
         $this->block($page, $s, 'hero_banner', [
             'title' => 'Tworzymy z intencją',
             'subtitle' => 'Wierzymy, że świetny design powinien być dostępny dla każdego — bez kompromisów w kwestii etyki i środowiska.',
@@ -978,14 +893,14 @@ class PagesDemoSeeder extends Seeder
         ], 1);
 
         // ── 7 · CTA ──────────────────────────────────────────────────────────
-        $s = $this->section($page, 'banner', 'full-width', 'dark', ['padding' => 'xl', 'animation' => 'zoom-in'], $pos++);
+        $s = $this->section($page, 'banner', 'contained', 'light', ['padding' => 'xl', 'animation' => 'zoom-in'], $pos++);
         $this->block($page, $s, 'call_to_action', [
             'title' => 'Przeglądaj nasze kolekcje',
             'subtitle' => 'Każdy zakup wspiera rzemieślników za naszymi produktami i przybliża nas do bardziej zrównoważonej przyszłości.',
             'alignment' => 'center',
             'style' => 'gradient',
             'primary_label' => 'Przeglądaj wszystkie produkty',
-            'primary_url' => '/produkty',
+            'primary_url' => '/sklep',
             'secondary_label' => 'Poznaj nasze marki',
             'secondary_url' => '/marki',
         ], 1);

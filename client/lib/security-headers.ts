@@ -39,7 +39,10 @@ export function buildStaticSecurityHeaders(
         },
     ];
 
-    if (options.includeStrictTransportSecurity) {
+    if (
+        options.includeStrictTransportSecurity &&
+        process.env.NEXT_PUBLIC_API_URL?.startsWith('https')
+    ) {
         headers.push({
             key: 'Strict-Transport-Security',
             value: 'max-age=31536000; includeSubDomains',
@@ -69,7 +72,9 @@ export function buildContentSecurityPolicy({
         `base-uri 'self'`,
         `form-action 'self'`,
         frameAncestors,
-        `upgrade-insecure-requests`,
+        process.env.NEXT_PUBLIC_API_URL?.startsWith('https')
+            ? `upgrade-insecure-requests`
+            : '',
     ]
         .filter(Boolean)
         .join('; ');

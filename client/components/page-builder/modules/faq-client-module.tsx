@@ -1,5 +1,6 @@
 'use client';
 
+import { Input } from '@/components/ui/input';
 import { useTranslation } from '@/hooks/use-translation';
 import { sanitizeHtml } from '@/lib/sanitize';
 import { cn } from '@/lib/utils';
@@ -182,15 +183,15 @@ export function FaqClientModule({
                 {/* Search Bar Container */}
                 <div className="mx-auto mb-10 max-w-2xl">
                     <div className="group relative">
-                        <div className="text-muted-foreground group-focus-within:text-primary pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 transition-colors">
+                        <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                             <Search className="h-5 w-5" />
                         </div>
-                        <input
+                        <Input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder={texts.searchPlaceholder}
-                            className="border-border bg-card text-foreground placeholder-muted-foreground focus:border-primary focus:ring-primary block w-full rounded-2xl border py-4 pr-12 pl-11 text-base shadow-xs transition-all focus:ring-1 focus:outline-hidden md:text-lg"
+                            className="bg-card h-14 w-full rounded-2xl pr-12 pl-11 text-base shadow-xs md:text-lg"
                         />
                         {searchQuery && (
                             <button
@@ -281,7 +282,7 @@ export function FaqClientModule({
                                 <motion.div
                                     key={faq.id}
                                     layout="position"
-                                    initial={{ opacity: 0, y: 12 }}
+                                    initial={false}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.95 }}
                                     transition={{ duration: 0.2 }}
